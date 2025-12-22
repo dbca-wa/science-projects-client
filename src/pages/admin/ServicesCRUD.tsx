@@ -6,65 +6,44 @@ import {
   getAllDepartmentalServices,
 } from "@/features/admin/services/admin.service";
 import type { IDepartmentalService } from "@/shared/types";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Spinner,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export const ServicesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
   const [selectedDirector, setSelectedDirector] = useState<number>();
+  const [addIsOpen, setAddIsOpen] = useState(false);
   const nameData = watch("name");
-
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createDepartmentalService,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
+      toast.success("Created", {
+        description: "Service created successfully",
       });
-      onAddClose();
+      setAddIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Failed to create service",
       });
     },
     onMutate: () => {
@@ -109,67 +88,58 @@ export const ServicesCRUD = () => {
       setCountOfItems(slices.length);
     }
   }, [searchTerm, slices]);
-
-  const { colorMode } = useColorMode();
   return (
     <>
       <Head title="Services" />
 
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <h2 className="text-lg font-semibold">
                 Departmental Services ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </h2>
+            </div>
+            <div className="flex w-full mt-4 gap-4">
               <Input
                 type="text"
                 placeholder="Search service by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="flex-1 max-w-[65%]"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end flex-1">
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white"
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
-            <Grid
-              gridTemplateColumns="5fr 4fr 1fr"
-              mt={4}
-              width="100%"
-              p={3}
-              borderWidth={1}
-              borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+              </div>
+            </div>
+            <div
+              className="grid grid-cols-[5fr_4fr_1fr] mt-4 w-full p-3 border border-b-0 last:border-b"
+              style={{
+                borderBottomWidth: filteredSlices.length === 0 ? "1px" : "0",
+              }}
             >
-              <Flex justifyContent="flex-start">
-                <Text as="b">Service</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Executive Director</Text>
-              </Flex>
-              <Flex justifyContent="flex-end" mr={2}>
-                <Text as="b">Change</Text>
-              </Flex>
-            </Grid>
+              <div className="flex justify-start">
+                <span className="font-bold">Service</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Executive Director</span>
+              </div>
+              <div className="flex justify-end mr-2">
+                <span className="font-bold">Change</span>
+              </div>
+            </div>
 
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {filteredSlices
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((s) => (
@@ -180,36 +150,36 @@ export const ServicesCRUD = () => {
                     director={s.director}
                   />
                 ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Service</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={10}
-                  as="form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Add Service</SheetTitle>
+                <SheetDescription>
+                  Create a new departmental service
+                </SheetDescription>
+              </SheetHeader>
+              <div className="py-6">
+                <form
+                  className="space-y-6"
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  <FormControl>
-                    <FormLabel>Name</FormLabel>
-                    <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
-                      <Input
-                        autoComplete="off"
-                        autoFocus
-                        {...register("name", { required: true })}
-                        required
-                        type="text"
-                      />
-                    </InputGroup>
-                  </FormControl>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      autoComplete="off"
+                      autoFocus
+                      {...register("name", { required: true })}
+                      required
+                      type="text"
+                    />
+                  </div>
 
-                  <FormControl>
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("director", { required: true })}
                       onlyInternal={false}
@@ -220,40 +190,33 @@ export const ServicesCRUD = () => {
                       isEditable
                       helperText={"The director of the Service"}
                     />
-                  </FormControl>
+                  </div>
                   {mutation.isError ? (
-                    <Box mt={4}>
+                    <div className="mt-4">
                       {Object.keys(
                         (mutation.error as AxiosError).response.data,
                       ).map((key) => (
-                        <Box key={key}>
+                        <div key={key}>
                           {(
                             (mutation.error as AxiosError).response.data[
                               key
                             ] as string[]
                           ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
+                            <p key={`${key}-${index}`} className="text-red-500">
                               {`${key}: ${errorMessage}`}
-                            </Text>
+                            </p>
                           ))}
-                        </Box>
+                        </div>
                       ))}
-                    </Box>
+                    </div>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </form>
+              </div>
+              <SheetFooter>
                 <Button
-                  // form="add-form"
-                  // type="submit"
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  disabled={mutation.isPending}
+                  className="bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white w-full"
                   size="lg"
-                  width={"100%"}
                   onClick={() => {
                     onSubmit({
                       old_id: 1,
@@ -262,11 +225,14 @@ export const ServicesCRUD = () => {
                     });
                   }}
                 >
+                  {mutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </>
       )}
     </>

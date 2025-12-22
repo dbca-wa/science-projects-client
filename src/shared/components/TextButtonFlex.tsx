@@ -1,4 +1,4 @@
-import { Flex, Text, useColorMode } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 
 interface IProps {
   onClick?: () => void;
@@ -6,34 +6,23 @@ interface IProps {
 }
 
 export const TextButtonFlex = ({ onClick, name }: IProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  
   return (
-    <Flex
-      justifyContent="flex-start"
-      // textOverflow="ellipsis"
-      maxW="100%"
-      pr={8}
-      alignItems={"center"}
-    >
-      <Text
-        variant={"link"}
-        color={
-          name ? (colorMode === "light" ? "blue.500" : "blue.400") : undefined
-        }
-        _hover={
-          name && {
-            textDecoration: "underline",
-            color: colorMode === "light" ? "blue.400" : "blue.300",
-          }
-        }
-        fontWeight={"semibold"}
+    <div className="flex justify-start max-w-full pr-8 items-center">
+      <span
+        className={`font-semibold whitespace-normal text-ellipsis ${
+          name
+            ? `${
+                isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-500 hover:text-blue-400"
+              } hover:underline cursor-pointer`
+            : ""
+        }`}
         onClick={onClick && onClick}
-        whiteSpace="normal"
-        textOverflow="ellipsis"
-        cursor={name && "pointer"}
       >
         {name ?? "-"}
-      </Text>
-    </Flex>
+      </span>
+    </div>
   );
 };

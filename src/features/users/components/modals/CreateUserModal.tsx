@@ -1,18 +1,14 @@
 // Modal version of CreateUser component
 
 import { CreateUser } from "@/pages/users/CreateUser";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 
 interface IAddUserModalProps {
   isOpen: boolean;
@@ -20,8 +16,7 @@ interface IAddUserModalProps {
 }
 
 export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
-  const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -30,29 +25,26 @@ export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
   };
 
   const navigate = useNavigate();
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Add User</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Add User</DialogTitle>
+        </DialogHeader>
+        <div className="p-6">
           <CreateUser
             isModal
             onClose={handleToastClose}
             onSuccess={() => navigate("/users")}
           />
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

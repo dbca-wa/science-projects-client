@@ -1,8 +1,6 @@
 // Component for adjusting the layout to Modern
 
 import { Outlet } from "react-router-dom";
-
-import { Box, Spinner } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { ModernHeader } from "../../Navigation/ModernHeader";
@@ -13,27 +11,15 @@ export const ModernLayout = () => {
   const { loading } = useLayoutSwitcher();
 
   return (
-    <Box
-      display={"flex"}
-      minH={"100vh"}
-      maxH={"100vh"}
-      w={"100vw"}
-      overscrollBehaviorY={"none"}
-      pos={"fixed"}
-    >
+    <div className="flex min-h-screen max-h-screen w-screen overscroll-none fixed">
       <Sidebar />
-      <Box flex={1} h={"100vh"} overflow={"auto"} pos="relative">
+      <div className="flex-1 h-screen overflow-auto relative">
         <ModernHeader />
         <ModernPageWrapper>
           {loading ? (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height="100vh"
-            >
-              <Spinner size="xl" />
-            </Box>
+            <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-500"></div>
+            </div>
           ) : (
             <motion.div
               key={location.pathname}
@@ -49,7 +35,7 @@ export const ModernLayout = () => {
             </motion.div>
           )}
         </ModernPageWrapper>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

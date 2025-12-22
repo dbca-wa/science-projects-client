@@ -1,18 +1,11 @@
 // Component for changing the layout between modern and traditional
 
-import {
-  Box,
-  Button,
-  IconButton,
-  MenuItem,
-  Text,
-  useColorMode,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 import { AnimatePresence, motion } from "framer-motion";
 import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { cn } from "@/shared/utils";
 
 interface IOptionalToggleLayoutProps {
   showText?: boolean;
@@ -24,25 +17,21 @@ export const ToggleLayout = ({
   asMenuItem,
 }: IOptionalToggleLayoutProps) => {
   const { manuallyCheckAndToggleDialog } = useEditorContext();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const { layout, switchLayout } = useLayoutSwitcher();
-  const iconColor = useColorModeValue("gray.400", "gray.300");
-  const backgroundHoverColor = useColorModeValue(
-    "whiteAlpha.400",
-    "whiteAlpha.500",
-  );
-  const { colorMode } = useColorMode();
+  const iconColor = isDark ? "text-gray-300" : "text-gray-400";
+  
   const layouts = {
     traditional: {
       key: "traditional",
       icon: <RiLayout3Fill />,
-      color: iconColor,
       onclick: switchLayout,
     },
     modern: {
       key: "modern",
       icon: <RiLayoutTopFill />,
-      color: iconColor,
       onclick: switchLayout,
     },
   };
@@ -53,53 +42,52 @@ export const ToggleLayout = ({
   };
 
   return asMenuItem ? (
-    <MenuItem
-      color={colorMode === "dark" ? "gray.400" : null}
+    <div
       onClick={handleClick}
-      zIndex={2}
+      className={cn(
+        "flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-sm z-10",
+        isDark ? "text-gray-400" : "text-gray-900"
+      )}
     >
       {layouts[layout].icon}
-      <Text ml={2}>Toggle Layout</Text>
-    </MenuItem>
+      <span className="ml-2">Toggle Layout</span>
+    </div>
   ) : (
     <AnimatePresence mode="wait" initial={false}>
-      <Box
-        color={iconColor}
-        as={motion.div}
-        style={{ display: "inline-block" }}
+      <motion.div
+        className={cn("inline-block", iconColor)}
         key={currentLayout.key}
         initial={{ x: -10, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 10, opacity: 0 }}
-        sx={{ transitionDuration: 2.01 }}
+        style={{ transitionDuration: "2.01s" }}
       >
         {showText ? (
-          <Button
-            // bg={"blue"}
-            color={iconColor}
-            size={"md"}
-            rightIcon={currentLayout.icon}
+          <button
+            className={cn(
+              "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              "hover:bg-white/40 hover:text-white",
+              iconColor
+            )}
             onClick={handleClick}
-            variant={"ghost"}
             aria-label="Toggle Layout"
-            _hover={{
-              background: backgroundHoverColor,
-              color: "white",
-            }}
           >
-            <Text pl={3}>{layout === "modern" ? "Traditional" : "Modern"}</Text>
-          </Button>
+            <span className="pl-3">{layout === "modern" ? "Traditional" : "Modern"}</span>
+            <span className="ml-2">{currentLayout.icon}</span>
+          </button>
         ) : (
-          <IconButton
-            color={iconColor}
-            size={"md"}
-            icon={currentLayout.icon}
+          <button
+            className={cn(
+              "p-2 rounded-md transition-colors hover:bg-white/20",
+              iconColor
+            )}
             onClick={handleClick}
-            variant={"ghost"}
             aria-label="Toggle Layout"
-          />
+          >
+            {currentLayout.icon}
+          </button>
         )}
-      </Box>
+      </motion.div>
     </AnimatePresence>
   );
 };

@@ -1,32 +1,28 @@
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import type { IDepartmentalService } from "@/shared/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -40,6 +36,8 @@ import {
 import { useState } from "react";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 // import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 export const ServiceItemDisplay = ({
@@ -50,47 +48,30 @@ export const ServiceItemDisplay = ({
   const { register, handleSubmit } = useForm<IDepartmentalService>();
   const [selectedDirector, setSelectedDirector] = useState<number>();
   const [nameData, setNameData] = useState(name);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isUserOpen, setIsUserOpen] = useState(false);
 
-  const toast = useToast();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isUpdateaModalOpen,
-    onOpen: onUpdateModalOpen,
-    onClose: onUpdateModalClose,
-  } = useDisclosure();
   const queryClient = useQueryClient();
   const { userLoading, userData } = useFullUserByPk(director);
 
-  const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose,
-  } = useDisclosure();
   const drawerFunction = () => {
     console.log(`${userData?.first_name} clicked`);
-    onUserOpen();
+    setIsUserOpen(true);
   };
 
   const updateMutation = useMutation({
     mutationFn: updateDepartmentalService,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
+      toast.success("Updated", {
+        description: "Service updated successfully",
       });
-      onUpdateModalClose();
+      setIsUpdateModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Failed to update service",
       });
     },
   });
@@ -98,12 +79,10 @@ export const ServiceItemDisplay = ({
   const deleteMutation = useMutation({
     mutationFn: deleteDepartmentalService,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
+      toast.success("Deleted", {
+        description: "Service deleted successfully",
       });
-      onDeleteModalClose();
+      setIsDeleteModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
   });
@@ -116,156 +95,127 @@ export const ServiceItemDisplay = ({
     updateMutation.mutate(formData);
   };
 
-  const { colorMode } = useColorMode();
-
   return !userLoading && userData ? (
     <>
-      <Drawer
-        isOpen={isUserOpen}
-        placement="right"
-        onClose={onUserClose}
-        size={"sm"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
+      <Sheet open={isUserOpen} onOpenChange={setIsUserOpen}>
+        <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>User Profile</SheetTitle>
+            <SheetDescription>
+              View user profile information
+            </SheetDescription>
+          </SheetHeader>
+          <div className="py-6">
             <UserProfile pk={director} />
-          </DrawerBody>
+          </div>
+        </SheetContent>
+      </Sheet>
 
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-      <Grid
-        gridTemplateColumns="5fr 4fr 1fr"
-        width="100%"
-        p={3}
-        borderWidth={1}
-        // gridColumnGap={8}
-      >
-        <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
-        <Flex>
+      <div className="grid grid-cols-[5fr_4fr_1fr] w-full p-3 border border-t-0 first:border-t">
+        <TextButtonFlex name={name} onClick={() => setIsUpdateModalOpen(true)} />
+        <div className="flex">
           <TextButtonFlex
             name={`${userData.first_name} ${userData.last_name}`}
             onClick={drawerFunction}
           />
-        </Flex>
-        <Flex justifyContent="flex-end" alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              px={2}
-              py={2}
-              transition="all 0.2s"
-              rounded={4}
-              borderRadius="md"
-              borderWidth="1px"
-              _hover={{ bg: "gray.400" }}
-              _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline-solid" }}
-              mr={4}
-            >
-              <Flex alignItems={"center"} justifyContent={"center"}>
-                <MdMoreVert />
-              </Flex>
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
-              <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </Grid>
-      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Service</ModalHeader>
-          <ModalBody>
-            <Box>
-              <Text fontSize="lg" fontWeight="semibold">
-                Are you sure you want to delete this service?
-              </Text>
-
-              <Text
-                fontSize="lg"
-                fontWeight="semibold"
-                color={"blue.500"}
-                mt={4}
+        </div>
+        <div className="flex justify-end items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="px-2 py-2 mr-4 transition-all duration-200 rounded-md border hover:bg-gray-400 focus:ring-2 focus:ring-blue-400"
               >
-                "{name}"
-              </Text>
-            </Box>
-          </ModalBody>
-          <ModalFooter justifyContent="flex-end">
-            <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme={"gray"}>
+                <div className="flex items-center justify-center">
+                  <MdMoreVert />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setIsUpdateModalOpen(true)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsDeleteModalOpen(true)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Service</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this service?
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <p className="text-lg font-semibold">
+              Are you sure you want to delete this service?
+            </p>
+            <p className="text-lg font-semibold text-blue-500 mt-4">
+              "{name}"
+            </p>
+          </div>
+          <DialogFooter className="flex justify-end">
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
                 No
               </Button>
               <Button
                 onClick={deleteBtnClicked}
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                ml={3}
+                disabled={deleteMutation.isPending}
+                className="bg-red-500 hover:bg-red-400 dark:bg-red-600 dark:hover:bg-red-500 text-white"
               >
+                {deleteMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Yes
               </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>{" "}
-      <Modal
-        isOpen={isUpdateaModalOpen}
-        onClose={onUpdateModalClose}
-        size={"xl"}
-      >
-        <ModalOverlay />
-        <ModalHeader>Update Research Function</ModalHeader>
-        <ModalBody>
-          <ModalContent
-            color={colorMode === "dark" ? "gray.400" : null}
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            p={4}
-            px={6}
-          >
-            <FormControl>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Update Research Function</DialogTitle>
+            <DialogDescription>
+              Update the service information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6">
+            <form
+              className="space-y-6"
+              id="update-form"
+              onSubmit={handleSubmit(onUpdateSubmit)}
+            >
               {/* Hidden input to capture the pk */}
               <input
                 type="hidden"
                 {...register("pk")}
                 defaultValue={pk} // Prefill with the 'pk' prop
               />
-            </FormControl>
-            <VStack
-              spacing={10}
-              as="form"
-              id="update-form"
-              onSubmit={handleSubmit(onUpdateSubmit)}
-            >
-              {/* <UnboundStatefulEditor
-                title="Service Name"
-                helperText={"Name of Service"}
-                showToolbar={false}
-                showTitle={true}
-                isRequired={true}
-                value={nameData}
-                setValueFunction={setNameData}
-                setValueAsPlainText={true}
-              /> */}
-              <FormControl>
-                <FormLabel>Service Name</FormLabel>
+
+              <div className="space-y-2">
+                <Label htmlFor="service-name">Service Name</Label>
                 <Input
+                  id="service-name"
                   autoFocus
                   autoComplete="off"
                   value={nameData}
                   onChange={(e) => setNameData(e.target.value)}
-                  // {...register("name", { required: true })}
                 />
-              </FormControl>
-              <FormControl>
+              </div>
+
+              <div className="space-y-2">
                 <UserSearchDropdown
                   {...register("director", { required: true })}
                   onlyInternal={false}
@@ -277,31 +227,25 @@ export const ServiceItemDisplay = ({
                   isEditable
                   helperText={"The director of the Service"}
                 />
-              </FormControl>
+              </div>
 
               {updateMutation.isError ? (
-                <Text color={"red.500"}>Something went wrong</Text>
+                <p className="text-red-500">Something went wrong</p>
               ) : null}
-            </VStack>
-            <Grid
-              mt={10}
-              w={"100%"}
-              justifyContent={"end"}
-              gridTemplateColumns={"repeat(2, 1fr)"}
-              gridGap={4}
-            >
-              <Button onClick={onUpdateModalClose} size="lg">
+            </form>
+          </div>
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button
+                variant="outline"
+                onClick={() => setIsUpdateModalOpen(false)}
+                size="lg"
+              >
                 Cancel
               </Button>
               <Button
-                // form="update-form"
-                // type="submit"
-                isLoading={updateMutation.isPending}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                disabled={updateMutation.isPending}
+                className="bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white"
                 size="lg"
                 onClick={() => {
                   console.log("clicked");
@@ -312,12 +256,15 @@ export const ServiceItemDisplay = ({
                   });
                 }}
               >
+                {updateMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Update
               </Button>
-            </Grid>
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   ) : null;
 };

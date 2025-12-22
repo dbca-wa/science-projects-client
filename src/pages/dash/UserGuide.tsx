@@ -6,7 +6,7 @@ import { AccountPageViewWrapper } from "@/shared/components/layout/wrappers/Acco
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useAdminOptions } from "@/features/admin/hooks/useAdminOptions";
 import { useUser } from "@/features/users/hooks/useUser";
-import { Box, Flex, useColorMode } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 interface ISectionProps {
@@ -24,12 +24,12 @@ const GuideAboutSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_about";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`guide_about${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -39,7 +39,7 @@ const GuideAboutSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -49,12 +49,12 @@ const GuideLoginSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_login";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`guide_login${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -64,7 +64,7 @@ const GuideLoginSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -74,12 +74,12 @@ const GuideUserProfileSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_profile";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`guide_profile${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -89,7 +89,7 @@ const GuideUserProfileSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -99,9 +99,9 @@ const GuideCreateProjectSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_project_creation";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
     <GuideRichTextEditor
@@ -122,9 +122,9 @@ const GuideViewProjectSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_project_view";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
     <>
@@ -149,7 +149,7 @@ const GuideProjectsSection = ({
   refetch,
 }: ISectionProps) => {
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideCreateProjectSection
         adminOptionsPk={adminOptionsPk}
         isSuperUser={isSuperUser}
@@ -162,7 +162,7 @@ const GuideProjectsSection = ({
         sectionData={sectionDataB}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -172,9 +172,9 @@ const GuideCreateUsersSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_user_creation";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
     <>
@@ -197,9 +197,9 @@ const GuideViewUsersSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_user_view";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
     <>
@@ -224,7 +224,7 @@ const GuideUsersSection = ({
   refetch,
 }: ISectionProps) => {
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideCreateUsersSection
         adminOptionsPk={adminOptionsPk}
         isSuperUser={isSuperUser}
@@ -238,7 +238,7 @@ const GuideUsersSection = ({
         sectionData={sectionDataB}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -248,12 +248,12 @@ const GuideTeamsSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_project_team";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -263,7 +263,7 @@ const GuideTeamsSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -273,12 +273,12 @@ const GuideDocumentsSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_documents";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -288,7 +288,7 @@ const GuideDocumentsSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -298,12 +298,12 @@ const GuideAdminSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_admin";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -313,7 +313,7 @@ const GuideAdminSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -323,12 +323,12 @@ const GuideAnnualReportSection = ({
   adminOptionsPk,
   refetch,
 }: ISectionProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "guide_report";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
 
   return (
-    <Box pr={4}>
+    <div className="pr-4">
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
@@ -338,7 +338,7 @@ const GuideAnnualReportSection = ({
         isUpdate={true}
         refetch={refetch}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -347,7 +347,8 @@ const GuideAnnualReportSection = ({
 export const UserGuide = () => {
   const { manuallyCheckAndToggleDialog } = useEditorContext();
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { userData, userLoading } = useUser();
   const { adminOptionsData, adminOptionsLoading, refetch } = useAdminOptions(1);
   //   softRefetch
@@ -512,20 +513,15 @@ export const UserGuide = () => {
   return (
     <>
       <Head title="Guide" />
-      <Flex h={"100%"} w={"100%"}>
+      <div className="flex h-full w-full">
         {/* Content */}
         <AccountPageViewWrapper children={pageViewChildren} />
 
         {/* Sidebar */}
-        <Box
-          borderLeftWidth="1px"
-          borderLeftColor={
-            colorMode === "light" ? "gray.300" : "whiteAlpha.400"
-          }
-          px={2}
-          minW={174}
-          minH={"100%"}
-          h={"100%"}
+        <div
+          className={`border-l px-2 min-w-[174px] min-h-full h-full ${
+            isDark ? "border-white/40" : "border-gray-300"
+          }`}
         >
           <SideMenuButton
             pageName={"About"}
@@ -575,8 +571,8 @@ export const UserGuide = () => {
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("admin")}
           /> */}
-        </Box>
-      </Flex>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,29 +1,24 @@
 // The traditional version of the dashboard
 
-import {
-  Button,
-  Center,
-  Grid,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@/features/users/hooks/useUser";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
-// import type { IDashProps } from "@/shared/types";
 import { CreateProjectPageModal } from "@/features/projects/components/modals/CreateProjectPageModal";
-import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { WelcomeBox } from "./WelcomeBox";
+import { Button } from "@/shared/components/ui/button";
+import { useTheme } from "next-themes";
+import { cn } from "@/shared/utils";
 
 export const TraditionalDashboard = () => {
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
   const [shouldConcat, setShouldConcat] = useState(false);
 
   const { userData } = useUser();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const handleResize = useCallback(() => {
     // 1150 = the breakpoint at which issues occur with text overlaying
@@ -32,78 +27,67 @@ export const TraditionalDashboard = () => {
     } else {
       setShouldConcat(false);
     }
-  }, [theme.breakpoints.lg, userData?.first_name]);
+  }, [userData?.first_name]);
 
   useEffect(() => {
     handleResize(); // call the handleResize function once after mounting
     window.addEventListener("resize", handleResize); // add event listener to window object
     return () => window.removeEventListener("resize", handleResize); // remove event listener when unmounting
   }, [handleResize]);
+
   return (
     <>
-      <CreateProjectPageModal isOpen={isOpen} onClose={onClose} />
+      <CreateProjectPageModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <WelcomeBox userData={userData} showNotes={false} />
 
-      <Grid
-        my={5}
-        templateColumns={{
-          base: "repeat(1, 1fr)",
-          md: "repeat(3, 1fr)",
-          lg: "repeat(3, 1fr)",
-          // xl: "repeat(3, 1fr)",
-        }}
-        gap={10}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10 my-5">
         <Button
-          leftIcon={<FaDatabase />}
-          bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `blue.600` : `blue.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
+          className={cn(
+            "flex items-center gap-2 text-white",
+            isDark 
+              ? "bg-blue-600 hover:bg-blue-400" 
+              : "bg-blue-500 hover:bg-blue-600"
+          )}
           onClick={() => {
             window.open("https://data.bio.wa.gov.au/", "_blank");
           }}
         >
+          <FaDatabase />
           {shouldConcat ? "Data" : "Data Catalogue"}
         </Button>
 
         <Button
-          leftIcon={<TbWorldWww />}
-          bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `blue.600` : `blue.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
-          // as={"a"}
-          // href="https://scientificsites.dpaw.wa.gov.au/"
+          className={cn(
+            "flex items-center gap-2 text-white",
+            isDark 
+              ? "bg-blue-600 hover:bg-blue-400" 
+              : "bg-blue-500 hover:bg-blue-600"
+          )}
           onClick={() =>
             window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")
           }
         >
+          <TbWorldWww />
           {shouldConcat ? "Scientific Sites" : "Scientific Sites Register"}
         </Button>
+
         <Button
-          leftIcon={<FaCirclePlus />}
-          bgColor={colorMode === "light" ? `green.500` : `green.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `green.600` : `green.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
-          onClick={onOpen}
+          className={cn(
+            "flex items-center gap-2 text-white",
+            isDark 
+              ? "bg-green-600 hover:bg-green-400" 
+              : "bg-green-500 hover:bg-green-600"
+          )}
+          onClick={() => setIsOpen(true)}
         >
+          <FaCirclePlus />
           Create Project
         </Button>
-      </Grid>
+      </div>
 
-      <TraditionalTasksAndProjects
-      // onAddTaskOpen={onAddTaskOpen}
-      />
+      <TraditionalTasksAndProjects />
 
-      <Center mt={6}></Center>
+      <div className="flex justify-center mt-6"></div>
     </>
   );
 };

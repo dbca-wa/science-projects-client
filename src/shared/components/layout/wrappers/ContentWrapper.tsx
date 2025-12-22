@@ -1,6 +1,7 @@
 // Simple wrapper to ensure content is padded and 100% of the height of the other wrappers
 
-import { Box, useColorMode } from "@chakra-ui/react";
+import { FC, ReactNode } from "react";
+import { useTheme } from "next-themes";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 
 interface IPageWrapperProps {
@@ -9,21 +10,22 @@ interface IPageWrapperProps {
 
 export const ContentWrapper: FC<IPageWrapperProps> = ({ children }) => {
   const { layout } = useLayoutSwitcher();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  
   return (
-    <Box
-      p={4}
-      px={layout === "traditional" ? 0 : 9}
-      flex={1}
+    <div
+      className={`p-4 flex-1 ${
+        layout === "traditional" ? "px-0" : "px-9"
+      } ${isDark ? "text-gray-400" : ""}`}
       style={{
         minHeight: "70vh",
         height: "100%",
       }}
-      color={colorMode === "dark" ? "gray.400" : null}
     >
-      <Box pb={4} h={"100%"}>
+      <div className="pb-4 h-full">
         {children}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

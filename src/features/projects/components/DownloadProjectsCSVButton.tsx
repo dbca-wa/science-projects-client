@@ -1,13 +1,12 @@
+import { Button } from "@/shared/components/ui/button";
 import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  type ToastId,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FaCaretDown } from "react-icons/fa";
@@ -15,46 +14,17 @@ import { downloadProjectsCSV, downloadProjectsCSVAR } from "@/features/projects/
 import { AxiosError, AxiosResponse } from "axios";
 
 export const DownloadProjectsCSVButton = () => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const { colorMode } = useColorMode();
-
-  // Unified toast helper
-  const showToast = (
-    status: "loading" | "success" | "error",
-    title: string,
-    description?: string,
-    duration?: number | null,
-  ) => {
-    if (ToastIdRef.current) {
-      toast.update(ToastIdRef.current, {
-        status,
-        title,
-        description,
-        position: "top-right",
-        duration: duration === undefined ? 3000 : duration,
-        isClosable: status !== "loading",
-      });
-    } else {
-      ToastIdRef.current = toast({
-        status,
-        title,
-        description,
-        position: "top-right",
-        duration: duration === undefined ? 3000 : duration,
-        isClosable: status !== "loading",
-      });
-    }
-  };
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   // Full CSV download mutation
   const downloadFullCSVMutation = useMutation({
     mutationFn: downloadProjectsCSV,
     onMutate: () => {
-      showToast("loading", "Generating Full Projects CSV", undefined, null);
+      toast.loading("Generating Full Projects CSV");
     },
     onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
-      showToast("success", "Success", "Full Projects CSV Downloaded");
+      toast.success("Full Projects CSV Downloaded");
 
       // Handle file download
       const downloadUrl = window.URL.createObjectURL(response as Blob);
@@ -70,13 +40,7 @@ export const DownloadProjectsCSVButton = () => {
       const errorMessage = error?.response?.data
         ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
         : "Unable to download Full Projects CSV";
-      showToast("error", "Download Failed", errorMessage);
-    },
-    onSettled: () => {
-      // Clean up toast reference after mutation completes
-      setTimeout(() => {
-        ToastIdRef.current = undefined;
-      }, 100);
+      toast.error(`Download Failed: ${errorMessage}`);
     },
   });
 
@@ -84,10 +48,10 @@ export const DownloadProjectsCSVButton = () => {
   const downloadAnnualReportMutation = useMutation({
     mutationFn: downloadProjectsCSVAR,
     onMutate: () => {
-      showToast("loading", "Generating Annual Report CSV", undefined, null);
+      toast.loading("Generating Annual Report CSV");
     },
     onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
-      showToast("success", "Success", "Annual Report CSV Downloaded");
+      toast.success("Annual Report CSV Downloaded");
 
       // Handle file download
       const downloadUrl = window.URL.createObjectURL(response as Blob);
@@ -103,13 +67,7 @@ export const DownloadProjectsCSVButton = () => {
       const errorMessage = error?.response?.data
         ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
         : "Unable to download Annual Report CSV";
-      showToast("error", "Download Failed", errorMessage);
-    },
-    onSettled: () => {
-      // Clean up toast reference after mutation completes
-      setTimeout(() => {
-        ToastIdRef.current = undefined;
-      }, 100);
+      toast.error(`Download Failed: ${errorMessage}`);
     },
   });
 
@@ -126,64 +84,34 @@ export const DownloadProjectsCSVButton = () => {
   };
 
   return (
-    <Menu>
-      <MenuButton
-        as={Button}
-        variant="solid"
-        color="white"
-        background={colorMode === "light" ? "green.500" : "green.600"}
-        _hover={{
-          background: colorMode === "light" ? "green.400" : "green.500",
-        }}
-        _active={{
-          background: colorMode === "light" ? "green.600" : "green.700",
-        }}
-        rightIcon={<FaCaretDown />}
-        isLoading={isLoading}
-        disabled={isLoading}
-        loadingText="Downloading..."
-      >
-        CSV
-      </MenuButton>
-      <MenuList
-        bg={colorMode === "light" ? "white" : "gray.800"}
-        borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-      >
-        <MenuItem
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          className={`text-white ${
+            isDark 
+              ? "bg-green-600 hover:bg-green-500" 
+              : "bg-green-500 hover:bg-green-400"
+          }`}
+          disabled={isLoading}
+        >
+          {isLoading ? "Downloading..." : "CSV"}
+          <FaCaretDown className="ml-2 h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem
           onClick={handleFullDownload}
-          isDisabled={isLoading}
-          _hover={
-            !isLoading
-              ? {
-                  bg: colorMode === "light" ? "gray.100" : "gray.700",
-                }
-              : {}
-          }
-          _disabled={{
-            opacity: 0.6,
-            cursor: "not-allowed",
-          }}
+          disabled={isLoading}
         >
           Full
-        </MenuItem>
-        <MenuItem
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={handleAnnualReportDownload}
-          isDisabled={isLoading}
-          _hover={
-            !isLoading
-              ? {
-                  bg: colorMode === "light" ? "gray.100" : "gray.700",
-                }
-              : {}
-          }
-          _disabled={{
-            opacity: 0.6,
-            cursor: "not-allowed",
-          }}
+          disabled={isLoading}
         >
           Annual Report
-        </MenuItem>
-      </MenuList>
-    </Menu>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

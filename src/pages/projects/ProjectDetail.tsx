@@ -17,20 +17,10 @@ import type {
   IProjectDocuments,
   IProjectMember,
 } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Spinner,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useTheme } from "next-themes";
+import { ArrowLeft, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -38,8 +28,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Mail } from "lucide-react";
 
 export const ProjectDetail = ({
   selectedTab,
@@ -185,7 +173,8 @@ export const ProjectDetail = ({
     }
   }, [projectData, tabs, isInitialRender, selectedTab, selectedTabSet]);
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const navigate = useNavigate();
 
   // useEffect(() => console.log(documents))
@@ -205,58 +194,49 @@ export const ProjectDetail = ({
     >
       {isLoading || !documents || !distilledTitle ? (
         isLoading === false && projectData === undefined ? (
-          <Box
-            w={"100%"}
-            h={"100%"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            display={"flex"}
-            flexDir={"column"}
-            mt={10}
-          >
-            <Text fontWeight={"semibold"} fontSize={"2xl"}>
+          <div className="w-full h-full flex justify-center items-center flex-col mt-10">
+            <h2 className="font-semibold text-2xl">
               Sorry, a project with id "{projectPk}" does not exist.
-            </Text>
-            <Text mt={6}>
+            </h2>
+            <p className="mt-6">
               This project likely has data issues, never existed or has been
               deleted.
-            </Text>
-            <Text mt={3}>
+            </p>
+            <p className="mt-3">
               If you believe this is in error, please submit feedback
-            </Text>
-            <Flex mt={8}>
+            </p>
+            <div className="flex mt-8">
               <Button
-                color={"white"}
-                bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                className={`text-white ${
+                  isDark 
+                    ? "bg-blue-600 hover:bg-blue-500" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                }`}
                 onClick={() => navigate("/projects")}
-                leftIcon={<ArrowBackIcon />}
               >
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Projects
               </Button>
               <Button
-                ml={4}
-                color={"white"}
-                bg={colorMode === "light" ? "orange.500" : "orange.600"}
-                _hover={{
-                  bg: colorMode === "light" ? "orange.400" : "orange.500",
-                }}
+                className={`ml-4 text-white ${
+                  isDark 
+                    ? "bg-orange-600 hover:bg-orange-500" 
+                    : "bg-orange-500 hover:bg-orange-400"
+                }`}
                 onClick={() => {
                   const email = "ecoinformatics.admin@dbca.wa.gov.au";
                   window.location.href = `mailto:${email}?subject=Feedback on Project ${projectPk}&body=I have feedback on project ${projectPk} and would like to report an issue.`;
                 }}
-                leftIcon={<Mail />}
               >
+                <Mail className="mr-2 h-4 w-4" />
                 Submit Feedback
               </Button>
-            </Flex>
-          </Box>
+            </div>
+          </div>
         ) : (
-          <Center>
-            <Spinner />
-          </Center>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          </div>
         )
       ) : (
         documents &&
@@ -264,21 +244,17 @@ export const ProjectDetail = ({
           <>
             <Head title={distilledTitle} />
             <Tabs
-              isLazy
-              isFitted
-              variant={"enclosed"}
-              onChange={(index) => {
+              value={tabs[activeTabIndex]}
+              onValueChange={(value) => {
                 manuallyCheckAndToggleDialog(() => {
                   refetch();
-                  setActiveTabIndex(index);
+                  const newIndex = tabs.indexOf(value);
+                  setActiveTabIndex(newIndex);
                 });
               }}
-              defaultIndex={activeTabIndex}
-              index={activeTabIndex}
             >
-              <TabList mb="1em">
-                <Tab
-                  fontSize="sm"
+              <TabsList className="mb-4 w-full justify-start">
+                <TabsTrigger
                   value="overview"
                   onClick={() => {
                     setActiveTabIndex(tabs.indexOf("overview"));
@@ -288,12 +264,12 @@ export const ProjectDetail = ({
                       `/projects/${projectPk}/overview`,
                     );
                   }}
+                  className="text-sm"
                 >
                   Overview
-                </Tab>
+                </TabsTrigger>
                 {documents?.concept_plan && (
-                  <Tab
-                    fontSize="sm"
+                  <TabsTrigger
                     value="concept"
                     onClick={() => {
                       setActiveTabIndex(tabs.indexOf("concept"));
@@ -303,13 +279,13 @@ export const ProjectDetail = ({
                         `/projects/${projectPk}/concept`,
                       );
                     }}
+                    className="text-sm"
                   >
                     Concept Plan
-                  </Tab>
+                  </TabsTrigger>
                 )}
                 {documents?.project_plan && (
-                  <Tab
-                    fontSize="sm"
+                  <TabsTrigger
                     value="project"
                     onClick={() => {
                       setActiveTabIndex(tabs.indexOf("project"));
@@ -319,15 +295,15 @@ export const ProjectDetail = ({
                         `/projects/${projectPk}/project`,
                       );
                     }}
+                    className="text-sm"
                   >
                     Project Plan
-                  </Tab>
+                  </TabsTrigger>
                 )}
                 {!isLoading &&
                   documents?.progress_reports &&
                   documents.progress_reports.length !== 0 && (
-                    <Tab
-                      fontSize="sm"
+                    <TabsTrigger
                       value="progress"
                       onClick={() => {
                         setActiveTabIndex(tabs.indexOf("progress"));
@@ -337,15 +313,15 @@ export const ProjectDetail = ({
                           `/projects/${projectPk}/progress`,
                         );
                       }}
+                      className="text-sm"
                     >
                       Progress Reports
-                    </Tab>
+                    </TabsTrigger>
                   )}
                 {!isLoading &&
                   documents?.student_reports &&
                   documents.student_reports.length !== 0 && (
-                    <Tab
-                      fontSize="sm"
+                    <TabsTrigger
                       value="student"
                       onClick={() => {
                         setActiveTabIndex(tabs.indexOf("student"));
@@ -356,13 +332,13 @@ export const ProjectDetail = ({
                           `/projects/${projectPk}/student`,
                         );
                       }}
+                      className="text-sm"
                     >
                       Student Reports
-                    </Tab>
+                    </TabsTrigger>
                   )}
                 {documents?.project_closure && (
-                  <Tab
-                    fontSize="sm"
+                  <TabsTrigger
                     value="closure"
                     onClick={() => {
                       setActiveTabIndex(tabs.indexOf("closure"));
@@ -373,14 +349,14 @@ export const ProjectDetail = ({
                         `/projects/${projectPk}/closure`,
                       );
                     }}
+                    className="text-sm"
                   >
                     Project Closure
-                  </Tab>
+                  </TabsTrigger>
                 )}
-              </TabList>
-              <TabPanels>
+              </TabsList>
                 {/* OVERVIEW */}
-                <TabPanel>
+                <TabsContent value="overview">
                   {baseInformation ? (
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -428,13 +404,13 @@ export const ProjectDetail = ({
                       />
                     </motion.div>
                   ) : (
-                    <Spinner />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
                   )}
-                </TabPanel>
+                </TabsContent>
 
                 {/* CONCEPT PLAN */}
                 {documents?.concept_plan && (
-                  <TabPanel>
+                  <TabsContent value="concept">
                     <ConceptPlanContents
                       baseAPI={baseAPI}
                       userData={me?.userData}
@@ -450,12 +426,12 @@ export const ProjectDetail = ({
                       userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
                       userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
-                  </TabPanel>
+                  </TabsContent>
                 )}
 
                 {/* PROJECT PLAN */}
                 {documents?.project_plan && (
-                  <TabPanel>
+                  <TabsContent value="project">
                     <ProjectPlanContents
                       baseAPI={baseAPI}
                       refetch={refetch}
@@ -473,13 +449,13 @@ export const ProjectDetail = ({
                       userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
                       userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
-                  </TabPanel>
+                  </TabsContent>
                 )}
 
                 {/* PROGRESS REPORT */}
                 {documents?.progress_reports &&
                   documents.progress_reports.length !== 0 && (
-                    <TabPanel>
+                    <TabsContent value="progress">
                       <ProgressReportContents
                         baseAPI={baseAPI}
                         documents={documents.progress_reports}
@@ -496,14 +472,14 @@ export const ProjectDetail = ({
                         userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
                         userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
-                    </TabPanel>
+                    </TabsContent>
                   )}
 
                 {/* STUDENT REPORT */}
                 {documents?.student_reports &&
                   documents.student_reports.length !== 0 &&
                   projectPk && (
-                    <TabPanel>
+                    <TabsContent value="student">
                       <StudentReportContents
                         baseAPI={baseAPI}
                         projectPk={projectPk}
@@ -520,12 +496,12 @@ export const ProjectDetail = ({
                         userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
                         userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
-                    </TabPanel>
+                    </TabsContent>
                   )}
 
                 {/* PROJECT CLOSURE */}
                 {documents?.project_closure && (
-                  <TabPanel>
+                  <TabsContent value="closure">
                     <ProjectClosureContents
                       baseAPI={baseAPI}
                       document={documents.project_closure}
@@ -542,9 +518,8 @@ export const ProjectDetail = ({
                       userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
                       userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
-                  </TabPanel>
+                  </TabsContent>
                 )}
-              </TabPanels>
             </Tabs>
           </>
         )

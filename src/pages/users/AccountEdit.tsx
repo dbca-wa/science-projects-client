@@ -5,11 +5,12 @@ import CaretakerModePage from "@/features/users/components/account/Caretaking/Ca
 import { ProfilePage } from "@/features/users/components/account/ProfilePage";
 import { SideMenuButton } from "@/features/users/components/account/SideMenuButton";
 import { AccountPageViewWrapper } from "@/shared/components/layout/wrappers/AccountPageViewWrapper";
-import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 export const AccountEdit = () => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const [selected, setSelected] = useState("spmsprofile");
   const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>(
@@ -38,23 +39,15 @@ export const AccountEdit = () => {
   return (
     <>
       <Head title="My Account" />
-      <Flex
-        h={"100%"}
-        w={"100%"}
-        //
-        // bg={"yellow"}
-      >
+      <div className="flex h-full w-full">
         {/* Content */}
         <AccountPageViewWrapper children={pageViewChildren} />
 
         {/* Sidebar */}
-        <Box
-          borderLeftWidth="1px"
-          borderLeftColor={
-            colorMode === "light" ? "gray.300" : "whiteAlpha.400"
-          }
-          px={2}
-          minW={174}
+        <div
+          className={`border-l px-2 min-w-[174px] ${
+            isDark ? "border-white/40" : "border-gray-300"
+          }`}
         >
           <SideMenuButton
             pageName={"SPMS Profile"}
@@ -66,13 +59,8 @@ export const AccountEdit = () => {
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("caretakermode")}
           />
-          {/* <SideMenuButton
-            pageName={"Public Profile"}
-            selectedString={selected}
-            onClick={() => handleSidebarMenuClick("publicprofile")}
-          /> */}
-        </Box>
-      </Flex>
+        </div>
+      </div>
     </>
   );
 };

@@ -5,7 +5,6 @@ import { ModernDashboard } from "@/features/dashboard/components/ModernDashboard
 import { TraditionalDashboard } from "@/features/dashboard/components/TraditionalDashboard";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { type IDashProps } from "@/shared/types";
-import { Box } from "@chakra-ui/react";
 
 export const Dashboard = ({ activeTab }: IDashProps) => {
   const { layout } = useLayoutSwitcher();
@@ -13,16 +12,16 @@ export const Dashboard = ({ activeTab }: IDashProps) => {
   return layout === "traditional" ? (
     <>
       <Head title="Home" />
-      <Box h={"100%"}>
+      <div className="h-full">
         <TraditionalDashboard />
-      </Box>
+      </div>
     </>
   ) : (
     <>
       <Head title="Home" />
-      <Box h={"100%"}>
+      <div className="h-full">
         <ModernDashboard activeTab={activeTab} />
-      </Box>
+      </div>
     </>
   );
 };

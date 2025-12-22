@@ -2,8 +2,6 @@
 
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-// import { CloseIcon } from "@chakra-ui/icons";
-import { useDisclosure } from "@chakra-ui/react";
 import {
   forwardRef,
   useEffect,
@@ -19,19 +17,13 @@ import type { IUserData } from "@/shared/types";
 import { EmailSiteLinkModal } from "@/features/users/components/modals/EmailSiteLinkModal";
 import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
 import { createPortal } from "react-dom";
-import { useColorMode } from "@chakra-ui/react/color-mode";
-import {
-  FormControl,
-  FormHelperText,
-  FormLabel,
-} from "@chakra-ui/react/form-control";
-import { Box } from "@chakra-ui/react/box";
-import { Input, InputGroup } from "@chakra-ui/react/input";
-import { Button, IconButton } from "@chakra-ui/react/button";
-import { Flex } from "@chakra-ui/react/flex";
-import { Avatar } from "@chakra-ui/react/avatar";
-import { CloseIcon } from "@chakra-ui/icons/Close";
-import { Text } from "@chakra-ui/react/typography";
+import { useTheme } from "next-themes";
+import { Label } from "@/shared/components/ui/label";
+import { Input } from "@/shared/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { X } from "lucide-react";
+import { cn } from "@/shared/utils";
 
 interface IUserSearchDropdown {
   onlyInternal?: boolean;
@@ -83,19 +75,12 @@ export const UserSearchDropdown = forwardRef(
     const [selectedUser, setSelectedUser] = useState<IUserData | null>();
     const [showAddUser, setShowAddUser] = useState<boolean>(false);
 
-    const {
-      isOpen: isEmailSiteLinkModalOpen,
-      onClose: onCloseEmailSiteLinkModal,
-      onOpen: onOpenEmailSiteLinkModal,
-    } = useDisclosure();
+    // Replace useDisclosure with React state
+    const [isEmailSiteLinkModalOpen, setIsEmailSiteLinkModalOpen] = useState(false);
+    const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
-    const {
-      isOpen: isCreateUserModalOpen,
-      onClose: onCloseCreateUserModal,
-      onOpen: onOpenCreateUserModal,
-    } = useDisclosure();
-
-    const { colorMode } = useColorMode();
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
 
     useEffect(() => {
       if (projectPk || searchTerm.trim() !== "") {
@@ -184,40 +169,40 @@ export const UserSearchDropdown = forwardRef(
     }));
 
     return (
-      <FormControl isRequired={isRequired} mb={0} my={0} w={"100%"} h={"100%"}>
-        <FormLabel>{label}</FormLabel>
+      <div className={cn("mb-0 my-0 w-full h-full", isRequired && "required")}>
+        <Label>{label}</Label>
         {selectedUser ? (
-          <Box mb={2} color="blue.500">
+          <div className="mb-2 text-blue-500">
             <SelectedUserInput user={selectedUser} onClear={handleClearUser} />
-          </Box>
+          </div>
         ) : (
-          <InputGroup>
+          <div className="relative">
             <Input
-              ref={inputRef} // Important: Attach the ref to the input element
+              ref={inputRef}
               type="text"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={placeholder}
-              _placeholder={
+              className={cn(
+                className,
+                "placeholder:ml-[-4px]",
                 placeholderColor
-                  ? { color: placeholderColor, marginLeft: "-4px" }
-                  : colorMode === "dark"
-                    ? { color: "gray.300", marginLeft: "-4px" }
-                    : { color: "gray.500", marginLeft: "-4px" }
-              }
+                  ? `placeholder:text-[${placeholderColor}]`
+                  : isDark
+                    ? "placeholder:text-gray-300"
+                    : "placeholder:text-gray-500"
+              )}
               onFocus={() => setIsMenuOpen(true)}
               autoFocus={autoFocus ? true : false}
               autoComplete="off"
-              className={className}
             />
-          </InputGroup>
+          </div>
         )}
         {selectedUser ? null : (
-          <Box pos="relative" w="100%">
-            {/* Pass the inputRef directly to the CustomMenu component */}
+          <div className="relative w-full">
             <CustomMenu
               isOpen={filteredItems.length > 0 && isMenuOpen}
-              inputRef={inputRef} // Pass the ref to the menu
+              inputRef={inputRef}
             >
               <CustomMenuList minWidth="100%">
                 {filteredItems.map((user) => (
@@ -229,15 +214,15 @@ export const UserSearchDropdown = forwardRef(
                 ))}
               </CustomMenuList>
             </CustomMenu>
-          </Box>
+          </div>
         )}
-        <FormHelperText>
+        <p className={cn("text-sm text-muted-foreground mt-2")}>
           {hideCannotFind !== true &&
           hideCannotFind !== undefined &&
           showAddUser
             ? "Can't find who you're looking for? Use the buttons below to add an external user or email a DBCA staff member with a link to create an account - they must click the link and login."
             : helperText}
-        </FormHelperText>{" "}
+        </p>
         {hideCannotFind !== true &&
           hideCannotFind !== undefined &&
           showAddUser && (
@@ -246,41 +231,38 @@ export const UserSearchDropdown = forwardRef(
                 (ignoreArray?.length < 1 && (
                   <>
                     <CreateUserModal
-                      onClose={onCloseCreateUserModal}
+                      onClose={() => setIsCreateUserModalOpen(false)}
                       isOpen={isCreateUserModalOpen}
                     />
                     <EmailSiteLinkModal
-                      onClose={onCloseEmailSiteLinkModal}
+                      onClose={() => setIsEmailSiteLinkModalOpen(false)}
                       isOpen={isEmailSiteLinkModalOpen}
                     />
-                    <Flex mt={4} mb={2} justifyContent={"flex-end"}>
+                    <div className="flex mt-4 mb-2 justify-end gap-3">
                       <Button
-                        color={"white"}
-                        bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                        _hover={{
-                          bg: colorMode === "light" ? "blue.400" : "blue.500",
-                        }}
-                        onClick={onOpenCreateUserModal}
+                        className={cn(
+                          "text-white",
+                          isDark ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-400"
+                        )}
+                        onClick={() => setIsCreateUserModalOpen(true)}
                       >
                         Add New External User
                       </Button>
                       <Button
-                        ml={3}
-                        color={"white"}
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
-                        onClick={onOpenEmailSiteLinkModal}
+                        className={cn(
+                          "text-white",
+                          isDark ? "bg-green-600 hover:bg-green-500" : "bg-green-500 hover:bg-green-400"
+                        )}
+                        onClick={() => setIsEmailSiteLinkModalOpen(true)}
                       >
                         Send Link to DBCA Staff
                       </Button>
-                    </Flex>{" "}
+                    </div>
                   </>
                 ))}
             </>
           )}
-      </FormControl>
+      </div>
     );
   },
 );
@@ -300,7 +282,8 @@ const CustomMenuPortal = ({
   referenceElement,
   zIndex = 9999,
 }: CustomMenuPortalProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [portalNode, setPortalNode] = useState<HTMLDivElement | null>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
@@ -345,18 +328,20 @@ const CustomMenuPortal = ({
   if (!isOpen || !portalNode) return null;
 
   return createPortal(
-    <Box
-      pos="fixed"
-      top={`${position.top}px`}
-      left={`${position.left}px`}
-      width={`${position.width}px`}
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      zIndex={zIndex}
-      borderRadius="md"
+    <div
+      className={cn(
+        "fixed shadow-md rounded-md z-[9999]",
+        isDark ? "bg-gray-700" : "bg-white"
+      )}
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: `${position.width}px`,
+        zIndex,
+      }}
     >
       {children}
-    </Box>,
+    </div>,
     portalNode,
   );
 };
@@ -383,7 +368,8 @@ const CustomMenu = ({
   inputRef,
   ...rest
 }: CustomMenuProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
@@ -429,20 +415,20 @@ const CustomMenu = ({
 
   // Use createPortal to render the menu at the correct position
   return createPortal(
-    <Box
-      pos="fixed"
-      top={`${position.top}px`}
-      left={`${position.left}px`}
-      width={`${position.width}px`}
-      minW="200px"
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      zIndex={9999}
-      borderRadius="md"
+    <div
+      className={cn(
+        "fixed min-w-[200px] shadow-md z-[9999] rounded-md",
+        isDark ? "bg-gray-700" : "bg-white"
+      )}
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: `${position.width}px`,
+      }}
       {...rest}
     >
       {children}
-    </Box>,
+    </div>,
     portalElement,
   );
 };
@@ -470,58 +456,55 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
   const handleClick = () => {
     onClick();
   };
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const serverUrl = useApiEndpoint();
   const noImage = useNoImage();
   return serverUrl ? (
-    <Flex
-      as="button"
+    <button
       type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+      className={cn(
+        "w-full text-left p-2 flex items-center transition-colors",
+        isHovered ? "bg-gray-200" : "transparent"
+      )}
       onClick={handleClick}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
       {...rest}
     >
-      <Avatar
-        src={
-          user.image
-            ? user.image?.file?.startsWith("http")
-              ? `${user.image?.file}`
-              : `${serverUrl}${user.image?.file}`
-            : user.image?.old_file
-              ? user.image?.old_file
-              : noImage
-        }
-      />
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text
-          ml={2}
-          color={
-            user.is_staff
-              ? user.is_superuser
-                ? colorMode === "light"
-                  ? "blue.500"
-                  : "blue.300"
-                : colorMode === "light"
-                  ? "green.500"
-                  : "green.300"
-              : colorMode === "light"
-                ? "gray.500"
-                : "gray.400"
+      <Avatar className="w-10 h-10">
+        <AvatarImage
+          src={
+            user.image
+              ? user.image?.file?.startsWith("http")
+                ? `${user.image?.file}`
+                : `${serverUrl}${user.image?.file}`
+              : user.image?.old_file
+                ? user.image?.old_file
+                : noImage
           }
-        >
+          alt={`${user?.display_first_name} ${user?.display_last_name}`}
+        />
+        <AvatarFallback>
+          {user?.display_first_name?.[0]}{user?.display_last_name?.[0]}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex items-center justify-start ml-3 h-full">
+        <p className={cn(
+          "ml-2",
+          user.is_staff
+            ? user.is_superuser
+              ? isDark
+                ? "text-blue-300"
+                : "text-blue-500"
+              : isDark
+                ? "text-green-300"
+                : "text-green-500"
+            : isDark
+              ? "text-gray-400"
+              : "text-gray-500"
+        )}>
           {`${user?.display_first_name === "None" ? user.username : (user?.display_first_name ?? user.first_name)} ${
             user?.display_last_name === "None"
               ? ""
@@ -533,9 +516,9 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
                 : "(Staff)"
               : "(External)"
           }`}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </button>
   ) : null;
 };
 
@@ -545,9 +528,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className={cn("relative w-full")} style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -557,48 +540,47 @@ interface SelectedUserInputProps {
 }
 
 const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const serverUrl = useApiEndpoint();
   const noImage = useNoImage();
 
   return serverUrl ? (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      // py={1}
-      // mr={2}
-    >
-      <Avatar
-        size="sm"
-        src={
-          user.image
-            ? user.image?.file?.startsWith("http")
-              ? `${user.image?.file}`
-              : `${serverUrl}${user.image?.file}`
-            : user.image?.old_file
-              ? user.image?.old_file
-              : noImage
-        }
-      />
-      <Text
-        ml={2}
-        color={
-          user.is_staff
-            ? user.is_superuser
-              ? colorMode === "light"
-                ? "blue.500"
-                : "blue.400"
-              : colorMode === "light"
-                ? "green.500"
-                : "green.400"
-            : colorMode === "dark"
-              ? "gray.200"
-              : "gray.500"
-        }
-      >
+    <div className={cn(
+      "flex items-center relative px-2 rounded-md",
+      isDark ? "bg-gray-700" : "bg-gray-100"
+    )}>
+      <Avatar className="w-8 h-8">
+        <AvatarImage
+          src={
+            user.image
+              ? user.image?.file?.startsWith("http")
+                ? `${user.image?.file}`
+                : `${serverUrl}${user.image?.file}`
+              : user.image?.old_file
+                ? user.image?.old_file
+                : noImage
+          }
+          alt={`${user.first_name} ${user.last_name}`}
+        />
+        <AvatarFallback>
+          {user.first_name?.[0]}{user.last_name?.[0]}
+        </AvatarFallback>
+      </Avatar>
+      <p className={cn(
+        "ml-2",
+        user.is_staff
+          ? user.is_superuser
+            ? isDark
+              ? "text-blue-400"
+              : "text-blue-500"
+            : isDark
+              ? "text-green-400"
+              : "text-green-500"
+          : isDark
+            ? "text-gray-200"
+            : "text-gray-500"
+      )}>
         {`${user.first_name === "None" ? user.username : user.first_name} ${
           user.last_name === "None" ? "" : user.last_name
         } ${
@@ -608,19 +590,18 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
               : "(Staff)"
             : "(External)"
         }`}
-      </Text>
+      </p>
 
-      <IconButton
+      <Button
+        variant="ghost"
+        size="sm"
+        className="absolute top-1/2 right-2 transform -translate-y-1/2 h-6 w-6 p-0"
+        onClick={onClear}
         tabIndex={-1}
         aria-label="Clear selected user"
-        icon={<CloseIcon />}
-        size="xs"
-        position="absolute"
-        top="50%"
-        right={2}
-        transform="translateY(-50%)"
-        onClick={onClear}
-      />
-    </Flex>
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
   ) : null;
 };

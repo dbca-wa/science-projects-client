@@ -2,15 +2,7 @@ import { DisplayRTE } from "@/shared/components/RichTextEditor/Editors/DisplayRT
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { BusinessAreaImage, IUserMe } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Icon,
-  Text,
-  useColorMode,
-  useDisclosure,
-  Image,
-} from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { EditMyBusinessAreaModal } from "./EditMyBusinessAreaModal";
@@ -32,9 +24,14 @@ export const BusinessAreaEditableDisplay = ({
   leader,
   refetch,
 }: IMyBaUpdateData) => {
-  const { colorMode } = useColorMode();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
+  
   const onMouseOver = () => {
     if (!isHovered) {
       setIsHovered(true);
@@ -60,53 +57,31 @@ export const BusinessAreaEditableDisplay = ({
         image={image?.file}
         refetch={refetch}
       />
-      <Box
-        overflow={"hidden"}
-        bg={colorMode === "light" ? "gray.50" : "gray.700"}
-        rounded={10}
-        pb={8}
-        mb={20}
+      <div
+        className={`overflow-hidden rounded-lg pb-8 mb-20 ${
+          isDark ? "bg-gray-700" : "bg-gray-50"
+        }`}
         onMouseOver={onMouseOver}
         onMouseLeave={onMouseOut}
       >
         {/* BA image and title */}
-        <Box
-          rounded={4}
-          // boxSize={"100px"}
-          w={"100%"}
-          h={"23vh"}
-          minH={"285px"}
-          pos={"relative"}
-          userSelect={"none"}
+        <div
+          className="rounded w-full h-[23vh] min-h-[285px] relative select-none"
+          style={{ userSelect: "none" }}
           draggable={false}
         >
-          <Box
-            pos={"absolute"}
-            right={0}
-            bottom={"30px"}
-            zIndex={0}
-            width={"76%"}
-            height={"70px"}
-            display={"flex"}
-            alignItems={"center"}
-            bg={"rgba(255, 255, 255, 0.6)"}
-            border={"3px solid #396494"}
-            roundedLeft={30}
-            borderRight={"none"}
+          <div
+            className="absolute right-0 bottom-[30px] z-0 w-[76%] h-[70px] flex items-center bg-white/60 border-3 border-[#396494] rounded-l-[30px] border-r-0"
           >
-            <Text
-              pl={4}
-              fontWeight={"bold"}
-              fontSize={"28px"}
-              color={"black"}
-              userSelect={"none"}
+            <p
+              className="pl-4 font-bold text-[28px] text-black select-none"
+              style={{ userSelect: "none" }}
             >
               {name}
-            </Text>
-          </Box>
-          <Image
-            // pos={"absolute"}
-            zIndex={0}
+            </p>
+          </div>
+          <img
+            className="z-0 top-0 left-0 object-cover w-full h-full select-none"
             src={
               image instanceof File
                 ? `${apiEndpoint}${image.name}` // Use the image directly for File
@@ -115,52 +90,34 @@ export const BusinessAreaEditableDisplay = ({
                   : // : image instanceof string ?
                     NoImageFile
             }
-            top={0}
-            left={0}
-            objectFit={"cover"}
-            width={"100%"}
-            height={"100%"}
-            userSelect={"none"}
+            style={{ userSelect: "none" }}
             draggable={false}
+            alt={`${name} business area`}
           />
-        </Box>
+        </div>
 
         {/* Program Lead name and Text */}
-        <Box mt={8} px={12} pos={"relative"}>
+        <div className="mt-8 px-12 relative">
           {isHovered && (
-            <Center
-              bg={"green.500"}
-              rounded={"full"}
-              boxSize={"40px"}
-              pos={"absolute"}
-              right={12}
-              mt={-4}
-              _hover={{ cursor: "pointer" }}
+            <div
+              className="bg-green-500 rounded-full w-10 h-10 absolute right-12 -mt-4 hover:cursor-pointer text-white flex items-center justify-center"
               onClick={onOpen}
-              color={"whitesmoke"}
             >
-              <Icon as={FaEdit} boxSize={"20px"} ml={"3px"} mt={-0.5} />
-            </Center>
+              <FaEdit className="w-5 h-5 ml-[3px] -mt-0.5" />
+            </div>
           )}
 
-          <Text fontWeight={"semibold"} textAlign={"justify"}>
+          <p className="font-semibold text-justify">
             Program Leader: {leader?.first_name} {leader?.last_name}
-          </Text>
+          </p>
 
           {introduction !== "" && (
-            <Box pt={12}>
+            <div className="pt-12">
               <DisplayRTE payload={introduction} />
-            </Box>
+            </div>
           )}
-
-          {/* <Text
-                    mt={4}
-                    textAlign={"justify"}
-                >
-                    {distilledIntro}
-                </Text> */}
-        </Box>
-      </Box>
+        </div>
+      </div>
     </>
   );
 };

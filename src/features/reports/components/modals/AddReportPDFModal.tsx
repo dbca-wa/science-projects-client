@@ -1,27 +1,27 @@
+import { Button } from "@/shared/components/ui/button";
 import {
-  Button,
-  Text,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
   Select,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/features/users/hooks/useUser";
 import { addPDFToReport } from "@/features/reports/services/reports.service";
 import { useGetARARsWithoputPDF } from "@/features/reports/hooks/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
+import { toast } from "sonner";
 
 interface Props {
   isAddPDFOpen: boolean;
@@ -34,17 +34,10 @@ export const AddReportPDFModal = ({
   onAddPDFClose,
   refetchPDFs,
 }: Props) => {
-  const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const [uploadedPDF, setUploadedPDF] = useState<File>();
-  const [reportId, setReportId] = useState<number>();
+  const [reportId, setReportId] = useState<string>("");
   const [isError, setIsError] = useState(false);
 
   const { userData } = useUser();
@@ -57,7 +50,7 @@ export const AddReportPDFModal = ({
   useEffect(() => {
     if (!reportsWithoutPDFLoading && reportsWithoutPDFData) {
       setReportId(
-        reportsWithoutPDFData.length > 0 ? reportsWithoutPDFData[0]?.pk : 0,
+        reportsWithoutPDFData.length > 0 ? String(reportsWithoutPDFData[0]?.pk) : "",
       );
     }
   }, [reportsWithoutPDFLoading, reportsWithoutPDFData]);
@@ -65,23 +58,10 @@ export const AddReportPDFModal = ({
   const ararPDFAdditionMutation = useMutation({
     mutationFn: addPDFToReport,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Adding PDF",
-        position: "top-right",
-      });
+      toast.loading("Adding PDF...");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `PDF Added`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("PDF Added");
       onAddPDFClose();
 
       setTimeout(() => {
@@ -92,60 +72,51 @@ export const AddReportPDFModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Add PDF",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not Add PDF: ${error}`);
     },
   });
 
   const onSubmitPDFAdd = () => {
     const formData = {
       userId: userData?.pk ? userData.pk : userData.id,
-      reportId,
+      reportId: Number(reportId),
       pdfFile: uploadedPDF,
     };
     ararPDFAdditionMutation.mutate(formData);
   };
 
   return (
-    <Modal isOpen={isAddPDFOpen} onClose={onAddPDFClose} size={"sm"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Add PDF to Report</ModalHeader>
-        <ModalCloseButton />
-
-        <ModalBody>
-          <Text mb={4}>
+    <Dialog open={isAddPDFOpen} onOpenChange={onAddPDFClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add PDF to Report</DialogTitle>
+          <DialogDescription>
             Use this form to add the finalised pdf to the report.
-          </Text>
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
           {!reportsWithoutPDFLoading && reportsWithoutPDFData ? (
-            <>
-              <FormControl pb={6}>
-                <FormLabel>Selected Report</FormLabel>
-                <Select onChange={(e) => setReportId(Number(e.target.value))}>
+            <div className="space-y-2">
+              <Label htmlFor="report-select">Selected Report</Label>
+              <Select value={reportId} onValueChange={setReportId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a report" />
+                </SelectTrigger>
+                <SelectContent>
                   {!reportsWithoutPDFLoading &&
                     reportsWithoutPDFData.map((report, index) => (
-                      <option key={index} value={report?.pk}>
+                      <SelectItem key={index} value={String(report?.pk)}>
                         {report?.year}
-                      </option>
+                      </SelectItem>
                     ))}
-                </Select>
-              </FormControl>
-            </>
+                </SelectContent>
+              </Select>
+            </div>
           ) : null}
 
-          <FormControl>
-            <FormLabel>PDF File</FormLabel>
+          <div className="space-y-2">
+            <Label>PDF File</Label>
             <SingleFileStateUpload
               fileType={"pdf"}
               uploadedFile={uploadedPDF}
@@ -153,29 +124,22 @@ export const AddReportPDFModal = ({
               isError={isError}
               setIsError={setIsError}
             />
-          </FormControl>
-        </ModalBody>
+          </div>
+        </div>
 
-        <ModalFooter>
-          <Button mr={3} onClick={onAddPDFClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={onAddPDFClose}>
             Cancel
           </Button>
           <Button
-            isLoading={ararPDFAdditionMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
-            isDisabled={!uploadedPDF || !reportId || reportId === 0 || isError}
-            onClick={() => {
-              onSubmitPDFAdd();
-            }}
+            disabled={!uploadedPDF || !reportId || reportId === "" || isError || ararPDFAdditionMutation.isPending}
+            onClick={onSubmitPDFAdd}
+            className="bg-green-500 hover:bg-green-400 text-white dark:bg-green-500 dark:hover:bg-green-400"
           >
-            Add
+            {ararPDFAdditionMutation.isPending ? "Adding..." : "Add"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

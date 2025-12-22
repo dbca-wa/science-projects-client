@@ -1,18 +1,8 @@
-import {
-  AbsoluteCenter,
-  Box,
-  Button,
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  Image,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { FaEdit } from "react-icons/fa";
 import type { ISmallReport, IUserMe } from "@/shared/types";
 import { ChangeReportPDFModal } from "@/features/reports/components/modals/ChangeReportPDFModal";
+import { useState } from "react";
 
 interface Props {
   report: ISmallReport;
@@ -27,12 +17,8 @@ export const AnnualReportPDFGridItem = ({
   userData,
   isLegacy,
 }: Props) => {
-  const { colorMode } = useColorMode();
-  const {
-    isOpen: isChangePDFOpen,
-    onOpen: onChangePDFOpen,
-    onClose: onChangePDFClose,
-  } = useDisclosure();
+  const [isChangePDFOpen, setIsChangePDFOpen] = useState(false);
+  
   const downloadPDF = (report) => {
     console.log(report);
     console.log(report?.pdf?.file ? report.pdf.file : report.file);
@@ -47,43 +33,28 @@ export const AnnualReportPDFGridItem = ({
       <ChangeReportPDFModal
         isLegacy={isLegacy}
         isChangePDFOpen={isChangePDFOpen}
-        onChangePDFClose={onChangePDFClose}
+        onChangePDFClose={() => setIsChangePDFOpen(false)}
         report={report}
         refetchPDFs={refetchFunction}
       />
 
-      <Flex
-        border={"1px solid"}
-        rounded={"lg"}
-        borderColor={"gray.200"}
-        minH={"200px"}
-        minW={"150px"}
-        px={3}
-        pt={6}
-        pb={userData?.is_superuser ? 3 : 6}
-        flexDir={"column"}
-      >
-        <Center
-          mb={8}
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg min-h-[200px] min-w-[150px] px-3 pt-6 pb-6 flex flex-col">
+        <div
+          className="mb-8 flex justify-center cursor-pointer"
           onClick={() => {
             downloadPDF(report);
           }}
-          cursor={"pointer"}
         >
-          <Image
+          <img
             src="pdf2.png"
-            objectFit="contain"
-            maxH={"200px"}
-            userSelect={"none"}
+            className="object-contain max-h-[200px] select-none"
             draggable={false}
+            alt="PDF Icon"
           />
-        </Center>
-        <Box position="relative" px={0} userSelect={"none"}>
-          <Divider />
-          <AbsoluteCenter
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            px="4"
-          >
+        </div>
+        <div className="relative px-0 select-none">
+          <div className="border-t border-gray-200 dark:border-gray-700"></div>
+          <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-4">
             {report?.year &&
               (() => {
                 const yearStr = String(report.year).slice(2); // Get the last two digits of the year
@@ -96,49 +67,25 @@ export const AnnualReportPDFGridItem = ({
 
                 return `FY ${formattedPrevYear}-${formattedYear}`;
               })()}
-          </AbsoluteCenter>
-        </Box>
+          </div>
+        </div>
         {userData?.is_superuser && (
-          <Grid
-            mt={4}
-            w={"100%"}
-            // gridTemplateColumns={"repeat(2, 1fr)"}
-            gridGap={8}
-          >
+          <div className="mt-4 w-full gap-8">
             <Button
-              variant={"link"}
-              userSelect={"none"}
-              draggable={false}
-              onClick={onChangePDFOpen}
-              leftIcon={
-                <Box color={"blue.500"} mt={"2px"}>
-                  <FaEdit size={"14px"} />
-                </Box>
-              }
+              variant="link"
+              className="select-none p-0 h-auto text-blue-500 hover:text-blue-400"
+              onClick={() => setIsChangePDFOpen(true)}
             >
+              <div className="text-blue-500 mt-0.5 mr-2">
+                <FaEdit size="14px" />
+              </div>
               Update
             </Button>
-          </Grid>
+          </div>
         )}
-      </Flex>
+      </div>
     </>
   );
 };
 
-{
-  /* <Button
-variant={"link"}
-userSelect={"none"}
-draggable={false}
-onClick={() => {
-  downloadPDF(report);
-}}
-leftIcon={
-  <Box color={"blue.500"} mt={"2px"}>
-    <MdDownload size={"18px"} />
-  </Box>
-}
->
-Download
-</Button> */
-}
+

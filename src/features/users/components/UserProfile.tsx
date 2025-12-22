@@ -12,7 +12,6 @@ import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useCheckExistingCaretaker } from "@/features/users/hooks/useCheckExistingCaretaker";
 import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
-import { useDisclosure } from "@chakra-ui/react";
 import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
@@ -29,17 +28,11 @@ import { DeleteUserModal } from "@/features/users/components/modals/DeleteUserMo
 import { EditUserDetailsModal } from "@/features/users/components/modals/EditUserDetailsModal";
 import { PromoteUserModal } from "@/features/users/components/modals/PromoteUserModal";
 import { UserProjectsDataTable } from "@/features/dashboard/components/UserProjectsDataTable";
-import { useColorMode } from "@chakra-ui/react/color-mode";
-import { Center } from "@chakra-ui/react/center";
-import { Spinner } from "@chakra-ui/react/spinner";
-import { Flex } from "@chakra-ui/react/flex";
-import { Avatar } from "@radix-ui/react-avatar";
+import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
 import { cn } from "@/shared/utils";
-import { Button } from "@chakra-ui/react/button";
-import { Grid } from "@chakra-ui/react/grid";
-import { Spacer } from "@chakra-ui/react/spacer";
-import { Image } from "@chakra-ui/react/image";
-import { Tooltip } from "@chakra-ui/react/tooltip";
 
 interface Props {
   pk: number;
@@ -60,10 +53,11 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
   const { currentPage } = useUpdatePage();
 
-  const { colorMode } = useColorMode();
-  const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
-  const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
-  const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const borderColor = isDark ? "border-gray-500" : "border-gray-300";
+  const sectionTitleColor = isDark ? "text-gray-300" : "text-gray-600";
+  const subsectionTitleColor = "text-gray-500";
   const replaceLightWithDark = (htmlString: string): string => {
     // Replace 'light' with 'dark' in class attributes
     const modifiedHTML = htmlString.replace(
@@ -130,79 +124,20 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     window.open(`mailto:${user?.email}`);
   };
 
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeactivateModalOpen,
-    onOpen: onDeactivateModalOpen,
-    onClose: onDeactivateModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isPromoteModalOpen,
-    onOpen: onPromoteModalOpen,
-    onClose: onPromoteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isAddToProjectModalOpen,
-    onOpen: onAddToProjectModalOpen,
-    onClose: onAddToProjectModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isMergeUserModalOpen,
-    onOpen: onMergeUserModalOpen,
-    onClose: onMergeUserModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isRequestCaretakerModalOpen,
-    onOpen: onRequestCaretakerModalOpen,
-    onClose: onRequestCaretakerModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isSetCaretakerAdminModalOpen,
-    onOpen: onOpenSetCaretakerAdminModal,
-    onClose: onCloseSetCaretakerAdminModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: cancelModalIsOpen,
-    onOpen: onCancelModalOpen,
-    onClose: onCancelModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: cancelBecomeModalIsOpen,
-    onOpen: onOpenCancelBecomeModal,
-    onClose: onCancelBecomeModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isSetCaretakerMyModalOpen,
-    onOpen: onOpenSetCaretakerMyModal,
-    onClose: onCloseSetCaretakerMyModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isBecomeCaretakerModalOpen,
-    onOpen: onOpenBecomeCaretakerModal,
-    onClose: onCloseBecomeCaretakerModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isRemoveCaretakerAdminModalOpen,
-    onOpen: onOpenRemoveCaretakerAdminModal,
-    onClose: onCloseRemoveCaretakerAdminModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isEditUserDetailsModalOpen,
-    onOpen: onEditUserDetailsModalOpen,
-    onClose: onEditUserDetailsModalClose,
-  } = useDisclosure();
+  // Replace useDisclosure with React state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
+  const [isAddToProjectModalOpen, setIsAddToProjectModalOpen] = useState(false);
+  const [isMergeUserModalOpen, setIsMergeUserModalOpen] = useState(false);
+  const [isRequestCaretakerModalOpen, setIsRequestCaretakerModalOpen] = useState(false);
+  const [isSetCaretakerAdminModalOpen, setIsSetCaretakerAdminModalOpen] = useState(false);
+  const [cancelModalIsOpen, setCancelModalIsOpen] = useState(false);
+  const [cancelBecomeModalIsOpen, setCancelBecomeModalIsOpen] = useState(false);
+  const [isSetCaretakerMyModalOpen, setIsSetCaretakerMyModalOpen] = useState(false);
+  const [isBecomeCaretakerModalOpen, setIsBecomeCaretakerModalOpen] = useState(false);
+  const [isRemoveCaretakerAdminModalOpen, setIsRemoveCaretakerAdminModalOpen] = useState(false);
+  const [isEditUserDetailsModalOpen, setIsEditUserDetailsModalOpen] = useState(false);
 
   const me = useUser();
 
@@ -217,7 +152,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     isUserToChangeSuperUser: boolean,
   ) => {
     setUserInQuestionIsSuperuser(isUserToChangeSuperUser);
-    onPromoteModalOpen();
+    setIsPromoteModalOpen(true);
   };
 
   const navigate = useNavigate();
@@ -273,9 +208,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const accountIsCaretaking = user?.caretaking_for?.length > 0;
 
   return loading || !user || pk === undefined || caretakerDataLoading ? (
-    <Center w={"100%"} h={"100%"}>
-      <Spinner size={"xl"} />
-    </Center>
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>
   ) : (
     <>
       {(viewingUserIsSuper || viewingUserIsAccount || caretakerIsMe) && (
@@ -283,7 +218,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           {viewingUserIsAccount && (
             <SetCaretakerForMyAccountModal
               isOpen={isSetCaretakerMyModalOpen}
-              onClose={onCloseSetCaretakerMyModal}
+              onClose={() => setIsSetCaretakerMyModalOpen(false)}
               userIsSuper={userInQuestionIsSuperuser}
               userPk={user?.pk}
               userData={user}
@@ -349,7 +284,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         <>
           <SetCaretakerAdminModal
             isOpen={isSetCaretakerAdminModalOpen}
-            onClose={onCloseSetCaretakerAdminModal}
+            onClose={() => setIsSetCaretakerAdminModalOpen(false)}
             userIsSuper={userInQuestionIsSuperuser}
             userPk={user?.pk}
             userData={user}
@@ -360,19 +295,19 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           />
           <DeleteUserModal
             isOpen={isDeleteModalOpen}
-            onClose={onDeleteModalClose}
+            onClose={() => setIsDeleteModalOpen(false)}
             userIsSuper={userInQuestionIsSuperuser}
             userPk={user?.pk}
           />
           <DeactivateUserModal
             isOpen={isDeactivateModalOpen}
-            onClose={onDeactivateModalClose}
+            onClose={() => setIsDeactivateModalOpen(false)}
             userIsSuper={userInQuestionIsSuperuser}
             user={user}
           />
           <PromoteUserModal
             isOpen={isPromoteModalOpen}
-            onClose={onPromoteModalClose}
+            onClose={() => setIsPromoteModalOpen(false)}
             userPk={user?.pk}
             userIsSuper={userInQuestionIsSuperuser}
             userIsExternal={!user.is_staff}
@@ -382,7 +317,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
       <BecomeCaretakerModal
         isOpen={isBecomeCaretakerModalOpen}
-        onClose={onCloseBecomeCaretakerModal}
+        onClose={() => setIsBecomeCaretakerModalOpen(false)}
         myPk={me?.userData?.pk}
         user={user}
         refetch={() => {
@@ -393,7 +328,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
       <AddUserToProjectModal
         isOpen={isAddToProjectModalOpen}
-        onClose={onAddToProjectModalClose}
+        onClose={() => setIsAddToProjectModalOpen(false)}
         preselectedUser={pk}
       />
 
@@ -401,13 +336,13 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         <>
           <RequestMergeUserModal
             isOpen={isMergeUserModalOpen}
-            onClose={onMergeUserModalClose}
+            onClose={() => setIsMergeUserModalOpen(false)}
             primaryUserPk={me?.userData?.pk}
             secondaryUserPks={[user?.pk]}
           />
           <CaretakerModeConfirmModal
             isOpen={isRequestCaretakerModalOpen}
-            onClose={onRequestCaretakerModalClose}
+            onClose={() => setIsRequestCaretakerModalOpen(false)}
             refetch={() => {
               refetch();
               refetchCaretakerData();
@@ -423,28 +358,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
       <EditUserDetailsModal
         isOpen={isEditUserDetailsModalOpen}
-        onClose={onEditUserDetailsModalClose}
+        onClose={() => setIsEditUserDetailsModalOpen(false)}
         user={user}
         branches={branches}
         businessAreas={businessAreas}
       />
-      <Flex flexDir={"column"} h={"100%"}>
-        <Flex mt={4}>
-          <Avatar
-            src={user?.image?.file ? user.image.file : user?.image?.old_file}
-            size={"2xl"}
-            userSelect={"none"}
-            draggable="false"
-            className="pointer-events-none"
-          />
+      <div className="flex flex-col h-full">
+        <div className="flex mt-4">
+          <Avatar className="w-20 h-20 select-none pointer-events-none">
+            <AvatarImage 
+              src={user?.image?.file ? user.image.file : user?.image?.old_file} 
+              alt={`${user?.display_first_name} ${user?.display_last_name}`}
+            />
+            <AvatarFallback>
+              {user?.display_first_name?.[0]}{user?.display_last_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
 
-          <Flex
-            flexDir={"column"}
-            flex={1}
-            justifyContent={"center"}
-            ml={4}
-            overflow={"auto"}
-          >
+          <div className="flex flex-col flex-1 justify-center ml-4 overflow-auto">
             <p className={cn("font-bold select-none")}>
               {!user?.display_first_name?.startsWith("None")
                 ? `${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`
@@ -453,148 +384,102 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             <p className={cn("select-none")}>
               {user?.phone ? user.phone : "No Phone number"}
             </p>
-            <Flex>
+            <div className="flex">
               <p className={cn("select-none")}>
                 {user?.email?.startsWith("unset") ? "No Email" : user?.email}
               </p>
-            </Flex>
+            </div>
             {!user?.email?.startsWith("unset") && (
               <Button
-                // ml={2}
-                size={"xs"}
-                variant={"ghost"}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                size="sm"
+                variant="ghost"
+                className={cn(
+                  "text-white mt-2 px-4 w-fit rounded",
+                  isDark ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-400"
+                )}
                 onClick={copyEmail}
-                leftIcon={<FiCopy />}
-                ml={0}
-                rounded={4}
-                mt={2}
-                px={4}
-                w={"fit-content"}
               >
+                <FiCopy className="mr-2 h-4 w-4" />
                 Copy Email
-                {/* <Icon as={FiCopy} /> */}
               </Button>
             )}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
 
-        <Grid
-          gridTemplateColumns={
-            !viewingUserIsAccount ? "repeat(2, 1fr)" : "repeat(2, 1fr)"
-          }
-          gridGap={4}
-          mt={4}
-          pt={2}
-          pb={4}
-        >
+        <div className={cn(
+          "grid gap-4 mt-4 pt-2 pb-4",
+          !viewingUserIsAccount ? "grid-cols-2" : "grid-cols-2"
+        )}>
           {!accountIsStaff && (
             <Button
               onClick={openEmailAddressedToUser}
-              bg={colorMode === "light" ? "blue.500" : "blue.400"}
-              color={
-                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-              }
-              isDisabled={
+              className={cn(
+                "text-white",
+                isDark ? "bg-blue-400 hover:bg-blue-300" : "bg-blue-500 hover:bg-blue-400"
+              )}
+              disabled={
                 user.email?.startsWith("unset") ||
                 me.userData.email === user.email
               }
-              _hover={{
-                bg: colorMode === "light" ? "blue.400" : "blue.300",
-                color: "white",
-              }}
             >
               Email
             </Button>
           )}
           {accountIsStaff && (
             <Button
-              bg={colorMode === "light" ? "blue.500" : "blue.400"}
-              color={
-                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-              }
-              _hover={{
-                bg: colorMode === "light" ? "blue.400" : "blue.300",
-                color: "white",
-              }}
-              // isDisabled={true}
+              className={cn(
+                "text-white",
+                isDark ? "bg-blue-400 hover:bg-blue-300" : "bg-blue-500 hover:bg-blue-400"
+              )}
               onClick={openEmailAddressedToUser}
             >
-              {/* Chat */}
               Email
             </Button>
           )}
 
           <Button
-            bg={colorMode === "light" ? "green.500" : "green.400"}
-            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
-            onClick={onAddToProjectModalOpen}
-            _hover={{
-              bg: colorMode === "light" ? "green.400" : "green.300",
-              color: "white",
-            }}
-            isDisabled={user.email === me.userData.email}
+            className={cn(
+              "text-white",
+              isDark ? "bg-green-400 hover:bg-green-300" : "bg-green-500 hover:bg-green-400"
+            )}
+            onClick={() => setIsAddToProjectModalOpen(true)}
+            disabled={user.email === me.userData.email}
           >
             Add to Project
           </Button>
-        </Grid>
+        </div>
 
-        <Flex
-          border={"1px solid"}
-          rounded={"xl"}
-          borderColor={borderColor}
-          padding={4}
-          // mb={4}
-          flexDir={"column"}
-          mt={2}
-        >
-          <Flex flexDir={"column"} userSelect={"none"}>
+        <div className={cn(
+          "border rounded-xl p-4 flex flex-col mt-2",
+          borderColor
+        )}>
+          <div className="flex flex-col select-none">
             {accountIsStaff && (
-              <Flex h={"60px"}>
-                <Image
-                  rounded={"lg"}
-                  w="60px"
-                  h="60px"
-                  src={
-                    // user?.agency?.image ? user.agency.image.old_file : ""
-                    "/dbca.jpg"
-                  }
-                  objectFit="cover"
-                  className="pointer-events-none select-none"
+              <div className="flex h-15">
+                <img
+                  className="rounded-lg w-15 h-15 object-cover pointer-events-none select-none"
+                  src="/dbca.jpg"
+                  alt="DBCA Logo"
                 />
-                <Center>
-                  <Flex ml={3} flexDir="column">
-                    <p
-                      className={cn("font-bold", `text-[${sectionTitleColor}]`)}
-                    >
+                <div className="flex items-center">
+                  <div className="ml-3 flex flex-col">
+                    <p className={cn("font-bold", sectionTitleColor)}>
                       {user.agency !== null
                         ? user.agency.name
                         : "agency returning none"}
                     </p>
-                    <p
-                      className={cn(
-                        "text-sm",
-                        colorMode === "light"
-                          ? "text-gray-600"
-                          : "text-gray-400",
-                      )}
-                    >
+                    <p className={cn(
+                      "text-sm",
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    )}>
                       {user.branch !== null
                         ? `${user.branch.name} Branch`
                         : "Branch not set"}
                     </p>
-                    <p
-                      className={cn(
-                        "text-sm",
-                        colorMode === "light"
-                          ? "text-blue-600"
-                          : "text-gray-400",
-                      )}
-                    >
+                    <p className={cn(
+                      "text-sm",
+                      isDark ? "text-gray-400" : "text-blue-600"
+                    )}>
                       {user?.business_area?.name ? (
                         <>
                           <span>
@@ -602,10 +487,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                               ? "Business Area Leader, "
                               : ``}
                           </span>
-                          <span
-                          // onClick={() => console.log(user)}
-                          // style={{ color: "blue.500" }}
-                          >
+                          <span>
                             {user.business_area.name}
                           </span>
                         </>
@@ -613,44 +495,33 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         "Business Area not set"
                       )}
                     </p>
-                  </Flex>
-                </Center>
-              </Flex>
+                  </div>
+                </div>
+              </div>
             )}
             {!accountIsStaff && (
-              <p
-                className={cn()}
-                color={colorMode === "light" ? "gray.600" : "gray.300"}
-              >
+              <p className={cn(isDark ? "text-gray-300" : "text-gray-600")}>
                 <b>External User</b> - This user does not belong to DBCA
               </p>
             )}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
 
-        <div className={"mt-2"}>
-          <Flex
-            border={"1px solid"}
-            rounded={"xl"}
-            borderColor={borderColor}
-            padding={4}
-            mb={4}
-            flexDir={"column"}
-            mt={2}
-          >
-            <Flex>
-              <p
-                className={cn("mb-1 text-sm font-bold select-none")}
-                color={sectionTitleColor}
-              >
+        <div className="mt-2">
+          <div className={cn(
+            "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+            borderColor
+          )}>
+            <div className="flex">
+              <p className={cn("mb-1 text-sm font-bold select-none", sectionTitleColor)}>
                 About
               </p>
-            </Flex>
+            </div>
             <div
               className="mt-1"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
-                  colorMode === "dark"
+                  isDark
                     ? replaceLightWithDark(
                         user?.about === "" ||
                           user?.about === "<p></p>" ||
@@ -673,27 +544,16 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               }}
             />
 
-            {/* <p className={
-            cn()}>
-              {user.about
-                ? user.about
-                : "This user has not filled in this section."}
-            </p> */}
-            <Flex mt={4}>
-              <p
-                className={cn(
-                  "mb-1 text-sm font-bold select-none",
-                  `text-[${sectionTitleColor}]`,
-                )}
-              >
+            <div className="flex mt-4">
+              <p className={cn("mb-1 text-sm font-bold select-none", sectionTitleColor)}>
                 Expertise
               </p>
-            </Flex>
+            </div>
             <div
               className="mt-1"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
-                  colorMode === "dark"
+                  isDark
                     ? replaceLightWithDark(
                         user?.expertise === "" ||
                           user?.expertise === "<p></p>" ||
@@ -717,38 +577,20 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 ),
               }}
             />
+          </div>
 
-            {/* <p className={
-            cn()}>
-              {user?.expertise
-                ? user.expertise
-                : "This user has not filled in this section."}
-            </p> */}
-          </Flex>
-
-          <Spacer />
+          <div className="flex-1" />
 
           {!userProjectsLoading && userProjectsData?.length > 0 && (
-            <Flex
-              border={"1px solid"}
-              rounded={"xl"}
-              borderColor={borderColor}
-              padding={4}
-              mb={4}
-              flexDir={"column"}
-              mt={2}
-            >
-              {" "}
-              <Flex>
-                <p
-                  className={cn(
-                    "mb-1 text-sm font-bold select-none",
-                    `text-[${sectionTitleColor}]`,
-                  )}
-                >
+            <div className={cn(
+              "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+              borderColor
+            )}>
+              <div className="flex">
+                <p className={cn("mb-1 text-sm font-bold select-none", sectionTitleColor)}>
                   Involved Projects
                 </p>
-              </Flex>
+              </div>
               {!userProjectsLoading &&
                 (userProjectsData?.length === 0 ? (
                   <p>No Projects</p>
@@ -769,71 +611,53 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     />
                   </>
                 ))}
-              {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
-            </Flex>
+            </div>
           )}
 
-          <Spacer />
+          <div className="flex-1" />
 
-          <Flex
-            border={"1px solid"}
-            rounded={"xl"}
-            borderColor={borderColor}
-            padding={4}
-            mb={4}
-            flexDir={"column"}
-            mt={2}
-          >
-            <Flex mb={3}>
-              <p
-                className={cn(
-                  "mr-2 text-sm select-none",
-                  `text-[${sectionTitleColor}]`,
-                )}
-              >
+          <div className={cn(
+            "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+            borderColor
+          )}>
+            <div className="flex mb-3">
+              <p className={cn("mr-2 text-sm select-none", sectionTitleColor)}>
                 <b>Caretaker and Merging</b>
               </p>
-            </Flex>
+            </div>
 
-            <Flex flexDir={"column"} gap={2}>
-              <p
-                className={cn(
-                  "text-sm select-none",
-                  `text-${subsectionTitleColor}`,
-                  accountHasCaretakers ? "mb-3" : "mb-2",
-                )}
-              >
+            <div className="flex flex-col gap-2">
+              <p className={cn(
+                "text-sm select-none",
+                subsectionTitleColor,
+                accountHasCaretakers ? "mb-3" : "mb-2"
+              )}>
                 <b>Caretaker</b>
               </p>
               {accountHasCaretakers ? (
                 <div>
-                  <Flex
-                    justifyContent={"space-between"}
-                    mb={4}
-                    alignItems={"center"}
-                  >
+                  <div className="flex justify-between mb-4 items-center">
                     <div className="flex items-center gap-2">
-                      <Avatar
-                        size="md"
-                        name={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
-                        src={
-                          user?.caretakers[0]?.image
-                            ? user?.caretakers[0]?.image?.startsWith("http")
-                              ? `${user?.caretakers[0]?.image}`
-                              : `${baseAPI}${user?.caretakers[0]?.image}`
-                            : noImage
-                        }
-                        className="pointer-events-none select-none"
-                      />
+                      <Avatar className="w-10 h-10 pointer-events-none select-none">
+                        <AvatarImage
+                          src={
+                            user?.caretakers[0]?.image
+                              ? user?.caretakers[0]?.image?.startsWith("http")
+                                ? `${user?.caretakers[0]?.image}`
+                                : `${baseAPI}${user?.caretakers[0]?.image}`
+                              : noImage
+                          }
+                          alt={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
+                        />
+                        <AvatarFallback>
+                          {user?.caretakers[0]?.display_first_name?.[0]}{user?.caretakers[0]?.display_last_name?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="flex flex-col">
-                        <p
-                          className={cn(
-                            "font-bold",
-                            colorMode === "light"
-                              ? "text-gray-800"
-                              : "text-gray-200",
-                          )}
-                        >
+                        <p className={cn(
+                          "font-bold",
+                          isDark ? "text-gray-200" : "text-gray-800"
+                        )}>
                           {`${user?.caretakers[0]?.display_first_name} ${
                             user?.caretakers[0]?.display_last_name
                           }`}
@@ -845,22 +669,17 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       viewingUserIsSuper) && (
                       <div>
                         <Button
-                          bg={colorMode === "light" ? "red.600" : "red.700"}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.900"
-                          }
-                          _hover={{
-                            bg: colorMode === "light" ? "red.500" : "red.600",
-                          }}
-                          onClick={onOpenRemoveCaretakerAdminModal}
+                          className={cn(
+                            "text-white",
+                            isDark ? "bg-red-700 hover:bg-red-600" : "bg-red-600 hover:bg-red-500"
+                          )}
+                          onClick={() => setIsRemoveCaretakerAdminModalOpen(true)}
                         >
                           Remove Caretaker
                         </Button>
                       </div>
                     )}
-                  </Flex>
+                  </div>
                 </div>
               ) : (
                 <>
@@ -869,7 +688,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       "pending" && (
                       <CancelCaretakerRequestModal
                         isOpen={cancelModalIsOpen}
-                        onClose={onCancelModalClose}
+                        onClose={() => setCancelModalIsOpen(false)}
                         refresh={() => {
                           refetch();
                           refetchCaretakerData();
@@ -883,7 +702,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       "pending" && (
                       <CancelCaretakerRequestModal
                         isOpen={cancelBecomeModalIsOpen}
-                        onClose={onCancelBecomeModalClose}
+                        onClose={() => setCancelBecomeModalIsOpen(false)}
                         refresh={() => {
                           refetch();
                           refetchCaretakerData();
@@ -893,11 +712,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         }
                       />
                     )}
-                  <Flex
-                    justifyContent={"space-between"}
-                    mb={0}
-                    alignItems={"center"}
-                  >
+                  <div className="flex justify-between mb-0 items-center">
                     <p className={cn()}>
                       {caretakerData?.caretaker_request_object?.status &&
                       caretakerData?.caretaker_request_object?.status ===
@@ -912,45 +727,26 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     </p>
                     {!accountHasCaretakers && viewingUserIsAccount && (
                       <Button
-                        // w={"100%"}
                         onClick={
                           caretakerData?.caretaker_request_object?.status &&
                           caretakerData?.caretaker_request_object?.status ===
                             "pending"
-                            ? onCancelModalOpen
+                            ? () => setCancelModalIsOpen(true)
                             : viewingUserIsSuper
-                              ? onOpenSetCaretakerAdminModal
-                              : onOpenSetCaretakerMyModal
+                              ? () => setIsSetCaretakerAdminModalOpen(true)
+                              : () => setIsSetCaretakerMyModalOpen(true)
                         }
-                        bg={
+                        className={cn(
+                          "text-white",
                           caretakerData?.caretaker_request_object?.status &&
                           caretakerData?.caretaker_request_object?.status ===
                             "pending"
-                            ? colorMode === "light"
-                              ? `gray.500`
-                              : `gray.500`
-                            : colorMode === "light"
-                              ? `green.600`
-                              : `green.700`
-                        }
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.900"
-                        }
-                        _hover={{
-                          bg:
-                            caretakerData?.caretaker_request_object?.status &&
-                            caretakerData?.caretaker_request_object?.status ===
-                              "pending"
-                              ? colorMode === "light"
-                                ? `gray.400`
-                                : `gray.400`
-                              : colorMode === "light"
-                                ? `green.500`
-                                : `green.600`,
-                        }}
-                        isDisabled={
+                            ? "bg-gray-500 hover:bg-gray-400"
+                            : isDark
+                              ? "bg-green-700 hover:bg-green-600"
+                              : "bg-green-600 hover:bg-green-500"
+                        )}
+                        disabled={
                           user?.caretakers && user.caretakers.length > 0
                         }
                       >
@@ -963,37 +759,17 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                             : "Request Caretaker"}
                       </Button>
                     )}
-                  </Flex>
+                  </div>
 
                   {accountHasCaretakers && accountIsStaff ? (
                     <>
-                      <p
-                        className={cn(
-                          "text-sm text-balance",
-                          colorMode === "light"
-                            ? "text-gray-500"
-                            : "text-gray-400",
-                        )}
-                      >
+                      <p className={cn(
+                        "text-sm text-balance",
+                        isDark ? "text-gray-400" : "text-gray-500"
+                      )}>
                         To set or become caretaker, visit your profile and
                         remove your current caretaker.
                       </p>
-
-                      {/* <Flex w={"100%"} justifyContent={"space-between"} pr={2}>
-                        {" "}
-                        <p className={
-                        cn()}>Click here to remove your caretaker</p>
-                        <p className={
-                        cn()}
-                          color={
-                            colorMode === "light" ? "blue.500" : "blue.400"
-                          }
-                          fontWeight={"semibold"}
-                          onClick={}
-                        >
-                          Remove
-                        </p>
-                      </Flex> */}
                     </>
                   ) : (
                     !viewingUserIsAccount &&
@@ -1001,7 +777,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       <>
                         <BecomeCaretakerModal
                           isOpen={isSetCaretakerAdminModalOpen}
-                          onClose={onCloseSetCaretakerAdminModal}
+                          onClose={() => setIsSetCaretakerAdminModalOpen(false)}
                           myPk={me?.userData?.pk}
                           user={user}
                           refetch={() => {
@@ -1009,89 +785,52 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                             refetchCaretakerData();
                           }}
                         />
-                        <Flex
-                          justifyContent={"space-between"}
-                          alignItems={"center"}
-                          mb={0}
-                        >
+                        <div className="flex justify-between items-center mb-0">
                           {caretakerData?.become_caretaker_request_object
                             ?.secondary_users[0]?.pk === me?.userData?.pk && (
-                            <p
-                              className={cn(
-                                "text-sm text-balance",
-                                colorMode === "light"
-                                  ? "text-gray-500"
-                                  : "text-gray-400",
-                              )}
-                            >
+                            <p className={cn(
+                              "text-sm text-balance",
+                              isDark ? "text-gray-400" : "text-gray-500"
+                            )}>
                               Your request has been made to become this user's
                               caretaker
                             </p>
                           )}
 
                           <Button
-                            mt={2}
-                            w={
+                            className={cn(
+                              "mt-2 text-white",
                               caretakerData?.become_caretaker_request_object
                                 ?.secondary_users[0]?.pk === me?.userData?.pk
                                 ? undefined
-                                : "100%"
-                            }
+                                : "w-full",
+                              caretakerData?.become_caretaker_request_object
+                                ?.status === "pending" &&
+                              caretakerData?.become_caretaker_request_object
+                                ?.secondary_users[0]?.pk === me?.userData?.pk
+                                ? isDark
+                                  ? "bg-red-600 hover:bg-red-500"
+                                  : "bg-red-500 hover:bg-red-400"
+                                : isDark
+                                  ? "bg-green-700 hover:bg-green-600"
+                                  : "bg-green-600 hover:bg-green-500"
+                            )}
                             onClick={
                               caretakerData?.become_caretaker_request_object
                                 ?.status === "pending" &&
                               caretakerData?.become_caretaker_request_object
                                 ?.secondary_users[0]?.pk === me?.userData?.pk
-                                ? onOpenCancelBecomeModal
-                                : onOpenBecomeCaretakerModal
+                                ? () => setCancelBecomeModalIsOpen(true)
+                                : () => setIsBecomeCaretakerModalOpen(true)
                             }
-                            bg={
-                              caretakerData?.become_caretaker_request_object
-                                ?.status === "pending" &&
-                              caretakerData?.become_caretaker_request_object
-                                ?.secondary_users[0]?.pk === me?.userData?.pk
-                                ? colorMode === "light"
-                                  ? "red.500"
-                                  : "red.600"
-                                : colorMode === "light"
-                                  ? "green.600"
-                                  : "green.700"
-                            }
-                            color={
-                              colorMode === "light"
-                                ? "whiteAlpha.900"
-                                : "whiteAlpha.900"
-                            }
-                            _hover={{
-                              bg:
-                                caretakerData?.become_caretaker_request_object
-                                  ?.status === "pending" &&
-                                caretakerData?.become_caretaker_request_object
-                                  ?.secondary_users[0]?.pk === me?.userData?.pk
-                                  ? colorMode === "light"
-                                    ? "red.400"
-                                    : "red.500"
-                                  : colorMode === "light"
-                                    ? "green.500"
-                                    : "green.600",
-                            }}
-                            isDisabled={
+                            disabled={
                               accountHasCaretakers ||
                               caretakerData?.caretaker_request_object
                                 ?.primary_user?.pk === me?.userData?.pk ||
                               caretakerData?.caretaker_object?.caretaker?.pk ===
                                 user?.pk
-                              //     ||
-                              //     caretakerData?.become_caretaker_request_object
-                              //   ?.status === "pending" &&
-                              // caretakerData?.become_caretaker_request_object
-                              //   ?.secondary_users[0]?.pk === me?.userData?.pk
                             }
                           >
-                            {/* {
-                            caretakerData?.caretaker_request_object
-                              ?.secondary_users[0]?.display_first_name
-                          } */}
                             {caretakerData?.become_caretaker_request_object
                               ?.status === "pending" &&
                             caretakerData?.become_caretaker_request_object
@@ -1099,7 +838,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                               ? "Cancel Request"
                               : "Become Caretaker"}
                           </Button>
-                        </Flex>
+                        </div>
                       </>
                     )
                   )}
@@ -1107,128 +846,115 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               )}
 
               {viewingUserIsSuper && accountIsStaff && (
-                <Flex
-                  mb={0}
-                  gap={4}
-                  w={"100%"}
-                  justifyContent={"space-between"}
-                >
+                <div className="flex mb-0 gap-4 w-full justify-between">
                   {user?.caretakers && user.caretakers.length > 0 && (
                     <Button
-                      w={"100%"}
-                      onClick={onOpenRemoveCaretakerAdminModal}
-                      bg={colorMode === "light" ? "red.600" : "red.700"}
-                      color={
-                        colorMode === "light"
-                          ? "whiteAlpha.900"
-                          : "whiteAlpha.900"
-                      }
-                      _hover={{
-                        bg: colorMode === "light" ? "red.500" : "red.600",
-                      }}
-                      isDisabled={accountHasCaretakers ? false : true}
+                      className={cn(
+                        "w-full text-white",
+                        isDark ? "bg-red-700 hover:bg-red-600" : "bg-red-600 hover:bg-red-500"
+                      )}
+                      onClick={() => setIsRemoveCaretakerAdminModalOpen(true)}
+                      disabled={accountHasCaretakers ? false : true}
                     >
                       Remove Caretaker
                     </Button>
                   )}
-                </Flex>
+                </div>
               )}
 
-              {/* {accountIsCaretaking && ( */}
-              <div className={"mt-2"}>
-                <p
-                  className={cn(
-                    "text-sm select-none",
-                    `text-[${subsectionTitleColor}]`,
-                    accountIsCaretaking ? "mb-3" : "mb-1",
-                  )}
-                >
+              <div className="mt-2">
+                <p className={cn(
+                  "text-sm select-none",
+                  subsectionTitleColor,
+                  accountIsCaretaking ? "mb-3" : "mb-1"
+                )}>
                   <b>Caretaking For</b>
                 </p>
                 {accountIsCaretaking ? (
-                  <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
+                  <div className="grid grid-cols-1 gap-4">
                     {user?.caretaking_for?.map((obj) => (
-                      <Tooltip
-                        key={obj?.pk}
-                        label={`This user has authority to act on ${obj.display_first_name} ${obj.display_last_name}'s behalf`}
-                      >
-                        {viewingUserIsAccount ||
-                          viewingUserIsSuper ||
-                          caretakeeIsMe ||
-                          (caretakerIsMe && (
-                            <RemoveCaretakerModal
-                              isOpen={isRemoveCaretakerAdminModalOpen}
-                              onClose={onCloseRemoveCaretakerAdminModal}
-                              caretakerObject={{
-                                id: obj?.caretaker_obj_id,
-                                user: obj?.pk,
-                                caretaker: {
-                                  pk: user?.pk || null,
-                                  display_first_name:
-                                    user?.display_first_name || "",
-                                  display_last_name:
-                                    user?.display_last_name || "",
-                                  image: user?.image || null,
-                                },
-                                reason: "leave",
-                                notes: "",
-                                end_date: null,
-                              }}
-                              refetch={() => {
-                                refetch();
-                                refetchCaretakerData();
-                              }}
-                            />
-                          ))}
+                      <TooltipProvider key={obj?.pk}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              {viewingUserIsAccount ||
+                                viewingUserIsSuper ||
+                                caretakeeIsMe ||
+                                (caretakerIsMe && (
+                                  <RemoveCaretakerModal
+                                    isOpen={isRemoveCaretakerAdminModalOpen}
+                                    onClose={() => setIsRemoveCaretakerAdminModalOpen(false)}
+                                    caretakerObject={{
+                                      id: obj?.caretaker_obj_id,
+                                      user: obj?.pk,
+                                      caretaker: {
+                                        pk: user?.pk || null,
+                                        display_first_name:
+                                          user?.display_first_name || "",
+                                        display_last_name:
+                                          user?.display_last_name || "",
+                                        image: user?.image || null,
+                                      },
+                                      reason: "leave",
+                                      notes: "",
+                                      end_date: null,
+                                    }}
+                                    refetch={() => {
+                                      refetch();
+                                      refetchCaretakerData();
+                                    }}
+                                  />
+                                ))}
 
-                        <Flex
-                          key={obj?.pk}
-                          bg={colorMode === "light" ? "gray.50" : "gray.600"}
-                          p={2}
-                          rounded={"xl"}
-                          alignItems={"center"}
-                          justifyContent={"space-between"}
-                        >
-                          <Flex alignItems={"center"}>
-                            <Avatar
-                              size="sm"
-                              className="pointer-events-none select-none"
-                              name={`${obj.display_first_name} ${obj.display_last_name}`}
-                              src={
-                                obj.image
-                                  ? obj.image.startsWith("http")
-                                    ? `${obj.image}`
-                                    : `${baseAPI}${obj.image}`
-                                  : noImage
-                              }
-                            />
-                            <p className={cn("ml-2")}>
-                              {obj.display_first_name} {obj.display_last_name}
-                            </p>
-                          </Flex>
-                          {(viewingUserIsAccount ||
-                            viewingUserIsSuper ||
-                            caretakerIsMe ||
-                            caretakeeIsMe) && (
-                            <Button
-                              variant={"ghost"}
-                              color={"white"}
-                              background={
-                                colorMode === "light" ? "red.500" : "red.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light" ? "red.400" : "red.500",
-                              }}
-                              onClick={onOpenRemoveCaretakerAdminModal}
-                            >
-                              Remove
-                            </Button>
-                          )}
-                        </Flex>
-                      </Tooltip>
+                              <div className={cn(
+                                "flex p-2 rounded-xl items-center justify-between",
+                                isDark ? "bg-gray-600" : "bg-gray-50"
+                              )}>
+                                <div className="flex items-center">
+                                  <Avatar className="w-8 h-8 pointer-events-none select-none">
+                                    <AvatarImage
+                                      src={
+                                        obj.image
+                                          ? obj.image.startsWith("http")
+                                            ? `${obj.image}`
+                                            : `${baseAPI}${obj.image}`
+                                          : noImage
+                                      }
+                                      alt={`${obj.display_first_name} ${obj.display_last_name}`}
+                                    />
+                                    <AvatarFallback>
+                                      {obj.display_first_name?.[0]}{obj.display_last_name?.[0]}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <p className={cn("ml-2")}>
+                                    {obj.display_first_name} {obj.display_last_name}
+                                  </p>
+                                </div>
+                                {(viewingUserIsAccount ||
+                                  viewingUserIsSuper ||
+                                  caretakerIsMe ||
+                                  caretakeeIsMe) && (
+                                  <Button
+                                    variant="ghost"
+                                    className={cn(
+                                      "text-white",
+                                      isDark ? "bg-red-600 hover:bg-red-500" : "bg-red-500 hover:bg-red-400"
+                                    )}
+                                    onClick={() => setIsRemoveCaretakerAdminModalOpen(true)}
+                                  >
+                                    Remove
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>This user has authority to act on {obj.display_first_name} {obj.display_last_name}'s behalf</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     ))}
-                  </Grid>
+                  </div>
                 ) : (
                   <p className={cn()}>
                     {viewingUserIsAccount
@@ -1237,7 +963,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   </p>
                 )}
               </div>
-              {/* )} */}
 
               {!viewingUserIsAccount && (
                 <>
@@ -1246,69 +971,45 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       "pending" &&
                     caretakerData?.caretaker_request_object?.secondary_users[0]
                       ?.pk === user?.pk ? (
-                      <Flex
-                        justifyContent={"space-between"}
-                        alignItems={"center"}
-                        my={2}
-                      >
-                        <p
-                          className={cn(
-                            "text-sm text-balance",
-                            colorMode === "light"
-                              ? "text-gray-500"
-                              : "text-gray-400",
-                          )}
-                        >
+                      <div className="flex justify-between items-center my-2">
+                        <p className={cn(
+                          "text-sm text-balance",
+                          isDark ? "text-gray-400" : "text-gray-500"
+                        )}>
                           Your request has been made to set this user as your
                           caretaker
                         </p>
                         <Button
-                          bg={colorMode === "light" ? "red.600" : "red.700"}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.900"
-                          }
-                          _hover={{
-                            bg: colorMode === "light" ? "red.500" : "red.600",
-                          }}
-                          onClick={onCancelModalOpen}
+                          className={cn(
+                            "text-white",
+                            isDark ? "bg-red-700 hover:bg-red-600" : "bg-red-600 hover:bg-red-500"
+                          )}
+                          onClick={() => setCancelModalIsOpen(true)}
                         >
                           Cancel Request
                         </Button>
-                      </Flex>
+                      </div>
                     ) : (
                       <Button
-                        bg={colorMode === "light" ? "red.500" : "red.400"}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.900"
-                        }
-                        onClick={onRequestCaretakerModalOpen}
-                        _hover={{
-                          bg: colorMode === "light" ? "red.400" : "red.300",
-                          color: "white",
-                        }}
-                        isDisabled={
-                          // accountHasCaretakers &&
+                        className={cn(
+                          "text-white",
+                          isDark ? "bg-red-400 hover:bg-red-300" : "bg-red-500 hover:bg-red-400"
+                        )}
+                        onClick={() => setIsRequestCaretakerModalOpen(true)}
+                        disabled={
                           caretakerIsMe ||
-                          // accountIsCaretaking ||
                           viewingUserIsAccount ||
                           (caretakerData?.caretaker_request_object?.status ===
                             "pending" &&
                             caretakerData?.caretaker_request_object
                               ?.secondary_users[0]?.pk === me?.userData?.pk) ||
-                          // If user already has an open request elsewhere
                           (caretakerData?.become_caretaker_request_object
                             ?.status === "pending" &&
                             caretakerData?.become_caretaker_request_object
                               ?.secondary_users[0]?.pk === me?.userData?.pk) ||
-                          // If user is already being cared for by this user (check if user pk is in caretaking_for)
                           user?.caretaking_for?.some(
                             (obj) => obj?.pk === me?.userData?.pk,
                           ) ||
-                          // If user already has a caretaker set
                           me?.userData?.caretakers?.length > 0
                         }
                       >
@@ -1317,70 +1018,45 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     ))}
 
                   <Button
-                    bg={colorMode === "light" ? "red.500" : "red.400"}
-                    color={
-                      colorMode === "light"
-                        ? "whiteAlpha.900"
-                        : "whiteAlpha.900"
-                    }
-                    onClick={onMergeUserModalOpen}
-                    _hover={{
-                      bg: colorMode === "light" ? "red.400" : "red.300",
-                      color: "white",
-                    }}
-                    isDisabled={user.email === me.userData.email}
+                    className={cn(
+                      "text-white",
+                      isDark ? "bg-red-400 hover:bg-red-300" : "bg-red-500 hover:bg-red-400"
+                    )}
+                    onClick={() => setIsMergeUserModalOpen(true)}
+                    disabled={user.email === me.userData.email}
                   >
                     Merge with My Account
                   </Button>
                 </>
               )}
-            </Flex>
-          </Flex>
+            </div>
+          </div>
           {viewingUserIsSuper && (
-            <Flex
-              border={"1px solid"}
-              rounded={"xl"}
-              borderColor={borderColor}
-              padding={4}
-              mb={4}
-              flexDir={"column"}
-              mt={2}
-            >
-              <Flex pb={1}>
-                <p
-                  className={cn(
-                    "mb-1 text-sm font-bold select-none",
-                    `text-[${subsectionTitleColor}]`,
-                  )}
-                >
+            <div className={cn(
+              "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+              borderColor
+            )}>
+              <div className="flex pb-1">
+                <p className={cn("mb-1 text-sm font-bold select-none", subsectionTitleColor)}>
                   Admin
                 </p>
-              </Flex>
-              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
                 <Button
                   onClick={
                     user.email === me.userData.email
                       ? () => {
                           navigate("/users/me");
                         }
-                      : onEditUserDetailsModalOpen
+                      : () => setIsEditUserDetailsModalOpen(true)
                   }
-                  bg={accountIsSuper ? "blue.600" : "blue.500"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg:
-                      colorMode === "light"
-                        ? accountIsSuper
-                          ? "blue.500"
-                          : "blue.400"
-                        : accountIsSuper
-                          ? "blue.500"
-                          : "blue.400",
-                    color: "white",
-                  }}
-                  isDisabled={
+                  className={cn(
+                    "text-white",
+                    accountIsSuper
+                      ? "bg-blue-600 hover:bg-blue-500"
+                      : "bg-blue-500 hover:bg-blue-400"
+                  )}
+                  disabled={
                     user.email === me.userData.email &&
                     currentPage === "/users/me"
                   }
@@ -1391,201 +1067,114 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={() => {
                     setVariablesForPromoteModalAndOpen(accountIsSuper);
                   }}
-                  bg={
-                    colorMode === "light"
-                      ? accountIsSuper
-                        ? "red.600"
-                        : "green.600"
-                      : accountIsSuper
-                        ? "red.800"
-                        : "green.500"
-                  }
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg:
-                      colorMode === "light"
-                        ? accountIsSuper
-                          ? "red.500"
-                          : "green.500"
-                        : accountIsSuper
-                          ? "red.700"
-                          : "green.400",
-                    color: "white",
-                  }}
-                  isDisabled={
+                  className={cn(
+                    "text-white",
+                    accountIsSuper
+                      ? isDark
+                        ? "bg-red-800 hover:bg-red-700"
+                        : "bg-red-600 hover:bg-red-500"
+                      : isDark
+                        ? "bg-green-500 hover:bg-green-400"
+                        : "bg-green-600 hover:bg-green-500"
+                  )}
+                  disabled={
                     !accountIsStaff || user.email === me.userData.email
                   }
                 >
                   {accountIsSuper ? "Demote" : "Promote"}
                 </Button>
                 <Button
-                  onClick={onDeactivateModalOpen}
-                  bg={colorMode === "light" ? "orange.600" : "orange.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg: colorMode === "light" ? "orange.500" : "orange.600",
-                  }}
-                  isDisabled={
+                  onClick={() => setIsDeactivateModalOpen(true)}
+                  className={cn(
+                    "text-white",
+                    isDark ? "bg-orange-700 hover:bg-orange-600" : "bg-orange-600 hover:bg-orange-500"
+                  )}
+                  disabled={
                     accountIsSuper || user.email === me.userData.email
                   }
                 >
                   {user?.is_active ? "Deactivate" : "Reactivate"}
                 </Button>
                 <Button
-                  onClick={onDeleteModalOpen}
-                  bg={colorMode === "light" ? "red.600" : "red.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{ bg: colorMode === "light" ? "red.500" : "red.600" }}
-                  isDisabled={
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className={cn(
+                    "text-white",
+                    isDark ? "bg-red-700 hover:bg-red-600" : "bg-red-600 hover:bg-red-500"
+                  )}
+                  disabled={
                     accountIsSuper || user.email === me.userData.email
                   }
                 >
                   Delete
                 </Button>
-              </Grid>
-            </Flex>
+              </div>
+            </div>
           )}
 
-          <Flex
-            border={"1px solid"}
-            rounded={"xl"}
-            borderColor={borderColor}
-            padding={4}
-            mb={4}
-            flexDir={"column"}
-            mt={2}
-          >
-            <Flex>
-              <p
-                className={cn(
-                  "mb-1 text-sm font-bold select-none",
-                  `text-[${subsectionTitleColor}]`,
-                )}
-              >
+          <div className={cn(
+            "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+            borderColor
+          )}>
+            <div className="flex">
+              <p className={cn("mb-1 text-sm font-bold select-none", subsectionTitleColor)}>
                 Details
               </p>
-            </Flex>
+            </div>
 
-            <Flex>
-              {/* <p className={
-              cn()} color={subsectionTitleColor}
-                                    userSelect={"none"}
-                                    fontSize={"sm"}
-                                ><b>Role: </b></p><p className={
-                                cn()} >{user?.role ? user.role : "This user has not filled in their 'role' section."}</p> */}
-              <p
-                className={cn(
-                  "text-sm select-none",
-                  `text-[${subsectionTitleColor}]`,
-                )}
-              >
+            <div className="flex">
+              <p className={cn("text-sm select-none", subsectionTitleColor)}>
                 <b>Joined&nbsp;</b>
               </p>{" "}
               <p className={cn("text-sm")}>{`${formatted_date}`}</p>
-            </Flex>
-            <Flex
-              mt={4}
-              rounded="xl"
-              p={4}
-              bg={colorMode === "light" ? "gray.50" : "gray.600"}
-              userSelect={"none"}
-            >
-              <Grid gridTemplateColumns="repeat(3, 1fr)" gap={3} w="100%">
-                <Grid
-                  gridTemplateColumns={"repeat(1, 1fr)"}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <p
-                    className={cn(
-                      "mb-2 font-bold",
-                      `text-[${subsectionTitleColor}]`,
-                    )}
-                  >
+            </div>
+            <div className={cn(
+              "flex mt-4 rounded-xl p-4 select-none",
+              isDark ? "bg-gray-600" : "bg-gray-50"
+            )}>
+              <div className="grid grid-cols-3 gap-3 w-full">
+                <div className="grid grid-cols-1 flex flex-col justify-center items-center">
+                  <p className={cn("mb-2 font-bold", subsectionTitleColor)}>
                     Active?
                   </p>
                   {user?.is_active ? (
                     <FcApproval />
                   ) : (
-                    <div
-                      className={
-                        colorMode === "light" ? "text-red-500" : "text-red-600"
-                      }
-                    >
+                    <div className={isDark ? "text-red-600" : "text-red-500"}>
                       <AiFillCloseCircle />
                     </div>
                   )}
-                </Grid>
+                </div>
 
-                <Grid
-                  gridTemplateColumns={"repeat(1, 1fr)"}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <p
-                    className={cn(
-                      "mb-2 font-bold",
-                      `text-[${subsectionTitleColor}]`,
-                    )}
-                  >
+                <div className="grid grid-cols-1 flex flex-col justify-center items-center">
+                  <p className={cn("mb-2 font-bold", subsectionTitleColor)}>
                     Staff?
                   </p>
                   {accountIsStaff ? (
                     <FcApproval />
                   ) : (
-                    <div
-                      className={cn(
-                        colorMode === "light" ? "text-red-500" : "text-red-600",
-                      )}
-                    >
+                    <div className={cn(isDark ? "text-red-600" : "text-red-500")}>
                       <AiFillCloseCircle />
                     </div>
                   )}
-                </Grid>
+                </div>
 
-                <Grid
-                  gridTemplateColumns={"repeat(1, 1fr)"}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <p
-                    className={cn(
-                      "mb-2 font-bold",
-                      `text-[${subsectionTitleColor}]`,
-                    )}
-                  >
+                <div className="grid grid-cols-1 flex flex-col justify-center items-center">
+                  <p className={cn("mb-2 font-bold", subsectionTitleColor)}>
                     Admin?
                   </p>
                   {accountIsSuper ? (
                     <FcApproval />
                   ) : (
-                    <div
-                      className={cn(
-                        colorMode === "light" ? "text-red-500" : "text-red-600",
-                      )}
-                      color={colorMode === "light" ? "red.500" : "red.600"}
-                    >
+                    <div className={cn(isDark ? "text-red-600" : "text-red-500")}>
                       <AiFillCloseCircle />
                     </div>
                   )}
-                </Grid>
-              </Grid>
-            </Flex>
-          </Flex>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </Flex>
+      </div>
     </>
   );
 };

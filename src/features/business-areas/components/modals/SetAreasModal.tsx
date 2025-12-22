@@ -1,22 +1,15 @@
 import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { type ISetProjectAreas, setProjectAreas } from "@/features/projects/services/projects.service";
 import { AreaCheckAndMaps } from "@/features/projects/components/forms/AreaCheckAndMaps";
@@ -38,36 +31,17 @@ export const SetAreasModal = ({
   onDeleteSuccess,
   setToLastTab,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
   const setAreasMutation = useMutation({
     mutationFn: setProjectAreas,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Updating Areas`,
-        position: "top-right",
-      });
+      toast.loading("Updating Areas");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Areas updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        onDeleteSuccess?.();
-      }
+      toast.success("Areas updated");
+      onDeleteSuccess?.();
 
       setTimeout(async () => {
         queryClient.invalidateQueries({
@@ -79,16 +53,7 @@ export const SetAreasModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not set areas`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not set areas: ${error}`);
     },
   });
 
@@ -96,7 +61,8 @@ export const SetAreasModal = ({
     setAreasMutation.mutate(formData);
   };
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
     useGetLocations();
@@ -126,122 +92,95 @@ export const SetAreasModal = ({
   ]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
-      <ModalOverlay />
-      <Flex
-        as={"form"}
-        // onSubmit={handleSubmit(setAreas)}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Set Project Areas</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`max-w-6xl ${isDark ? "text-gray-400 bg-gray-800" : "bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>Set Project Areas</DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            <>
-              {!locationsLoading && (
-                <Grid
-                  gridTemplateColumns={"repeat(2, 1fr)"}
-                  gridColumnGap={4}
-                  px={4}
+        <div>
+          {!locationsLoading && (
+            <div className="grid grid-cols-2 gap-4 px-4">
+              <div className="flex w-full">
+                {dbcaDistricts && (
+                  <AreaCheckAndMaps
+                    title="DBCA Districts"
+                    areas={dbcaDistricts}
+                    area_type="dbcadistrict"
+                    selectedAreas={selectedDistricts}
+                    setSelectedAreas={setSelectedDistricts}
+                  />
+                )}
+              </div>
+              <div className="flex w-full">
+                {imcra && (
+                  <AreaCheckAndMaps
+                    title="IMCRAs"
+                    areas={imcra}
+                    area_type="imcra"
+                    selectedAreas={selectedImcras}
+                    setSelectedAreas={setSelectedImcras}
+                  />
+                )}
+              </div>
+              <div className="flex w-full mt-2">
+                {dbcaRegions && (
+                  <AreaCheckAndMaps
+                    title="DBCA Regions"
+                    areas={dbcaRegions}
+                    area_type="dbcaregion"
+                    selectedAreas={selectedRegions}
+                    setSelectedAreas={setSelectedRegions}
+                  />
+                )}
+              </div>
+
+              <div className="flex flex-col mt-2 w-full">
+                {nrm && (
+                  <AreaCheckAndMaps
+                    title="Natural Resource Management Regions"
+                    areas={nrm}
+                    area_type="nrm"
+                    selectedAreas={selectedNrms}
+                    setSelectedAreas={setSelectedNrms}
+                  />
+                )}
+              </div>
+              <div className="flex w-full">
+                {ibra && (
+                  <AreaCheckAndMaps
+                    title="IBRAs"
+                    areas={ibra}
+                    area_type="ibra"
+                    selectedAreas={selectedIbras}
+                    setSelectedAreas={setSelectedIbras}
+                  />
+                )}
+              </div>
+              <div className="flex w-full justify-end mt-4">
+                <Button variant="outline" onClick={onClose}>Cancel</Button>
+                <Button
+                  className={`ml-3 text-white ${
+                    isDark 
+                      ? "bg-blue-600 hover:bg-blue-500" 
+                      : "bg-blue-500 hover:bg-blue-400"
+                  }`}
+                  disabled={!projectPk || locationData.length < 1}
+                  onClick={() =>
+                    setAreas({
+                      projectPk: Number(projectPk),
+                      areas: locationData,
+                    })
+                  }
                 >
-                  <Box display={"flex"} w={"100%"}>
-                    {" "}
-                    {dbcaDistricts && (
-                      <AreaCheckAndMaps
-                        title="DBCA Districts"
-                        areas={dbcaDistricts}
-                        area_type="dbcadistrict"
-                        // required
-                        selectedAreas={selectedDistricts}
-                        setSelectedAreas={setSelectedDistricts}
-                      />
-                    )}
-                  </Box>
-                  <Box display={"flex"} w={"100%"}>
-                    {" "}
-                    {imcra && (
-                      <AreaCheckAndMaps
-                        title="IMCRAs"
-                        areas={imcra}
-                        area_type="imcra"
-                        // required
-                        selectedAreas={selectedImcras}
-                        setSelectedAreas={setSelectedImcras}
-                      />
-                    )}
-                  </Box>
-                  <Box display={"flex"} w={"100%"} mt={2}>
-                    {" "}
-                    {dbcaRegions && (
-                      <AreaCheckAndMaps
-                        title="DBCA Regions"
-                        areas={dbcaRegions}
-                        area_type="dbcaregion"
-                        // required
-                        selectedAreas={selectedRegions}
-                        setSelectedAreas={setSelectedRegions}
-                      />
-                    )}
-                  </Box>
-
-                  <Box display={"flex"} flexDir={"column"} mt={2} w={"100%"}>
-                    {nrm && (
-                      <AreaCheckAndMaps
-                        title="Natural Resource Management Regions"
-                        areas={nrm}
-                        area_type="nrm"
-                        // required
-                        selectedAreas={selectedNrms}
-                        setSelectedAreas={setSelectedNrms}
-                      />
-                    )}
-                  </Box>
-                  <Box display={"flex"} w={"100%"}>
-                    {ibra && (
-                      <AreaCheckAndMaps
-                        title="IBRAs"
-                        areas={ibra}
-                        area_type="ibra"
-                        // required
-                        selectedAreas={selectedIbras}
-                        setSelectedAreas={setSelectedIbras}
-                      />
-                    )}
-                  </Box>
-                  <Flex w={"100%"} justifyContent={"flex-end"} mt={4}>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button
-                      ml={3}
-                      // type="submit"
-                      color={"white"}
-                      background={
-                        colorMode === "light" ? "blue.500" : "blue.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light" ? "blue.400" : "blue.500",
-                      }}
-                      rightIcon={<IoIosCreate />}
-                      isDisabled={!projectPk || locationData.length < 1}
-                      onClick={() =>
-                        setAreas({
-                          projectPk: Number(projectPk),
-                          areas: locationData,
-                        })
-                      }
-                    >
-                      Set Areas
-                    </Button>
-                  </Flex>
-                </Grid>
-              )}
-            </>
-          </ModalBody>
-        </ModalContent>
-      </Flex>
-    </Modal>
+                  <IoIosCreate className="mr-2" />
+                  Set Areas
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

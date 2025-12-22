@@ -10,19 +10,8 @@ import { ParticipatingProjectReports } from "@/features/reports/components/curre
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { getLatestReportingYear } from "@/features/admin/services/admin.service";
 import type { IReport } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  Spinner,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from "@chakra-ui/react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 // import { CeleryTest } from "@/shared/components/HTMLPDFs/CeleryTest";
 
@@ -64,122 +53,70 @@ export const CurrentReport = () => {
   const financialYearString = `FY ${formattedYearBefore}-${formattedLatestYear}`;
   const { manuallyCheckAndToggleDialog } = useEditorContext();
 
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const tabs = ["details", "media", "pending", "approved", "preview"];
+  const [activeTab, setActiveTab] = useState<string>("details");
 
   return isLoading ? (
-    <Center mt={4}>
-      <Spinner size={"lg"} />
-    </Center>
+    <div className="flex justify-center mt-4">
+      <Loader2 className="h-6 w-6 animate-spin" />
+    </div>
   ) : (
     <>
-      <Box>
+      <div>
         <Head title={financialYearString} />
-        <Flex>
-          <Text flex={1} fontSize={"2xl"} fontWeight={"bold"} pb={6}>
+        <div className="flex">
+          <h1 className="flex-1 text-2xl font-bold pb-6">
             Annual Report ({financialYearString}){" "}
-          </Text>
-        </Flex>
+          </h1>
+        </div>
 
         {thisReport !== null && thisReport !== undefined && (
           <Tabs
-            isLazy
-            isFitted
-            variant={"enclosed"}
-            onChange={(index) => {
+            value={activeTab}
+            onValueChange={(value) => {
               manuallyCheckAndToggleDialog(() => {
-                // console.log("changed");
-                setActiveTabIndex(index);
+                setActiveTab(value);
               });
             }}
-            defaultIndex={activeTabIndex}
-            index={activeTabIndex}
+            className="w-full"
           >
-            <TabList>
-              <Tab
-                value="details"
-                onClick={() => {
-                  setActiveTabIndex(tabs.indexOf("details"));
-                }}
-              >
-                Details
-              </Tab>
-              <Tab
-                value="media"
-                onClick={() => {
-                  setActiveTabIndex(tabs.indexOf("media"));
-                }}
-              >
-                Media
-              </Tab>
-              <Tab
-                value="pending"
-                onClick={() => {
-                  setActiveTabIndex(tabs.indexOf("pending"));
-                }}
-              >
-                Pending Reports
-              </Tab>
-              <Tab
-                value="approved"
-                onClick={() => {
-                  setActiveTabIndex(tabs.indexOf("approved"));
-                }}
-              >
-                Approved Progress Reports
-              </Tab>
-              <Tab
-                value="preview"
-                onClick={() => {
-                  setActiveTabIndex(tabs.indexOf("preview"));
-                }}
-              >
-                Print Preview
-              </Tab>
-              {/* <Tab>Test</Tab> */}
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <AnnualReportDetails />
-              </TabPanel>
-              <TabPanel>
-                <AnnualReportMedia
-                  reportId={thisReport?.pk ? thisReport.pk : thisReport?.id}
-                />
-              </TabPanel>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="pending">Pending Reports</TabsTrigger>
+              <TabsTrigger value="approved">Approved Progress Reports</TabsTrigger>
+              <TabsTrigger value="preview">Print Preview</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="mt-6">
+              <AnnualReportDetails />
+            </TabsContent>
+            
+            <TabsContent value="media" className="mt-6">
+              <AnnualReportMedia
+                reportId={thisReport?.pk ? thisReport.pk : thisReport?.id}
+              />
+            </TabsContent>
 
-              <TabPanel>
-                <LatestReportsNotYetApproved />
-              </TabPanel>
+            <TabsContent value="pending" className="mt-6">
+              <LatestReportsNotYetApproved />
+            </TabsContent>
 
-              <TabPanel>
-                <ParticipatingProjectReports />
-              </TabPanel>
+            <TabsContent value="approved" className="mt-6">
+              <ParticipatingProjectReports />
+            </TabsContent>
 
-              <TabPanel>
-                <PDFViewer thisReport={thisReport} />
-                {/* <AnnualReportPrintPreview thisReport={thisReport} /> */}
-              </TabPanel>
-              {/* <TabPanel>
-                <CeleryTest />
-              </TabPanel> */}
-            </TabPanels>
+            <TabsContent value="preview" className="mt-6">
+              <PDFViewer thisReport={thisReport} />
+              {/* <AnnualReportPrintPreview thisReport={thisReport} /> */}
+            </TabsContent>
+            {/* <TabsContent value="test">
+              <CeleryTest />
+            </TabsContent> */}
           </Tabs>
         )}
-      </Box>
+      </div>
     </>
   );
 };
 
-<Grid gridGap={8} textAlign={"center"}>
-  <Text fontWeight={"bold"} fontSize={"2xl"}>
-    Participating Business Areas
-  </Text>
-  <Text fontWeight={"bold"} fontSize={"xl"}>
-    Presents a preview of report for current year based on projects in year
-  </Text>
 
-  <Text fontWeight={"bold"} fontSize={"2xl"}>
-    Participating Business Areas
-  </Text>
-</Grid>;

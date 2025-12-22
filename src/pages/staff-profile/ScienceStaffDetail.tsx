@@ -5,27 +5,26 @@ import StaffContent from "@/features/staff-profiles/components/Staff/Detail/Staf
 import StaffHero from "@/features/staff-profiles/components/Staff/Detail/StaffHero";
 import StaffNotFound from "@/features/staff-profiles/components/Staff/StaffNotFound";
 import { Button } from "@/shared/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { useCheckStaffProfile } from "@/features/staff-profiles/hooks/useCheckStaffProfile";
 import { useUser } from "@/features/users/hooks/useUser";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import {
-  Box,
-  Center,
-  Button as ChakraButton,
-  Icon,
-  Spinner,
-  Tooltip,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { MdArrowBack } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const ScienceStaffDetail = () => {
   const { staffProfilePk: usersPk } = useParams();
   const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [isToggleStaffProfileVisibilityModalOpen, setIsToggleStaffProfileVisibilityModalOpen] = useState(false);
   const isNumeric = /^[0-9]+$/.test(usersPk || "");
   const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
     .VITE_PRODUCTION_PROFILES_BASE_URL;
@@ -40,14 +39,6 @@ const ScienceStaffDetail = () => {
   const { staffBaseDataLoading, staffBaseData, refetch } = useCheckStaffProfile(
     Number(usersPk),
   );
-
-  // console.log(staffBaseData);
-
-  const {
-    isOpen: isToggleStaffProfileVisibilityModalOpen,
-    onClose: onCloseToggleStaffProfileVisibilityModal,
-    onOpen: onOpenToggleStaffProfileVisibilityModal,
-  } = useDisclosure();
 
   // console.log(
   //   staffBaseData?.keyword_tags
@@ -85,9 +76,9 @@ const ScienceStaffDetail = () => {
           isStaffProfile
           userData={userDataObject}
         />
-        <Center my={24}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center my-24">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       </div>
     );
   }
@@ -112,7 +103,7 @@ const ScienceStaffDetail = () => {
         <ToggleStaffProfileVisibilityModal
           isOpen={isToggleStaffProfileVisibilityModalOpen}
           userPk={staffBaseData?.user?.pk}
-          onClose={onCloseToggleStaffProfileVisibilityModal}
+          onClose={() => setIsToggleStaffProfileVisibilityModalOpen(false)}
           staffProfilePk={staffBaseData?.pk}
           profileIsHidden={staffBaseData?.is_hidden}
           refetch={() => {
@@ -154,9 +145,9 @@ const ScienceStaffDetail = () => {
         <div className="sm: max-w-[600px] justify-center px-0 sm:px-12 md:max-w-[800px]">
           <div className="flex flex-col">
             {staffBaseDataLoading ? (
-              <Center my={24}>
-                <Spinner />
-              </Center>
+              <div className="flex items-center justify-center my-24">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
             ) : staffBaseData?.is_hidden &&
               viewingUser?.pk !== staffBaseData?.user?.pk &&
               !viewingUser?.is_superuser ? (
@@ -186,63 +177,68 @@ const ScienceStaffDetail = () => {
             <div className={`flex items-center justify-center gap-2`}>
               {(viewingUser?.pk === Number(staffBaseData?.user?.pk) ||
                 viewingUser?.is_superuser) && (
-                <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
-                  <Box>
-                    <BaseToggleOptionsButton
-                      iconOne={AiFillEye}
-                      colorSchemeOne="green"
-                      iconTwo={AiFillEyeInvisible}
-                      colorSchemeTwo="blue"
-                      currentState={buttonsVisible}
-                      setCurrentState={setButtonsVisible}
-                    />
-                  </Box>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <BaseToggleOptionsButton
+                          iconOne={AiFillEye}
+                          colorSchemeOne="green"
+                          iconTwo={AiFillEyeInvisible}
+                          colorSchemeTwo="blue"
+                          currentState={buttonsVisible}
+                          setCurrentState={setButtonsVisible}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Toggle Edit/View</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               {(buttonsVisible &&
                 viewingUser?.pk === Number(staffBaseData?.user?.pk)) ||
               (viewingUser?.is_superuser && buttonsVisible) ? (
                 <div className={`flex items-center justify-center`}>
-                  <Tooltip aria-label="toggle-tooltip" label="Back to SPMS">
-                    {isDesktop ? (
-                      <ChakraButton
-                        onClick={() => {
-                          if (import.meta.env.MODE === "development") {
-                            navigate("/users/me");
-                          } else {
-                            setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
-                          }
-                        }}
-                        leftIcon={<IoArrowBackCircle />}
-                        bg={"green.500"}
-                        _hover={{ bg: "green.400" }}
-                        color={"white"}
-                        mr={2}
-                      >
-                        SPMS
-                      </ChakraButton>
-                    ) : (
-                      <ChakraButton
-                        onClick={() => {
-                          if (import.meta.env.MODE === "development") {
-                            navigate("/users/me");
-                          } else {
-                            setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
-                          }
-                        }}
-                        // rightIcon={<MdScience />}
-                        bg={"green.500"}
-                        _hover={{ bg: "green.400" }}
-                        color={"white"}
-                        rounded={"full"}
-                        p={0}
-                        m={0}
-                        // mt={2}
-                      >
-                        <Icon as={IoArrowBackCircle} boxSize={6} />
-                      </ChakraButton>
-                    )}
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {isDesktop ? (
+                          <Button
+                            onClick={() => {
+                              if (import.meta.env.MODE === "development") {
+                                navigate("/users/me");
+                              } else {
+                                setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
+                              }
+                            }}
+                            className="bg-green-500 hover:bg-green-400 text-white mr-2"
+                          >
+                            <IoArrowBackCircle className="mr-2" />
+                            SPMS
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => {
+                              if (import.meta.env.MODE === "development") {
+                                navigate("/users/me");
+                              } else {
+                                setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
+                              }
+                            }}
+                            className="bg-green-500 hover:bg-green-400 text-white rounded-full p-2"
+                            size="sm"
+                          >
+                            <IoArrowBackCircle className="h-6 w-6" />
+                          </Button>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Back to SPMS</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               ) : null}
             </div>
@@ -254,8 +250,7 @@ const ScienceStaffDetail = () => {
                   <Button
                     className="w-full"
                     onClick={() => {
-                      // console.log("clicked");
-                      onOpenToggleStaffProfileVisibilityModal();
+                      setIsToggleStaffProfileVisibilityModalOpen(true);
                     }}
                   >
                     {staffBaseData?.is_hidden ? "Show" : "Hide"} Profile
@@ -266,9 +261,9 @@ const ScienceStaffDetail = () => {
           </div>
         </div>
       ) : (
-        <Center my={4}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center my-4">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       )}
     </div>
   );

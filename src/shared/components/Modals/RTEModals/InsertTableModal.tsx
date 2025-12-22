@@ -2,23 +2,15 @@ import { INSERT_LINE_BREAK_COMMAND, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 
 interface Props {
   isOpen: boolean;
@@ -51,81 +43,60 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
     onClose();
   };
 
-  const { colorMode } = useColorMode();
-
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"md"}
-      // isCentered={true}
-    >
-      {" "}
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-        p={4}
-      >
-        <ModalHeader mt={5}>Insert Table</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody mb={5}>
-          <Grid gridRowGap={4}>
-            <FormControl>
-              <FormLabel>Rows</FormLabel>
-              <InputGroup>
-                <Input
-                  placeholder={"# of rows (1-51)"}
-                  //   label="Rows"
-                  onChange={(e) => setRows(e.target.value)}
-                  value={rows}
-                  data-test-id="table-modal-rows"
-                  type="number"
-                />
-              </InputGroup>
-              <FormHelperText>
-                Enter the number of rows for the table (Max 11, including
-                header)
-              </FormHelperText>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Columns</FormLabel>
-              <InputGroup>
-                <Input
-                  placeholder={"# of columns (1-7)"}
-                  //   label="Columns"
-                  onChange={(e) => setColumns(e.target.value)}
-                  value={columns}
-                  data-test-id="table-modal-columns"
-                  type="number"
-                />
-              </InputGroup>
-              <FormHelperText>
-                Enter the number of columns for the table (Max 7, including
-                header)
-              </FormHelperText>
-            </FormControl>
-          </Grid>
-        </ModalBody>
-        <ModalFooter>
-          <Flex>
-            <Button onClick={onClose} mr={3} colorScheme={"gray"}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md p-6" onClose={onClose}>
+        <DialogHeader>
+          <DialogTitle className="mt-5">Insert Table</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 mb-5">
+          <div className="space-y-2">
+            <Label htmlFor="rows">Rows</Label>
+            <Input
+              id="rows"
+              placeholder="# of rows (1-51)"
+              onChange={(e) => setRows(e.target.value)}
+              value={rows}
+              data-test-id="table-modal-rows"
+              type="number"
+            />
+            <p className="text-sm text-muted-foreground">
+              Enter the number of rows for the table (Max 11, including header)
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="columns">Columns</Label>
+            <Input
+              id="columns"
+              placeholder="# of columns (1-7)"
+              onChange={(e) => setColumns(e.target.value)}
+              value={columns}
+              data-test-id="table-modal-columns"
+              type="number"
+            />
+            <p className="text-sm text-muted-foreground">
+              Enter the number of columns for the table (Max 7, including header)
+            </p>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <div className="flex gap-3">
+            <Button onClick={onClose} variant="outline">
               Cancel
             </Button>
             <Button
-              isDisabled={isDisabled}
+              disabled={isDisabled}
               onClick={onClick}
-              color={"white"}
-              background={colorMode === "light" ? "green.500" : "green.600"}
-              _hover={{
-                background: colorMode === "light" ? "green.400" : "green.500",
-              }}
+              className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white"
             >
               Confirm
             </Button>
-          </Flex>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

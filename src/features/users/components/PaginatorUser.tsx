@@ -5,12 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useBranches } from "@/features/admin/hooks/useBranches";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import { UserGridItem } from "./UserGridItem";
-import { Flex } from "@chakra-ui/react/flex";
-import { Box } from "@chakra-ui/react/box";
-import { Grid } from "@chakra-ui/react/grid";
-import { Center } from "@chakra-ui/react/center";
-import { Spinner } from "@chakra-ui/react/spinner";
-import { Button } from "@chakra-ui/react/button";
+import { Button } from "@/shared/components/ui/button";
 
 interface IPaginationProps {
   data: IUserData[];
@@ -51,12 +46,12 @@ export const PaginatorUser = ({
   // }, [data]);
 
   return (
-    <Flex flexDir={"column"} minH={"64vh"}>
-      <Box h={"100%"} flex={1}>
+    <div className="flex flex-col min-h-[64vh]">
+      <div className="h-full flex-1">
         {/* Render the current page's data */}
         {!loading ? (
           <AnimatePresence>
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {data.map((u: IUserData, i: number) => (
                 <motion.div
                   key={i}
@@ -90,24 +85,25 @@ export const PaginatorUser = ({
                   />
                 </motion.div>
               ))}
-            </Grid>
+            </div>
           </AnimatePresence>
         ) : (
           // Render a loading spinner while fetching data
-          <Center height="200px">
-            <Spinner size="lg" />
-          </Center>
+          <div className="flex items-center justify-center h-[200px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-blue-500"></div>
+          </div>
         )}
-      </Box>
-      <Box h={"100%"} mt={8} display="flex" justifyContent="center">
+      </div>
+      <div className="h-full mt-8 flex justify-center">
         {/* Render the pagination buttons */}
         <Button
-          isDisabled={currentUserResultsPage === 1}
+          disabled={currentUserResultsPage === 1}
           onClick={() => {
             handleClick(currentUserResultsPage - 1);
             window.scrollTo(0, 0);
           }}
-          mx={1}
+          className="mx-1"
+          variant="outline"
         >
           Prev
         </Button>
@@ -118,25 +114,24 @@ export const PaginatorUser = ({
               handleClick(startPage + i);
               window.scrollTo(0, 0);
             }}
-            mx={1}
-            colorScheme={
-              startPage + i === currentUserResultsPage ? "blue" : "gray"
-            }
+            className="mx-1"
+            variant={startPage + i === currentUserResultsPage ? "default" : "outline"}
           >
             {startPage + i}
           </Button>
         ))}
         <Button
-          isDisabled={currentUserResultsPage === totalPages}
+          disabled={currentUserResultsPage === totalPages}
           onClick={() => {
             handleClick(currentUserResultsPage + 1);
             window.scrollTo(0, 0);
           }}
-          mx={1}
+          className="mx-1"
+          variant="outline"
         >
           Next
         </Button>
-      </Box>
-    </Flex>
+      </div>
+    </div>
   );
 };

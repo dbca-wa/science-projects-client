@@ -10,28 +10,17 @@ import {
   getDoesUserWithFullNameExist,
 } from "@/features/users/services/users.service";
 import { type IAffiliation } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Spinner,
-  Text,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { useTheme } from "next-themes";
+import { cn } from "@/shared/utils";
+import { toast } from "sonner";
 
 // interface UserData {
 // 	username: string;
@@ -53,8 +42,8 @@ interface IProps {
 }
 
 export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
-  const { colorMode } = useColorMode();
-  const toast = useToast();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const navigate = useNavigate();
   // Tracking input fields
   const [firstName, setFirstName] = useState("");
@@ -223,13 +212,8 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
           };
           await createUser(userData);
 
-          toast({
-            position: "top-right",
-            title: "User Created",
+          toast.success("User Created", {
             description: "The user has been successfully created.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
           });
           if (onSuccess) {
             onSuccess();
@@ -246,13 +230,8 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
       } catch (error) {
         console.error("Error checking email:", error);
         setIsCheckingEmail(false);
-        toast({
-          position: "top-right",
-          title: "Error",
+        toast.error("Error", {
           description: "An error occurred while creating the user.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
         });
       }
     }
@@ -264,31 +243,26 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
   return (
     <>
       <Head title={"Add User"} />
-      <Box>
-        <Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
+      <div>
+        <h1 className="mb-8 font-bold text-2xl">
           Add External User
-        </Text>
-      </Box>
+        </h1>
+      </div>
 
       {!isModal && (
-        <Box
-          bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
-          rounded={6}
-          flexDir={"column"}
-          p={6}
-          pos={"relative"}
-          mt={5}
-          mb={7}
-          color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-          userSelect={"none"}
+        <div
+          className={cn(
+            "rounded-md flex-col p-6 relative mt-5 mb-7 select-none",
+            isDark ? "bg-gray-700 text-white/80" : "bg-gray-100 text-black/80"
+          )}
         >
           <TypewriterText>
-            <Text>
+            <p>
               This is for adding external users only. If you are trying to add a
               DBCA staff member, please send them a link to this website and an
               account will be created when they visit. All existing users can be
               found on the users page.
-            </Text>
+            </p>
             {location.pathname !== "/users" && (
               <motion.span
                 initial={{ opacity: 0 }}
@@ -301,8 +275,10 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               >
                 <Button
                   variant={"link"}
-                  color={colorMode === "light" ? "blue.500" : "blue.300"}
-                  cursor={"pointer"}
+                  className={cn(
+                    "cursor-pointer p-0 h-auto",
+                    isDark ? "text-blue-300" : "text-blue-500"
+                  )}
                   onClick={() => {
                     navigate(`/users`);
                   }}
@@ -310,124 +286,138 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               </motion.span>
             )}
           </TypewriterText>
-        </Box>
+        </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
+        <div className="grid grid-cols-2 gap-8">
           {/* First Name */}
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>First Name</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
+          <div className="my-2 mb-4">
+            <Label htmlFor="firstName">First Name *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 {isCheckingName ? (
-                  <Spinner size="sm" color="gray.500" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-500"></div>
                 ) : (
-                  <Icon as={RiNumber1} />
+                  <RiNumber1 className="h-4 w-4 text-gray-500" />
                 )}
-              </InputLeftElement>
+              </div>
               <Input
+                id="firstName"
                 type="text"
                 placeholder="First Name"
                 value={firstName}
                 onChange={handleFirstNameChange}
                 maxLength={30}
+                className="pl-10"
               />
-            </InputGroup>
-          </FormControl>
+            </div>
+          </div>
 
           {/* Last Name */}
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Last Name</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
+          <div className="my-2 mb-4">
+            <Label htmlFor="lastName">Last Name *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 {isCheckingName ? (
-                  <Spinner size="sm" color="gray.500" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-500"></div>
                 ) : (
-                  <Icon as={RiNumber2} />
+                  <RiNumber2 className="h-4 w-4 text-gray-500" />
                 )}
-              </InputLeftElement>
+              </div>
               <Input
+                id="lastName"
                 type="text"
                 placeholder="Last Name"
                 value={lastName}
                 onChange={handleLastNameChange}
                 maxLength={30}
+                className="pl-10"
               />
-            </InputGroup>
+            </div>
             {isCheckingName && (
-              <FormHelperText color="blue.500">Checking name...</FormHelperText>
+              <p className="text-sm text-blue-500 mt-1">Checking name...</p>
             )}
             {nameExists && (
-              <FormHelperText color="orange.500">
+              <p className="text-sm text-orange-500 mt-1">
                 Warning: User with this name already exists.
-              </FormHelperText>
+              </p>
             )}
             {firstNameError && (
-              <FormHelperText color="red.500">{firstNameError}</FormHelperText>
+              <p className="text-sm text-red-500 mt-1">{firstNameError}</p>
             )}
             {lastNameError && (
-              <FormHelperText color="red.500">{lastNameError}</FormHelperText>
+              <p className="text-sm text-red-500 mt-1">{lastNameError}</p>
             )}
-          </FormControl>
-        </Grid>
+          </div>
+        </div>
 
         {/* Email */}
-        <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Email</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
-                {isCheckingEmail ? <Spinner size="sm" /> : <Icon as={GrMail} />}
-              </InputLeftElement>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="my-2 mb-4">
+            <Label htmlFor="email">Email *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                {isCheckingEmail ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-500"></div>
+                ) : (
+                  <GrMail className="h-4 w-4 text-gray-500" />
+                )}
+              </div>
               <Input
+                id="email"
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
                 maxLength={50}
+                className="pl-10"
               />
-            </InputGroup>
-          </FormControl>
+            </div>
+          </div>
 
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Email Confirmation</FormLabel>
-            <InputGroup>
-              <InputLeftElement children={<Icon as={GrMail} />} />
+          <div className="my-2 mb-4">
+            <Label htmlFor="confirmEmail">Email Confirmation *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <GrMail className="h-4 w-4 text-gray-500" />
+              </div>
               <Input
+                id="confirmEmail"
                 type="email"
                 placeholder="Confirm Email"
                 value={confirmEmail}
                 onChange={handleConfirmEmailChange}
                 maxLength={50}
+                className="pl-10"
               />
-            </InputGroup>
+            </div>
             {email.length > 0 && email.length < 5 && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 Email must be at least 5 characters long.
-              </FormHelperText>
+              </p>
             )}
             {email.length >= 5 && !isValidEmail && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 {email.endsWith("@dbca.wa.gov.au")
                   ? "'@dbca.wa.gov.au' addresses are not valid for adding external users. Please enter a valid external email address."
                   : "Please enter a valid email address."}
-              </FormHelperText>
+              </p>
             )}
             {email.length >= 5 && isValidEmail && !emailsMatch && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 Email and Confirm Email must match.
-              </FormHelperText>
+              </p>
             )}
             {isCheckingEmail && (
-              <FormHelperText color="blue.500">
+              <p className="text-sm text-blue-500 mt-1">
                 Checking email...
-              </FormHelperText>
+              </p>
             )}
             {emailExists && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 User with this email already exists.
-              </FormHelperText>
+              </p>
             )}
             {!emailExists &&
               email.length >= 5 &&
@@ -435,13 +425,12 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               emailsMatch &&
               firstName.length > 1 &&
               lastName.length > 1 && (
-                // !nameExists && #enabling same name
-                <FormHelperText color="green.500">
+                <p className="text-sm text-green-500 mt-1">
                   All fields complete. Press Add User.
-                </FormHelperText>
+                </p>
               )}
-          </FormControl>
-        </Grid>
+          </div>
+        </div>
 
         <AffiliationSearchDropdown
           isRequired={false}
@@ -452,24 +441,19 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
         />
 
         {isModal && (
-          <Box
-            bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
-            rounded={6}
-            flexDir={"column"}
-            p={6}
-            pos={"relative"}
-            mt={5}
-            mb={7}
-            color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-            userSelect={"none"}
+          <div
+            className={cn(
+              "rounded-md flex-col p-6 relative mt-5 mb-7 select-none",
+              isDark ? "bg-gray-700 text-white/80" : "bg-gray-100 text-black/80"
+            )}
           >
             <TypewriterText>
-              <Text>
+              <p>
                 This is for adding external users only. If you are trying to add
                 a DBCA staff member, please send them a link to this website and
                 an account will be created when they visit. All existing users
                 can be found on the users page.
-              </Text>
+              </p>
               {location.pathname !== "/users" && (
                 <motion.span
                   initial={{ opacity: 0 }}
@@ -482,8 +466,10 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
                 >
                   <Button
                     variant={"link"}
-                    color={colorMode === "light" ? "blue.500" : "blue.300"}
-                    cursor={"pointer"}
+                    className={cn(
+                      "cursor-pointer p-0 h-auto",
+                      isDark ? "text-blue-300" : "text-blue-500"
+                    )}
                     onClick={() => {
                       navigate(`/users`);
                     }}
@@ -491,20 +477,19 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
                 </motion.span>
               )}
             </TypewriterText>
-          </Box>
+          </div>
         )}
 
-        <Flex mt={5} justifyContent="end">
+        <div className="flex mt-5 justify-end">
           <Button
             type="submit"
-            bgColor={colorMode === "light" ? `green.500` : `green.600`}
-            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-            _hover={{
-              bg: colorMode === "light" ? `green.600` : `green.400`,
-              color: colorMode === "light" ? `white` : `white`,
-            }}
-            ml={3}
-            isDisabled={
+            className={cn(
+              "ml-3 text-white",
+              isDark 
+                ? "bg-green-600 hover:bg-green-400" 
+                : "bg-green-500 hover:bg-green-600"
+            )}
+            disabled={
               isCheckingEmail ||
               isCheckingName ||
               !isValidEmail ||
@@ -513,13 +498,11 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               !email ||
               !emailsMatch ||
               emailExists
-              // ||
-              // nameExists
             }
           >
             Add User
           </Button>
-        </Flex>
+        </div>
       </form>
     </>
   );

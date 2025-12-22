@@ -10,10 +10,9 @@ import {
 } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
-import { useColorMode } from "@chakra-ui/react/color-mode";
-import { Flex } from "@chakra-ui/react/flex";
-import { Select } from "@chakra-ui/react/select";
-import { Input, InputGroup, InputRightElement } from "@chakra-ui/react/input";
+import { useTheme } from "next-themes";
+import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
 export const SearchUsers = () => {
   const {
@@ -23,11 +22,11 @@ export const SearchUsers = () => {
     onlySuperuser,
     onlyStaff,
     onlyExternal,
-
     setCurrentUserResultsPage,
     setSearchFilters,
   } = useUserSearchContext();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
@@ -57,11 +56,7 @@ export const SearchUsers = () => {
 
   const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
 
-  const handleOnlySelectedBusinessAreaChange: ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const businessAreaValue = event.target.value;
-    // console.log(businessAreaValue);
+  const handleOnlySelectedBusinessAreaChange = (businessAreaValue: string) => {
     setSearchFilters({
       onlySuperuser: onlySuperuser,
       onlyExternal: onlyExternal,
@@ -115,111 +110,42 @@ export const SearchUsers = () => {
   };
 
   return (
-    <Flex gap={4}>
-      <Select
-        onChange={handleOnlySelectedBusinessAreaChange}
-        size={"sm"}
-        // mx={4}
-        rounded={"5px"}
-        style={
-          colorMode === "light"
-            ? {
-                color: "black",
-                backgroundColor: "white",
-                borderColor: "gray.200",
-                caretColor: "black !important",
-              }
-            : {
-                color: "white",
-                borderColor: "white",
-                caretColor: "black !important",
-              }
-        }
-      >
-        <option key={"All"} value={"All"} color={"black"}>
-          All Business Areas
-        </option>
-        {orderedDivisionSlugs.flatMap((divSlug) => {
-          // Filter business areas for the current division
-          const divisionBusinessAreas = businessAreas
-            .filter((ba) => (ba.division as IDivision).slug === divSlug)
-            .sort((a, b) => a.name.localeCompare(b.name));
+    <div className="flex gap-4">
+      <Select onValueChange={handleOnlySelectedBusinessAreaChange} defaultValue="All">
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="All Business Areas" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="All">All Business Areas</SelectItem>
+          {orderedDivisionSlugs.flatMap((divSlug) => {
+            // Filter business areas for the current division
+            const divisionBusinessAreas = businessAreas
+              .filter((ba) => (ba.division as IDivision).slug === divSlug)
+              .sort((a, b) => a.name.localeCompare(b.name));
 
-          return divisionBusinessAreas.map((ba, index) => (
-            <option key={`${ba.name}${index}`} value={ba.pk}>
-              {ba?.division ? `[${(ba?.division as IDivision)?.slug}] ` : ""}
-              {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-              {ba.is_active ? "" : "(INACTIVE)"}
-            </option>
-          ));
-        })}
+            return divisionBusinessAreas.map((ba, index) => (
+              <SelectItem key={`${ba.name}${index}`} value={ba.pk.toString()}>
+                {ba?.division ? `[${(ba?.division as IDivision)?.slug}] ` : ""}
+                {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                {ba.is_active ? "" : "(INACTIVE)"}
+              </SelectItem>
+            ));
+          })}
+        </SelectContent>
       </Select>
-      {/* <Select
-        onChange={handleOnlySelectedBusinessAreaChange}
-        size={"sm"}
-        mx={4}
-        rounded={"5px"}
-        style={
-          colorMode === "light"
-            ? {
-              color: "black",
-              backgroundColor: "white",
-              borderColor: "gray.200",
-              caretColor: "black !important",
-            }
-            : {
-              color: "white",
-              borderColor: "white",
-              caretColor: "black !important",
-            }
-        }
-      >
-        <option value={"All"} color={"black"}>
-          All Business Areas
-        </option>
-        {businessAreas.map((ba, index) => {
-          const checkIsHtml = (data: string) => {
-            // Regular expression to check for HTML tags
-            const htmlRegex = /<\/?[a-z][\s\S]*>/i;
 
-            // Check if the string contains any HTML tags
-            return htmlRegex.test(data);
-          };
-
-          const isHtml = checkIsHtml(ba.name);
-          let baName = ba?.name;
-          if (isHtml === true) {
-            const parser = new DOMParser();
-            const dom = parser.parseFromString(ba.name, "text/html");
-            const content = dom.body.textContent;
-            baName = content;
-          }
-          return (
-            <option key={index} value={ba.pk}>
-              [{ba.division.slug}] {baName}
-            </option>
-          );
-        })}{" "}
-      </Select> */}
-
-      <InputGroup borderColor="gray.200" size="sm">
-        <InputRightElement
-          pointerEvents="none"
-          children={<FiSearch color={"#9CA3AF"} />}
-        />
+      <div className="relative">
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+          <FiSearch className="h-4 w-4 text-gray-400" />
+        </div>
         <Input
           placeholder="Search Users..."
-          rounded={6}
           type="text"
           value={inputValue}
           onChange={handleChange}
-          background={"transparent"}
-          color={colorMode === "dark" ? "whiteAlpha.900" : ""}
-          _placeholder={{
-            color: colorMode === "dark" ? "gray.300" : "gray.500",
-          }}
+          className="pr-10 bg-transparent"
         />
-      </InputGroup>
-    </Flex>
+      </div>
+    </div>
   );
 };
