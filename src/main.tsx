@@ -15,15 +15,14 @@ export const CurrentPageContext = createContext<{
 });
 
 // Router and Queries
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
 import { LayoutSwitcherProvider } from "@/shared/hooks/LayoutSwitcherContext";
 import { ProjectSearchProvider } from "@/features/projects/hooks/ProjectSearchContext";
 import { UserSearchProvider } from "@/features/users/hooks/UserSearchContext";
 import { router } from "@/app/router";
-import theme from "@/theme";
 import { ProjectMapSearchProvider } from "@/features/projects/hooks/ProjectMapSearchContext";
+import { ThemeProvider } from "@/shared/providers/ThemeProvider";
 // import { RouterProvider, createRouter } from "react-router-dom";
 // import { routeTree } from "./routeTree.gen";
 
@@ -46,8 +45,12 @@ const root = ReactDOM.createRoot(container);
 
 root.render(
   <QueryClientProvider client={queryClient}>
-    <ChakraProvider theme={theme}>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem={false}
+      disableTransitionOnChange
+    >
       <LayoutSwitcherProvider>
         <UserSearchProvider>
           <ProjectSearchProvider>
@@ -63,6 +66,6 @@ root.render(
           </ProjectSearchProvider>
         </UserSearchProvider>
       </LayoutSwitcherProvider>
-    </ChakraProvider>
+    </ThemeProvider>
   </QueryClientProvider>,
 );

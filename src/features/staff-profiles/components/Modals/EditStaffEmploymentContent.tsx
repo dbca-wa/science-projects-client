@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { editEmployment } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffEmploymentEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -41,15 +41,12 @@ const EditStaffEmploymentContent = ({
     },
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: editEmployment,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
+      toast.success("Updated", {
+        description: "Employment entry updated successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["employment", usersPk],
@@ -59,10 +56,8 @@ const EditStaffEmploymentContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not update employment entry",
       });
     },
     // onMutate: () => {

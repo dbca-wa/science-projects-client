@@ -3,41 +3,27 @@ import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdo
 import { BranchItemDisplay } from "@/features/admin/components/BranchItemDisplay";
 import { createBranch, getAllBranches } from "@/features/admin/services/admin.service";
 import type { IBranch } from "@/shared/types";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Spinner,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Loader2 } from "lucide-react";
 
 export const BranchesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IBranch>();
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<number>();
 
   const nameData = watch("name");
@@ -46,20 +32,12 @@ export const BranchesCRUD = () => {
   const mutation = useMutation({
     mutationFn: createBranch,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
-      onAddClose();
+      toast.success("Created");
+      setAddIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["branches"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
 
@@ -112,60 +90,56 @@ export const BranchesCRUD = () => {
     <>
       <Head title="Branches" />
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center items-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <h2 className="font-semibold text-lg">
                 Branches ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </h2>
+            </div>
+            <div className="flex w-full mt-4">
               <Input
                 type="text"
                 placeholder="Search branch by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="w-2/3"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end w-full">
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  }`}
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
-            <Grid
-              gridTemplateColumns="6fr 3fr 3fr"
-              mt={4}
-              width="100%"
-              p={3}
-              borderWidth={1}
-              borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+              </div>
+            </div>
+            <div
+              className={`grid grid-cols-[6fr_3fr_3fr] mt-4 w-full p-3 border ${
+                filteredSlices.length === 0 ? "border-b" : "border-b-0"
+              }`}
             >
-              <Flex justifyContent="flex-start">
-                <Text as="b">Branch</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Manager</Text>
-              </Flex>
-              <Flex justifyContent="flex-end" mr={2}>
-                <Text as="b">Change</Text>
-              </Flex>
-            </Grid>
+              <div className="flex justify-start">
+                <span className="font-bold">Branch</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Manager</span>
+              </div>
+              <div className="flex justify-end mr-2">
+                <span className="font-bold">Change</span>
+              </div>
+            </div>
 
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {filteredSlices
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((s) => (
@@ -178,36 +152,35 @@ export const BranchesCRUD = () => {
                     old_id={s.old_id}
                   />
                 ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Branch</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={10}
-                  as="form"
-                  id="add-form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-full sm:max-w-lg">
+              <SheetHeader>
+                <SheetTitle>Add Branch</SheetTitle>
+              </SheetHeader>
+              <div className="py-6">
+                <div
+                  className="space-y-10"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  <Input
+                  <input
                     {...register("agency", { required: true })}
                     value={1}
                     required
                     type="hidden"
                   />
-                  <FormControl>
-                    <FormLabel>Name</FormLabel>
+                  <div>
+                    <Label htmlFor="name">Name</Label>
                     <Input
+                      id="name"
                       autoFocus
                       autoComplete="off"
                       {...register("name", { required: true })}
                     />
-                  </FormControl>
-                  <FormControl>
+                  </div>
+                  <div>
                     <UserSearchDropdown
                       {...register("manager", { required: true })}
                       onlyInternal={false}
@@ -217,16 +190,14 @@ export const BranchesCRUD = () => {
                       placeholder="Search for a user"
                       helperText={"The manager of the branch."}
                     />
-                  </FormControl>
+                  </div>
                   {mutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
+                    <p className="text-red-500">Something went wrong</p>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </div>
+              </div>
+              <SheetFooter>
                 <Button
-                  // form="add-form"
-                  // type="submit"
                   onClick={() => {
                     console.log("clicked");
                     onSubmitBranchCreation({
@@ -236,20 +207,19 @@ export const BranchesCRUD = () => {
                       manager: selectedUser,
                     });
                   }}
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  disabled={mutation.isPending}
+                  className={`text-white w-full ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
                   size="lg"
-                  width={"100%"}
                 >
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </>
       )}
     </>

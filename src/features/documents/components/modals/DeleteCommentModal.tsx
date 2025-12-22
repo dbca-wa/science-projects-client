@@ -1,26 +1,16 @@
+import { Button } from "@/shared/components/ui/button";
 import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { IDeleteComment, deleteCommentCall } from "@/features/documents/services/documents.service";
-import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -41,36 +31,20 @@ export const DeleteCommentModal = ({
   onClose,
   onDeleteSuccess,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
   const deleteCommentMutation = useMutation({
     mutationFn: deleteCommentCall,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Removing Comment`,
-        position: "top-right",
-      });
+      toast.loading("Removing Comment...");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Comment Removed`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        onDeleteSuccess?.();
-      }
+      toast.success("Success", {
+        description: "Comment Removed",
+      });
+      onDeleteSuccess?.();
+      
       queryClient.invalidateQueries({
         queryKey: ["documentComments", documentPk],
       });
@@ -81,21 +55,13 @@ export const DeleteCommentModal = ({
       }, 150);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not remove comment`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could not remove comment", {
+        description: `${error}`,
+      });
     },
   });
 
   const deleteComment = (formData: IDeleteComment) => {
-    // console.log(formData);
     deleteCommentMutation.mutate(formData);
   };
 
@@ -103,78 +69,66 @@ export const DeleteCommentModal = ({
   const { register, handleSubmit } = useForm<IDeleteComment>();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(deleteComment)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Comment?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "bg-white"}`}>
+        <form onSubmit={handleSubmit(deleteComment)}>
+          <DialogHeader>
+            <DialogTitle>Delete Comment?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"semibold"} fontSize={"xl"}>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <p className="font-semibold text-xl text-center">
                 Are you sure you want to delete this comment? There's no turning
                 back.
-              </Text>
-            </Center>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("commentPk", {
-                    required: true,
-                    value: Number(commentPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("documentPk", {
-                    required: true,
-                    value: Number(documentPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={2} p={5} pb={3}>
-              <Text
-                fontWeight={"bold"}
-                color={"red.400"}
-                textDecoration={"underline"}
-              >
+              </p>
+            </div>
+            
+            <Input
+              type="hidden"
+              {...register("commentPk", {
+                required: true,
+                value: Number(commentPk),
+              })}
+              readOnly
+            />
+            
+            <Input
+              type="hidden"
+              {...register("documentPk", {
+                required: true,
+                value: Number(documentPk),
+              })}
+              readOnly
+            />
+            
+            <div className="flex justify-center mt-2 p-5 pb-3">
+              <p className="font-bold text-red-400 underline">
                 This is irreversible.
-              </Text>
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isLoading={deleteCommentMutation.isPending}
+                disabled={deleteCommentMutation.isPending}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
                 type="submit"
-                ml={3}
               >
-                Delete
+                {deleteCommentMutation.isPending ? "Deleting..." : "Delete"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

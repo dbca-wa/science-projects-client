@@ -1,25 +1,17 @@
-import { Box, useBreakpointValue } from "@chakra-ui/react";
+import { useBreakpointValue } from "@/shared/utils/theme.utils";
 
 export const SideMenuSectionDivider = () => {
   const isOver750 = useBreakpointValue({
-    false: true,
+    base: true,
     sm: false,
     md: false,
-    "768px": true,
-    mdlg: true,
     lg: true,
-    xlg: true,
   });
   return (
-    <Box
-      w={"100%"}
-      p={2}
-      mb={4}
-      position={"relative"}
-      // display={"flex"}
-      ml={isOver750 ? 4 : undefined}
+    <div
+      className={`w-full p-2 mb-4 relative ${isOver750 ? "ml-4" : ""}`}
     >
       <hr />
-    </Box>
+    </div>
   );
 };

@@ -3,26 +3,11 @@ import {
   IAdjustEmailListProps,
 } from "@/features/admin/services/admin.service";
 import type { EmailListPerson, IEmailListUser } from "@/shared/types";
-import {
-  Text,
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -44,12 +29,6 @@ const AddRemoveUserFromEmailListModal = ({
   refetch,
   currentList,
 }: IEmailListModalProps) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const [usersToAction, setUsersToAction] = useState<EmailListPerson[]>(
     currentList || [],
   );
@@ -84,23 +63,12 @@ const AddRemoveUserFromEmailListModal = ({
   const addRemoveEmailListMutation = useMutation({
     mutationFn: addRemoveUserFromEmailListCall,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Adjusting Email List`,
-        position: "top-right",
-      });
+      toast.loading("Adjusting Email List");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Adjusted Email List`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "Adjusted Email List",
+      });
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["divisions"] });
@@ -109,16 +77,9 @@ const AddRemoveUserFromEmailListModal = ({
       }, 350);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not action request`,
-          description: `${error.response?.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could not action request", {
+        description: `${error.response?.data}`,
+      });
     },
   });
 
@@ -148,29 +109,28 @@ const AddRemoveUserFromEmailListModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(handleAction)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <form onSubmit={handleSubmit(handleAction)}>
+        <DialogContent
+          className={`md:max-w-md ${
+            colorMode === "dark" ? "text-gray-400 bg-gray-800" : "bg-white"
+          }`}
         >
-          <ModalHeader>{"Adjust Email List"}</ModalHeader>
-          <ModalCloseButton />
+          <DialogHeader>
+            <DialogTitle>Adjust Email List</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("divisionPk", {
-                    required: true,
-                    value: divisionPk,
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
+          <div className="space-y-4">
+            <div>
+              <Input
+                type="hidden"
+                {...register("divisionPk", {
+                  required: true,
+                  value: divisionPk,
+                })}
+                readOnly
+              />
+            </div>
 
             {/* Not setting a direct value here, but using setValue in the useEffect instead */}
             <Input
@@ -192,38 +152,36 @@ const AddRemoveUserFromEmailListModal = ({
               ignoreUserPks={usersToAction?.map((u) => u.pk)}
               internalOnly
             />
-          </ModalBody>
-          <ModalFooter>
-            <Flex flexDir={"column"} w={"full"}>
-              <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-                <Button colorScheme="gray" onClick={() => onClose()}>
+          </div>
+          
+          <DialogFooter>
+            <div className="flex flex-col w-full">
+              <div className="grid grid-cols-2 gap-4">
+                <Button variant="outline" onClick={() => onClose()}>
                   Cancel
                 </Button>
                 <Button
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  }`}
                   disabled={
                     addRemoveEmailListMutation.isPending ||
                     !divisionPk ||
                     isSubmitting ||
                     !isValid
                   }
-                  isLoading={addRemoveEmailListMutation.isPending}
                   type="submit"
-                  ml={3}
                 >
-                  Update
+                  {addRemoveEmailListMutation.isPending ? "Updating..." : "Update"}
                 </Button>
-              </Grid>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+              </div>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </form>
+    </Dialog>
   );
 };
 

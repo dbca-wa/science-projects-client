@@ -6,15 +6,11 @@ import { useGetPendingCaretakerTasks } from "@/features/users/hooks/useGetPendin
 import { useUser } from "@/features/users/hooks/useUser";
 import {
   Accordion,
-  AccordionButton,
-  AccordionIcon,
+  AccordionContent,
   AccordionItem,
-  AccordionPanel,
-  Box,
-  Center,
-  Spinner,
-  useColorMode,
-} from "@chakra-ui/react";
+  AccordionTrigger,
+} from "@/shared/components/ui/accordion";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { AiFillProject } from "react-icons/ai";
 import { FcHighPriority, FcOk } from "react-icons/fc";
@@ -24,6 +20,7 @@ import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
+import { Loader2 } from "lucide-react";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();

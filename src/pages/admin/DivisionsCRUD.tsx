@@ -1,27 +1,10 @@
-import {
-  Text,
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  Flex,
-  FormControl,
-  Input,
-  InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  FormLabel,
-  useToast,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
+import { Loader2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -41,12 +24,10 @@ export const DivisionsCRUD = () => {
   const nameData = watch("name");
   const slugData = watch("slug");
 
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
+  const onAddOpen = () => setAddIsOpen(true);
+  const onAddClose = () => setAddIsOpen(false);
+  
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
@@ -54,22 +35,14 @@ export const DivisionsCRUD = () => {
     mutationFn: createDivision,
     onSuccess: (data: IDivision) => {
       // console.log("success")
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Created");
       console.log(data);
       onAddClose();
       queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
     onMutate: () => {
       console.log("mutation");
@@ -154,77 +127,72 @@ export const DivisionsCRUD = () => {
     <>
       <Head title="Divisions" />
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center items-center h-[200px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <p className="font-semibold text-lg">
                 Divisions ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </p>
+            </div>
+            <div className="flex w-full mt-4">
               <Input
                 type="text"
                 placeholder="Search division by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="w-[65%]"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end w-full">
                 <Button
                   onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  }`}
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
+              </div>
+            </div>
             {countOfItems === 0 ? (
-              <Box py={10} fontWeight={"bold"}>
-                <Text>No results</Text>
-              </Box>
+              <div className="py-10 font-bold">
+                <p>No results</p>
+              </div>
             ) : (
               <>
-                <Grid
-                  gridTemplateColumns="4fr 2fr 2fr 2fr 1fr"
-                  mt={4}
-                  width="100%"
-                  p={3}
-                  borderWidth={1}
-                  borderBottomWidth={0}
+                <div
+                  className="grid mt-4 w-full p-3 border border-b-0"
+                  style={{ gridTemplateColumns: "4fr 2fr 2fr 2fr 1fr" }}
                 >
-                  <Flex justifyContent="flex-start">
-                    <Text as="b">Division</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">Slug</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">Director</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">Approver</Text>
-                  </Flex>
-                  <Flex justifyContent="flex-end" mr={2}>
-                    <Text as="b">Change</Text>
-                  </Flex>
-                </Grid>
+                  <div className="flex justify-start">
+                    <p className="font-bold">Division</p>
+                  </div>
+                  <div className="flex">
+                    <p className="font-bold">Slug</p>
+                  </div>
+                  <div className="flex">
+                    <p className="font-bold">Director</p>
+                  </div>
+                  <div className="flex">
+                    <p className="font-bold">Approver</p>
+                  </div>
+                  <div className="flex justify-end mr-2">
+                    <p className="font-bold">Change</p>
+                  </div>
+                </div>
 
                 {searchLoading ? (
-                  <Center w={"100%"} minH="100px" pt={10}>
-                    <Spinner size={"xl"} />
-                  </Center>
+                  <div className="flex justify-center w-full min-h-[100px] pt-10">
+                    <Loader2 className="h-12 w-12 animate-spin" />
+                  </div>
                 ) : (
-                  <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+                  <div className="grid grid-cols-1">
                     {filteredSlices
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((s) => (
@@ -238,45 +206,43 @@ export const DivisionsCRUD = () => {
                           old_id={s.old_id}
                         />
                       ))}
-                  </Grid>
+                  </div>
                 )}
               </>
             )}
-          </Box>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Division</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={6}
-                  as="form"
-                  id="add-form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Add Division</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <div
+                  className="space-y-6"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  <FormControl>
-                    <FormLabel>Name</FormLabel>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
                     <Input
+                      id="name"
                       autoComplete="off"
                       autoFocus
                       {...register("name", { required: true })}
                     />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Slug</FormLabel>
-                    <InputGroup>
-                      <Input
-                        {...register("slug", { required: true })}
-                        required
-                        type="text"
-                        placeholder="eg. BCS"
-                      />
-                    </InputGroup>
-                  </FormControl>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="slug">Slug</Label>
+                    <Input
+                      id="slug"
+                      {...register("slug", { required: true })}
+                      required
+                      type="text"
+                      placeholder="eg. BCS"
+                    />
+                  </div>
 
-                  <FormControl>
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("director", { required: true })}
                       onlyInternal={false}
@@ -286,8 +252,8 @@ export const DivisionsCRUD = () => {
                       placeholder="Search for a user..."
                       helperText={"The director of the Division"}
                     />
-                  </FormControl>
-                  <FormControl>
+                  </div>
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("approver", { required: true })}
                       onlyInternal={false}
@@ -297,24 +263,20 @@ export const DivisionsCRUD = () => {
                       placeholder="Search for a user..."
                       helperText={"The approver of the Division"}
                     />
-                  </FormControl>
+                  </div>
                   {mutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
+                    <p className="text-red-500">Something went wrong</p>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </div>
+              </div>
+              <SheetFooter>
                 <Button
-                  // form="add-form"
-                  // type="submit"
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                  size="lg"
-                  width={"100%"}
+                  disabled={mutation.isPending}
+                  className={`text-white w-full ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
                   onClick={() => {
                     console.log("clicked");
                     onSubmit({
@@ -326,11 +288,12 @@ export const DivisionsCRUD = () => {
                     });
                   }}
                 >
+                  {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </>
       )}
     </>

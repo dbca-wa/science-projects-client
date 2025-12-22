@@ -1,17 +1,11 @@
-import {
-  Box,
-  Center,
-  Flex,
-  Progress,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { FaFile, FaFilePdf } from "react-icons/fa";
 import { TbPhoto } from "react-icons/tb";
 import imageCompression from "browser-image-compression";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Progress } from "@/shared/components/ui/progress";
 
 export interface IFileType {
   fileType: "pdf" | "image";
@@ -108,77 +102,42 @@ export const FileDropzone = ({
         // getInputProps,
         acceptedFiles,
       }) => (
-        <Box
+        <div
           {...getRootProps()}
-          h={64}
-          m={4}
-          border={"1px dashed"}
-          borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-          rounded={"lg"}
+          className={`h-64 m-4 border border-dashed rounded-lg ${
+            colorMode === "light" ? "border-gray-300" : "border-gray-500"
+          }`}
         >
-          <Box
-            display={"flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            h={"100%"}
-            w={"100%"}
-            rounded={"lg"}
-          >
-            <Flex
-              rounded={"lg"}
-              background={colorMode === "light" ? "gray.100" : "gray.700"}
-              flexDir={"column"}
-              justifyContent={"center"}
-              justifyItems={"center"}
-              alignItems={"center"}
-              pt={5}
-              pb={6}
-              w={"100%"}
-              h={"100%"}
-              userSelect={"none"}
-              _hover={{
-                cursor: "pointer",
-              }}
+          <div className="flex justify-center items-center h-full w-full rounded-lg">
+            <div
+              className={`rounded-lg flex flex-col justify-center items-center pt-5 pb-6 w-full h-full select-none cursor-pointer ${
+                colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+              }`}
             >
-              <Box
-              // boxSize={}
-              >
+              <div>
                 <BsCloudArrowUp size={"50px"} color="gray" />
-              </Box>
+              </div>
               {extraText === undefined ? (
-                <Text
-                  px={8}
-                  textAlign={"center"}
-                >{`Drag and drop a ${fileType} file.`}</Text>
+                <p className="px-8 text-center">{`Drag and drop a ${fileType} file.`}</p>
               ) : (
-                <Text px={8} textAlign={"center"}>{`Drag and drop ${
+                <p className="px-8 text-center">{`Drag and drop ${
                   fileType === "image" ? "an" : "a"
-                } ${fileType} file${extraText}.`}</Text>
+                } ${fileType} file${extraText}.`}</p>
               )}
               {!isError && acceptedFiles && acceptedFiles[0] && uploadedFile ? (
-                <Flex
-                  mt={4}
-                  maxW={"80%"}
-                  bg={colorMode === "light" ? "white" : "gray.800"}
-                  justifyContent={"center"}
-                  rounded={"md"}
-                  overflow={"hidden"}
-                  outline={"1px"}
-                  outlineColor={"gray.800"}
-                  borderWidth={"1px"}
-                  borderColor={colorMode === "light" ? "gray.300" : "gray.600"}
+                <div
+                  className={`flex mt-4 max-w-[80%] justify-center rounded-md overflow-hidden outline outline-1 outline-gray-800 border ${
+                    colorMode === "light" 
+                      ? "bg-white border-gray-300" 
+                      : "bg-gray-800 border-gray-600"
+                  }`}
                 >
-                  <Box
-                    p={3}
-                    h={"100%"}
-                    placeItems={"center"}
-                    alignItems={"center"}
-                    borderRight={"1px solid"}
-                    borderColor={
-                      colorMode === "light" ? "gray.300" : "gray.600"
-                    }
+                  <div
+                    className={`p-3 h-full place-items-center items-center border-r ${
+                      colorMode === "light" ? "border-gray-300" : "border-gray-600"
+                    }`}
                   >
-                    <Box color={fileType === "pdf" ? "red.500" : "blue.500"}>
+                    <div className={fileType === "pdf" ? "text-red-500" : "text-blue-500"}>
                       {fileType === "pdf" ? (
                         <FaFilePdf />
                       ) : fileType === "image" ? (
@@ -186,49 +145,35 @@ export const FileDropzone = ({
                       ) : (
                         <FaFile />
                       )}
-                    </Box>
-                  </Box>
-                  <Box
-                    flex={1}
-                    whiteSpace={"nowrap"}
-                    textOverflow={"ellipsis"}
-                    overflow={"hidden"}
-                    pl={2}
-                    pr={3}
-                    py={2}
-                    fontSize={"sm"}
-                    mt={"1px"}
-                  >
+                    </div>
+                  </div>
+                  <div className="flex-1 whitespace-nowrap text-ellipsis overflow-hidden pl-2 pr-3 py-2 text-sm mt-[1px]">
                     {acceptedFiles[0].name}
-                  </Box>
-                </Flex>
+                  </div>
+                </div>
               ) : null}
 
               {isUploading ? (
-                <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                  <Box w={"80%"} h={1} px={1}>
+                <div className="flex justify-center w-full mt-4 max-w-xs mx-auto">
+                  <div className="w-[80%] h-1 px-1">
                     <Progress
-                      bg={colorMode === "light" ? "gray.200" : "gray.900"}
-                      colorScheme={
-                        uploadProgress === 100 && uploadedFile
-                          ? "green"
-                          : "blue"
-                      }
-                      size={"xs"}
                       value={uploadProgress}
+                      className={`h-1 ${
+                        colorMode === "light" ? "bg-gray-200" : "bg-gray-900"
+                      }`}
                     />
-                  </Box>
-                </Center>
+                  </div>
+                </div>
               ) : null}
 
               {isError ? (
-                <Text color={"red.500"} mt={4}>
+                <p className="text-red-500 mt-4">
                   That file is not of the correct type
-                </Text>
+                </p>
               ) : null}
-            </Flex>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
       )}
     </Dropzone>
   );
@@ -252,7 +197,7 @@ export const SingleFileStateUpload = ({
   extraText,
 }: Props) => {
   return (
-    <Box>
+    <div>
       <FileDropzone
         fileType={fileType}
         setUploadedFile={setUploadedFile}
@@ -261,6 +206,6 @@ export const SingleFileStateUpload = ({
         isError={isError}
         extraText={extraText}
       />
-    </Box>
+    </div>
   );
 };

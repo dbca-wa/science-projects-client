@@ -1,31 +1,20 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { batchApproveProgressAndStudentReports } from "@/features/users/services/users.service";
 import { AxiosError } from "axios";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -34,7 +23,7 @@ interface IModalProps {
 
 export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -43,15 +32,8 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -60,26 +42,15 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
     // Start of mutation handling
     mutationFn: batchApproveProgressAndStudentReports,
     onMutate: () => {
-      addToast({
-        title: "Batch Approving Progress and Student Reports...",
+      toast.loading("Batch Approving Progress and Student Reports...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Docs awaiting final approval belonging to most recent financial year have been batch approved.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Docs awaiting final approval belonging to most recent financial year have been batch approved.`,
+      });
       //  Close the modal
       queryClient.invalidateQueries({
         queryKey: ["latestUnapprovedProgressReports"],
@@ -127,16 +98,9 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -146,67 +110,59 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex
-      // as={"form"} onSubmit={handleSubmit(onSubmit)}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Batch Approve For Latest Report?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent className={`max-w-lg ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>Batch Approve For Latest Report?</DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to batch approve reports (with status
-                "awaiting approval")?
-              </Text>
-            </Center>
-            <Text mt={4}>
-              Any progress reports and student reports which meet these
-              conditions, will get final approval:
-            </Text>
-            <Box mt={4}>
-              <UnorderedList>
-                <ListItem>Belongs to most recent annual report</ListItem>
-                <ListItem>Is approved by Project Lead</ListItem>
-                <ListItem>Is approved by Business Area Lead</ListItem>
-                <ListItem>Is yet to be approved by Directorate</ListItem>
-                <ListItem>
-                  Belongs to an active project with the status "awaiting
-                  approval"
-                </ListItem>
-              </UnorderedList>
-            </Box>
+        <div>
+          <div className="text-center">
+            <p className="font-bold text-xl">
+              Are you sure you want to batch approve reports (with status
+              "awaiting approval")?
+            </p>
+          </div>
+          <p className="mt-4">
+            Any progress reports and student reports which meet these
+            conditions, will get final approval:
+          </p>
+          <div className="mt-4">
+            <ul className="list-disc list-inside space-y-1">
+              <li>Belongs to most recent annual report</li>
+              <li>Is approved by Project Lead</li>
+              <li>Is approved by Business Area Lead</li>
+              <li>Is yet to be approved by Directorate</li>
+              <li>
+                Belongs to an active project with the status "awaiting
+                approval"
+              </li>
+            </ul>
+          </div>
 
-            <Text mt={4}>
-              If you would still like to proceed, press "Batch Approve".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={batchApproveMutation.isPending}
-                onClick={() => onSubmit()}
-                ml={3}
-              >
-                Batch Approve
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+          <p className="mt-4">
+            If you would still like to proceed, press "Batch Approve".
+          </p>
+        </div>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              }`}
+              disabled={batchApproveMutation.isPending}
+              onClick={() => onSubmit()}
+            >
+              Batch Approve
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

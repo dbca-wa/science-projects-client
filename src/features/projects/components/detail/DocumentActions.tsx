@@ -1,6 +1,7 @@
 // Used for all documents. WIP - need to update the content shown based on doc, and parametise the document sent in.
 
-import { Box, Flex, Grid, Tag, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   IConceptPlan,
   IProgressReport,
@@ -29,55 +30,51 @@ export const DocumentActions = ({
 }: IDocumentActions) => {
   const { colorMode } = useColorMode();
   return (
-    <Box
-      bg={colorMode === "light" ? "gray.100" : "gray.700"}
-      rounded={"lg"}
-      p={4}
-      my={6}
+    <div
+      className={`rounded-lg p-4 my-6 ${
+        colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+      }`}
     >
-      <Flex w={"100%"}>
-        <Text
-          flex={1}
-          fontWeight={"bold"}
-          fontSize={"lg"}
-          color={colorMode === "light" ? "gray.800" : "gray.100"}
-          userSelect={"none"}
-          pb={4}
+      <div className="flex w-full">
+        <p
+          className={`flex-1 font-bold text-lg pb-4 select-none ${
+            colorMode === "light" ? "text-gray-800" : "text-gray-100"
+          }`}
         >
           Document Actions
-        </Text>
-        <Tag bg={"green.500"} color={"white"}>
+        </p>
+        <Badge className="bg-green-500 text-white">
           STATUS
-        </Tag>
-      </Flex>
+        </Badge>
+      </div>
 
       {tabType === "overview" ? (
-        <Grid mb={4} gridGap={4} gridTemplateColumns={"1fr 1fr"}></Grid>
+        <div className="mb-4 grid gap-4 grid-cols-2"></div>
       ) : tabType === "concept" ? (
-        <Box>
+        <div>
           Concept Plan (Project: {projectPk}, Pk: {document?.pk})
-        </Box>
+        </div>
       ) : tabType === "project" ? (
-        <Box>
+        <div>
           Project Plan (Project: {projectPk}, Pk: {document?.pk})
-        </Box>
+        </div>
       ) : tabType === "progress" ? (
-        <Box>
+        <div>
           Progress Reports (Project: {projectPk}, Pk: {document?.pk})
-        </Box>
+        </div>
       ) : tabType === "student" ? (
-        <Box>
+        <div>
           Student Reports (Project: {projectPk}, Pk: {document?.pk})
-        </Box>
+        </div>
       ) : tabType === "closure" ? (
-        <Box>
+        <div>
           Closure (Project: {projectPk}, Pk: {document.pk})
-        </Box>
+        </div>
       ) : (
-        <Box>
+        <div>
           Unimplemented: neither concept, progress, student, project, closure
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

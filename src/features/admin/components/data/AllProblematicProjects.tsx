@@ -8,26 +8,19 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "@/shared/components/ui/accordion";
+import { Button } from "@/shared/components/ui/button";
+import { Separator } from "@/shared/components/ui/separator";
 import { getAllProblematicProjects } from "@/features/admin/services/admin.service";
 import { getEmailProjectList } from "@/features/users/services/users.service";
 import { IProblematicData } from "@/features/projects/hooks/useAllProblematicProjects";
-import {
-  Box,
-  Button,
-  Center,
-  Divider,
-  Flex,
-  Spinner,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { useState, useEffect } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { UserProjectsDataTable } from "@/features/dashboard/components/UserProjectsDataTable";
 import { RemedyOpenClosedModalContent } from "@/features/admin/components/modals/RemedyOpenClosedModalContent";
 import { FaFileDownload } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const AllProblematicProjects = () => {
   const { colorMode } = useColorMode();
@@ -54,35 +47,24 @@ export const AllProblematicProjects = () => {
     fetchProblematicProjects();
   }, []);
 
-  const {
-    isOpen: isRemedyNoMembersModalOpen,
-    onOpen: onOpenRemedyNoMembersModal,
-    onClose: onCloseRemedyNoMembersModal,
-  } = useDisclosure();
+  // State for all modals (replacing useDisclosure hooks)
+  const [isRemedyNoMembersModalOpen, setIsRemedyNoMembersModalOpen] = useState(false);
+  const [isRemedyOpenClosedModalOpen, setIsRemedyOpenClosedModalOpen] = useState(false);
+  const [isRemedyNoLeadersModalOpen, setIsRemedyNoLeadersModalOpen] = useState(false);
+  const [isRemedyMultipleLeadersModalOpen, setIsRemedyMultipleLeadersModalOpen] = useState(false);
+  const [isRemedyExternalLeadersModalOpen, setIsRemedyExternalLeadersModalOpen] = useState(false);
 
-  const {
-    isOpen: isRemedyOpenClosedModalOpen,
-    onOpen: onOpenRemedyOpenClosedModal,
-    onClose: onCloseRemedyOpenClosedModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isRemedyNoLeadersModalOpen,
-    onOpen: onOpenRemedyNoLeadersModal,
-    onClose: onCloseRemedyNoLeadersModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isRemedyMultipleLeadersModalOpen,
-    onOpen: onOpenRemedyMultipleLeadersModal,
-    onClose: onCloseRemedyMultipleLeadersModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isRemedyExternalLeadersModalOpen,
-    onOpen: onOpenRemedyExternalLeadersModal,
-    onClose: onCloseRemedyExternalLeadersModal,
-  } = useDisclosure();
+  // Modal control functions
+  const onOpenRemedyNoMembersModal = () => setIsRemedyNoMembersModalOpen(true);
+  const onCloseRemedyNoMembersModal = () => setIsRemedyNoMembersModalOpen(false);
+  const onOpenRemedyOpenClosedModal = () => setIsRemedyOpenClosedModalOpen(true);
+  const onCloseRemedyOpenClosedModal = () => setIsRemedyOpenClosedModalOpen(false);
+  const onOpenRemedyNoLeadersModal = () => setIsRemedyNoLeadersModalOpen(true);
+  const onCloseRemedyNoLeadersModal = () => setIsRemedyNoLeadersModalOpen(false);
+  const onOpenRemedyMultipleLeadersModal = () => setIsRemedyMultipleLeadersModalOpen(true);
+  const onCloseRemedyMultipleLeadersModal = () => setIsRemedyMultipleLeadersModalOpen(false);
+  const onOpenRemedyExternalLeadersModal = () => setIsRemedyExternalLeadersModalOpen(true);
+  const onCloseRemedyExternalLeadersModal = () => setIsRemedyExternalLeadersModalOpen(false);
 
   const [isProcessingEmailList, setIsProcessingEmailList] = useState(false);
 
@@ -180,52 +162,47 @@ export const AllProblematicProjects = () => {
         />
       </BaseModal>
 
-      <Box>
-        <Flex alignItems={"center"} mt={4}>
-          <Text fontSize={"x-large"} py={4} flex={1}>
+      <div>
+        <div className="flex items-center mt-4">
+          <h2 className="text-xl py-4 flex-1">
             Problematic Project Lists
-          </Text>
+          </h2>
           {problematicProjectData && (
-            <Box justifyContent={"flex-end"}>
+            <div className="flex justify-end">
               <Button
-                bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.400",
-                }}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                }`}
                 onClick={fetchProblematicProjects}
-                isDisabled={fetchingData}
-                leftIcon={<TbRefresh />}
+                disabled={fetchingData}
               >
+                <TbRefresh className="mr-2 h-4 w-4" />
                 Refresh Data
               </Button>
-            </Box>
+            </div>
           )}
-        </Flex>
+        </div>
 
         {fetchingData && !problematicProjectData ? (
-          <Center w={"100%"} h={"500px"}>
-            <Spinner />
-            <Text
-              ml={4}
-              color={"gray.500"}
-              fontSize={"x-large"}
-              fontWeight={"bold"}
-            >
+          <div className="flex justify-center items-center w-full h-[500px]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <p className="ml-4 text-gray-500 text-xl font-bold">
               Fetching ...
-            </Text>
-          </Center>
+            </p>
+          </div>
         ) : (
           <>
             {problematicProjectData && (
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects with progress reports with no updates since
                       creation this FY (
                       {problematicProjectData?.no_progress?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
                     <UserProjectsDataTable
@@ -242,28 +219,28 @@ export const AllProblematicProjects = () => {
                 </AccordionItem>
                 <AccordionItem value="item-2">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       ACTIVE Projects with INACTIVE Staff Leaders (
                       {problematicProjectData?.inactive_lead_active_project
                         ?.length || 0}
                       )
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={downloadEmailList}
-                        leftIcon={<FaFileDownload />}
-                        isDisabled={isProcessingEmailList}
+                        disabled={isProcessingEmailList}
                       >
+                        <FaFileDownload className="mr-2 h-4 w-4" />
                         Download TXT List
                       </Button>
-                    </Flex>
+                    </div>
                     <UserProjectsDataTable
                       projectData={
                         problematicProjectData?.inactive_lead_active_project
@@ -280,24 +257,24 @@ export const AllProblematicProjects = () => {
                 </AccordionItem>
                 <AccordionItem value="item-3">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects With Approved Closure That Are Open (
                       {problematicProjectData?.open_closed?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={onOpenRemedyOpenClosedModal}
                       >
                         Remedy
                       </Button>
-                    </Flex>
+                    </div>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.open_closed}
                       defaultSorting={"business_area"}
@@ -312,24 +289,24 @@ export const AllProblematicProjects = () => {
                 </AccordionItem>
                 <AccordionItem value="item-4">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects with No Members (
                       {problematicProjectData?.no_members?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={onOpenRemedyNoMembersModal}
                       >
                         Remedy
                       </Button>
-                    </Flex>
+                    </div>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.no_members}
                       defaultSorting={"business_area"}
@@ -342,27 +319,27 @@ export const AllProblematicProjects = () => {
                     />
                   </AccordionContent>
                 </AccordionItem>
-                <Divider />
+                <Separator />
                 <AccordionItem value="item-5">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects with Members but No Leader Role (
                       {problematicProjectData?.no_leader?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={onOpenRemedyNoLeadersModal}
                       >
                         Remedy
                       </Button>
-                    </Flex>
+                    </div>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.no_leader}
                       defaultSorting={"business_area"}
@@ -375,27 +352,27 @@ export const AllProblematicProjects = () => {
                     />
                   </AccordionContent>
                 </AccordionItem>
-                <Divider />
+                <Separator />
                 <AccordionItem value="item-6">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects with Multiple Project Leader Roles (
                       {problematicProjectData?.multiple_leads?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={onOpenRemedyMultipleLeadersModal}
                       >
                         Remedy
                       </Button>
-                    </Flex>
+                    </div>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.multiple_leads}
                       defaultSorting={"business_area"}
@@ -408,27 +385,27 @@ export const AllProblematicProjects = () => {
                     />
                   </AccordionContent>
                 </AccordionItem>
-                <Divider />
+                <Separator />
                 <AccordionItem value="item-7">
                   <AccordionTrigger>
-                    <Text fontSize={"large"} py={4}>
+                    <p className="text-lg py-4">
                       Projects with Leaders Set to External User (
                       {problematicProjectData?.external_leader?.length || 0})
-                    </Text>
+                    </p>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    <div className="flex pb-8 justify-end">
                       <Button
-                        bg={colorMode === "light" ? "green.500" : "green.600"}
-                        color={"white"}
-                        _hover={{
-                          bg: colorMode === "light" ? "green.400" : "green.500",
-                        }}
+                        className={`text-white ${
+                          colorMode === "light" 
+                            ? "bg-green-500 hover:bg-green-400" 
+                            : "bg-green-600 hover:bg-green-500"
+                        }`}
                         onClick={onOpenRemedyExternalLeadersModal}
                       >
                         Remedy
                       </Button>
-                    </Flex>
+                    </div>
 
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.external_leader}
@@ -443,12 +420,12 @@ export const AllProblematicProjects = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                <Divider />
+                <Separator />
               </Accordion>
             )}
           </>
         )}
-      </Box>
+      </div>
     </>
   );
 };

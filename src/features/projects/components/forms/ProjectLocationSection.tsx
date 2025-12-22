@@ -1,6 +1,7 @@
 // Tab data for Project Location on the creation page. WIP need to update to take in pre-set locations for use in update project.
 
-import { Box, Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
@@ -74,157 +75,98 @@ export const ProjectLocationSection = ({
   return (
     <>
       {!locationsLoading && (
-        <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={4} px={36}>
+        <div className="grid grid-cols-2 gap-4 px-36">
           {dbcaDistricts && dbcaDistricts.length > 0 && (
-            <Flex
-              display={"flex"}
-              justifyContent={"center"}
-              alignContent={"center"}
-              alignItems={"center"}
-              w={"100%"}
-            >
+            <div className="flex justify-center items-center w-full">
               <AreaCheckAndMaps
                 title="DBCA Districts"
                 areas={dbcaDistricts}
                 area_type="dbcadistrict"
-                // required={false}
                 selectedAreas={selectedDistricts}
                 setSelectedAreas={setSelectedDistricts}
               />
-            </Flex>
+            </div>
           )}
-          {/* <Flex flexDir={"column"}> */}
-          {/* <Flex flexDir={"column"}> */}
 
           {imcra && imcra.length > 0 && (
-            <Flex
-              display={"flex"}
-              justifyContent={"center"}
-              alignContent={"center"}
-              alignItems={"center"}
-              w={"100%"}
-            >
+            <div className="flex justify-center items-center w-full">
               <AreaCheckAndMaps
                 title="IMCRAs"
                 areas={imcra}
                 area_type="imcra"
-                // required={false}
                 selectedAreas={selectedImcras}
                 setSelectedAreas={setSelectedImcras}
               />
-            </Flex>
+            </div>
           )}
           {dbcaRegions && dbcaRegions.length > 0 && (
-            <Flex
-              display={"flex"}
-              justifyContent={"center"}
-              alignContent={"center"}
-              alignItems={"center"}
-              w={"100%"}
-            >
+            <div className="flex justify-center items-center w-full">
               <AreaCheckAndMaps
                 title="DBCA Regions"
                 areas={dbcaRegions}
                 area_type="dbcaregion"
-                // required={false}
                 selectedAreas={selectedRegions}
                 setSelectedAreas={setSelectedRegions}
               />
-            </Flex>
+            </div>
           )}
           {nrm && nrm.length > 0 && (
-            <Flex
-              flexDir={"column"}
-              display={"flex"}
-              justifyContent={"center"}
-              alignContent={"center"}
-              alignItems={"center"}
-              w={"100%"}
-            >
+            <div className="flex flex-col justify-center items-center w-full">
               <AreaCheckAndMaps
                 title="Natural Resource Management Regions"
                 areas={nrm}
                 area_type="nrm"
-                // required={false}
                 selectedAreas={selectedNrms}
                 setSelectedAreas={setSelectedNrms}
               />
-            </Flex>
+            </div>
           )}
           {ibra && ibra.length > 0 && (
-            <Flex
-              display={"flex"}
-              justifyContent={"center"}
-              alignContent={"center"}
-              alignItems={"center"}
-              w={"100%"}
-            >
+            <div className="flex justify-center items-center w-full">
               <AreaCheckAndMaps
                 title="IBRAs"
                 areas={ibra}
                 area_type="ibra"
-                // required={false}
                 selectedAreas={selectedIbras}
                 setSelectedAreas={setSelectedIbras}
               />
-            </Flex>
+            </div>
           )}
-          <Flex
-            w={"100%"}
-            justifyContent={"flex-end"}
-            pb={4}
-            pt={10}
-            // pr={"200px"}
-            // bg={"red"}
-          >
-            <Grid mr={4}>
-              <></>
-              <Box>
+          <div className="w-full flex justify-end pb-4 pt-10">
+            <div className="mr-4">
+              <div>
                 <Button onClick={backClick}>Back</Button>
                 <Button
-                  ml={3}
-                  type="submit"
-                  // colorScheme="blue"
-                  backgroundColor={
-                    colorMode === "light" ? "blue.500" : "blue.600"
-                  }
-                  color={"white"}
-                  _hover={{
-                    backgroundColor:
-                      colorMode === "light" ? "blue.600" : "blue.700",
-                  }}
-                  // isDisabled={!locationFilled}
+                  className={`ml-3 text-white ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-600" 
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                   onClick={() => {
                     if (
                       projectType.includes("External") ||
                       projectType.includes("Student")
                     ) {
                       setLocationFilled(true);
-                      nextClick(
-                        locationData,
-                        // "locations": [...locationData]
-                      );
-                      // } else return;
+                      nextClick(locationData);
                     } else {
                       createClick();
                     }
                   }}
-                  rightIcon={
-                    projectType.includes("External") ||
-                    projectType.includes("Student") ? undefined : (
-                      <IoIosCreate />
-                    )
-                  }
                 >
                   {projectType.includes("External") ||
                   projectType.includes("Student")
                     ? `Next`
                     : `Create`}
+                  {!(projectType.includes("External") ||
+                    projectType.includes("Student")) && (
+                    <IoIosCreate className="ml-2" />
+                  )}
                 </Button>
-              </Box>
-            </Grid>
-          </Flex>
-        </Grid>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

@@ -2,21 +2,18 @@
 
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useNoImage } from "@/shared/hooks/useNoImage";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import {
-  Avatar,
-  Box,
-  Center,
-  Menu,
-  MenuButton,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { FaBook, FaFileCode, FaGamepad, FaUserCircle } from "react-icons/fa";
@@ -51,33 +48,20 @@ export const Navitar = ({
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   const mutation = useMutation({
     mutationFn: logOut,
     onMutate: () => {
-      // const ToastId =
-      addToast({
-        title: "Logging out...",
+      toast.loading("Logging out...", {
         description: "One moment!",
-        status: "loading",
-        position: "bottom-right",
-        duration: 1000,
       });
     },
     onSuccess: (data) => {
       console.log("logout success");
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Logged out",
-          description: "Thank you, come again!",
-          status: "success",
-          duration: 3000,
+      toast.success("Logged out", {
+        description: "Thank you, come again!",
+      });
         });
       }
       // queryClient.refetchQueries(['me']);

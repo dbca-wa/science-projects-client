@@ -2,31 +2,20 @@ import {
   toggleProjectVisibilityOnStaffProfile,
   toggleStaffProfileVisibility,
 } from "@/features/staff-profiles/services/staff-profiles.service";
-import {
-  Text,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface HideProjectModalProps {
   isOpen: boolean;
@@ -46,7 +35,7 @@ const HideProjectModal = ({
   refetch,
 }: HideProjectModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -55,15 +44,8 @@ const HideProjectModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -71,28 +53,17 @@ const HideProjectModal = ({
     // Start of mutation handling
     mutationFn: toggleProjectVisibilityOnStaffProfile,
     onMutate: () => {
-      addToast({
-        title: "Changing Project Visibility...",
+      toast.loading("Changing Project Visibility...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `This project is now ${
-            !projectIsHiddenFromStaffProfile ? "hidden" : "visible"
-          } from your staff profile.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `This project is now ${
+          !projectIsHiddenFromStaffProfile ? "hidden" : "visible"
+        } from your staff profile.`,
+      });
       //  Close the modal
       queryClient.invalidateQueries({
         queryKey: ["hiddenProjects", userPk],
@@ -141,16 +112,9 @@ const HideProjectModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -169,70 +133,60 @@ const HideProjectModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex
-      // as={"form"} onSubmit={handleSubmit(onSubmit)}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent className={`max-w-lg ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>
             {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"} Project From
             Staff Profile
-          </ModalHeader>
-          <ModalCloseButton />
+          </DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            {/* <Center> */}
-            <Text fontWeight={"bold"} fontSize={"xl"}>
-              Are you sure you want to{" "}
-              {!projectIsHiddenFromStaffProfile
-                ? "hide this project from your staff profile"
-                : "show this project on your staff profile"}
-              ?
-            </Text>
-            {/* </Center> */}
-            <Text mt={4}>
-              This project{" "}
-              {!projectIsHiddenFromStaffProfile ? " will no longer " : " will "}
-              appear on your projects tab in the science profiles public
-              directory. You can change this setting at any time.
-            </Text>
+        <div>
+          <p className="font-bold text-xl">
+            Are you sure you want to{" "}
+            {!projectIsHiddenFromStaffProfile
+              ? "hide this project from your staff profile"
+              : "show this project on your staff profile"}
+            ?
+          </p>
+          <p className="mt-4">
+            This project{" "}
+            {!projectIsHiddenFromStaffProfile ? " will no longer " : " will "}
+            appear on your projects tab in the science profiles public
+            directory. You can change this setting at any time.
+          </p>
 
-            <Text mt={4}>
-              If you would still like to proceed, press "
-              {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={toggleVisibilityMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    userPk,
-                    projectPk,
-                  })
-                }
-                ml={3}
-              >
-                {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+          <p className="mt-4">
+            If you would still like to proceed, press "
+            {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}".
+          </p>
+        </div>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              }`}
+              disabled={toggleVisibilityMutation.isPending}
+              onClick={() =>
+                onSubmit({
+                  userPk,
+                  projectPk,
+                })
+              }
+            >
+              {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

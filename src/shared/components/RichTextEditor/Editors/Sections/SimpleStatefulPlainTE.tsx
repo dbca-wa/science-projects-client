@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
@@ -81,7 +80,7 @@ export const SimpleStatefulPlainTE = ({
         {/* Text Area */}
         <PlainTextPlugin
           contentEditable={
-            <Box zIndex={2}>
+            <div className="z-[2]">
               {/* Toolbar */}
               <ContentEditable
                 tabIndex={tabbable ? undefined : -1}
@@ -97,7 +96,7 @@ export const SimpleStatefulPlainTE = ({
                   zIndex: 2,
                 }}
               />
-            </Box>
+            </div>
           }
           placeholder={
             <div

@@ -2,14 +2,8 @@ import { Head } from "@/shared/components/layout/base/Head";
 import HomeConfetti from "@/shared/components/Fun/HomeConfetti";
 import theme from "@/theme";
 import type { IUserMe } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Heading,
-  Link,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useCallback, useEffect, useState } from "react";
 import PatchNotes from "./PatchNotes";
 
@@ -68,26 +62,23 @@ export const WelcomeBox = ({ userData, showNotes }: IUserInterface) => {
   return (
     <>
       <HomeConfetti />
-      <Box
-        mt={5}
-        bgColor={colorMode === "dark" ? "gray.700" : "gray.200"}
-        color={colorMode === "dark" ? "white" : "black"}
-        rounded={6}
-        flexDir={"column"}
-        p={10}
-        pos={"relative"}
-        userSelect={"none"}
+      <div
+        className={`mt-5 rounded-md flex-col p-10 relative select-none ${
+          colorMode === "dark" 
+            ? "bg-gray-700 text-white" 
+            : "bg-gray-200 text-black"
+        }`}
       >
         <Head title="Home" />
 
-        <Heading mb={0} pb={shouldConcat ? 4 : 0}>
+        <h1 className={`mb-0 text-2xl font-bold ${shouldConcat ? "pb-4" : ""}`}>
           <div dangerouslySetInnerHTML={{ __html: spmsText }} />
-        </Heading>
+        </h1>
         {/* <br /> */}
         {/* {!shouldConcat && ( */}
-        <Text pt={4} fontSize={"19px"} fontWeight={"normal"}>
+        <p className="pt-4 text-lg font-normal">
           {welcomeUser}
-        </Text>
+        </p>
 
         {/* Patch Notes */}
         {showNotes ? <PatchNotes /> : null}
@@ -95,39 +86,37 @@ export const WelcomeBox = ({ userData, showNotes }: IUserInterface) => {
         {/* Feedback */}
         <div className="mt-4">
           <span style={{ marginTop: 20 }}>
-            <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+            <span className="text-base font-normal">
               We are always looking for ways to improve, and value your
               feedback! If you notice something off, or would like to request a
               change, please send an email to{" "}
-            </Text>
-            <Link
+            </span>
+            <a
               href={`mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback`}
-              color={colorMode === "light" ? "blue.400" : "blue.300"}
+              className={colorMode === "light" ? "text-blue-400" : "text-blue-300"}
             >
               ecoinformatics.admin@dbca.wa.gov.au
-            </Link>
+            </a>
             .
           </span>
-          <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+          <span className="text-base font-normal">
             {" "}
             Don't be shy, we can only make things better with your help!
-          </Text>
+          </span>
 
           <div className="mt-6 flex items-center justify-between">
             <p className="text-blue-500">Version {VERSION}</p>
             <Button
-              variant={"solid"}
-              color={"white"}
-              bg={"blue.500"}
-              _hover={{ bg: "blue.400" }}
-              as={Link}
-              href={`mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback`}
+              className="text-white bg-blue-500 hover:bg-blue-400"
+              asChild
             >
-              Submit Feedback
+              <a href={`mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback`}>
+                Submit Feedback
+              </a>
             </Button>
           </div>
         </div>
-      </Box>
+      </div>
     </>
   );
 };

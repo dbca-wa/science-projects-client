@@ -8,40 +8,31 @@ import {
   mergeAffiliations,
 } from "@/features/admin/services/admin.service";
 import type { IAffiliation, IMergeAffiliation } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Spinner,
-  Text,
-  type ToastId,
-  type UseToastOptions,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Loader2 } from "lucide-react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const AffiliationsCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IAffiliation>();
@@ -72,143 +63,68 @@ export const AffiliationsCRUD = () => {
   //   });
   // }, [primaryAffiliation, secondaryAffiliations]);
 
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: mergeIsOpen,
-    onOpen: onMergeOpen,
-    onClose: onMergeClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: cleanIsOpen,
-    onOpen: onCleanOpen,
-    onClose: onCleanClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
+  const [mergeIsOpen, setMergeIsOpen] = useState(false);
+  const [cleanIsOpen, setCleanIsOpen] = useState(false);
 
   const queryClient = useQueryClient();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const mergeToast = (data) => {
-    ToastIdRef.current = toast(data);
-  };
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+
   const creationMutation = useMutation({
     mutationFn: createAffiliation,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Creating Affiliation...",
-        position: "top-right",
-      });
+      toast.loading("Creating Affiliation...");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Created`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      onAddClose();
+      toast.success("Success", {
+        description: "Created",
+      });
+      setAddIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Failed",
-          description: `Something went wrong!`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Failed", {
+        description: "Something went wrong!",
+      });
     },
   });
 
   const mergeMutation = useMutation({
     mutationFn: mergeAffiliations,
     onMutate: () => {
-      mergeToast({
-        status: "loading",
-        title: "Merging...",
-        position: "top-right",
-      });
+      toast.loading("Merging...");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Merged!",
-          description: `The affiliations are now one!`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Merged!", {
+        description: "The affiliations are now one!",
+      });
       clearSecondaryAffiliationArray();
       setPrimaryAffiliation(null);
-      onMergeClose();
+      setMergeIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Failed",
-          description: `Something went wrong!`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Failed", {
+        description: "Something went wrong!",
+      });
     },
   });
 
   const cleanMutation = useMutation({
     mutationFn: cleanOrphanedAffiliations,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Cleaning orphaned affiliations...",
-        position: "top-right",
-      });
+      toast.loading("Cleaning orphaned affiliations...");
     },
     onSuccess: (data) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Cleanup Complete!",
-          description: data.message,
-          status: "success",
-          position: "top-right",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-      onCleanClose();
+      toast.success("Cleanup Complete!", {
+        description: data.message,
+      });
+      setCleanIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Failed",
-          description: `Something went wrong!`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Failed", {
+        description: "Something went wrong!",
+      });
     },
   });
 

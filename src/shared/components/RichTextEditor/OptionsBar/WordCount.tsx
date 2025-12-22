@@ -1,4 +1,3 @@
-import { Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 interface IWordCountProps {
@@ -28,8 +27,6 @@ export const WordCount = ({
     wordCount = getWordCount(text);
     charCount = getCharacterCount(text);
   }
-
-  const { colorMode } = useColorMode();
 
   useEffect(() => {
     if (!wordLimit) {
@@ -62,46 +59,33 @@ export const WordCount = ({
   }, [limitExceeded, limitCanBePassed]);
 
   return (
-    <Flex flexDir={"column"}>
-      <Text
-        fontWeight={"semibold"}
-        fontSize={"lg"}
-        color={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.500"}
-        userSelect={"none"}
-      >
+    <div className="flex flex-col">
+      <p className="font-semibold text-lg text-muted-foreground select-none">
         {`${wordCount} word${wordCount > 1 || wordCount === 0 ? "s" : ""}`} |{" "}
         {`${charCount} character${charCount > 1 || charCount === 0 ? "s" : ""}`}
-      </Text>
+      </p>
       {wordLimit ? (
         limitExceeded === true ? (
-          <Text fontSize={"xs"} color={"red.500"} fontWeight={"bold"}>
+          <p className="text-xs text-red-500 font-bold">
             {`${
               limitCanBePassed ? "Aim for max of" : "Limit"
             }: ${wordLimit} words `}
-          </Text>
+          </p>
         ) : limitAlmostExceeded === true ? (
-          <Text
-            fontSize={"xs"}
-            color={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.500"}
-            fontWeight={"bold"}
-          >
+          <p className="text-xs text-muted-foreground font-bold">
             {`${
               limitCanBePassed ? "Aim for max of" : "Limit"
             }: ${wordLimit} words `}
-          </Text>
+          </p>
         ) : (
-          <Text
-            fontSize={"xs"}
-            color={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.500"}
-            fontWeight={"semibold"}
-          >
+          <p className="text-xs text-muted-foreground font-semibold">
             {`${
               limitCanBePassed ? "Aim for max of" : "Limit"
             }: ${wordLimit} words `}
-          </Text>
+          </p>
         )
       ) : null}
-    </Flex>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 // Hook used to determine the noimage file for projects
 
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const useNoImage = () => {
   const { colorMode } = useColorMode();

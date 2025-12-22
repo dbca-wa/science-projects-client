@@ -1,9 +1,11 @@
-import { Button, Flex, Text, useColorMode } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { BsPlus } from "react-icons/bs";
+import { ReactNode } from "react";
 
 interface TeamMemberContainerProps {
   id: UniqueIdentifier;
@@ -40,19 +42,19 @@ export const TeamMemberContainer = ({
         isDragging && "opacity-50"
       )}
     >
-      <Flex justifyContent={"space-between"}>
-        <Text>Test</Text>
+      <div className="flex justify-between">
+        <p>Test</p>
         <Button
-          size={"sm"}
+          size="sm"
           onClick={onAddItem}
-          leftIcon={<BsPlus />}
-          bg={colorMode === "light" ? "green.500" : "green.600"}
-          color={"white"}
-          userSelect={"none"}
+          className={`text-white select-none ${
+            colorMode === "light" ? "bg-green-500" : "bg-green-600"
+          }`}
         >
+          <BsPlus className="mr-2 h-4 w-4" />
           Invite Member
         </Button>
-      </Flex>
+      </div>
 
       {children}
       <Button variant="ghost" onClick={onAddItem}>

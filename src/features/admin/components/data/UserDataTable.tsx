@@ -6,21 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  Image,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
 
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
@@ -97,41 +85,32 @@ export const UserDataTable = ({
         return (
           <Button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex w-full text-left"
-            justifyContent={"flex-start"}
-            rightIcon={sortIcon}
-            bg={"transparent"}
-            _hover={
+            className={`flex w-full text-left justify-start bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Name
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const originalImageData = row?.original?.image;
         return (
-          <Flex
-            className="text-center font-medium"
-            // justifyContent={"center"}
-            alignItems={"center"}
-            pl={4}
-          >
-            <Image
-              objectFit={"cover"}
+          <div className="text-center font-medium flex items-center pl-4">
+            <img
+              className="object-cover w-[50px] h-[50px] rounded-full"
               src={
                 originalImageData !== null && originalImageData !== undefined
                   ? `${baseUrl}${originalImageData}`
                   : noImage
               }
-              boxSize={"50px"}
-              rounded={"full"}
+              alt="User"
             />
-            <Text px={4}>{row.original.name}</Text>
-          </Flex>
+            <p className="px-4">{row.original.name}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -155,24 +134,22 @@ export const UserDataTable = ({
         return (
           <Button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Email
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         return (
-          <Box className="text-center align-middle font-medium">
-            <Text>{row?.original?.email}</Text>
-          </Box>
+          <div className="text-center align-middle font-medium">
+            <p>{row?.original?.email}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -195,31 +172,28 @@ export const UserDataTable = ({
 
         return (
           <Button
-            bg={"transparent"}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            justifyContent={"center"}
-            _hover={
+            className={`bg-transparent w-full text-center justify-center ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Is Staff
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const staffData = row?.original?.is_staff;
         return (
-          <Center>
+          <div className="flex justify-center">
             {staffData === true ? (
               <FcApproval size={"30px"} />
             ) : (
               <FcCancel size={"30px"} />
             )}
-          </Center>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -243,29 +217,27 @@ export const UserDataTable = ({
         return (
           <Button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Is Active
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const isActiveData = row?.original?.is_active;
         return (
-          <Center>
+          <div className="flex justify-center">
             {isActiveData === true ? (
               <FcApproval size={"30px"} />
             ) : (
               <FcCancel size={"30px"} />
             )}
-          </Center>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -353,11 +325,9 @@ interface UserTableRowProps {
 }
 
 const UserTableRow = ({ row }: UserTableRowProps) => {
-  const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose,
-  } = useDisclosure();
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const onUserOpen = () => setIsUserOpen(true);
+  const onUserClose = () => setIsUserOpen(false);
 
   const drawerFunction = () => {
     // console.log(`${first_name} clicked`);
@@ -368,25 +338,21 @@ const UserTableRow = ({ row }: UserTableRowProps) => {
 
   return (
     <>
-      <Drawer
-        isOpen={isUserOpen}
-        placement="right"
-        onClose={onUserClose}
-        size={"lg"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
+      <Sheet open={isUserOpen} onOpenChange={setIsUserOpen}>
+        <SheetContent className="w-[400px] sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>User Profile</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
             <UserProfile
               pk={row?.original?.pk}
               branches={[]}
               businessAreas={[]}
             />
-          </DrawerBody>
-
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+          </div>
+          <SheetFooter></SheetFooter>
+        </SheetContent>
+      </Sheet>
       <TableRow
         key={row.id}
         className={colorMode === "light" ? twRowClassLight : twRowClassDark}

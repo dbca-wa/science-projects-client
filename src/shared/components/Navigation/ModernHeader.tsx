@@ -1,6 +1,5 @@
 // Modern Header
 
-import { Box, HStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import theme from "@/theme";
@@ -45,38 +44,22 @@ export const ModernHeader = () => {
   }, [theme.breakpoints.lg]);
 
   return (
-    <Box
-      display={"flex"}
-      padding={"0.25rem"}
-      sx={{
-        "@media (min-width: 768px)": {
-          flexDirection: "row",
-        },
-      }}
-      position="sticky"
-      top={0}
-      zIndex={1}
-      w={"100%"}
+    <div
+      className="flex p-1 sticky top-0 z-10 w-full md:flex-row"
     >
       {/* Breadcrumb */}
-      <Box display={"flex"} justifyContent={"flex-start"} padding={"0.25rem"}>
+      <div className="flex justify-start p-1">
         <ModernBreadcrumb />
-      </Box>
+      </div>
 
       {/* Search and Avatar */}
-      <Box
-        display={"flex"}
-        flex={"1 1 0%"}
-        justifyContent={"flex-end"}
-        alignItems={"center"}
-        w={"100%"}
-        px={6}
-        padding={"0.25rem"}
+      <div
+        className="flex flex-1 justify-end items-center w-full px-6 p-1"
       >
-        <HStack pl={6} pr={3}>
+        <div className="flex pl-6 pr-3">
           <Navitar shouldShowName windowSize={windowSizeValue} isModern />
-        </HStack>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };

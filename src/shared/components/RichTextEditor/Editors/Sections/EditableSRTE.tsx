@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
@@ -136,9 +135,9 @@ export const EditableSRTE = ({
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
-            <Box
+            <div
               // mr={3}
-              maxW={"100%"}
+              className="max-w-full"
             >
               {/* Toolbar */}
               <RevisedRichTextToolbar
@@ -151,8 +150,8 @@ export const EditableSRTE = ({
                 toolbarRef={toolbarRef}
               />
 
-              <Box className="editor-scroller">
-                <Box
+              <div className="editor-scroller">
+                <div
                   className="editor"
                   ref={onRef}
                   style={{
@@ -177,13 +176,13 @@ export const EditableSRTE = ({
 
                     // autoFocus
                   />
-                </Box>
-              </Box>
-              {/* <Box>Editor: {editorText}</Box> */}
-            </Box>
+                </div>
+              </div>
+              {/* <div>Editor: {editorText}</div> */}
+            </div>
           }
           placeholder={
-            <Box
+            <div
               style={{
                 position: "absolute",
                 left: `${32 + dragBtnMargin}px`,
@@ -194,7 +193,7 @@ export const EditableSRTE = ({
               }}
             >
               {`Enter ${useGetRTESectionPlaceholder(section)}..`}
-            </Box>
+            </div>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
@@ -211,7 +210,7 @@ export const EditableSRTE = ({
           </>
         )}
 
-        <Box>
+        <div>
           <OptionsBar
             details_pk={details_pk}
             editorType={editorType}
@@ -236,7 +235,7 @@ export const EditableSRTE = ({
             documentTypeCount={documentsCount}
             // setDisplayData={setDisplayData}
           />
-        </Box>
+        </div>
         {shouldShowTree ? <TreeViewPlugin /> : null}
         <ClearEditorPlugin />
         <TabIndentationPlugin />

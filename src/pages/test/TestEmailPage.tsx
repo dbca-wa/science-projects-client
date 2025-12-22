@@ -5,14 +5,11 @@ import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { useUser } from "@/features/users/hooks/useUser";
 
 import {
-  Center,
-  Spinner,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
   Tabs,
-} from "@chakra-ui/react";
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 
 export const TestEmailPage = () => {
   const { userLoading, userData } = useUser();
@@ -23,32 +20,29 @@ export const TestEmailPage = () => {
 
   if (userLoading || !userData || maintainerLoading || !maintainerData) {
     return (
-      <Center>
-        <Spinner />
-      </Center>
+      <div className="flex justify-center items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+      </div>
     );
   }
 
   return (
     <>
       <Head title="Emails" />
-      <Tabs>
-        <TabList>
-          <Tab>Divisional Directorate Email Lists</Tab>
-          {/* {isMaintainer ? <Tab>Email Styling Page</Tab> : null} */}
-
-          {/* <Tab>Templates</Tab> */}
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <DivisionalEmailLists />
-          </TabPanel>
-          {/* {isMaintainer ? (
-            <TabPanel>
-              <EmailStylingPage />
-            </TabPanel>
-          ) : null} */}
-        </TabPanels>
+      <Tabs defaultValue="divisional-lists">
+        <TabsList>
+          <TabsTrigger value="divisional-lists">Divisional Directorate Email Lists</TabsTrigger>
+          {/* {isMaintainer ? <TabsTrigger value="email-styling">Email Styling Page</TabsTrigger> : null} */}
+          {/* <TabsTrigger value="templates">Templates</TabsTrigger> */}
+        </TabsList>
+        <TabsContent value="divisional-lists">
+          <DivisionalEmailLists />
+        </TabsContent>
+        {/* {isMaintainer ? (
+          <TabsContent value="email-styling">
+            <EmailStylingPage />
+          </TabsContent>
+        ) : null} */}
       </Tabs>
     </>
   );

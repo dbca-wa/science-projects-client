@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
@@ -231,7 +230,7 @@ export const EditableGuideSRTE = ({
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
-            <Box maxW={"100%"}>
+            <div className="max-w-full">
               {/* Toolbar */}
               <RevisedRichTextToolbar
                 allowTable={true}
@@ -239,8 +238,8 @@ export const EditableGuideSRTE = ({
                 toolbarRef={toolbarRef}
               />
 
-              <Box className="editor-scroller">
-                <Box
+              <div className="editor-scroller">
+                <div
                   className="editor"
                   ref={onRef}
                   style={{
@@ -258,12 +257,12 @@ export const EditableGuideSRTE = ({
                       outline: "none",
                     }}
                   />
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
           }
           placeholder={
-            <Box
+            <div
               style={{
                 position: "absolute",
                 left: `${32 + dragBtnMargin}px`,
@@ -274,7 +273,7 @@ export const EditableGuideSRTE = ({
               }}
             >
               {`Enter ${placeholderText}..`}
-            </Box>
+            </div>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
@@ -285,7 +284,7 @@ export const EditableGuideSRTE = ({
           />
         )}
 
-        <Box>
+        <div>
           <GuideOptionsBar
             adminOptionsByPk={adminOptionsPk}
             displayData={displayData}
@@ -303,7 +302,7 @@ export const EditableGuideSRTE = ({
             refetch={refetch}
             onSave={handleSave} // Pass our adapter function
           />
-        </Box>
+        </div>
         {shouldShowTree ? <TreeViewPlugin /> : null}
         <ClearEditorPlugin />
         <TabIndentationPlugin />

@@ -1,24 +1,25 @@
 import type { ILegacyPDF } from "@/shared/types";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
   Select,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { addLegacyPDF } from "@/features/reports/services/reports.service";
 import { useUser } from "@/features/users/hooks/useUser";
 import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
@@ -39,15 +40,8 @@ export const AddLegacyReportPDFModal = ({
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const [uploadedPDF, setUploadedPDF] = useState<File>();
   const [reportYear, setReportYear] = useState<number>();
-  //   const [reportId, setReportId] = useState<number>();
   const [isError, setIsError] = useState(false);
 
   const { userData } = useUser();
@@ -55,23 +49,12 @@ export const AddLegacyReportPDFModal = ({
   const ararPDFAdditionMutation = useMutation({
     mutationFn: addLegacyPDF,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Adding PDF",
-        position: "top-right",
-      });
+      toast.loading("Adding PDF...");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `PDF Added`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "PDF Added",
+      });
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
@@ -81,16 +64,9 @@ export const AddLegacyReportPDFModal = ({
       onAddLegacyPDFClose();
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Add PDF",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could Not Add PDF", {
+        description: `${error}`,
+      });
     },
   });
 
@@ -108,40 +84,36 @@ export const AddLegacyReportPDFModal = ({
   );
 
   return (
-    <Modal
-      isOpen={isAddLegacyPDFOpen}
-      onClose={onAddLegacyPDFClose}
-      size={"sm"}
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Add Legacy PDF</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isAddLegacyPDFOpen} onOpenChange={onAddLegacyPDFClose}>
+      <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>Add Legacy PDF</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody>
-          <Text mb={4}>
+        <div className="space-y-4">
+          <p className="mb-4">
             Use this form to add the finalised pdf of ancient reports.
-          </Text>
+          </p>
           {legacyPDFData ? (
-            <>
-              <FormControl pb={6}>
-                <FormLabel>Report Year</FormLabel>
-                <Select onChange={(e) => setReportYear(Number(e.target.value))}>
+            <div className="pb-6">
+              <Label htmlFor="report-year">Report Year</Label>
+              <Select onValueChange={(value) => setReportYear(Number(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a year" />
+                </SelectTrigger>
+                <SelectContent>
                   {availableYears.map((year, index) => (
-                    <option key={index} value={year}>
+                    <SelectItem key={index} value={year.toString()}>
                       {year}
-                    </option>
+                    </SelectItem>
                   ))}
-                </Select>
-              </FormControl>
-            </>
+                </SelectContent>
+              </Select>
+            </div>
           ) : null}
 
-          <FormControl>
-            <FormLabel>PDF File</FormLabel>
+          <div>
+            <Label>PDF File</Label>
             <SingleFileStateUpload
               fileType={"pdf"}
               uploadedFile={uploadedPDF}
@@ -149,29 +121,28 @@ export const AddLegacyReportPDFModal = ({
               isError={isError}
               setIsError={setIsError}
             />
-          </FormControl>
-        </ModalBody>
+          </div>
+        </div>
 
-        <ModalFooter>
-          <Button mr={3} onClick={onAddLegacyPDFClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={onAddLegacyPDFClose}>
             Cancel
           </Button>
           <Button
-            isLoading={ararPDFAdditionMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
-            isDisabled={!uploadedPDF || !reportYear || isError}
+            disabled={ararPDFAdditionMutation.isPending || !uploadedPDF || !reportYear || isError}
+            className={`text-white ${
+              colorMode === "dark" 
+                ? "bg-green-500 hover:bg-green-400" 
+                : "bg-green-400 hover:bg-green-300"
+            }`}
             onClick={() => {
               onSubmitPDFAdd();
             }}
           >
-            Add
+            {ararPDFAdditionMutation.isPending ? "Adding..." : "Add"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

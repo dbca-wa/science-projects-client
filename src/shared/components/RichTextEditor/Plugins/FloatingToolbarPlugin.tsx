@@ -15,7 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getDOMRangeRect } from "@/shared/utils/getDOMRangeRect";
 import { getSelectedNode } from "@/shared/utils/getSelectedNode";
 import { setFloatingElemPosition } from "@/shared/utils/setFloatingElemPosition";
-import { Flex, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import {
   $getNearestBlockElementAncestorOrThrow,
   mergeRegister,
@@ -167,24 +167,14 @@ export const FloatingToolbar = ({
     );
   }, [editor, updateTextFormatFloatingToolbar]);
   return (
-    <Flex
+    <div
       ref={popupCharStylesEditorRef}
-      backgroundColor={colorMode === "light" ? "white" : "gray.700"}
-      // overflowX={
-      //     "hidden"
-      // }
-      display={"flex"}
-      zIndex={99}
-      padding={"4px"}
-      verticalAlign={"middle"}
-      pos={"absolute"}
-      top={8}
-      left={2}
-      opacity={0}
-      boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
-      borderRadius={"10px 10px 10px 10px"}
-      transition={"opacity 0.5s"}
-      willChange={"transform"}
+      className={`flex z-50 p-1 absolute top-2 left-0.5 opacity-0 rounded-lg transition-opacity duration-500 shadow-lg ${
+        colorMode === "light" ? "bg-white" : "bg-gray-700"
+      }`}
+      style={{
+        willChange: "transform",
+      }}
     >
       {editor.isEditable() && (
         <>
@@ -223,15 +213,6 @@ export const FloatingToolbar = ({
           </RevisedBaseToolbarButton>
           <VerticalDivider />
 
-          {/* <RevisedBaseToolbarButton
-                        ariaLabel="Format text with a strikethrough"
-                        isActive={isStrikethrough}
-                        variant={"ghost"}
-                        isDisabled={false}
-                        onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough') }}
-                    >
-                        Strike
-                    </RevisedBaseToolbarButton> */}
           <RevisedBaseToolbarButton
             ariaLabel="Format Subscript"
             isActive={isSubscript}
@@ -298,12 +279,6 @@ export const FloatingToolbar = ({
                       }
                       node = textNode;
                     }
-                    // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
-                    // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
-                    //     node.replace($createParagraphNode(), true);
-                    // } else if ($isDecoratorBlockNode(node)) {
-                    //     node.setFormat('');
-                    // }
                   });
                 }
               });
@@ -313,16 +288,7 @@ export const FloatingToolbar = ({
           </RevisedBaseToolbarButton>
         </>
       )}
-    </Flex>
-
-    //         {/* <button
-    //     type="button"
-    //     onClick={insertComment}
-    //     className={'popup-item spaced insert-comment'}
-    //     aria-label="Insert comment">
-    //     <i className="format add-comment" />
-    //   </button> */}
-    //     </div>
+    </div>
   );
 };
 

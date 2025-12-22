@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { createEducation } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffEducationEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -31,16 +31,11 @@ const AddStaffEducationContent = ({
     mode: "onChange", // or "onBlur"
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createEducation,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Created");
       await queryClient.invalidateQueries({
         queryKey: ["education", usersPk],
       });
@@ -49,11 +44,7 @@ const AddStaffEducationContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
     // onMutate: () => {
     //   console.log("mutation");

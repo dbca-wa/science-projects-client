@@ -12,20 +12,12 @@ import { FaTrash } from "react-icons/fa";
 import { getUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
 import type { IUserData, EmailListPerson } from "@/shared/types";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
-import {
-  FormControl,
-  FormHelperText,
-  FormLabel,
-} from "@chakra-ui/react/form-control";
-import { Box } from "@chakra-ui/react/box";
-import { Input, InputGroup } from "@chakra-ui/react/input";
-import { Button } from "@react-email/components";
-import { Flex } from "@chakra-ui/react/flex";
-import { Tag } from "@chakra-ui/react/tag";
-import { useColorMode } from "@chakra-ui/react/color-mode";
-import { IconButton } from "@chakra-ui/react/button";
-import { Text } from "@chakra-ui/react";
-import { CloseIcon } from "@chakra-ui/icons/Close";
+import { Label } from "@/shared/components/ui/label";
+import { Input } from "@/shared/components/ui/input";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { X } from "lucide-react";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;
@@ -164,18 +156,20 @@ export const UserArraySearchDropdown = forwardRef(
 
     return (
       <>
-        <FormControl isRequired={isRequired} mb={4}>
-          <FormLabel>{label}</FormLabel>
+        <div className="mb-4">
+          <Label className={isRequired ? "after:content-['*'] after:ml-0.5 after:text-red-500" : ""}>
+            {label}
+          </Label>
           {selectedUser ? (
-            <Box mb={2} color="blue.500">
+            <div className="mb-2 text-blue-500">
               <SelectedUserPk
                 user={selectedUser}
                 onClear={handleClearUser}
                 isEditable={isEditable}
               />
-            </Box>
+            </div>
           ) : (
-            <InputGroup>
+            <div>
               <Input
                 ref={inputRef} // Attach the ref to the input element
                 type="text"
@@ -185,11 +179,11 @@ export const UserArraySearchDropdown = forwardRef(
                 autoComplete="off"
                 onFocus={() => setIsMenuOpen(true)}
               />
-            </InputGroup>
+            </div>
           )}
 
           {selectedUser ? null : (
-            <Box pos="relative" w="100%">
+            <div className="relative w-full">
               <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen}>
                 <CustomMenuList minWidth="100%">
                   {filteredItems.map((user) => (
@@ -201,43 +195,38 @@ export const UserArraySearchDropdown = forwardRef(
                   ))}
                 </CustomMenuList>
               </CustomMenu>
-            </Box>
+            </div>
           )}
 
-          <FormHelperText>{helperText}</FormHelperText>
+          <p className="text-sm text-muted-foreground mt-2">{helperText}</p>
           {array?.length > 1 && (
             <Button
               onClick={() => {
                 arrayClearFunction?.();
               }}
-              size={"xs"}
-              pos={"absolute"}
-              bottom={-8}
-              right={2}
-              background={colorMode === "light" ? "red.500" : "red.800"}
-              px={2}
-              rightIcon={<FaTrash />}
-              color={"white"}
+              size="sm"
+              className={`absolute -bottom-8 right-2 px-2 text-white ${
+                colorMode === "light" ? "bg-red-500 hover:bg-red-600" : "bg-red-800 hover:bg-red-700"
+              }`}
             >
+              <FaTrash className="mr-2 h-3 w-3" />
               Clear list
             </Button>
           )}
-        </FormControl>
+        </div>
         {array?.length > 0 && (
-          <Flex flexWrap="wrap" gap={2} pt={array?.length > 1 ? 7 : 0} pb={2}>
+          <div className={`flex flex-wrap gap-2 ${array?.length > 1 ? "pt-7" : "pt-0"} pb-2`}>
             {array?.map((u, index) => (
-              <Tag
+              <Badge
                 key={index}
-                size="md"
-                borderRadius="full"
-                variant="solid"
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                variant="secondary"
+                className={`rounded-full text-white ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-600 hover:bg-blue-500"
+                }`}
               >
-                <TagLabel pl={1}>
+                <span className="pl-1">
                   {" "}
                   {/* Handle different object structures */}
                   {
@@ -245,15 +234,17 @@ export const UserArraySearchDropdown = forwardRef(
                       ? `${u.display_first_name} ${u.display_last_name}${u.is_superuser ? " (Superuser)" : u.is_staff ? " (Staff)" : ""}`
                       : u.name /* For IEmailListUser which has a name property */
                   }
-                </TagLabel>
-                <TagCloseButton
+                </span>
+                <button
                   onClick={() => arrayRemoveFunction(u)}
-                  userSelect={"none"}
+                  className="ml-2 hover:bg-black/20 rounded-full p-0.5"
                   tabIndex={-1}
-                />
-              </Tag>
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
             ))}
-          </Flex>
+          </div>
         )}
       </>
     );
@@ -280,17 +271,14 @@ interface CustomMenuListProps {
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   const { colorMode } = useColorMode();
   return (
-    <Box
-      pos="absolute"
-      w="100%"
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      display={isOpen ? "block" : "none"}
-      zIndex={99}
+    <div
+      className={`absolute w-full shadow-md z-[99] ${
+        colorMode === "light" ? "bg-white" : "bg-gray-700"
+      } ${isOpen ? "block" : "hidden"}`}
       {...rest}
     >
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -303,47 +291,36 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      as="button"
+    <button
       type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+      className={`w-full text-left p-2 flex items-center z-[99] ${
+        isHovered ? "bg-gray-200" : "bg-transparent"
+      }`}
       onClick={handleClick}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
-      zIndex={99}
       {...rest}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text
-          ml={2}
-          color={
+      <div className="flex items-center justify-start ml-3 h-full">
+        <p
+          className={`ml-2 ${
             user?.is_superuser
               ? colorMode === "light"
-                ? "blue.500"
-                : "blue.300"
+                ? "text-blue-500"
+                : "text-blue-300"
               : user?.is_staff
                 ? colorMode === "light"
-                  ? "green.500"
-                  : "green.300"
+                  ? "text-green-500"
+                  : "text-green-300"
                 : colorMode === "light"
-                  ? "gray.500"
-                  : "gray.300"
-          }
+                  ? "text-gray-500"
+                  : "text-gray-300"
+          }`}
         >
           {`${user.display_first_name} ${user.display_last_name}${user.is_superuser ? " (Superuser)" : user.is_staff ? " (Staff)" : ""}`}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </button>
   );
 };
 
@@ -353,9 +330,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className="relative w-full" style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -369,45 +346,39 @@ const SelectedUserPk = ({ user, onClear, isEditable }: selectedUserPkProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
+    <div
+      className={`flex items-center relative rounded-md px-2 py-1 mr-2 ${
+        colorMode === "dark" ? "bg-gray-700" : "bg-gray-100"
+      }`}
     >
-      <Text
-        ml={2}
-        color={
+      <p
+        className={`ml-2 ${
           user?.is_superuser
             ? colorMode === "light"
-              ? "blue.500"
-              : "blue.300"
+              ? "text-blue-500"
+              : "text-blue-300"
             : user?.is_staff
               ? colorMode === "light"
-                ? "green.500"
-                : "green.300"
+                ? "text-green-500"
+                : "text-green-300"
               : colorMode === "light"
-                ? "gray.500"
-                : "gray.300"
-        }
+                ? "text-gray-500"
+                : "text-gray-300"
+        }`}
       >
         {`${user.display_first_name} ${user.display_last_name}${user.is_superuser ? " (Superuser)" : user.is_staff ? " (Staff)" : ""}`}
-      </Text>
+      </p>
       {isEditable ? (
-        <IconButton
-          aria-label="Clear selected affiliation"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-1/2 right-2 -translate-y-1/2 h-6 w-6 p-0"
           onClick={onClear}
-        />
+          aria-label="Clear selected affiliation"
+        >
+          <X className="h-3 w-3" />
+        </Button>
       ) : null}
-    </Flex>
+    </div>
   );
 };

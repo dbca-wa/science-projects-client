@@ -5,7 +5,7 @@ import { PASTE_COMMAND } from "lexical";
 import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
 import { BaseOptionsButton } from "./BaseOptionsButton";
 import { RTEPriorReportPopulationModal } from "@/features/reports/components/modals/RTEPriorReportPopulationModal";
-import { useDisclosure } from "@chakra-ui/react";
+import { useState } from "react";
 
 interface Props {
   canPopulate: boolean;
@@ -58,7 +58,10 @@ export const PopulationButton = ({
     editor.dispatchCommand(PASTE_COMMAND, pasteEvent);
   };
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
 
   return (
     <>

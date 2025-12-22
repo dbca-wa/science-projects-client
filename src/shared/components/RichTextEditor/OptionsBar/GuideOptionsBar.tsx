@@ -1,6 +1,5 @@
 import { GuideSections, saveGuideContentToDB } from "@/features/admin/services/admin.service";
 import { useUser } from "@/features/users/hooks/useUser";
-import { Flex, Grid } from "@chakra-ui/react";
 import type { EditorType } from "@/shared/types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { GuideSaveButton } from "../Buttons/GuideSaveButton";
@@ -72,25 +71,25 @@ export const GuideOptionsBar = ({
 
   return (
     editorIsOpen && (
-      <Flex height={20} width={"100%"} bottom={0}>
-        {/* <Flex justifyContent="flex-start" alignItems="center" flex={1} px={10}>
+      <div className="flex h-20 w-full bottom-0">
+        {/* <div className="flex justify-start items-center flex-1 px-10">
           <WordCount
             text={editorText}
             wordLimit={wordLimit}
             limitCanBePassed={limitCanBePassed}
             setCanSave={setCanSave}
           />
-        </Flex> */}
+        </div> */}
 
-        <Flex justifyContent="flex-end" alignItems="center" flex={1}>
-          <Grid
-            px={10}
-            py={4}
-            gridTemplateColumns={`repeat(${
-              userData?.is_superuser ? 3 : 2
-            }, 1fr)`}
-            // width={"100%"}
-            gridColumnGap={2}
+        <div className="flex justify-end items-center flex-1">
+          <div
+            className="px-10 py-4 gap-2"
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${
+                userData?.is_superuser ? 3 : 2
+              }, 1fr)`,
+            }}
           >
             {userData?.is_superuser ? (
               <TreeButton
@@ -113,9 +112,9 @@ export const GuideOptionsBar = ({
               softRefetch={refetch}
               fieldKey={fieldKey || section.toString()} // Use fieldKey if provided, otherwise use section
             />
-          </Grid>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
     )
   );
 };

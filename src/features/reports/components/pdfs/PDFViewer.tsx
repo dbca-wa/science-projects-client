@@ -6,20 +6,10 @@ import {
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useGetAnnualReportPDF } from "@/features/reports/hooks/useGetAnnualReportPDF";
 import type { IReport } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Input,
-  Spinner,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
@@ -28,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { BsStars } from "react-icons/bs";
 import { FaFileDownload } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   thisReport: IReport;
@@ -46,18 +37,10 @@ Props) => {
   const apiEndpoint = useApiEndpoint();
   const queryClient = useQueryClient();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const annualReportPDFGenerationMutation = useMutation({
     mutationFn: generateAnnualReportPDF,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Generating AR PDF",
+      toast.loading("Generating AR PDF...");
         position: "top-right",
       });
     },
@@ -80,20 +63,13 @@ Props) => {
       });
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Generate AR PDF",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could Not Generate AR PDF", {
+        description: error?.response?.data
+          ? `${error.response.status}: ${
+              Object.values(error.response.data)[0]
+            }`
+          : "Error",
+      });
     },
   });
 
@@ -114,23 +90,12 @@ Props) => {
   const cancelDocGenerationMutation = useMutation({
     mutationFn: cancelAnnualReportPDF,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Canceling Generation",
-        position: "top-right",
-      });
+      toast.loading("Canceling Generation...");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Canceled`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "Canceled",
+      });
       queryClient.cancelQueries({
         queryKey: [
           "annualReportPDF",
@@ -152,19 +117,15 @@ Props) => {
     onError: (error: AxiosError) => {
       if (ToastIdRef.current) {
         console.log(error);
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Cancel",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+    },
+    onError: (error: AxiosError) => {
+      toast.error("Could Not Cancel", {
+        description: error?.response?.data
+          ? `${error.response.status}: ${
+              Object.values(error.response.data)[0]
+            }`
+          : "Error",
+      });
     },
   });
 
@@ -233,24 +194,23 @@ Props) => {
   };
 
   return (
-    <Box>
-      <Flex alignContent={"center"} justifyContent={"flex-end"} mb={4}>
-        <Flex>
-          <Text fontSize={"sm"} color={"gray.500"} mr={2}>
+    <div>
+      <div className="flex items-center justify-end mb-4">
+        <div className="flex">
+          <p className="text-sm text-gray-500 mr-2">
             {showRestartMessage
               ? "Generation taking longer than expected. If generation time exceeds one minute, please try again."
               : null}
-          </Text>
-          <Text fontSize={"sm"} color={"gray.500"} mr={2}>
+          </p>
+          <p className="text-sm text-gray-500 mr-2">
             {generationTime > 0
               ? `Generation time: ${generationTime / 1000} seconds`
               : null}
-          </Text>
-        </Flex>
+          </p>
+        </div>
 
-        <Flex>
-          <Box
-            as="form"
+        <div className="flex">
+          <form
             id="cancel-pdf-generation-form"
             onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
           >
@@ -261,10 +221,9 @@ Props) => {
                 value: thisReport?.pk ? thisReport.pk : thisReport?.id,
               })}
             />
-          </Box>
+          </form>
 
-          <Box
-            as="form"
+          <form
             id="pdf-generation-form"
             onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
           >
@@ -275,10 +234,9 @@ Props) => {
                 value: thisReport?.pk ? thisReport.pk : thisReport?.id,
               })}
             />
-          </Box>
+          </form>
 
-          <Box
-            as="form"
+          <form
             id="pdf-generation-form-unapproved"
             onSubmit={handleGenSubmit(beginUnapprovedProjectDocPDFGeneration)}
           >
@@ -289,7 +247,7 @@ Props) => {
                 value: thisReport?.pk ? thisReport.pk : thisReport?.id,
               })}
             />
-          </Box>
+          </form>
 
           {/* If the generation mutation is still pending but has been cancelled 
             show the generate buttons, otherwise show the cancel button
@@ -298,120 +256,103 @@ Props) => {
             !cancelDocGenerationMutation.isSuccess) ||
           pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
-              size={"sm"}
-              ml={2}
-              variant={"solid"}
-              color={"white"}
-              background={colorMode === "light" ? "gray.400" : "gray.500"}
-              _hover={{
-                background: colorMode === "light" ? "gray.300" : "gray.400",
-              }}
-              loadingText={"Canceling"}
-              isDisabled={cancelDocGenerationMutation.isPending}
+              size="sm"
+              className={`ml-2 text-white ${
+                colorMode === "light" ? "bg-gray-400 hover:bg-gray-300" : "bg-gray-500 hover:bg-gray-400"
+              }`}
+              disabled={cancelDocGenerationMutation.isPending}
               type="submit"
               form="cancel-pdf-generation-form"
-              isLoading={cancelDocGenerationMutation.isPending}
             >
-              <Box mr={2}>
-                <FcCancel />
-              </Box>
-              Cancel
+              {cancelDocGenerationMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FcCancel className="mr-2" />
+              )}
+              {cancelDocGenerationMutation.isPending ? "Canceling" : "Cancel"}
             </Button>
           ) : pdfDocumentData?.pdf_data ? (
             <Button
-              as={motion.div}
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 10, opacity: 0 }}
-              sx={{ transitionDuration: 0.7, animationDelay: 1 }}
-              size={"sm"}
-              ml={2}
-              variant={"solid"}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                cursor: "pointer",
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
+              size="sm"
+              className={`ml-2 text-white ${
+                colorMode === "light" ? "bg-blue-500 hover:bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
+              }`}
               onClick={() => {
                 window.open(`${apiEndpoint}${pdfDocumentData?.file}`, "_blank");
               }}
             >
-              <Box mr={2}>
-                <FaFileDownload />
-              </Box>
+              <FaFileDownload className="mr-2" />
               Download PDF
             </Button>
           ) : null}
+            </Button>
+          ) : null}
           <Button
-            size={"sm"}
-            ml={2}
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "green.500" : "green.600"}
-            _hover={{
-              cursor: "pointer",
-              background: colorMode === "light" ? "green.400" : "green.500",
-            }}
-            loadingText={"Generation In Progress"}
+            size="sm"
+            className={`ml-2 text-white ${
+              colorMode === "light" ? "bg-green-500 hover:bg-green-400" : "bg-green-600 hover:bg-green-500"
+            }`}
             type="submit"
             form="pdf-generation-form"
-            isLoading={
+            disabled={
               annualReportPDFGenerationMutation.isPending &&
               !cancelDocGenerationMutation.isPending
             }
           >
-            <Box mr={2}>
-              <BsStars />
-            </Box>
-            Generate New
+            {annualReportPDFGenerationMutation.isPending &&
+            !cancelDocGenerationMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <BsStars className="mr-2" />
+            )}
+            {annualReportPDFGenerationMutation.isPending &&
+            !cancelDocGenerationMutation.isPending
+              ? "Generation In Progress"
+              : "Generate New"}
           </Button>
 
           <Button
-            size={"sm"}
-            ml={2}
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "orange.500" : "orange.600"}
-            _hover={{
-              cursor: "pointer",
-              background: colorMode === "light" ? "orange.400" : "orange.500",
-            }}
-            loadingText={"Generation In Progress"}
-            isDisabled={
+            size="sm"
+            className={`ml-2 text-white ${
+              colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+            }`}
+            disabled={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
               (annualReportPDFGenerationMutation.isPending &&
                 !cancelDocGenerationMutation.isSuccess)
             }
             type="submit"
             form="pdf-generation-form-unapproved"
-            isLoading={
-              pdfDocumentData?.report?.pdf_generation_in_progress ||
-              (annualReportPDFGenerationMutation.isPending &&
-                !cancelDocGenerationMutation.isSuccess)
-            }
           >
-            <Box mr={2}>
-              <BsStars />
-            </Box>
-            Include Unapproved
+            {pdfDocumentData?.report?.pdf_generation_in_progress ||
+            (annualReportPDFGenerationMutation.isPending &&
+              !cancelDocGenerationMutation.isSuccess) ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <BsStars className="mr-2" />
+            )}
+            {pdfDocumentData?.report?.pdf_generation_in_progress ||
+            (annualReportPDFGenerationMutation.isPending &&
+              !cancelDocGenerationMutation.isSuccess)
+              ? "Generation In Progress"
+              : "Include Unapproved"}
           </Button>
-        </Flex>
-      </Flex>
+        </div>
+      </div>
       {!pdfDocumentDataLoading ? (
         pdfDocumentData !== undefined ? (
           (pdfDocumentData?.report?.pdf_generation_in_progress &&
             !cancelDocGenerationMutation.isSuccess) ||
           (annualReportPDFGenerationMutation.isPending &&
             !cancelDocGenerationMutation.isSuccess) ? (
-            <Center mt={100}>
+            <div className="flex justify-center mt-24">
               <img
                 src="/bouncing-ball.svg"
                 alt="Loading..."
-                width={"20%"}
-                height={"20%"}
+                width="20%"
+                height="20%"
               />
-            </Center>
+            </div>
           ) : (
             <iframe
               title="Annual Report PDF Viewer"
@@ -425,22 +366,22 @@ Props) => {
             />
           )
         ) : (
-          <Center>
-            <Grid>
-              <Center>
-                <Text>There is no pdf.</Text>
-              </Center>
-              <Center>
-                <Text>Click generate new to create one.</Text>
-              </Center>
-            </Grid>
-          </Center>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex justify-center">
+                <p>There is no pdf.</p>
+              </div>
+              <div className="flex justify-center">
+                <p>Click generate new to create one.</p>
+              </div>
+            </div>
+          </div>
         )
       ) : (
-        <Center mt={4}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center mt-4">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

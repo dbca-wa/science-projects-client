@@ -1,6 +1,6 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { ReactNode } from "react";
 import "./staffprofileeditor.css";
 
@@ -23,25 +23,19 @@ export const ToolbarButton = ({
   onClick,
 }: IBaseToolbarButtonProps) => {
   return (
-    <Box className="tooltip-container">
+    <div className="tooltip-container">
       <Button
-        size={"sm"}
+        size="sm"
         aria-label={ariaLabel}
         variant={variant ? variant : "ghost"}
-        isDisabled={isDisabled}
-        bg={isActive ? "gray.700" : undefined}
-        _hover={{
-          bg: "gray.600",
-        }}
+        disabled={isDisabled}
+        className={`${isActive ? "bg-gray-700" : ""} hover:bg-gray-600 text-white border-0 flex`}
         onClick={onClick}
         tabIndex={-1}
-        border={0}
-        display={"flex"}
-        color={"white"}
       >
         {children}
       </Button>
-      {ariaLabel && <Text className="tooltip-text">{ariaLabel}</Text>}
-    </Box>
+      {ariaLabel && <p className="tooltip-text">{ariaLabel}</p>}
+    </div>
   );
 };

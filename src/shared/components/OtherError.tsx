@@ -1,17 +1,7 @@
 // Error handler for non-404 errors.
 
-import {
-  Box,
-  Button,
-  Center,
-  Grid,
-  Heading,
-  Text,
-  VStack,
-  useColorMode,
-} from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { AiFillHome } from "react-icons/ai";
 import { IoIosArrowBack } from "react-icons/io";
 
@@ -30,48 +20,34 @@ export const OtherError = ({ code, message, stack }: GenericErrorProps) => {
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minH="100vh"
-      background={colorMode === "dark" ? "gray.800" : "gray.100"}
-    >
-      <Grid
-        gridTemplateColumns="repeat(1, 1fr)"
-        gridTemplateRows="1fr 1fr 1fr 1fr"
-        height="100%"
-      >
-        <VStack spacing={8} align="center">
-          <Heading>Error: {code}</Heading>
-          <Text>Oh, oh. We have an error!</Text>
-          <Text>{message}</Text>
-          <Grid gridTemplateColumns="repeat(2, 1fr)" gridColumnGap={20}>
+    <div className={`flex justify-center items-center min-h-screen ${
+      colorMode === "dark" ? "bg-gray-800" : "bg-gray-100"
+    }`}>
+      <div className="grid grid-cols-1 grid-rows-4 h-full">
+        <div className="flex flex-col items-center space-y-8">
+          <h1 className="text-3xl font-bold">Error: {code}</h1>
+          <p>Oh, oh. We have an error!</p>
+          <p>{message}</p>
+          <div className="grid grid-cols-2 gap-20">
             <Link to="/">
-              <Button
-                variant="link"
-                colorScheme="twitter"
-                leftIcon={<AiFillHome />}
-              >
+              <button className="flex items-center text-blue-500 hover:text-blue-600 underline">
+                <AiFillHome className="mr-2" />
                 Go home
-              </Button>
+              </button>
             </Link>
-            {/* <Link to='/'> */}
-            <Button
-              variant="link"
-              colorScheme="twitter"
-              leftIcon={<IoIosArrowBack />}
+            <button
+              className="flex items-center text-blue-500 hover:text-blue-600 underline"
               onClick={goBack}
             >
+              <IoIosArrowBack className="mr-2" />
               Go back
-            </Button>
-            {/* </Link> */}
-          </Grid>
-          <Center p={20}>
-            <Text>{stack}</Text>
-          </Center>
-        </VStack>
-      </Grid>
-    </Box>
+            </button>
+          </div>
+          <div className="flex justify-center p-20">
+            <p>{stack}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

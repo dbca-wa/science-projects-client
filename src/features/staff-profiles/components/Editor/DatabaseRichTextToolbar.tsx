@@ -1,7 +1,5 @@
 // Toolbar for the simple rich text editor
 
-import { Box, Flex, FlexProps, Text, useDisclosure } from "@chakra-ui/react";
-
 import { InsertTableModal } from "@/shared/components/Modals/RTEModals/InsertTableModal";
 import { VerticalDivider } from "@/shared/components/RichTextEditor/Toolbar/VerticalDivider";
 import { ToolbarButton } from "@/features/staff-profiles/components/Editor/ToolbarButton";
@@ -9,6 +7,7 @@ import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { ImClearFormatting } from "react-icons/im";
 import { MdSubscript, MdSuperscript } from "react-icons/md";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import "./staffprofileeditor.css";
 
 import {
@@ -237,7 +236,7 @@ const useToolbar = ({
   ];
 };
 
-interface Props extends FlexProps {
+interface Props {
   allowInserts?: boolean;
   allowTable?: boolean;
   referenceFlex: MutableRefObject<HTMLDivElement>;
@@ -260,11 +259,10 @@ export const DatabaseRichTextToolbar = ({
     canRedo,
     blockType,
   ] = useToolbar({ editor });
-  const {
-    isOpen: isAddTableOpen,
-    onClose: onAddTableClose,
-    // onOpen: onAddTableOpen,
-  } = useDisclosure();
+  
+  const [isAddTableOpen, setIsAddTableOpen] = useState(false);
+  const onAddTableClose = () => setIsAddTableOpen(false);
+  // const onAddTableOpen = () => setIsAddTableOpen(true);
 
   const formatParagraph = () => {
     editor.update(() => {
@@ -300,15 +298,9 @@ export const DatabaseRichTextToolbar = ({
         onClose={onAddTableClose}
       />
 
-      <Flex
-        flexWrap="wrap" // This allows the toolbar buttons to wrap to the next line
-        justifyContent="flex-start" // Align items to the start
-        gap="8px" // Adds spacing between items
-        bg={"gray.900"}
-        roundedTop={6}
-        px={1}
-        py={1}
-        boxShadow="4px 0px 4px rgba(0,0,0,0.2), -4px 0px -4px rgba(0,0,0,0.2)"
+      <div
+        className="flex flex-wrap justify-start gap-2 bg-gray-900 rounded-t-md px-1 py-1"
+        style={{ boxShadow: "4px 0px 4px rgba(0,0,0,0.2), -4px 0px -4px rgba(0,0,0,0.2)" }}
         ref={referenceFlex}
       >
         <ToolbarButton
@@ -453,12 +445,11 @@ export const DatabaseRichTextToolbar = ({
         />
 
         {allowTable ? <TableDropdown activeEditor={editor} /> : null}
-      </Flex>
+      </div>
     </>
   );
 };
 
-import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { useRef } from "react";
 import { BsChatSquareQuoteFill, BsTextParagraph } from "react-icons/bs";
 import { FaCaretDown, FaCode } from "react-icons/fa";
@@ -472,6 +463,13 @@ import {
 } from "react-icons/lu";
 import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
 import { TbChecklist } from "react-icons/tb";
+import { Button } from "@/shared/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 
 interface ElementProps {
   buttonSize?: "sm" | "md" | "lg";
@@ -589,110 +587,64 @@ const ElementSelector = ({
   }, [buttonRef]);
 
   return (
-    <Menu
-      isLazy
-      // placement="bottom"
-    >
-      {" "}
-      <Box className="tooltip-container grow">
-        <MenuButton
-          as={Button}
-          variant={"ghost"}
-          size={buttonSize}
-          leftIcon={blockTypeToBlockIcon(blockType)}
-          rightIcon={<FaCaretDown />}
-          flex="1 1 auto" // Ensures the button can grow and shrink as needed
-          whiteSpace="nowrap" // Prevents text from wrapping within the button itself
-          overflow="hidden" // Hides any overflow content
-          textOverflow="ellipsis" // Adds ellipsis if text overflows
-          mx={1}
-          ref={buttonRef}
-          w={"100%"}
-          color={"white"}
-          bg={"gray.900"}
-          _hover={{ bg: "gray.600" }}
-          _active={{ bg: "gray.600" }}
-          _selected={{ bg: "gray.600" }}
-          _expanded={{ bg: "gray.600" }}
+    <DropdownMenu>
+      <div className="tooltip-container grow">
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size={buttonSize}
+            className="flex-1 whitespace-nowrap overflow-hidden text-ellipsis mx-1 w-full text-white bg-gray-900 hover:bg-gray-600 active:bg-gray-600"
+            ref={buttonRef}
+          >
+            <span className="mr-2">{blockTypeToBlockIcon(blockType)}</span>
+            {blockTypeToBlockName(blockType)}
+            <FaCaretDown className="ml-2" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="z-[9999999999999] min-w-[200px] bg-white"
+          style={{ width: Math.max(buttonWidth, 200) }}
         >
-          {/* {buttonSize} */}
-          {blockTypeToBlockName(blockType)}
-        </MenuButton>
-        <MenuList
-          zIndex={9999999999999}
-          w={buttonWidth}
-          minW={"200px"}
-          pos={"absolute"}
-          bg={"white"}
-        >
-          <MenuItem
+          <DropdownMenuItem
             onClick={formatParagraph}
-            // w={"100%"}
-            display={"inline-flex"}
-            alignItems={"center"}
-            zIndex={2}
-            bg={"white"}
-            _hover={{
-              bg: "gray.100",
-            }}
-            color={"black"}
+            className="inline-flex items-center z-2 bg-white hover:bg-gray-100 text-black"
           >
             <BsTextParagraph />
-
-            <Box pl={4} zIndex={2}>
+            <div className="pl-4 z-2">
               <span>Normal</span>
-            </Box>
-          </MenuItem>
+            </div>
+          </DropdownMenuItem>
           {allowInserts ? (
             <>
-              <MenuItem
+              <DropdownMenuItem
                 onClick={formatBulletList}
-                w={"100%"}
-                display={"inline-flex"}
-                alignItems={"center"}
-                zIndex={2}
-                bg={"white"}
-                _hover={{
-                  bg: "gray.100",
-                }}
-                color={"black"}
+                className="w-full inline-flex items-center z-2 bg-white hover:bg-gray-100 text-black"
               >
                 <MdFormatListBulleted />
-
-                <Box pl={4} zIndex={2}>
+                <div className="pl-4 z-2">
                   <span>Bullet List</span>
-                </Box>
-              </MenuItem>
-              <MenuItem
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={formatNumberList}
-                w={"100%"}
-                display={"inline-flex"}
-                alignItems={"center"}
-                zIndex={2}
-                bg={"white"}
-                _hover={{
-                  bg: "gray.100",
-                }}
-                color={"black"}
+                className="w-full inline-flex items-center z-2 bg-white hover:bg-gray-100 text-black"
               >
                 <MdFormatListNumbered />
-
-                <Box pl={4} zIndex={2}>
+                <div className="pl-4 z-2">
                   <span>Numbered List</span>
-                </Box>
-              </MenuItem>
+                </div>
+              </DropdownMenuItem>
             </>
           ) : null}
-        </MenuList>
-        <Text className="tooltip-text">Select Type</Text>
-      </Box>
-    </Menu>
+        </DropdownMenuContent>
+        <span className="tooltip-text">Select Type</span>
+      </div>
+    </DropdownMenu>
   );
 };
 
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Center, Grid, useColorMode } from "@chakra-ui/react";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import { FaTable } from "react-icons/fa";
 import "@/styles/texteditor.css";
@@ -753,47 +705,40 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
         const isHighlighted = row < tableRows && col < tableColumns;
         const isFirstRowOrColumn = row === 0 || col === 0;
         cols.push(
-          <Box
+          <div
             key={`${row}-${col}`}
-            w="25px"
-            h="25px"
-            border="1px solid"
-            borderColor={isHighlighted ? "gray.300" : "gray.300"}
-            onMouseEnter={() => handleMouseEnter(row, col)}
-            onClick={onGridClick}
-            backgroundColor={
+            className={`w-6 h-6 border border-gray-300 cursor-pointer ${
               isFirstRowOrColumn
                 ? isHighlighted
-                  ? "blue.300"
-                  : "gray.200"
+                  ? "bg-blue-300 hover:bg-blue-400"
+                  : "bg-gray-200 hover:bg-blue-400"
                 : isHighlighted
-                  ? "blue.200"
-                  : "white"
-            }
-            _hover={{
-              backgroundColor: isFirstRowOrColumn ? "blue.400" : "green.100",
-            }}
+                  ? "bg-blue-200 hover:bg-green-100"
+                  : "bg-white hover:bg-green-100"
+            }`}
+            onMouseEnter={() => handleMouseEnter(row, col)}
+            onClick={onGridClick}
           />,
         );
       }
       grid.push(
-        <Grid templateColumns={`repeat(${columns}, 1fr)`} key={row}>
+        <div className="grid grid-cols-7 gap-0" key={row}>
           {cols}
-        </Grid>,
+        </div>,
       );
     }
     return grid;
   };
 
   return (
-    <Center display={"flex"} flexDir={"column"} w={"100%"}>
+    <div className="flex flex-col items-center w-full">
       {/* Table amount */}
-      <Text fontSize={"large"} pb={2}>
+      <p className="text-lg pb-2">
         {tableColumns} x {tableRows} table
-      </Text>
+      </p>
       {/* Table grid */}
-      <Box>{createGrid()}</Box>
-    </Center>
+      <div>{createGrid()}</div>
+    </div>
   );
 };
 
@@ -814,7 +759,6 @@ const TableDropdown = ({ activeEditor }: TableGridProps) => {
 
 // A template for a RTE menu button - props fill out its icon, text and functionality
 
-import { Icon } from "@chakra-ui/react";
 import { type FC, type ReactNode } from "react";
 import { IconType } from "react-icons";
 
@@ -865,68 +809,43 @@ export const BaseToolbarMenuButton = ({
   // const { colorMode } = useColorMode();
 
   return (
-    <Menu isLazy>
-      <MenuButton
-        as={Button}
-        variant={"ghost"}
-        leftIcon={MenuIcon ? <MenuIcon /> : undefined}
-        rightIcon={<FaCaretDown />}
-        // px={8}
-        mx={1}
-        flex={1}
-        ref={buttonRef}
-        tabIndex={-1}
-        onClick={() => onClick?.()}
-        color={"white"}
-        _active={{ bg: "gray.600" }}
-        _selected={{ bg: "gray.600" }}
-        _expanded={{ bg: "gray.600" }}
-      >
-        {title ? title : null}
-      </MenuButton>
-      <MenuList
-        w={"fit-content"}
-        // w={buttonWidth}
-        // minW={"200px"}
-        // maxW={"200px"}
-        zIndex={9999999999999}
-        pos={"absolute"}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="text-white active:bg-gray-600 hover:bg-gray-600 mx-1 flex-1"
+          ref={buttonRef}
+          onClick={() => onClick?.()}
+        >
+          {MenuIcon && <MenuIcon className="mr-2" />}
+          {title ? title : null}
+          <FaCaretDown className="ml-2" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-fit z-[9999999999999] absolute"
       >
         {menuItems.map((item, index) => {
           return (
-            <MenuItem
+            <DropdownMenuItem
               key={index}
               onClick={item.onClick}
-              w={"100%"}
-              display={"inline-flex"}
-              alignItems={"center"}
-              zIndex={2}
-              // pos={"absolute"}
-              _hover={{
-                bg: disableHoverBackground
-                  ? undefined
-                  : // colorMode === "light" ?
-                    // "gray.100",
-                    // :
-                    "gray.600",
-              }}
-              _active={{ bg: "gray.600" }}
-              _selected={{ bg: "gray.600" }}
-              _expanded={{ bg: "gray.600" }}
-              color={"black"}
+              className={`w-full inline-flex items-center z-2 text-black ${
+                !disableHoverBackground ? "hover:bg-gray-600" : ""
+              } active:bg-gray-600`}
             >
-              {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
+              {item.leftIcon && <item.leftIcon className="mr-2" />}
               {item?.text && (
-                <Box pl={4} zIndex={2} color={"black"}>
+                <div className="pl-4 z-2 text-black">
                   <span className="text-black">{item.text}</span>
-                </Box>
+                </div>
               )}
               {item?.component && item?.component}
-            </MenuItem>
+            </DropdownMenuItem>
           );
         })}
-      </MenuList>
-    </Menu>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

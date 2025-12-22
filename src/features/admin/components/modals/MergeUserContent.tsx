@@ -4,19 +4,9 @@ import { Head } from "@/shared/components/layout/base/Head";
 import { UserArraySearchDropdown } from "@/features/users/components/UserArraySearchDropdown";
 import { mergeUsers } from "@/features/users/services/users.service";
 import type { IMergeUser, IUserData } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  ListItem,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef, useState } from "react";
@@ -29,13 +19,8 @@ interface IProps {
 
 export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
   const { colorMode } = useColorMode();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
   const queryClient = useQueryClient();
-
-  const mergeToast = (data) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const [primaryUser, setPrimaryUser] = useState<IUserData | null>(null);
   const [secondaryUsers, setSecondaryUsers] = useState<IUserData[] | null>([]);
@@ -55,21 +40,13 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
   const mergeMutation = useMutation({
     mutationFn: mergeUsers,
     onMutate: () => {
-      mergeToast({
-        status: "loading",
-        title: "Merging...",
-        position: "top-right",
-      });
+      ToastIdRef.current = toast.loading("Merging...");
     },
     onSuccess: () => {
       if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Merged!",
-          description: `The users are now one!`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+        toast.success("Merged!", {
+          description: "The users are now one!",
+          id: ToastIdRef.current,
         });
       }
       clearSecondaryUserArray();
@@ -79,13 +56,9 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
     },
     onError: (error: AxiosError) => {
       if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Failed",
+        toast.error("Failed", {
           description: `${Object.values(error.response.data)[0] || "An error occurred"}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+          id: ToastIdRef.current,
         });
       }
     },
@@ -106,45 +79,42 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
     <>
       <Head title={"Merge Users"} />
       {!isModal && (
-        <Box>
-          <Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
+        <div>
+          <p className="mb-8 font-bold text-2xl">
             Merge Users
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
 
-      <Box mb={3}>
-        <Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
+      <div className="mb-3">
+        <p className={colorMode === "light" ? "text-blue-500" : "text-blue-400"}>
           This form is for merging duplicate users. Please ensure that the user
           you merge has the correct information.
-        </Text>
-        <UnorderedList ml={6} mt={2}>
-          <ListItem>
+        </p>
+        <ul className="ml-6 mt-2 list-disc">
+          <li>
             The primary user will receive any projects belonging to the
             secondary user/s
-          </ListItem>
-          <ListItem>
+          </li>
+          <li>
             The primary user will receive any comments belonging to the
             secondary user/s
-          </ListItem>
-          <ListItem>
+          </li>
+          <li>
             The primary user will receive any documents and roles belonging to
             the secondary user/s on projects, where applicable (if primary user
             is already on the project and has a higher role, they will maintain
             the higher role)
-          </ListItem>
-          <ListItem
-            textDecoration={"underline"}
-            color={colorMode === "light" ? "red.500" : "red.400"}
-          >
+          </li>
+          <li className={`underline ${colorMode === "light" ? "text-red-500" : "text-red-400"}`}>
             The secondary user/s will be deleted from the system. This is
             permanent.
-          </ListItem>
-        </UnorderedList>
-      </Box>
+          </li>
+        </ul>
+      </div>
 
-      <Grid gridColumnGap={8} gridTemplateColumns={"repeat(1, 1fr)"}>
-        <FormControl>
+      <div className="grid grid-cols-1 gap-8">
+        <div>
           <UserArraySearchDropdown
             isRequired
             autoFocus
@@ -155,8 +125,8 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
             placeholder="Search for primary user to merge into"
             helperText="This user will be the primary user after the merge, others will be deleted"
           />
-        </FormControl>
-        <FormControl>
+        </div>
+        <div>
           <UserArraySearchDropdown
             isRequired
             isEditable
@@ -169,26 +139,21 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
             placeholder="Search for an user"
             helperText="The user/s you would like to merge into the primary user"
           />
-        </FormControl>
-      </Grid>
+        </div>
+      </div>
 
-      {/* ======================================================= */}
-
-      <Flex mt={5} justifyContent="end">
+      <div className="flex mt-5 justify-end">
         <Button
-          bgColor={colorMode === "light" ? `red.500` : `red.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `red.600` : `red.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
-          ml={3}
-          isDisabled={
+          className={`ml-3 ${
+            colorMode === "light" 
+              ? "bg-red-500 hover:bg-red-600 text-white" 
+              : "bg-red-600 hover:bg-red-400 text-white"
+          }`}
+          disabled={
             mergeMutation.isPending ||
             secondaryUsers?.length < 1 ||
             !primaryUser
           }
-          isLoading={mergeMutation.isPending}
           onClick={() => {
             onSubmitMerge({
               primaryUser,
@@ -196,9 +161,9 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
             });
           }}
         >
-          Merge
+          {mergeMutation.isPending ? "Merging..." : "Merge"}
         </Button>
-      </Flex>
+      </div>
     </>
   );
 };

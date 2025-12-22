@@ -9,7 +9,8 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import type { IAdminTask } from "@/shared/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 
 import {
   ColumnDef,
@@ -21,7 +22,7 @@ import {
 } from "@tanstack/react-table";
 import { formatDate } from "date-fns";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsFillSignMergeLeftFill } from "react-icons/bs";
 import { FaUserCog } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -104,20 +105,13 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
 
         return (
           <Button
-            // variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className={`w-full text-center bg-transparent hover:${
+              colorMode === "dark" ? "bg-blue-400 text-white" : "bg-blue-50 text-black"
+            }`}
           >
             Type
+            {sortIcon}
           </Button>
         );
       },
@@ -129,14 +123,12 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         const formattedColour = taskKindsDict[originalKindData].colour;
 
         return (
-          <Box className="text-center align-middle font-medium">
-            <Icon
-              as={formattedIcon}
-              color={`${formattedColour}.500`}
-              boxSize={"22px"}
-            />
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-          </Box>
+          <div className="text-center align-middle font-medium">
+            <div className={`text-${formattedColour}-500`}>
+              {React.createElement(formattedIcon, { size: 22 })}
+            </div>
+            <p className={`text-${formattedColour}-500`}>{formattedString}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -161,33 +153,25 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            className={`w-full text-start bg-transparent justify-start hover:${
+              colorMode === "dark" ? "bg-blue-400 text-white" : "bg-blue-50 text-black"
+            }`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-start"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
           >
             Requester
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const originalRequesterData = row.original.requester;
         return (
-          <Box className="justify-start px-4 text-start font-medium">
-            <Text color={"blue.400"} fontWeight={"semibold"}>
+          <div className="justify-start px-4 text-start font-medium">
+            <p className="text-blue-400 font-semibold">
               {originalRequesterData.display_first_name}{" "}
               {originalRequesterData.display_last_name}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -209,21 +193,13 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            className={`w-full text-left bg-transparent justify-start hover:${
+              colorMode === "dark" ? "bg-blue-400 text-white" : "bg-blue-50 text-black"
+            }`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
           >
             Details
+            {sortIcon}
           </Button>
         );
       },
@@ -249,38 +225,22 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
                 : originalReasonData;
         const originalNoteData = row.original.notes;
         return (
-          <Box className="text-left font-medium">
-            <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration:
-                  colorMode === "dark" ? "underline" : "undefined",
-              }}
-              cursor={"pointer"}
-              px={4}
+          <div className="text-left font-medium">
+            <p
+              className={`px-4 font-bold cursor-pointer hover:underline ${
+                colorMode === "dark" ? "text-blue-200 hover:text-blue-100" : "text-blue-400 hover:text-blue-300"
+              }`}
             >
               {originalReasonData || "No reason provided."}
-            </Text>
+            </p>
             {originalNoteData && (
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                px={4}
-              >
+              <p className="text-gray-400 font-semibold text-sm px-4">
                 {originalNoteData}
-              </Text>
+              </p>
             )}
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"x-small"}
-              px={4}
-            >
+            <p className="text-gray-400 font-semibold text-xs px-4">
               {taskKindsDict[row.original.action].description}
-            </Text>
+            </p>
             {row?.original?.action === "deleteproject" ? (
               <div className="px-4">
                 <span className="text-xs font-semibold text-red-400">
@@ -295,26 +255,15 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
 
             {/* Group text so it appears next to each other - on same line in same sentence */}
             <div className="flex w-full flex-col flex-nowrap items-center px-4">
-              <Text
-                color={"blue.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                className="w-full"
-              >
+              <p className="text-blue-400 font-semibold text-xs w-full">
                 Requested by:{" "}
                 {`${row.original.requester.display_first_name} ${row.original.requester.display_last_name}`}{" "}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                ml={1}
-                className="w-full"
-              >
+              </p>
+              <p className="text-gray-400 font-semibold text-xs ml-1 w-full">
                 {` on ${formattedDate}`}
-              </Text>
+              </p>
             </div>
-          </Box>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {

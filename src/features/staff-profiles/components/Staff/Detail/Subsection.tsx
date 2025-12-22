@@ -1,4 +1,4 @@
-import { Divider } from "@chakra-ui/react";
+import { Separator } from "@/shared/components/ui/separator";
 import { ReactElement, ReactNode } from "react";
 
 const Subsection = ({
@@ -17,7 +17,7 @@ const Subsection = ({
       <p className="text-lg font-semibold">{title}</p>
       {button && button}
     </div>
-    {divider && <Divider mt={2} mb={1} bg={"gray.300"} />}
+    {divider && <Separator className="mt-2 mb-1 bg-gray-300" />}
     <div className="w-full">{children}</div>
   </div>
 );

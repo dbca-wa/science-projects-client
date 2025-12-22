@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { IStaffPublicEmail, publicEmailStaffMember } from "@/features/staff-profiles/services/staff-profiles.service";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
@@ -27,24 +27,15 @@ const EmailStaffMemberContent = ({
   } = useForm<IStaffPublicEmail>({
     mode: "onChange", // or "onBlur"
   });
-  const toast = useToast();
   const mutation = useMutation({
     mutationFn: publicEmailStaffMember,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Email Sent",
-        position: "top-right",
-      });
+      toast.success("Email Sent");
       onClose();
     },
     onError: (e) => {
       console.log("error", e);
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
   const onSubmit = (formData: IStaffPublicEmail) => {

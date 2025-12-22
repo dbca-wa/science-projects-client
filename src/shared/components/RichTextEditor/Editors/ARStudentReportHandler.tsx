@@ -4,7 +4,7 @@
 import { useState } from "react";
 
 // Styles and Styling Components
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import "@/styles/texteditor.css";
 

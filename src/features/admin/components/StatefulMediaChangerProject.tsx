@@ -1,32 +1,13 @@
 import { handleImageFileCompression } from "@/shared/utils/imageCompression";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Center,
-  Flex,
-  Grid,
-  IconButton,
-  Image,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Progress,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-  Text,
-  Tooltip,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Slider } from "@/shared/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
+import { Progress } from "@/shared/components/ui/progress";
+import { X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { AiOutlineRotateLeft, AiOutlineRotateRight } from "react-icons/ai";
@@ -69,7 +50,9 @@ export const StatefulMediaChangerProject = ({
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // For cropping modal
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
   const [crop, setCrop] = useState<Crop>({
     unit: "%",
     width: 50,
@@ -476,31 +459,21 @@ export const StatefulMediaChangerProject = ({
 
   return (
     <>
-      <Flex direction="row" w="100%" gap={6} className="select-none">
+      <div className="flex flex-row w-full gap-6 select-none">
         {/* Only show preview if we have an image */}
         {hasValidImage && (
-          <Flex
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            minWidth="220px"
-            px={4}
-          >
+          <div className="flex flex-col items-center justify-center min-w-[220px] px-4">
             {/* Project Card Preview */}
-            <Box textAlign="center">
-              <Text fontSize="sm" mb={2} fontWeight="medium">
+            <div className="text-center">
+              <p className="text-sm mb-2 font-medium">
                 Project Card Preview:
-              </Text>
-              <Box
-                w="200px"
-                h="120px"
-                borderRadius="lg"
-                overflow="hidden"
-                border="1px solid"
-                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-                bg={colorMode === "light" ? "white" : "gray.700"}
-                boxShadow="sm"
-                mx="auto"
+              </p>
+              <div
+                className={`w-[200px] h-[120px] rounded-lg overflow-hidden border mx-auto shadow-sm ${
+                  colorMode === "light" 
+                    ? "border-gray-200 bg-white" 
+                    : "border-gray-600 bg-gray-700"
+                }`}
               >
                 <img
                   src={
@@ -515,31 +488,25 @@ export const StatefulMediaChangerProject = ({
                   onError={() => setIsImageError(true)}
                   draggable="false"
                 />
-              </Box>
+              </div>
 
               {/* Dynamic photo note */}
-              <Text
-                fontSize="xs"
-                color={colorMode === "light" ? "gray.600" : "gray.400"}
-                mt={2}
-                maxW="200px"
-                mx="auto"
-                textAlign="center"
-                fontStyle="italic"
+              <p
+                className={`text-xs mt-2 max-w-[200px] mx-auto text-center italic ${
+                  colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                }`}
               >
                 Photos are dynamic when not printed
-              </Text>
-            </Box>
-          </Flex>
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Upload area - will take all remaining space */}
-        <Box
-          pos={"relative"}
+        <div
+          className={`relative flex-1 ${isHovered ? "cursor-pointer" : ""}`}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          cursor={isHovered ? "pointer" : undefined}
-          flex="1"
         >
           {/* Hidden file input */}
           <input
@@ -551,15 +518,8 @@ export const StatefulMediaChangerProject = ({
           />
 
           {isHovered && hasValidImage ? (
-            <Box
-              bg={"white"}
-              padding={4}
-              rounded={"full"}
-              pos={"absolute"}
-              right={4}
-              top={4}
-              color={isHovered ? "red.500" : "green.500"}
-              _hover={{ color: "red.400" }}
+            <div
+              className="bg-white p-4 rounded-full absolute right-4 top-4 text-red-500 hover:text-red-400 z-[99999]"
               onClick={async (e) => {
                 onDeleteEntry(e);
                 if (clearImageAddedFunctionality) {
@@ -568,28 +528,19 @@ export const StatefulMediaChangerProject = ({
                   console.log("cleared");
                 }
               }}
-              zIndex={99999}
             >
-              <ImCross size={"25px"} />
-            </Box>
+              <X size={25} />
+            </div>
           ) : null}
 
           {/* Edit button */}
           {isHovered && hasValidImage ? (
-            <Box
-              bg={"white"}
-              padding={4}
-              rounded={"full"}
-              pos={"absolute"}
-              left={4}
-              top={4}
-              color={isHovered ? "blue.500" : "green.500"}
-              _hover={{ color: "blue.400" }}
+            <div
+              className="bg-white p-4 rounded-full absolute left-4 top-4 text-blue-500 hover:text-blue-400 z-[99999]"
               onClick={openCropModal}
-              zIndex={99999}
             >
               <FiEdit size={"25px"} />
-            </Box>
+            </div>
           ) : null}
 
           <Dropzone multiple={false} onDrop={onFileDrop}>
@@ -598,13 +549,11 @@ export const StatefulMediaChangerProject = ({
               const { onClick, ...rootProps } = getRootProps();
 
               return (
-                <Box
+                <div
                   {...rootProps}
-                  h={72}
-                  width={"100%"}
-                  border={"1px dashed"}
-                  borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-                  rounded={"lg"}
+                  className={`h-72 w-full border border-dashed rounded-lg ${
+                    colorMode === "light" ? "border-gray-300" : "border-gray-500"
+                  }`}
                   onClick={(e) => {
                     // Prevent default onClick behavior from Dropzone
                     e.stopPropagation();
@@ -614,15 +563,10 @@ export const StatefulMediaChangerProject = ({
                 >
                   <input {...getInputProps()} />
                   {hasValidImage ? (
-                    <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
-                      <Box
-                        overflow={"hidden"}
-                        w={"100%"}
-                        h={"100%"}
-                        rounded={"lg"}
-                      >
-                        <Image
-                          rounded={"lg"}
+                    <div className="w-full h-full relative rounded-lg">
+                      <div className="overflow-hidden w-full h-full rounded-lg">
+                        <img
+                          className="rounded-lg object-cover w-full h-full"
                           src={
                             selectedImageUrl
                               ? selectedImageUrl?.startsWith("/files")
@@ -630,113 +574,68 @@ export const StatefulMediaChangerProject = ({
                                 : selectedImageUrl
                               : NoImageFile
                           }
-                          objectFit={"cover"}
-                          w={"100%"}
-                          h={"100%"}
+                          alt="Selected project image"
                           draggable="false"
                         />
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                   ) : (
-                    <Flex
-                      rounded={"lg"}
-                      flexDir={"column"}
-                      justifyContent={"center"}
-                      justifyItems={"center"}
-                      w={"100%"}
-                      h={"100%"}
-                      background={"blackAlpha.800"}
-                      zIndex={3}
-                    >
-                      <Center
-                        flexDir={"column"}
-                        justifyContent={"center"}
-                        justifyItems={"center"}
-                      >
-                        <BsCloudArrowUp size={"50px"} color={"white"} />
-                      </Center>
+                    <div className="rounded-lg flex flex-col justify-center items-center w-full h-full bg-black/80 z-[3]">
+                      <div className="flex flex-col justify-center items-center">
+                        <BsCloudArrowUp size={50} color="white" />
+                      </div>
 
-                      <Grid
-                        flexDir={"column"}
-                        alignItems={"center"}
-                        textAlign={"center"}
-                        color={"white"}
-                      >
-                        <Text px={8} textAlign={"center"}>
+                      <div className="flex flex-col items-center text-center text-white">
+                        <p className="px-8 text-center">
                           {`${helperText || "Click or drop image here"}`}
-                        </Text>
-                      </Grid>
+                        </p>
+                      </div>
 
                       {isUploading ? (
-                        <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                          <Box w={"80%"} h={1} px={1}>
+                        <div className="w-full mt-4 max-w-xs mx-auto flex justify-center">
+                          <div className="w-4/5 h-1 px-1">
                             <Progress
-                              bg={
-                                colorMode === "light" ? "gray.200" : "gray.900"
-                              }
-                              colorScheme={
-                                uploadProgress === 100 && selectedFile
-                                  ? "green"
-                                  : "blue"
-                              }
-                              size={"xs"}
                               value={uploadProgress}
+                              className={`h-1 ${
+                                colorMode === "light" ? "bg-gray-200" : "bg-gray-900"
+                              }`}
                             />
-                          </Box>
-                        </Center>
+                          </div>
+                        </div>
                       ) : null}
 
                       {isError ? (
-                        <Center>
-                          <Text color={"red.500"} mt={4}>
+                        <div className="flex justify-center">
+                          <p className="text-red-500 mt-4">
                             That file is not of the correct type
-                          </Text>
-                        </Center>
+                          </p>
+                        </div>
                       ) : null}
-                    </Flex>
+                    </div>
                   )}
-                </Box>
+                </div>
               );
             }}
           </Dropzone>
-        </Box>
-      </Flex>
+        </div>
+      </div>
 
       {/* Enhanced Crop Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="full">
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          maxW="90vw"
-          h="80vh"
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent
+          className={`max-w-[90vw] h-[80vh] ${
+            colorMode === "dark" ? "text-gray-400" : ""
+          }`}
         >
-          <ModalHeader>Crop and Adjust Project Image</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody overflow="hidden" h="full">
-            <Flex direction={{ base: "column", md: "row" }} gap={6} h="full">
+          <DialogHeader>
+            <DialogTitle>Crop and Adjust Project Image</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-hidden h-full">
+            <div className="flex flex-col md:flex-row gap-6 h-full">
               {/* Main crop area */}
-              <Box
-                flex="3"
-                bg="gray.100"
-                _dark={{ bg: "gray.700" }}
-                borderRadius="md"
-                position="relative"
-                overflow="hidden"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
+              <div className="flex-[3] bg-gray-100 dark:bg-gray-700 rounded-md relative overflow-hidden flex justify-center items-center">
                 {selectedImageUrl && (
-                  <Box
-                    position="relative"
-                    w="auto"
-                    h="auto"
-                    maxH="100%"
-                    maxW="100%"
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
+                  <div className="relative w-auto h-auto max-h-full max-w-full flex justify-center items-center">
                     <ReactCrop
                       crop={crop}
                       onChange={(c) => setCrop(c)}
@@ -769,33 +668,28 @@ export const StatefulMediaChangerProject = ({
                         onLoad={handleImageLoad}
                       />
                     </ReactCrop>
-                  </Box>
+                  </div>
                 )}
-              </Box>
+              </div>
 
               {/* Right side tools and previews */}
-              <Flex flex="1" direction="column" gap={6} overflow="auto" pr={2}>
+              <div className="flex-1 flex flex-col gap-6 overflow-auto pr-2">
                 {/* Live preview */}
                 {completedCrop && (
-                  <Box>
-                    <Text fontWeight="medium" mb={2}>
+                  <div>
+                    <p className="font-medium mb-2">
                       Live Preview
-                    </Text>
-                    <Box>
-                      <Text fontSize="sm" mb={1}>
+                    </p>
+                    <div>
+                      <p className="text-sm mb-1">
                         Project Card:
-                      </Text>
-                      <Box
-                        w="150px"
-                        h="90px"
-                        borderRadius="lg"
-                        overflow="hidden"
-                        border="1px solid"
-                        borderColor={
-                          colorMode === "light" ? "gray.200" : "gray.600"
-                        }
-                        bg={colorMode === "light" ? "white" : "gray.700"}
-                        boxShadow="sm"
+                      </p>
+                      <div
+                        className={`w-[150px] h-[90px] rounded-lg overflow-hidden border shadow-sm ${
+                          colorMode === "light" 
+                            ? "border-gray-200 bg-white" 
+                            : "border-gray-600 bg-gray-700"
+                        }`}
                       >
                         <img
                           src={previewUrls.card || NoImageFile}
@@ -806,132 +700,151 @@ export const StatefulMediaChangerProject = ({
                           }
                           draggable="false"
                         />
-                      </Box>
-                    </Box>
-                  </Box>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {/* Aspect ratio tools */}
-                <Box>
-                  <Text fontWeight="medium" mb={2}>
+                <div>
+                  <p className="font-medium mb-2">
                     Aspect Ratio
-                  </Text>
-                  <ButtonGroup size="sm" isAttached variant="outline" mb={4}>
-                    <Tooltip label="Free crop">
-                      <IconButton
-                        aria-label="Free crop"
-                        icon={<FiMaximize />}
-                        colorScheme={aspect === undefined ? "blue" : "gray"}
-                        onClick={() => setAspectRatio(undefined)}
-                      />
-                    </Tooltip>
-                    <Tooltip label="Square (1:1)">
-                      <IconButton
-                        aria-label="Square aspect"
-                        icon={<FiSquare />}
-                        colorScheme={aspect === 1 ? "blue" : "gray"}
-                        onClick={() => setAspectRatio(1)}
-                      />
-                    </Tooltip>
-                    <Tooltip label="Landscape (16:9)">
-                      <IconButton
-                        aria-label="16:9 aspect"
-                        icon={<MdAspectRatio />}
-                        colorScheme={aspect === 16 / 9 ? "blue" : "gray"}
-                        onClick={() => setAspectRatio(16 / 9)}
-                      />
-                    </Tooltip>
-                    <Tooltip label="Photo (4:3)">
-                      <IconButton
-                        aria-label="4:3 aspect"
-                        icon={<MdAspectRatio />}
-                        colorScheme={aspect === 4 / 3 ? "blue" : "gray"}
-                        onClick={() => setAspectRatio(4 / 3)}
-                      />
-                    </Tooltip>
-                  </ButtonGroup>
-                </Box>
+                  </p>
+                  <TooltipProvider>
+                    <div className="flex mb-4">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={aspect === undefined ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAspectRatio(undefined)}
+                            className="rounded-r-none"
+                          >
+                            <FiMaximize />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Free crop</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={aspect === 1 ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAspectRatio(1)}
+                            className="rounded-none"
+                          >
+                            <FiSquare />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Square (1:1)</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={aspect === 16 / 9 ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAspectRatio(16 / 9)}
+                            className="rounded-none"
+                          >
+                            <MdAspectRatio />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Landscape (16:9)</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={aspect === 4 / 3 ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAspectRatio(4 / 3)}
+                            className="rounded-l-none"
+                          >
+                            <MdAspectRatio />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Photo (4:3)</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TooltipProvider>
+                </div>
 
                 {/* Rotation and zoom tools */}
-                <Box>
-                  <Text fontWeight="medium" mb={2}>
+                <div>
+                  <p className="font-medium mb-2">
                     Adjustments
-                  </Text>
-                  <Box mb={4}>
-                    <Flex align="center" justify="space-between" mb={1}>
-                      <Text fontSize="sm">Zoom</Text>
-                      <ButtonGroup size="xs" isAttached>
-                        <Button onClick={() => setScale(1)}>Reset</Button>
-                      </ButtonGroup>
-                    </Flex>
+                  </p>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm">Zoom</p>
+                      <Button size="sm" onClick={() => setScale(1)}>Reset</Button>
+                    </div>
                     <Slider
-                      min={0.5}
-                      max={3}
-                      step={0.1}
-                      value={scale}
-                      onChange={(val) => setScale(val)}
-                      colorScheme="blue"
-                    >
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <SliderThumb />
-                    </Slider>
-                  </Box>
+                      min={[0.5]}
+                      max={[3]}
+                      step={[0.1]}
+                      value={[scale]}
+                      onValueChange={(val) => setScale(val[0])}
+                      className="w-full"
+                    />
+                  </div>
 
-                  <Box>
-                    <Flex align="center" justify="space-between" mb={1}>
-                      <Text fontSize="sm">Rotate</Text>
-                      <ButtonGroup size="xs" isAttached>
-                        <IconButton
-                          aria-label="Rotate left"
-                          icon={<AiOutlineRotateLeft />}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm">Rotate</p>
+                      <div className="flex">
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => setRotate((r) => r - 90)}
-                          size="xs"
-                        />
-                        <IconButton
-                          aria-label="Rotate right"
-                          icon={<AiOutlineRotateRight />}
+                          className="rounded-r-none"
+                        >
+                          <AiOutlineRotateLeft />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => setRotate((r) => r + 90)}
-                          size="xs"
-                        />
-                        <Button onClick={() => setRotate(0)} size="xs">
+                          className="rounded-none"
+                        >
+                          <AiOutlineRotateRight />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setRotate(0)}
+                          className="rounded-l-none"
+                        >
                           Reset
                         </Button>
-                      </ButtonGroup>
-                    </Flex>
+                      </div>
+                    </div>
                     <Slider
-                      min={0}
-                      max={360}
-                      step={1}
-                      value={rotate}
-                      onChange={(val) => setRotate(val)}
-                      colorScheme="blue"
-                    >
-                      <SliderTrack>
-                        <SliderFilledTrack />
-                      </SliderTrack>
-                      <SliderThumb />
-                    </Slider>
-                  </Box>
-                </Box>
-              </Flex>
-            </Flex>
-          </ModalBody>
+                      min={[0]}
+                      max={[360]}
+                      step={[1]}
+                      value={[rotate]}
+                      onValueChange={(val) => setRotate(val[0])}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <ModalFooter>
-            <Button onClick={resetCrop} colorScheme="gray" mr={2}>
+          <DialogFooter>
+            <Button onClick={resetCrop} variant="outline" className="mr-2">
               Reset
             </Button>
-            <Button onClick={onClose} colorScheme="gray" mr={2}>
+            <Button onClick={() => setIsOpen(false)} variant="outline" className="mr-2">
               Cancel
             </Button>
-            <Button onClick={applyCrop} colorScheme="blue">
+            <Button onClick={applyCrop}>
               Apply Changes
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

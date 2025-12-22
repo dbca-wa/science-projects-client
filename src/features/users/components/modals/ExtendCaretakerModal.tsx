@@ -1,34 +1,7 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   extendCaretaker,
   MutationError,
@@ -39,6 +12,19 @@ import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { type FC } from "react";
 import { ShadcnDatePicker } from "@/features/users/components/account/ShadcnDatePicker";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import React from "react";
 
 interface IModalProps {
   isOpen: boolean;
@@ -54,7 +40,7 @@ export const ExtendCaretakerModal = ({
   refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -63,15 +49,8 @@ export const ExtendCaretakerModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -84,26 +63,15 @@ export const ExtendCaretakerModal = ({
     // Start of mutation handling
     mutationFn: extendCaretaker,
     onMutate: () => {
-      addToast({
-        title: "Extending Caretaker...",
+      toast.loading("Extending Caretaker...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Caretaker extended.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Caretaker extended.`,
+      });
       queryClient
         .invalidateQueries({
           queryKey: ["caretakers"],
@@ -147,16 +115,9 @@ export const ExtendCaretakerModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -191,89 +152,90 @@ export const ExtendCaretakerModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Extend Caretaker?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>Extend Caretaker?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <p className="font-bold text-xl">
+                  Are you sure you want to extend{" "}
+                  {caretakerObject?.caretaker?.display_first_name}{" "}
+                  {caretakerObject?.caretaker?.display_last_name} as caretaker?
+                </p>
+              </div>
+              <p>
+                The period they are currently assigned to ends on {formattedEnd}
+              </p>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to extend{" "}
-                {caretakerObject?.caretaker?.display_first_name}{" "}
-                {caretakerObject?.caretaker?.display_last_name} as caretaker?
-              </Text>
-            </Center>
-            <Text mt={4}>
-              The period they are currently assigned to ends on {formattedEnd}
-            </Text>
-
-            <Flex flexDir={"row"} gap={4} mt={4} pos={"relative"}>
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>New End Date</FormLabel>
-                <InputGroup flexDir={"column"}>
-                  <ShadcnDatePicker
-                    placeholder={"Enter end date"}
-                    date={newEndDate}
-                    setDate={(date) => {
-                      setNewEndDate(date);
-                    }}
-                  />
-                  <Box mt={2}>
-                    {error ? (
-                      <Text
-                        fontSize={"sm"}
-                        color={colorMode === "light" ? "red.600" : "red.400"}
-                      >
-                        {error}
-                      </Text>
-                    ) : (
-                      <Text
-                        fontSize={"sm"}
-                        color={colorMode === "light" ? "gray.600" : "gray.400"}
-                      >
-                        Set a date beyond the current end date.
-                      </Text>
-                    )}
-                  </Box>
-                  {/* <FormErrorMessage>{error}</FormErrorMessage> */}
-                </InputGroup>
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }} // isDisabled={!changesMade}
-                isLoading={extendCaretakerMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    id: caretakerObject?.id,
-                    newEndDate: newEndDate,
-                    currentEndDate: caretakerObject?.end_date,
-                  })
-                }
-                isDisabled={error !== null}
-                ml={3}
-              >
-                Extend Date
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+              <div className="flex flex-row gap-4 relative">
+                <div className="my-2 mb-4 select-none flex-1">
+                  <Label>New End Date</Label>
+                  <div className="flex flex-col">
+                    <ShadcnDatePicker
+                      placeholder={"Enter end date"}
+                      date={newEndDate}
+                      setDate={(date) => {
+                        setNewEndDate(date);
+                      }}
+                    />
+                    <div className="mt-2">
+                      {error ? (
+                        <p
+                          className={`text-sm ${
+                            colorMode === "light" ? "text-red-600" : "text-red-400"
+                          }`}
+                        >
+                          {error}
+                        </p>
+                      ) : (
+                        <p
+                          className={`text-sm ${
+                            colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                          }`}
+                        >
+                          Set a date beyond the current end date.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+              disabled={extendCaretakerMutation.isPending || error !== null}
+              onClick={() =>
+                onSubmit({
+                  id: caretakerObject?.id,
+                  newEndDate: newEndDate,
+                  currentEndDate: caretakerObject?.end_date,
+                })
+              }
+            >
+              {extendCaretakerMutation.isPending ? "Loading..." : "Extend Date"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

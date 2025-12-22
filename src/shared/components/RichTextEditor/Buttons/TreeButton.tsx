@@ -2,7 +2,6 @@
 
 import { TbBinaryTree } from "react-icons/tb";
 
-import { Box } from "@chakra-ui/react";
 import { BaseToggleOptionsButton } from "./BaseToggleOptionsButton";
 
 interface TreeButtonProps {
@@ -17,7 +16,7 @@ export const TreeButton = ({
   setShouldShowTree,
 }: TreeButtonProps) => {
   return (
-    <Box>
+    <div>
       <BaseToggleOptionsButton
         iconOne={TbBinaryTree}
         iconTwo={TbBinaryTree}
@@ -27,6 +26,6 @@ export const TreeButton = ({
         setCurrentState={setShouldShowTree}
         toolTipText={!shouldShowTree ? "Show Tree" : "Hide Tree"}
       />
-    </Box>
+    </div>
   );
 };

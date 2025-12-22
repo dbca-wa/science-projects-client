@@ -1,26 +1,13 @@
 // Dropdown search component for affiliations. Displays 5 affiliations below the search box.
 
 import { useAffiliation } from "@/features/admin/hooks/useAffiliation";
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { X } from "lucide-react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Badge } from "@/shared/components/ui/badge";
+import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   forwardRef,
@@ -56,7 +43,10 @@ interface IAffiliationSearchDropdown {
   hideTags?: boolean;
 }
 
-export const AffiliationCreateSearchDropdown = forwardRef(
+export const AffiliationCreateSearchDropdown = forwardRef<
+  HTMLInputElement,
+  IAffiliationSearchDropdown
+>(
   (
     {
       isRequired,
@@ -71,7 +61,7 @@ export const AffiliationCreateSearchDropdown = forwardRef(
       preselectedAffiliationPk,
       isEditable,
       hideTags,
-    }: IAffiliationSearchDropdown,
+    },
     ref,
   ) => {
     const { colorMode } = useColorMode();
@@ -166,18 +156,18 @@ export const AffiliationCreateSearchDropdown = forwardRef(
 
     return (
       <>
-        <FormControl isRequired={isRequired} mb={4} zIndex={99}>
-          <FormLabel>{label}</FormLabel>
+        <div className={`mb-4 z-50 ${isRequired ? 'required' : ''}`}>
+          <Label>{label}</Label>
           {selectedAffiliation ? (
-            <Box mb={2} color="blue.500">
+            <div className="mb-2 text-blue-500">
               <SelectedAffiliationPk
                 affiliation={selectedAffiliation}
                 onClear={handleClearAffiliation}
                 isEditable={isEditable}
               />
-            </Box>
+            </div>
           ) : (
-            <InputGroup>
+            <div>
               <Input
                 ref={inputRef} // Attach the ref to the input element
                 type="text"
@@ -187,11 +177,11 @@ export const AffiliationCreateSearchDropdown = forwardRef(
                 autoComplete="off"
                 onFocus={() => setIsMenuOpen(true)}
               />
-            </InputGroup>
+            </div>
           )}
 
           {selectedAffiliation ? null : (
-            <Box pos="relative" w="100%">
+            <div className="relative w-full">
               <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen}>
                 <CustomMenuList minWidth="100%">
                   {filteredItems.map((affiliation) => (
@@ -218,55 +208,52 @@ export const AffiliationCreateSearchDropdown = forwardRef(
                     </CustomMenuList>
                   </CustomMenu>
                 )}
-            </Box>
+            </div>
           )}
 
-          <FormHelperText>{helperText}</FormHelperText>
+          <p className="text-sm text-muted-foreground mt-1">{helperText}</p>
           {array?.length > 1 && !hideTags && (
             <Button
               onClick={() => {
                 arrayClearFunction?.();
               }}
-              size={"xs"}
-              pos={"absolute"}
-              bottom={-8}
-              right={2}
-              background={colorMode === "light" ? "red.500" : "red.800"}
-              px={2}
-              rightIcon={<FaTrash />}
-              color={"white"}
+              size="sm"
+              className={`absolute -bottom-8 right-2 px-2 text-white ${
+                colorMode === "light" ? "bg-red-500" : "bg-red-800"
+              }`}
             >
+              <FaTrash className="mr-1" />
               Clear Affiliations
             </Button>
           )}
-        </FormControl>
+        </div>
         {!hideTags && array?.length > 0 && (
-          <Flex flexWrap="wrap" gap={2} pt={array?.length > 1 ? 7 : 0} pb={2}>
+          <div className={`flex flex-wrap gap-2 pb-2 ${array?.length > 1 ? 'pt-7' : ''}`}>
             {array?.map((aff, index) => (
-              <Tag
+              <Badge
                 key={index}
-                size="md"
-                borderRadius="full"
-                variant="solid"
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                variant="secondary"
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-600 hover:bg-blue-500"
+                }`}
               >
-                <TagLabel pl={1}>{aff?.name}</TagLabel>
-                <TagCloseButton
+                <span className="pl-1">{aff?.name}</span>
+                <button
                   onClick={() => arrayRemoveFunction(aff)}
-                  userSelect={"none"}
+                  className="ml-1 hover:bg-blue-700 rounded-full p-0.5"
                   tabIndex={-1}
-                />
-              </Tag>
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
             ))}
-          </Flex>
+          </div>
         )}
       </>
     );
-  },
+  }
 );
 
 // =========================================== ADDITIONAL COMPONENTS ====================================================
@@ -289,17 +276,12 @@ interface CustomMenuListProps {
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   const { colorMode } = useColorMode();
   return (
-    <Box
-      pos="absolute"
-      w="100%"
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      zIndex={1}
-      display={isOpen ? "block" : "none"}
+    <div
+      className={`absolute w-full ${colorMode === "light" ? "bg-white" : "bg-gray-700"} shadow-md z-10 ${isOpen ? "block" : "hidden"}`}
       {...rest}
     >
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -321,12 +303,19 @@ const DropdownCreateAffiliationMenuItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const toast = useToast();
-
   const queryClient = useQueryClient();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  let toastId: string | number | undefined = undefined;
+  const addToast = (message: string, type: 'loading' | 'success' | 'error' | 'warning' = 'loading') => {
+    if (type === 'loading') {
+      toastId = toast.loading(message);
+    } else {
+      if (toastId) {
+        toast.dismiss(toastId);
+      }
+      if (type === 'success') toast.success(message);
+      else if (type === 'error') toast.error(message);
+      else if (type === 'warning') toast.warning(message);
+    }
   };
 
   const { colorMode } = useColorMode();
@@ -356,11 +345,7 @@ const DropdownCreateAffiliationMenuItem = ({
     let skipped = 0;
     let failed = 0;
 
-    addToast({
-      status: "loading",
-      title: `Processing ${affiliationNames.length} affiliation(s)...`,
-      position: "top-right",
-    });
+    addToast(`Processing ${affiliationNames.length} affiliation(s)...`, 'loading');
 
     for (const affiliationName of affiliationNames) {
       const capitalizedName = `${affiliationName[0].toLocaleUpperCase()}${affiliationName.slice(1)}`;
@@ -403,22 +388,14 @@ const DropdownCreateAffiliationMenuItem = ({
     }
 
     // Show summary toast
-    if (ToastIdRef.current) {
-      const messages = [];
-      if (created > 0) messages.push(`${created} created`);
-      if (added > 0) messages.push(`${added} added`);
-      if (skipped > 0) messages.push(`${skipped} already in project`);
-      if (failed > 0) messages.push(`${failed} failed`);
+    const messages = [];
+    if (created > 0) messages.push(`${created} created`);
+    if (added > 0) messages.push(`${added} added`);
+    if (skipped > 0) messages.push(`${skipped} already in project`);
+    if (failed > 0) messages.push(`${failed} failed`);
 
-      toast.update(ToastIdRef.current, {
-        title: "Bulk Add Complete",
-        description: messages.join(", "),
-        status: failed > 0 ? "warning" : "success",
-        position: "top-right",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
+    const summaryMessage = `Bulk Add Complete: ${messages.join(", ")}`;
+    addToast(summaryMessage, failed > 0 ? 'warning' : 'success');
 
     queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     setFilteredItems([]);
@@ -432,25 +409,12 @@ const DropdownCreateAffiliationMenuItem = ({
     setIsProcessing(true);
     const capitalizedName = `${name[0].toLocaleUpperCase()}${name.slice(1)}`;
 
-    addToast({
-      status: "loading",
-      title: "Creating Affiliation...",
-      position: "top-right",
-    });
+    addToast("Creating Affiliation...", 'loading');
 
     try {
       const newAffiliation = await createAffiliation({ name: capitalizedName });
       
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Created "${capitalizedName}"`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast(`Created "${capitalizedName}"`, 'success');
 
       if (arrayAddFunction) {
         arrayAddFunction(newAffiliation);
@@ -459,16 +423,7 @@ const DropdownCreateAffiliationMenuItem = ({
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
       setFilteredItems([]);
     } catch (error) {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Failed",
-          description: `Could not create affiliation`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast("Could not create affiliation", 'error');
     }
     
     setIsProcessing(false);
@@ -485,49 +440,35 @@ const DropdownCreateAffiliationMenuItem = ({
   };
 
   return (
-    <Flex
-      as="button"
-      type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+    <div
+      className={`w-full text-left p-2 flex items-center cursor-pointer ${isHovered ? "bg-gray-200" : "bg-transparent"}`}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
-      {...rest}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
+      <div className="flex items-center justify-start ml-3 h-full">
         <Button
           onClick={handleClick}
-          isDisabled={isAlreadyAdded || isProcessing}
-          isLoading={isProcessing}
-          leftIcon={<GrOrganization />}
-          variant={"ghost"}
-          color={
+          disabled={isAlreadyAdded || isProcessing}
+          variant="ghost"
+          className={`${
             isAlreadyAdded
-              ? "orange.500"
+              ? "text-orange-500"
               : isBulkAdd
-                ? "blue.500"
+                ? "text-blue-500"
                 : colorMode === "light"
-                  ? "green.500"
-                  : "green.300"
-          }
+                  ? "text-green-500"
+                  : "text-green-300"
+          }`}
         >
+          <GrOrganization className="mr-2" />
           {isAlreadyAdded
             ? `Already added`
             : isBulkAdd
               ? `Click to add ${name.split(";").filter((n) => n.trim()).length} affiliation(s)`
               : `Click to add "${name[0].toLocaleUpperCase()}${name.slice(1)}" as an organisation/affiliation`}
         </Button>
-      </Box>
-    </Flex>
+      </div>
+    </div>
   );
 };
 
@@ -544,31 +485,19 @@ const CustomMenuItem = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      as="button"
-      type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+    <div
+      className={`w-full text-left p-2 flex items-center cursor-pointer ${isHovered ? "bg-gray-200" : "bg-transparent"}`}
       onClick={handleClick}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
       {...rest}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text ml={2} color={colorMode === "light" ? "green.500" : "green.300"}>
+      <div className="flex items-center justify-start ml-3 h-full">
+        <p className={`ml-2 ${colorMode === "light" ? "text-green-500" : "text-green-300"}`}>
           {`${affiliation.name}`}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </div>
   );
 };
 
@@ -578,9 +507,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className="relative w-full" style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -598,30 +527,23 @@ const SelectedAffiliationPk = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
+    <div
+      className={`flex items-center relative px-2 py-1 mr-2 rounded-md ${
+        colorMode === "dark" ? "bg-gray-700" : "bg-gray-100"
+      }`}
     >
-      <Text ml={2} color={colorMode === "light" ? "green.500" : "green.400"}>
+      <p className={`ml-2 ${colorMode === "light" ? "text-green-500" : "text-green-400"}`}>
         {`${affiliation.name}`}
-      </Text>
+      </p>
       {isEditable ? (
-        <IconButton
+        <button
           aria-label="Clear selected affiliation"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 p-1 hover:bg-gray-300 rounded"
           onClick={onClear}
-        />
+        >
+          <X className="h-3 w-3" />
+        </button>
       ) : null}
-    </Flex>
+    </div>
   );
 };

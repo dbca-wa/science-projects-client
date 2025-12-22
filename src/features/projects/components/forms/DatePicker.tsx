@@ -1,41 +1,18 @@
 // Stateful date picker.
 // Returns a Date object whilst displaying a date string in desired format ('DD/MM/YYY')
 
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Center,
-  InputProps as ChakraInputProps,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  HStack,
-  Heading,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Menu,
-  MenuButton,
-  MenuList,
-  Text,
-  VStack,
-  useColorMode,
-  useColorModeValue,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { ChevronDown, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight, Calendar } from "lucide-react";
 import dayjs from "dayjs";
 import { createRef, useState } from "react";
-import { BsFillCalendarEventFill } from "react-icons/bs";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/components/ui/popover";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 /**
  *  Core
@@ -137,25 +114,21 @@ const todayTimestamp =
   (Date.now() % oneDay) +
   new Date().getTimezoneOffset() * 1000 * 60;
 
-export interface IDatePickerProps extends Omit<ChakraInputProps, "onChange"> {
+export interface IDatePickerProps {
   label: string;
   required: boolean;
   dateFormat?: string;
-  // onChange?: (date: string) => void;
   selectedDate?: Date;
-  setSelectedDate: (date: Date) => void; // Change the type of onChange
+  setSelectedDate: (date: Date) => void;
 }
 
 export const DatePicker = ({
   label,
   required,
-  dateFormat,
+  dateFormat = 'DD/MM/YYYY',
   selectedDate,
   setSelectedDate,
-  // onChange,
-  ...rest
 }: IDatePickerProps) => {
-  // const { onChange, dateFormat = 'DD/MM/YYYY', ...rest } = props;
   const date = new Date();
   const [year, setYear] = useState(date.getFullYear());
   const [month, setMonth] = useState(date.getMonth());
@@ -165,9 +138,8 @@ export const DatePicker = ({
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(
     selectedDate ? selectedDate : undefined
   );
+  const [isOpen, setIsOpen] = useState(false);
   const inputRef = createRef<HTMLInputElement>();
-  const color = useColorModeValue("gray", "white");
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const isCurrentDay = (day: any) => {
     return day.timestamp === todayTimestamp;
@@ -178,7 +150,7 @@ export const DatePicker = ({
 
   const getDateStringFromTimestamp = (timestamp: number) => {
     const dateObject = new Date(timestamp);
-    return dayjs(dateObject).format(dateFormat); // Use dayjs to format the date
+    return dayjs(dateObject).format(dateFormat);
   };
 
   const onDateClick = (day: any) => {
@@ -187,8 +159,7 @@ export const DatePicker = ({
       inputRef.current.value = getDateStringFromTimestamp(day.timestamp);
       setSelectedDate(new Date(day.timestamp));
     }
-
-    onClose();
+    setIsOpen(false);
   };
 
   const setYearAction = (offset: number) => {
@@ -214,143 +185,113 @@ export const DatePicker = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex flexDir={"column"}>
-      <FormControl isRequired={required}>
-        <FormLabel>
-          <Box
-            display={"inline-flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-          >
-            <Icon as={BsFillCalendarEventFill} mr={2} />
-            {label}
-          </Box>
-        </FormLabel>
-      </FormControl>
+    <div className="flex flex-col">
+      <div className={required ? "required" : ""}>
+        <Label className="flex items-center">
+          <Calendar className="mr-2 h-4 w-4" />
+          {label}
+        </Label>
+      </div>
 
-      <Box
-        display={"inline-flex"}
-        justifyContent={"center"}
-        alignItems={"center"}
-      >
-        <Menu
-          {...rest}
-          placement="bottom-end"
-          isOpen={isOpen}
-          onClose={onClose}
-
-          // ref={menuRef}
-        >
-          <MenuButton w="100%" type="button" mr={2} onClick={onOpen}>
-            <InputGroup>
+      <div className="flex items-center">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between text-left font-normal"
+              onClick={() => setIsOpen(true)}
+            >
               <Input
-                // color={color}
                 ref={inputRef}
-                {...rest}
-                borderColor={colorMode === "light" ? "gray.500" : "gray.400"}
-                color={colorMode === "light" ? "gray.500" : "gray.300"}
+                className={`border-0 p-0 ${
+                  colorMode === "light" ? "text-gray-500" : "text-gray-300"
+                }`}
+                readOnly
               />
-              <InputRightElement children={<ChevronDownIcon w={5} h={5} />} />
-            </InputGroup>
-          </MenuButton>
-          <MenuList justifyContent={"end"} right={0}>
-            <Center p={3}>
-              <HStack>
-                <IconButton
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <div className="p-3">
+              <div className="flex items-center justify-center space-x-2">
+                <Button
                   variant="ghost"
-                  aria-label="datepicker left button"
+                  size="sm"
                   onClick={() => setYearAction(-1)}
-                  icon={<ArrowLeftIcon color={color} />}
-                />
-                <IconButton
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <Button
                   variant="ghost"
-                  aria-label="datepicker left button"
+                  size="sm"
                   onClick={() => setMonthAction(-1)}
-                  icon={<ChevronLeftIcon color={color} />}
-                />
-                <VStack align="center">
-                  <Button variant="ghost" size="none">
-                    <Heading color={color} m={0} fontWeight={200} as="h5">
-                      {year}
-                    </Heading>
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="flex flex-col items-center">
+                  <Button variant="ghost" size="sm">
+                    <h5 className="font-light text-lg m-0">{year}</h5>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="none"
-                    py="0px"
-                    color={color}
-                    margin="0px !important"
-                  >
+                  <Button variant="ghost" size="sm" className="py-0 m-0">
                     {getMonthStr(month).toUpperCase()}
                   </Button>
-                </VStack>
-                <IconButton
+                </div>
+                <Button
                   variant="ghost"
-                  aria-label="datepicker right button"
-                  color={color}
+                  size="sm"
                   onClick={() => setMonthAction(1)}
-                  icon={<ChevronRightIcon />}
-                />
-                <IconButton
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
                   variant="ghost"
-                  aria-label="datepicker right button"
-                  color={color}
+                  size="sm"
                   onClick={() => setYearAction(1)}
-                  icon={<ArrowRightIcon />}
-                />
-              </HStack>
-            </Center>
-            <Box p={3}>
-              <Grid templateColumns="repeat(7, 1fr)" gap={3}>
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="p-3">
+              <div className="grid grid-cols-7 gap-3">
                 {daysMap.map((d, i) => (
-                  <Text color={color} key={i} w="100%" align="center">
+                  <p key={i} className="w-full text-center text-sm">
                     {d.substring(0, 3).toLocaleUpperCase()}
-                  </Text>
+                  </p>
                 ))}
-              </Grid>
-            </Box>
-            <Box p={3}>
-              <Grid templateColumns="repeat(7, 1fr)" gap={3}>
+              </div>
+            </div>
+            <div className="p-3">
+              <div className="grid grid-cols-7 gap-3">
                 {monthDetails.map((day, index) => {
                   const isCurrentMonth = day.month === 0;
                   return isCurrentMonth ? (
                     <Button
-                      color={
-                        isSelectedDay(day)
-                          ? "white"
-                          : isCurrentDay(day)
-                            ? "white"
-                            : color
-                      }
-                      backgroundColor={
-                        isSelectedDay(day)
-                          ? "blue.500"
-                          : isCurrentDay(day)
-                            ? "gray.400"
-                            : ""
-                      }
+                      key={index}
                       variant="ghost"
                       size="sm"
-                      key={index}
                       onClick={() => onDateClick(day)}
-                      _hover={{
-                        color: isSelectedDay(day) ? "white" : "gray",
-                        backgroundColor: isSelectedDay(day)
-                          ? "blue.300"
-                          : "gray.100",
-                      }}
+                      className={`
+                        ${
+                          isSelectedDay(day)
+                            ? "bg-blue-500 text-white hover:bg-blue-300"
+                            : isCurrentDay(day)
+                            ? "bg-gray-400 text-white"
+                            : "hover:bg-gray-100"
+                        }
+                      `}
                     >
                       {day.date}
                     </Button>
                   ) : (
-                    <Text key={index} w="100%" />
+                    <div key={index} className="w-full" />
                   );
                 })}
-              </Grid>
-            </Box>
-          </MenuList>
-        </Menu>
-      </Box>
-    </Flex>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
   );
 };

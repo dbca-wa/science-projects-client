@@ -1,8 +1,9 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Box, Button, Text, useColorMode } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import "@/styles/texteditor.css";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/utils";
 
 interface IBaseToolbarButtonProps {
   ariaLabel: string;
@@ -24,34 +25,23 @@ export const RevisedBaseToolbarButton = ({
   isActive,
   onClick,
 }: IBaseToolbarButtonProps) => {
-  const { colorMode } = useColorMode();
   return (
-    <Box
-      // pos={"relative"}
-      // display={"inline-block"}
-      className="tooltip-container"
-    >
+    <div className="tooltip-container">
       <Button
-        size={buttonSize}
+        size={buttonSize || "sm"}
         aria-label={ariaLabel}
-        variant={variant ? variant : "ghost"}
-        isDisabled={isDisabled}
-        bg={
-          isActive
-            ? colorMode === "light"
-              ? "gray.200"
-              : "gray.700"
-            : undefined
-        }
+        variant={variant === "ghost" ? "ghost" : "default"}
+        disabled={isDisabled}
+        className={cn(
+          "min-w-auto flex border-0",
+          isActive && "bg-muted dark:bg-muted"
+        )}
         onClick={onClick}
         tabIndex={-1}
-        border={0}
-        display={"flex"}
-        minWidth="auto" // Ensure buttons have a natural minimum width
       >
         {children}
       </Button>
-      {ariaLabel && <Text className="tooltip-text">{ariaLabel}</Text>}
-    </Box>
+      {ariaLabel && <span className="tooltip-text">{ariaLabel}</span>}
+    </div>
   );
 };

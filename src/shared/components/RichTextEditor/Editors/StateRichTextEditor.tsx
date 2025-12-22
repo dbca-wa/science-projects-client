@@ -3,7 +3,7 @@
 import "@/styles/texteditor.css";
 import type { EditorSubsections, EditorType } from "@/shared/types";
 
-import { Box, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { useState } from "react";
@@ -93,15 +93,11 @@ export const StateRichTextEditor = ({
   };
 
   return (
-    <Box pb={6} w={"100%"} zIndex={2}>
-      <Box
-        pos={"relative"}
-        w={"100%"}
-        roundedBottom={20}
-        boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-        bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-        roundedTop={20}
-        zIndex={2}
+    <div className="pb-6 w-full z-[2]">
+      <div
+        className={`relative w-full rounded-b-[20px] shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px] ${
+          colorMode === "light" ? "bg-white/60" : "bg-black/50"
+        } rounded-t-[20px] z-[2]`}
       >
         <SimpleEditableRTE
           initialConfig={initialConfig}
@@ -117,7 +113,7 @@ export const StateRichTextEditor = ({
           setShouldShowTree={setShouldShowTree}
           setDisplayData={setValueFunction}
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

@@ -1,21 +1,11 @@
 import { remedyExternallyLedProjects } from "@/features/admin/services/admin.service";
 import { sendBumpEmails } from "@/features/documents/services/documents.service";
 import type { BumpEmailData, IProjectData } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  List,
-  ListItem,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useRef } from "react";
 
 interface BumpModalProps {
   documentsRequiringAction: BumpEmailData[];
@@ -31,52 +21,31 @@ export const BumpEmailModalContent = ({
   isSingleDocument = false,
 }: BumpModalProps) => {
   const { colorMode } = useColorMode();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const mutation = useMutation({
     mutationFn: sendBumpEmails,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: isSingleDocument
+      toast.loading(
+        isSingleDocument
           ? "Sending bump email"
-          : `Sending ${documentsRequiringAction.length} bump emails`,
-        position: "top-right",
-      });
+          : `Sending ${documentsRequiringAction.length} bump emails`
+      );
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: isSingleDocument
-            ? "Bump email sent successfully"
-            : `${documentsRequiringAction.length} bump emails sent successfully`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: isSingleDocument
+          ? "Bump email sent successfully"
+          : `${documentsRequiringAction.length} bump emails sent successfully`,
+      });
       refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Encountered an error",
-          description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Encountered an error", {
+        description: error?.response?.data
+          ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+          : "Error",
+      });
     },
   });
 
@@ -88,57 +57,55 @@ export const BumpEmailModalContent = ({
 
   return (
     <>
-      <Box>
-        <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
+      <div>
+        <p className={`my-2 ${colorMode === "light" ? "text-blue-500" : "text-blue-300"}`}>
           {isSingleDocument
             ? "This will send an email to the person that needs to take action for this document. Are you sure?"
             : `This will send emails to ${documentsRequiringAction.length} people that need to take action. Are you sure?`}
-        </Text>
+        </p>
 
         {/* Show summary of documents being bumped */}
         {!isSingleDocument && documentsRequiringAction.length > 1 && (
-          <Box
-            my={3}
-            p={3}
-            bg={colorMode === "light" ? "gray.50" : "gray.700"}
-            borderRadius="md"
+          <div
+            className={`my-3 p-3 rounded-md ${
+              colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+            }`}
           >
-            <Text fontSize="sm" fontWeight="medium" mb={2}>
+            <p className="text-sm font-medium mb-2">
               Documents to bump:
-            </Text>
-            <List spacing={1}>
+            </p>
+            <ul className="space-y-1">
               {documentsRequiringAction.slice(0, 5).map((doc) => (
-                <ListItem key={doc.documentId} fontSize="sm">
+                <li key={doc.documentId} className="text-sm">
                   • {doc.projectTitle} ({doc.documentKind})
-                </ListItem>
+                </li>
               ))}
               {documentsRequiringAction.length > 5 && (
-                <ListItem fontSize="sm" color="gray.500">
+                <li className="text-sm text-gray-500">
                   ... and {documentsRequiringAction.length - 5} more
-                </ListItem>
+                </li>
               )}
-            </List>
-          </Box>
+            </ul>
+          </div>
         )}
 
-        <Flex justifyContent={"flex-end"} py={4}>
-          <Box>
+        <div className="flex justify-end py-4">
+          <div>
             <Button
-              bg={"green.500"}
-              color={"white"}
-              _hover={{
-                bg: "green.400",
-              }}
+              className="bg-green-500 text-white hover:bg-green-400"
               onClick={onSend}
-              isLoading={mutation.isPending}
+              disabled={mutation.isPending}
             >
-              {isSingleDocument
-                ? "Send Email"
-                : `Send ${documentsRequiringAction.length} Emails`}
+              {mutation.isPending 
+                ? "Sending..." 
+                : isSingleDocument
+                  ? "Send Email"
+                  : `Send ${documentsRequiringAction.length} Emails`
+              }
             </Button>
-          </Box>
-        </Flex>
-      </Box>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

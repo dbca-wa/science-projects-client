@@ -1,21 +1,16 @@
 import { ProjectLeadEmailModal } from "@/features/projects/components/modals/ProjectLeadEmailModal";
 import { getEmailProjectList } from "@/features/users/services/users.service";
 import { downloadBCSStaffCSV } from "@/features/users/services/users.service";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Center,
-  Divider,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Spinner,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Separator } from "@/shared/components/ui/separator";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserDataTable } from "./UserDataTable";
 import {
@@ -27,7 +22,7 @@ import {
 import { MdEmail } from "react-icons/md";
 import { TbRefresh } from "react-icons/tb";
 import { FaFileDownload } from "react-icons/fa";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDown } from "lucide-react";
 
 export interface IUserDataTableEntry {
   pk: number;
@@ -46,11 +41,9 @@ interface IEmailResponseObject {
 
 export const EmailLists = () => {
   const { colorMode } = useColorMode();
-  const {
-    isOpen: isProjectLeadEmailModalOpen,
-    onOpen: onProjectLeadEmailModalOpen,
-    onClose: onProjectLeadEmailModalClose,
-  } = useDisclosure();
+  const [isProjectLeadEmailModalOpen, setIsProjectLeadEmailModalOpen] = useState(false);
+  const onProjectLeadEmailModalOpen = () => setIsProjectLeadEmailModalOpen(true);
+  const onProjectLeadEmailModalClose = () => setIsProjectLeadEmailModalOpen(false);
 
   const [activeProjectLeadEmailList, setActiveProjectLeadEmailList] =
     useState<IUserDataTableEntry[]>(null);
@@ -125,116 +118,90 @@ export const EmailLists = () => {
 
   return (
     <>
-      <Box>
-        <Flex alignItems={"center"} mt={4}>
-          <Text fontSize={"x-large"} py={4} flex={1}>
+      <div>
+        <div className="flex items-center mt-4">
+          <p className="text-2xl py-4 flex-1">
             Email List
-          </Text>
+          </p>
 
           {!fetchingData && activeProjectLeadEmailList && (
             <div className="flex gap-2">
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rightIcon={<ChevronDownIcon />}
-                  bg={colorMode === "light" ? "orange.500" : "orange.500"}
-                  color={"white"}
-                  _hover={{
-                    bg: colorMode === "light" ? "orange.400" : "orange.400",
-                  }}
-                >
-                  Download BCS Staff (CSV)
-                </MenuButton>
-                <MenuList>
-                  <MenuItem
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className={`text-white ${
+                      colorMode === "light" 
+                        ? "bg-orange-500 hover:bg-orange-400" 
+                        : "bg-orange-500 hover:bg-orange-400"
+                    }`}
+                  >
+                    Download BCS Staff (CSV)
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
                     onClick={() => downloadBCSStaffCSV({ in_spms: false })}
                   >
                     All
-                  </MenuItem>
-                  <MenuItem
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
                     onClick={() =>
                       downloadBCSStaffCSV({ in_spms: true, is_active: true })
                     }
                   >
                     SPMS | Active Users
-                  </MenuItem>
-                  <MenuItem
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
                     onClick={() =>
                       downloadBCSStaffCSV({ in_spms: true, is_active: false })
                     }
                   >
                     SPMS | Inactive Users
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Button
-                bg={colorMode === "light" ? "green.500" : "green.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "green.400" : "green.400",
-                }}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-500 hover:bg-green-400"
+                }`}
                 onClick={sendEmailsToDBCALeads}
-                isDisabled={
+                disabled={
                   fetchingData || activeProjectLeadEmailList?.length < 1
                 }
-                leftIcon={<MdEmail />}
               >
+                <MdEmail className="mr-2 h-4 w-4" />
                 Email Leads
               </Button>
-              {/* <Button
-                bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.400",
-                }}
-                onClick={fetchLeadEmails}
-                isDisabled={fetchingData}
-                leftIcon={<TbRefresh />}
-              >
-                Refresh Data
-              </Button> */}
             </div>
-            // <Button
-            //   onClick={onProjectLeadEmailModalOpen}
-            //   bg={colorMode === "light" ? "green.500" : "green.500"}
-            //   color={"white"}
-            //   _hover={{
-            //     bg: colorMode === "light" ? "green.400" : "green.400",
-            //   }}
-            // >
-            //   Get Project Leads
-            // </Button>
           )}
-        </Flex>
-      </Box>
+        </div>
+      </div>
 
       {/* <ProjectLeadEmailModal
         isOpen={isProjectLeadEmailModalOpen}
         onClose={onProjectLeadEmailModalClose}
       /> */}
       {fetchingData && !activeProjectLeadEmailList && !inactiveLeadList ? (
-        <Center w={"100%"} h={"500px"}>
-          <Spinner />
-          <Text
-            ml={4}
-            color={"gray.500"}
-            fontSize={"x-large"}
-            fontWeight={"bold"}
-          >
+        <div className="w-full h-[500px] flex justify-center items-center">
+          <Loader2 className="animate-spin" />
+          <p className="ml-4 text-gray-500 text-2xl font-bold">
             Fetching ...
-          </Text>
-        </Center>
+          </p>
+        </div>
       ) : (
         <>
           {activeProjectLeadEmailList && inactiveLeadList ? (
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger>
-                  <Text fontSize={"large"} py={4}>
+                  <p className="text-lg py-4">
                     Project Leads with DBCA Email (
                     {activeProjectLeadEmailList?.length || 0})
-                  </Text>
+                  </p>
                 </AccordionTrigger>
                 <AccordionContent>
                   <UserDataTable
@@ -252,13 +219,13 @@ export const EmailLists = () => {
                   />
                 </AccordionContent>
               </AccordionItem>
-              <Divider />
+              <Separator />
               <AccordionItem value="item-2">
                 <AccordionTrigger>
-                  <Text fontSize={"large"} py={4}>
+                  <p className="text-lg py-4">
                     Non-DBCA Email / Inactive Project Leads (
                     {inactiveLeadList?.length || 0})
-                  </Text>
+                  </p>
                 </AccordionTrigger>
                 <AccordionContent>
                   <UserDataTable
@@ -276,33 +243,27 @@ export const EmailLists = () => {
                   />{" "}
                 </AccordionContent>
               </AccordionItem>
-              <Divider />
+              <Separator />
             </Accordion>
           ) : (
-            <Center
-              w={"100%"}
-              h={"500px"}
-              flexDir={"column"}
-              //   bg={"Red"}
-            >
+            <div className="w-full h-[500px] flex flex-col justify-center items-center">
               <Button
-                bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.400",
-                }}
+                className={`text-white my-4 ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                }`}
                 onClick={fetchLeadEmails}
-                isDisabled={fetchingData}
-                size={"lg"}
-                my={4}
+                disabled={fetchingData}
+                size="lg"
               >
                 Check Data
               </Button>
-              <Text color={"gray.500"} fontSize={"x-large"} fontWeight={"bold"}>
+              <p className="text-gray-500 text-2xl font-bold">
                 Press "Check Data" to get the latest information for project
                 leads in active, update requested and suspended projects.
-              </Text>
-            </Center>
+              </p>
+            </div>
           )}
         </>
       )}

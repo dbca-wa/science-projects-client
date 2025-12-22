@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { BsGripVertical } from "react-icons/bs";
@@ -56,7 +55,7 @@ export const SortableTeamMember = ({
   };
 
   return (
-    <Box ref={setNodeRef} style={style} mb={0}>
+    <div ref={setNodeRef} style={style} className="mb-0">
       <TeamMember
         ba_leader={ba_leader}
         leader_pk={leader_pk}
@@ -84,26 +83,14 @@ export const SortableTeamMember = ({
         baData={baData}
         draggingUser={userData}
       />
-      <Box
+      <div
         {...listeners}
-        pos="absolute"
-        userSelect="none"
-        right={0}
-        top={1}
-        h="100%"
-        p={12}
-        flex={1}
-        color={
-          isDragging ? "white" : colorMode === "light" ? "black" : "gray.100"
-        }
-        cursor="grab"
-        _active={{ cursor: "grabbing" }}
-        justifyItems="center"
-        alignItems="center"
-        display="flex"
+        className={`absolute select-none right-0 top-1 h-full p-12 flex-1 cursor-grab active:cursor-grabbing flex justify-center items-center ${
+          isDragging ? "text-white" : colorMode === "light" ? "text-black" : "text-gray-100"
+        }`}
       >
         <BsGripVertical />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

@@ -1,7 +1,9 @@
 // A template for a RTE options bar - props fill out its icon and functionality
 
-import { Button, Icon, useColorMode } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { IconType } from "react-icons";
+import { Loader2 } from "lucide-react";
 
 import "@/styles/texteditor.css";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
@@ -35,43 +37,30 @@ export const BaseOptionsButton = ({
     }
   };
 
+  const getColorSchemeClasses = () => {
+    const colorMap = {
+      blue: colorMode === "light" ? "bg-blue-500 hover:bg-blue-600" : "bg-blue-600 hover:bg-blue-500",
+      green: colorMode === "light" ? "bg-green-500 hover:bg-green-600" : "bg-green-600 hover:bg-green-500",
+      red: colorMode === "light" ? "bg-red-500 hover:bg-red-600" : "bg-red-600 hover:bg-red-500",
+    };
+    return colorMap[colorScheme] || colorMap.blue;
+  };
+
+  const ButtonIcon = buttonIcon;
+
   return (
     <div className="tooltip-container">
       <Button
-        bg={colorMode === "light" ? `${colorScheme}.500` : `${colorScheme}.600`}
-        color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
-        _hover={
-          colorMode === "light"
-            ? {
-                bg: `${colorScheme}.600`,
-                color: `white`,
-              }
-            : {
-                bg: `${colorScheme}.500`,
-                color: `white`,
-              }
-        }
+        className={`${getColorSchemeClasses()} ${
+          colorMode === "light" ? "text-white/90" : "text-white/80"
+        } rounded-full p-0 m-0 max-w-[35px] max-h-[40px] w-[20px] h-[20px]`}
         onClick={handleClick}
-        rounded={"full"}
-        data-tip="Click to Save"
-        isDisabled={!canRunFunction || isLoading} // Disable when loading
-        isLoading={isLoading} // Add loading state
-        p={0}
-        m={0}
-        maxW={{ base: "35px", lg: "35px" }}
-        maxH={{ base: "40px", lg: "40px" }}
+        disabled={!canRunFunction || isLoading}
       >
-        {/* Only show icon when not loading */}
-        {!isLoading && (
-          <Icon
-            as={buttonIcon}
-            boxSize={{
-              base: 5,
-              lg: 6,
-            }}
-            w={{ base: "20px", lg: "20px" }}
-            h={{ base: "20px", lg: "20px" }}
-          />
+        {isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <ButtonIcon className="h-5 w-5" />
         )}
       </Button>
       <span className="tooltip-text">{toolTipText}</span>

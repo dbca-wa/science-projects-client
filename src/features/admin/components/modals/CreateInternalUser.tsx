@@ -9,27 +9,16 @@ import {
   getDoesUserWithFullNameExist,
 } from "@/features/users/services/users.service";
 import type { IBranch, IBusinessArea, IDivision } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Select,
-  Spinner,
-  Text,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
+import { Loader2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const capitalizeAfterSpaceOrHyphen = (name: string) => {
@@ -46,7 +35,6 @@ interface IProps {
 
 export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
   const { colorMode } = useColorMode();
-  const toast = useToast();
   const navigate = useNavigate();
   // Tracking input fields
   const [firstName, setFirstName] = useState("");
@@ -226,13 +214,8 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
           };
           await createUser(userData);
 
-          toast({
-            position: "top-right",
-            title: "User Created",
+          toast.success("User Created", {
             description: "The user has been successfully created.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
           });
           onSuccess?.();
           if (location.pathname === "/users") {
@@ -244,13 +227,8 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
       } catch (error) {
         console.error("Error checking email:", error);
         setIsCheckingEmail(false);
-        toast({
-          position: "top-right",
-          title: "Error",
+        toast.error("Error", {
           description: "An error occurred while creating the user.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
         });
       }
     }
@@ -298,138 +276,152 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
     <>
       <Head title={"Add User"} />
       {!isModal && (
-        <Box>
-          <Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
+        <div>
+          <p className="mb-8 font-bold text-2xl">
             Add Internal User
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
 
-      <Box mb={3}>
-        <Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
+      <div className="mb-3">
+        <p className={colorMode === "light" ? "text-blue-500" : "text-blue-400"}>
           Ideally, users should visit the SPMS with their DBCA account for an
           account to be automatically created using OIM's data. In situations
           where this is not possible, please use this form to manually create
           users. To avoid data inconsistencies with OIM, please use this form
           sparingly.
-        </Text>
-      </Box>
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit}>
-        <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
+        <div className="grid grid-cols-2 gap-8">
           {/* First Name */}
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>First Name</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
+          <div className="my-2 mb-4">
+            <Label htmlFor="firstName">First Name *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 {isCheckingName ? (
-                  <Spinner size="sm" color="gray.500" />
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
                 ) : (
-                  <Icon as={RiNumber1} />
+                  <RiNumber1 className="h-4 w-4" />
                 )}
-              </InputLeftElement>
+              </div>
               <Input
+                id="firstName"
                 type="text"
                 placeholder="John"
                 value={firstName}
                 onChange={handleFirstNameChange}
                 maxLength={30}
+                className="pl-10"
               />
-            </InputGroup>
-          </FormControl>
+            </div>
+          </div>
 
           {/* Last Name */}
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Last Name</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
+          <div className="my-2 mb-4">
+            <Label htmlFor="lastName">Last Name *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 {isCheckingName ? (
-                  <Spinner size="sm" color="gray.500" />
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
                 ) : (
-                  <Icon as={RiNumber2} />
+                  <RiNumber2 className="h-4 w-4" />
                 )}
-              </InputLeftElement>
+              </div>
               <Input
+                id="lastName"
                 type="text"
                 placeholder="Doe"
                 value={lastName}
                 onChange={handleLastNameChange}
                 maxLength={30}
+                className="pl-10"
               />
-            </InputGroup>
+            </div>
             {isCheckingName && (
-              <FormHelperText color="blue.500">Checking name...</FormHelperText>
+              <p className="text-sm text-blue-500 mt-1">Checking name...</p>
             )}
             {nameExists && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 User with this name already exists.
-              </FormHelperText>
+              </p>
             )}
             {firstNameError && (
-              <FormHelperText color="red.500">{firstNameError}</FormHelperText>
+              <p className="text-sm text-red-500 mt-1">{firstNameError}</p>
             )}
             {lastNameError && (
-              <FormHelperText color="red.500">{lastNameError}</FormHelperText>
+              <p className="text-sm text-red-500 mt-1">{lastNameError}</p>
             )}
-          </FormControl>
-        </Grid>
+          </div>
+        </div>
 
         {/* Email */}
-        <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Email</FormLabel>
-            <InputGroup>
-              <InputLeftElement>
-                {isCheckingEmail ? <Spinner size="sm" /> : <Icon as={GrMail} />}
-              </InputLeftElement>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="my-2 mb-4">
+            <Label htmlFor="email">Email *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                {isCheckingEmail ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <GrMail className="h-4 w-4" />
+                )}
+              </div>
               <Input
+                id="email"
                 type="email"
                 placeholder="john.doe@dbca.wa.gov.au"
                 value={email}
                 onChange={handleEmailChange}
                 maxLength={50}
+                className="pl-10"
               />
-            </InputGroup>
-          </FormControl>
+            </div>
+          </div>
 
-          <FormControl isRequired my={2} mb={4}>
-            <FormLabel>Email Confirmation</FormLabel>
-            <InputGroup>
-              <InputLeftElement children={<Icon as={GrMail} />} />
+          <div className="my-2 mb-4">
+            <Label htmlFor="confirmEmail">Email Confirmation *</Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <GrMail className="h-4 w-4" />
+              </div>
               <Input
+                id="confirmEmail"
                 type="email"
                 placeholder="john.doe@dbca.wa.gov.au"
                 value={confirmEmail}
                 onChange={handleConfirmEmailChange}
                 maxLength={50}
+                className="pl-10"
               />
-            </InputGroup>
+            </div>
             {email.length > 0 && email.length < 5 && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 Email must be at least 5 characters long.
-              </FormHelperText>
+              </p>
             )}
             {email.length >= 5 && !isValidEmail && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 {!email.endsWith("@dbca.wa.gov.au")
                   ? "Needs to be a DBCA address."
                   : "Please enter a valid email address."}
-              </FormHelperText>
+              </p>
             )}
             {email.length >= 5 && isValidEmail && !emailsMatch && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 Email and Confirm Email must match.
-              </FormHelperText>
+              </p>
             )}
             {isCheckingEmail && (
-              <FormHelperText color="blue.500">
+              <p className="text-sm text-blue-500 mt-1">
                 Checking email...
-              </FormHelperText>
+              </p>
             )}
             {emailExists && (
-              <FormHelperText color="red.500">
+              <p className="text-sm text-red-500 mt-1">
                 User with this email already exists.
-              </FormHelperText>
+              </p>
             )}
             {!emailExists &&
               email.length >= 5 &&
@@ -438,127 +430,92 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
               firstName.length > 1 &&
               lastName.length > 1 &&
               !nameExists && (
-                <FormHelperText color="green.500">
+                <p className="text-sm text-green-500 mt-1">
                   All fields complete. Press Add User.
-                </FormHelperText>
+                </p>
               )}
-          </FormControl>
-        </Grid>
+          </div>
+        </div>
 
-        <Box my={4}>
-          <Text color={colorMode === "light" ? "red.500" : "red.400"}>
+        <div className="my-4">
+          <p className={colorMode === "light" ? "text-red-500" : "text-red-400"}>
             NOTE: If the information provided above does not match OIM's data,
             the user will be unable to log in. Instead, when they visit the
             site, a fresh account will be created with OIM's data. That account
             will NOT be connected to the account created here. You will have to
             merge the users.
-          </Text>
-        </Box>
+          </p>
+        </div>
 
-        {/* ======================================================= */}
-        <FormControl mt={2} isRequired>
-          <FormLabel>Branch</FormLabel>
+        {/* Branch Selection */}
+        <div className="mt-2">
+          <Label htmlFor="branch">Branch *</Label>
           <Select
-            onChange={(e) => {
-              const strVal = e.target.value ?? null;
-              if (strVal) {
-                setSelectedBranch(Number(e.target.value));
+            onValueChange={(value) => {
+              if (value) {
+                setSelectedBranch(Number(value));
               }
             }}
-            size={"sm"}
-            // mx={4}
-            rounded={"5px"}
-            style={
-              colorMode === "light"
-                ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
-                : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
-            }
           >
-            <option key={"---"} value={null} color={"black"}>
-              ---
-            </option>
-            {branches
-              ?.sort((a, b) => a.name.localeCompare(b.name))
-              .map((branch, index) => (
-                <option key={`${branch.name}${index}`} value={branch.pk}>
-                  {branch.name}
-                </option>
-              ))}
-            ;
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a branch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">---</SelectItem>
+              {branches
+                ?.sort((a, b) => a.name.localeCompare(b.name))
+                .map((branch, index) => (
+                  <SelectItem key={`${branch.name}${index}`} value={branch.pk.toString()}>
+                    {branch.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
           </Select>
-        </FormControl>
+        </div>
 
-        <FormControl mt={2} isRequired>
-          <FormLabel>Business Area</FormLabel>
-
+        <div className="mt-2">
+          <Label htmlFor="businessArea">Business Area *</Label>
           <Select
-            onChange={(e) => {
-              const strVal = e.target.value ?? null;
-              if (strVal) {
-                setSelectedBusinessArea(Number(e.target.value));
+            onValueChange={(value) => {
+              if (value) {
+                setSelectedBusinessArea(Number(value));
               }
             }}
-            size={"sm"}
-            // mx={4}
-            rounded={"5px"}
-            style={
-              colorMode === "light"
-                ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
-                : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
-            }
           >
-            <option key={"---"} value={null} color={"black"}>
-              ---
-            </option>
-            {orderedDivisionSlugs.flatMap((divSlug) => {
-              // Filter business areas for the current division
-              const divisionBusinessAreas = businessAreas
-                .filter((ba) => (ba.division as IDivision).slug === divSlug)
-                .sort((a, b) => a.name.localeCompare(b.name));
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a business area" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">---</SelectItem>
+              {orderedDivisionSlugs.flatMap((divSlug) => {
+                // Filter business areas for the current division
+                const divisionBusinessAreas = businessAreas
+                  .filter((ba) => (ba.division as IDivision).slug === divSlug)
+                  .sort((a, b) => a.name.localeCompare(b.name));
 
-              return divisionBusinessAreas.map((ba, index) => (
-                <option key={`${ba.name}${index}`} value={ba.pk}>
-                  {ba?.division
-                    ? `[${(ba?.division as IDivision)?.slug}] `
-                    : ""}
-                  {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-                  {ba.is_active ? "" : "(INACTIVE)"}
-                </option>
-              ));
-            })}
+                return divisionBusinessAreas.map((ba, index) => (
+                  <SelectItem key={`${ba.name}${index}`} value={ba.pk.toString()}>
+                    {ba?.division
+                      ? `[${(ba?.division as IDivision)?.slug}] `
+                      : ""}
+                    {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                    {ba.is_active ? "" : "(INACTIVE)"}
+                  </SelectItem>
+                ));
+              })}
+            </SelectContent>
           </Select>
-        </FormControl>
-        {/* ======================================================= */}
+        </div>
 
-        <Flex mt={5} justifyContent="end">
+        <div className="flex mt-5 justify-end">
           <Button
             type="submit"
-            bgColor={colorMode === "light" ? `green.500` : `green.600`}
-            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-            _hover={{
-              bg: colorMode === "light" ? `green.600` : `green.400`,
-              color: colorMode === "light" ? `white` : `white`,
-            }}
-            ml={3}
-            isDisabled={
+            className={`ml-3 ${
+              colorMode === "light" 
+                ? "bg-green-500 hover:bg-green-600 text-white" 
+                : "bg-green-600 hover:bg-green-400 text-white"
+            }`}
+            disabled={
               isCheckingEmail ||
               isCheckingName ||
               !isValidEmail ||
@@ -574,7 +531,7 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
           >
             Create
           </Button>
-        </Flex>
+        </div>
       </form>
     </>
   );

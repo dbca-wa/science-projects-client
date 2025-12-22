@@ -1,4 +1,4 @@
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const useBoxShadow = () => {
   const { colorMode } = useColorMode();

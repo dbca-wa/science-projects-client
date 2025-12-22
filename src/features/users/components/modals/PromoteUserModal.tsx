@@ -1,27 +1,6 @@
 // Modal for promoting or demoting users
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
-import { useRef } from "react";
+import { useState } from "react";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -31,6 +10,18 @@ import {
   switchAdmin,
 } from "@/features/users/services/users.service";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -48,18 +39,9 @@ export const PromoteUserModal = ({
   userIsExternal,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { onClose: closeToast } = useDisclosure();
 
   const handleToastClose = () => {
-    closeToast();
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const { reFetch } = useUserSearchContext();
@@ -75,12 +57,8 @@ export const PromoteUserModal = ({
     // Start of mutation handling
     mutationFn: switchAdmin,
     onMutate: () => {
-      addToast({
-        title: "Updating membership...",
+      toast.loading("Updating membership...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
@@ -92,16 +70,9 @@ export const PromoteUserModal = ({
       queryClient.refetchQueries({ queryKey: [`membership`, userPk] });
       queryClient.refetchQueries({ queryKey: [`profile`, userPk] });
       reFetch();
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Information Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Information Updated`,
+      });
       //  Close the modal
       if (onClose) {
         onClose();
@@ -143,16 +114,9 @@ export const PromoteUserModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -164,65 +128,67 @@ export const PromoteUserModal = ({
   const { register, handleSubmit } = useForm<AdminSwitchVar>();
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
       >
-        <ModalHeader>
-          {!userIsSuper ? "Promote User" : "Demote User"}?
-        </ModalHeader>
-        <ModalCloseButton />
-        <Flex as={"form"} id="promotion-form" onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody>
-            {userIsExternal ? (
-              <Text>
-                This user is external and cannot be promoted to admin.
-              </Text>
-            ) : (
-              <>
-                <Text>
-                  Are you sure you want to {!userIsSuper ? "promote" : "demote"}{" "}
-                  this user {!userIsSuper ? "to admin" : "from admin"}?
-                </Text>
-
-                <FormControl my={2} mb={4} userSelect="none">
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("userPk", { required: true, value: userPk })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl>
-              </>
-            )}
-          </ModalBody>
-        </Flex>
-        <ModalFooter>
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-            <Button colorScheme="gray" onClick={onClose}>
+        <DialogHeader>
+          <DialogTitle>
+            {!userIsSuper ? "Promote User" : "Demote User"}?
+          </DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              {userIsExternal ? (
+                <p>
+                  This user is external and cannot be promoted to admin.
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  <p>
+                    Are you sure you want to {!userIsSuper ? "promote" : "demote"}{" "}
+                    this user {!userIsSuper ? "to admin" : "from admin"}?
+                  </p>
+                  <form id="promotion-form" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="my-2 mb-4 select-none">
+                      <Input
+                        type="hidden"
+                        {...register("userPk", { required: true, value: userPk })}
+                        readOnly
+                      />
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              isDisabled={userIsExternal}
-              isLoading={promotionMutation.isPending}
+              disabled={userIsExternal || promotionMutation.isPending}
               form="promotion-form"
               type="submit"
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-600" 
+                  : "bg-green-600 hover:bg-green-400"
+              }`}
             >
-              {userIsSuper ? "Demote" : "Promote"}
+              {promotionMutation.isPending 
+                ? "Loading..." 
+                : (userIsSuper ? "Demote" : "Promote")
+              }
             </Button>
-          </Grid>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -2,14 +2,8 @@ import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import { useBoxShadow } from "@/shared/hooks/useBoxShadow";
 import type { IMainDoc } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Divider,
-  Flex,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Separator } from "@/shared/components/ui/separator";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useNavigate } from "react-router-dom";
 import { FaBiohazard, FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
@@ -80,18 +74,14 @@ export const TraditionalEndorsementTaskDisplay = ({
   const boxShadow = useBoxShadow();
 
   return (
-    <Flex
-      alignItems={"center"}
-      border={"1px solid"}
-      borderTopWidth={0}
-      borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-      w={"100%"}
-      p={2}
-      _hover={{
-        color: colorMode === "dark" ? "blue.100" : "blue.300",
-        cursor: "pointer",
-        boxShadow: boxShadow,
-        zIndex: 999,
+    <div
+      className={`flex items-center border border-t-0 w-full p-2 cursor-pointer hover:z-[999] ${
+        colorMode === "light" 
+          ? "border-gray-200 hover:text-blue-300" 
+          : "border-gray-600 hover:text-blue-100"
+      }`}
+      style={{
+        boxShadow: "hover:" + boxShadow,
       }}
       onClick={(e) =>
         goToProjectDocument(
@@ -101,31 +91,22 @@ export const TraditionalEndorsementTaskDisplay = ({
         )
       }
     >
-      <Box
-        pos={"relative"}
-        minW={"170px"}
-        maxW={"170px"}
-        h={"100%"}
-        alignItems={"center"}
-      >
-        <Box alignItems={"center"} display={"flex"} h={"100%"}>
-          <Center
-            color={
+      <div className="relative min-w-[170px] max-w-[170px] h-full flex items-center">
+        <div className="flex items-center h-full">
+          <div
+            className={`flex items-center justify-center mr-3 w-5 h-5 ${
               endorsementKind === "animalEthics"
                 ? colorMode === "light"
-                  ? "blue.600"
-                  : "blue.200"
+                  ? "text-blue-600"
+                  : "text-blue-200"
                 : endorsementKind === "biometrician"
                   ? colorMode === "light"
-                    ? "red.600"
-                    : "red.200"
+                    ? "text-red-600"
+                    : "text-red-200"
                   : colorMode === "light"
-                    ? "green.600"
-                    : "green.200"
-            }
-            mr={3}
-            boxSize={5}
-            w={"20px"}
+                    ? "text-green-600"
+                    : "text-green-200"
+            }`}
           >
             {endorsementKind === "animalEthics" ? (
               <FaShieldDog />
@@ -134,41 +115,29 @@ export const TraditionalEndorsementTaskDisplay = ({
             ) : (
               <FaBiohazard />
             )}
-          </Center>
+          </div>
 
-          <Box mx={0} w={"100%"}>
-            <Text>{formattedKind(endorsementKind)}</Text>
-          </Box>
-        </Box>
-        <Box
-          // bg={"orange"}
-          w={6}
-          right={0}
-          top={0}
-          pos={"absolute"}
-          h={"100%"}
-        >
-          <Divider
+          <div className="mx-0 w-full">
+            <p>{formattedKind(endorsementKind)}</p>
+          </div>
+        </div>
+        <div className="w-6 right-0 top-0 absolute h-full">
+          <Separator
             orientation="vertical"
-            // ml={-1}\
-            // bg={"red"}
-
-            h={"100%"}
-            ml={2}
-            mr={3}
+            className="h-full ml-2 mr-3"
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      <Flex flexDir={"column"}>
+      <div className="flex flex-col">
         <ExtractedHTMLTitle
           htmlContent={`${document?.project?.title}`}
           color={colorMode === "dark" ? "blue.200" : "blue.400"}
           fontWeight={"bold"}
           cursor={"pointer"}
         />
-        <Flex>
-          <Text color={"gray.500"} fontWeight={"semibold"} fontSize={"small"}>
+        <div className="flex">
+          <p className="text-gray-500 font-semibold text-sm">
             {endorsementKind === "animalEthics"
               ? "Upload the Animal Ethics Committee Approval form (PDF) to provide AEC approval"
               : endorsementKind === "biometrician"
@@ -176,9 +145,9 @@ export const TraditionalEndorsementTaskDisplay = ({
                 : endorsementKind === "herbarium"
                   ? "Provide Hermarium Curator Approval"
                   : `Provide ${endorsementKind} approval`}
-          </Text>
-        </Flex>
-      </Flex>
-    </Flex>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };

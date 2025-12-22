@@ -1,4 +1,4 @@
-import { useDisclosure } from "@chakra-ui/react";
+import { useState } from "react";
 import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
 import { ActionAdminRequestModal } from "./ActionAdminRequestModal";
@@ -8,11 +8,9 @@ export const AdminTableRowWithModal = ({
   colorMode,
   goToProjectDocument,
 }) => {
-  const {
-    isOpen: isActionAdminRequestModalOpen,
-    onOpen: openActionAdminRequestModal,
-    onClose: closeActionAdminRequestModal,
-  } = useDisclosure();
+  const [isActionAdminRequestModalOpen, setIsActionAdminRequestModalOpen] = useState(false);
+  const openActionAdminRequestModal = () => setIsActionAdminRequestModalOpen(true);
+  const closeActionAdminRequestModal = () => setIsActionAdminRequestModalOpen(false);
 
   const handleRowClick = (e) => {
     if (row.original.action === "deleteproject") {

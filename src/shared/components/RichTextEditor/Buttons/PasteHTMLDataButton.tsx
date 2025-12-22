@@ -1,6 +1,6 @@
 // A button to clear the rich text editor of all information
 
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { PASTE_COMMAND } from "lexical";
 import { HiClipboardCopy, HiOutlineClipboardCopy } from "react-icons/hi";

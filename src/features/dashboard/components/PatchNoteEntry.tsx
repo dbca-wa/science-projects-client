@@ -1,5 +1,4 @@
-import { ListIcon, ListItem, Text } from "@chakra-ui/react";
-import { MdCheckCircle } from "react-icons/md";
+import { Check } from "lucide-react";
 
 const PatchNoteEntry = ({
   title,
@@ -11,23 +10,17 @@ const PatchNoteEntry = ({
   description: string;
 }) => {
   return (
-    <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
-      <ListIcon as={MdCheckCircle} color="green.500" />
-      <Text as="span" fontWeight="semibold">
-        {`${kind[0].toUpperCase()}${kind.slice(1)}: ${title}`}
-      </Text>
-      <Text
-        display="block"
-        mt={0}
-        ml="21px"
-        sx={{
-          textIndent: "0",
-          marginLeft: "0",
-        }}
-      >
-        {description}
-      </Text>
-    </ListItem>
+    <li className="text-sm -indent-5 ml-5 flex items-start gap-2">
+      <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+      <div>
+        <span className="font-semibold">
+          {`${kind[0].toUpperCase()}${kind.slice(1)}: ${title}`}
+        </span>
+        <div className="block mt-0 ml-0">
+          {description}
+        </div>
+      </div>
+    </li>
   );
 };
 

@@ -1,26 +1,18 @@
 // Modal designed to send out emails seeking endorsement on the project plan where required
 // Will send an email out to users marked as is_biometrician, is_herb_curator, or is_aec
 
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { useRef } from "react";
 import { deleteAECPDFEndorsement } from "@/features/projects/services/projects.service";
 
 interface Props {
@@ -38,32 +30,15 @@ export const DeletePDFEndorsementModal = ({
   refetchEndorsements,
   setToggle,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const deleteAECPDFEndorsementMutation = useMutation({
     mutationFn: deleteAECPDFEndorsement,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Updating Endorsements`,
-        position: "top-right",
-      });
+      toast.loading("Updating Endorsements...");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Updated Endorsements`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "Updated Endorsements",
+      });
 
       setTimeout(() => {
         refetchEndorsements();
@@ -72,16 +47,9 @@ export const DeletePDFEndorsementModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not Update Endorsements`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could Not Update Endorsements", {
+        description: `${error}`,
+      });
     },
   });
 
@@ -92,46 +60,38 @@ export const DeletePDFEndorsementModal = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete AEC PDF?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>Delete AEC PDF?</DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            <Box mt={2}>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
-                Note that this will remove the AEC approval.
-              </Text>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
+        <div className="mt-2">
+          <p className="font-semibold text-lg">
+            Note that this will remove the AEC approval.
+          </p>
+        </div>
 
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isLoading={deleteAECPDFEndorsementMutation.isPending}
-                ml={3}
-                onClick={() => onDeleteAECPDFAndApproval()}
-              >
-                Delete
-              </Button>
-            </Grid>
-            {}
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+
+            <Button
+              disabled={deleteAECPDFEndorsementMutation.isPending}
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              }`}
+              onClick={() => onDeleteAECPDFAndApproval()}
+            >
+              {deleteAECPDFEndorsementMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

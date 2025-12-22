@@ -1,5 +1,5 @@
-import { Button as ChakraButton, Icon } from "@chakra-ui/react";
-import { MdArrowBack } from "react-icons/md";
+import { Button } from "@/shared/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const StaffNotFound = () => {
   return (
@@ -8,20 +8,15 @@ const StaffNotFound = () => {
         Sorry, that staff member may have left the department or their profile
         is not public.
       </p>
-      <ChakraButton
-        className="mt-8"
+      <Button
+        className="mt-8 bg-blue-500 hover:bg-blue-600 text-white"
         onClick={() => {
           window.location.href = "/staff";
         }}
-        color={"white"}
-        bg={"blue.500"}
-        _hover={{
-          bg: "blue.600",
-        }}
       >
-        <Icon as={MdArrowBack} className="mr-2" />
+        <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Listings
-      </ChakraButton>
+      </Button>
     </div>
   );
 };

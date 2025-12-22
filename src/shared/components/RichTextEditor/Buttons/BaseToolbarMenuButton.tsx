@@ -1,19 +1,15 @@
 // A template for a RTE menu button - props fill out its icon, text and functionality
 
-import {
-  Box,
-  Button,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  useColorMode,
-  Text,
-} from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, ReactNode } from "react";
 import { IconType } from "react-icons";
 import { FaCaretDown } from "react-icons/fa";
+import { Button } from "@/shared/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 
 interface IMenuItem {
   leftIcon?: IconType;
@@ -40,13 +36,11 @@ export const BaseToolbarMenuButton = ({
   disableHoverBackground,
 }: IBaseToolbarMenuButtonProps) => {
   const [buttonWidth, setButtonWidth] = useState(0);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const updateButtonWidth = () => {
       if (buttonRef.current) {
-        // eslint-disable-next-line
-        // @ts-ignore
         const width = buttonRef.current.offsetWidth;
         setButtonWidth(width);
       }
@@ -57,70 +51,52 @@ export const BaseToolbarMenuButton = ({
     window.addEventListener("resize", updateButtonWidth); // Update width on window resize
 
     return () => {
-      window.removeEventListener("resize", updateButtonWidth); // Clean up for optomisation
+      window.removeEventListener("resize", updateButtonWidth); // Clean up for optimization
     };
   }, [buttonRef]);
 
-  const { colorMode } = useColorMode();
-
   return (
-    <Menu isLazy>
-      <Box className="tooltip-container grow">
-        <MenuButton
-          as={Button}
-          variant={"ghost"}
-          leftIcon={MenuIcon ? <MenuIcon /> : undefined}
-          rightIcon={<FaCaretDown />}
-          // px={8}
-          mx={1}
-          flex={1}
-          ref={buttonRef}
-          tabIndex={-1}
-          onClick={() => onClick?.()}
-          size={"sm"}
-          w={"100%"}
-        >
-          {title ? title : null}
-        </MenuButton>
-        <MenuList
-          w={"fit-content"}
-          // w={buttonWidth}
-          // minW={"200px"}
-          // maxW={"200px"}
-          zIndex={9999999999999}
-          pos={"absolute"}
+    <DropdownMenu>
+      <div className="tooltip-container grow">
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="mx-1 flex-1 w-full"
+            ref={buttonRef}
+            tabIndex={-1}
+            onClick={() => onClick?.()}
+            size="sm"
+          >
+            {MenuIcon && <MenuIcon className="mr-2 h-4 w-4" />}
+            {title}
+            <FaCaretDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="w-fit z-[9999999999999] absolute"
+          style={{ minWidth: "200px" }}
         >
           {menuItems.map((item, index) => {
             return (
-              <MenuItem
+              <DropdownMenuItem
                 key={index}
                 onClick={item.onClick}
-                w={"100%"}
-                display={"inline-flex"}
-                alignItems={"center"}
-                zIndex={2}
-                // pos={"absolute"}
-                _hover={{
-                  bg: disableHoverBackground
-                    ? undefined
-                    : colorMode === "light"
-                      ? "gray.100"
-                      : "gray.600",
+                className="w-full inline-flex items-center z-2"
+                onSelect={(e) => {
+                  if (item.component) {
+                    e.preventDefault();
+                  }
                 }}
               >
-                {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
-                {item?.text && (
-                  <Box pl={4} zIndex={2}>
-                    <span>{item.text}</span>
-                  </Box>
-                )}
+                {item.leftIcon && <item.leftIcon className="mr-4 h-4 w-4" />}
+                {item?.text && <span>{item.text}</span>}
                 {item?.component && item?.component}
-              </MenuItem>
+              </DropdownMenuItem>
             );
           })}
-        </MenuList>
-        {tooltipText && <Text className="tooltip-text">{tooltipText}</Text>}
-      </Box>
-    </Menu>
+        </DropdownMenuContent>
+        {tooltipText && <span className="tooltip-text">{tooltipText}</span>}
+      </div>
+    </DropdownMenu>
   );
 };

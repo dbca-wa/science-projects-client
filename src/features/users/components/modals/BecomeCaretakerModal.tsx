@@ -1,29 +1,8 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   becomeCaretaker,
   MutationError,
@@ -37,6 +16,16 @@ import {
   IUserData,
 } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -54,7 +43,7 @@ export const BecomeCaretakerModal = ({
   refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -63,15 +52,8 @@ export const BecomeCaretakerModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -84,26 +66,15 @@ export const BecomeCaretakerModal = ({
     // Start of mutation handling
     mutationFn: becomeCaretaker,
     onMutate: () => {
-      addToast({
-        title: "Requesting Caretaker...",
+      toast.loading("Requesting Caretaker...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Request made.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Request made.`,
+      });
       queryClient
         .invalidateQueries({
           queryKey: ["caretakers"],
@@ -153,16 +124,9 @@ export const BecomeCaretakerModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -177,52 +141,52 @@ export const BecomeCaretakerModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Become Caretaker?</ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to become {user?.display_first_name}{" "}
-                {user?.display_last_name}&apos;s caretaker?
-              </Text>
-            </Center>
-            <Text mt={4}>
-              A request will be made to admins to approve your request.
-            </Text>
-
-            <Text mt={4}>
-              If you would still like to proceed, press "Become Caretaker".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }} // isDisabled={!changesMade}
-                isLoading={becomeCaretakerMutation.isPending}
-                onClick={() => onSubmit()}
-                ml={3}
-              >
-                Become Caretaker
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>Become Caretaker?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <p className="font-bold text-xl">
+                  Are you sure you want to become {user?.display_first_name}{" "}
+                  {user?.display_last_name}&apos;s caretaker?
+                </p>
+              </div>
+              <p>
+                A request will be made to admins to approve your request.
+              </p>
+              <p>
+                If you would still like to proceed, press "Become Caretaker".
+              </p>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+              disabled={becomeCaretakerMutation.isPending}
+              onClick={() => onSubmit()}
+            >
+              {becomeCaretakerMutation.isPending ? "Loading..." : "Become Caretaker"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

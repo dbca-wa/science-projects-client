@@ -1,6 +1,6 @@
 // Maps out the document provided to the rich text editor components for concept plan documents.
 
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
 import {

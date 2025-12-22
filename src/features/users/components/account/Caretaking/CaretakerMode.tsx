@@ -1,6 +1,7 @@
 import { useCheckExistingCaretaker } from "@/features/users/hooks/useCheckExistingCaretaker";
 import { useUser } from "@/features/users/hooks/useUser";
-import { Box, Spinner, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Loader2 } from "lucide-react";
 import CaretakersAndRequestsSection from "./CaretakersAndRequestsSection";
 import { MemoizedCaretakeeSection } from "./MemoizedCaretakeeSection";
 
@@ -11,28 +12,19 @@ const CaretakerModePage = () => {
     useCheckExistingCaretaker();
 
   return userLoading || caretakerDataLoading ? (
-    <Box
-      w={"100%"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      display={"flex"}
-      my={4}
-    >
-      <Spinner />
-    </Box>
+    <div className="w-full flex items-center justify-center my-4">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
   ) : userData?.pk ? (
     <div className="h-full min-h-full">
       {/* Descriptor */}
-      <Box mb={3}>
-        <Text
-          color={colorMode === "light" ? "gray.500" : "gray.500"}
-          fontSize={"sm"}
-        >
+      <div className="mb-3">
+        <p className={`text-sm ${colorMode === "light" ? "text-gray-500" : "text-gray-500"}`}>
           This feature allows you to view your caretakees and assign a caretaker
           to manage your projects in your absence. Caretaker requests are
           subject to admin approval.{" "}
-        </Text>
-      </Box>
+        </p>
+      </div>
 
       {/* Request Caretaker Form & Pending  */}
 

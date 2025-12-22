@@ -1,11 +1,9 @@
 // Simple Divider
 
-import { Center, Divider } from "@chakra-ui/react";
-
 export const VerticalDivider = () => {
   return (
-    <Center px={2}>
-      <Divider orientation="vertical" />
-    </Center>
+    <div className="flex items-center px-2">
+      <div className="h-6 w-px bg-border" />
+    </div>
   );
 };

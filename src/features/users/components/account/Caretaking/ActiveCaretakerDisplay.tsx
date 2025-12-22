@@ -3,16 +3,12 @@ import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveC
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { checkIfDateExpired } from "@/shared/utils/checkIfDateExpired";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import type { ICaretakerSubsections } from "@/shared/types";
-import {
-  Avatar,
-  Box,
-  Button,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
 import { formatDate } from "date-fns";
+import { useState } from "react";
 
 const ActiveCaretakerDisplay = ({
   userData,
@@ -24,17 +20,13 @@ const ActiveCaretakerDisplay = ({
 
   const { colorMode } = useColorMode();
 
-  const {
-    isOpen: removeModalIsOpen,
-    onOpen: onOpenRemoveModal,
-    onClose: onRemoveModalClose,
-  } = useDisclosure();
+  const [removeModalIsOpen, setRemoveModalIsOpen] = useState(false);
+  const onOpenRemoveModal = () => setRemoveModalIsOpen(true);
+  const onRemoveModalClose = () => setRemoveModalIsOpen(false);
 
-  const {
-    isOpen: extendModalIsOpen,
-    onOpen: onOpenExtendModal,
-    onClose: onExtendModalClose,
-  } = useDisclosure();
+  const [extendModalIsOpen, setExtendModalIsOpen] = useState(false);
+  const onOpenExtendModal = () => setExtendModalIsOpen(true);
+  const onExtendModalClose = () => setExtendModalIsOpen(false);
 
   const isExpiredCaretakerDate = checkIfDateExpired(
     caretakerData?.caretaker_object?.end_date,
@@ -52,35 +44,36 @@ const ActiveCaretakerDisplay = ({
             caretakerObject={caretakerData?.caretaker_object}
           />
           <div className="my-4">
-            <Text color={"red.500"} fontSize={"md"} fontWeight={"semibold"}>
+            <p className="text-red-500 text-md font-semibold">
               You have an active caretaker.
-            </Text>
+            </p>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Avatar
-                size="md"
-                name={`${caretakerData?.caretaker_object?.caretaker?.display_first_name} ${caretakerData?.caretaker_object?.caretaker?.display_last_name}`}
-                src={
-                  caretakerData?.caretaker_object?.caretaker?.image
-                    ? caretakerData?.caretaker_object?.caretaker?.image?.file?.startsWith(
-                        "http",
-                      )
-                      ? `${caretakerData?.caretaker_object?.caretaker?.image?.file}`
-                      : `${baseAPI}${caretakerData?.caretaker_object?.caretaker?.image?.file}`
-                    : caretakerData?.caretaker_object?.caretaker?.image
-                          ?.old_file
-                      ? caretakerData?.caretaker_object?.caretaker?.image
-                          ?.old_file
-                      : noImage
-                }
-              />
-              <Box display={"flex"} flexDir={"column"}>
-                <Text
-                  fontSize={"md"}
-                  fontWeight={"semibold"}
-                  color={colorMode === "light" ? "gray.800" : "gray.200"}
-                >
+              <Avatar className="w-12 h-12">
+                <AvatarImage
+                  src={
+                    caretakerData?.caretaker_object?.caretaker?.image
+                      ? caretakerData?.caretaker_object?.caretaker?.image?.file?.startsWith(
+                          "http",
+                        )
+                        ? `${caretakerData?.caretaker_object?.caretaker?.image?.file}`
+                        : `${baseAPI}${caretakerData?.caretaker_object?.caretaker?.image?.file}`
+                      : caretakerData?.caretaker_object?.caretaker?.image
+                            ?.old_file
+                        ? caretakerData?.caretaker_object?.caretaker?.image
+                            ?.old_file
+                        : noImage
+                  }
+                />
+                <AvatarFallback>
+                  {`${caretakerData?.caretaker_object?.caretaker?.display_first_name} ${caretakerData?.caretaker_object?.caretaker?.display_last_name}`}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <p className={`text-md font-semibold ${
+                  colorMode === "light" ? "text-gray-800" : "text-gray-200"
+                }`}>
                   {
                     caretakerData?.caretaker_object?.caretaker
                       ?.display_first_name
@@ -89,9 +82,9 @@ const ActiveCaretakerDisplay = ({
                     caretakerData?.caretaker_object?.caretaker
                       ?.display_last_name
                   }
-                </Text>
+                </p>
                 {caretakerData?.caretaker_object?.end_date && (
-                  <Text fontSize={"sm"} color={"gray.500"}>
+                  <p className="text-sm text-gray-500">
                     {isExpiredCaretakerDate
                       ? `(Expired)`
                       : `Ends ${formatDate(
@@ -99,9 +92,9 @@ const ActiveCaretakerDisplay = ({
                           "dd/MM/yyyy",
                         )}
                    `}
-                  </Text>
+                  </p>
                 )}
-              </Box>
+              </div>
             </div>
             <div>
               {/* Button to extend the end date of the caretaker, if the end date has passed */}
@@ -114,19 +107,14 @@ const ActiveCaretakerDisplay = ({
                     caretakerObject={caretakerData?.caretaker_object}
                   />
                   <Button
-                    isDisabled={checkIfDateExpired(
+                    disabled={checkIfDateExpired(
                       caretakerData?.caretaker_object?.end_date,
                     )}
-                    color={"white"}
-                    background={
-                      colorMode === "light" ? "green.500" : "green.600"
-                    }
-                    _hover={{
-                      background:
-                        colorMode === "light" ? "green.400" : "green.500",
-                    }}
-                    // isLoading={removeCaretakerMutation.isPending}
-                    ml={3}
+                    className={`text-white ml-3 ${
+                      colorMode === "light" 
+                        ? "bg-green-500 hover:bg-green-400" 
+                        : "bg-green-600 hover:bg-green-500"
+                    }`}
                     onClick={() => {
                       onOpenExtendModal();
                     }}
@@ -138,13 +126,11 @@ const ActiveCaretakerDisplay = ({
 
               {/* Button to remove the caretaker completely */}
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                // isLoading={removeCaretakerMutation.isPending}
-                ml={3}
+                className={`text-white ml-3 ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
                 onClick={() => {
                   onOpenRemoveModal();
                 }}
