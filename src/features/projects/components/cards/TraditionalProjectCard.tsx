@@ -1,14 +1,8 @@
 // The project card used in the traditional layout's accordion section for projects
 
-import {
-  Box,
-  Button,
-  Grid,
-  Image,
-  Tag,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
+import { useTheme } from "next-themes";
 import { Link } from "react-router-dom";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import { TbAlertOctagon } from "react-icons/tb";
@@ -35,190 +29,115 @@ export const TraditionalProjectCard = ({
   statusTag,
   projectTypeTag,
 }: IProjectCardProps) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <>
-      <Grid
-        minH={"100px"}
-        bg={colorMode === "dark" ? "blackAlpha.400" : "blackAlpha.200"}
-        rounded={"lg"}
-        mb={4}
-        p={4}
-        templateColumns={{
-          base: "repeat(1, 1fr)",
-          xl: "40% 60%",
-        }}
-        gap={3}
+      <div
+        className={`min-h-[100px] ${
+          isDark ? "bg-black/40" : "bg-black/20"
+        } rounded-lg mb-4 p-4 grid xl:grid-cols-[40%_60%] grid-cols-1 gap-3`}
       >
-        <Box
-          position={"relative"}
-          width="100%"
-          paddingTop="56.25%" // For 16.9 aspect ratio
-          overflow={"hidden"}
-        >
-          <Image
+        <div className="relative w-full pt-[56.25%] overflow-hidden">
+          <img
             src={imageUrl !== "" ? imageUrl : PlaceHolderImage}
-            width="100%"
-            height="100%"
-            position="absolute"
-            top="0" // These four keep the image where it should be
-            right="0"
-            bottom="0"
-            left="0"
-            objectFit={"cover"} // prevent image stretch
-            rounded={"2xl"}
-            userSelect={"none"}
+            className="w-full h-full absolute top-0 right-0 bottom-0 left-0 object-cover rounded-2xl select-none"
             draggable={false}
           />
-        </Box>
+        </div>
 
-        <Box px={2} pb={10}>
-          <Box pb={6}>
+        <div className="px-2 pb-10">
+          <div className="pb-6">
             <Button
-              as={Link}
-              to={`/projects/${pk}`}
-              fontSize="xl"
-              fontWeight="bold"
-              variant={"link"}
-              colorScheme="facebook"
-              my={2}
-              whiteSpace={"normal"} // breaks the word
-              textOverflow={"ellipsis"}
+              asChild
+              variant="link"
+              className="text-xl font-bold text-blue-600 hover:text-blue-500 my-2 whitespace-normal text-left h-auto p-0"
             >
-              {projectTitle}
+              <Link to={`/projects/${pk}`}>
+                {projectTitle}
+              </Link>
             </Button>
-            <Text
-              color={colorMode === "dark" ? "gray.300" : "gray.600"}
-              fontSize={"sm"}
-            >
+            <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
               {authors.map(
                 (author, index) =>
                   `${author}${index !== authors.length - 1 ? ", " : ""}`
               )}
-            </Text>
-          </Box>
-          <Grid flexDir={"row"} templateColumns={"repeat(1, 1fr)"}>
-            <Box pb={4} display="inline-flex" alignItems="center">
+            </p>
+          </div>
+          <div className="grid grid-cols-1">
+            <div className="pb-4 inline-flex items-center">
               <TbAlertOctagon />
-              <Grid
-                gridTemplateColumns={{
-                  base: "repeat(2, 1fr)",
-                }}
-                gridGap={3}
-                ml={3}
-                gap={4}
-              >
-                <Tag
-                  p={1.5}
-                  bgColor={
+              <div className="grid grid-cols-2 ml-3 gap-4">
+                <Badge
+                  className={`p-1.5 text-xs text-center justify-center text-white ${
                     projectTypeTag === "Core Function"
-                      ? "blue.500"
+                      ? "bg-blue-500"
                       : projectTypeTag === "Science"
-                        ? "green.500"
+                        ? "bg-green-500"
                         : projectTypeTag === "Student"
-                          ? "blue.400"
-                          : "gray.400"
-                  }
-                  textColor={"whiteAlpha.900"}
-                  fontSize={"xs"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
+                          ? "bg-blue-400"
+                          : "bg-gray-400"
+                  }`}
                 >
                   {projectTypeTag}
-                </Tag>
+                </Badge>
 
-                <Tag
-                  p={1.5}
-                  bgColor={
+                <Badge
+                  className={`p-1.5 text-xs text-center justify-center text-white ${
                     statusTag === "Completed"
-                      ? "green.800"
+                      ? "bg-green-800"
                       : statusTag === "Update Requested"
-                        ? "red.500"
+                        ? "bg-red-500"
                         : statusTag === "Active"
-                          ? "green.300"
-                          : "gray.200"
-                  }
-                  textColor={"whiteAlpha.900"}
-                  fontSize={"xs"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
+                          ? "bg-green-300"
+                          : "bg-gray-200"
+                  }`}
                 >
                   {statusTag}
-                </Tag>
-              </Grid>
-            </Box>
+                </Badge>
+              </div>
+            </div>
             {years ? (
-              <Box pb={4} display="inline-flex" alignItems="center">
-                <AiFillCalendar size={"16px"} />
-                <Grid
-                  ml={2}
-                  templateColumns={{
-                    base: "repeat(1, 1fr)",
-                    lg: "repeat(2, 1fr)",
-                    xl: "repeat(auto, 1fr)",
-                  }}
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    md: "repeat(2, 1fr)",
-                    xl: "repeat(3, 1fr)",
-                  }}
-                  gridTemplateRows={"28px"}
-                  gap={4}
-                >
-                  <Tag
-                    ml={1}
-                    bgColor={
-                      colorMode === "dark" ? "gray.600" : "blackAlpha.100"
-                    }
+              <div className="pb-4 inline-flex items-center">
+                <AiFillCalendar size={16} />
+                <div className="ml-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 h-7">
+                  <Badge
+                    className={`ml-1 ${
+                      isDark ? "bg-gray-600" : "bg-black/10"
+                    }`}
                   >
                     {years}
-                  </Tag>
-                </Grid>
-              </Box>
+                  </Badge>
+                </div>
+              </div>
             ) : (
-              <Text>No dates provided.</Text>
+              <p>No dates provided.</p>
             )}
             {tags.length !== 0 ? (
-              <Box display="inline-flex" pb={4}>
-                <AiFillTag size={"16px"} />
-                <Grid
-                  ml={3}
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    sm: "repeat(2, 1fr)",
-                    md: "repeat(2, 1fr)",
-                    lg: "repeat(3, 1fr)",
-                    xl: "repeat(3, 1fr)",
-                    "2xl": "repeat(4, 1fr)",
-                  }}
-                  gridTemplateRows={"28px"}
-                  gap={4}
-                >
+              <div className="inline-flex pb-4">
+                <AiFillTag size={16} />
+                <div className="ml-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 h-7">
                   {tags.map((tag, index) => {
                     return (
-                      <Tag
-                        bgColor={
-                          colorMode === "dark" ? "gray.600" : "blackAlpha.100"
-                        }
-                        size={"sm"}
+                      <Badge
                         key={index}
-                        textAlign={"center"}
-                        justifyContent={"center"}
-                        p={"10px"}
+                        className={`text-center justify-center p-2.5 ${
+                          isDark ? "bg-gray-600" : "bg-black/10"
+                        }`}
                       >
                         {tag}
-                      </Tag>
+                      </Badge>
                     );
                   })}
-                </Grid>
-              </Box>
+                </div>
+              </div>
             ) : (
-              <Text>No tags provided.</Text>
+              <p>No tags provided.</p>
             )}
-          </Grid>
-        </Box>
-      </Grid>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,13 +1,9 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { useEffect } from "react";
 
 interface IModalProps {
@@ -25,35 +21,46 @@ export const BaseModal = ({
   modalTitle,
   children,
 }: IModalProps) => {
-  const { colorMode } = useColorMode();
-  const {
-    isOpen: isToastOpen,
-    // onOpen: openToast,
-    onClose: closeToast,
-  } = useDisclosure();
-
-  useEffect(() => {
-    if (isToastOpen) {
-      onClose();
+  // Convert Chakra modal sizes to Tailwind classes
+  const getSizeClass = (size?: string) => {
+    switch (size) {
+      case "xs":
+        return "max-w-xs";
+      case "sm":
+        return "max-w-sm";
+      case "md":
+        return "max-w-md";
+      case "lg":
+        return "max-w-lg";
+      case "xl":
+        return "max-w-xl";
+      case "2xl":
+        return "max-w-2xl";
+      case "3xl":
+        return "max-w-3xl";
+      case "4xl":
+        return "max-w-4xl";
+      case "5xl":
+        return "max-w-5xl";
+      case "6xl":
+        return "max-w-6xl";
+      case "full":
+        return "max-w-full h-full";
+      default:
+        return "max-w-3xl";
     }
-  }, [isToastOpen, onClose]);
-
-  const handleToastClose = () => {
-    closeToast();
-    onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={modalSize || "3xl"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>{modalTitle}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>{children}</ModalBody>
-      </ModalContent>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className={getSizeClass(modalSize)} onClose={onClose}>
+        <DialogHeader>
+          <DialogTitle>{modalTitle}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
+          {children}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

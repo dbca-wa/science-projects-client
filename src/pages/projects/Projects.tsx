@@ -11,24 +11,17 @@ import { useUser } from "@/features/users/hooks/useUser";
 import { getAllBusinessAreas } from "@/features/business-areas/services/business-areas.service";
 import type { IBusinessArea, IDivision } from "@/shared/types";
 import { useWindowWidth } from "@/shared/utils/useWindowWidth";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Select,
-  Spinner,
-  Text,
-  useColorMode
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
 export const Projects = () => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const {
     filteredItems,
@@ -47,10 +40,7 @@ export const Projects = () => {
     setSearchFilters,
   } = useProjectSearchContext();
 
-  const handleOnlySelectedStatusChange: React.ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const statusValue = event.target.value;
+  const handleOnlySelectedStatusChange = (statusValue: string) => {
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -62,10 +52,7 @@ export const Projects = () => {
     });
   };
 
-  const handleOnlySelectedProjectKindChange: React.ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const projectKindValue = event.target.value;
+  const handleOnlySelectedProjectKindChange = (projectKindValue: string) => {
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -81,10 +68,7 @@ export const Projects = () => {
 
   const { layout } = useLayoutSwitcher();
 
-  const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const businessAreaValue = event.target.value;
+  const handleOnlySelectedBusinessAreaChange = (businessAreaValue: string) => {
     // console.log(businessAreaValue);
     setSearchFilters({
       onlyActive: onlyActive,
@@ -142,202 +126,144 @@ export const Projects = () => {
       )}
       <Head title="Projects" />
 
-      <Flex width={"100%"} mt={2} mb={6} flexDir={"row"}>
-        <Flex flex={1} width={"100%"} flexDir={"column"}>
-          <Text fontSize={"2xl"} fontWeight={"bold"}>
+      <div className="flex w-full mt-2 mb-6 flex-row">
+        <div className="flex-1 w-full flex-col">
+          <h1 className="text-2xl font-bold">
             Projects ({totalResults})
-          </Text>
-          <Text
-            fontSize={"sm"}
-            color={colorMode === "dark" ? "gray.200" : "gray.600"}
-          >
+          </h1>
+          <p className={`text-sm ${isDark ? "text-gray-200" : "text-gray-600"}`}>
             Ctrl + Click to open projects in another tab and keep filters.
-          </Text>
-        </Flex>
+          </p>
+        </div>
 
-        <Flex
-          flex={1}
-          w={"100%"}
-          justifyContent={"flex-end"}
-          alignItems={"center"}
-          gap={2}
-        >
+        <div className="flex flex-1 w-full justify-end items-center gap-2">
           {!userLoading && userData.is_superuser ? (
             <DownloadProjectsCSVButton />
           ) : null}
 
           <Button
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "green.500" : "green.600"}
-            _hover={{
-              background: colorMode === "light" ? "green.400" : "green.500",
-            }}
+            className={`text-white ${
+              isDark 
+                ? "bg-green-600 hover:bg-green-500" 
+                : "bg-green-500 hover:bg-green-400"
+            }`}
             onClick={() => navigate("/projects/add")}
-            leftIcon={<IoMdAdd />}
           >
+            <IoMdAdd className="mr-2 h-4 w-4" />
             New Project
           </Button>
 
           {showMapButton ? (
             <Button
-              variant={"solid"}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
+              className={`text-white ${
+                isDark 
+                  ? "bg-blue-600 hover:bg-blue-500" 
+                  : "bg-blue-500 hover:bg-blue-400"
+              }`}
               onClick={() => navigate("/projects/map")}
-              leftIcon={<FaMapMarkerAlt />}
             >
+              <FaMapMarkerAlt className="mr-2 h-4 w-4" />
               Map
             </Button>
           ) : null}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
-      <Box
-        alignItems="center"
-        borderWidth={1}
-        width="100%"
-        userSelect="none"
-        p={4}
+      <div
+        className="flex items-center border w-full select-none p-4"
       >
-        <Grid
-          w={"100%"}
-          flex={1}
-          gridTemplateColumns={{
-            base: "repeat(1, 1fr)",
-            lg: "repeat(2, 1fr)",
-          }}
-          gridGap={4}
-          justifyContent="space-between"
-        >
-          <Grid
-            gridGap={3}
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(1, 1fr)",
-            }}
-            w={"100%"}
-          >
+        <div className="w-full flex-1 grid lg:grid-cols-2 grid-cols-1 gap-4 justify-between">
+          <div className="grid gap-3 md:grid-cols-1 grid-cols-1 w-full">
             {/* Filter BA */}
             <Select
-              onChange={handleOnlySelectedBusinessAreaChange}
-              size={"sm"}
-              // mx={4}
-              rounded={"5px"}
-              style={
-                colorMode === "light"
-                  ? {
-                      color: "black",
-                      backgroundColor: "white",
-                      borderColor: "gray.200",
-                      caretColor: "black !important",
-                    }
-                  : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
-              }
+              onValueChange={handleOnlySelectedBusinessAreaChange}
             >
-              <option key={"All"} value={"All"} color={"black"}>
-                All Business Areas
-              </option>
-              {orderedDivisionSlugs.flatMap((divSlug) => {
-                // Filter business areas for the current division
-                const divisionBusinessAreas = businessAreas
-                  .filter((ba) => {
-                    const division = ba.division as IDivision;
-                    return division.slug === divSlug;
-                  })
-                  .sort((a, b) => a.name.localeCompare(b.name));
+              <SelectTrigger className={`text-sm rounded-md ${
+                isDark 
+                  ? "text-white border-white" 
+                  : "text-black bg-white border-gray-200"
+              }`}>
+                <SelectValue placeholder="All Business Areas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Business Areas</SelectItem>
+                {orderedDivisionSlugs.flatMap((divSlug) => {
+                  // Filter business areas for the current division
+                  const divisionBusinessAreas = businessAreas
+                    .filter((ba) => {
+                      const division = ba.division as IDivision;
+                      return division.slug === divSlug;
+                    })
+                    .sort((a, b) => a.name.localeCompare(b.name));
 
-                return divisionBusinessAreas.map((ba, index) => (
-                  <option key={`${ba.name}${index}`} value={ba.pk}>
-                    {ba?.division
-                      ? `[${(ba?.division as IDivision)?.slug}] `
-                      : ""}
-                    {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-                    {ba.is_active ? "" : "(INACTIVE)"}
-                  </option>
-                ));
-              })}
+                  return divisionBusinessAreas.map((ba, index) => (
+                    <SelectItem key={`${ba.name}${index}`} value={ba.pk.toString()}>
+                      {ba?.division
+                        ? `[${(ba?.division as IDivision)?.slug}] `
+                        : ""}
+                      {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                      {ba.is_active ? "" : "(INACTIVE)"}
+                    </SelectItem>
+                  ));
+                })}
+              </SelectContent>
             </Select>
 
             {/* Filter Project Kind */}
             <Select
-              onChange={handleOnlySelectedProjectKindChange}
-              size={"sm"}
-              rounded={"5px"}
-              style={
-                colorMode === "light"
-                  ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
-                  : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
-              }
+              onValueChange={handleOnlySelectedProjectKindChange}
             >
-              <option value={"All"}>All Kinds</option>
-              <option value={"core_function"}>Core Function</option>
-              <option value={"science"}>Science Project</option>
-              <option value={"student"}>Student Project</option>
-              <option value={"external"}>External Project</option>
+              <SelectTrigger className={`text-sm rounded-md ${
+                isDark 
+                  ? "text-white border-white" 
+                  : "text-black border-gray-100"
+              }`}>
+                <SelectValue placeholder="All Kinds" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Kinds</SelectItem>
+                <SelectItem value="core_function">Core Function</SelectItem>
+                <SelectItem value="science">Science Project</SelectItem>
+                <SelectItem value="student">Student Project</SelectItem>
+                <SelectItem value="external">External Project</SelectItem>
+              </SelectContent>
             </Select>
 
             {/* Filter Status */}
             <Select
-              onChange={handleOnlySelectedStatusChange}
-              size={"sm"}
-              rounded={"5px"}
-              style={
-                colorMode === "light"
-                  ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
-                  : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
-              }
+              onValueChange={handleOnlySelectedStatusChange}
             >
-              <option value={"All"}>All Statuses</option>
-              <option value={"new"}>New</option>
-              <option value={"pending"}>Pending Project Plan</option>
-              <option value={"active"}>Active (Approved)</option>
-              <option value={"updating"}>Update Requested</option>
-              <option value={"closure_requested"}>Closure Requested</option>
-              <option value={"completed"}>Completed and Closed</option>
-              <option value={"terminated"}>Terminated</option>
-              <option value={"suspended"}>Suspended</option>
+              <SelectTrigger className={`text-sm rounded-md ${
+                isDark 
+                  ? "text-white border-white" 
+                  : "text-black border-gray-100"
+              }`}>
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Statuses</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="pending">Pending Project Plan</SelectItem>
+                <SelectItem value="active">Active (Approved)</SelectItem>
+                <SelectItem value="updating">Update Requested</SelectItem>
+                <SelectItem value="closure_requested">Closure Requested</SelectItem>
+                <SelectItem value="completed">Completed and Closed</SelectItem>
+                <SelectItem value="terminated">Terminated</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+              </SelectContent>
             </Select>
-          </Grid>
+          </div>
 
-          <Flex
-            flexDir={"column"}
-            w={"100%"}
-            justifyContent={"space-between"}
-            gridGap={4}
-          >
+          <div className="flex flex-col w-full justify-between gap-4">
             <SearchProjects orientation={"vertical"} />
-          </Flex>
-        </Grid>
-      </Box>
+          </div>
+        </div>
+      </div>
 
       {loading ? (
-        <Center w={"100%"} minH="100px" pt={10}>
-          <Spinner size={"xl"} />
-        </Center>
+        <div className="flex w-full min-h-[100px] pt-10 justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+        </div>
       ) : (
         <PaginatorProject
           loading={loading}

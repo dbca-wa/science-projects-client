@@ -6,8 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { Button } from "@/shared/components/ui/button";
 import type { IMainDoc } from "@/shared/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 
 import {
   ColumnDef,
@@ -190,7 +191,8 @@ function isDocTypeTask(taskRow: any): taskRow is IDocTypeTask {
 export const UnapprovedDocumentsDataTable = ({
   pendingProjectDocumentData,
 }: Props) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const navigate = useNavigate();
   const goToProjectDocument = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -235,20 +237,12 @@ export const UnapprovedDocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-center"
           >
             Level
+            {sortIcon}
           </Button>
         );
       },
@@ -260,15 +254,20 @@ export const UnapprovedDocumentsDataTable = ({
         const formattedColour = taskKindsDict[originalKindData].colour;
 
         if (originalKindData !== "all") {
+          const IconComponent = formattedIcon;
           return (
-            <Box className="text-center align-middle font-medium">
-              <Icon
-                as={formattedIcon}
-                color={`${formattedColour}.500`}
-                boxSize={"22px"}
+            <div className="text-center align-middle font-medium">
+              <IconComponent 
+                className={`w-6 h-6 mx-auto ${
+                  isDark ? `text-${formattedColour}-300` : `text-${formattedColour}-500`
+                }`}
               />
-              <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-            </Box>
+              <p className={`${
+                isDark ? `text-${formattedColour}-300` : `text-${formattedColour}-500`
+              }`}>
+                {formattedString}
+              </p>
+            </div>
           );
         }
       },
@@ -294,21 +293,12 @@ export const UnapprovedDocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-start"
           >
             Title
+            {sortIcon}
           </Button>
         );
       },
@@ -317,38 +307,22 @@ export const UnapprovedDocumentsDataTable = ({
           const originalTitleData = row.original.project.title;
           const formatted = returnHTMLTitle(originalTitleData);
           return (
-            <Box className="text-left font-medium">
-              <Text
-                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                fontWeight={"bold"}
-                _hover={{
-                  color: colorMode === "dark" ? "blue.100" : "blue.300",
-                  textDecoration:
-                    colorMode === "dark" ? "underline" : "undefined",
-                }}
-                cursor={"pointer"}
-                px={4}
+            <div className="text-left font-medium">
+              <p
+                className={`font-bold px-4 cursor-pointer hover:underline ${
+                  isDark ? "text-blue-200 hover:text-blue-100" : "text-blue-400 hover:text-blue-300"
+                }`}
               >
                 {formatted}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                px={4}
-              >
+              </p>
+              <p className="text-gray-400 font-semibold text-sm px-4">
                 {kindDict[row.original.project.kind as kinds].tag}-
                 {row.original.project.year}-{row.original.project.number}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                px={4}
-              >
+              </p>
+              <p className="text-gray-400 font-semibold text-xs px-4">
                 {taskKindsDict[row.original.taskType].description}
-              </Text>
-            </Box>
+              </p>
+            </div>
           );
         }
       },
@@ -390,20 +364,12 @@ export const UnapprovedDocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-center"
           >
             Kind
+            {sortIcon}
           </Button>
         );
       },
@@ -412,9 +378,9 @@ export const UnapprovedDocumentsDataTable = ({
           const originalKindData: docKinds = row.original.kind as docKinds;
           //   console.log(originalKindData);
           return (
-            <Box className="text-center align-middle font-medium">
+            <div className="text-center align-middle font-medium">
               {docKindsDict[originalKindData].title}
-            </Box>
+            </div>
           );
         }
       },
@@ -439,21 +405,12 @@ export const UnapprovedDocumentsDataTable = ({
         }
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-right"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-end"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-end"
           >
             Doc Status
+            {sortIcon}
           </Button>
         );
       },
@@ -464,13 +421,9 @@ export const UnapprovedDocumentsDataTable = ({
         const formatted = statusMapping[originalStatusData] || "Other";
 
         return (
-          <Box
-            className="text-right font-medium"
-            color={colorMode === "light" ? "gray.500" : "gray.300"}
-            px={4}
-          >
+          <div className={`text-right font-medium px-4 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
             {formatted}
-          </Box>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -544,7 +497,7 @@ export const UnapprovedDocumentsDataTable = ({
               <TableRow
                 key={row.id}
                 className={
-                  colorMode === "light" ? twRowClassLight : twRowClassDark
+                  isDark ? twRowClassDark : twRowClassLight
                 }
                 data-state={row.getIsSelected() && "selected"}
                 onClick={(e) => {

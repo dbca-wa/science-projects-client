@@ -4,14 +4,8 @@ import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
 import { Head } from "@/shared/components/layout/base/Head";
 import { NewProjectCard } from "@/features/projects/components/forms/NewProjectCard";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import {
-  Box,
-  Button,
-  Grid,
-  GridItem,
-  Text,
-  useColorMode
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useTheme } from "next-themes";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
@@ -78,7 +72,8 @@ export const CreateProject = () => {
       color: "#1E5456",
     },
   ];
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { layout } = useLayoutSwitcher();
 
   return (
@@ -86,26 +81,20 @@ export const CreateProject = () => {
       <Head title={"Add Project"} />
 
       {
-        <Box
-          bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
-          rounded={6}
-          p={6}
-          mt={5}
-          mb={7}
-          color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-          // userSelect={"none"}
-          // display={"inline"}
-          pos={"relative"}
+        <div
+          className={`${isDark ? "bg-gray-700" : "bg-gray-100"} rounded-md p-6 mt-5 mb-7 ${
+            isDark ? "text-white/80" : "text-black/80"
+          } relative`}
         >
           <TypewriterText>
-            <Text as="span" display="inline">
+            <span className="inline">
               Projects differ by documentation structure, approval process, and
               reporting requirements. Make sure you choose the correct project
               type as you will not be able to change this after creation. If you
               need to change the project type, you will need to request that the
               project be deleted by an administrator and create a new project of
               the desired type. For further guidance on project types, refer to
-            </Text>
+            </span>
             {/* Button appears after text is animated */}
             <motion.span
               initial={{ opacity: 0 }}
@@ -117,9 +106,8 @@ export const CreateProject = () => {
               style={{ display: "inline", marginLeft: "0.2em" }}
             >
               <Button
-                variant={"link"}
-                color={colorMode === "light" ? "blue.500" : "blue.300"}
-                cursor={"pointer"}
+                variant="link"
+                className={`${isDark ? "text-blue-300" : "text-blue-500"} cursor-pointer p-0 h-auto`}
                 onClick={() =>
                   window.open(
                     "https://dpaw.sharepoint.com/Key%20documents/Forms/AllItems.aspx?FilterField1=Category&FilterValue1=Corporate%20guideline&FilterType1=Choice&FilterDisplay1=Corporate%20guideline&id=%2FKey%20documents%2FCorporate%20Guideline%2048%20%2D%20Science%20Implementation%2Epdf&viewid=f605923d%2D172f%2D4d35%2Db8ee%2D3f0d60db0ef7&parent=%2FKey%20documents",
@@ -141,24 +129,20 @@ export const CreateProject = () => {
             }}
             style={{ display: "inline" }}
           ></motion.div> */}
-        </Box>
+        </div>
       }
 
       <AnimatePresence>
-        <Grid
-          my={5}
-          templateColumns={{
-            base: "repeat(1, 1fr)",
-            "768px": "repeat(2, 1fr)",
-            "1240px": layout === "modern" ? "repeat(2, 1fr)" : "repeat(2, 1fr)",
-            "2xl": "repeat(4, 1fr)",
-          }}
-          gap={12}
-          userSelect={"none"}
+        <div
+          className={`my-5 grid gap-12 select-none ${
+            layout === "modern" 
+              ? "grid-cols-1 md:grid-cols-2 2xl:grid-cols-4" 
+              : "grid-cols-1 md:grid-cols-2 2xl:grid-cols-4"
+          }`}
         >
           {creationData.map((item, index) => {
             return (
-              <GridItem alignSelf="stretch" key={index}>
+              <div key={index} className="self-stretch">
                 <motion.div
                   key={index}
                   initial={{ y: -10, opacity: 0 }}
@@ -179,10 +163,10 @@ export const CreateProject = () => {
                     color={item.color}
                   />
                 </motion.div>
-              </GridItem>
+              </div>
             );
           })}
-        </Grid>
+        </div>
       </AnimatePresence>
     </>
   );

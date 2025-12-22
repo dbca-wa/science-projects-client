@@ -6,15 +6,11 @@ import { useLatestYearsActiveStudentProjects } from "@/features/projects/hooks/u
 import { useUser } from "@/features/users/hooks/useUser";
 import {
   Accordion,
-  AccordionButton,
+  AccordionContent,
   AccordionItem,
-  AccordionPanel,
-  Box,
-  Center,
-  Spinner,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+  AccordionTrigger,
+} from "@/shared/components/ui/accordion";
+import { Loader2 } from "lucide-react";
 // import {
 // JSXElementConstructor, ReactElement,
 // useEffect } from "react";
@@ -53,100 +49,52 @@ export const ParticipatingProjectReports = () => {
   const A4Width = 210; // in millimeters
   const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
 
-  const { colorMode } = useColorMode();
-
   return (
-    <Box>
+    <div>
       {latestProgressReportsLoading || latestStudentReportsLoading ? (
-        <Center>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
       ) : (
-        <Box
-          display={"flex"}
-          flexDir={"column"}
-          margin={"auto"}
-          maxW={`${A4Width}mm`}
-          minH={`${A4Height}mm`}
-          py={4}
-          // bg={"orange"}
-          position="relative"
-          // zIndex={1}
+        <div
+          className="flex flex-col mx-auto py-4 relative"
+          style={{
+            maxWidth: `${A4Width}mm`,
+            minHeight: `${A4Height}mm`,
+          }}
         >
-          <Box
-            position="absolute"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            minH={`${A4Height}mm`}
-            //
-            background={"white"}
-            backgroundSize="cover"
-            backgroundPosition="center"
-            backgroundRepeat="no-repeat"
-            // transform="rotate(90deg)" // Rotate the background image by 90 degrees
-            opacity={0.25} // Set the opacity of the background image
-            zIndex={0}
+          <div
+            className="absolute top-0 left-0 right-0 bottom-0 bg-white bg-cover bg-center bg-no-repeat opacity-25 z-0"
+            style={{
+              minHeight: `${A4Height}mm`,
+            }}
           />
           {latestStudentReportsData?.length +
             latestProgressReportsData?.length <
           1 ? (
-            <Center>
-              <Text pos={"absolute"} top={10}>
+            <div className="flex justify-center">
+              <p className="absolute top-10">
                 There are no approved reports for this year
-              </Text>
-            </Center>
+              </p>
+            </div>
           ) : (
-            <Accordion defaultIndex={[1]} allowMultiple zIndex={2} w={"100%"}>
-              <AccordionItem
-                mt={-4}
-                borderColor={
-                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                }
-                borderBottom={"none"}
-                borderTop={"none"}
-                zIndex={999}
-                opacity={1.5}
-                w={"100%"}
-              >
-                <AccordionButton
-                  // bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                  bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                  w={"100%"}
-                  color={"white"}
-                  _hover={
-                    colorMode === "light"
-                      ? { bg: "blue.400" }
-                      : { bg: "blue.500" }
-                  }
-                  userSelect={"none"}
-                  opacity={0.9}
-                  borderBottomRadius={"50%"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                >
-                  <Center mb={4} mt={4} ml={6}>
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      width={8}
-                      height={8}
-                      mr={4}
-                    >
-                      <RiBook3Fill size={"lg"} />
-                    </Box>
-                    <Text
-                      fontWeight={"bold"}
-                      fontSize={"xl"}
-                      // color={"black"}
-                    >
+            <Accordion
+              type="multiple"
+              defaultValue={["progress-reports"]}
+              className="z-10 w-full"
+            >
+              <AccordionItem value="student-reports" className="border-none">
+                <AccordionTrigger className="bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-b-full px-6 py-4 select-none opacity-90 hover:no-underline">
+                  <div className="flex items-center justify-center mb-4 mt-4 ml-6">
+                    <div className="flex items-center justify-center w-8 h-8 mr-4">
+                      <RiBook3Fill size="lg" />
+                    </div>
+                    <span className="font-bold text-xl">
                       Student Reports ({latestStudentReportsData?.length})
-                    </Text>
-                  </Center>
-                </AccordionButton>
-                <AccordionPanel py={4} mt={4}>
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="py-4 mt-4">
                   {!userLoading &&
                     latestStudentReportsData?.map((sr, index) => {
                       return (
@@ -161,57 +109,21 @@ export const ParticipatingProjectReports = () => {
                         />
                       );
                     })}
-                </AccordionPanel>
+                </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem
-                mt={4}
-                borderColor={
-                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                }
-                borderBottom={"none"}
-                borderTop={"none"}
-                zIndex={999}
-                opacity={1.5}
-                w={"100%"}
-              >
-                <AccordionButton
-                  // bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                  bg={colorMode === "light" ? "green.500" : "green.600"}
-                  w={"100%"}
-                  color={"white"}
-                  _hover={
-                    colorMode === "light"
-                      ? { bg: "green.400" }
-                      : { bg: "green.500" }
-                  }
-                  userSelect={"none"}
-                  opacity={0.9}
-                  borderBottomRadius={"50%"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                >
-                  <Center mb={4} mt={4} ml={6}>
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      width={8}
-                      height={8}
-                      mr={4}
-                    >
-                      <MdScience size={"lg"} />
-                    </Box>
-                    <Text
-                      fontWeight={"bold"}
-                      fontSize={"xl"}
-                      // color={"black"}
-                    >
+              <AccordionItem value="progress-reports" className="border-none mt-4">
+                <AccordionTrigger className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white rounded-b-full px-6 py-4 select-none opacity-90 hover:no-underline">
+                  <div className="flex items-center justify-center mb-4 mt-4 ml-6">
+                    <div className="flex items-center justify-center w-8 h-8 mr-4">
+                      <MdScience size="lg" />
+                    </div>
+                    <span className="font-bold text-xl">
                       Progress Reports ({latestProgressReportsData?.length})
-                    </Text>
-                  </Center>
-                </AccordionButton>
-                <AccordionPanel py={4} mt={4}>
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="py-4 mt-4">
                   {latestProgressReportsData &&
                     latestProgressReportsData?.map((pr, index) => {
                       return (
@@ -226,39 +138,14 @@ export const ParticipatingProjectReports = () => {
                         />
                       );
                     })}
-                </AccordionPanel>
+                </AccordionContent>
               </AccordionItem>
             </Accordion>
           )}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 
-{
-  /* // <Center>
-        //   {!userLoading &&
-        //     latestProgressReportsData?.map((report, index) => {
-        //       return (
-        //         <Box key={index}>
-        //           <>
-        //             <ARProgressReportHandler
-        //               canEdit={
-        //                 userData?.is_superuser ||
-        //                 userData?.business_area?.name === "Directorate"
-        //               }
-        //               project={report?.project}
-        //               document={report?.document}
-        //               report={report}
-        //               reportKind={
-        //                 report?.progress_report ? "student" : "ordinary"
-        //               }
-        //               shouldAlternatePicture={index % 2 === 0}
-        //             />
-        //           </>
-        //         </Box>
-        //       );
-        //     })}
-        // </Center> */
-}
+

@@ -7,25 +7,16 @@ import {
   type IUsernameLoginSuccess,
   type IUsernameLoginVariables,
 } from "@/features/auth/services/auth.service";
-import {
-  Box,
-  Button,
-  Center,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  VStack,
-  useColorMode,
-  useToast,
-  type ToastId,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FaLock, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 interface ILoginData {
@@ -47,11 +38,22 @@ export const Login = ({ onClose }: IIsModal) => {
     reset,
   } = useForm<ILoginData>();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
 
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const addToast = (title: string, description: string, type: 'loading' | 'success' | 'error') => {
+    if (type === 'loading') {
+      toastIdRef.current = toast.loading(title, { description });
+    } else if (type === 'success') {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
+      }
+      toast.success(title, { description });
+    } else if (type === 'error') {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
+      }
+      toast.error(title, { description });
+    }
   };
 
   const mutation = useMutation<
@@ -65,13 +67,7 @@ export const Login = ({ onClose }: IIsModal) => {
       mutationFn: logInOrdinary,
       onMutate: () => {
         // console.log("Mutation starting")
-        addToast({
-          title: "Logging in...",
-          description: "One moment!",
-          status: "loading",
-          position: "bottom-right",
-          duration: 3000,
-        });
+        addToast("Logging in...", "One moment!", "loading");
       },
       onSuccess: async () => {
         // Refetch user data after a successful login
@@ -79,15 +75,7 @@ export const Login = ({ onClose }: IIsModal) => {
         queryClient.refetchQueries({ queryKey: ["me"] });
 
         // Show the toast
-        if (ToastIdRef.current) {
-          toast.update(ToastIdRef.current, {
-            title: "Logged in",
-            description: "Welcome back!",
-            status: "success",
-            position: "bottom-right",
-            duration: 1000,
-          });
-        }
+        addToast("Logged in", "Welcome back!", "success");
 
         // Reset and close the modal
         reset();
@@ -101,15 +89,7 @@ export const Login = ({ onClose }: IIsModal) => {
       },
 
       onError: (error) => {
-        if (ToastIdRef.current) {
-          toast.update(ToastIdRef.current, {
-            title: "Login failed",
-            description: error.message,
-            status: "error",
-            position: "bottom-right",
-            duration: 3000,
-          });
-        }
+        addToast("Login failed", error.message, "error");
       },
     },
   );
@@ -119,7 +99,7 @@ export const Login = ({ onClose }: IIsModal) => {
   };
 
   const buildType = import.meta.env.MODE;
-  // useEffect(() => console.log(import.meta.env.MODE))
+
   const { userData, userLoading } = useUser();
   useEffect(() => {
     if (!userLoading && userData?.pk !== undefined) {
@@ -145,7 +125,7 @@ export const Login = ({ onClose }: IIsModal) => {
     }
   }, [userLoading, userData, buildType]);
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
 
   return (
     <AnimatePresence>
@@ -155,76 +135,52 @@ export const Login = ({ onClose }: IIsModal) => {
         exit={{ y: 70, opacity: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Center
-          height={"100vh"}
-          // height={"100%"}
-          width="100%"
-        >
-          <Box>
-            <VStack as={"form"} onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex items-center justify-center min-h-screen w-full">
+          <div>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4">
               <motion.div>
-                <InputGroup>
-                  <InputLeftElement
-                    children={
-                      <Box color="gray.400">
-                        <FaUser />
-                      </Box>
-                    }
-                  />
-
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaUser className="text-gray-400" />
+                  </div>
                   <Input
-                    border={"1px solid"}
-                    borderColor={"gray.300"}
-                    isInvalid={Boolean(errors.username?.message)}
-                    variant={"filled"}
-                    placeholder={"Username"}
+                    className="pl-10 border border-gray-300"
+                    placeholder="Username"
                     required
                     {...register("username", {
                       required: "Please provide a username",
                     })}
                   />
-                </InputGroup>
+                </div>
               </motion.div>
 
               <motion.div>
-                <InputGroup>
-                  <InputLeftElement
-                    children={
-                      <Box color="gray.400">
-                        <FaLock />
-                      </Box>
-                    }
-                  />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaLock className="text-gray-400" />
+                  </div>
                   <Input
-                    border={"1px solid"}
-                    borderColor={"gray.300"}
-                    isInvalid={Boolean(errors.password?.message)}
-                    variant={"filled"}
-                    placeholder={"Password"}
+                    className="pl-10 border border-gray-300"
+                    placeholder="Password"
                     required
                     type="password"
                     {...register("password", {
                       required: "Please provide a password",
                     })}
                   />
-                </InputGroup>
+                </div>
               </motion.div>
 
               <Button
-                width={"100%"}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                className="w-full text-white bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500"
                 type="submit"
-                isLoading={mutation.isPending}
+                disabled={mutation.isPending}
               >
-                Login
+                {mutation.isPending ? "Logging in..." : "Login"}
               </Button>
-            </VStack>
-          </Box>
-        </Center>
+            </form>
+          </div>
+        </div>
       </motion.div>
     </AnimatePresence>
   );

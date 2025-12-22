@@ -3,62 +3,42 @@ import { BranchSearchDropdown } from "@/features/admin/components/BranchSearchDr
 import { AddressItemDisplay } from "@/features/admin/components/AddressItemDisplay";
 import { createAddress, getAllAddresses } from "@/features/admin/services/admin.service";
 import type { IAddress, IBranch } from "@/shared/types";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Spinner,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export const AddressesCRUD = () => {
   const { register, handleSubmit, watch, reset } = useForm<IAddress>();
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createAddress,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
+      toast.success("Created", {
+        description: "Address created successfully",
       });
       reset();
-      onAddClose();
+      setAddIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Failed to create address",
       });
     },
   });
@@ -113,82 +93,72 @@ export const AddressesCRUD = () => {
   const countryData = watch("country");
   const zipcodeData = watch("zipcode");
   const poboxData = watch("pobox");
-
-  const { colorMode } = useColorMode();
   return (
     <>
       <Head title="Addresses" />
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <h2 className="text-lg font-semibold">
                 Addresses ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </h2>
+            </div>
+            <div className="flex w-full mt-4 gap-4">
               <Input
                 type="text"
                 placeholder="Search address by branch"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
-                zIndex={0}
+                className="flex-1 max-w-[65%] z-0"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end flex-1">
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white"
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
+              </div>
+            </div>
             {countOfItems === 0 ? (
-              <Box py={10} fontWeight={"bold"}>
-                <Text>No results</Text>
-              </Box>
+              <div className="py-10 font-bold">
+                <p>No results</p>
+              </div>
             ) : (
               <>
-                <Grid
-                  gridTemplateColumns="2fr 4fr 2fr 2fr 1fr 1fr"
-                  mt={4}
-                  width="100%"
-                  p={3}
-                  borderWidth={1}
-                  borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+                <div
+                  className="grid grid-cols-[2fr_4fr_2fr_2fr_1fr_1fr] mt-4 w-full p-3 border border-b-0 last:border-b"
+                  style={{
+                    borderBottomWidth: filteredSlices.length === 0 ? "1px" : "0",
+                  }}
                 >
-                  <Flex justifyContent="flex-start">
-                    <Text as="b">Branch</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">Street</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">City</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">Country</Text>
-                  </Flex>
-                  <Flex>
-                    <Text as="b">PO Box</Text>
-                  </Flex>
-                  <Flex justifyContent="flex-end" mr={2}>
-                    <Text as="b">Change</Text>
-                  </Flex>
-                </Grid>
+                  <div className="flex justify-start">
+                    <span className="font-bold">Branch</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-bold">Street</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-bold">City</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-bold">Country</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-bold">PO Box</span>
+                  </div>
+                  <div className="flex justify-end mr-2">
+                    <span className="font-bold">Change</span>
+                  </div>
+                </div>
 
-                <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+                <div className="grid grid-cols-1">
                   {filteredSlices
                     .sort((a, b) => {
                       const nameA =
@@ -216,24 +186,26 @@ export const AddressesCRUD = () => {
                         state={s.state}
                       />
                     ))}
-                </Grid>
+                </div>
               </>
             )}
-          </Box>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Address</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={2}
-                  as="form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Add Address</SheetTitle>
+                <SheetDescription>
+                  Create a new address for a branch
+                </SheetDescription>
+              </SheetHeader>
+              <div className="py-6">
+                <form
+                  className="space-y-4"
                   id="add-form"
                   onSubmit={handleSubmit(onSubmitAddressCreation)}
                 >
-                  <FormControl>
+                  <div className="space-y-2">
                     <BranchSearchDropdown
                       {...register("branch", { required: true })}
                       autoFocus
@@ -244,81 +216,87 @@ export const AddressesCRUD = () => {
                       placeholder="Search for a branch"
                       helperText={"The branch this address belongs to."}
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
-                    <FormLabel>Street</FormLabel>
-                    <InputGroup>
-                      <Input
-                        {...register("street", { required: true })}
-                        required
-                        type="text"
-                      />
-                    </InputGroup>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Zip Code</FormLabel>
+                  <div className="space-y-2">
+                    <Label htmlFor="street">Street</Label>
                     <Input
+                      id="street"
+                      {...register("street", { required: true })}
+                      required
+                      type="text"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="zipcode">Zip Code</Label>
+                    <Input
+                      id="zipcode"
                       {...register("zipcode", { required: true })}
                       type="number"
                     />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>City</FormLabel>
-                    <Input {...register("city", { required: true })} />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>State</FormLabel>
-                    <Input
-                      {...register("state", { required: true })}
-                      value={"WA"}
-                    />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
-                    <FormLabel>Country</FormLabel>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
                     <Input
-                      {...register("country", { required: true })}
-                      value={"Australia"}
+                      id="city"
+                      {...register("city", { required: true })}
                     />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>PO Box</FormLabel>
-                    <Input {...register("pobox", { required: false })} />
-                  </FormControl>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      {...register("state", { required: true })}
+                      defaultValue="WA"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      {...register("country", { required: true })}
+                      defaultValue="Australia"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pobox">PO Box</Label>
+                    <Input
+                      id="pobox"
+                      {...register("pobox", { required: false })}
+                    />
+                  </div>
+
                   {mutation.isError && (
-                    <Box mt={4}>
+                    <div className="mt-4">
                       {Object.keys(
                         (mutation.error as AxiosError).response.data,
                       ).map((key) => (
-                        <Box key={key}>
+                        <div key={key}>
                           {(
                             (mutation.error as AxiosError).response.data[
                               key
                             ] as string[]
                           ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
+                            <p key={`${key}-${index}`} className="text-red-500">
                               {`${key}: ${errorMessage}`}
-                            </Text>
+                            </p>
                           ))}
-                        </Box>
+                        </div>
                       ))}
-                    </Box>
+                    </div>
                   )}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </form>
+              </div>
+              <SheetFooter>
                 <Button
-                  // form="add-form"
-                  // type="submit"
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  disabled={mutation.isPending}
+                  className="bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white w-full"
                   size="lg"
-                  width={"100%"}
                   onClick={() => {
                     console.log("clicked");
                     onSubmitAddressCreation({
@@ -333,11 +311,14 @@ export const AddressesCRUD = () => {
                     });
                   }}
                 >
+                  {mutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </>
       )}
     </>

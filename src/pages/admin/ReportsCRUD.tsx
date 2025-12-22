@@ -1,28 +1,15 @@
 import { AddReportModal } from "@/features/reports/components/modals/AddReportModal";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Spinner,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { getAllReports } from "@/features/admin/services/admin.service";
 import type { IReport } from "@/shared/types";
 import { ReportItemDisplay } from "@/features/admin/components/ReportItemDisplay";
 import { Head } from "@/shared/components/layout/base/Head";
+import { Loader2 } from "lucide-react";
 
 export const ReportsCRUD = () => {
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
 
   const { isLoading, data: slices } = useQuery<IReport[]>({
     queryFn: getAllReports,
@@ -37,66 +24,51 @@ export const ReportsCRUD = () => {
     }
   }, [slices]);
 
-  const { colorMode } = useColorMode();
-
   return (
     <>
       <Head title="Reports" />
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"} w={"100%"}>
-            <Flex width={"100%"} mt={4} justifyContent={"space-between"}>
-              <Box alignItems={"center"} display={"flex"} flex={1} ml={1}>
-                <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full w-full">
+            <div className="flex w-full mt-4 justify-between">
+              <div className="flex items-center flex-1 ml-1">
+                <h2 className="text-lg font-semibold">
                   Reports ({countOfItems})
-                </Text>
-              </Box>
-              <Flex>
+                </h2>
+              </div>
+              <div className="flex">
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white"
                 >
                   Create Report Info
                 </Button>
-              </Flex>
-            </Flex>
-            <Grid
-              gridTemplateColumns="2fr 3fr 3fr 1fr"
-              mt={4}
-              width="100%"
-              p={3}
-              borderWidth={1}
-              borderBottomWidth={slices.length === 0 ? 1 : 0}
+              </div>
+            </div>
+            <div
+              className="grid grid-cols-[2fr_3fr_3fr_1fr] mt-4 w-full p-3 border border-b-0 last:border-b"
+              style={{
+                borderBottomWidth: slices.length === 0 ? "1px" : "0",
+              }}
             >
-              <Flex justifyContent="flex-start">
-                <Text as="b">Year</Text>
-              </Flex>
-              {/* <Flex>
-                <Text as="b">Open Date</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Closing Date</Text>
-              </Flex> */}
-              <Flex>
-                <Text as="b">Creator</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Modifier</Text>
-              </Flex>
-              <Flex justifyContent="flex-end" mr={2}>
-                <Text as="b">Change</Text>
-              </Flex>
-            </Grid>
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+              <div className="flex justify-start">
+                <span className="font-bold">Year</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Creator</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Modifier</span>
+              </div>
+              <div className="flex justify-end mr-2">
+                <span className="font-bold">Change</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1">
               {slices &&
                 slices
                   .sort((a, b) => b.year - a.year) // Sort in descending order based on the year
@@ -118,10 +90,10 @@ export const ReportsCRUD = () => {
                       student_intro={s.student_intro}
                     />
                   ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
 
-          <AddReportModal isOpen={addIsOpen} onClose={onAddClose} />
+          <AddReportModal isOpen={addIsOpen} onClose={() => setAddIsOpen(false)} />
         </>
       )}
     </>

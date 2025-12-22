@@ -4,54 +4,64 @@ import { EmailLists } from "@/features/admin/components/data/EmailLists";
 import StaffProfileEmails from "@/features/admin/components/data/StaffProfileEmails";
 import { StaffUsers } from "@/features/admin/components/data/StaffUsers";
 import UnapprovedProjectsThisFY from "@/features/admin/components/data/UnapprovedProjectsThisFY";
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 import { useState } from "react";
 
 export const AdminDataLists = () => {
-  const [loadedTabs, setLoadedTabs] = useState<Set<number>>(new Set([0])); // Start with first tab loaded
-  const [activeTab, setActiveTab] = useState(0);
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(["unapproved"])); // Start with first tab loaded
+  const [activeTab, setActiveTab] = useState("unapproved");
 
-  const handleTabChange = (index: number) => {
-    setActiveTab(index);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
     // Mark this tab as loaded
-    setLoadedTabs((prev) => new Set(prev).add(index));
+    setLoadedTabs((prev) => new Set(prev).add(value));
   };
 
   return (
     <>
       <Head title="Data" />
       <Tabs
-        isFitted
-        variant={"enclosed"}
-        index={activeTab}
-        onChange={handleTabChange}
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
       >
-        <TabList>
-          <Tab>Unapproved Docs</Tab>
-          <Tab>Problematic Projects</Tab>
-          <Tab>Email List</Tab>
-          <Tab>Staff Profile List</Tab>
-          <Tab>Staff Users</Tab>
-        </TabList>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="unapproved">Unapproved Docs</TabsTrigger>
+          <TabsTrigger value="problematic">Problematic Projects</TabsTrigger>
+          <TabsTrigger value="emails">Email List</TabsTrigger>
+          <TabsTrigger value="profiles">Staff Profile List</TabsTrigger>
+          <TabsTrigger value="users">Staff Users</TabsTrigger>
+        </TabsList>
 
-        <TabPanels>
-          {/* Unapproved projects this FY */}
-          <TabPanel>
-            {loadedTabs.has(0) && <UnapprovedProjectsThisFY />}
-          </TabPanel>
+        {/* Unapproved projects this FY */}
+        <TabsContent value="unapproved" className="mt-4">
+          {loadedTabs.has("unapproved") && <UnapprovedProjectsThisFY />}
+        </TabsContent>
 
-          {/* Problematic Projects */}
-          <TabPanel>{loadedTabs.has(1) && <AllProblematicProjects />}</TabPanel>
+        {/* Problematic Projects */}
+        <TabsContent value="problematic" className="mt-4">
+          {loadedTabs.has("problematic") && <AllProblematicProjects />}
+        </TabsContent>
 
-          {/* Emails */}
-          <TabPanel>{loadedTabs.has(2) && <EmailLists />}</TabPanel>
+        {/* Emails */}
+        <TabsContent value="emails" className="mt-4">
+          {loadedTabs.has("emails") && <EmailLists />}
+        </TabsContent>
 
-          {/* Active Staff Profile Emails */}
-          <TabPanel>{loadedTabs.has(3) && <StaffProfileEmails />}</TabPanel>
+        {/* Active Staff Profile Emails */}
+        <TabsContent value="profiles" className="mt-4">
+          {loadedTabs.has("profiles") && <StaffProfileEmails />}
+        </TabsContent>
 
-          {/* Staff */}
-          <TabPanel>{loadedTabs.has(4) && <StaffUsers />}</TabPanel>
-        </TabPanels>
+        {/* Staff */}
+        <TabsContent value="users" className="mt-4">
+          {loadedTabs.has("users") && <StaffUsers />}
+        </TabsContent>
       </Tabs>
     </>
   );

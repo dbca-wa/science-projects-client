@@ -1,13 +1,14 @@
 // The quote that displays on the dashboard
 
 import { useQuote } from "@/features/dashboard/hooks/useQuote";
-import { Box, Flex, Spinner, Text, useColorMode } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
 import { BsChatQuoteFill } from "react-icons/bs";
 
 export const Quote = () => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { quote, quoteLoading } = useQuote();
 
   const textControls = useAnimation();
@@ -29,35 +30,27 @@ export const Quote = () => {
   }, [textControls, authorControls, quote, quoteLoading]);
 
   return (
-    <Box
-      rounded={22}
-      bgColor={colorMode === "light" ? "gray.100" : "blackAlpha.500"}
-      padding={8}
-      py={6}
-      userSelect="none"
+    <div
+      className={`rounded-3xl px-8 py-6 select-none ${
+        isDark ? "bg-black/50" : "bg-gray-100"
+      }`}
     >
-      <Flex alignItems="flex-start" mb={1}>
-        <Box
-          aria-label={""}
-          mt={1}
-          mr={4}
-          bgColor={colorMode === "light" ? "blue.400" : "blue.600"}
-          color="white"
-          padding={2}
-          rounded={10}
+      <div className="flex items-start mb-1">
+        <div
+          className={`mt-1 mr-4 p-2 rounded-xl text-white ${
+            isDark ? "bg-blue-600" : "bg-blue-400"
+          }`}
+          aria-label=""
         >
           <BsChatQuoteFill size={30} />
-        </Box>
-        <Flex width="100%" flexDir="column">
+        </div>
+        <div className="w-full flex flex-col">
           {!quoteLoading ? (
             <>
-              <Text
-                color={
-                  colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
-                }
-                fontSize="md"
-                mb={3}
-                fontStyle={"italic"}
+              <p
+                className={`text-base mb-3 italic ${
+                  isDark ? "text-white/90" : "text-black/90"
+                }`}
               >
                 {quote
                   ? quote.text.split(" ").map((word, i) => (
@@ -71,28 +64,26 @@ export const Quote = () => {
                       </motion.span>
                     ))
                   : "How wonderful that we have met with a paradox. Now we have some hope of making progress."}
-              </Text>
+              </p>
             </>
           ) : (
-            <Spinner />
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-blue-500"></div>
           )}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
       {quote && (
-        <Flex justifyContent="flex-end">
+        <div className="flex justify-end">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={authorControls}>
-            <Text
-              fontWeight="medium"
-              textAlign="right"
-              color={
-                colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
-              }
+            <p
+              className={`font-medium text-right ${
+                isDark ? "text-white/90" : "text-black/90"
+              }`}
             >
               {quote.author}
-            </Text>
+            </p>
           </motion.div>
-        </Flex>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

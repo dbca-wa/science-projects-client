@@ -1,6 +1,6 @@
 // Wrapper for the Page view on Account page.
 
-import { Box } from "@chakra-ui/react";
+import { ReactNode } from "react";
 
 interface IPageViewProps {
   children: ReactNode;
@@ -8,19 +8,10 @@ interface IPageViewProps {
 
 export const AccountPageViewWrapper = ({ children }: IPageViewProps) => {
   return (
-    <Box
-      minH={"90vh"}
-      height="100%"
-      w={"full"}
-      display="flex"
-      flexDirection="column"
-      flex={1}
-      overflowX={"hidden"}
-      flexShrink={0}
-    >
-      <Box overflowY="auto" flex="1" p={3} overflowX={"hidden"} w={"full"}>
+    <div className="min-h-[90vh] h-full w-full flex flex-col flex-1 overflow-x-hidden flex-shrink-0">
+      <div className="overflow-y-auto flex-1 p-3 overflow-x-hidden w-full">
         {children}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

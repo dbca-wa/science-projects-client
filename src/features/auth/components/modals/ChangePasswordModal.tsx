@@ -1,25 +1,18 @@
 // Component for changing a user's password
 
 import {
-  Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { useState } from "react";
 import { FaLock, FaUser } from "react-icons/fa";
+import { useTheme } from "next-themes";
 
 interface IChangePasswordModalProps {
   isOpen: boolean;
@@ -52,84 +45,93 @@ export const ChangePasswordModal = ({
     // Handle form submission
   };
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={"white"}
-      >
-        <ModalHeader>Add User</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-white dark:text-gray-400">
+        <DialogHeader>
+          <DialogTitle>Add User</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <ModalBody>
-            <FormControl isRequired>
-              <FormLabel>Username</FormLabel>
-              <InputGroup>
-                <InputLeftElement children={<Icon as={FaUser} />} />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username *</Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="text-gray-400" />
+                </div>
                 <Input
+                  id="username"
                   type="text"
                   placeholder="Username"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   maxLength={30}
                   pattern="[A-Za-z0-9@.+_-]*"
+                  className="pl-10"
                 />
-              </InputGroup>
-              <FormHelperText>
+              </div>
+              <p className="text-sm text-gray-500">
                 Required. 30 characters or fewer. Letters, digits and @/./+/-/_
                 only.
-              </FormHelperText>
-            </FormControl>
-            <FormControl isRequired mt={4}>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <InputLeftElement children={<Icon as={FaLock} />} />
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password *</Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="text-gray-400" />
+                </div>
                 <Input
+                  id="password"
                   type="password"
                   placeholder="Password"
                   value={password}
                   onChange={handlePasswordChange}
+                  className="pl-10"
                 />
-              </InputGroup>
-            </FormControl>
-            <FormControl isRequired mt={4}>
-              <FormLabel>Password Confirmation</FormLabel>
-              <InputGroup>
-                <InputLeftElement children={<Icon as={FaLock} />} />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Password Confirmation *</Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaLock className="text-gray-400" />
+                </div>
                 <Input
+                  id="confirmPassword"
                   type="password"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
+                  className="pl-10"
                 />
-              </InputGroup>
-              {passwordsMatch && (
-                <FormHelperText color="green.500">
+              </div>
+              {passwordsMatch && confirmPassword && (
+                <p className="text-sm text-green-500">
                   Passwords match
-                </FormHelperText>
+                </p>
               )}
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={onClose}>Cancel</Button>
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
             <Button
               type="submit"
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
-              ml={3}
-              isDisabled={!username || !passwordsMatch}
+              className="ml-3 text-white bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500"
+              disabled={!username || !passwordsMatch}
             >
               Add User
             </Button>
-          </ModalFooter>
+          </DialogFooter>
         </form>
-      </ModalContent>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

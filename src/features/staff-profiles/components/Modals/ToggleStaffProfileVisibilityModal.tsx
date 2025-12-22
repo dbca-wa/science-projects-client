@@ -1,29 +1,18 @@
 import { toggleStaffProfileVisibility } from "@/features/staff-profiles/services/staff-profiles.service";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Text,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type AxiosError } from "axios";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface IToggleStaffProfileVisibilityModalProps {
   isOpen: boolean;
@@ -42,54 +31,22 @@ const ToggleStaffProfileVisibilityModal = ({
   userPk,
   refetch,
 }: IToggleStaffProfileVisibilityModalProps) => {
-  const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
-
-  useEffect(() => {
-    if (isToastOpen) {
-      onClose();
-    }
-  }, [isToastOpen, onClose]);
-
-  const handleToastClose = () => {
-    closeToast();
-    onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const queryClient = useQueryClient();
   const toggleVisibilityMutation = useMutation({
     // Start of mutation handling
     mutationFn: toggleStaffProfileVisibility,
     onMutate: () => {
-      addToast({
-        title: "Changing Profile Visibility...",
+      toast.loading("Changing Profile Visibility...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Your profile is now ${
-            !profileIsHidden ? "hidden" : "visible"
-          }.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Your profile is now ${
+          !profileIsHidden ? "hidden" : "visible"
+        }.`,
+      });
       //  Close the modal
       // queryClient.invalidateQueries({
       //   queryKey: ["latestUnapprovedProgressReports"],
@@ -146,16 +103,9 @@ const ToggleStaffProfileVisibilityModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -167,64 +117,52 @@ const ToggleStaffProfileVisibilityModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex
-      // as={"form"} onSubmit={handleSubmit(onSubmit)}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
             {!profileIsHidden ? "Hide" : "Show"} Staff Profile
-          </ModalHeader>
-          <ModalCloseButton />
+          </DialogTitle>
+          <DialogDescription>
+            Are you sure you want to {!profileIsHidden ? "hide" : "show"} your
+            staff profile?
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <p className="text-sm text-muted-foreground mb-4">
+            Your account {!profileIsHidden ? " will no longer " : " will "}
+            appear in the science profiles public directory. You can change
+            this setting at any time.
+          </p>
 
-          <ModalBody>
-            {/* <Center> */}
-            <Text fontWeight={"bold"} fontSize={"xl"}>
-              Are you sure you want to {!profileIsHidden ? "hide" : "show"} your
-              staff profile?
-            </Text>
-            {/* </Center> */}
-            <Text mt={4}>
-              Your account {!profileIsHidden ? " will no longer " : " will "}
-              appear in the science profiles public directory. You can change
-              this setting at any time.
-            </Text>
-
-            <Text mt={4}>
-              If you would still like to proceed, press "
-              {!profileIsHidden ? "Hide" : "Show"}".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={toggleVisibilityMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    staffProfilePk,
-                  })
-                }
-                ml={3}
-              >
-                {!profileIsHidden ? "Hide" : "Show"}
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+          <p className="text-sm text-muted-foreground">
+            If you would still like to proceed, press "
+            {!profileIsHidden ? "Hide" : "Show"}".
+          </p>
+        </div>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              disabled={toggleVisibilityMutation.isPending}
+              className="bg-red-500 hover:bg-red-400 dark:bg-red-600 dark:hover:bg-red-500 text-white"
+              onClick={() =>
+                onSubmit({
+                  staffProfilePk,
+                })
+              }
+            >
+              {toggleVisibilityMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {!profileIsHidden ? "Hide" : "Show"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

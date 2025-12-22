@@ -1,30 +1,23 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { useGetDivisions } from "@/features/admin/hooks/useGetDivisions";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
   Select,
-  Spinner,
-  Stack,
-  Text,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -35,6 +28,8 @@ import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdo
 import { BusinessAreaItemDisplay } from "@/features/admin/components/BusinessAreaItemDisplay";
 import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
 import { Head } from "@/shared/components/layout/base/Head";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export const BusinessAreasCRUD = () => {
   const {
@@ -44,31 +39,22 @@ export const BusinessAreasCRUD = () => {
     reset,
     // formState: { errors },
   } = useForm<IBusinessAreaCreate>();
-  const toast = useToast();
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createBusinessArea,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
+      toast.success("Created", {
+        description: "Business area created successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
       clearFields();
-      onAddClose();
+      setAddIsOpen(false);
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Failed to create business area",
       });
     },
   });
@@ -188,81 +174,68 @@ export const BusinessAreasCRUD = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
 
-  const { colorMode } = useColorMode();
-
   const { divsData, divsLoading } = useGetDivisions();
 
   return (
     <>
       <Head title="Business Areas" />
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex items-center justify-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <h2 className="text-lg font-semibold">
                 Business Areas ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </h2>
+            </div>
+            <div className="flex w-full mt-4 gap-4">
               <Input
                 type="text"
                 placeholder="Search business area by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="flex-1 max-w-[65%]"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end flex-1">
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500 text-white"
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
-            <Grid
-              // gridTemplateColumns="2fr 2fr 3fr 2fr 2fr 2fr 1fr"
-              gridTemplateColumns="2fr 4fr 3fr 3fr 3fr 1fr"
-              mt={4}
-              width="100%"
-              p={3}
-              borderWidth={1}
-              borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+              </div>
+            </div>
+            <div
+              className="grid grid-cols-[2fr_4fr_3fr_3fr_3fr_1fr] mt-4 w-full p-3 border border-b-0 last:border-b"
+              style={{
+                borderBottomWidth: filteredSlices.length === 0 ? "1px" : "0",
+              }}
             >
-              <Flex justifyContent="flex-start">
-                <Text as="b">Image</Text>
-              </Flex>
-              {/* <Flex>
-                <Text as="b">Active</Text>
-              </Flex> */}
-              <Flex>
-                <Text as="b">Business Area</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Leader</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Finance Admin</Text>
-              </Flex>
-              <Flex>
-                <Text as="b">Data Custodian</Text>
-              </Flex>
-              <Flex justifyContent="flex-end" mr={2}>
-                <Text as="b">Change</Text>
-              </Flex>
-            </Grid>
+              <div className="flex justify-start">
+                <span className="font-bold">Image</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Business Area</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Leader</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Finance Admin</span>
+              </div>
+              <div className="flex">
+                <span className="font-bold">Data Custodian</span>
+              </div>
+              <div className="flex justify-end mr-2">
+                <span className="font-bold">Change</span>
+              </div>
+            </div>
 
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {filteredSlices
                 .sort((a, b) => {
                   const parserA = new DOMParser();
@@ -291,64 +264,59 @@ export const BusinessAreasCRUD = () => {
                     division={s.division}
                   />
                 ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
 
-          <Modal isOpen={addIsOpen} onClose={onAddClose} size={"2xl"}>
-            <ModalOverlay />
-            <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
-              <ModalCloseButton onClick={onAddClose} />
-              <ModalHeader>Add Business Area</ModalHeader>
-              <ModalBody>
-                <Stack
-                  spacing={6}
-                  as="form"
+          <Dialog open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add Business Area</DialogTitle>
+                <DialogDescription>
+                  Create a new business area
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-6">
+                <form
+                  className="space-y-6"
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  {/* <FormControl isRequired>
-                    <FormLabel>Name</FormLabel>
-                    <Input
-                      autoComplete="off"
-                      autoFocus
-                      {...register("division", { required: true })}
-                    />
-                    <FormHelperText>Name of the Business Area</FormHelperText>
-                  </FormControl> */}
                   {!divsLoading && (
-                    <Select
-                      onChange={(e) => setDivision(Number(e.target.value))}
-                      value={division}
-                      defaultValue={division}
-                      // {...register("division", { required: true })}
-                    >
-                      <option value={1}>Select a Division</option>
-                      {divsData?.map((divi) => (
-                        <option key={divi.pk} value={divi.pk}>
-                          [{divi.slug}] {divi.name}
-                        </option>
-                      ))}
-                    </Select>
+                    <div className="space-y-2">
+                      <Label>Division</Label>
+                      <Select
+                        value={division?.toString()}
+                        onValueChange={(value) => setDivision(Number(value))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a Division" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {divsData?.map((divi) => (
+                            <SelectItem key={divi.pk} value={divi.pk.toString()}>
+                              [{divi.slug}] {divi.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
 
-                  <FormControl isRequired>
-                    <FormLabel>Name</FormLabel>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name *</Label>
                     <Input
+                      id="name"
                       autoComplete="off"
                       autoFocus
                       {...register("name", { required: true })}
                     />
-                    <FormHelperText>Name of the Business Area</FormHelperText>
-                  </FormControl>
-                  <FormControl isRequired>
-                    <FormLabel>Focus</FormLabel>
-                    {/* <InputGroup>
-                      <Textarea
-                        {...register("focus", { required: true })}
-                        required
-                      />
-                    </InputGroup> */}
+                    <p className="text-sm text-muted-foreground">
+                      Name of the Business Area
+                    </p>
+                  </div>
 
+                  <div className="space-y-2">
+                    <Label>Focus *</Label>
                     <UnboundStatefulEditor
                       title={"Focus"}
                       showTitle={false}
@@ -358,20 +326,13 @@ export const BusinessAreasCRUD = () => {
                       value={focus}
                       setValueFunction={setFocus}
                     />
-                    <FormHelperText>
+                    <p className="text-sm text-muted-foreground">
                       Primary concerns of the Business Area
-                    </FormHelperText>
-                  </FormControl>
+                    </p>
+                  </div>
 
-                  <FormControl isRequired>
-                    <FormLabel>Introduction</FormLabel>
-                    {/* <InputGroup>
-                      <Textarea
-                        {...register("introduction", { required: true })}
-                        required
-                      />
-                    </InputGroup> */}
-
+                  <div className="space-y-2">
+                    <Label>Introduction *</Label>
                     <UnboundStatefulEditor
                       title={"Introduction"}
                       showTitle={false}
@@ -381,11 +342,13 @@ export const BusinessAreasCRUD = () => {
                       value={introduction}
                       setValueFunction={setIntroduction}
                     />
-                    <FormHelperText>
+                    <p className="text-sm text-muted-foreground">
                       A description of the Business Area
-                    </FormHelperText>
-                  </FormControl>
-                  <FormControl isRequired>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Image *</Label>
                     <StatefulMediaChanger
                       helperText={
                         "Upload an image that represents the Business Area."
@@ -395,8 +358,9 @@ export const BusinessAreasCRUD = () => {
                       selectedFile={selectedFile}
                       setSelectedFile={setSelectedFile}
                     />
-                  </FormControl>
-                  <FormControl>
+                  </div>
+
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("leader", { required: true })}
                       onlyInternal={false}
@@ -406,9 +370,9 @@ export const BusinessAreasCRUD = () => {
                       placeholder="Search for a user..."
                       helperText={"The leader of the Business Area"}
                     />
-                  </FormControl>
-                  <FormControl>
-                    {/* <FormLabel>Finance Admin</FormLabel> */}
+                  </div>
+
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("finance_admin", { required: true })}
                       onlyInternal={false}
@@ -418,8 +382,9 @@ export const BusinessAreasCRUD = () => {
                       placeholder="Search for a user..."
                       helperText={"The finance admin of the Business Area"}
                     />
-                  </FormControl>
-                  <FormControl>
+                  </div>
+
+                  <div className="space-y-2">
                     <UserSearchDropdown
                       {...register("data_custodian", { required: true })}
                       onlyInternal={false}
@@ -429,42 +394,34 @@ export const BusinessAreasCRUD = () => {
                       placeholder="Search for a user..."
                       helperText={"The data custodian of the Business Area"}
                     />
-                  </FormControl>
+                  </div>
 
                   {mutation.isError ? (
-                    <Box mt={4}>
+                    <div className="mt-4">
                       {Object.keys(
                         (mutation.error as AxiosError)?.response?.data,
                       ).map((key) => (
-                        <Box key={key}>
+                        <div key={key}>
                           {(
                             (mutation.error as AxiosError)?.response?.data[
                               key
                             ] as string[]
                           ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
+                            <p key={`${key}-${index}`} className="text-red-500">
                               {`${key}: ${errorMessage}`}
-                            </Text>
+                            </p>
                           ))}
-                        </Box>
+                        </div>
                       ))}
-                    </Box>
+                    </div>
                   ) : null}
-                </Stack>
-              </ModalBody>
-              <ModalFooter>
+                </form>
+              </div>
+              <DialogFooter>
                 <Button
-                  // form="add-form"
-                  // type="submit"
-                  isDisabled={!canSubmit}
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  disabled={!canSubmit || mutation.isPending}
+                  className="bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white w-full"
                   size="lg"
-                  width={"100%"}
                   onClick={() => {
                     onSubmitBusinessAreaCreation({
                       agency: 1,
@@ -479,11 +436,14 @@ export const BusinessAreasCRUD = () => {
                     });
                   }}
                 >
+                  {mutation.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Create
                 </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </>

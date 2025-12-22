@@ -1,7 +1,7 @@
 // A paginator for the projects page
 
 import type { IProjectData } from "@/shared/types";
-import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { ModernProjectCard } from "./cards/ModernProjectCard";
@@ -41,36 +41,17 @@ export const PaginatorProject = ({
   const { layout } = useLayoutSwitcher();
 
   return (
-    <Flex
-      minH={"69vh"}
-      // bg={"pink"}
-      pos={"relative"}
-      flexDir={"column"}
-    >
-      <Box h={"100%"} flex={1}>
+    <div className="min-h-[69vh] relative flex flex-col">
+      <div className="h-full flex-1">
         {/* Render the current page's data */}
         {!loading ? (
           <AnimatePresence>
-            <Grid
-              mt={8}
-              gridTemplateColumns={
+            <div
+              className={`mt-8 grid gap-8 ${
                 layout === "modern"
-                  ? {
-                      base: "repeat(1, 1fr)",
-                      "740px": "repeat(2, 1fr)",
-                      lg: "repeat(3, 1fr)",
-                      xl: "repeat(4, 1fr)",
-                      "3xl": "repeat(6, 1fr)",
-                    }
-                  : {
-                      base: "repeat(1, 1fr)",
-                      "740px": "repeat(2, 1fr)",
-                      lg: "repeat(2, 1fr)",
-                      xl: "repeat(3, 1fr)",
-                      "2xl": "repeat(4, 1fr)",
-                    }
-              }
-              gridGap={8}
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-6"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+              }`}
             >
               {data.map((project: IProjectData, index: number) => {
                 return (
@@ -108,31 +89,24 @@ export const PaginatorProject = ({
                   </motion.div>
                 );
               })}
-            </Grid>
+            </div>
           </AnimatePresence>
         ) : (
           // Render a loading spinner while fetching data
-          <Center height="200px">
-            <Spinner size="lg" />
-          </Center>
+          <div className="flex justify-center items-center h-[200px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          </div>
         )}
-      </Box>
-      <Box
-        h={"100%"}
-        mt={8}
-        display="flex"
-        justifyContent="center"
-        // bottom={0}
-        // bg={"red"}
-      >
+      </div>
+      <div className="h-full mt-8 flex justify-center">
         {/* Render the pagination buttons */}
         <Button
-          isDisabled={currentProjectResultsPage === 1}
+          disabled={currentProjectResultsPage === 1}
           onClick={() => {
             handleClick(currentProjectResultsPage - 1);
             window.scrollTo(0, 0);
           }}
-          mx={1}
+          className="mx-1"
         >
           Prev
         </Button>
@@ -143,25 +117,25 @@ export const PaginatorProject = ({
               handleClick(startPage + i);
               window.scrollTo(0, 0);
             }}
-            mx={1}
-            colorScheme={
-              startPage + i === currentProjectResultsPage ? "blue" : "gray"
+            className="mx-1"
+            variant={
+              startPage + i === currentProjectResultsPage ? "default" : "outline"
             }
           >
             {startPage + i}
           </Button>
         ))}
         <Button
-          isDisabled={currentProjectResultsPage === totalPages}
+          disabled={currentProjectResultsPage === totalPages}
           onClick={() => {
             handleClick(currentProjectResultsPage + 1);
             window.scrollTo(0, 0);
           }}
-          mx={1}
+          className="mx-1"
         >
           Next
         </Button>
-      </Box>
-    </Flex>
+      </div>
+    </div>
   );
 };

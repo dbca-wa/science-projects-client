@@ -1,17 +1,10 @@
 // A component for toggling the dark mode
 
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import {
-  Box,
-  Button,
-  IconButton,
-  useColorMode,
-  useColorModeValue,
-  Text,
-  MenuItem,
-} from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaMoon, FaSun } from "react-icons/fa";
+import { cn } from "@/shared/utils";
 
 interface IOptionalToggleDarkProps {
   showText?: boolean;
@@ -22,14 +15,13 @@ export const ToggleDarkMode = ({
   showText,
   asMenuItem,
 }: IOptionalToggleDarkProps) => {
-  const { toggleColorMode, colorMode } = useColorMode();
-  const colorToggleIcon = useColorModeValue(<FaMoon />, <FaSun />);
-  const keyColorMode = useColorModeValue("light", "dark");
-  const iconButtonColorScheme = useColorModeValue("blue", "orange");
-  const backgroundHoverColor = useColorModeValue(
-    "whiteAlpha.400",
-    "whiteAlpha.500",
-  );
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+  const toggleColorMode = () => setTheme(isDark ? "light" : "dark");
+  
+  const colorToggleIcon = isDark ? <FaSun /> : <FaMoon />;
+  const keyColorMode = isDark ? "dark" : "light";
+  const iconButtonColorScheme = isDark ? "orange" : "blue";
 
   const { manuallyCheckAndToggleDialog } = useEditorContext();
 
@@ -40,52 +32,52 @@ export const ToggleDarkMode = ({
   };
 
   return asMenuItem ? (
-    <MenuItem
+    <div
       onClick={handleClick}
-      zIndex={2}
-      color={colorMode === "dark" ? "gray.400" : null}
+      className={cn(
+        "flex items-center px-2 py-1.5 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-sm z-10",
+        isDark ? "text-gray-400" : "text-gray-900"
+      )}
     >
       {colorToggleIcon}
-      <Text ml={2}> Toggle Dark Mode</Text>
-    </MenuItem>
+      <span className="ml-2">Toggle Dark Mode</span>
+    </div>
   ) : (
     <AnimatePresence mode="wait" initial={false}>
-      <Box
-        as={motion.div}
-        style={{ display: "inline-block" }}
+      <motion.div
+        className="inline-block"
         key={keyColorMode}
         initial={{ x: -10, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 10, opacity: 0 }}
-        sx={{ transitionDuration: 2.01 }}
+        style={{ transitionDuration: "2.01s" }}
       >
         {showText ? (
-          <Button
-            // bg={"blue"}
-            color={`${iconButtonColorScheme}.400`}
-            size={"md"}
-            rightIcon={colorToggleIcon}
+          <button
+            className={cn(
+              "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              "hover:bg-white/40 dark:hover:bg-white/20",
+              isDark ? "text-orange-400 hover:text-orange-300" : "text-blue-400 hover:text-blue-300"
+            )}
             onClick={handleClick}
-            variant={"ghost"}
             aria-label="Toggle Dark Mode"
-            _hover={{
-              bg: backgroundHoverColor,
-              color: `${iconButtonColorScheme}.300`,
-            }}
           >
-            <Text>{keyColorMode === "dark" ? "Light" : "Dark"}</Text>
-          </Button>
+            <span>{keyColorMode === "dark" ? "Light" : "Dark"}</span>
+            <span className="ml-2">{colorToggleIcon}</span>
+          </button>
         ) : (
-          <IconButton
-            size={"md"}
-            icon={colorToggleIcon}
+          <button
+            className={cn(
+              "p-2 rounded-md transition-colors",
+              isDark ? "text-orange-400 hover:bg-white/20" : "text-blue-400 hover:bg-white/40"
+            )}
             onClick={handleClick}
-            colorScheme={iconButtonColorScheme}
-            variant={"ghost"}
             aria-label="Toggle Dark Mode"
-          />
+          >
+            {colorToggleIcon}
+          </button>
         )}
-      </Box>
+      </motion.div>
     </AnimatePresence>
   );
 };

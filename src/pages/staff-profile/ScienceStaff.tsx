@@ -7,7 +7,6 @@ import { useScienceStaffProfileList } from "@/features/staff-profiles/hooks/useS
 import { useUser } from "@/features/users/hooks/useUser";
 import type { IUserMe } from "@/shared/types";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import { Button as ChakraButton, Grid } from "@chakra-ui/react";
 import clsx from "clsx";
 import { useSearchParams } from "react-router-dom";
 
@@ -58,14 +57,13 @@ export const ScienceStaff = () => {
       {/* Admin Toggle Button - only show for superusers */}
       {userData?.is_superuser && (
         <div className="mb-4 flex justify-center">
-          <ChakraButton
+          <Button
             onClick={toggleHiddenProfiles}
-            colorScheme={showHidden ? "red" : "blue"}
-            variant="outline"
+            variant={showHidden ? "destructive" : "outline"}
             size="sm"
           >
             {showHidden ? "Hide Hidden Profiles" : "Show Hidden Profiles"}
-          </ChakraButton>
+          </Button>
         </div>
       )}
 
@@ -109,18 +107,13 @@ export const ScienceStaff = () => {
               </span>
             )}
           </p>
-          <Grid
-            gridTemplateColumns={
+          <div
+            className={clsx(
+              "grid gap-4 py-4",
               isDesktop
-                ? {
-                    md: "repeat(2, 4fr)",
-                    lg: "repeat(4, 4fr)",
-                    xl: "repeat(4, 4fr)",
-                  }
-                : "repeat(1, 1fr)"
-            }
-            gridGap={4}
-            py={4}
+                ? "md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4"
+                : "grid-cols-1"
+            )}
           >
             {scienceStaffData?.users
               ?.sort((a: IUserMe, b: IUserMe) =>
@@ -144,7 +137,7 @@ export const ScienceStaff = () => {
                   />
                 );
               })}
-          </Grid>
+          </div>
           <Pagination
             totalResults={scienceStaffData?.total_results}
             currentPage={page}

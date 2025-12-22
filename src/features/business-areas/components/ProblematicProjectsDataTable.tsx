@@ -6,8 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { Button } from "@/shared/components/ui/button";
 import type { IProjectData } from "@/shared/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import {
@@ -74,7 +75,8 @@ const statusMapping = {
 };
 
 export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   // console.log(projectData);
 
   const { isOnProjectsPage } = useProjectSearchContext();
@@ -177,36 +179,13 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
           sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
         }
         return (
-          // <Button
-          //   // variant="ghost"
-          //   bg={"transparent"}
-          //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          //   className="w-full text-left"
-          //   rightIcon={sortIcon}
-          //   _hover={
-          //     colorMode === "dark"
-          //       ? { bg: "blue.400", color: "white" }
-          //       : { bg: "blue.50", color: "black" }
-          //   }
-          // >
-          //   Status
-          // </Button>
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-right"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-end"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-end"
           >
             Status
+            {sortIcon}
           </Button>
         );
       },
@@ -217,13 +196,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         const formatted = statusMapping[originalStatusData] || "Other";
 
         return (
-          <Box
-            className="text-right font-medium"
-            color={colorMode === "light" ? "gray.500" : "gray.300"}
-            px={4}
-          >
+          <div className={`text-right font-medium px-4 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
             {formatted}
-          </Box>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -247,21 +222,12 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-start"
           >
             Title
+            {sortIcon}
           </Button>
         );
       },
@@ -333,40 +299,21 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
 
         const tag = row.original.tag;
         return (
-          <Box className="text-left font-medium">
-            <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration:
-                  colorMode === "dark" ? "underline" : "undefined",
-              }}
-              cursor={"pointer"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
+          <div className="text-left font-medium">
+            <p
+              className={`font-bold px-4 cursor-pointer hover:underline ${
+                isDark ? "text-blue-200 hover:text-blue-100" : "text-blue-400 hover:text-blue-300"
+              }`}
             >
               {formatted}
-            </Text>
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"small"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
-            >
+            </p>
+            <p className="text-gray-400 font-semibold text-sm px-4">
               {tag}
-            </Text>
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"x-small"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
-            >
+            </p>
+            <p className="text-gray-400 font-semibold text-xs px-4">
               Created on {formatDate(row.getValue("created_at"))}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -392,21 +339,12 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         }
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-right"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-start"
           >
             Problem
+            {sortIcon}
           </Button>
         );
       },
@@ -416,27 +354,22 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         const formatted = problemMapping[originalProblemData].title || "Other";
         const formattedProblem =
           problemMapping[originalProblemData].description;
+        const problemColor = problemMapping[originalProblemData].color;
+        
         return (
-          <Box
-            className="text-left font-medium"
-            color={
-              colorMode === "light"
-                ? `${problemMapping[originalProblemData].color}.500`
-                : `${problemMapping[originalProblemData].color}.300`
-            }
-            px={4}
+          <div
+            className={`text-left font-medium px-4 ${
+              isDark 
+                ? `text-${problemColor}-300` 
+                : `text-${problemColor}-500`
+            }`}
           >
             {formatted}
 
-            <Text
-              color={"gray.500"}
-              fontWeight={"semibold"}
-              fontSize={"x-small"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-            >
+            <p className="text-gray-500 font-semibold text-xs">
               {formattedProblem}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -525,21 +458,12 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className="w-full justify-start"
           >
             Created On
+            {sortIcon}
           </Button>
         );
       },
@@ -547,22 +471,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         // const date:Date = row.getValue("created_at");
         // const formatted = returnHTMLTitle(originalTitleData);
         return (
-          <Box className="text-left font-medium">
-            {/* <Text
-                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                fontWeight={"bold"}
-                _hover={{
-                  color: colorMode === "dark" ? "blue.100" : "blue.300",
-                  textDecoration: "underline",
-                }}
-                cursor={"pointer"}
-                // onClick={(e) => goToProject(e, row.original.id)}
-                px={4}
-              >
-                {date}
-              </Text> */}
-            <Text>{row.getValue("created_at")}</Text>
-          </Box>
+          <div className="text-left font-medium">
+            <p>{row.getValue("created_at")}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -642,7 +553,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
               <TableRow
                 key={row.id}
                 className={
-                  colorMode === "light" ? twRowClassLight : twRowClassDark
+                  isDark ? twRowClassDark : twRowClassLight
                 }
                 data-state={row.getIsSelected() && "selected"}
                 onClick={(e) => goToProject(e, row.original.pk)}

@@ -6,15 +6,9 @@ import { useGetFullLatestReport } from "@/features/reports/hooks/useGetFullLates
 // import { useGetLatestReportMedia } from "@/shared/hooks/useGetLatestReportMedia";
 import { useUser } from "@/features/users/hooks/useUser";
 import type { IReport } from "@/shared/types";
-import {
-  Box,
-  Center,
-  FormControl,
-  Input,
-  Spinner,
-  VStack,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Input } from "@/shared/components/ui/input";
+import { Loader2 } from "lucide-react";
+import { useTheme } from "next-themes";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -23,9 +17,9 @@ export const AnnualReportDetails = () => {
   const { register } = useForm<IReport>();
 
   const { userData } = useUser();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
   const documentType = "annualreport";
-  const editorKey = colorMode + documentType;
+  const editorKey = theme + documentType;
   // const queryClient = useQueryClient();
 
   const { reportData, reportLoading } = useGetFullLatestReport();
@@ -57,19 +51,14 @@ export const AnnualReportDetails = () => {
   // const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
 
   return (
-    <Box>
+    <div>
       {reportLoading || !reportData ? (
-        <Center>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
       ) : (
-        <Center flexDir={"column"}>
-          <VStack
-            p={6}
-            spacing={6}
-            //  w={`${A4Width}mm`}
-            w="100%"
-          >
+        <div className="flex flex-col items-center">
+          <div className="p-6 space-y-6 w-full">
             <input
               type="hidden"
               {...register("pk")}
@@ -83,7 +72,7 @@ export const AnnualReportDetails = () => {
               defaultValue={reportData.year} // Prefill with the 'name' prop
             />
 
-            <FormControl>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -94,9 +83,9 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -107,9 +96,9 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -120,8 +109,8 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
-            <FormControl>
+            </div>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -132,9 +121,9 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -145,9 +134,9 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
+            </div>
 
-            <FormControl>
+            <div>
               <RichTextEditor
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
@@ -158,10 +147,10 @@ export const AnnualReportDetails = () => {
                 writeable_document_kind={"Annual Report"}
                 writeable_document_pk={reportData?.id}
               />
-            </FormControl>
-          </VStack>
-        </Center>
+            </div>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

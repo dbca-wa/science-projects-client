@@ -1,20 +1,17 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { updateMyBa, type IMyBAUpdateSubmissionData } from "@/features/users/services/users.service";
 import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Label } from "@/shared/components/ui/label";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
@@ -42,7 +39,8 @@ export const EditMyBusinessAreaModal = ({
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
   const [canUpdate, setCanUpdate] = useState<boolean>(false);
 
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const introTextHtml = useDistilledHtml(introductionValue);
   const originalTextHtml = useDistilledHtml(introduction);
 
@@ -76,17 +74,11 @@ export const EditMyBusinessAreaModal = ({
     image,
   ]);
 
-  const toast = useToast();
-
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: updateMyBa,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Business Area Updated");
       queryClient.invalidateQueries({ queryKey: ["myBusinessAreas"] });
       refetch();
 
@@ -95,11 +87,7 @@ export const EditMyBusinessAreaModal = ({
       }, 350);
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed to update Business Area");
     },
   });
 
@@ -108,14 +96,15 @@ export const EditMyBusinessAreaModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
-      <ModalOverlay />
-      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
-        <ModalCloseButton onClick={onClose} />
-        <ModalHeader>Edit Business Area</ModalHeader>
-        <ModalBody>
-          <FormControl isRequired mb={4}>
-            <FormLabel>Introduction</FormLabel>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`max-w-2xl ${isDark ? "text-gray-400" : ""}`}>
+        <DialogHeader>
+          <DialogTitle>Edit Business Area</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="introduction">Introduction *</Label>
             <UnboundStatefulEditor
               title={"Introduction"}
               showTitle={false}
@@ -125,11 +114,10 @@ export const EditMyBusinessAreaModal = ({
               value={introductionValue}
               setValueFunction={setIntroductionValue}
             />
-          </FormControl>
+          </div>
 
-          <FormControl isRequired>
-            <FormLabel>Image</FormLabel>
-
+          <div className="space-y-2">
+            <Label htmlFor="image">Image *</Label>
             <StatefulMediaChanger
               helperText={"Upload an image that represents the Business Area."}
               selectedImageUrl={selectedImageUrl}
@@ -137,20 +125,17 @@ export const EditMyBusinessAreaModal = ({
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
             />
-          </FormControl>
-        </ModalBody>
+          </div>
+        </div>
 
-        <ModalFooter>
+        <DialogFooter>
           <Button
-            isDisabled={!canUpdate}
-            isLoading={mutation.isPending}
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
-            size="lg"
-            width={"100%"}
+            disabled={!canUpdate}
+            className={`w-full ${
+              isDark 
+                ? "bg-blue-600 hover:bg-blue-500" 
+                : "bg-blue-500 hover:bg-blue-400"
+            } text-white`}
             onClick={() => {
               onSubmitBusinessAreaUpdate({
                 pk: pk,
@@ -159,10 +144,10 @@ export const EditMyBusinessAreaModal = ({
               });
             }}
           >
-            Update
+            {mutation.isPending ? "Updating..." : "Update"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

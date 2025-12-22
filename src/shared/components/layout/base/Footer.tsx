@@ -1,6 +1,5 @@
 // Component for Traditional version footer
 
-import { Box, Center, Link, Text } from "@chakra-ui/react";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 
 export const Footer = () => {
@@ -8,30 +7,22 @@ export const Footer = () => {
   const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.0.0";
 
   return (
-    <Box
-      display={"flex"}
-      justifyContent={"center"}
-      bottom="0"
-      width="100%"
-      color="whiteAlpha.600"
-      bgColor="blackAlpha.900"
-      py={4}
-      userSelect={"none"}
+    <div
+      className="flex justify-center bottom-0 w-full text-white/60 bg-black/90 py-4 select-none"
     >
-      <Center
-        fontSize="12px"
-        textAlign="center"
+      <div
+        className="text-xs text-center cursor-pointer"
         onClick={() => console.log(VERSION)}
       >
-        <Link
-          color="whiteAlpha.800"
+        <a
+          className="text-white/80 hover:text-white"
           href="https://github.com/dbca-wa/science-projects-client"
         >
           {`SPMS ${VERSION}`}
-        </Link>
+        </a>
         &nbsp;
-        <Text>© 2012-{currentYear} DBCA. All rights reserved.</Text>
-      </Center>
-    </Box>
+        <span>© 2012-{currentYear} DBCA. All rights reserved.</span>
+      </div>
+    </div>
   );
 };

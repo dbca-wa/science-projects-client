@@ -11,24 +11,16 @@ import {
   getUnapprovedDocsForBusinessAreas,
 } from "@/features/users/services/users.service";
 import type { IMainDoc, IProjectData } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useColorMode
-} from "@chakra-ui/react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 // Show BAs how their BA will display on AR
 
 export const MyBusinessArea = () => {
   const { userData, userLoading } = useUser();
   const { basLoading, baData: myBusinessAreas, refetch } = useMyBusinessAreas();
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const [isRepainting, setIsRepainting] = useState(false);
 
@@ -133,182 +125,142 @@ export const MyBusinessArea = () => {
   return (
     <>
       {!userLoading && (
-        <Box maxW={"100%"} maxH={"100%"}>
+        <div className="max-w-full max-h-full">
           {/* Count of BAs Led and title */}
           {!basLoading && !isRepainting && myBusinessAreas?.length >= 1 && (
             <>
-              <Box mb={4}>
-                <Text fontWeight={"semibold"} fontSize={"lg"}>
+              <div className="mb-4">
+                <p className="font-semibold text-lg">
                   My Business Area
                   {myBusinessAreas?.length > 1 &&
                     `s (${myBusinessAreas.length})`}
-                </Text>
-              </Box>
+                </p>
+              </div>
 
-              <Tabs isFitted>
-                <TabList>
-                  <Tab>Display</Tab>
-                  <Tab>Problematic Projects</Tab>
-                  <Tab>Unapproved Project Documents</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <Box mb={4}>
-                      <Text
-                        color={colorMode === "light" ? "gray.500" : "gray.300"}
-                        mt={2}
-                      >
-                        {myBusinessAreas.length < 1
-                          ? "You are not leading any business areas."
-                          : "This section provides an idea of how your business area intro will look on the Annual Report before progress reports are shown"}
-                      </Text>
-                    </Box>
+              <Tabs defaultValue="display" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="display">Display</TabsTrigger>
+                  <TabsTrigger value="problematic">Problematic Projects</TabsTrigger>
+                  <TabsTrigger value="unapproved">Unapproved Project Documents</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="display">
+                  <div className="mb-4">
+                    <p className={`mt-2 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                      {myBusinessAreas.length < 1
+                        ? "You are not leading any business areas."
+                        : "This section provides an idea of how your business area intro will look on the Annual Report before progress reports are shown"}
+                    </p>
+                  </div>
 
-                    <Center w="100%">
-                      <Box w={"240mm"} h={"100%"} my={3}>
-                        {myBusinessAreas?.map((ba) => (
-                          <BusinessAreaEditableDisplay
-                            key={ba.pk}
-                            pk={ba.pk}
-                            leader={userData}
-                            name={ba.name}
-                            introduction={ba.introduction}
-                            image={ba.image}
-                            refetch={softRefetch}
-                          />
-                        ))}
-                      </Box>
-                    </Center>
-                  </TabPanel>
-                  <TabPanel>
-                    <Box mb={4}>
-                      <Text
-                        color={colorMode === "light" ? "gray.500" : "gray.300"}
-                        mt={2}
-                      >
-                        This section shows all projects belonging to your
-                        Business Area which have some data problems which may
-                        prevent progressing to the annual report.
-                      </Text>
-                    </Box>
+                  <div className="flex justify-center w-full">
+                    <div className="w-[240mm] h-full my-3">
+                      {myBusinessAreas?.map((ba) => (
+                        <BusinessAreaEditableDisplay
+                          key={ba.pk}
+                          pk={ba.pk}
+                          leader={userData}
+                          name={ba.name}
+                          introduction={ba.introduction}
+                          image={ba.image}
+                          refetch={softRefetch}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="problematic">
+                  <div className="mb-4">
+                    <p className={`mt-2 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                      This section shows all projects belonging to your
+                      Business Area which have some data problems which may
+                      prevent progressing to the annual report.
+                    </p>
+                  </div>
 
-                    {myBusinessAreas?.map((ba) => {
-                      const baData = problematicProjectsData[ba?.pk] || {};
+                  {myBusinessAreas?.map((ba) => {
+                    const baData = problematicProjectsData[ba?.pk] || {};
 
-                      // Reduce problematic project data
-                      const problematicProjectsForBaData = Object.keys(
-                        baData,
-                      ).reduce((acc, key) => {
-                        const problemType =
-                          key === "no_members"
-                            ? "memberless"
-                            : key === "no_leader"
-                              ? "leaderless"
-                              : key === "external_leader"
-                                ? "externally_led"
-                                : key === "multiple_leads"
-                                  ? "multiple_leaders"
-                                  : ""; // handle other cases if necessary
+                    // Reduce problematic project data
+                    const problematicProjectsForBaData = Object.keys(
+                      baData,
+                    ).reduce((acc, key) => {
+                      const problemType =
+                        key === "no_members"
+                          ? "memberless"
+                          : key === "no_leader"
+                            ? "leaderless"
+                            : key === "external_leader"
+                              ? "externally_led"
+                              : key === "multiple_leads"
+                                ? "multiple_leaders"
+                                : ""; // handle other cases if necessary
 
-                        const projectsWithType = baData[key].map((project) => ({
-                          ...project,
-                          problemKind: problemType,
-                        }));
+                      const projectsWithType = baData[key].map((project) => ({
+                        ...project,
+                        problemKind: problemType,
+                      }));
 
-                        return [...acc, ...projectsWithType];
-                      }, []);
+                      return [...acc, ...projectsWithType];
+                    }, []);
 
-                      const problemsCount = problematicProjectsForBaData.length;
+                    const problemsCount = problematicProjectsForBaData.length;
 
-                      return (
-                        <Box key={`${ba?.pk}problemProjects`}>
-                          <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
-                            {ba?.name} ({problemsCount} problems)
-                          </Text>
-                          <ProblematicProjectsDataTable
-                            projectData={problematicProjectsForBaData}
-                          />
-                        </Box>
-                      );
-                    })}
-                  </TabPanel>
-                  <TabPanel>
-                    <Box mb={4}>
-                      <Text
-                        color={colorMode === "light" ? "gray.500" : "gray.300"}
-                        mt={2}
-                      >
-                        {myBusinessAreas.length < 1
-                          ? "You are not leading any business areas."
-                          : "This section lists all projects documents in your area which have yet to be approved by Project Leads. Please check that the listed leader is a dbca member and confer with them to push the document through."}
-                      </Text>
-                      {/* <Box mt={2}>
-                        <Text color={"orange.500"} fontWeight={"semibold"}>
-                          There are some issues with older data. Please refrain
-                          from approving documents in the following situations:
-                        </Text>
-                        <List color={"red.500"}>
-                          <ListItem>
-                            - A concept plan requires approval, but a project
-                            plan already exists
-                          </ListItem>
-                          <ListItem>
-                            - A project plan requires approval, but a progress
-                            report already exists
-                          </ListItem>
-                        </List>
-                      </Box> */}
-                    </Box>
+                    return (
+                      <div key={`${ba?.pk}problemProjects`}>
+                        <p className="font-bold text-lg py-4">
+                          {ba?.name} ({problemsCount} problems)
+                        </p>
+                        <ProblematicProjectsDataTable
+                          projectData={problematicProjectsForBaData}
+                        />
+                      </div>
+                    );
+                  })}
+                </TabsContent>
+                
+                <TabsContent value="unapproved">
+                  <div className="mb-4">
+                    <p className={`mt-2 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
+                      {myBusinessAreas.length < 1
+                        ? "You are not leading any business areas."
+                        : "This section lists all projects documents in your area which have yet to be approved by Project Leads. Please check that the listed leader is a dbca member and confer with them to push the document through."}
+                    </p>
+                  </div>
 
-                    {myBusinessAreas?.map((ba) => {
-                      const pendingProjectDocumentData: IPendingProjectDocumentData =
-                        {
-                          all: [],
-                          team: [],
-                          ba: [],
-                          lead: unapprovedDocumentsInAreas[ba.pk]?.linked,
-                          directorate: [],
-                        };
-                      // console.log(unapprovedDocumentsInAreas[`${ba?.pk}`])
-                      return pendingProjectDocumentData ? (
-                        <Box key={`${ba?.pk}unapproveddocs`}>
-                          <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
-                            {ba?.name} (
-                            {
-                              unapprovedDocumentsInAreas[`${ba?.pk}`]?.linked
-                                ?.length
-                            }{" "}
-                            Unapproved Documents)
-                          </Text>
-                          {/* {Object.keys(pendingProjectDocumentData['lead']).length >
-                              0 && ( */}
-                          <>
-                            {/* {unapprovedDocumentsInAreas[ba?.pk]?.map(
-                                (doc) => {
-                                  console.log(doc);
-                                  return (
-                                    <Box key={doc?.id}>
-                                      <Text>{doc?.project?.title}</Text>
-                                    </Box>
-                                  );
-                                },
-                              )} */}
-                            <UnapprovedDocumentsDataTable
-                              pendingProjectDocumentData={
-                                pendingProjectDocumentData
-                              }
-                            />
-                          </>
-                          {/* )} */}
-                        </Box>
-                      ) : null;
-                    })}
-                  </TabPanel>
-                </TabPanels>
+                  {myBusinessAreas?.map((ba) => {
+                    const pendingProjectDocumentData: IPendingProjectDocumentData =
+                      {
+                        all: [],
+                        team: [],
+                        ba: [],
+                        lead: unapprovedDocumentsInAreas[ba.pk]?.linked,
+                        directorate: [],
+                      };
+                    return pendingProjectDocumentData ? (
+                      <div key={`${ba?.pk}unapproveddocs`}>
+                        <p className="font-bold text-lg py-4">
+                          {ba?.name} (
+                          {
+                            unapprovedDocumentsInAreas[`${ba?.pk}`]?.linked
+                              ?.length
+                          }{" "}
+                          Unapproved Documents)
+                        </p>
+                        <UnapprovedDocumentsDataTable
+                          pendingProjectDocumentData={
+                            pendingProjectDocumentData
+                          }
+                        />
+                      </div>
+                    ) : null;
+                  })}
+                </TabsContent>
               </Tabs>
             </>
           )}
-        </Box>
+        </div>
       )}
     </>
   );

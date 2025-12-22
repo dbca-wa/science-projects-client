@@ -7,83 +7,57 @@ import { AnnualReportPDFGridItem } from "@/features/reports/components/AnnualRep
 import { useGetARARsWithPDF } from "@/features/reports/hooks/useGetARARsWithPDF";
 import { useGetLegacyARPDFs } from "@/features/reports/hooks/useGetLegacyARPDFs";
 import { useUser } from "@/features/users/hooks/useUser";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Spinner,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export const Reports = () => {
-  const {
-    isOpen: isAddPDFOpen,
-    onOpen: onAddPDFOpen,
-    onClose: onAddPDFClose,
-  } = useDisclosure();
-  const {
-    isOpen: isAddLegacyPDFOpen,
-    onOpen: onAddLegacyPDFOpen,
-    onClose: onAddLegacyPDFClose,
-  } = useDisclosure();
+  const [isAddPDFOpen, setIsAddPDFOpen] = useState(false);
+  const [isAddLegacyPDFOpen, setIsAddLegacyPDFOpen] = useState(false);
 
   const { reportsWithPDFData, reportsWithPDFLoading, refetchReportsWithPDFs } =
     useGetARARsWithPDF();
   const { legacyPDFData, legacyPDFDataLoading, refetchLegacyPDFs } =
     useGetLegacyARPDFs();
-  const { colorMode } = useColorMode();
   const { userData, userLoading } = useUser();
 
   return (
     <>
-      <Box mt={5}>
+      <div className="mt-5">
         <Head title={"Reports"} />
         {!userLoading && userData?.is_superuser && (
           <>
             <AddReportPDFModal
               isAddPDFOpen={isAddPDFOpen}
-              onAddPDFClose={onAddPDFClose}
+              onAddPDFClose={() => setIsAddPDFOpen(false)}
               refetchPDFs={refetchReportsWithPDFs}
             />
             {!legacyPDFDataLoading && legacyPDFData && (
               <AddLegacyReportPDFModal
                 isAddLegacyPDFOpen={isAddLegacyPDFOpen}
-                onAddLegacyPDFClose={onAddLegacyPDFClose}
+                onAddLegacyPDFClose={() => setIsAddLegacyPDFOpen(false)}
                 refetchLegacyPDFs={refetchReportsWithPDFs}
                 legacyPDFData={legacyPDFData}
               />
             )}
 
-            <Flex justifyContent={"flex-end"} w={"100%"}>
-              <Box justifySelf={"flex-end"}>
+            <div className="flex justify-end w-full">
+              <div className="space-x-2">
                 <Button
-                  bg={colorMode === "dark" ? "blue.500" : "blue.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: colorMode === "dark" ? "blue.400" : "blue.300",
-                  }}
-                  onClick={onAddLegacyPDFOpen}
-                  mr={2}
+                  onClick={() => setIsAddLegacyPDFOpen(true)}
+                  className="bg-blue-500 hover:bg-blue-400 text-white dark:bg-blue-500 dark:hover:bg-blue-400"
                 >
                   Add Legacy PDF
                 </Button>
                 <Button
-                  bg={colorMode === "dark" ? "green.500" : "green.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: colorMode === "dark" ? "green.400" : "green.300",
-                  }}
-                  onClick={onAddPDFOpen}
+                  onClick={() => setIsAddPDFOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 text-white dark:bg-green-500 dark:hover:bg-green-400"
                 >
                   Add PDF
                 </Button>
-              </Box>
-            </Flex>
+              </div>
+            </div>
           </>
         )}
         {!reportsWithPDFLoading &&
@@ -92,19 +66,11 @@ export const Reports = () => {
         reportsWithPDFData ? (
           <>
             {reportsWithPDFData?.length > 0 && (
-              <Box>
-                <Text fontWeight={"bold"} fontSize={"larger"}>
+              <div>
+                <h2 className="font-bold text-lg">
                   Annual Report PDFs
-                </Text>
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    lg: "repeat(2, 1fr)",
-                    xl: "repeat(4, 1fr)",
-                  }}
-                  mt={6}
-                  gridGap={4}
-                >
+                </h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 mt-6 gap-4">
                   {reportsWithPDFData
                     .sort((a, b) => b.year - a.year)
                     .map((report, index) => {
@@ -134,25 +100,17 @@ export const Reports = () => {
                         );
                       }
                     })}
-                </Grid>
-              </Box>
+                </div>
+              </div>
             )}
 
             {/*  */}
             {legacyPDFData?.length > 0 && (
-              <Box mt={8}>
-                <Text fontWeight={"bold"} fontSize={"larger"}>
+              <div className="mt-8">
+                <h2 className="font-bold text-lg">
                   Legacy AR PDFs
-                </Text>
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    lg: "repeat(2, 1fr)",
-                    xl: "repeat(4, 1fr)",
-                  }}
-                  mt={6}
-                  gridGap={4}
-                >
+                </h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 mt-6 gap-4">
                   {legacyPDFData
                     .sort((a, b) => b.year - a.year)
                     .map((report, index) => {
@@ -177,16 +135,16 @@ export const Reports = () => {
                         </motion.div>
                       );
                     })}
-                </Grid>
-              </Box>
+                </div>
+              </div>
             )}
           </>
         ) : (
-          <Center mt={20}>
-            <Spinner size={"xl"} />
-          </Center>
+          <div className="flex justify-center mt-20">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
         )}
-      </Box>
+      </div>
     </>
   );
 };
