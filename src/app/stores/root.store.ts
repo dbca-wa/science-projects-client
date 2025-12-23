@@ -4,11 +4,17 @@ import { makeObservable, observable } from "mobx";
 import { AuthStore } from "./auth.store";
 import { UIStore } from "./ui.store";
 import { UserSearchStore } from "./userSearch.store";
+import { EditorStore } from "./editor.store";
+import { ProjectSearchStore } from "./projectSearch.store";
+import { ProjectMapSearchStore } from "./projectMapSearch.store";
 
 export class RootStore {
   authStore: AuthStore;
   uiStore: UIStore;
   userSearchStore: UserSearchStore;
+  editorStore: EditorStore;
+  projectSearchStore: ProjectSearchStore;
+  projectMapSearchStore: ProjectMapSearchStore;
 
   // System state
   isInitialised = false;
@@ -19,6 +25,9 @@ export class RootStore {
     this.authStore = new AuthStore();
     this.uiStore = new UIStore();
     this.userSearchStore = new UserSearchStore();
+    this.editorStore = new EditorStore();
+    this.projectSearchStore = new ProjectSearchStore();
+    this.projectMapSearchStore = new ProjectMapSearchStore();
 
     // isInitialised observable
     makeObservable(this, {
@@ -62,6 +71,9 @@ export class RootStore {
         this.authStore.initialise(),
         this.uiStore.initialise?.() || Promise.resolve(),
         this.userSearchStore.initialise?.() || Promise.resolve(),
+        this.editorStore.initialise?.() || Promise.resolve(),
+        this.projectSearchStore.initialise?.() || Promise.resolve(),
+        this.projectMapSearchStore.initialise?.() || Promise.resolve(),
       ]);
 
       this.isInitialised = true;
@@ -113,7 +125,10 @@ export class RootStore {
       await Promise.all([
         this.authStore.dispose?.(), 
         this.uiStore.dispose?.(),
-        this.userSearchStore.dispose?.()
+        this.userSearchStore.dispose?.(),
+        this.editorStore.dispose?.(),
+        this.projectSearchStore.dispose?.(),
+        this.projectMapSearchStore.dispose?.()
       ]);
 
       this.isInitialised = false;
@@ -130,9 +145,3 @@ export class RootStore {
 
 // Create and export singleton instance
 export const rootStore = new RootStore();
-
-// Convenience hooks for accessing stores
-export const useStore = () => rootStore;
-export const useAuthStore = () => rootStore.authStore;
-export const useUIStore = () => rootStore.uiStore;
-export const useUserSearchStore = () => rootStore.userSearchStore;

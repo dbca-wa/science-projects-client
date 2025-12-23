@@ -1,4 +1,4 @@
-import { INSERT_LINE_BREAK_COMMAND, LexicalEditor } from "lexical";
+import { INSERT_LINE_BREAK_COMMAND, type LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {

@@ -17,10 +17,12 @@ import { FiEdit, FiSquare, FiMaximize } from "react-icons/fi";
 import { AiOutlineRotateLeft, AiOutlineRotateRight } from "react-icons/ai";
 import { MdAspectRatio } from "react-icons/md";
 import ReactCrop, {
-  Crop,
-  PixelCrop,
   centerCrop,
   makeAspectCrop,
+} from "react-image-crop";
+import type {
+  Crop,
+  PixelCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 

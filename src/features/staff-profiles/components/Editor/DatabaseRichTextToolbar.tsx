@@ -28,10 +28,12 @@ import {
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
-  LexicalEditor,
-  NodeKey,
   REDO_COMMAND,
   UNDO_COMMAND,
+} from "lexical";
+import type {
+  LexicalEditor,
+  NodeKey,
 } from "lexical";
 
 import { getSelectedNode } from "@/shared/utils/getSelectedNode";
@@ -760,7 +762,7 @@ const TableDropdown = ({ activeEditor }: TableGridProps) => {
 // A template for a RTE menu button - props fill out its icon, text and functionality
 
 import { type FC, type ReactNode } from "react";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 
 interface IMenuItem {
   leftIcon?: IconType;

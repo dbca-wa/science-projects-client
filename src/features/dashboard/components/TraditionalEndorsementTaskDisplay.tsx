@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 import { useBoxShadow } from "@/shared/hooks/useBoxShadow";
 import type { IMainDoc } from "@/shared/types";
 import { Separator } from "@/shared/components/ui/separator";

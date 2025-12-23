@@ -1,22 +1,23 @@
 import {
-  IDocGen,
+  type IDocGen,
   cancelProjectDocumentGeneration,
   generateProjectDocument,
 } from "@/features/reports/services/reports.service";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {
-  IConceptPlan,
-  IProgressReport,
-  IProjectClosure,
-  IProjectPlan,
-  IStudentReport,
+  type IConceptPlan,
+  type IProgressReport,
+  type IProjectClosure,
+  type IProjectPlan,
+  type IStudentReport,
 } from "@/shared/types";
 import { toast } from "sonner";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";

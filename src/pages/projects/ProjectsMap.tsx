@@ -5,16 +5,17 @@ import MapBusinessAreasSidebar from "@/features/projects/components/map/MapBusin
 // import MapHeatLayer from "@/features/projects/components/map/MapHeatLayer"; // Import new component
 import MapLocationsSidebar from "@/features/projects/components/map/MapLocationsSidebar";
 import MapTopRightControls from "@/features/projects/components/map/MapTopRightControls";
-import { useProjectMapSearchContext } from "@/features/projects/hooks/ProjectMapSearchContext";
+import { useProjectMapSearch } from "@/features/projects/hooks/useProjectMapSearch";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
 import { useGetLocationsGeojson } from "@/features/admin/hooks/useGetLocationsGeojson";
 import type { IBusinessArea } from "@/shared/types";
+import { observer } from "mobx-react-lite";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 
-const ProjectsMap = () => {
+const ProjectsMap = observer(() => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
@@ -68,7 +69,7 @@ const ProjectsMap = () => {
     filteredItems,
     filterUser,
     setSelectedLocations,
-  } = useProjectMapSearchContext();
+  } = useProjectMapSearch();
 
   // Locations State and Selections ================================
   const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
@@ -231,6 +232,6 @@ const ProjectsMap = () => {
       )} */}
     </div>
   );
-};
+});
 
 export default ProjectsMap;

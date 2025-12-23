@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  MutationError,
-  MutationSuccess,
+  type MutationError,
+  type MutationSuccess,
   requestCaretaker,
 } from "@/features/users/services/users.service";
 import type { ICaretakerEntry } from "@/shared/types";

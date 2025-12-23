@@ -7,9 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import {
+import type {
   ColumnDef,
   SortingState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,

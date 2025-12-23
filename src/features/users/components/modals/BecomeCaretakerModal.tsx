@@ -5,15 +5,15 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   becomeCaretaker,
-  MutationError,
-  MutationSuccess,
+  type MutationError,
+  type MutationSuccess,
   removeCaretaker,
 } from "@/features/users/services/users.service";
 import {
-  ICaretakerEntry,
-  ICaretakerObject,
-  ISimpleIdProp,
-  IUserData,
+  type ICaretakerEntry,
+  type ICaretakerObject,
+  type ISimpleIdProp,
+  type IUserData,
 } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { Button } from "@/shared/components/ui/button";

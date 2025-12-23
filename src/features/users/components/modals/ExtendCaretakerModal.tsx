@@ -4,9 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   extendCaretaker,
-  MutationError,
-  MutationSuccess,
-  IExtendCaretakerProps,
+  type MutationError,
+  type MutationSuccess,
+  type IExtendCaretakerProps,
 } from "@/features/users/services/users.service";
 import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";

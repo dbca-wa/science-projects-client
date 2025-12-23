@@ -9,9 +9,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  IProfileUpdateError,
-  IProfileUpdateSuccess,
-  IProfileUpdateVariables,
+  type IProfileUpdateError,
+  type IProfileUpdateSuccess,
+  type IProfileUpdateVariables,
   removeUserAvatar,
   updateProfile,
 } from "@/features/users/services/users.service";

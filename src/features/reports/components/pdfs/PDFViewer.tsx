@@ -1,5 +1,5 @@
 import {
-  IDocGen,
+  type IDocGen,
   cancelAnnualReportPDF,
   generateAnnualReportPDF,
 } from "@/features/reports/services/reports.service";

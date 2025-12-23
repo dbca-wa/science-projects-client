@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 import type { ITaskEndorsement } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { useNavigate } from "react-router-dom";

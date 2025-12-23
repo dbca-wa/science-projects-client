@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  AdminSwitchVar,
-  MutationError,
-  MutationSuccess,
+  type AdminSwitchVar,
+  type MutationError,
+  type MutationSuccess,
   adminSetCaretaker,
   deleteUserAdmin,
   requestCaretaker,

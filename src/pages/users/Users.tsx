@@ -5,7 +5,7 @@ import { Head } from "@/shared/components/layout/base/Head";
 import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
 import { SearchUsers } from "@/features/users/components/SearchUsers";
 import { PaginatorUser } from "@/features/users/components/PaginatorUser";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { type IUserData } from "@/shared/types";
 import { useEffect, useState } from "react";

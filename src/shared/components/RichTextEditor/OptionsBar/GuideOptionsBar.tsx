@@ -1,4 +1,4 @@
-import { GuideSections, saveGuideContentToDB } from "@/features/admin/services/admin.service";
+import { type GuideSections, saveGuideContentToDB } from "@/features/admin/services/admin.service";
 import { useUser } from "@/features/users/hooks/useUser";
 import type { EditorType } from "@/shared/types";
 import { ClearButton } from "../Buttons/ClearButton";

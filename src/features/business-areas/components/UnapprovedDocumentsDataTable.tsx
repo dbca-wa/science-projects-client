@@ -10,9 +10,11 @@ import { Button } from "@/shared/components/ui/button";
 import type { IMainDoc } from "@/shared/types";
 import { useTheme } from "next-themes";
 
-import {
+import type {
   ColumnDef,
   SortingState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,

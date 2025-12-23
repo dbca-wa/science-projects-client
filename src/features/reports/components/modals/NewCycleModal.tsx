@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { INewCycle, openNewCycle } from "@/features/users/services/users.service";
+import { type INewCycle, openNewCycle } from "@/features/users/services/users.service";
 import type { MutationError, MutationSuccess } from "@/shared/services/api";
 import { useLatestReportYear } from "@/features/reports/hooks/useLatestReportYear";
 import { Button } from "@/shared/components/ui/button";

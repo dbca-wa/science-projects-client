@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  AdminSwitchVar,
-  MutationError,
-  MutationSuccess,
+  type AdminSwitchVar,
+  type MutationError,
+  type MutationSuccess,
   switchAdmin,
 } from "@/features/users/services/users.service";
 import { useForm } from "react-hook-form";

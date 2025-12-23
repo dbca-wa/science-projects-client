@@ -1,8 +1,8 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { IProgressReportDisplayData } from "@/shared/components/RichTextEditor/Editors/ARProgressReportHandler";
-import { IStudentReportDisplayData } from "@/shared/components/RichTextEditor/Editors/ARStudentReportHandler";
+import { type IProgressReportDisplayData } from "@/shared/components/RichTextEditor/Editors/ARProgressReportHandler";
+import { type IStudentReportDisplayData } from "@/shared/components/RichTextEditor/Editors/ARStudentReportHandler";
 import {
-  IApproveProgressReport,
+  type IApproveProgressReport,
   approveProgressReport,
 } from "@/features/users/services/users.service";
 import { useColorMode } from "@/shared/utils/theme.utils";

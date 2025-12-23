@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
-import { IDeleteDocument, deleteDocumentCall } from "@/features/documents/services/documents.service";
+import { type IDeleteDocument, deleteDocumentCall } from "@/features/documents/services/documents.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useGetStudentReportAvailableReportYears } from "@/features/reports/hooks/useGetStudentReportAvailableReportYears";

@@ -2,7 +2,7 @@
 
 import { Outlet } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { ModernHeader } from "../../Navigation/ModernHeader";
 import { Sidebar } from "../../Navigation/Sidebar";
 import { ModernPageWrapper } from "../wrappers/ModernPageWrapper";

@@ -17,17 +17,17 @@ import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAre
 import { useDepartmentalServices } from "@/features/admin/hooks/useDepartmentalServices";
 import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
 import {
-  IAffiliation,
-  IBusinessArea,
-  IDepartmentalService,
-  IDivision,
-  IExtendedProjectDetails,
-  IExternalProjectDetails,
-  ISimpleLocationData,
-  ISmallService,
-  IStudentProjectDetails,
-  IUserData,
-  ProjectImage,
+  type IAffiliation,
+  type IBusinessArea,
+  type IDepartmentalService,
+  type IDivision,
+  type IExtendedProjectDetails,
+  type IExternalProjectDetails,
+  type ISimpleLocationData,
+  type ISmallService,
+  type IStudentProjectDetails,
+  type IUserData,
+  type ProjectImage,
 } from "@/shared/types";
 import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
@@ -36,7 +36,7 @@ import { AreaCheckAndMaps } from "@/features/projects/components/forms/AreaCheck
 import { StartAndEndDateSelector } from "@/features/projects/components/forms/StartAndEndDateSelector";
 import TagInput from "@/features/projects/components/forms/TagInput";
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
 import { cn } from "@/shared/utils";
 

@@ -11,7 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { downloadProjectsCSV, downloadProjectsCSVAR } from "@/features/projects/services/projects.service";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, type AxiosResponse } from "axios";
 
 export const DownloadProjectsCSVButton = () => {
   const { theme } = useTheme();

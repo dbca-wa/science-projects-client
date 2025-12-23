@@ -10,7 +10,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { toast } from "sonner";
-import { IDeleteComment, deleteCommentCall } from "@/features/documents/services/documents.service";
+import { type IDeleteComment, deleteCommentCall } from "@/features/documents/services/documents.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 

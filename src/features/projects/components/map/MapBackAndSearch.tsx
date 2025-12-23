@@ -1,4 +1,4 @@
-import { MapSearchFilters } from "@/features/projects/hooks/ProjectMapSearchContext";
+import { type MapSearchFilters } from "@/app/stores/projectMapSearch.store";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types";
 import L from "leaflet";

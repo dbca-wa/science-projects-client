@@ -10,11 +10,13 @@ import type { IMiniEndorsement } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { Button } from "@/shared/components/ui/button";
 
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
-import {
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
+import type {
   ColumnDef,
   SortingState,
   VisibilityState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,

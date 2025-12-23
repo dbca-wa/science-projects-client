@@ -3,7 +3,7 @@
 import { Head } from "@/shared/components/layout/base/Head";
 import { getAllBranches, getAllBusinessAreas } from "@/features/admin/services/admin.service";
 import {
-  UserData,
+  type UserData,
   createUser,
   getDoesUserWithEmailExist,
   getDoesUserWithFullNameExist,

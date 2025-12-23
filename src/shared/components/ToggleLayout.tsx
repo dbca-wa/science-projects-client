@@ -1,10 +1,10 @@
 // Component for changing the layout between modern and traditional
 
-import { useTheme } from "next-themes";
+import { useUIStore } from "@/app/providers/store.provider";
+import { observer } from "mobx-react-lite";
 import { AnimatePresence, motion } from "framer-motion";
 import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { cn } from "@/shared/utils";
 
 interface IOptionalToggleLayoutProps {
@@ -12,15 +12,15 @@ interface IOptionalToggleLayoutProps {
   asMenuItem?: boolean;
 }
 
-export const ToggleLayout = ({
+export const ToggleLayout = observer(({
   showText,
   asMenuItem,
 }: IOptionalToggleLayoutProps) => {
   const { manuallyCheckAndToggleDialog } = useEditorContext();
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const uiStore = useUIStore();
+  const isDark = uiStore.resolvedTheme === "dark";
 
-  const { layout, switchLayout } = useLayoutSwitcher();
+  const { layout, switchLayout } = uiStore;
   const iconColor = isDark ? "text-gray-300" : "text-gray-400";
   
   const layouts = {
@@ -90,4 +90,4 @@ export const ToggleLayout = ({
       </motion.div>
     </AnimatePresence>
   );
-};
+});

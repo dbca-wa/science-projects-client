@@ -2,11 +2,11 @@
 
 import { Button } from "@/shared/components/ui/button";
 import { useColorMode } from "@/shared/utils/theme.utils";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 import { Loader2 } from "lucide-react";
 
 import "@/styles/texteditor.css";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 
 interface BaseOptionsButtonProps {
   colorScheme?: string;

@@ -10,11 +10,13 @@ import { Button } from "@/shared/components/ui/button";
 import type { IProjectData } from "@/shared/types";
 import { useTheme } from "next-themes";
 
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
-import {
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
+import type {
   ColumnDef,
   SortingState,
   VisibilityState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,

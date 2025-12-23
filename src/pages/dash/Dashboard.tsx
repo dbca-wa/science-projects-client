@@ -3,7 +3,7 @@
 import { Head } from "@/shared/components/layout/base/Head";
 import { ModernDashboard } from "@/features/dashboard/components/ModernDashboard";
 import { TraditionalDashboard } from "@/features/dashboard/components/TraditionalDashboard";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { type IDashProps } from "@/shared/types";
 
 export const Dashboard = ({ activeTab }: IDashProps) => {

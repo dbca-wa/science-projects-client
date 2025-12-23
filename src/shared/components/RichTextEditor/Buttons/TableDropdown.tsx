@@ -9,7 +9,7 @@ import {
   $getSelection,
   INSERT_LINE_BREAK_COMMAND,
   INSERT_PARAGRAPH_COMMAND,
-  LexicalEditor,
+  type LexicalEditor,
 } from "lexical";
 import { cn } from "@/shared/utils";
 

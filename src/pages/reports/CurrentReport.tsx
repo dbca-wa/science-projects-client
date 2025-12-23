@@ -7,7 +7,7 @@ import { AnnualReportDetails } from "@/features/reports/components/current/Annua
 import { AnnualReportMedia } from "@/features/reports/components/current/AnnualReportMedia";
 import { LatestReportsNotYetApproved } from "@/features/reports/components/current/LatestReportsNotYetApproved";
 import { ParticipatingProjectReports } from "@/features/reports/components/current/ParticipatingProjectReports";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { getLatestReportingYear } from "@/features/admin/services/admin.service";
 import type { IReport } from "@/shared/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";

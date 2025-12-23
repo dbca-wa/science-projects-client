@@ -4,8 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
-  MutationError,
-  PRPopulationVar,
+  type MutationError,
+  type PRPopulationVar,
   getPreviousDataForProgressReportPopulation,
 } from "@/features/users/services/users.service";
 import { Button } from "@/shared/components/ui/button";

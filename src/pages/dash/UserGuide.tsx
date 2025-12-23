@@ -3,7 +3,7 @@ import { SideMenuButton } from "@/features/users/components/account/SideMenuButt
 import { SideMenuSectionDivider } from "@/features/dashboard/components/guide/SidebarSectionDivider";
 import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
 import { AccountPageViewWrapper } from "@/shared/components/layout/wrappers/AccountPageViewWrapper";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { useAdminOptions } from "@/features/admin/hooks/useAdminOptions";
 import { useUser } from "@/features/users/hooks/useUser";
 import { useTheme } from "next-themes";

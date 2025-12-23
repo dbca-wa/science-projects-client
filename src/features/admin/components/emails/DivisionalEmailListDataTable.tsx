@@ -7,15 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import {
+import type {
   ColumnDef,
   SortingState,
   VisibilityState,
+  ColumnFiltersState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-  ColumnFiltersState,
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/shared/components/ui/input";
@@ -29,7 +31,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { useColorMode } from "@/shared/utils/theme.utils";
 
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import {

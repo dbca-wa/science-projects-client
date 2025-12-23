@@ -25,8 +25,8 @@ import {
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
-  LexicalEditor,
-  NodeKey,
+  type LexicalEditor,
+  type NodeKey,
   REDO_COMMAND,
   UNDO_COMMAND,
 } from "lexical";

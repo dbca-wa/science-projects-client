@@ -21,8 +21,8 @@ import { HeadingNode } from "@lexical/rich-text";
 // Design, React & Other ====================================================================
 
 import { Label } from "@/shared/components/ui/label";
-import { TextareaProps } from "@/shared/components/ui/textarea";
-import { ControllerRenderProps, Path, UseFormRegister } from "react-hook-form";
+import { type TextareaProps } from "@/shared/components/ui/textarea";
+import type { ControllerRenderProps, Path, UseFormRegister } from "react-hook-form";
 import { DatabaseRichTextToolbar } from "./DatabaseRichTextToolbar";
 
 // CSS ======================================================================================

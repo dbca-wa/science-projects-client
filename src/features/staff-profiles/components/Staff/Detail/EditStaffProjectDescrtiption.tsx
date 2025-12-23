@@ -26,7 +26,7 @@ import {
   type IUpdateProjectDescription,
   updateProjectDescription,
 } from "@/features/projects/services/projects.service";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 
 interface IEditDescriptionProps {
   projectId: number;

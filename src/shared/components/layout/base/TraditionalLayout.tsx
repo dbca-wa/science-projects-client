@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useTheme } from "next-themes";
 import dayImage from "@/assets/80mile.jpg";
 import nightImage from "@/assets/night.webp";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import OldHeader from "../../Navigation/OldHeader";
 import { TraditionalPageWrapper } from "../wrappers/TraditionalPageWrapper";
 import { Footer } from "./Footer";

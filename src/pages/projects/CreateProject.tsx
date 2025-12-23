@@ -3,7 +3,7 @@
 import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
 import { Head } from "@/shared/components/layout/base/Head";
 import { NewProjectCard } from "@/features/projects/components/forms/NewProjectCard";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { Button } from "@/shared/components/ui/button";
 import { useTheme } from "next-themes";
 import { AnimatePresence, motion } from "framer-motion";

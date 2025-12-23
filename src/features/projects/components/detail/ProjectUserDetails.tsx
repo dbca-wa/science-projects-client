@@ -16,7 +16,7 @@ import { FiCopy } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/shared/utils";
 import {
-  RemoveUserMutationType,
+  type RemoveUserMutationType,
   promoteUserToLeader,
   removeTeamMemberFromProject,
   updateProjectMember,

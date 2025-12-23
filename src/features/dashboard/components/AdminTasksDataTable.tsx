@@ -12,9 +12,11 @@ import type { IAdminTask } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { Button } from "@/shared/components/ui/button";
 
-import {
+import type {
   ColumnDef,
   SortingState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,

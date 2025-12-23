@@ -6,7 +6,7 @@ import { Separator } from "@/shared/components/ui/separator";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { useNavigate } from "react-router-dom";
 import { HiDocumentCheck } from "react-icons/hi2";
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 
 interface IProps {
   inputKind:

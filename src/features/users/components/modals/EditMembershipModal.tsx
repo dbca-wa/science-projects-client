@@ -10,9 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  IMembershipUpdateVariables,
-  IProfileUpdateSuccess,
-  MutationError,
+  type IMembershipUpdateVariables,
+  type IProfileUpdateSuccess,
+  type MutationError,
   updateMembership,
 } from "@/features/users/services/users.service";
 import { useForm } from "react-hook-form";

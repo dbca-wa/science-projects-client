@@ -1,15 +1,13 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 import {
-  ISaveProgressReportSection,
+  type ISaveProgressReportSection,
   updateProgressReportSection,
 } from "@/features/reports/services/reports.service";
 import type { IProjectData, IProjectMember } from "@/shared/types";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import {
-  InitialConfigType,
-  LexicalComposer,
-} from "@lexical/react/LexicalComposer";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";

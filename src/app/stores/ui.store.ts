@@ -8,6 +8,9 @@ type Loader = "cook" | "base" | "minimal";
 type ContentWidth = "sm" | "md" | "lg" | "xl" | "2xl" | "full";
 type ItemsPerPage = 10 | 25 | 50 | 100;
 
+// Export Layout type for use by other components
+export type Layout = "modern" | "traditional";
+
 interface UIStoreState extends BaseStoreState {
   theme: Theme;
   sidebarOpen: boolean;
@@ -18,6 +21,8 @@ interface UIStoreState extends BaseStoreState {
   // Mobile responsive state
   mobileSidebarOpen: boolean; // Mobile sidebar overlay state
   // Layout preferences
+  layout: Layout; // Main layout mode (modern/traditional)
+  layoutLoading: boolean; // Loading state for layout switching
   defaultContentWidth: ContentWidth; // Default content width preference
   // Pagination preferences
   itemsPerPage: ItemsPerPage; // Global pagination preference
@@ -27,6 +32,7 @@ export class UIStore extends BaseStore<UIStoreState> {
   private storageKey: string = "cannabis-theme";
   private loaderStorageKey: string = "cannabis-loader";
   private itemsPerPageStorageKey: string = "cannabis-items-per-page";
+  private layoutStorageKey: string = "layout"; // Keep same key as LayoutSwitcherContext
 
   // Content width class mappings
   private readonly maxWidthClasses = {
@@ -52,6 +58,8 @@ export class UIStore extends BaseStore<UIStoreState> {
       // Mobile responsive state
       mobileSidebarOpen: false,
       // Layout preferences
+      layout: "traditional", // Default to traditional layout
+      layoutLoading: false,
       defaultContentWidth: "lg", // Default to large width
       // Pagination preferences
       itemsPerPage: 25, // Match backend default
@@ -136,15 +144,18 @@ export class UIStore extends BaseStore<UIStoreState> {
       const storedItemsPerPage = storage.getItem<ItemsPerPage>(
         this.itemsPerPageStorageKey,
       );
+      const storedLayout = storage.getItem<Layout>(this.layoutStorageKey);
 
       logger.info("🔍 initFromStorage called", {
         storedTheme,
         storedLoader,
         storedItemsPerPage,
+        storedLayout,
         lastSyncTimestamp: this.state.lastSyncTimestamp,
         currentTheme: this.state.theme,
         currentLoader: this.state.selectedLoader,
         currentItemsPerPage: this.state.itemsPerPage,
+        currentLayout: this.state.layout,
       });
 
       // Don't override server preferences if we have recent server data
@@ -188,10 +199,20 @@ export class UIStore extends BaseStore<UIStoreState> {
         });
       }
 
+      if (storedLayout && ["modern", "traditional"].includes(storedLayout)) {
+        runInAction(() => {
+          this.state.layout = storedLayout;
+        });
+        logger.info("🎨 Layout loaded from localStorage", {
+          layout: storedLayout,
+        });
+      }
+
       logger.info("UI store initialized from localStorage", {
         finalTheme: this.state.theme,
         finalLoader: this.state.selectedLoader,
         finalItemsPerPage: this.state.itemsPerPage,
+        finalLayout: this.state.layout,
       });
     } catch (error) {
       logger.error("Failed to initialise UI state from storage", {
@@ -337,6 +358,42 @@ export class UIStore extends BaseStore<UIStoreState> {
     this.setMobileSidebarOpen(!this.state.mobileSidebarOpen);
   };
 
+  // Layout management
+  setLayout = (layout: Layout) => {
+    runInAction(() => {
+      this.state.layout = layout;
+    });
+
+    // Always update localStorage
+    storage.setItem(this.layoutStorageKey, layout);
+
+    logger.info("Layout changed", { layout });
+  };
+
+  setLayoutLoading = (loading: boolean) => {
+    runInAction(() => {
+      this.state.layoutLoading = loading;
+    });
+  };
+
+  switchLayout = () => {
+    this.setLayoutLoading(true);
+    
+    // Switch to opposite layout
+    const newLayout = this.state.layout === "modern" ? "traditional" : "modern";
+    this.setLayout(newLayout);
+
+    // Simulate loading delay like original context
+    setTimeout(() => {
+      this.setLayoutLoading(false);
+    }, 200);
+
+    logger.info("Layout switched", { 
+      from: this.state.layout === "modern" ? "traditional" : "modern",
+      to: newLayout 
+    });
+  };
+
   // Content width management
   setDefaultContentWidth = async (
     width: ContentWidth,
@@ -471,6 +528,14 @@ export class UIStore extends BaseStore<UIStoreState> {
     return this.state.itemsPerPage;
   }
 
+  get layout() {
+    return this.state.layout;
+  }
+
+  get layoutLoading() {
+    return this.state.layoutLoading;
+  }
+
   getMaxWidthClass = (width?: ContentWidth): string => {
     const targetWidth = width || this.state.defaultContentWidth;
     return this.maxWidthClasses[targetWidth];
@@ -498,6 +563,7 @@ export class UIStore extends BaseStore<UIStoreState> {
       storage.removeItem(this.storageKey);
       storage.removeItem(this.loaderStorageKey);
       storage.removeItem(this.itemsPerPageStorageKey);
+      storage.removeItem(this.layoutStorageKey);
 
       // Clear sync service localStorage items
       storage.removeItem("preferences-migrated-to-server");
@@ -524,6 +590,8 @@ export class UIStore extends BaseStore<UIStoreState> {
       // Reset mobile state
       this.state.mobileSidebarOpen = false;
       // Reset layout preferences
+      this.state.layout = "traditional";
+      this.state.layoutLoading = false;
       this.state.defaultContentWidth = "lg";
       // Reset pagination preferences
       this.state.itemsPerPage = 25;

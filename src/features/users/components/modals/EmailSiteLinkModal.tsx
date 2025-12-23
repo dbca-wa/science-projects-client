@@ -1,6 +1,6 @@
 import { getDoesUserWithEmailExist } from "@/features/users/services/users.service";
 import {
-  IEmailRecipientsString,
+  type IEmailRecipientsString,
   sendSPMSLinkEmail,
 } from "@/features/documents/services/documents.service";
 import { useUser } from "@/features/users/hooks/useUser";

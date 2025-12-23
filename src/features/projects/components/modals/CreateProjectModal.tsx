@@ -3,23 +3,23 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
-import { IconType } from "react-icons";
+import { type IconType } from "react-icons";
 import { ProjectDetailsSection } from "@/features/projects/components/forms/ProjectDetailsSection";
 import { ProjectLocationSection } from "@/features/projects/components/forms/ProjectLocationSection";
 import { ProjectBaseInformation } from "@/features/projects/components/forms/ProjectBaseInformation";
 import "@/styles/modalscrollbar.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  ICreateProjectBaseInfo,
-  ICreateProjectDetails,
-  ICreateProjectExternalDetails,
-  ICreateProjectStudentDetails,
-  IProjectCreationVariables,
+  type ICreateProjectBaseInfo,
+  type ICreateProjectDetails,
+  type ICreateProjectExternalDetails,
+  type ICreateProjectStudentDetails,
+  type IProjectCreationVariables,
   createProject,
 } from "@/features/projects/services/projects.service";
 import {
-  MutationError,
-  ProjectCreationMutationSuccess,
+  type MutationError,
+  type ProjectCreationMutationSuccess,
 } from "@/features/users/services/users.service";
 import { useNavigate } from "react-router-dom";
 import { ProjectExternalSection } from "@/features/projects/components/forms/ProjectExternalSection";
