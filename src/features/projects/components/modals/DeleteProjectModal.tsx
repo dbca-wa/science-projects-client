@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { ISimplePkProp } from "@/shared/types";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   projectPk: string | number;

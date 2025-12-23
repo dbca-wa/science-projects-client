@@ -14,7 +14,7 @@ import { useUser } from "@/features/users/hooks/useUser";
 import type { IMidDoc } from "@/shared/types";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IProjectDocumentDropdown {
   selectedProject: boolean;

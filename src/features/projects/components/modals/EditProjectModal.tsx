@@ -38,7 +38,7 @@ import TagInput from "@/features/projects/components/forms/TagInput";
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 
 interface Props {
   projectPk: string | number;

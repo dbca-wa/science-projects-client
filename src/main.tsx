@@ -19,7 +19,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
 import { LayoutSwitcherProvider } from "@/shared/hooks/LayoutSwitcherContext";
 import { ProjectSearchProvider } from "@/features/projects/hooks/ProjectSearchContext";
-import { UserSearchProvider } from "@/features/users/hooks/UserSearchContext";
 import { router } from "@/app/router";
 import { ProjectMapSearchProvider } from "@/features/projects/hooks/ProjectMapSearchContext";
 import { ThemeProvider } from "@/shared/providers/ThemeProvider";
@@ -52,19 +51,17 @@ root.render(
       disableTransitionOnChange
     >
       <LayoutSwitcherProvider>
-        <UserSearchProvider>
-          <ProjectSearchProvider>
-            <ProjectMapSearchProvider>
-              <RouterProvider
-                router={router}
-                // future={{
-                //   v7_startTransition: true,
-                //   v7_fetcherPersist: true,
-                // }}
-              />
-            </ProjectMapSearchProvider>
-          </ProjectSearchProvider>
-        </UserSearchProvider>
+        <ProjectSearchProvider>
+          <ProjectMapSearchProvider>
+            <RouterProvider
+              router={router}
+              // future={{
+              //   v7_startTransition: true,
+              //   v7_fetcherPersist: true,
+              // }}
+            />
+          </ProjectMapSearchProvider>
+        </ProjectSearchProvider>
       </LayoutSwitcherProvider>
     </ThemeProvider>
   </QueryClientProvider>,

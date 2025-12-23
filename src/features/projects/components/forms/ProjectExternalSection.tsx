@@ -5,7 +5,7 @@ import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editor
 import type { IAffiliation } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 // import { ICreateProjectExternalDetails } from "@/shared/lib/api";

@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form";
 import { BsStars } from "react-icons/bs";
 import { FaFileDownload } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IPDFSectionProps {
   data_document:

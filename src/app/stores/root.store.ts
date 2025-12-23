@@ -1,13 +1,14 @@
-import { apiClient } from "@/shared/services/api";
 import { logger } from "@/shared/services/logger.service";
-import { getErrorMessage } from "@/shared/utils";
+import { getErrorMessage } from "@/shared/utils/error.utils";
 import { makeObservable, observable } from "mobx";
 import { AuthStore } from "./auth.store";
 import { UIStore } from "./ui.store";
+import { UserSearchStore } from "./userSearch.store";
 
 export class RootStore {
   authStore: AuthStore;
   uiStore: UIStore;
+  userSearchStore: UserSearchStore;
 
   // System state
   isInitialised = false;
@@ -17,6 +18,7 @@ export class RootStore {
   constructor() {
     this.authStore = new AuthStore();
     this.uiStore = new UIStore();
+    this.userSearchStore = new UserSearchStore();
 
     // isInitialised observable
     makeObservable(this, {
@@ -25,17 +27,11 @@ export class RootStore {
 
     // set up logger access to stores
     this.setupLogger();
-    this.setupApiClient();
     this.setupEventListeners();
   }
 
   private setupLogger() {
     logger.info("Logger configured");
-  }
-
-  private setupApiClient() {
-    apiClient.setUnauthorizedHandler(() => this.handleUnauthorized());
-    logger.info("API client configured with unauthorized handler");
   }
 
   private setupEventListeners() {
@@ -65,6 +61,7 @@ export class RootStore {
       await Promise.all([
         this.authStore.initialise(),
         this.uiStore.initialise?.() || Promise.resolve(),
+        this.userSearchStore.initialise?.() || Promise.resolve(),
       ]);
 
       this.isInitialised = true;
@@ -113,7 +110,11 @@ export class RootStore {
       }
 
       // Graceful shutdown of stores
-      await Promise.all([this.authStore.dispose?.(), this.uiStore.dispose?.()]);
+      await Promise.all([
+        this.authStore.dispose?.(), 
+        this.uiStore.dispose?.(),
+        this.userSearchStore.dispose?.()
+      ]);
 
       this.isInitialised = false;
       this.initialisationPromise = null;
@@ -129,3 +130,9 @@ export class RootStore {
 
 // Create and export singleton instance
 export const rootStore = new RootStore();
+
+// Convenience hooks for accessing stores
+export const useStore = () => rootStore;
+export const useAuthStore = () => rootStore.authStore;
+export const useUIStore = () => rootStore.uiStore;
+export const useUserSearchStore = () => rootStore.userSearchStore;

@@ -8,7 +8,7 @@ import { useColorMode } from "@/shared/utils/theme.utils";
 import { Separator } from "@/shared/components/ui/separator";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 import { Loader2 } from "lucide-react";
 
 export interface IDocumentComment {

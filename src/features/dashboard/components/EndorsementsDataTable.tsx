@@ -294,9 +294,7 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
             <TableRow>
               {/* pendingEndorsementsData?.aec?.length >= 1 */}
               <TableCell colSpan={columns?.length} className="h-24 text-center">
-                {/* <Text mt={4} mx={2}> */}
                 No Endorsements Required From You!
-                {/* </Text> */}
               </TableCell>
             </TableRow>
           )}

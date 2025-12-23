@@ -697,13 +697,8 @@ export const ProjectOverviewCard = ({
                   htmlContent={`${baseInformation.title}`}
                   color={"#62a0f2"}
                   fontWeight={"bold"}
-                  userSelect={"text"}
-                  mb={"8px"}
                   fontSize={"22px"}
-                  cursor={"pointer"}
-                  _hover={{
-                    textDecoration: "underline",
-                  }}
+                  className="mb-2 cursor-pointer select-text hover:underline"
                   draggable={false}
                   onDragStart={(e) => e.preventDefault()}
                 />

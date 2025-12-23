@@ -9,12 +9,13 @@ import {
   type ChangeEvent,
 } from "react";
 import { FiSearch } from "react-icons/fi";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { useTheme } from "next-themes";
 import { Input } from "@/shared/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { observer } from "mobx-react-lite";
 
-export const SearchUsers = () => {
+export const SearchUsers = observer(() => {
   const {
     setSearchTerm,
     setIsOnUserPage,
@@ -148,4 +149,4 @@ export const SearchUsers = () => {
       </div>
     </div>
   );
-};
+});

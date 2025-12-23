@@ -17,7 +17,6 @@ import {
 } from "@tanstack/react-table";
 
 import { useColorMode } from "@/shared/utils/theme.utils";
-import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import {
@@ -38,7 +37,7 @@ import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveC
 import { ChevronDown } from "lucide-react";
 import { BsArrow90DegDown, BsArrow90DegRight } from "react-icons/bs";
 import clsx from "clsx";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface CaretakerTableData extends ICaretakerSimpleUserData {
   type: "direct" | "indirect";

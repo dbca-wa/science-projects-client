@@ -9,7 +9,7 @@ import { type ICloseProjectProps, closeProjectCall } from "@/features/projects/s
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   projectKind: string;

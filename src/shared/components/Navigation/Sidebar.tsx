@@ -22,7 +22,7 @@ import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 const buttonWidthVariants = {
   open: {

@@ -20,7 +20,7 @@ import { CreateProgressReportModal } from "@/features/reports/components/modals/
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 import { Loader2 } from "lucide-react";
 
 interface Props extends ICaretakerPermissions {

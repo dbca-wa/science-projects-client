@@ -20,7 +20,7 @@ import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IProfile } from "@/shared/types";
 import { StatefulMediaChangerAvatar } from "@/features/admin/components/StatefulMediaChangerAvatar";
 import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IEditProfileModalProps {
   isOpen: boolean;

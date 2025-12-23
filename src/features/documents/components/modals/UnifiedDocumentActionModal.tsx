@@ -17,7 +17,7 @@ import {
 import { handleDocumentAction } from "@/features/documents/services/documents.service";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import EmailFeedbackRTE from "./EmailFeedbackRTE";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 
 export type DocumentType =
   | "concept"

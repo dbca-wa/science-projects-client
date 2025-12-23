@@ -6,7 +6,6 @@ import { useColorMode } from "@/shared/utils/theme.utils";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
-import { type FC, type ReactNode } from "react";
 
 const CaretakerUserDisplay = ({
   caretakerObject,
@@ -23,6 +22,9 @@ const CaretakerUserDisplay = ({
 
   const [removeModalIsOpen, setRemoveModalIsOpen] = useState(false);
 
+  const onRemoveModalClose = () => setRemoveModalIsOpen(false);
+  const onOpenRemoveModal = () => setRemoveModalIsOpen(true);
+
   console.log(caretakerObject);
   const caretakee = caretakerObject.user as ICaretakerSimpleUserData;
 
@@ -35,41 +37,41 @@ const CaretakerUserDisplay = ({
         caretakerObject={caretakerObject}
       />
 
-      <Flex
-        className="items-center justify-between gap-4 py-2"
+      <div
+        className="flex items-center justify-between gap-4 py-2"
         key={caretakee.email}
       >
-        <Flex className="items-center gap-4">
-          <Avatar
-            size="md"
-            name={`${caretakee.display_first_name} ${caretakee.display_last_name}`}
-            src={
-              caretakee.image
-                ? caretakee.image?.startsWith("http")
-                  ? `${caretakee.image}`
-                  : `${baseAPI}${caretakee.image}`
-                : noImage
-            }
-          />
-          <Text
-            fontSize={"md"}
-            fontWeight={"semibold"}
-            color={colorMode === "light" ? "gray.800" : "gray.200"}
-          >
+        <div className="flex items-center gap-4">
+          <Avatar className="h-10 w-10">
+            <AvatarImage
+              src={
+                caretakee.image
+                  ? caretakee.image?.startsWith("http")
+                    ? `${caretakee.image}`
+                    : `${baseAPI}${caretakee.image}`
+                  : noImage
+              }
+              alt={`${caretakee.display_first_name} ${caretakee.display_last_name}`}
+            />
+            <AvatarFallback>
+              {caretakee.display_first_name?.[0]}{caretakee.display_last_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+          <p className={`text-base font-semibold ${colorMode === "light" ? "text-gray-800" : "text-gray-200"}`}>
             {caretakee.display_first_name} {caretakee.display_last_name}
-          </Text>
-        </Flex>
+          </p>
+        </div>
         <Button
           onClick={onOpenRemoveModal}
-          color={"white"}
-          background={colorMode === "light" ? "red.500" : "red.600"}
-          _hover={{
-            background: colorMode === "light" ? "red.400" : "red.500",
-          }}
+          className={`text-white ${
+            colorMode === "light" 
+              ? "bg-red-500 hover:bg-red-400" 
+              : "bg-red-600 hover:bg-red-500"
+          }`}
         >
           Remove
         </Button>
-      </Flex>
+      </div>
     </>
   );
 };

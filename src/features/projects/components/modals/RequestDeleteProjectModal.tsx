@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import type { IMakeRequestToAdmins } from "@/shared/types";
 import { AxiosError } from "axios";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   projectPk: string | number;

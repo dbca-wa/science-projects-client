@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { FaBiohazard } from "react-icons/fa";
 import { FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IProps {
   endorsement: ITaskEndorsement;

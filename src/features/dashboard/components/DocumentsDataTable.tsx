@@ -214,16 +214,13 @@ export const DocumentsDataTable = ({
       return (
         <Button
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="w-full text-center"
-          rightIcon={sortIcon}
-          bg={"transparent"}
-          _hover={
+          className={`w-full text-center bg-transparent ${
             colorMode === "dark"
-              ? { bg: "blue.400", color: "white" }
-              : { bg: "blue.50", color: "black" }
-          }
+              ? "hover:bg-blue-400 hover:text-white"
+              : "hover:bg-blue-50 hover:text-black"
+          }`}
         >
-          User
+          User {sortIcon}
         </Button>
       );
     },
@@ -305,20 +302,14 @@ export const DocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
-            Level
+            Level {sortIcon}
           </Button>
         );
       },
@@ -363,20 +354,14 @@ export const DocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
-            Kind
+            Kind {sortIcon}
           </Button>
         );
       },
@@ -412,21 +397,14 @@ export const DocumentsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
+            className={`w-full text-left justify-start bg-transparent ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
-            Title
+            Title {sortIcon}
           </Button>
         );
       },
@@ -629,9 +607,7 @@ export const DocumentsDataTable = ({
           ) : (
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
-                {/* <Text mt={4} mx={2}> */}
                 All done!
-                {/* </Text> */}
               </TableCell>
             </TableRow>
           )}

@@ -21,7 +21,7 @@ import {
   MutationSuccess,
   deleteUserAdmin,
 } from "@/features/users/services/users.service";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 
 interface IModalProps {
   isOpen: boolean;

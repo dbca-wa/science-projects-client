@@ -6,6 +6,7 @@ import { Button } from "@/shared/components/ui/button";
 import { type AxiosError, type AxiosResponse } from "axios";
 import { type FC } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import React from "react";
 
 interface IWrapper {
   children: React.ReactElement;
@@ -39,7 +40,10 @@ export const EmailPreviewWrapper: React.FC<EmailPreviewWrapperProps> = ({
 }) => {
   const [htmlString, setHtmlString] = React.useState<string>("");
   const { colorMode } = useColorMode();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
 
   React.useEffect(() => {
     try {
@@ -58,60 +62,52 @@ export const EmailPreviewWrapper: React.FC<EmailPreviewWrapperProps> = ({
         thisUser={thisUser}
       />
 
-      <Box
-        alignItems="center"
-        justifyContent="center"
-        w="100%"
-        alignContent="center"
-        border="1px solid"
-        borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-        rounded="xl"
-        pos="relative"
-        overflow="hidden"
+      <div
+        className={`
+          flex flex-col items-center justify-center w-full relative overflow-hidden
+          border rounded-xl
+          ${colorMode === "light" ? "border-gray-300" : "border-gray-500"}
+        `}
       >
-        <Box
-          bg={colorMode === "light" ? "gray.50" : "gray.800"}
-          py={2}
-          justifyContent="center"
-          w="100%"
-          borderBottom="1px solid"
-          borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-          roundedTop="xl"
-          textAlign="center"
+        <div
+          className={`
+            w-full py-2 flex justify-center text-center rounded-t-xl border-b
+            ${colorMode === "light" 
+              ? "bg-gray-50 border-gray-300" 
+              : "bg-gray-800 border-gray-500"
+            }
+          `}
         >
-          <Text fontWeight="bold" color="blue.500">
+          <p className="font-bold text-blue-500">
             {title}
-          </Text>
-        </Box>
+          </p>
+        </div>
 
         <div
           className="email-preview"
           dangerouslySetInnerHTML={{ __html: htmlString }}
         />
 
-        <Flex
-          justifyContent="flex-end"
-          mt={-10}
-          bg={colorMode === "light" ? "gray.200" : "gray.800"}
-          py={4}
-          px={6}
-          border="1px solid"
-          borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-          rounded="xl"
-          roundedTop={0}
+        <div
+          className={`
+            flex justify-end -mt-10 py-4 px-6 w-full rounded-xl rounded-t-none border
+            ${colorMode === "light" 
+              ? "bg-gray-200 border-gray-300" 
+              : "bg-gray-800 border-gray-500"
+            }
+          `}
         >
           <Button
-            bg={colorMode === "light" ? "blue.500" : "blue.500"}
-            color="white"
-            _hover={{
-              bg: "blue.400",
-            }}
             onClick={onOpen}
+            className={`
+              text-white hover:bg-blue-400
+              ${colorMode === "light" ? "bg-blue-500" : "bg-blue-500"}
+            `}
           >
             Send Test Email
           </Button>
-        </Flex>
-      </Box>
+        </div>
+      </div>
     </>
   );
 };
