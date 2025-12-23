@@ -28,7 +28,7 @@ import { TeamMemberDisplay } from "./TeamMemberDisplay";
 import { useBranches } from "@/features/admin/hooks/useBranches";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import { SortableTeamMember } from "./SortableTeamMember";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props extends ICaretakerPermissions {
   project_id: number;

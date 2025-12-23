@@ -68,13 +68,9 @@ export class UIStore extends BaseStore<UIStoreState> {
     // Sync to server if user is authenticated
     if (syncToServer && this.isUserAuthenticated()) {
       try {
-        // Import dynamically to avoid circular dependencies
-        const { UserPreferencesService } = await import(
-          "@/features/user/services/userPreferences.service"
-        );
-        await UserPreferencesService.updateUIPreferences({
-          dataViewMode: newMode,
-          sidebarCollapsed: this.state.sidebarCollapsed,
+        // TODO: Implement user preferences sync when backend supports it
+        logger.info("User preferences sync not implemented yet", {
+          mode: newMode,
         });
 
         runInAction(() => {
@@ -109,17 +105,9 @@ export class UIStore extends BaseStore<UIStoreState> {
         // If user is authenticated, try to load server preferences first
         if (this.isUserAuthenticated()) {
           try {
-            const { PreferencesSyncService } = await import(
-              "@/shared/services/preferencesSync.service"
-            );
-            const serverPreferences =
-              await PreferencesSyncService.loadPreferencesOnLogin();
-
-            if (serverPreferences) {
-              this.loadFromServerPreferences(serverPreferences);
-            } else {
-              this.initFromStorage();
-            }
+            // TODO: Implement preferences sync when backend supports it
+            logger.info("Server preferences sync not implemented yet");
+            this.initFromStorage();
           } catch (error) {
             logger.error("Failed to load server preferences", { error });
             this.initFromStorage();
@@ -309,13 +297,9 @@ export class UIStore extends BaseStore<UIStoreState> {
     // Sync to server if user is authenticated
     if (syncToServer && this.isUserAuthenticated()) {
       try {
-        // Import dynamically to avoid circular dependencies
-        const { UserPreferencesService } = await import(
-          "@/features/user/services/userPreferences.service"
-        );
-        await UserPreferencesService.updateUIPreferences({
-          dataViewMode: this.state.dataViewMode,
-          sidebarCollapsed: collapsed,
+        // TODO: Implement user preferences sync when backend supports it
+        logger.info("User preferences sync not implemented yet", {
+          collapsed,
         });
 
         runInAction(() => {
@@ -365,14 +349,9 @@ export class UIStore extends BaseStore<UIStoreState> {
     // Sync to server if user is authenticated
     if (syncToServer && this.isUserAuthenticated()) {
       try {
-        // Import dynamically to avoid circular dependencies
-        const { UserPreferencesService } = await import(
-          "@/features/user/services/userPreferences.service"
-        );
-        await UserPreferencesService.updateUIPreferences({
-          dataViewMode: this.state.dataViewMode,
-          sidebarCollapsed: this.state.sidebarCollapsed,
-          defaultContentWidth: width,
+        // TODO: Implement user preferences sync when backend supports it
+        logger.info("User preferences sync not implemented yet", {
+          width,
         });
 
         runInAction(() => {
@@ -419,12 +398,9 @@ export class UIStore extends BaseStore<UIStoreState> {
     // Sync to server if user is authenticated
     if (syncToServer && this.isUserAuthenticated()) {
       try {
-        // Import dynamically to avoid circular dependencies
-        const { UserPreferencesService } = await import(
-          "@/features/user/services/userPreferences.service"
-        );
-        await UserPreferencesService.updatePreferences({
-          items_per_page: itemsPerPage,
+        // TODO: Implement user preferences sync when backend supports it
+        logger.info("User preferences sync not implemented yet", {
+          itemsPerPage,
         });
 
         runInAction(() => {
@@ -561,112 +537,38 @@ export class UIStore extends BaseStore<UIStoreState> {
 
   /**
    * Load preferences from server data (called after successful server fetch)
+   * TODO: Implement when backend supports user preferences
    */
-  loadFromServerPreferences = (preferences: UserPreferences) => {
-    try {
-      logger.info("Loading preferences from server", {
-        theme: preferences.theme,
-        loader: preferences.loader_style,
-        currentTheme: this.state.theme,
-        currentLoader: this.state.selectedLoader,
-      });
-
-      // First, update localStorage to prevent any race conditions
-      storage.setItem(this.storageKey, preferences.theme);
-      storage.setItem(this.loaderStorageKey, preferences.loader_style);
-
-      // Save items per page to localStorage if valid
-      if (
-        preferences.items_per_page &&
-        [10, 25, 50, 100].includes(preferences.items_per_page)
-      ) {
-        storage.setItem(
-          this.itemsPerPageStorageKey,
-          preferences.items_per_page,
-        );
-      }
-
-      runInAction(() => {
-        // Map server preferences to UI store state
-        this.state.theme = preferences.theme;
-        this.state.selectedLoader = preferences.loader_style;
-
-        // Load pagination preference from backend field
-        if (
-          preferences.items_per_page &&
-          [10, 25, 50, 100].includes(preferences.items_per_page)
-        ) {
-          logger.info("Loading items per page from server", {
-            serverValue: preferences.items_per_page,
-            currentValue: this.state.itemsPerPage,
-          });
-          this.state.itemsPerPage = preferences.items_per_page as ItemsPerPage;
-        } else {
-          logger.warn("Invalid or missing items_per_page from server", {
-            serverValue: preferences.items_per_page,
-            currentValue: this.state.itemsPerPage,
-          });
-        }
-
-        // Load UI preferences from JSON field
-        if (preferences.ui_preferences) {
-          if (
-            preferences.ui_preferences.dataViewMode &&
-            (preferences.ui_preferences.dataViewMode === "grid" ||
-              preferences.ui_preferences.dataViewMode === "list")
-          ) {
-            this.state.dataViewMode = preferences.ui_preferences.dataViewMode;
-          }
-          if (
-            typeof preferences.ui_preferences.sidebarCollapsed === "boolean"
-          ) {
-            this.state.sidebarCollapsed =
-              preferences.ui_preferences.sidebarCollapsed;
-          }
-          if (
-            preferences.ui_preferences.defaultContentWidth &&
-            ["sm", "md", "lg", "xl", "2xl", "full"].includes(
-              preferences.ui_preferences.defaultContentWidth as string,
-            )
-          ) {
-            this.state.defaultContentWidth = preferences.ui_preferences
-              .defaultContentWidth as ContentWidth;
-          }
-        }
-
-        this.state.lastSyncTimestamp = Date.now();
-      });
-
-      // Apply theme immediately
-      this.applyTheme();
-
-      logger.info("UI preferences loaded from server", {
-        theme: preferences.theme,
-        loader: preferences.loader_style,
-        syncTimestamp: this.state.lastSyncTimestamp,
-        appliedTheme: this.state.theme,
-        documentClasses: document.documentElement.className,
-      });
-    } catch (error) {
-      logger.error("Failed to load preferences from server", { error });
-    }
-  };
+  // loadFromServerPreferences = (preferences: UserPreferences) => {
+  //   try {
+  //     logger.info("Loading preferences from server", {
+  //       theme: preferences.theme,
+  //       loader: preferences.loader_style,
+  //       currentTheme: this.state.theme,
+  //       currentLoader: this.state.selectedLoader,
+  //     });
+  //     // ... implementation commented out
+  //   } catch (error) {
+  //     logger.error("Failed to load preferences from server", { error });
+  //   }
+  // };
 
   /**
    * Get current UI preferences in server format
+   * TODO: Implement when backend supports user preferences
    */
-  getServerPreferencesData = (): Partial<UserPreferences> => {
-    return {
-      theme: this.state.theme,
-      loader_style: this.state.selectedLoader,
-      items_per_page: this.state.itemsPerPage,
-      ui_preferences: {
-        dataViewMode: this.state.dataViewMode,
-        sidebarCollapsed: this.state.sidebarCollapsed,
-        defaultContentWidth: this.state.defaultContentWidth,
-      },
-    };
-  };
+  // getServerPreferencesData = (): Partial<UserPreferences> => {
+  //   return {
+  //     theme: this.state.theme,
+  //     loader_style: this.state.selectedLoader,
+  //     items_per_page: this.state.itemsPerPage,
+  //     ui_preferences: {
+  //       dataViewMode: this.state.dataViewMode,
+  //       sidebarCollapsed: this.state.sidebarCollapsed,
+  //       defaultContentWidth: this.state.defaultContentWidth,
+  //     },
+  //   };
+  // };
 
   /**
    * Get last sync timestamp
@@ -711,11 +613,8 @@ export class UIStore extends BaseStore<UIStoreState> {
     const maxRetries = 2;
 
     try {
-      const { UserPreferencesService } = await import(
-        "@/features/user/services/userPreferences.service"
-      );
-
-      await UserPreferencesService.updateTheme(theme);
+      // TODO: Implement theme sync when backend supports it
+      logger.info("Theme sync not implemented yet", { theme });
       return true;
     } catch (error) {
       const errorMessage =
@@ -745,11 +644,8 @@ export class UIStore extends BaseStore<UIStoreState> {
    */
   private async syncLoaderToServer(loader: Loader): Promise<boolean> {
     try {
-      const { UserPreferencesService } = await import(
-        "@/features/user/services/userPreferences.service"
-      );
-
-      await UserPreferencesService.updateLoaderStyle(loader);
+      // TODO: Implement loader sync when backend supports it
+      logger.info("Loader sync not implemented yet", { loader });
       return true;
     } catch (error) {
       logger.error("Failed to sync loader style to server", {

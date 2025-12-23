@@ -1,7 +1,7 @@
 // Modal for promoting or demoting users
 
 import { useState } from "react";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AdminSwitchVar,

@@ -232,24 +232,7 @@ export const EmploymentDialog = ({
                   ? MdModeEditOutline
                   : undefined
             }
-            bgColor={
-              kind === "edit"
-                ? "green.500"
-                : kind === "delete"
-                  ? "red.500"
-                  : "blue.500"
-            }
-            _hover={{
-              bg:
-                kind === "edit"
-                  ? "green.400"
-                  : kind === "delete"
-                    ? "red.400"
-                    : "blue.400",
-            }}
-            mr={kind === "edit" ? 2 : undefined}
             innerItemSize={kind !== "add" ? "20px" : undefined}
-            p={kind !== "add" ? 1 : undefined}
           />
         </span>
       </DialogTrigger>
@@ -330,24 +313,7 @@ export const EmploymentDrawer = ({
                   ? MdModeEditOutline
                   : undefined
             }
-            bgColor={
-              kind === "edit"
-                ? "green.500"
-                : kind === "delete"
-                  ? "red.500"
-                  : "blue.500"
-            }
-            _hover={{
-              bg:
-                kind === "edit"
-                  ? "green.400"
-                  : kind === "delete"
-                    ? "red.400"
-                    : "blue.400",
-            }}
-            mr={kind === "edit" ? 2 : undefined}
             innerItemSize={kind !== "add" ? "20px" : undefined}
-            p={kind !== "add" ? 1 : undefined}
           />
         </span>
       </DrawerTrigger>
@@ -430,24 +396,7 @@ export const EducationDialog = ({
                   ? MdModeEditOutline
                   : undefined
             }
-            bgColor={
-              kind === "edit"
-                ? "green.500"
-                : kind === "delete"
-                  ? "red.500"
-                  : "blue.500"
-            }
-            _hover={{
-              bg:
-                kind === "edit"
-                  ? "green.400"
-                  : kind === "delete"
-                    ? "red.400"
-                    : "blue.400",
-            }}
-            mr={kind === "edit" ? 2 : undefined}
             innerItemSize={kind !== "add" ? "20px" : undefined}
-            p={kind !== "add" ? 1 : undefined}
           />
         </span>
       </DialogTrigger>
@@ -527,24 +476,7 @@ export const EducationDrawer = ({
                   ? MdModeEditOutline
                   : undefined
             }
-            bgColor={
-              kind === "edit"
-                ? "green.500"
-                : kind === "delete"
-                  ? "red.500"
-                  : "blue.500"
-            }
-            _hover={{
-              bg:
-                kind === "edit"
-                  ? "green.400"
-                  : kind === "delete"
-                    ? "red.400"
-                    : "blue.400",
-            }}
-            mr={kind === "edit" ? 2 : undefined}
             innerItemSize={kind !== "add" ? "20px" : undefined}
-            p={kind !== "add" ? 1 : undefined}
           />
         </span>
       </DrawerTrigger>

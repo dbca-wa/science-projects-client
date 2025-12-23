@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 import { type ISetProjectStatusProps, setProjectStatus } from "@/features/projects/services/projects.service";
 
 interface Props {

@@ -6,15 +6,16 @@ import { CreateUserModal } from "@/features/users/components/modals/CreateUserMo
 import { SearchUsers } from "@/features/users/components/SearchUsers";
 import { PaginatorUser } from "@/features/users/components/PaginatorUser";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { type IUserData } from "@/shared/types";
 import { useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { useTheme } from "next-themes";
 import { cn } from "@/shared/utils";
 
-export const Users = () => {
+export const Users = observer(() => {
   const {
     filteredItems,
     loading,
@@ -27,6 +28,7 @@ export const Users = () => {
     onlyStaff,
     setSearchFilters,
     totalResults,
+    setIsOnUserPage,
   } = useUserSearchContext();
 
   const { theme } = useTheme();
@@ -34,6 +36,14 @@ export const Users = () => {
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
   const [filtered, setFiltered] = useState<IUserData[]>([]);
   const [isInitialRender, setIsInitialRender] = useState(true);
+
+  // Set page status for user search store
+  useEffect(() => {
+    setIsOnUserPage(true);
+    return () => {
+      setIsOnUserPage(false);
+    };
+  }, [setIsOnUserPage]);
 
   useEffect(() => {
     if (!isInitialRender && !loading) {
@@ -271,4 +281,4 @@ export const Users = () => {
       </>
     </>
   );
-};
+});

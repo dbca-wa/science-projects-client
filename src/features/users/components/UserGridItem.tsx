@@ -4,8 +4,8 @@ import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IUserData } from "@/shared/types";
 import { UserProfile } from "./UserProfile";
 import type { FC, ReactNode } from "react";
-import { useState } from "react";
-import { useColorMode, useBreakpointValue } from "@/shared/utils/theme.utils";
+import { useState, useEffect } from "react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/shared/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
@@ -46,28 +46,18 @@ export const UserGridItem = ({
       ? `${display_first_name} ${display_last_name}`
       : `No Name (${username})`;
       
-  // Replace useBreakpointValue with Tailwind responsive approach
-  const isXlOrLarger = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    lg: false,
-    xl: true,
-  });
-  const isLargerOrLarger = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    lg: true,
-    xl: true,
-  });
-  const isOver690 = useBreakpointValue({
-    base: true,
-    sm: false,
-    md: false,
-    lg: true,
-    xl: true,
-  });
+  // Use Tailwind responsive approach with window size detection
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isXlOrLarger = windowWidth >= 1280; // xl breakpoint
+  const isLargerOrLarger = windowWidth >= 1024; // lg breakpoint  
+  const isOver690 = windowWidth >= 690;
 
   const imageUrl = useServerImageUrl(image?.file);
   const { colorMode } = useColorMode();

@@ -14,7 +14,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 import {
   RemoveUserMutationType,
   promoteUserToLeader,
@@ -379,11 +379,12 @@ export const ProjectUserDetails = ({
                 mr={2}
                 size={"xs"}
                 variant={"ghost"}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                className={cn(
+                  "text-white",
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-600 hover:bg-blue-500"
+                )}
                 onClick={copyEmail}
               >
                 <Icon as={FiCopy} />

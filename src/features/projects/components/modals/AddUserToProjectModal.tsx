@@ -26,7 +26,7 @@ import {
 import { checkStaffStatusApiCall } from "@/features/users/services/users.service";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CustomAxiosError } from "@/shared/types";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IAddUserToProjectModalProps {
   isOpen: boolean;

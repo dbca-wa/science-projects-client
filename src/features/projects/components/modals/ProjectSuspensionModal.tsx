@@ -8,7 +8,7 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { suspendProjectCall } from "@/features/projects/services/projects.service";
 import type { ISimplePkProp } from "@/shared/types";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   projectPk: string | number;

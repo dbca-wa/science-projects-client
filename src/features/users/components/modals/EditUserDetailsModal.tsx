@@ -16,7 +16,7 @@ import {
   adminUpdateUser,
   removeUserAvatar,
 } from "@/features/users/services/users.service";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import type { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/shared/types";
 import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
@@ -47,7 +47,7 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { useColorMode } from "@/shared/utils/theme.utils";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 
 interface IModalProps {
   isOpen: boolean;

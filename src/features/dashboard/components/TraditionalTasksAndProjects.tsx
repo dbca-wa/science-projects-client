@@ -21,7 +21,7 @@ import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();

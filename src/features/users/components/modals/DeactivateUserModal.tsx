@@ -9,7 +9,7 @@ import {
   deactivateUserAdmin,
 } from "@/features/users/services/users.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import type { IUserData } from "@/shared/types";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";

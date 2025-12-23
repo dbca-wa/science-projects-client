@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search } from "lucide-react";
 import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/shared/utils";
 import { getAllProjectsYears } from "@/features/projects/services/projects.service";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import SearchProjectsByUser from "./SearchProjectsByUser";

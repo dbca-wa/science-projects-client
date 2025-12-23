@@ -11,7 +11,7 @@ import {
   requestCaretaker,
 } from "@/features/users/services/users.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";
 import type { ICaretakerEntry, IUserMe } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { ShadcnDatePicker } from "@/features/users/components/account/ShadcnDatePicker";

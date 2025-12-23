@@ -8,7 +8,7 @@ import type {
 import { Avatar } from "@/shared/components/ui/avatar";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { useState } from "react";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 // import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";
 
 // Lexical

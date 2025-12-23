@@ -9,7 +9,7 @@ import "@/styles/modalscrollbar.css";
 import type { IUserData } from "@/shared/types";
 import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
 import TagInput from "./TagInput";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IProjectBaseInformationProps {
   projectKind: string;

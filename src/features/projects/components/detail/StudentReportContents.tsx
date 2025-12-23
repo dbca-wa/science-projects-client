@@ -19,7 +19,7 @@ import { CreateStudentReportModal } from "@/features/reports/components/modals/C
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 import { Loader2 } from "lucide-react";
 
 interface Props extends ICaretakerPermissions {

@@ -20,7 +20,7 @@ import { ProjectExternalSection } from "@/features/projects/components/forms/Pro
 import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";
 import type { IExtendedProjectDetails, IProjectData } from "@/shared/types";
 import { useUser } from "@/features/users/hooks/useUser";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IEditProjectDetailsProps {
   projectType: string;

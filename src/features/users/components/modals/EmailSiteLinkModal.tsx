@@ -13,7 +13,7 @@ import { Label } from "@/shared/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   isOpen: boolean;

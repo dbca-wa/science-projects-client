@@ -31,7 +31,7 @@ import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { MdSpeakerNotes } from "react-icons/md";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 export const Navitar = ({
   isModern,

@@ -9,7 +9,7 @@ import "@/styles/modalscrollbar.css";
 import type { IBusinessArea, IDepartmentalService, IDivision } from "@/shared/types";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface IProjectDetailSectionProps {
   thisUser: number;

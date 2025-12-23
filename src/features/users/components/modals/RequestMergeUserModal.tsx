@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { requestMergeUserCall } from "@/features/admin/services/admin.service";
 import type { IMakeRequestToAdmins } from "@/shared/types";
-import { cn } from "@/shared/utils/component.utils";
+import { cn } from "@/shared/utils";
 
 interface Props {
   primaryUserPk: number;
