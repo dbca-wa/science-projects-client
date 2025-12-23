@@ -10,9 +10,9 @@ import { GrMail } from "react-icons/gr";
 import { MdFax } from "react-icons/md";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import {
-  IFullUserUpdateVariables,
-  MutationError,
-  MutationSuccess,
+  type IFullUserUpdateVariables,
+  type MutationError,
+  type MutationSuccess,
   adminUpdateUser,
   removeUserAvatar,
 } from "@/features/users/services/users.service";

@@ -1,5 +1,6 @@
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import { $getRoot, $isElementNode, EditorState, LexicalEditor } from "lexical";
+import { $getRoot, $isElementNode } from "lexical";
+import type { EditorState, LexicalEditor } from "lexical";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";

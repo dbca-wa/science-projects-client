@@ -9,10 +9,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  IApproveDocument,
-  IBusinessArea,
-  IProjectData,
-  IUserMe,
+  type IApproveDocument,
+  type IBusinessArea,
+  type IProjectData,
+  type IUserMe,
 } from "@/shared/types";
 import { handleDocumentAction } from "@/features/documents/services/documents.service";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";

@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 // import { ProgressReportSelector } from "@/features/projects/components/detail/ProgressReportSelector";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";
 

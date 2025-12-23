@@ -4,11 +4,11 @@ import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
 import {
-  ICaretakerPermissions,
-  IConceptPlan,
-  IProjectDocuments,
-  IProjectMember,
-  IUserMe,
+  type ICaretakerPermissions,
+  type IConceptPlan,
+  type IProjectDocuments,
+  type IProjectMember,
+  type IUserMe,
 } from "@/shared/types";
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";

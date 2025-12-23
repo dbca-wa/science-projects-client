@@ -1,7 +1,8 @@
 // A component for toggling the dark mode
 
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import { useTheme } from "next-themes";
+import { useEditorContext } from "@/shared/hooks/useEditor";
+import { useUIStore } from "@/app/providers/store.provider";
+import { observer } from "mobx-react-lite";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { cn } from "@/shared/utils";
@@ -11,17 +12,16 @@ interface IOptionalToggleDarkProps {
   asMenuItem?: boolean;
 }
 
-export const ToggleDarkMode = ({
+export const ToggleDarkMode = observer(({
   showText,
   asMenuItem,
 }: IOptionalToggleDarkProps) => {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
-  const toggleColorMode = () => setTheme(isDark ? "light" : "dark");
+  const uiStore = useUIStore();
+  const isDark = uiStore.resolvedTheme === "dark";
+  const toggleColorMode = () => uiStore.toggleTheme();
   
   const colorToggleIcon = isDark ? <FaSun /> : <FaMoon />;
   const keyColorMode = isDark ? "dark" : "light";
-  const iconButtonColorScheme = isDark ? "orange" : "blue";
 
   const { manuallyCheckAndToggleDialog } = useEditorContext();
 
@@ -80,4 +80,4 @@ export const ToggleDarkMode = ({
       </motion.div>
     </AnimatePresence>
   );
-};
+});

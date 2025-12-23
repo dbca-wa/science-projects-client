@@ -1,7 +1,7 @@
 // A template for a RTE menu button - props fill out its icon, text and functionality
 
 import React, { useEffect, useRef, useState, ReactNode } from "react";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 import { FaCaretDown } from "react-icons/fa";
 import { Button } from "@/shared/components/ui/button";
 import {

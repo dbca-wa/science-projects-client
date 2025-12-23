@@ -12,15 +12,15 @@ import { useEffect, useRef, useState } from "react";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { ProjectSearchDropdown } from "@/features/projects/components/ProjectSearchDropdown";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
+import type {
   RegisterOptions,
   UseFormRegister,
   UseFormSetValue,
   UseFormWatch,
-  useForm,
 } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
-  INewMember,
+  type INewMember,
   createTeamMember,
 } from "@/features/projects/services/projects.service";
 import { checkStaffStatusApiCall } from "@/features/users/services/users.service";

@@ -11,8 +11,8 @@ import {
   COMMAND_PRIORITY_LOW,
   DRAGOVER_COMMAND,
   DROP_COMMAND,
-  LexicalEditor,
 } from "lexical";
+import type { LexicalEditor } from "lexical";
 import {
   DragEvent as ReactDragEvent,
   useEffect,

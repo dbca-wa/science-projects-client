@@ -20,6 +20,9 @@ import instance from "@/shared/lib/api/axiosInstance";
 import { type QueryFunctionContext } from "@tanstack/react-query";
 import { AxiosHeaders } from "axios";
 
+// Re-export commonly used types for convenience
+export type { MutationSuccess, MutationError, ProjectCreationMutationSuccess };
+
 export interface IDownloadBCSStaffCSVParams {
   in_spms?: boolean; // Optional parameter to filter by SPMS users
   is_active?: boolean;

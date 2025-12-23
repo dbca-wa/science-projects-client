@@ -1,6 +1,6 @@
 // Sidebar for modern version
 
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { useUser } from "@/features/users/hooks/useUser";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";

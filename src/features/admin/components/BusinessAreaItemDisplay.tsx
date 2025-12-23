@@ -49,10 +49,10 @@ import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import {
-  BusinessAreaImage,
-  IBusinessArea,
-  IBusinessAreaUpdate,
-  IDivision,
+  type BusinessAreaImage,
+  type IBusinessArea,
+  type IBusinessAreaUpdate,
+  type IDivision,
 } from "@/shared/types";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { TextButtonFlex } from "@/shared/components/TextButtonFlex";

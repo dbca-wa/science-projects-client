@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useUserSearchStore } from "@/app/stores/root.store";
+import { useUserSearchStore } from "@/app/providers/store.provider";
 import type { IUserData } from "@/shared/types";
 import { useEffect } from "react";
 

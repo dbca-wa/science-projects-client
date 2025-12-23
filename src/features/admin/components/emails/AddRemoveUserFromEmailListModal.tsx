@@ -1,6 +1,6 @@
 import {
   addRemoveUserFromEmailListCall,
-  IAdjustEmailListProps,
+  type IAdjustEmailListProps,
 } from "@/features/admin/services/admin.service";
 import type { EmailListPerson, IEmailListUser } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";

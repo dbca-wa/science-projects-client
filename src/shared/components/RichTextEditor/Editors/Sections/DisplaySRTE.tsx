@@ -1,7 +1,7 @@
 import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
-  InitialConfigType,
+  type InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

@@ -16,8 +16,8 @@ import { FiEdit, FiMaximize, FiSquare } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
 import { MdAspectRatio } from "react-icons/md";
 import ReactCrop, {
-  Crop,
-  PixelCrop,
+  type Crop,
+  type PixelCrop,
   centerCrop,
   makeAspectCrop,
 } from "react-image-crop";

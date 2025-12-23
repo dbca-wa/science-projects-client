@@ -1,6 +1,6 @@
 // Navitar - shown on both layouts. Uses useLayoutSwitcher to determine style
 
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import {
@@ -23,7 +23,7 @@ import { SiReadthedocs } from "react-icons/si";
 import { TbWorldWww } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "@/features/auth/services/auth.service";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useUser } from "@/features/users/hooks/useUser";
 import type { INavitar } from "@/shared/types";

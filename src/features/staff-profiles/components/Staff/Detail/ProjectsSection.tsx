@@ -1,4 +1,4 @@
-import replaceDarkWithLight from "@/shared/utils/htmlHelpers";
+import { replaceDarkWithLight } from "@/shared/utils/htmlHelpers";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
 import { useNavigate } from "react-router-dom";

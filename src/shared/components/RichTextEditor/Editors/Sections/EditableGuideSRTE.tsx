@@ -1,6 +1,6 @@
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
-  InitialConfigType,
+  type InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";

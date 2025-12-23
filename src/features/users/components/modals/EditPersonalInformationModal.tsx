@@ -17,9 +17,9 @@ import { GrMail } from "react-icons/gr";
 import { MdFax } from "react-icons/md";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import {
-  IPIUpdateError,
-  IPIUpdateSuccess,
-  IPIUpdateVariables,
+  type IPIUpdateError,
+  type IPIUpdateSuccess,
+  type IPIUpdateVariables,
   updatePersonalInformation,
 } from "@/features/users/services/users.service";
 

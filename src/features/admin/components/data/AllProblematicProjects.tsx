@@ -12,7 +12,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
 import { getAllProblematicProjects } from "@/features/admin/services/admin.service";
 import { getEmailProjectList } from "@/features/users/services/users.service";
-import { IProblematicData } from "@/features/projects/hooks/useAllProblematicProjects";
+import { type IProblematicData } from "@/features/projects/hooks/useAllProblematicProjects";
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { useState, useEffect } from "react";
 import { TbRefresh } from "react-icons/tb";

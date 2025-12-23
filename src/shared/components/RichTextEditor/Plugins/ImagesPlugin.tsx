@@ -7,10 +7,10 @@ import {
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_EDITOR,
   createCommand,
-  LexicalCommand,
+  type LexicalCommand,
 } from "lexical";
 import { useEffect } from "react";
-import { $createImageNode, ImageNode, ImagePayload } from "../Nodes/ImageNode";
+import { $createImageNode, ImageNode, type ImagePayload } from "../Nodes/ImageNode";
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 

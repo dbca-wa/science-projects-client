@@ -13,10 +13,12 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { getAllUnapprovedProjectsThisFY } from "@/features/admin/services/admin.service";
-import {
+import type {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,

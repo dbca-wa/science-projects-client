@@ -7,12 +7,15 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import {
   LexicalTypeaheadMenuPlugin,
   MenuOption,
-  MenuTextMatch,
+  type MenuTextMatch,
   useBasicTypeaheadTriggerMatch,
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import {
   $applyNodeReplacement,
   $createTextNode,
+  TextNode,
+} from "lexical";
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
@@ -21,7 +24,6 @@ import {
   NodeKey,
   SerializedTextNode,
   Spread,
-  TextNode,
 } from "lexical";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactDOM from "react-dom";

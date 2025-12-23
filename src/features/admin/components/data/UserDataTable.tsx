@@ -12,11 +12,13 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import {
+import type {
   ColumnDef,
   Row,
   SortingState,
   VisibilityState,
+} from "@tanstack/react-table";
+import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
@@ -25,7 +27,7 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useState } from "react";
 import { UserProfile } from "@/features/users/components/UserProfile";
-import { IUserDataTableEntry } from "./EmailLists";
+import { type IUserDataTableEntry } from "./EmailLists";
 import { FcApproval, FcCancel } from "react-icons/fc";
 
 export type UserColumnTypes =

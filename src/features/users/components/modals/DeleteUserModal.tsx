@@ -16,9 +16,9 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import {
-  AdminSwitchVar,
-  MutationError,
-  MutationSuccess,
+  type AdminSwitchVar,
+  type MutationError,
+  type MutationSuccess,
   deleteUserAdmin,
 } from "@/features/users/services/users.service";
 import { useUserSearchContext } from "@/features/users/hooks/useUserSearch";

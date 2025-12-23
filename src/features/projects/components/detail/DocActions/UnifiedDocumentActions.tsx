@@ -10,15 +10,15 @@ import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import { useProjectTeam } from "@/features/projects/hooks/useProjectTeam";
 import { useUser } from "@/features/users/hooks/useUser";
 import {
-  ICaretakerPermissions,
-  IConceptPlan,
-  IProgressReport,
-  IProjectClosure,
-  IProjectDocuments,
-  IProjectMember,
-  IProjectPlan,
-  IStudentReport,
-  ProjectStatus,
+  type ICaretakerPermissions,
+  type IConceptPlan,
+  type IProgressReport,
+  type IProjectClosure,
+  type IProjectDocuments,
+  type IProjectMember,
+  type IProjectPlan,
+  type IStudentReport,
+  type ProjectStatus,
 } from "@/shared/types";
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { Button } from "@/shared/components/ui/button";

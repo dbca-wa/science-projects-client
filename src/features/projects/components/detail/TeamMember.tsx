@@ -7,12 +7,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shar
 import { useColorMode } from "@/shared/utils/theme.utils";
 import { FaCrown } from "react-icons/fa";
 import {
-  IBranch,
-  IBusinessArea,
-  ICaretakerSimpleUserData,
-  IImageData,
-  IUserData,
-  IUserMe,
+  type IBranch,
+  type IBusinessArea,
+  type ICaretakerSimpleUserData,
+  type IImageData,
+  type IUserData,
+  type IUserMe,
 } from "@/shared/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { UserProfile } from "@/features/users/components/UserProfile";

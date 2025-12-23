@@ -2,9 +2,9 @@
 
 import { Button } from "@/shared/components/ui/button";
 import { useColorMode } from "@/shared/utils/theme.utils";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 import "@/styles/texteditor.css";
-import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/useEditor";
 import { useEffect } from "react";
 
 interface BaseToggleOptionsButtonProps {

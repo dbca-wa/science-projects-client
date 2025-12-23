@@ -3,7 +3,7 @@
 import type { IProjectData } from "@/shared/types";
 import { Button } from "@/shared/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { ModernProjectCard } from "./cards/ModernProjectCard";
 
 interface IPaginationProps {

@@ -7,7 +7,7 @@ import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IProjectData } from "@/shared/types";

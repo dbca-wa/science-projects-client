@@ -47,7 +47,7 @@ import { IoCreate } from "react-icons/io5";
 import { MdBusinessCenter, MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { VscOrganization } from "react-icons/vsc";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
 import { useCheckUserIsTeamLeader } from "@/features/users/hooks/useCheckUserIsTeamLeader";
 import { useNoImage } from "@/shared/hooks/useNoImage";

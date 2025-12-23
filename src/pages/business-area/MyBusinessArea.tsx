@@ -1,7 +1,7 @@
 import { BusinessAreaEditableDisplay } from "@/features/business-areas/components/BusinessAreaEditableDisplay";
 import { ProblematicProjectsDataTable } from "@/features/business-areas/components/ProblematicProjectsDataTable";
 import {
-  IPendingProjectDocumentData,
+  type IPendingProjectDocumentData,
   UnapprovedDocumentsDataTable,
 } from "@/features/business-areas/components/UnapprovedDocumentsDataTable";
 import { useMyBusinessAreas } from "@/features/business-areas/hooks/useMyBusinessAreas";

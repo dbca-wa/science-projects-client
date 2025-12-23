@@ -9,7 +9,7 @@ import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "
 import { FiSearch } from "react-icons/fi";
 import { cn } from "@/shared/utils";
 import { getAllProjectsYears } from "@/features/projects/services/projects.service";
-import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/useProjectSearch";
 import SearchProjectsByUser from "./SearchProjectsByUser";
 
 interface IProps {

@@ -2,7 +2,7 @@
 
 import { FC, ReactNode } from "react";
 import { useTheme } from "next-themes";
-import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/useLayout";
 
 interface IPageWrapperProps {
   children: ReactNode;

@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { FaSave } from "react-icons/fa";
 import {
-  IHTMLGuideSave,
+  type IHTMLGuideSave,
   saveGuideContentToDB,
   saveGuideHtmlToDB,
 } from "@/features/admin/services/admin.service";

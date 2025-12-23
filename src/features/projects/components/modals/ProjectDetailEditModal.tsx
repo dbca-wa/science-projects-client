@@ -5,16 +5,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/compo
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useState } from "react";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 import { ProjectDetailsSection } from "@/features/projects/components/forms/ProjectDetailsSection";
 import { ProjectLocationSection } from "@/features/projects/components/forms/ProjectLocationSection";
 import { ProjectBaseInformation } from "@/features/projects/components/forms/ProjectBaseInformation";
 import "@/styles/modalscrollbar.css";
 import {
-  ICreateProjectBaseInfo,
-  ICreateProjectDetails,
-  ICreateProjectExternalDetails,
-  ICreateProjectStudentDetails,
+  type ICreateProjectBaseInfo,
+  type ICreateProjectDetails,
+  type ICreateProjectExternalDetails,
+  type ICreateProjectStudentDetails,
 } from "@/features/projects/services/projects.service";
 import { ProjectExternalSection } from "@/features/projects/components/forms/ProjectExternalSection";
 import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";

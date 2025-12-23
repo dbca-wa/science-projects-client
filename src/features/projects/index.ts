@@ -88,7 +88,6 @@ export { useInvolvedStaffProfileProjects } from "./hooks/useInvolvedStaffProfile
 export { useLatestYearsActiveStudentProjects } from "./hooks/useLatestYearsActiveStudentProjects";
 export { useProject } from "./hooks/useProject";
 export { useProjectTeam } from "./hooks/useProjectTeam";
-export { ProjectMapSearchContext } from "./hooks/ProjectMapSearchContext";
 export { ProjectSearchContext } from "./hooks/ProjectSearchContext";
 
 // Services

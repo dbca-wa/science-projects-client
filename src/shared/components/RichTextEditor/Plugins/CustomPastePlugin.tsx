@@ -1,9 +1,9 @@
 import {
-	BaseSelection,
-	CommandPayloadType,
-	LexicalCommand,
-	LexicalEditor,
-	LexicalNode,
+	type BaseSelection,
+	type CommandPayloadType,
+	type LexicalCommand,
+	type LexicalEditor,
+	type LexicalNode,
 	TextNode,
 } from "lexical";
 
