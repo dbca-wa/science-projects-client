@@ -141,7 +141,264 @@ In order to establish a frontend we first require some development tools. Tools 
 
 ### Create the App
 
-### Install Dependencies
+Once you have the prerequisite tools, you may begin to create the app. We will start with a basic vite typescript app, restructure it, and install dependencies as we go.
+
+First step is to create the base app:
+
+```bash
+bun create vite frontend --template react-ts
+```
+
+Select default options. This will provide typescript support and provide a base scaffolding for your app.
+If you didn't select the default of starting now, you can check out the app with the following commands:
+
+```bash
+cd frontend && bun run dev
+```
+
+Your frontend should now be structured similarly to this:
+
+```
+frontend/
+├── node_modules/                   # Dependencies (should be gitignored)
+├── public/
+├── src/
+|   ├── assets/
+│   ├── App.css
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── .gitignore
+├── bun.lock
+├── eslint.config.js
+├── index.html
+├── package.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+├── vite.config.ts
+└── .gitignore
+```
+
+You should see a working app now when you visit localhost:5173. However, we should remove all unecessary components and install dependencies as we restructure for scalability and maintainability.
+
+### Styling Setup
+
+Delete the following files and folders:
+
+-   App.css
+-   App.tsx
+-   index.css
+-   assets folder
+
+Create a subfolder in src called 'shared', and another folder called 'styles', then create an index.css in that folder.
+
+```bash
+mkdir -p src/shared/styles && touch src/shared/styles/index.css
+```
+
+In main.tsx, remove the App import and replace the app tag with a simple paragraph tag. Then adjust the import of styles to the shared directory. Your main.tsx should look like this:
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./shared/styles/index.css";
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<p>Hello</p>
+	</StrictMode>
+);
+```
+
+#### Install Tailwind
+
+Now is the perfect time to install Tailwindcss v4 and checkout the ease of styling.
+
+```bash
+bun add tailwindcss @tailwindcss/vite
+```
+
+Next, adjust your vite.config.ts
+
+```typescript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+	plugins: [react(), tailwindcss()],
+});
+```
+
+In your index.css:
+
+```css
+@import "tailwindcss";
+```
+
+Once you hit save, you will notice that a CSS reset occurred - the padding around the hello p tag disappeared; this means Tailwind is working! Go ahead and doublecheck by adjusting the p tag in your main.tsx to have a classname like follows (should be a medium red):
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./shared/styles/index.css";
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<p className="text-red-500">Hello</p>
+	</StrictMode>
+);
+```
+
+**Note**: For a better development experience, we recommend using VS Code and installing "Tailwind CSS Intellisense" by Tailwind Labs - this will allow autocomplete when typing classes in the className as well as visual indicators for colours.
+
+#### Install Shadcn
+
+With tailwindcss confirmed to be working, we can move onto our other major styling dependency - Shadcn.
+
+But first, we must adjust our tsconfig files to have an import alias, like so (just adjust/add what is missing).
+
+tsconfig.json:
+
+```json
+{
+	"files": [],
+	"references": [
+		{
+			"path": "./tsconfig.app.json"
+		},
+		{
+			"path": "./tsconfig.node.json"
+		}
+	],
+	"compilerOptions": {
+		// "baseUrl": ".", # Will be deprecated in typescript 7
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	}
+}
+```
+
+tsconfig.app.json:
+
+```json
+{
+	"compilerOptions": {
+		// ...
+		// "baseUrl": ".", # Will be deprecated in typescript 7
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+		// ...
+	}
+}
+```
+
+Next we need to run the following and update vite config to prevent errors when resolving paths:
+
+```bash
+bun add -D @types/node
+```
+
+Ensure your vite config looks like this:
+
+```typescript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import path from "path";
+
+// https://vite.dev/config/
+export default defineConfig({
+	plugins: [react(), tailwindcss()],
+	resolve: {
+		alias: {
+			"@": path.resolve(__dirname, "./src"),
+		},
+	},
+});
+```
+
+To install, we will simply run the command below and select 'neutral':
+
+```bash
+bunx shadcn@latest init
+```
+
+Once we install, you will notice a few things:
+
+-   a components.json file now exists at frontend root
+-   index.css has updated to be quite comprehensive
+-   a lib/utils.ts file now exists
+
+We are not quite done. To ensure that shadcn works with our intended structure, we need to create some folders and adjust some settings.
+
+Run the following command:
+
+```bash
+mv src/lib src/shared/ && mkdir -p src/shared/components/ui && mkdir -p src/shared/hooks
+```
+
+Now adjust the components.json file as follows:
+
+```json
+{
+	"$schema": "https://ui.shadcn.com/schema.json",
+	"style": "new-york",
+	"rsc": false,
+	"tsx": true,
+	"tailwind": {
+		"config": "",
+		"css": "src/shared/styles/index.css",
+		"baseColor": "neutral",
+		"cssVariables": true,
+		"prefix": ""
+	},
+	"iconLibrary": "lucide",
+	"aliases": {
+		"components": "@/shared/components",
+		"utils": "@/shared/lib/utils",
+		"ui": "@/shared/components/ui",
+		"lib": "@/shared/lib",
+		"hooks": "@/shared/hooks"
+	},
+	"registries": {}
+}
+```
+
+We should be good to go to test adding a component now. Run the following command and you should see your shared/components/ui folder populate with a button.tsx component.
+
+```bash
+bunx shadcn@latest add button
+```
+
+The beauty of shadcn is that you can directly edit this component source code to your liking and the component remains reusable througout. Test it out by adding it to your main.tsx and playing with the variant/classname:
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./shared/styles/index.css";
+import { Button } from "./shared/components/ui/button";
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<p className="text-red-500">Hello</p>
+		<Button className="cursor-pointer" variant={"destructive"}>
+			Testing
+		</Button>
+	</StrictMode>
+);
+```
+
+If you have made it this far, congratulations, the styling setup is complete.
+
+### Router Setup
+
+Now we need to get routing going. To do this, we should first install a routing library. There are many to choose from, but for this setup, we will go with React Router.
 
 ## Establish Structure
 
