@@ -89,6 +89,7 @@ src/
 │   ├── auth/                    # Authentication configuration with backend
 │   ├── dashboard/               # Dashboard and overview
 │   └── .../                     # Any other feature folders specific to application
+├── pages/                       # Pages built from components to route between
 ├── shared/                      # Shared resources
 │   ├── components/              # Reusable UI components
 │   │   ├── ui/                  # shadcn/ui components
@@ -398,9 +399,85 @@ If you have made it this far, congratulations, the styling setup is complete.
 
 ### Router Setup
 
-Now we need to get routing going. To do this, we should first install a routing library. There are many to choose from, but for this setup, we will go with React Router.
+Now we need to get routing going. To do this, we should first install a routing library. There are many to choose from, but for this setup, we will go with React Router. Note that React Router has three primary "modes" for establishing routes - Declarative, Data, and Framework. We will be setting up a Data Mode Router.
 
-## Establish Structure
+Install it and prepare a routing config, routing folder, and routing guards with this command:
+
+```bash
+bun add react-router && mkdir -p src/config && touch src/config/routes.config.tsx && mkdir -p src/app/router/guards && touch src/app/router/index.tsx src/app/router/guards/auth.guard.ts
+```
+
+Next we need to also setup some base pages to route between. Create a pages folder with a Login.tsx file, a Register.tsx file and a Dashboard.tsx file.
+
+```bash
+mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Dashboard.tsx
+```
+
+For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Reduc/React-Native snippets'by dsznajder. Once installed you can go into the Dashboard.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
+
+Ensure it looks like this:
+
+```typescript
+const Dashboard = () => {
+	return (
+		<div>
+			<p>Dashboard</p>
+		</div>
+	);
+};
+
+export default Dashboard;
+```
+
+Repeat the process for the other two files.
+
+Login.tsx:
+
+```typescript
+const Login = () => {
+	return (
+		<div>
+			<p>Login</p>
+		</div>
+	);
+};
+
+export default Login;
+```
+
+Register.tsx
+
+```typescript
+const Register = () => {
+	return (
+		<div>
+			<p>Register</p>
+		</div>
+	);
+};
+
+export default Register;
+```
+
+Now we need to establish a Router Provider to replace our hello p tag so we can dynamically swap components based on the route.
+
+In src/config/routes.config.tsx:
+
+```typescript
+
+```
+
+In src/app/router/index.tsx establish the following:
+
+```typescript
+
+```
+
+**Note**: This is a basic setup that you should use as a reference and add additional things to it as you go such as error pages, loading indicators etc.
+
+### State Management Setup
+
+Now we can install a state management library. As with routing, there are many options to choose from. We will be using
 
 ## Continued Development
 
