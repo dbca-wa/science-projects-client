@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment.
+This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology. For the sake of completeness, this guide will show you how to develop a simple Todo app which utilises the tech mentioned in the stack below.
 Note: This represents a recommended approach rather than a strict requirement. It assumes developers have access to install necessary tools and are using Windows as their primary operating system.
 
 ## Stack
@@ -258,7 +258,7 @@ createRoot(document.getElementById("root")!).render(
 
 #### Install Shadcn
 
-With tailwindcss confirmed to be working, we can move onto our other major styling dependency - Shadcn.
+With TailwindCSS working, we can move onto our other major styling dependency - Shadcn.
 
 But first, we must adjust our tsconfig files to have an import alias, like so (just adjust/add what is missing).
 
@@ -324,7 +324,28 @@ export default defineConfig({
 });
 ```
 
-To install, we will simply run the command below and select 'neutral':
+Going forward we should also add the folowing above the 'resolve' and 'plugins' definitions in vite.config.ts:
+
+```typescript
+	preview: {
+		host: true,
+		port: 3000,
+	},
+	build: {
+		minify: true,
+		sourcemap: false,
+	},
+```
+
+Similarly, in package.json, adjust the dev config under scripts as follows:
+
+```json
+    "dev": "vite --host=127.0.0.1 --port=3000",
+```
+
+This will provide some optimisation when building and launch our server on port 3000.
+
+To install Shadcn, we will simply run the command below and select 'neutral':
 
 ```bash
 bunx shadcn@latest init
@@ -344,7 +365,7 @@ Run the following command:
 mv src/lib src/shared/ && mkdir -p src/shared/components/ui && mkdir -p src/shared/hooks
 ```
 
-Now adjust the components.json file as follows:
+Now adjust the components.json file to point to our new folders, as follows:
 
 ```json
 {
@@ -371,7 +392,7 @@ Now adjust the components.json file as follows:
 }
 ```
 
-We should be good to go to test adding a component now. Run the following command and you should see your shared/components/ui folder populate with a button.tsx component.
+This ensures that when we install new components from shadcn, they are installed in the correct location. We should be good to go to test adding a component now. Run the following command and you should see your shared/components/ui folder populate with a button.tsx component.
 
 ```bash
 bunx shadcn@latest add button
@@ -407,10 +428,10 @@ Install it and prepare a routing config, routing folder, and routing guards with
 bun add react-router && mkdir -p src/config && touch src/config/routes.config.tsx && mkdir -p src/app/router/guards && touch src/app/router/index.tsx src/app/router/guards/auth.guard.ts
 ```
 
-Next we need to also setup some base pages to route between. Create a pages folder with a Login.tsx file, a Register.tsx file and a Dashboard.tsx file.
+Next we need to also setup some base pages to route between. Create a pages folder with a Login.tsx file, a Register.tsx file, a Settings.tsx file, and a Dashboard.tsx file.
 
 ```bash
-mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Dashboard.tsx
+mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Dashboard.tsx src/pages/Settings.tsx
 ```
 
 For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Reduc/React-Native snippets'by dsznajder. Once installed you can go into the Dashboard.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
@@ -459,6 +480,20 @@ const Register = () => {
 export default Register;
 ```
 
+Settings.tsx
+
+```typescript
+const Settings = () => {
+	return (
+		<div>
+			<p>Settings</p>
+		</div>
+	);
+};
+
+export default Settings;
+```
+
 Now we need to establish a Router Provider to replace our hello p tag so we can dynamically swap components based on the route.
 
 In src/config/routes.config.tsx:
@@ -473,7 +508,7 @@ In src/app/router/index.tsx establish the following:
 
 ```
 
-**Note**: This is a basic setup that you should use as a reference and add additional things to it as you go such as error pages, loading indicators etc.
+**Note**: This router setup is a basic example that you should use as a reference and add to as you go such - as error pages, loading indicators etc.
 
 ### State Management Setup
 
