@@ -418,14 +418,291 @@ createRoot(document.getElementById("root")!).render(
 
 If you have made it this far, congratulations, the styling setup is complete.
 
+### State Management Setup
+
+Before we set up routing, we need to establish our state management system using MobX. This will handle our authentication state, UI preferences, and other client-side data that needs to be reactive across our application.
+First, install the required dependencies:
+
+```bash
+bun add mobx mobx-react-lite
+```
+
+Now let's create our store structure:
+
+```bash
+mkdir -p src/app/stores && touch src/app/stores/root.store.tsx src/app/stores/auth.store.ts src/app/stores/ui.store.ts
+```
+
+#### Create the Auth Store
+
+The auth store will manage user authentication state. Create src/app/stores/auth.store.ts:
+
+```typescript
+import { makeAutoObservable } from "mobx";
+
+export interface User {
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+}
+
+export class AuthStore {
+	user: User | null = null;
+	token: string | null = null;
+	isLoading = false;
+
+	constructor() {
+		makeAutoObservable(this);
+		// Check for existing token in localStorage on initialization
+		this.loadFromStorage();
+	}
+
+	/**
+	 * Check if user is authenticated
+	 */
+	get isAuthenticated(): boolean {
+		return !!this.token && !!this.user;
+	}
+
+	/**
+	 * Load auth data from localStorage
+	 */
+	private loadFromStorage() {
+		const token = localStorage.getItem("auth_token");
+		const userStr = localStorage.getItem("auth_user");
+
+		if (token && userStr) {
+			this.token = token;
+			this.user = JSON.parse(userStr);
+		}
+	}
+
+	/**
+	 * Save auth data to localStorage
+	 */
+	private saveToStorage() {
+		if (this.token && this.user) {
+			localStorage.setItem("auth_token", this.token);
+			localStorage.setItem("auth_user", JSON.stringify(this.user));
+		} else {
+			localStorage.removeItem("auth_token");
+			localStorage.removeItem("auth_user");
+		}
+	}
+
+	/**
+	 * Login user
+	 */
+	login(user: User, token: string) {
+		this.user = user;
+		this.token = token;
+		this.saveToStorage();
+	}
+
+	/**
+	 * Logout user
+	 */
+	logout() {
+		this.user = null;
+		this.token = null;
+		this.saveToStorage();
+	}
+
+	/**
+	 * Set loading state
+	 */
+	setLoading(loading: boolean) {
+		this.isLoading = loading;
+	}
+}
+```
+
+#### Create the UI Store
+
+The UI store will manage client-side UI state like theme preferences. Create src/app/stores/ui.store.ts:
+
+```typescript
+import { makeAutoObservable } from "mobx";
+
+type Theme = "light" | "dark";
+
+export class UIStore {
+	theme: Theme = "light";
+	sidebarCollapsed = false;
+
+	constructor() {
+		makeAutoObservable(this);
+		// Load theme from localStorage
+		this.loadTheme();
+	}
+
+	/**
+	 * Load theme from localStorage
+	 */
+	private loadTheme() {
+		const savedTheme = localStorage.getItem("theme") as Theme;
+		if (savedTheme) {
+			this.theme = savedTheme;
+			this.applyTheme();
+		}
+	}
+
+	/**
+	 * Toggle theme between light and dark
+	 */
+	toggleTheme() {
+		this.theme = this.theme === "light" ? "dark" : "light";
+		localStorage.setItem("theme", this.theme);
+		this.applyTheme();
+	}
+
+	/**
+	 * Apply theme to document
+	 */
+	private applyTheme() {
+		if (this.theme === "dark") {
+			document.documentElement.classList.add("dark");
+		} else {
+			document.documentElement.classList.remove("dark");
+		}
+	}
+
+	/**
+	 * Toggle sidebar collapsed state
+	 */
+	toggleSidebar() {
+		this.sidebarCollapsed = !this.sidebarCollapsed;
+	}
+}
+```
+
+#### Create the Root Store
+
+The root store combines all stores and provides them via React Context. Create src/app/stores/root.store.tsx:
+
+```typescript
+import { createContext, useContext, type ReactNode } from "react";
+import { AuthStore } from "./auth.store";
+import { UIStore } from "./ui.store";
+
+/**
+ * Root store that combines all MobX stores
+ */
+class RootStore {
+	authStore: AuthStore;
+	uiStore: UIStore;
+
+	constructor() {
+		this.authStore = new AuthStore();
+		this.uiStore = new UIStore();
+	}
+}
+
+// Create singleton instance
+const rootStore = new RootStore();
+
+// Create React Context
+const StoreContext = createContext<RootStore>(rootStore);
+
+/**
+ * Provider component to wrap app with stores
+ */
+export const StoreProvider = ({ children }: { children: ReactNode }) => {
+	return (
+		<StoreContext.Provider value={rootStore}>
+			{children}
+		</StoreContext.Provider>
+	);
+};
+
+/**
+ * Hook to access stores in components
+ */
+export const useStore = () => {
+	const context = useContext(StoreContext);
+	if (!context) {
+		throw new Error("useStore must be used within StoreProvider");
+	}
+	return context;
+};
+```
+
+#### Wrap Your App with the Store Provider
+
+Update src/main.tsx to include the StoreProvider:
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./shared/styles/index.css";
+import { Button } from "./shared/components/ui/button";
+import { StoreProvider } from "./app/stores/root.store";
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<StoreProvider>
+			<p className="text-red-500">Hello</p>
+			<Button className="cursor-pointer" variant={"destructive"}>
+				Testing
+			</Button>
+		</StoreProvider>
+	</StrictMode>
+);
+```
+
+#### Test the Store
+
+Let's quickly test that MobX is working. Update your main.tsx temporarily to test the theme toggle:
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { observer } from "mobx-react-lite";
+import "./shared/styles/index.css";
+import { Button } from "./shared/components/ui/button";
+import { StoreProvider, useStore } from "./app/stores/root.store";
+
+const TestComponent = observer(() => {
+	const { uiStore } = useStore();
+
+	return (
+		<div className="p-4">
+			<p className="text-red-500 mb-4">Current theme: {uiStore.theme}</p>
+			<Button onClick={() => uiStore.toggleTheme()}>Toggle Theme</Button>
+		</div>
+	);
+});
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<StoreProvider>
+			<TestComponent />
+		</StoreProvider>
+	</StrictMode>
+);
+```
+
+Click the button and you should see the theme text change between "light" and "dark", as well as the background, and if you refresh the page, the changes should persist. This confirms MobX is working!
+
+**_Key MobX Concepts:_**
+
+-   makeAutoObservable: Makes all properties observable and all methods actions automatically
+-   observer: HOC that makes React components reactive to MobX state changes
+-   useStore hook: Provides access to stores throughout your component tree
+
+Now that we have state management set up, we can proceed with routing that will use these stores for authentication.
+
 ### Router Setup
 
-Now we need to get routing going. To do this, we should first install a routing library. There are many to choose from, but for this setup, we will go with React Router. Note that React Router has three primary "modes" for establishing routes - Declarative, Data, and Framework. We will be setting up a Data Mode Router.
+Now that we have our state management in place, we can set up routing. The authentication guard will use the `authStore` we just created to protect routes.
+
+But before we get to that, let's first install a routing library. There are many to choose from, but for this setup, we will go with React Router. Note that React Router has three primary "modes" for establishing routes - Declarative, Data, and Framework. We will be setting up a Data Mode Router.
 
 Install it and prepare a routing config, routing folder, and routing guards with this command:
 
 ```bash
-bun add react-router && mkdir -p src/config && touch src/config/routes.config.tsx && mkdir -p src/app/router/guards && touch src/app/router/index.tsx src/app/router/guards/auth.guard.ts
+bun add react-router && mkdir -p src/config && touch src/config/routes.config.tsx && mkdir -p src/app/router/guards && touch src/app/router/index.tsx src/app/router/guards/auth.guard.tsx
 ```
 
 Next we need to also setup some base pages to route between. Create a pages folder with a Login.tsx file, a Register.tsx file, a Settings.tsx file, and a Dashboard.tsx file.
@@ -434,31 +711,424 @@ Next we need to also setup some base pages to route between. Create a pages fold
 mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Dashboard.tsx src/pages/Settings.tsx
 ```
 
-For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Reduc/React-Native snippets'by dsznajder. Once installed you can go into the Dashboard.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
+For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Redux/React-Native snippets' by dsznajder. Once installed you can go into the Dashboard.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
 
 Ensure it looks like this:
 
 ```typescript
 const Dashboard = () => {
-	return (
-		<div>
-			<p>Dashboard</p>
-		</div>
-	);
+	return Dashboard;
 };
 
 export default Dashboard;
 ```
 
-Repeat the process for the other two files.
+Repeat the process for the other three files.
 
-Login.tsx:
+**Login.tsx:**
 
 ```typescript
 const Login = () => {
+	return Login;
+};
+
+export default Login;
+```
+
+**Register.tsx:**
+
+```typescript
+const Register = () => {
+	return Register;
+};
+
+export default Register;
+```
+
+**Settings.tsx:**
+
+```typescript
+const Settings = () => {
+	return Settings;
+};
+
+export default Settings;
+```
+
+This will be the entirety of our routes for this app. Now we need to establish a Router configuration and guards.
+
+First, let's install react-icons for our navigation icons:
+
+```bash
+bun add react-icons
+```
+
+#### Create Route Configuration
+
+In **src/config/routes.config.tsx**, create a centralised route configuration:
+
+```typescript
+import { type ReactNode, type ComponentType } from "react";
+/**
+ * Visit https://react-icons.github.io/react-icons/ to search for an icon of your liking
+ */
+import { HiMiniSquares2X2, HiCog6Tooth } from "react-icons/hi2";
+import { RiLoginBoxLine, RiUserAddLine } from "react-icons/ri";
+
+// Pages
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import Dashboard from "@/pages/Dashboard";
+import Settings from "@/pages/Settings";
+
+/**
+ * Route configuration interface
+ */
+export interface RouteConfig {
+	name: string;
+	path: string;
+	icon?: ReactNode;
+	component: ComponentType;
+	requiresAuth: boolean;
+	showInSidebar: boolean;
+}
+
+/**
+ * Application routes configuration
+ */
+export const ROUTES_CONFIG: RouteConfig[] = [
+	// Public routes
+	{
+		name: "Login",
+		path: "/login",
+		icon: <RiLoginBoxLine />,
+		component: Login,
+		requiresAuth: false,
+		showInSidebar: false,
+	},
+	{
+		name: "Register",
+		path: "/register",
+		icon: <RiUserAddLine />,
+		component: Register,
+		requiresAuth: false,
+		showInSidebar: false,
+	},
+
+	// Protected routes
+	{
+		name: "Dashboard",
+		path: "/",
+		icon: <HiMiniSquares2X2 />,
+		component: Dashboard,
+		requiresAuth: true,
+		showInSidebar: true,
+	},
+	{
+		name: "Settings",
+		path: "/settings",
+		icon: <HiCog6Tooth />,
+		component: Settings,
+		requiresAuth: true,
+		showInSidebar: true,
+	},
+];
+
+/**
+ * Helper function to get routes to show in sidebar navigation
+ */
+export const getSidebarRoutes = (): RouteConfig[] => {
+	return ROUTES_CONFIG.filter((route) => route.showInSidebar);
+};
+
+/**
+ * Helper function to check if a route requires authentication
+ */
+export const isProtectedRoute = (path: string): boolean => {
+	const route = ROUTES_CONFIG.find((r) => r.path === path);
+	return route?.requiresAuth ?? true;
+};
+```
+
+This configuration file:
+
+-   Defines all routes in one place
+-   Specifies which routes require authentication
+-   Includes icons for sidebar navigation
+-   Makes it easy to add new routes later
+
+#### Create Authentication Guard
+
+Next, create an authentication guard in **src/app/router/guards/auth.guard.tsx**:
+
+```typescript
+import { Navigate, useLocation } from "react-router";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/root.store";
+
+/**
+ * Protected Route Guard
+ * Redirects to login if user is not authenticated
+ */
+export const ProtectedRoute = observer(
+	({ children }: { children: React.ReactNode }) => {
+		const { authStore } = useStore();
+		const location = useLocation();
+
+		if (!authStore.isAuthenticated) {
+			// Redirect to login, but save the location they were trying to access
+			return;
+		}
+
+		return <>{children}</>;
+	}
+);
+```
+
+This guard will redirect unauthenticated users to the login page when they try to access protected routes. Notice how it uses the `authStore.isAuthenticated` getter we defined earlier.
+
+#### Create the Router
+
+Now create the main router in **src/app/router/index.tsx**:
+
+```typescript
+import { createBrowserRouter, Navigate } from "react-router";
+import { ROUTES_CONFIG } from "@/config/routes.config";
+import { ProtectedRoute } from "./guards/auth.guard";
+
+// We will create this file soon
+import AppLayout from "@/shared/components/layout/AppLayout";
+
+/**
+ * Generate router from configuration
+ */
+const generateRouter = () => {
+	// Separate public and protected routes
+	const publicRoutes = ROUTES_CONFIG.filter((r) => !r.requiresAuth);
+	const protectedRoutes = ROUTES_CONFIG.filter((r) => r.requiresAuth);
+
+	return createBrowserRouter([
+		// Public routes (no layout)
+		...publicRoutes.map((route) => ({
+			path: route.path,
+			element: <route.component />,
+		})),
+
+		// Protected routes (with layout)
+		{
+			path: "/",
+			element: (
+				<ProtectedRoute>
+					<AppLayout />
+				</ProtectedRoute>
+			),
+			children: protectedRoutes.map((route) => ({
+				path: route.path === "/" ? "" : route.path,
+				element: <route.component />,
+			})),
+		},
+
+		// Catch-all redirect
+		{
+			path: "*",
+			element: <Navigate to="/" replace />,
+		},
+	]);
+};
+
+export const router = generateRouter();
+```
+
+This router:
+
+-   Separates public routes (login, register) from protected routes
+-   Wraps protected routes with the authentication guard
+-   Applies a layout to authenticated pages using React Router's `Outlet` component for nested routing
+-   Redirects any unknown routes to the dashboard
+
+#### Create the App Layout
+
+Before the router works, we need to create the layout component. Create the folder and file:
+
+```bash
+mkdir -p src/shared/components/layout && touch src/shared/components/layout/AppLayout.tsx
+```
+
+Now create **src/shared/components/layout/AppLayout.tsx**:
+
+```typescript
+import { Outlet, Link, useLocation } from "react-router";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/root.store";
+import { getSidebarRoutes } from "@/config/routes.config";
+import { Button } from "@/shared/components/ui/button";
+
+const AppLayout = observer(() => {
+	const { authStore, uiStore } = useStore();
+	const location = useLocation();
+	const sidebarRoutes = getSidebarRoutes();
+
 	return (
-		<div>
-			<p>Login</p>
+		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+			{/* Header */}
+			<header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex justify-between items-center h-16">
+						<h1 className="text-xl font-bold text-gray-900 dark:text-white">
+							Task Manager
+						</h1>
+
+						<div className="flex items-center gap-4">
+							{/* Theme Toggle */}
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => uiStore.toggleTheme()}
+							>
+								{uiStore.theme === "light" ? "🌙" : "☀️"}
+							</Button>
+
+							{/* User Info & Logout */}
+							<div className="flex items-center gap-2">
+								<span className="text-sm text-gray-600 dark:text-gray-300">
+									{authStore.user?.email || "Guest"}
+								</span>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => authStore.logout()}
+								>
+									Logout
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			{/* Sidebar & Main Content */}
+			<div className="flex">
+				{/* Sidebar */}
+				<aside className="w-64 bg-white dark:bg-gray-800 min-h-[calc(100vh-4rem)] border-r border-gray-200 dark:border-gray-700">
+					<nav className="p-4 space-y-2">
+						{sidebarRoutes.map((route) => {
+							const isActive = location.pathname === route.path;
+							return (
+								<Link
+									key={route.path}
+									to={route.path}
+									className={`
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
+                    ${
+						isActive
+							? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+							: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+					}
+                  `}
+								>
+									<span className="text-lg">
+										{route.icon}
+									</span>
+									<span className="font-medium">
+										{route.name}
+									</span>
+								</Link>
+							);
+						})}
+					</nav>
+				</aside>
+
+				{/* Main Content */}
+				<main className="flex-1 p-8">
+					<Outlet />
+				</main>
+			</div>
+		</div>
+	);
+});
+
+export default AppLayout;
+```
+
+This layout component:
+
+-   Uses MobX stores (`observer` HOC) for reactivity with theme and auth state
+-   Displays a header with theme toggle and logout button
+-   Shows a sidebar with navigation links based on our route configuration
+-   Highlights the active route using React Router's `useLocation` hook
+-   Uses `<Outlet />` to render child routes (Dashboard, Settings, etc.)
+-   Supports dark mode through Tailwind's dark mode classes
+
+#### Connect the Router to Your App
+
+Finally, update **src/main.tsx** to use the router:
+
+```typescript
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "react-router";
+import "./shared/styles/index.css";
+import { StoreProvider } from "./app/stores/root.store";
+import { router } from "./app/router";
+
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<StoreProvider>
+			<RouterProvider router={router} />
+		</StoreProvider>
+	</StrictMode>
+);
+```
+
+#### Test the Router
+
+Now run `bun run dev` and navigate to http://127.0.0.1:3000. You'll see the Login page since we haven't set up authentication yet. You can manually type `/register` in the URL to see the routing works.
+
+If you try to navigate to `/` or `/settings`, you'll be redirected back to `/login` because the `ProtectedRoute` guard is working correctly - it checks `authStore.isAuthenticated` which is currently `false` since we haven't logged in.
+
+**Testing Protected Routes:**
+
+To temporarily test the protected routes and see the full layout with sidebar navigation, you can add a test login button. Update your **src/pages/Login.tsx**:
+
+```typescript
+import { useStore } from "@/app/stores/root.store";
+import { useNavigate } from "react-router";
+import { Button } from "@/shared/components/ui/button";
+
+const Login = () => {
+	const { authStore } = useStore();
+	const navigate = useNavigate();
+
+	const handleTestLogin = () => {
+		// Temporary test login - we'll replace this with real authentication later
+		authStore.login(
+			{
+				id: "1",
+				email: "test@example.com",
+				firstName: "Test",
+				lastName: "User",
+			},
+			"fake-token-123"
+		);
+		// Navigate to dashboard after login
+		navigate("/");
+	};
+
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+			<div className="max-w-md w-full space-y-6 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+				<div className="text-center">
+					<h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+						Login
+					</h2>
+					<p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+						Temporary test login for development
+					</p>
+				</div>
+				<Button onClick={handleTestLogin} className="w-full" size="lg">
+					Test Login
+				</Button>
+			</div>
 		</div>
 	);
 };
@@ -466,53 +1136,16 @@ const Login = () => {
 export default Login;
 ```
 
-Register.tsx
+Now when you visit the app:
 
-```typescript
-const Register = () => {
-	return (
-		<div>
-			<p>Register</p>
-		</div>
-	);
-};
+1. You'll land on the Login page
+2. Click "Test Login"
+3. You'll be redirected to the Dashboard with a working sidebar
+4. You can navigate between Dashboard and Settings
+5. Try the theme toggle button (moon/sun icon)
+6. Click "Logout" to be redirected back to Login
 
-export default Register;
-```
-
-Settings.tsx
-
-```typescript
-const Settings = () => {
-	return (
-		<div>
-			<p>Settings</p>
-		</div>
-	);
-};
-
-export default Settings;
-```
-
-Now we need to establish a Router Provider to replace our hello p tag so we can dynamically swap components based on the route.
-
-In src/config/routes.config.tsx:
-
-```typescript
-
-```
-
-In src/app/router/index.tsx establish the following:
-
-```typescript
-
-```
-
-**Note**: This router setup is a basic example that you should use as a reference and add to as you go such - as error pages, loading indicators etc.
-
-### State Management Setup
-
-Now we can install a state management library. As with routing, there are many options to choose from. We will be using
+**Note**: This router setup is a foundational example. As you progress through this guide, you'll add real authentication with API calls, proper form handling, and more sophisticated features. For now, this gives us a solid routing foundation to build upon.
 
 ## Continued Development
 
@@ -523,3 +1156,7 @@ Now we can install a state management library. As with routing, there are many o
 A guide for working with Docker can be found [here]().
 
 ### Deploy Application to Kubernetes
+
+```
+
+```
