@@ -1,11 +1,18 @@
 import { type ReactNode, type ComponentType } from "react";
-import { HiMiniSquares2X2, HiCog6Tooth } from "react-icons/hi2";
+/**
+ * Visit https://react-icons.github.io/react-icons/ to search for an icon of your liking
+ */
+import { HiCog6Tooth } from "react-icons/hi2";
 import { RiLoginBoxLine, RiUserAddLine } from "react-icons/ri";
+import { IoGameController } from "react-icons/io5";
+import { FaTrophy, FaChartLine } from "react-icons/fa";
 
 // Pages
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import Dashboard from "@/pages/Dashboard";
+import Game from "@/pages/Game";
+import Leaderboard from "@/pages/Leaderboard";
+import MyStats from "@/pages/MyStats";
 import Settings from "@/pages/Settings";
 
 /**
@@ -15,7 +22,7 @@ export interface RouteConfig {
 	name: string;
 	path: string;
 	icon?: ReactNode;
-	component: ComponentType<any>;
+	component: ComponentType;
 	requiresAuth: boolean;
 	showInSidebar: boolean;
 }
@@ -44,11 +51,27 @@ export const ROUTES_CONFIG: RouteConfig[] = [
 
 	// Protected routes
 	{
-		name: "Dashboard",
+		name: "Play",
 		path: "/",
-		icon: <HiMiniSquares2X2 />,
-		component: Dashboard,
-		requiresAuth: true,
+		icon: <IoGameController />,
+		component: Game,
+		requiresAuth: false, // Game is public but shows different features when logged in
+		showInSidebar: true,
+	},
+	{
+		name: "Leaderboard",
+		path: "/leaderboard",
+		icon: <FaTrophy />,
+		component: Leaderboard,
+		requiresAuth: false, // Leaderboard is public
+		showInSidebar: true,
+	},
+	{
+		name: "My Stats",
+		path: "/stats",
+		icon: <FaChartLine />,
+		component: MyStats,
+		requiresAuth: true, // Only logged in users can see their stats
 		showInSidebar: true,
 	},
 	{

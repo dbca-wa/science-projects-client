@@ -3,8 +3,7 @@ import { makeAutoObservable } from "mobx";
 export interface User {
 	id: string;
 	email: string;
-	firstName: string;
-	lastName: string;
+	username: string;
 }
 
 export class AuthStore {
