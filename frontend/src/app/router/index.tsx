@@ -1,37 +1,43 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import { ROUTES_CONFIG } from "@/config/routes.config";
 import { ProtectedRoute } from "./guards/auth.guard";
-
-// We will create this file soon
 import AppLayout from "@/shared/components/layout/AppLayout";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 /**
  * Generate router from configuration
  */
 const generateRouter = () => {
-	// Separate public and protected routes
-	const publicRoutes = ROUTES_CONFIG.filter((r) => !r.requiresAuth);
-	const protectedRoutes = ROUTES_CONFIG.filter((r) => r.requiresAuth);
-
 	return createBrowserRouter([
-		// Public routes (no layout)
-		...publicRoutes.map((route) => ({
-			path: route.path,
-			element: <route.component />,
-		})),
+		// Auth routes (no layout)
+		{
+			path: "/login",
+			element: <Login />,
+		},
+		{
+			path: "/register",
+			element: <Register />,
+		},
 
-		// Protected routes (with layout)
+		// All other routes use the layout
 		{
 			path: "/",
-			element: (
-				<ProtectedRoute>
-					<AppLayout />
-				</ProtectedRoute>
-			),
-			children: protectedRoutes.map((route) => ({
-				path: route.path === "/" ? "" : route.path,
-				element: <route.component />,
-			})),
+			element: <AppLayout />,
+			children: ROUTES_CONFIG.filter(
+				(r) => r.path !== "/login" && r.path !== "/register"
+			).map((route) => {
+				const element = <route.component />;
+
+				return {
+					path: route.path === "/" ? "" : route.path,
+					element: route.requiresAuth ? (
+						<ProtectedRoute>{element}</ProtectedRoute>
+					) : (
+						element
+					),
+				};
+			}),
 		},
 
 		// Catch-all redirect

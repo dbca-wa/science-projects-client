@@ -2,8 +2,13 @@
 
 ## Overview
 
-This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology. For the sake of completeness, this guide will show you how to develop a simple Todo app which utilises the tech mentioned in the stack below.
-Note: This represents a recommended approach rather than a strict requirement. It assumes developers have access to install necessary tools and are using Windows as their primary operating system.
+This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology.
+
+**What We're Building:** A Reaction Clicker game - an engaging web application where players click targets that appear randomly on screen before they disappear. This application naturally demonstrates all the technologies in our stack through real-world implementation patterns.
+
+**Learning Approach:** We'll build the game using our modern stack, showcasing proper architecture, state management, API integration, and component patterns. This game format provides clear use cases for authentication (user accounts), forms (settings), real-time updates (game state), and backend integration (leaderboards and statistics).
+
+Note: This represents a recommended approach rather than a strict organisational requirement. It assumes developers have access to install necessary tools and are using Windows as their primary operating system, as per DBCA standard.
 
 ## Stack
 
@@ -56,7 +61,7 @@ This guide prioritises pragmatic architecture for small-to-medium scale applicat
 
 ### Project Structure
 
-This guide assumes the frontend and backend are bundled in the same repository for simplicity, with each creating its own Docker image:
+This guide assumes the frontend and backend are bundled in the same repository (for simplicity), with each creating its own Docker image:
 
 ```
 project_root/:
@@ -84,11 +89,12 @@ src/
 │       ├── root.store.ts        # Root store orchestration
 │       ├── auth.store.ts        # Authentication state
 │       ├── ui.store.ts          # UI preferences and theme
-│       ├── ...                  # Any other stores related to the project
+│       ├── game.store.ts        # Game state management
 ├── features/                    # Feature-based modules
-│   ├── auth/                    # Authentication configuration with backend
-│   ├── dashboard/               # Dashboard and overview
-│   └── .../                     # Any other feature folders specific to application
+│   ├── auth/                    # Authentication
+│   ├── game/                    # Game mechanics and UI
+│   ├── leaderboard/             # Leaderboard display
+│   └── stats/                   # User statistics
 ├── pages/                       # Pages built from components to route between
 ├── shared/                      # Shared resources
 │   ├── components/              # Reusable UI components
@@ -116,7 +122,6 @@ src/features/[feature-name]/
 ├── components/                     # Feature-specific components
 │   ├── forms/                      # Form components
 │   ├── modals/                     # Modal components
-│   ├── tables/                     # Data table components
 │   └── index.ts                    # Barrel exports
 ├── hooks/                          # Feature-specific hooks
 │   ├── use[Feature].ts             # Main feature hook
@@ -193,7 +198,7 @@ Delete the following files and folders:
 -   index.css
 -   assets folder
 
-Create a subfolder in src called 'shared', and another folder called 'styles', then create an index.css in that folder.
+Create a subfolder in src called 'shared', and another folder called 'styles', then create an index.css in that folder, liks so:
 
 ```bash
 mkdir -p src/shared/styles && touch src/shared/styles/index.css
@@ -398,7 +403,7 @@ This ensures that when we install new components from shadcn, they are installed
 bunx shadcn@latest add button
 ```
 
-The beauty of shadcn is that you can directly edit this component source code to your liking and the component remains reusable througout. Test it out by adding it to your main.tsx and playing with the variant/classname:
+The beauty of shadcn is that you can directly edit this component's source code to your liking and the component remains reusable througout. Test it out by adding it to your main.tsx and playing with the variant/classname:
 
 ```typescript
 import { StrictMode } from "react";
@@ -420,7 +425,8 @@ If you have made it this far, congratulations, the styling setup is complete.
 
 ### State Management Setup
 
-Before we set up routing, we need to establish our state management system using MobX. This will handle our authentication state, UI preferences, and other client-side data that needs to be reactive across our application.
+Before we set up routing, we need to establish our state management system using MobX. This will handle our authentication state, UI preferences, game state, and other client-side data that needs to be reactive across our application.
+
 First, install the required dependencies:
 
 ```bash
@@ -443,8 +449,7 @@ import { makeAutoObservable } from "mobx";
 export interface User {
 	id: string;
 	email: string;
-	firstName: string;
-	lastName: string;
+	username: string;
 }
 
 export class AuthStore {
@@ -705,31 +710,31 @@ Install it and prepare a routing config, routing folder, and routing guards with
 bun add react-router && mkdir -p src/config && touch src/config/routes.config.tsx && mkdir -p src/app/router/guards && touch src/app/router/index.tsx src/app/router/guards/auth.guard.tsx
 ```
 
-Next we need to also setup some base pages to route between. Create a pages folder with a Login.tsx file, a Register.tsx file, a Settings.tsx file, and a Dashboard.tsx file.
+Next we need to also setup some base pages to route between. Create a pages folder with the necessary files:
 
 ```bash
-mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Dashboard.tsx src/pages/Settings.tsx
+mkdir src/pages && touch src/pages/Login.tsx src/pages/Register.tsx src/pages/Game.tsx src/pages/Leaderboard.tsx src/pages/MyStats.tsx src/pages/Settings.tsx
 ```
 
-For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Redux/React-Native snippets' by dsznajder. Once installed you can go into the Dashboard.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
+For scaffolding these files and an improved developer experience, we recommend installing the VS Code extension 'ES7+ React/Redux/React-Native snippets' by dsznajder. Once installed you can go into the Game.tsx file and type 'rafce' and press Enter - this will create boilerplate for the file and its export.
 
 Ensure it looks like this:
 
 ```typescript
-const Dashboard = () => {
-	return Dashboard;
+const Game = () => {
+	return <div>Game</div>;
 };
 
-export default Dashboard;
+export default Game;
 ```
 
-Repeat the process for the other three files.
+Repeat the process for the other files.
 
 **Login.tsx:**
 
 ```typescript
 const Login = () => {
-	return Login;
+	return <div>Login</div>;
 };
 
 export default Login;
@@ -739,17 +744,37 @@ export default Login;
 
 ```typescript
 const Register = () => {
-	return Register;
+	return <div>Register</div>;
 };
 
 export default Register;
+```
+
+**Leaderboard.tsx:**
+
+```typescript
+const Leaderboard = () => {
+	return <div>Leaderboard</div>;
+};
+
+export default Leaderboard;
+```
+
+**MyStats.tsx:**
+
+```typescript
+const MyStats = () => {
+	return <div>My Stats</div>;
+};
+
+export default MyStats;
 ```
 
 **Settings.tsx:**
 
 ```typescript
 const Settings = () => {
-	return Settings;
+	return <div>Settings</div>;
 };
 
 export default Settings;
@@ -774,11 +799,15 @@ import { type ReactNode, type ComponentType } from "react";
  */
 import { HiMiniSquares2X2, HiCog6Tooth } from "react-icons/hi2";
 import { RiLoginBoxLine, RiUserAddLine } from "react-icons/ri";
+import { IoGameController } from "react-icons/io5";
+import { FaTrophy, FaChartLine } from "react-icons/fa";
 
 // Pages
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import Dashboard from "@/pages/Dashboard";
+import Game from "@/pages/Game";
+import Leaderboard from "@/pages/Leaderboard";
+import MyStats from "@/pages/MyStats";
 import Settings from "@/pages/Settings";
 
 /**
@@ -817,11 +846,27 @@ export const ROUTES_CONFIG: RouteConfig[] = [
 
 	// Protected routes
 	{
-		name: "Dashboard",
+		name: "Play",
 		path: "/",
-		icon: <HiMiniSquares2X2 />,
-		component: Dashboard,
-		requiresAuth: true,
+		icon: <IoGameController />,
+		component: Game,
+		requiresAuth: false, // Game is public but shows different features when logged in
+		showInSidebar: true,
+	},
+	{
+		name: "Leaderboard",
+		path: "/leaderboard",
+		icon: <FaTrophy />,
+		component: Leaderboard,
+		requiresAuth: false, // Leaderboard is public
+		showInSidebar: true,
+	},
+	{
+		name: "My Stats",
+		path: "/stats",
+		icon: <FaChartLine />,
+		component: MyStats,
+		requiresAuth: true, // Only logged in users can see their stats
 		showInSidebar: true,
 	},
 	{
@@ -877,7 +922,7 @@ export const ProtectedRoute = observer(
 
 		if (!authStore.isAuthenticated) {
 			// Redirect to login, but save the location they were trying to access
-			return;
+			return <Navigate to="/login" state={{ from: location }} replace />;
 		}
 
 		return <>{children}</>;
@@ -895,37 +940,43 @@ Now create the main router in **src/app/router/index.tsx**:
 import { createBrowserRouter, Navigate } from "react-router";
 import { ROUTES_CONFIG } from "@/config/routes.config";
 import { ProtectedRoute } from "./guards/auth.guard";
-
-// We will create this file soon
 import AppLayout from "@/shared/components/layout/AppLayout";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 /**
  * Generate router from configuration
  */
 const generateRouter = () => {
-	// Separate public and protected routes
-	const publicRoutes = ROUTES_CONFIG.filter((r) => !r.requiresAuth);
-	const protectedRoutes = ROUTES_CONFIG.filter((r) => r.requiresAuth);
-
 	return createBrowserRouter([
-		// Public routes (no layout)
-		...publicRoutes.map((route) => ({
-			path: route.path,
-			element: <route.component />,
-		})),
+		// Auth routes (no layout)
+		{
+			path: "/login",
+			element: <Login />,
+		},
+		{
+			path: "/register",
+			element: <Register />,
+		},
 
-		// Protected routes (with layout)
+		// All other routes use the layout
 		{
 			path: "/",
-			element: (
-				<ProtectedRoute>
-					<AppLayout />
-				</ProtectedRoute>
-			),
-			children: protectedRoutes.map((route) => ({
-				path: route.path === "/" ? "" : route.path,
-				element: <route.component />,
-			})),
+			element: <AppLayout />,
+			children: ROUTES_CONFIG.filter(
+				(r) => r.path !== "/login" && r.path !== "/register"
+			).map((route) => {
+				const element = <route.component />;
+
+				return {
+					path: route.path === "/" ? "" : route.path,
+					element: route.requiresAuth ? (
+						<ProtectedRoute>{element}</ProtectedRoute>
+					) : (
+						element
+					),
+				};
+			}),
 		},
 
 		// Catch-all redirect
@@ -941,10 +992,10 @@ export const router = generateRouter();
 
 This router:
 
--   Separates public routes (login, register) from protected routes
+-   Separates public routes (login, register, game, leaderboard) from protected routes (stats, settings)
 -   Wraps protected routes with the authentication guard
 -   Applies a layout to authenticated pages using React Router's `Outlet` component for nested routing
--   Redirects any unknown routes to the dashboard
+-   Redirects any unknown routes to the game page
 
 #### Create the App Layout
 
@@ -970,16 +1021,13 @@ const AppLayout = observer(() => {
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-			{/* Header */}
 			<header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div className="mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-16">
 						<h1 className="text-xl font-bold text-gray-900 dark:text-white">
-							Task Manager
+							Reaction Clicker
 						</h1>
-
 						<div className="flex items-center gap-4">
-							{/* Theme Toggle */}
 							<Button
 								variant="outline"
 								size="sm"
@@ -987,44 +1035,50 @@ const AppLayout = observer(() => {
 							>
 								{uiStore.theme === "light" ? "🌙" : "☀️"}
 							</Button>
-
-							{/* User Info & Logout */}
-							<div className="flex items-center gap-2">
-								<span className="text-sm text-gray-600 dark:text-gray-300">
-									{authStore.user?.email || "Guest"}
-								</span>
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => authStore.logout()}
-								>
-									Logout
-								</Button>
-							</div>
+							{authStore.isAuthenticated ? (
+								<div className="flex items-center gap-2">
+									<span className="text-sm text-gray-600 dark:text-gray-300">
+										{authStore.user?.username || "Guest"}
+									</span>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => authStore.logout()}
+									>
+										Logout
+									</Button>
+								</div>
+							) : (
+								<Link to="/login">
+									<Button variant="outline" size="sm">
+										Login
+									</Button>
+								</Link>
+							)}
 						</div>
 					</div>
 				</div>
 			</header>
-
-			{/* Sidebar & Main Content */}
 			<div className="flex">
-				{/* Sidebar */}
 				<aside className="w-64 bg-white dark:bg-gray-800 min-h-[calc(100vh-4rem)] border-r border-gray-200 dark:border-gray-700">
 					<nav className="p-4 space-y-2">
 						{sidebarRoutes.map((route) => {
 							const isActive = location.pathname === route.path;
+							const requiresAuth = route.requiresAuth;
+							const canAccess =
+								!requiresAuth || authStore.isAuthenticated;
+
+							if (!canAccess) return null;
+
 							return (
 								<Link
 									key={route.path}
 									to={route.path}
-									className={`
-                    flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
-                    ${
-						isActive
-							? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-							: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-					}
-                  `}
+									className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+										isActive
+											? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+											: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+									}`}
 								>
 									<span className="text-lg">
 										{route.icon}
@@ -1037,8 +1091,6 @@ const AppLayout = observer(() => {
 						})}
 					</nav>
 				</aside>
-
-				{/* Main Content */}
 				<main className="flex-1 p-8">
 					<Outlet />
 				</main>
@@ -1053,10 +1105,11 @@ export default AppLayout;
 This layout component:
 
 -   Uses MobX stores (`observer` HOC) for reactivity with theme and auth state
--   Displays a header with theme toggle and logout button
+-   Displays a header with theme toggle and login/logout button
 -   Shows a sidebar with navigation links based on our route configuration
+-   Conditionally shows routes based on authentication status
 -   Highlights the active route using React Router's `useLocation` hook
--   Uses `<Outlet />` to render child routes (Dashboard, Settings, etc.)
+-   Uses `<Outlet />` to render child routes
 -   Supports dark mode through Tailwind's dark mode classes
 
 #### Connect the Router to Your App
@@ -1082,13 +1135,13 @@ createRoot(document.getElementById("root")!).render(
 
 #### Test the Router
 
-Now run `bun run dev` and navigate to http://127.0.0.1:3000. You'll see the Login page since we haven't set up authentication yet. You can manually type `/register` in the URL to see the routing works.
+Now run `bun run dev` and navigate to http://127.0.0.1:3000. You'll see the Game page (since it's our home route and doesn't require auth). You can navigate between Play and Leaderboard without logging in.
 
-If you try to navigate to `/` or `/settings`, you'll be redirected back to `/login` because the `ProtectedRoute` guard is working correctly - it checks `authStore.isAuthenticated` which is currently `false` since we haven't logged in.
+If you try to navigate to `/stats` or `/settings`, you'll be redirected back to `/login` because these routes require authentication.
 
 **Testing Protected Routes:**
 
-To temporarily test the protected routes and see the full layout with sidebar navigation, you can add a test login button. Update your **src/pages/Login.tsx**:
+To temporarily test the protected routes and see how the navigation changes when logged in, update your **src/pages/Login.tsx**:
 
 ```typescript
 import { useStore } from "@/app/stores/root.store";
@@ -1100,17 +1153,14 @@ const Login = () => {
 	const navigate = useNavigate();
 
 	const handleTestLogin = () => {
-		// Temporary test login - we'll replace this with real authentication later
 		authStore.login(
 			{
 				id: "1",
 				email: "test@example.com",
-				firstName: "Test",
-				lastName: "User",
+				username: "TestPlayer",
 			},
 			"fake-token-123"
 		);
-		// Navigate to dashboard after login
 		navigate("/");
 	};
 
@@ -1138,25 +1188,13 @@ export default Login;
 
 Now when you visit the app:
 
-1. You'll land on the Login page
-2. Click "Test Login"
-3. You'll be redirected to the Dashboard with a working sidebar
-4. You can navigate between Dashboard and Settings
-5. Try the theme toggle button (moon/sun icon)
-6. Click "Logout" to be redirected back to Login
+1. You'll land on the Game page
+2. Notice the sidebar only shows "Play" and "Leaderboard"
+3. Click the "Login" button in the header
+4. Click "Test Login"
+5. You'll be redirected back to the game, but now the sidebar shows all routes including "My Stats" and "Settings"
+6. The header now shows your username and a "Logout" button
+7. Try the theme toggle button (moon/sun icon)
+8. Click "Logout" and watch the sidebar update to hide protected routes
 
 **Note**: This router setup is a foundational example. As you progress through this guide, you'll add real authentication with API calls, proper form handling, and more sophisticated features. For now, this gives us a solid routing foundation to build upon.
-
-## Continued Development
-
-## Setup for DevOps
-
-### Docker
-
-A guide for working with Docker can be found [here]().
-
-### Deploy Application to Kubernetes
-
-```
-
-```
