@@ -993,13 +993,13 @@ export const router = generateRouter();
 This router:
 
 -   Separates public routes (login, register, game, leaderboard) from protected routes (stats, settings)
--   Wraps protected routes with the authentication guard
+-   Wraps protected routes with the authentication guard (causing redirect in attempting non-public pages when not logged in)
 -   Applies a layout to authenticated pages using React Router's `Outlet` component for nested routing
 -   Redirects any unknown routes to the game page
 
 #### Create the App Layout
 
-Before the router works, we need to create the layout component. Create the folder and file:
+Before working on the router, we need to create the layout component so pages can share a structure. Create the folder and file:
 
 ```bash
 mkdir -p src/shared/components/layout && touch src/shared/components/layout/AppLayout.tsx
@@ -1112,6 +1112,8 @@ This layout component:
 -   Uses `<Outlet />` to render child routes
 -   Supports dark mode through Tailwind's dark mode classes
 
+**Note:** We could further componetise this with a separate Navbar and Sidebar component.
+
 #### Connect the Router to Your App
 
 Finally, update **src/main.tsx** to use the router:
@@ -1186,15 +1188,114 @@ const Login = () => {
 export default Login;
 ```
 
+#### Add Page Titles
+
+You may notice that the title of the tab is simply "Vite + React" with the default Vite icon and doesn't update as we move between pages. This is because we have not yet configured React Helmet Async for dynamic page titles. For the purposes of this tutorial, we will keep the default Vite icon, but you can adjust your favicon by changing the path (and type) of your image via this line in your index.html:
+
+```html
+<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+```
+
+As for titles, begin by installing React Helmet Async:
+
+```bash
+bun add react-helmet-async
+```
+
+Next, wrap the Router with the HelmetProvider component and remove StrictMode component. Update **src/main.tsx**:
+
+```typescript
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "react-router";
+import "./shared/styles/index.css";
+import { StoreProvider } from "./app/stores/root.store";
+import { router } from "./app/router";
+import { HelmetProvider } from "react-helmet-async";
+
+createRoot(document.getElementById("root")!).render(
+	<StoreProvider>
+		<HelmetProvider>
+			<RouterProvider router={router} />
+		</HelmetProvider>
+	</StoreProvider>
+);
+```
+
+To avoid repeating page names and metadata, it's a good practice to create a reusable component that uses the route configuration. Create **src/shared/components/layout/PageHead.tsx**:
+
+```bash
+	touch src/shared/components/layout/PageHead.tsx
+```
+
+```typescript
+import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router";
+import { ROUTES_CONFIG } from "@/config/routes.config";
+
+interface PageHeadProps {
+	title?: string;
+	description?: string;
+}
+
+export const PageHead = ({ title, description }: PageHeadProps) => {
+	const location = useLocation();
+
+	// Find route config for current page if title not provided
+	const route = ROUTES_CONFIG.find((r) => r.path === location.pathname);
+	const pageTitle = title || route?.name || "Reaction Clicker";
+	const appName = "Reaction Clicker";
+	const fullTitle =
+		pageTitle === appName ? appName : `${pageTitle} | ${appName}`;
+
+	return (
+		<Helmet>
+			<title>{fullTitle}</title>
+			{description && <meta name="description" content={description} />}
+		</Helmet>
+	);
+};
+```
+
+Now update your pages to use this component. For example, **src/pages/Game.tsx**:
+
+```typescript
+import { PageHead } from "@/shared/components/layout/PageHead";
+
+const Game = () => {
+	return (
+		<>
+			<PageHead />
+			<p>Game</p>
+		</>
+	);
+};
+
+export default Game;
+```
+
+The `PageHead` component automatically pulls the page name from `ROUTES_CONFIG` based on the current route, so you don't need to manually specify the title unless you want to override it. For pages with custom titles, you can pass them explicitly:
+
+```typescript
+<PageHead title="Custom Title" description="Custom description for SEO" />
+```
+
+Repeat this pattern for all your pages (Leaderboard, MyStats, Settings). The Login and Register pages can also use `PageHead` since they're in the routes config.
+
+Now when you navigate between pages, you'll see the browser tab title update automatically to match each page (e.g., "Play | Reaction Clicker", "Leaderboard | Reaction Clicker", etc.).
+
+**Testing the Complete Setup:**
+
 Now when you visit the app:
 
-1. You'll land on the Game page
-2. Notice the sidebar only shows "Play" and "Leaderboard"
-3. Click the "Login" button in the header
-4. Click "Test Login"
-5. You'll be redirected back to the game, but now the sidebar shows all routes including "My Stats" and "Settings"
-6. The header now shows your username and a "Logout" button
-7. Try the theme toggle button (moon/sun icon)
-8. Click "Logout" and watch the sidebar update to hide protected routes
+1. You'll land on the Game page with the title "Play | Reaction Clicker"
+2. The layout includes a header with theme toggle and a sidebar with navigation
+3. Notice the sidebar only shows "Play" and "Leaderboard" (public routes)
+4. Click the "Login" button in the header to see the login page (no layout)
+5. Click "Test Login" and you'll be redirected back to the game
+6. Now the sidebar shows all routes including "My Stats" and "Settings"
+7. The header displays your username and a "Logout" button
+8. Try the theme toggle button (moon/sun icon) - the theme persists across page refreshes
+9. Navigate between pages and watch the tab title update automatically
+10. Click "Logout" and the sidebar updates to hide protected routes
 
-**Note**: This router setup is a foundational example. As you progress through this guide, you'll add real authentication with API calls, proper form handling, and more sophisticated features. For now, this gives us a solid routing foundation to build upon.
+**Note**: This router setup provides a solid foundation. As you progress through this guide, you'll add real authentication with API calls, proper form handling with React Hook Form and Zod, and backend integration with TanStack Query. The `PageHead` component can be extended to include other metadata like OpenGraph tags, Twitter cards, and canonical URLs for production applications.

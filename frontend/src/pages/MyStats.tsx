@@ -1,5 +1,12 @@
+import { PageHead } from "@/shared/components/layout/PageHead";
+
 const MyStats = () => {
-	return <div>MyStats</div>;
+	return (
+		<>
+			<PageHead />
+			<p>MyStats</p>
+		</>
+	);
 };
 
 export default MyStats;

@@ -1,8 +1,11 @@
+import { PageHead } from "@/shared/components/layout/PageHead";
+
 const Register = () => {
 	return (
-		<div>
+		<>
+			<PageHead />
 			<p>Register</p>
-		</div>
+		</>
 	);
 };
 

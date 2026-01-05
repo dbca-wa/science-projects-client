@@ -1,5 +1,12 @@
+import { PageHead } from "@/shared/components/layout/PageHead";
+
 const Game = () => {
-	return <div>Game</div>;
+	return (
+		<>
+			<PageHead />
+			<p>Game</p>
+		</>
+	);
 };
 
 export default Game;
