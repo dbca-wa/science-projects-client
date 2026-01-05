@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useStore } from "@/app/stores/root.store";
+import { useStore } from "@/app/stores/useStore";
 
 /**
  * Protected Route Guard

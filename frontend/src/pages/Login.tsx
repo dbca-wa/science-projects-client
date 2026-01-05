@@ -1,4 +1,4 @@
-import { useStore } from "@/app/stores/root.store";
+import { useStore } from "@/app/stores/useStore";
 import { useNavigate } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import { PageHead } from "@/shared/components/layout/PageHead";
@@ -13,8 +13,7 @@ const Login = () => {
 			{
 				id: "1",
 				email: "test@example.com",
-				firstName: "Test",
-				lastName: "User",
+				username: "Guest",
 			},
 			"fake-token-123"
 		);
