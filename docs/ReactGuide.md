@@ -2,9 +2,9 @@
 
 ## Overview
 
-This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology.
+This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology. The guide is designed so that developers can more or less fully develop the frontend, step-by-step, before creating a simple backend and devops flow to tie it all together.
 
-**What We're Building:** A Reaction Clicker game - an engaging web application where players click targets that appear randomly on screen before they disappear. This application naturally demonstrates all the technologies in our stack through real-world implementation patterns.
+**What We're Building:** A Reaction Clicker game - a web application where players click targets that appear randomly on screen before they disappear. This application naturally demonstrates all the technologies in our stack through real-world implementation patterns.
 
 **Learning Approach:** We'll build the game using our modern stack, showcasing proper architecture, state management, API integration, and component patterns. This game format provides clear use cases for authentication (user accounts), forms (settings), real-time updates (game state), and backend integration (leaderboards and statistics).
 
@@ -2564,15 +2564,11 @@ Now you can test the Settings page:
 
 You now have a fully functional settings form! These same patterns will be used for the login and register forms when we add real authentication.
 
-## Backend Setup with Axios & Tanstack Query
-
-Now that we have our frontend working with local state, it's time to connect to a backend. We'll configure Axios as our HTTP client with proper error handling, authentication token management, and request/response interceptors.
+## Axios & Tanstack Query
 
 ### Install Dependencies
 
 Now that we have our frontend working with local state, it's time to connect to a backend. We'll configure Axios as our HTTP client and TanStack Query for server state management, caching, and intelligent data fetching.
-
-### Install Dependencies
 
 First, install Axios for HTTP requests and TanStack Query for server state management:
 
@@ -2584,3 +2580,1158 @@ bun add -D @tanstack/react-query-devtools
 -   **axios**: HTTP client for making API requests
 -   **@tanstack/react-query**: Server state management and caching
 -   **@tanstack/react-query-devtools**: Development tools for debugging queries
+
+### Create Environment Configuration
+
+Set up environment variables for your API URL. Create an `.env` file at the root of your frontend folder:
+
+```bash
+touch .env
+```
+
+**frontend/.env:**
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
+
+**Important:** Vite requires environment variables to be prefixed with `VITE_` to be exposed to your app.
+
+Add `.env` to your `.gitignore` if it's not already there, and create an example env file for clarity with other developers what the env file contains:
+
+```bash
+touch .env.example
+```
+
+**frontend/.env.example:**
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
+
+### Configure Axios Client
+
+Create an Axios instance with interceptors for authentication and error handling:
+
+```bash
+touch src/shared/lib/api-client.ts
+```
+
+**src/shared/lib/api-client.ts:**
+
+```typescript
+import axios, { type AxiosError, type AxiosResponse } from "axios";
+import { rootStore } from "@/app/stores/store-context";
+
+/**
+ * Axios instance configured for our API
+ */
+export const apiClient = axios.create({
+	baseURL:
+		import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/v1",
+	timeout: 10000, // 10 second timeout
+	headers: {
+		"Content-Type": "application/json",
+	},
+});
+
+/**
+ * Request interceptor to add auth token to all requests
+ */
+apiClient.interceptors.request.use(
+	(config) => {
+		const token = rootStore.authStore.token;
+
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
+
+/**
+ * Response interceptor for centralised error handling
+ */
+apiClient.interceptors.response.use(
+	(response: AxiosResponse) => {
+		// Return successful responses as-is
+		return response;
+	},
+	(error: AxiosError) => {
+		// Handle different error scenarios
+		if (error.response) {
+			// Server responded with error status
+			const status = error.response.status;
+
+			switch (status) {
+				case 401:
+					// Unauthorized - token expired or invalid
+					rootStore.authStore.logout();
+					window.location.href = "/login";
+					break;
+				case 403:
+					// Forbidden
+					console.error("Access forbidden");
+					break;
+				case 404:
+					// Not found
+					console.error("Resource not found");
+					break;
+				case 500:
+					// Server error
+					console.error("Server error occurred");
+					break;
+				default:
+					console.error(`Error ${status}:`, error.response.data);
+			}
+		} else if (error.request) {
+			// Request made but no response received
+			console.error("No response from server");
+		} else {
+			// Error setting up the request
+			console.error("Request error:", error.message);
+		}
+
+		return Promise.reject(error);
+	}
+);
+```
+
+This Axios configuration:
+
+-   Sets a base URL from environment variables
+-   Adds a 10-second timeout for all requests
+-   **Request Interceptor**: Automatically adds JWT token to every request
+-   **Response Interceptor**: Handles errors globally (401 redirects to login, logs other errors)
+
+### Configure TanStack Query
+
+Create a Query Client with sensible defaults:
+
+```bash
+touch src/shared/lib/query-client.ts
+```
+
+**src/shared/lib/query-client.ts:**
+
+```typescript
+import { QueryClient } from "@tanstack/react-query";
+
+/**
+ * Query client configuration for TanStack Query
+ */
+export const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
+			gcTime: 1000 * 60 * 10, // Cache data for 10 minutes
+			retry: 1, // Retry failed requests once
+			refetchOnWindowFocus: false, // Don't refetch when window regains focus
+		},
+		mutations: {
+			retry: 0, // Don't retry mutations
+		},
+	},
+});
+```
+
+**Configuration explained:**
+
+-   `staleTime`: How long fetched data is considered "fresh" (5 minutes)
+-   `gcTime`: How long unused data stays in cache before garbage collection (10 minutes)
+-   `retry`: Number of automatic retries on failed requests
+-   `refetchOnWindowFocus`: Whether to refetch data when user returns to the tab
+
+### Add Query Provider to Application
+
+Update **src/main.tsx** to wrap your app with the QueryClientProvider:
+
+```typescript
+// Providers
+import { RouterProvider } from "react-router";
+import "./shared/styles/index.css";
+import { StoreProvider } from "./app/stores/root.store";
+import { HelmetProvider } from "react-helmet-async";
+import { QueryClientProvider } from "@tanstack/react-query";
+
+// Configs
+import { router } from "./app/router";
+import { queryClient } from "./shared/lib/query-client";
+
+// Other
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "sonner";
+import { createRoot } from "react-dom/client";
+
+createRoot(document.getElementById("root")!).render(
+	<StoreProvider>
+		<QueryClientProvider client={queryClient}>
+			<HelmetProvider>
+				<RouterProvider router={router} />
+				<Toaster position="top-right" richColors />
+				<ReactQueryDevtools />
+			</HelmetProvider>
+		</QueryClientProvider>
+	</StoreProvider>
+);
+```
+
+**Note:** The `ReactQueryDevtools` component adds a helpful debugging panel in the bottom-left corner during development. It shows all active queries, their states, and cached data.
+
+### Create API Type Definitions
+
+Define TypeScript interfaces for API responses:
+
+```bash
+mkdir -p src/shared/types && touch src/shared/types/api.types.ts
+```
+
+**src/shared/types/api.types.ts:**
+
+```typescript
+/**
+ * Standard API response wrapper
+ */
+export interface ApiResponse<T> {
+	data: T;
+	message?: string;
+	success: boolean;
+}
+
+/**
+ * API error response
+ */
+export interface ApiError {
+	message: string;
+	errors?: Record<string, string[]>;
+	statusCode: number;
+}
+
+/**
+ * Pagination metadata
+ */
+export interface PaginationMeta {
+	page: number;
+	pageSize: number;
+	totalPages: number;
+	totalItems: number;
+}
+
+/**
+ * Paginated API response
+ */
+export interface PaginatedResponse<T> {
+	data: T[];
+	meta: PaginationMeta;
+}
+```
+
+These types ensure type safety when working with API responses throughout your application.
+
+### Create Authentication Service
+
+Now let's create a service that uses Axios to make API calls. This service will be consumed by TanStack Query hooks:
+
+```bash
+mkdir -p src/features/auth/services && touch src/features/auth/services/auth.service.ts
+```
+
+**src/features/auth/services/auth.service.ts:**
+
+```typescript
+import { apiClient } from "@/shared/lib/api-client";
+import type { ApiResponse } from "@/shared/types/api.types";
+import type { User } from "@/app/stores/auth.store";
+
+// Login request payload
+
+export interface LoginRequest {
+	email: string;
+	password: string;
+}
+
+// Login response
+
+export interface LoginResponse {
+	user: User;
+	token: string;
+}
+
+// Register request payload
+
+export interface RegisterRequest {
+	username: string;
+	email: string;
+	password: string;
+}
+
+/**
+ * Authentication service
+ * All methods return promises that TanStack Query will consume
+ */
+export const authService = {
+	// Login user
+	async login(credentials: LoginRequest): Promise<LoginResponse> {
+		const response = await apiClient.post<ApiResponse<LoginResponse>>(
+			"/auth/login",
+			credentials
+		);
+		return response.data.data;
+	},
+
+	// Register new user
+	async register(userData: RegisterRequest): Promise<LoginResponse> {
+		const response = await apiClient.post<ApiResponse<LoginResponse>>(
+			"/auth/register",
+			userData
+		);
+		return response.data.data;
+	},
+
+	// Logout user
+	async logout(): Promise<void> {
+		await apiClient.post("/auth/logout");
+	},
+
+	// Get current user
+	async getCurrentUser(): Promise<User> {
+		const response = await apiClient.get<ApiResponse<User>>("/auth/me");
+		return response.data.data;
+	},
+
+	// Update user profile
+	async updateProfile(userData: Partial<User>): Promise<User> {
+		const response = await apiClient.patch<ApiResponse<User>>(
+			"/auth/profile",
+			userData
+		);
+		return response.data.data;
+	},
+};
+```
+
+**Service Pattern:** Services are pure functions that interact with the API. They:
+
+-   Use the configured Axios client
+-   Return typed promises
+-   Handle request/response transformation
+-   Don't contain business logic (that stays in stores/hooks)
+
+### Create TanStack Query Hooks
+
+Now create hooks that use TanStack Query to consume the auth service:
+
+```bash
+mkdir -p src/features/auth/hooks && touch src/features/auth/hooks/useAuth.ts
+```
+
+**src/features/auth/hooks/useAuth.ts:**
+
+```typescript
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { authService } from "../services/auth.service";
+import type { LoginRequest, RegisterRequest } from "../services/auth.service";
+import { useStore } from "@/app/stores/useStore";
+import { toast } from "sonner";
+
+/**
+ * Query key factory for auth-related queries
+ * Provides consistent, type-safe query keys
+ */
+export const authKeys = {
+	all: ["auth"] as const,
+	user: () => [...authKeys.all, "user"] as const,
+};
+
+/**
+ * Hook to fetch current user
+ * Uses useQuery for data fetching with automatic caching
+ */
+export const useCurrentUser = () => {
+	const { authStore } = useStore();
+
+	return useQuery({
+		queryKey: authKeys.user(),
+		queryFn: authService.getCurrentUser,
+		enabled: authStore.isAuthenticated, // Only run query if user is logged in
+		staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+	});
+};
+
+/**
+ * Hook for login mutation
+ * Uses useMutation for one-time operations that modify server state
+ */
+export const useLogin = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (credentials: LoginRequest) =>
+			authService.login(credentials),
+		onSuccess: (data) => {
+			// Update MobX store with user and token
+			authStore.login(data.user, data.token);
+			// Invalidate user query to trigger refetch
+			queryClient.invalidateQueries({ queryKey: authKeys.user() });
+			toast.success("Logged in successfully!");
+		},
+		onError: (error: any) => {
+			toast.error(error.response?.data?.message || "Login failed");
+		},
+	});
+};
+
+/**
+ * Hook for register mutation
+ */
+export const useRegister = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (userData: RegisterRequest) =>
+			authService.register(userData),
+		onSuccess: (data) => {
+			authStore.login(data.user, data.token);
+			queryClient.invalidateQueries({ queryKey: authKeys.user() });
+			toast.success("Account created successfully!");
+		},
+		onError: (error: any) => {
+			toast.error(error.response?.data?.message || "Registration failed");
+		},
+	});
+};
+
+/**
+ * Hook for logout mutation
+ */
+export const useLogout = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: authService.logout,
+		onSuccess: () => {
+			authStore.logout();
+			queryClient.clear(); // Clear all cached data on logout
+			toast.success("Logged out successfully!");
+		},
+	});
+};
+```
+
+### Understanding the Architecture
+
+We're using a **three-layer architecture**:
+
+```
+Component → Hook (TanStack Query) → Service (Axios) → Backend API
+```
+
+**Layer 1: Services (Axios)**
+
+-   Pure functions that make HTTP requests
+-   Handle request/response transformation
+-   Return typed promises
+-   Example: `authService.login(credentials)`
+
+**Layer 2: Hooks (TanStack Query)**
+
+-   Wrap services with `useQuery` or `useMutation`
+-   Provide loading, error, and data states
+-   Handle caching and refetching
+-   Integrate with MobX stores
+-   Example: `useLogin()` returns `{ mutate, isLoading, error }`
+
+**Layer 3: Components**
+
+-   Call hooks to get data and mutations
+-   Handle UI rendering
+-   Show loading/error states
+-   Example: `const { mutate: login, isLoading } = useLogin()`
+
+### Key TanStack Query Concepts
+
+**Queries (useQuery):**
+
+-   For **fetching/reading** data from the server
+-   Automatically cache results
+-   Background refetching when data becomes stale
+-   Provides `data`, `isLoading`, `error` states
+-   Example: Fetching current user, leaderboard, game stats
+
+```typescript
+const { data, isLoading, error } = useQuery({
+	queryKey: ["user"],
+	queryFn: fetchUser,
+});
+```
+
+**Mutations (useMutation):**
+
+-   For **creating/updating/deleting** data on the server
+-   One-time operations (not cached)
+-   Provides callbacks for success/error handling
+-   Returns a `mutate` function to trigger the mutation
+-   Example: Login, register, submit game score
+
+```typescript
+const { mutate, isLoading } = useMutation({
+	mutationFn: loginUser,
+	onSuccess: (data) => {
+		/* handle success */
+	},
+});
+```
+
+**Query Keys:**
+
+-   Unique identifiers for cached queries
+-   Used to invalidate/refetch specific queries
+-   Best practice: Use a factory pattern for consistency
+-   Example: `authKeys.user()` returns `['auth', 'user']`
+
+**Query Invalidation:**
+
+-   Marks cached data as "stale"
+-   Triggers automatic refetch of affected queries
+-   Example: After login, invalidate user query to fetch fresh data
+
+```typescript
+queryClient.invalidateQueries({ queryKey: authKeys.user() });
+```
+
+### MobX + TanStack Query: Division of Responsibilities
+
+We use both libraries together strategically:
+
+**MobX for Client-Side State:**
+
+-   UI preferences (theme, sidebar collapsed)
+-   Game state (score, timer, targets)
+-   Auth token storage (synced to localStorage)
+-   Temporary form state
+
+**TanStack Query for Server State:**
+
+-   User profile data from API
+-   Leaderboard scores
+-   Game statistics
+-   Any data fetched from the backend
+
+**Why both?**
+
+-   MobX: Fast, synchronous updates for local state
+-   TanStack Query: Handles async data fetching, caching, and synchronization with server
+-   They complement each other perfectly!
+
+### What We've Built
+
+-   Axios client with interceptors for auth and error handling
+-   TanStack Query configuration with sensible defaults
+-   Query client provider wrapping the app
+-   Type-safe API response interfaces
+-   Authentication service with all endpoints
+-   TanStack Query hooks for login, register, logout
+-   Query devtools for debugging
+-   Three-layer architecture (Component → Hook → Service → API)
+
+### Next Steps
+
+Now that we have our API layer configured, we can:
+
+1. Build real Login/Register forms that use these hooks
+2. Connect the Settings page to update user profile on the backend
+3. Create game stats and leaderboard features with TanStack Query
+4. Submit game scores to the backend after each game
+
+## Authentication Forms with React Hook Form & Zod
+
+Now we'll build proper login and register forms that use React Hook Form for form handling, Zod for validation, and TanStack Query for API communication. For now, we'll test these forms with mock responses - you can connect them to a real Django backend later.
+
+**Note:** We will be mocking login/register until the backend/auth flow is properly setup.
+
+### Create Authentication Schemas
+
+First, define validation schemas for login and registration:
+
+```bash
+mkdir -p src/features/auth/schemas && touch src/features/auth/schemas/auth.schema.ts
+```
+
+**src/features/auth/schemas/auth.schema.ts:**
+
+```typescript
+import { z } from "zod";
+
+/**
+ * Login form validation schema
+ */
+export const loginSchema = z.object({
+	email: z
+		.string()
+		.min(1, "Email is required")
+		.email("Invalid email address"),
+	password: z
+		.string()
+		.min(1, "Password is required")
+		.min(6, "Password must be at least 6 characters"),
+});
+
+/**
+ * Register form validation schema
+ */
+export const registerSchema = z
+	.object({
+		username: z
+			.string()
+			.min(3, "Username must be at least 3 characters")
+			.max(20, "Username must be less than 20 characters")
+			.regex(
+				/^[a-zA-Z0-9_-]+$/,
+				"Username can only contain letters, numbers, underscores, and hyphens"
+			),
+		email: z
+			.string()
+			.min(1, "Email is required")
+			.email("Invalid email address"),
+		password: z
+			.string()
+			.min(6, "Password must be at least 6 characters")
+			.regex(
+				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+				"Password must contain at least one uppercase letter, one lowercase letter, and one number"
+			),
+		confirmPassword: z.string().min(1, "Please confirm your password"),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ["confirmPassword"],
+	});
+
+/**
+ * TypeScript types inferred from schemas
+ */
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
+```
+
+These schemas provide:
+
+-   Email validation
+-   Username format validation
+-   Password strength requirements
+-   Password confirmation matching
+-   Clear error messages
+
+### Install Additional Shadcn Components
+
+We'll need a few more UI components:
+
+```bash
+bunx shadcn@latest add card
+```
+
+Next, create the login form component:
+
+```bash
+mkdir -p src/features/auth/components && touch src/features/auth/components/LoginForm.tsx
+```
+
+**src/features/auth/components/LoginForm.tsx:**
+
+```typescript
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useLocation } from "react-router";
+import { loginSchema, type LoginFormData } from "../schemas/auth.schema";
+import { useLogin } from "../hooks/useAuth";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+
+export const LoginForm = () => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { mutate: login, isPending } = useLogin();
+
+	// Get the page they were trying to visit before being redirected to login
+	const from = (location.state as any)?.from?.pathname || "/";
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
+
+	const onSubmit = (data: LoginFormData) => {
+		login(data, {
+			onSuccess: () => {
+				// Redirect to the page they were trying to visit, or home
+				navigate(from, { replace: true });
+			},
+		});
+	};
+
+	return (
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+			<div className="space-y-2">
+				<Label htmlFor="email">Email</Label>
+				<Input
+					id="email"
+					type="email"
+					placeholder="Enter your email"
+					{...register("email")}
+					className={errors.email ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.email && (
+					<p className="text-sm text-red-500">
+						{errors.email.message}
+					</p>
+				)}
+			</div>
+
+			<div className="space-y-2">
+				<Label htmlFor="password">Password</Label>
+				<Input
+					id="password"
+					type="password"
+					placeholder="Enter your password"
+					{...register("password")}
+					className={errors.password ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.password && (
+					<p className="text-sm text-red-500">
+						{errors.password.message}
+					</p>
+				)}
+			</div>
+
+			<Button type="submit" className="w-full" disabled={isPending}>
+				{isPending ? "Logging in..." : "Login"}
+			</Button>
+
+			<div className="text-center text-sm text-gray-600 dark:text-gray-400">
+				Don't have an account?{" "}
+				<button
+					type="button"
+					onClick={() => navigate("/register")}
+					className="text-blue-600 hover:underline"
+					disabled={isPending}
+				>
+					Register here
+				</button>
+			</div>
+		</form>
+	);
+};
+```
+
+Next, create the register form component:
+
+```bash
+touch src/features/auth/components/RegisterForm.tsx
+```
+
+**src/features/auth/components/RegisterForm.tsx:**
+
+```typescript
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
+import { registerSchema, type RegisterFormData } from "../schemas/auth.schema";
+import { useRegister } from "../hooks/useAuth";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+
+export const RegisterForm = () => {
+	const navigate = useNavigate();
+	const { mutate: register, isPending } = useRegister();
+
+	const {
+		register: registerField,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterFormData>({
+		resolver: zodResolver(registerSchema),
+		defaultValues: {
+			username: "",
+			email: "",
+			password: "",
+			confirmPassword: "",
+		},
+	});
+
+	const onSubmit = (data: RegisterFormData) => {
+		// Remove confirmPassword before sending to API
+		const { confirmPassword, ...userData } = data;
+		register(userData, {
+			onSuccess: () => {
+				navigate("/", { replace: true });
+			},
+		});
+	};
+
+	return (
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+			<div className="space-y-2">
+				<Label htmlFor="username">Username</Label>
+				<Input
+					id="username"
+					placeholder="Choose a username"
+					{...registerField("username")}
+					className={errors.username ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.username && (
+					<p className="text-sm text-red-500">
+						{errors.username.message}
+					</p>
+				)}
+			</div>
+
+			<div className="space-y-2">
+				<Label htmlFor="email">Email</Label>
+				<Input
+					id="email"
+					type="email"
+					placeholder="Enter your email"
+					{...registerField("email")}
+					className={errors.email ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.email && (
+					<p className="text-sm text-red-500">
+						{errors.email.message}
+					</p>
+				)}
+			</div>
+
+			<div className="space-y-2">
+				<Label htmlFor="password">Password</Label>
+				<Input
+					id="password"
+					type="password"
+					placeholder="Create a password"
+					{...registerField("password")}
+					className={errors.password ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.password && (
+					<p className="text-sm text-red-500">
+						{errors.password.message}
+					</p>
+				)}
+				<p className="text-xs text-gray-500">
+					Must contain uppercase, lowercase, and number
+				</p>
+			</div>
+
+			<div className="space-y-2">
+				<Label htmlFor="confirmPassword">Confirm Password</Label>
+				<Input
+					id="confirmPassword"
+					type="password"
+					placeholder="Confirm your password"
+					{...registerField("confirmPassword")}
+					className={errors.confirmPassword ? "border-red-500" : ""}
+					disabled={isPending}
+				/>
+				{errors.confirmPassword && (
+					<p className="text-sm text-red-500">
+						{errors.confirmPassword.message}
+					</p>
+				)}
+			</div>
+
+			<Button type="submit" className="w-full" disabled={isPending}>
+				{isPending ? "Creating account..." : "Create Account"}
+			</Button>
+
+			<div className="text-center text-sm text-gray-600 dark:text-gray-400">
+				Already have an account?{" "}
+				<button
+					type="button"
+					onClick={() => navigate("/login")}
+					className="text-blue-600 hover:underline"
+					disabled={isPending}
+				>
+					Login here
+				</button>
+			</div>
+		</form>
+	);
+};
+```
+
+### Update Login page
+
+Replace the test login button with the real form:
+
+**src/pages/Login.tsx:**
+
+```typescript
+import { PageHead } from "@/shared/components/layout/PageHead";
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/shared/components/ui/card";
+
+const Login = () => {
+	return (
+		<>
+			<PageHead />
+			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+				<Card className="w-full max-w-md">
+					<CardHeader className="space-y-1">
+						<CardTitle className="text-2xl font-bold text-center">
+							Welcome Back
+						</CardTitle>
+						<CardDescription className="text-center">
+							Login to your account to continue playing
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<LoginForm />
+					</CardContent>
+				</Card>
+			</div>
+		</>
+	);
+};
+
+export default Login;
+```
+
+### Update Register Page
+
+**src/pages/Register.tsx:**
+
+```typescript
+import { PageHead } from "@/shared/components/layout/PageHead";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/shared/components/ui/card";
+
+const Register = () => {
+	return (
+		<>
+			<PageHead />
+			<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+				<Card className="w-full max-w-md">
+					<CardHeader className="space-y-1">
+						<CardTitle className="text-2xl font-bold text-center">
+							Create Account
+						</CardTitle>
+						<CardDescription className="text-center">
+							Join us and start competing on the leaderboard!
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<RegisterForm />
+					</CardContent>
+				</Card>
+			</div>
+		</>
+	);
+};
+
+export default Register;
+```
+
+### Mock the Auth Hooks for Testing
+
+Since we don't have a backend just yet, let's temporarily mock the hooks to test the forms:
+
+**Update src/features/auth/hooks/useAuth.ts** - add this at the top:
+
+```typescript
+// Temporary mock flag - set to true to test without backend
+const USE_MOCK = true;
+
+// Mock delay to simulate network request
+const mockDelay = (ms: number = 1000) =>
+	new Promise((resolve) => setTimeout(resolve, ms));
+```
+
+**Update the useLogin hook:**
+
+```typescript
+export const useLogin = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (credentials: LoginRequest) => {
+			if (USE_MOCK) {
+				// Mock implementation
+				await mockDelay(1000);
+
+				// Simulate validation
+				if (credentials.email === "error@test.com") {
+					throw new Error("Invalid credentials");
+				}
+
+				// Return mock user
+				return {
+					user: {
+						id: "1",
+						email: credentials.email,
+						username: credentials.email.split("@")[0],
+					},
+					token: "mock-jwt-token-" + Date.now(),
+				};
+			}
+
+			// Real implementation (when backend is ready)
+			return authService.login(credentials);
+		},
+		onSuccess: (data) => {
+			authStore.login(data.user, data.token);
+			queryClient.invalidateQueries({ queryKey: authKeys.user() });
+			toast.success("Logged in successfully!");
+		},
+		onError: (error: any) => {
+			toast.error(error.message || "Login failed");
+		},
+	});
+};
+```
+
+**Update the useRegister hook:**
+
+```typescript
+export const useRegister = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (userData: RegisterRequest) => {
+			if (USE_MOCK) {
+				// Mock implementation
+				await mockDelay(1000);
+
+				// Simulate validation
+				if (userData.email === "taken@test.com") {
+					throw new Error("Email already exists");
+				}
+
+				// Return mock user
+				return {
+					user: {
+						id: "1",
+						email: userData.email,
+						username: userData.username,
+					},
+					token: "mock-jwt-token-" + Date.now(),
+				};
+			}
+
+			// Real implementation (when backend is ready)
+			return authService.register(userData);
+		},
+		onSuccess: (data) => {
+			authStore.login(data.user, data.token);
+			queryClient.invalidateQueries({ queryKey: authKeys.user() });
+			toast.success("Account created successfully!");
+		},
+		onError: (error: any) => {
+			toast.error(error.message || "Registration failed");
+		},
+	});
+};
+```
+
+### Test the Authentication Flow
+
+Now you can fully test the authentication system:
+
+1. Test Login Form:
+
+    - Navigate to /login
+    - Try submitting with empty fields → See validation errors
+    - Enter an invalid email → See email validation error
+    - Enter error@test.com → See API error toast
+    - Enter any other valid email → Successfully login and redirect
+
+2. Test Register Form:
+
+    - Navigate to /register
+    - Try submitting with empty fields → See validation errors
+    - Enter weak password → See password strength error
+    - Enter mismatched passwords → See confirmation error
+    - Enter taken@test.com → See API error toast
+    - Enter valid data → Successfully register and redirect
+
+3. Test Protected Routes:
+
+    - Logout (click logout button in header)
+    - Try navigating to /stats or /settings directly in URL
+    - You'll be redirected to /login
+    - Login
+    - You'll be redirected back to the page you were trying to access
+
+4. Test Form States:
+    - Click submit and watch the button show "Logging in..." / "Creating account..."
+    - Notice fields are disabled during submission
+    - See toast notifications on success/error
+
+### Key Features Demonstrated
+
+**React Hook Form:**
+
+-   Form state management
+-   Field registration with {...register("fieldName")}
+-   Validation error display
+-   Form submission handling
+-   Loading states with isPending
+
+**Zod Validation:**
+
+-   Email format validation
+-   Password strength requirements
+-   Custom validation (password confirmation)
+-   Clear error messages
+-   Type inference
+
+**Tanstack Query:**
+
+-   useMutation for login/register
+-   Loading states (isPending)
+-   Success/error callbacks
+-   Integration with MobX stores
+-   Toast notifications
+
+**User Experience:**
+
+-   Disabled inputs during submission
+-   Loading button text
+-   Clear error messages
+-   Navigation between login/register
+-   Redirect after successful auth
+-   Remember intended destination (login redirects back to protected page)
+
+**Next:** We'll build the game stats submission and leaderboard features using the same TanStack Query patterns!
