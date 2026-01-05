@@ -74,4 +74,15 @@ export class AuthStore {
 	setLoading(loading: boolean) {
 		this.isLoading = loading;
 	}
+
+	updateUser(username: string, email: string) {
+		if (this.user) {
+			this.user = {
+				...this.user,
+				username,
+				email,
+			};
+			this.saveToStorage();
+		}
+	}
 }

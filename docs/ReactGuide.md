@@ -2023,3 +2023,564 @@ export const GameOverModal = observer(() => {
 	);
 });
 ```
+
+## Settings Page and Validation
+
+Now that we have our game working, let's build a proper Settings page to demonstrate form handling with React Hook Form and validation with Zod. This will teach you patterns you'll reuse for authentication forms later.
+
+### Install Dependencies
+
+First, install React Hook Form and Zod:
+
+```bash
+bun add react-hook-form zod @hookform/resolvers
+```
+
+-   **react-hook-form:** Performant forms with minimal re-renders
+-   **zod:** TypeScript-first schema validation
+-   **@hookform/resolvers:** Connects Zod validation to React Hook Form
+
+### Create Settings Schema
+
+Create a Zod schema to define and validate the settings form structure:
+
+```bash
+mkdir -p src/features/settings/schemas && touch src/features/settings/schemas/settings.schema.ts
+```
+
+**src/features/settings/schemas/settings.schema.ts:**
+
+```typescript
+import { z } from "zod";
+
+/**
+ * Settings form validation schema
+ */
+export const settingsSchema = z.object({
+	// User preferences
+	username: z
+		.string()
+		.min(3, "Username must be at least 3 characters")
+		.max(20, "Username must be less than 20 characters")
+		.regex(
+			/^[a-zA-Z0-9_-]+$/,
+			"Username can only contain letters, numbers, underscores, and hyphens"
+		),
+
+	email: z
+		.string()
+		.email("Invalid email address")
+		.min(1, "Email is required"),
+
+	// Game preferences
+	defaultDifficulty: z.enum(["easy", "normal", "hard"], {
+		message: "Please select a difficulty",
+	}),
+
+	soundEnabled: z.boolean(),
+
+	// UI preferences
+	theme: z.enum(["light", "dark"], {
+		message: "Please select a theme",
+	}),
+});
+
+/**
+ * TypeScript type inferred from schema
+ */
+export type SettingsFormData = z.infer<typeof settingsSchema>;
+```
+
+This schema:
+
+-   Validates username length and allowed characters
+-   Ensures email is properly formatted
+-   Restricts difficulty and theme to specific values
+-   Provides clear error messages
+
+### Create Settings Type
+
+```bash
+mkdir -p src/features/settings/types && touch src/features/settings/types/settings.types.ts
+```
+
+**src/features/settings/types/settings.types.ts:**
+
+```typescript
+import type { Difficulty } from "@/app/stores/game.store";
+
+export interface UserSettings {
+	username: string;
+	email: string;
+	defaultDifficulty: Difficulty;
+	soundEnabled: boolean;
+	theme: "light" | "dark";
+}
+```
+
+### Update UIStore for Settings
+
+We need to persist some settings. Update the UI store to handle game preferences:
+**src/app/stores/ui.store.ts:**
+
+```typescript
+import { makeAutoObservable } from "mobx";
+
+type Theme = "light" | "dark";
+
+export class UIStore {
+	theme: Theme = "light";
+	sidebarCollapsed = false;
+	soundEnabled = true;
+
+	constructor() {
+		makeAutoObservable(this);
+		// Load theme from localStorage
+		this.loadTheme();
+		// Load sound preference from localStorage
+		this.loadSoundPreference();
+	}
+
+	/**
+	 * Load from localStorage
+	 */
+	private loadTheme = () => {
+		const savedTheme = localStorage.getItem("theme") as Theme;
+		if (savedTheme) {
+			this.theme = savedTheme;
+			this.applyTheme();
+		}
+	};
+
+	private loadSoundPreference = () => {
+		const savedSound = localStorage.getItem("soundEnabled");
+		if (savedSound !== null) {
+			this.soundEnabled = savedSound === "true";
+		}
+	};
+
+	/**
+	 * Toggle theme between light and dark
+	 */
+	toggleTheme = () => {
+		this.theme = this.theme === "light" ? "dark" : "light";
+		localStorage.setItem("theme", this.theme);
+		this.applyTheme();
+	};
+
+	/**
+	 * Apply theme to document
+	 */
+	private applyTheme = () => {
+		if (this.theme === "dark") {
+			document.documentElement.classList.add("dark");
+		} else {
+			document.documentElement.classList.remove("dark");
+		}
+	};
+
+	/**
+	 * Toggle sidebar collapsed state
+	 */
+	toggleSidebar = () => {
+		this.sidebarCollapsed = !this.sidebarCollapsed;
+	};
+
+	// Direct setters
+	setSoundEnabled = (enabled: boolean) => {
+		this.soundEnabled = enabled;
+		localStorage.setItem("soundEnabled", String(enabled));
+	};
+
+	setTheme = (theme: Theme) => {
+		this.theme = theme;
+		localStorage.setItem("theme", this.theme);
+		this.applyTheme();
+	};
+}
+```
+
+### Update GameStore for Default Difficulty
+
+**src/app/stores/game.store.ts** -- Add this near the top of the file:
+
+```typescript
+	...
+
+	constructor() {
+		makeAutoObservable(this);
+		this.loadDefaultDifficulty();
+	}
+
+	private loadDefaultDifficulty = () => {
+		const savedDifficulty = localStorage.getItem(
+			"defaultDifficulty"
+		) as Difficulty;
+		if (savedDifficulty) {
+			this.difficulty = savedDifficulty;
+		}
+	};
+	...
+
+	// Adjust the set difficulty method
+
+	// Set Difficulty
+	setDifficulty = (difficulty: Difficulty, saveAsDefault = false) => {
+		this.difficulty = difficulty;
+		if (saveAsDefault) {
+			localStorage.setItem("defaultDifficulty", difficulty);
+		}
+	};
+```
+
+### Create Settings Form Component
+
+Now, let's build the form component itself.
+
+```bash
+mkdir -p src/features/settings/components && touch src/features/settings/components/SettingsForm.tsx
+```
+
+We will also need some help from shadcn:
+
+```bash
+bunx shadcn@latest add input label sonner
+```
+
+Once we have installed those, add the Toaster to the app by updaing main.tsx:
+
+```typescript
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "react-router";
+import "./shared/styles/index.css";
+import { StoreProvider } from "./app/stores/root.store";
+import { router } from "./app/router";
+import { HelmetProvider } from "react-helmet-async";
+import { Toaster } from "sonner";
+
+createRoot(document.getElementById("root")!).render(
+	<StoreProvider>
+		<HelmetProvider>
+			<RouterProvider router={router} />
+			<Toaster position="top-right" richColors />
+		</HelmetProvider>
+	</StoreProvider>
+);
+```
+
+Next we will need to adjust the authStore so that we dont directly modify the store, but instead use a store method - this is to prevent MobX from complaining in strict mode:
+
+**src/app/stores/auth.store.ts:**
+
+```typescript
+	...
+	// Add this method
+	updateUser(username: string, email: string) {
+		if (this.user) {
+			this.user = {
+				...this.user,
+				username,
+				email,
+			};
+			this.saveToStorage();
+		}
+	}
+```
+
+And now we make the component SettingsForm.tsx:
+
+**src/features/settings/components/SettingsForm.tsx:**
+
+```typescript
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import {
+	settingsSchema,
+	type SettingsFormData,
+} from "../schemas/settings.schema";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { toast } from "sonner";
+
+export const SettingsForm = observer(() => {
+	const { authStore, uiStore, gameStore } = useStore();
+
+	// Initialise form with default values from stores
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		reset,
+	} = useForm<SettingsFormData>({
+		resolver: zodResolver(settingsSchema),
+		defaultValues: {
+			username: authStore.user?.username || "",
+			email: authStore.user?.email || "",
+			defaultDifficulty: gameStore.difficulty,
+			soundEnabled: uiStore.soundEnabled,
+			theme: uiStore.theme,
+		},
+	});
+
+	const onSubmit = async (data: SettingsFormData) => {
+		try {
+			// Simulate API delay
+			await new Promise((resolve) => setTimeout(resolve, 500));
+
+			// Update stores with new values using actions
+			authStore.updateUser(data.username, data.email);
+			gameStore.setDifficulty(data.defaultDifficulty, true);
+			uiStore.setSoundEnabled(data.soundEnabled);
+			uiStore.setTheme(data.theme);
+
+			toast.success("Settings saved successfully!");
+		} catch (error) {
+			toast.error("Failed to save settings");
+			console.error(error);
+		}
+	};
+
+	const handleReset = () => {
+		reset({
+			username: authStore.user?.username || "",
+			email: authStore.user?.email || "",
+			defaultDifficulty: gameStore.difficulty,
+			soundEnabled: uiStore.soundEnabled,
+			theme: uiStore.theme,
+		});
+		toast.info("Form reset to current values");
+	};
+
+	return (
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+			{/* User Information Section */}
+			<div className="space-y-4">
+				<h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+					User Information
+				</h2>
+
+				<div className="space-y-2">
+					<Label htmlFor="username">Username</Label>
+					<Input
+						id="username"
+						{...register("username")}
+						placeholder="Enter your username"
+						className={errors.username ? "border-red-500" : ""}
+					/>
+					{errors.username && (
+						<p className="text-sm text-red-500">
+							{errors.username.message}
+						</p>
+					)}
+				</div>
+
+				<div className="space-y-2">
+					<Label htmlFor="email">Email</Label>
+					<Input
+						id="email"
+						type="email"
+						{...register("email")}
+						placeholder="Enter your email"
+						className={errors.email ? "border-red-500" : ""}
+					/>
+					{errors.email && (
+						<p className="text-sm text-red-500">
+							{errors.email.message}
+						</p>
+					)}
+				</div>
+			</div>
+
+			{/* Game Preferences Section */}
+			<div className="space-y-4">
+				<h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+					Game Preferences
+				</h2>
+
+				<div className="space-y-2">
+					<Label htmlFor="defaultDifficulty">
+						Default Difficulty
+					</Label>
+					<select
+						id="defaultDifficulty"
+						{...register("defaultDifficulty")}
+						className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					>
+						<option value="easy">Easy</option>
+						<option value="normal">Normal</option>
+						<option value="hard">Hard</option>
+					</select>
+					{errors.defaultDifficulty && (
+						<p className="text-sm text-red-500">
+							{errors.defaultDifficulty.message}
+						</p>
+					)}
+				</div>
+
+				<div className="flex items-center space-x-2">
+					<input
+						type="checkbox"
+						id="soundEnabled"
+						{...register("soundEnabled")}
+						className="h-4 w-4 rounded border-gray-300"
+					/>
+					<Label htmlFor="soundEnabled" className="cursor-pointer">
+						Enable sound effects
+					</Label>
+				</div>
+			</div>
+
+			{/* UI Preferences Section */}
+			<div className="space-y-4">
+				<h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+					Appearance
+				</h2>
+
+				<div className="space-y-2">
+					<Label>Theme</Label>
+					<div className="flex gap-4">
+						<label className="flex items-center space-x-2 cursor-pointer">
+							<input
+								type="radio"
+								{...register("theme")}
+								value="light"
+								className="h-4 w-4"
+							/>
+							<span className="text-sm">☀️ Light</span>
+						</label>
+						<label className="flex items-center space-x-2 cursor-pointer">
+							<input
+								type="radio"
+								{...register("theme")}
+								value="dark"
+								className="h-4 w-4"
+							/>
+							<span className="text-sm">🌙 Dark</span>
+						</label>
+					</div>
+					{errors.theme && (
+						<p className="text-sm text-red-500">
+							{errors.theme.message}
+						</p>
+					)}
+				</div>
+			</div>
+
+			{/* Form Actions */}
+			<div className="flex gap-3 pt-4">
+				<Button
+					type="submit"
+					disabled={isSubmitting}
+					className="flex-1"
+				>
+					{isSubmitting ? "Saving..." : "Save Settings"}
+				</Button>
+				<Button
+					type="button"
+					variant="outline"
+					onClick={handleReset}
+					disabled={isSubmitting}
+				>
+					Reset
+				</Button>
+			</div>
+		</form>
+	);
+});
+```
+
+### Update Settings Page
+
+Finally, update the Settings page to use the form.
+
+**src/psges/Settings.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { PageHead } from "@/shared/components/layout/PageHead";
+import { SettingsForm } from "@/features/settings/components/SettingsForm";
+
+const Settings = observer(() => {
+	return (
+		<>
+			<PageHead />
+			<div className="">
+				<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+					Settings
+				</h1>
+				<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+					<SettingsForm />
+				</div>
+			</div>
+		</>
+	);
+});
+
+export default Settings;
+```
+
+### Test the Settings Page
+
+Now you can test the Settings page:
+
+1. Login (use the test login button)
+2. Navigate to Settings from the sidebar
+3. Try submitting the form with invalid data:
+    - Username with special characters (should show error)
+    - Invalid email format (should show error)
+    - Leave fields empty (should show validation errors)
+4. Fill in valid data and click "Save Settings"
+5. You should see a success toast notification
+6. Changes are persisted to localStorage
+7. Refresh the page - your settings should be preserved
+8. You can double-check persistence by nagivating to play - you can see that whatever you set as difficulty will be auto-selected
+
+**Key Concepts Demonstrated**
+**React Hook Form:**
+
+-   useForm hook with TypeScript types
+-   register function to connect inputs to form state
+-   handleSubmit for form submission
+-   formState for tracking errors and submission state
+-   reset function to restore form values
+
+**Zod Validation:**
+
+-   Schema definition with constraints
+-   Custom error messages
+-   Type inference with z.infer
+-   Integration with React Hook Form via zodResolver
+
+**Form Patterns:**
+
+-   Controlled vs uncontrolled inputs
+-   Error display
+-   Loading states during submission
+-   Form reset functionality
+-   Toast notifications for user feedback
+
+You now have a fully functional settings form! These same patterns will be used for the login and register forms when we add real authentication.
+
+## Backend Setup with Axios & Tanstack Query
+
+Now that we have our frontend working with local state, it's time to connect to a backend. We'll configure Axios as our HTTP client with proper error handling, authentication token management, and request/response interceptors.
+
+### Install Dependencies
+
+Now that we have our frontend working with local state, it's time to connect to a backend. We'll configure Axios as our HTTP client and TanStack Query for server state management, caching, and intelligent data fetching.
+
+### Install Dependencies
+
+First, install Axios for HTTP requests and TanStack Query for server state management:
+
+```bash
+bun add axios @tanstack/react-query
+bun add -D @tanstack/react-query-devtools
+```
+
+-   **axios**: HTTP client for making API requests
+-   **@tanstack/react-query**: Server state management and caching
+-   **@tanstack/react-query-devtools**: Development tools for debugging queries

@@ -39,7 +39,17 @@ export default class GameStore {
 
 	constructor() {
 		makeAutoObservable(this);
+		this.loadDefaultDifficulty();
 	}
+
+	private loadDefaultDifficulty = () => {
+		const savedDifficulty = localStorage.getItem(
+			"defaultDifficulty"
+		) as Difficulty;
+		if (savedDifficulty) {
+			this.difficulty = savedDifficulty;
+		}
+	};
 
 	// Get current difficulty settings based on current set difficulty
 	get settings() {
@@ -131,8 +141,11 @@ export default class GameStore {
 	};
 
 	// Set Difficulty
-	setDifficulty = (difficulty: Difficulty) => {
+	setDifficulty = (difficulty: Difficulty, saveAsDefault = false) => {
 		this.difficulty = difficulty;
+		if (saveAsDefault) {
+			localStorage.setItem("defaultDifficulty", difficulty);
+		}
 	};
 
 	// Remove Target via id
