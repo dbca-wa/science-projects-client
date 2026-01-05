@@ -1,8 +1,11 @@
+import { PageHead } from "@/shared/components/layout/PageHead";
+
 const Settings = () => {
 	return (
-		<div>
+		<>
+			<PageHead />
 			<p>Settings</p>
-		</div>
+		</>
 	);
 };
 
