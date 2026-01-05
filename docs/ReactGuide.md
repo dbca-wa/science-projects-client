@@ -582,14 +582,21 @@ export class UIStore {
 }
 ```
 
-#### Create the Root Store
+#### Create the Root Store and Supporting Files
 
-The root store combines all stores and provides them via React Context. Create src/app/stores/root.store.tsx:
+The root store combines all stores and provides them via React Context. To avoid eslint issues, we will be splitting it into useStore.ts, root.store.tsx, and store-context.ts. Create the files:
+
+```bash
+touch src/app/stores/store-context.ts src/app/stores/useStore.ts root.store.tsx
+```
+
+**src/app/stores/store-context.ts:**
 
 ```typescript
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext } from "react";
 import { AuthStore } from "./auth.store";
 import { UIStore } from "./ui.store";
+import GameStore from "./game.store";
 
 /**
  * Root store that combines all MobX stores
@@ -597,29 +604,27 @@ import { UIStore } from "./ui.store";
 class RootStore {
 	authStore: AuthStore;
 	uiStore: UIStore;
+	gameStore: GameStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
 		this.uiStore = new UIStore();
+		this.gameStore = new GameStore();
 	}
 }
 
 // Create singleton instance
-const rootStore = new RootStore();
+export const rootStore = new RootStore();
 
 // Create React Context
-const StoreContext = createContext<RootStore>(rootStore);
+export const StoreContext = createContext<RootStore>(rootStore);
+```
 
-/**
- * Provider component to wrap app with stores
- */
-export const StoreProvider = ({ children }: { children: ReactNode }) => {
-	return (
-		<StoreContext.Provider value={rootStore}>
-			{children}
-		</StoreContext.Provider>
-	);
-};
+**src/app/stores/useStore.ts:**
+
+```typescript
+import { useContext } from "react";
+import { StoreContext } from "./store-context";
 
 /**
  * Hook to access stores in components
@@ -630,6 +635,24 @@ export const useStore = () => {
 		throw new Error("useStore must be used within StoreProvider");
 	}
 	return context;
+};
+```
+
+**src/app/stores/root.store.tsx:**
+
+```typescript
+import { type ReactNode } from "react";
+import { StoreContext, rootStore } from "./store-context";
+
+/**
+ * Provider component to wrap app with stores
+ */
+export const StoreProvider = ({ children }: { children: ReactNode }) => {
+	return (
+		<StoreContext.Provider value={rootStore}>
+			{children}
+		</StoreContext.Provider>
+	);
 };
 ```
 
@@ -909,7 +932,7 @@ Next, create an authentication guard in **src/app/router/guards/auth.guard.tsx**
 ```typescript
 import { Navigate, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useStore } from "@/app/stores/root.store";
+import { useStore } from "@/app/stores/useStore";
 
 /**
  * Protected Route Guard
@@ -1010,7 +1033,7 @@ Now create **src/shared/components/layout/AppLayout.tsx**:
 ```typescript
 import { Outlet, Link, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useStore } from "@/app/stores/root.store";
+import { useStore } from "@/app/stores/useStore";
 import { getSidebarRoutes } from "@/config/routes.config";
 import { Button } from "@/shared/components/ui/button";
 
@@ -1146,7 +1169,7 @@ If you try to navigate to `/stats` or `/settings`, you'll be redirected back to 
 To temporarily test the protected routes and see how the navigation changes when logged in, update your **src/pages/Login.tsx**:
 
 ```typescript
-import { useStore } from "@/app/stores/root.store";
+import { useStore } from "@/app/stores/useStore";
 import { useNavigate } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 
@@ -1299,3 +1322,704 @@ Now when you visit the app:
 10. Click "Logout" and the sidebar updates to hide protected routes
 
 **Note**: This router setup provides a solid foundation. As you progress through this guide, you'll add real authentication with API calls, proper form handling with React Hook Form and Zod, and backend integration with TanStack Query. The `PageHead` component can be extended to include other metadata like OpenGraph tags, Twitter cards, and canonical URLs for production applications.
+
+## Building the Game
+
+Now that we have our web app foundation in place (styling, state management, and routing), we can start building the actual game. We'll create the game mechanics, UI components, and eventually connect it to a backend for persistence and leaderboards.
+
+### Game Requirements
+
+Our Reaction Clicker game will have the following features:
+
+**Core Gameplay:**
+
+-   Timer starts at 5 seconds
+-   Targets appear randomly on the screen / game area
+-   Players must click targets
+-   Each successful click awards points and 1 second to timer by default
+-   Each unsuccessful click reduces timer 2 seconds by default
+-   Faster clicks = more points (bonus multiplier)
+
+**Game State:**
+
+-   Idle (waiting to start)
+-   Playing (active gameplay)
+-   Paused (temporary stop)
+-   Game Over (results screen and retry)
+
+**Difficulty:**
+
+-   Easy: Larger targerts, reward +2 secs to timer, penalty -1 secs to timer
+-   Normal: Standard targets, reward +1 secs to timer, penalty -2 secs to timer
+-   Hard: Tiny targets, reward +0.5secs to timer, penalty -3 secs to timer
+
+### Game Store
+
+First, let's create a MobX store to manage game state. Create the game store:
+
+```bash
+touch src/app/stores/game.store.ts
+```
+
+**src/app/stores/game.store.ts:**
+
+```typescript
+import { makeAutoObservable } from "mobx";
+
+export type GameState = "idle" | "playing" | "paused" | "gameOver";
+export type Difficulty = "easy" | "normal" | "hard";
+
+export interface Target {
+	id: string;
+	x: number;
+	y: number;
+	createdAt: number;
+}
+
+export interface GameStats {
+	score: number;
+	hits: number;
+	misses: number;
+	accuracy: number;
+	highestCombo: number;
+}
+
+export default class GameStore {
+	gameState: GameState = "idle"; // Default to idle
+	difficulty: Difficulty = "normal"; // Default to normal
+	score = 0;
+	timeRemainingMs = 5000; // Store in milliseconds internally
+	targets: Target[] = [];
+	currentCombo = 0;
+	highestCombo = 0;
+	hits = 0;
+	misses = 0;
+	boardDimensions = { width: 0, height: 0 };
+
+	private difficultySettings = {
+		// size of target, time reward if succeed, time penalty if fail
+		easy: { targetSize: 80, reward: 2000, penalty: 1000 },
+		normal: { targetSize: 60, reward: 1000, penalty: 2000 },
+		hard: { targetSize: 40, reward: 500, penalty: 3000 },
+	};
+
+	constructor() {
+		makeAutoObservable(this);
+	}
+
+	// Get current difficulty settings based on current set difficulty
+	get settings() {
+		return this.difficultySettings[this.difficulty];
+	}
+
+	// Calculate accuracy percentage
+	get accuracy() {
+		const total = this.hits + this.misses;
+		return total === 0 ? 0 : Math.round((this.hits / total) * 100);
+	}
+
+	setBoardDimensions = (width: number, height: number) => {
+		this.boardDimensions = { width, height };
+	};
+
+	// DRY Principle - helper function to prevent repetition between startGame and resetGame function
+	softReset = (state: GameState) => {
+		this.gameState = state;
+		this.score = 0;
+		this.timeRemainingMs = 5000;
+		this.targets = [];
+		this.currentCombo = 0;
+		this.highestCombo = 0;
+		this.hits = 0;
+		this.misses = 0;
+	};
+
+	// New Target
+	spawnTarget = () => {
+		// Fallback to window size if dimensions aren't set yet,
+		// but usually, we'll have these from the component
+		const { width, height } = this.boardDimensions;
+
+		// Use a default or window size if dimensions are 0 (prevents targets stuck at 0,0)
+		const boardW = width || window.innerWidth;
+		const boardH = height || window.innerHeight;
+
+		const targetSize = this.settings.targetSize;
+		const padding = 20;
+
+		const maxX = boardW - targetSize - padding;
+		const maxY = boardH - targetSize - padding;
+
+		const x = Math.max(padding, Math.floor(Math.random() * maxX));
+		const y = Math.max(padding, Math.floor(Math.random() * maxY));
+
+		const target: Target = {
+			id: `target-${Date.now()}-${Math.random()}`,
+			x,
+			y,
+			createdAt: Date.now(),
+		};
+
+		this.targets = [target];
+	};
+
+	// Start Game
+	startGame = () => {
+		this.softReset("playing");
+		this.spawnTarget();
+	};
+
+	// Pause Game
+	pauseGame = () => {
+		// Should only be pausable from play state
+		if (this.gameState === "playing") {
+			this.gameState = "paused";
+		}
+	};
+
+	// Resume Game
+	resumeGame = () => {
+		// Should only be resumable from pause state
+		if (this.gameState === "paused") {
+			this.gameState = "playing";
+		}
+	};
+
+	// End Game
+	endGame = () => {
+		this.gameState = "gameOver";
+		this.targets = []; // Clear targets
+	};
+
+	// Reset Game
+	resetGame = () => {
+		this.softReset("idle");
+	};
+
+	// Set Difficulty
+	setDifficulty = (difficulty: Difficulty) => {
+		this.difficulty = difficulty;
+	};
+
+	// Remove Target via id
+	removeTarget = (id: string) => {
+		this.targets = this.targets.filter((t) => t.id !== id);
+	};
+
+	// Handle Target Hit
+	hitTarget = (targetId: string, reactionTime: number) => {
+		this.removeTarget(targetId);
+		this.hits++;
+		this.currentCombo++;
+
+		// Check high combo
+		if (this.currentCombo > this.highestCombo) {
+			this.highestCombo = this.currentCombo;
+		}
+
+		// Calculate score based on reaction time and combo
+		const baseScore = 10;
+		const timeBonus = Math.max(0, 50 - reactionTime / 10);
+		const comboMultipler = 1 + this.currentCombo * 0.1;
+		const points = Math.round((baseScore + timeBonus) * comboMultipler);
+
+		// Handle rewards
+		this.score += points;
+		this.timeRemainingMs += this.settings.reward;
+
+		// Spawn next target immediately
+		if (this.gameState === "playing") {
+			this.spawnTarget();
+		}
+	};
+
+	// DRY principle to prevent repeating in below functions
+	timeCheck = () => {
+		if (this.timeRemainingMs <= 0) {
+			this.endGame();
+		}
+	};
+
+	missTarget = (targetId: string) => {
+		this.removeTarget(targetId);
+		this.misses++;
+		this.currentCombo = 0; // reset
+		// Handle timer penalty
+		this.timeRemainingMs -= this.settings.penalty;
+		this.timeCheck();
+
+		// Spawn next target immediately if game still playing
+		if (this.gameState === "playing") {
+			this.spawnTarget();
+		}
+	};
+
+	// Timer
+	tick = () => {
+		if (this.gameState === "playing" && this.timeRemainingMs > 0) {
+			this.timeRemainingMs -= 100;
+			this.timeCheck();
+		}
+	};
+}
+```
+
+Now update the root store to include the game store:
+
+**src/app/stores/root.store.tsx:**
+
+```typescript
+import { createContext, useContext, type ReactNode } from "react";
+import { AuthStore } from "./auth.store";
+import { UIStore } from "./ui.store";
+import { GameStore } from "./game.store";
+
+class RootStore {
+	authStore: AuthStore;
+	uiStore: UIStore;
+	gameStore: GameStore;
+
+	constructor() {
+		this.authStore = new AuthStore();
+		this.uiStore = new UIStore();
+		this.gameStore = new GameStore();
+	}
+}
+
+const rootStore = new RootStore();
+const StoreContext = createContext<RootStore>(rootStore);
+
+export const StoreProvider = ({ children }: { children: ReactNode }) => {
+	return (
+		<StoreContext.Provider value={rootStore}>
+			{children}
+		</StoreContext.Provider>
+	);
+};
+
+export const useStore = () => {
+	const context = useContext(StoreContext);
+	if (!context) {
+		throw new Error("useStore must be used within StoreProvider");
+	}
+	return context;
+};
+```
+
+This game store manages all the game state including:
+
+-   Current game state (idle, playing, paused, gameOver)
+-   Difficulty settings
+-   Score tracking
+-   Target management
+-   Combo system
+-   Statistics calculation
+
+In the next section, we'll build the game UI components and implement the game loop.
+
+### Game Hooks
+
+First, let's create custom hooks to manage the game loop and target spawing logic. This will involve creating our first feature for organisation
+
+```bash
+mkdir -p src/features/game/hooks && touch src/features/game/hooks/useGameLoop.ts
+```
+
+**src/features/game/hooks/useGameLoop.ts:**
+
+```typescript
+import { useEffect, useRef } from "react";
+import { useStore } from "@/app/stores/useStore";
+
+/**
+ * Custom hook to manage the game timer
+ * Ticks 10 times per second when game is in playing state
+ */
+export const useGameLoop = () => {
+	const { gameStore } = useStore();
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+	useEffect(() => {
+		// Only run timer when game is playing
+		if (gameStore.gameState === "playing") {
+			intervalRef.current = setInterval(() => {
+				gameStore.tick();
+			}, 100); // Tick ten times every second
+		}
+
+		// Cleanup interval when game state changes or component unmounts
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+			}
+		};
+	}, [gameStore, gameStore.gameState]);
+};
+```
+
+You may notice an error for ReturnType type - adjust your tsconfig.app.json so that this typescript issue is resolved:
+
+```typescript
+		// ... existing settings remain the same, simply add "node" to the array for types
+		"types": ["vite/client", "node"],
+```
+
+### Game Components
+
+With our store and loop in place, we just need to create the components that will use them. We will need the following components:
+
+-   GameBoard.tsx (play area where the targets will spawn)
+-   Target.tsx. (instances that spawn in the play area)
+-   GameHUD.tsx
+-   GameOverModal.tsx
+-   DifficultySelector.tsx
+
+Run this command to create them:
+
+```bash
+mkdir -p src/features/game/components && touch src/features/game/components/Target.tsx src/features/game/components/GameBoard.tsx src/features/game/components/GameHUD.tsx src/features/game/components/GameOverModal.tsx src/features/game/components/DifficultySelector.tsx
+```
+
+Note that with MobX each component will need to be wrapped with the observer function to 'watch' the store for changes and access global functions.
+
+All components will need to access the store to:
+
+-   Target: grab the size it should be as well as to access the hitTarget function.
+-   GameBoard: determine the area that targets can spawn, set that area on resize, handle misses, draw targets, and show pause screen on pause game state
+-   GameHUD: display score, time remaining, combos, accuracy, display button for pausing and resuming based on current game state
+-   DifficultySelector: display mapped difficulties and set difficulty globally - impacts other components
+-   GameOverModal: access game state, display score, hits, misses, accuracy and highest combo, as well as set the state by accessing start game and reset game functions
+
+You can find the code for these components below:
+
+**src/features/game/components/Target.tsx:**
+
+```typescript
+import { useState } from "react";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import type { Target as TargetType } from "@/app/stores/game.store";
+
+interface TargetProps {
+	target: TargetType;
+}
+
+export const Target = observer(({ target }: TargetProps) => {
+	const { gameStore } = useStore();
+	const [isClicked, setIsClicked] = useState(false);
+
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (isClicked) return;
+		setIsClicked(true);
+
+		const reactionTime = Date.now() - target.createdAt;
+		gameStore.hitTarget(target.id, reactionTime);
+	};
+
+	const size = gameStore.settings.targetSize;
+
+	return (
+		<button
+			onClick={handleClick}
+			disabled={isClicked}
+			style={{
+				position: "absolute",
+				left: `${target.x}px`,
+				top: `${target.y}px`,
+				width: `${size}px`,
+				height: `${size}px`,
+			}}
+			className={`
+				rounded-full bg-red-500 hover:bg-red-600 
+				transition-colors
+				flex items-center justify-center
+				text-white font-bold shadow-lg
+				${!isClicked && "hover:scale-110 active:scale-95 cursor-pointer"}
+				${isClicked ? "pointer-events-none opacity-0 scale-0" : ""}
+			`}
+		>
+			<span className="text-2xl">🎯</span>
+		</button>
+	);
+});
+```
+
+**src/features/game/components/GameBoard.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import { Target } from "./Target";
+import { useGameLoop } from "../hooks/useGameLoop";
+import { useEffect, useRef } from "react";
+
+export const GameBoard = observer(() => {
+	const { gameStore } = useStore();
+	const boardRef = useRef<HTMLDivElement>(null);
+
+	// Heartbeat for the timer
+	useGameLoop();
+
+	useEffect(() => {
+		const updateDimensions = () => {
+			if (boardRef.current) {
+				// This gives us the exact usable pixel area of the div
+				gameStore.setBoardDimensions(
+					boardRef.current.clientWidth,
+					boardRef.current.clientHeight
+				);
+			}
+		};
+
+		updateDimensions();
+		window.addEventListener("resize", updateDimensions);
+		return () => window.removeEventListener("resize", updateDimensions);
+	}, [gameStore]);
+
+	const handleBoardClick = (e: React.MouseEvent) => {
+		if (e.target === e.currentTarget && gameStore.gameState === "playing") {
+			if (gameStore.targets.length > 0) {
+				const targetId = gameStore.targets[0].id;
+				gameStore.missTarget(targetId);
+			}
+		}
+	};
+
+	return (
+		<div
+			ref={boardRef}
+			onClick={handleBoardClick}
+			className="relative w-full h-[calc(100vh-20rem)] bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-700 cursor-crosshair"
+		>
+			{gameStore.targets.map((target) => (
+				<Target key={target.id} target={target} />
+			))}
+
+			{gameStore.gameState === "paused" && (
+				<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm pointer-events-none">
+					<div className="text-white text-4xl font-bold">PAUSED</div>
+				</div>
+			)}
+		</div>
+	);
+});
+```
+
+**src/features/game/components/GameHUD.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import { Button } from "@/shared/components/ui/button";
+
+export const GameHUD = observer(() => {
+	const { gameStore } = useStore();
+
+	return (
+		<div className="flex justify-between items-center mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+			<div className="flex gap-6">
+				<div>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Score
+					</p>
+					<p className="text-2xl font-bold text-gray-900 dark:text-white">
+						{gameStore.score}
+					</p>
+				</div>
+				<div>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Time
+					</p>
+					<p className="text-2xl font-bold text-gray-900 dark:text-white">
+						{(gameStore.timeRemainingMs / 1000).toFixed(1)}s
+					</p>
+				</div>
+				<div>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Combo
+					</p>
+					<p className="text-2xl font-bold text-orange-500">
+						{gameStore.currentCombo}x
+					</p>
+				</div>
+				<div>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Accuracy
+					</p>
+					<p className="text-2xl font-bold text-blue-500">
+						{gameStore.accuracy}%
+					</p>
+				</div>
+			</div>
+			<div className="flex gap-2">
+				{gameStore.gameState === "playing" && (
+					<Button
+						onClick={() => gameStore.pauseGame()}
+						variant="outline"
+					>
+						⏸️ Pause
+					</Button>
+				)}
+				{gameStore.gameState === "paused" && (
+					<Button onClick={() => gameStore.resumeGame()}>
+						▶️ Resume
+					</Button>
+				)}
+			</div>
+		</div>
+	);
+});
+```
+
+**src/features/game/components/DifficultySelector.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import type { Difficulty } from "@/app/stores/game.store";
+
+export const DifficultySelector = observer(() => {
+	const { gameStore } = useStore();
+
+	const difficulties: {
+		value: Difficulty;
+		label: string;
+		description: string;
+	}[] = [
+		{
+			value: "easy",
+			label: "Easy",
+			description: "Larger targets, +2s reward, -1s penalty",
+		},
+		{
+			value: "normal",
+			label: "Normal",
+			description: "Standard targets, +1s reward, -2s penalty",
+		},
+		{
+			value: "hard",
+			label: "Hard",
+			description: "Tiny targets, +0.5s reward, -3s penalty",
+		},
+	];
+
+	return (
+		<div className="space-y-4">
+			<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+				Select Difficulty
+			</h3>
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				{difficulties.map((diff) => (
+					<button
+						key={diff.value}
+						onClick={() => gameStore.setDifficulty(diff.value)}
+						className={`
+							p-4 rounded-lg border-2 transition-all text-left
+							${
+								gameStore.difficulty === diff.value
+									? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+									: "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+							}
+						`}
+					>
+						<p className="font-bold text-gray-900 dark:text-white mb-1">
+							{diff.label}
+						</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							{diff.description}
+						</p>
+					</button>
+				))}
+			</div>
+		</div>
+	);
+});
+```
+
+**src/features/game/components/GameOverModal.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import { Button } from "@/shared/components/ui/button";
+
+export const GameOverModal = observer(() => {
+	const { gameStore } = useStore();
+
+	if (gameStore.gameState !== "gameOver") return null;
+
+	return (
+		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+			<div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+				<h2 className="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+					Game Over!
+				</h2>
+
+				<div className="space-y-4 mb-6">
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Final Score:
+						</span>
+						<span className="text-2xl font-bold text-gray-900 dark:text-white">
+							{gameStore.score}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Hits:
+						</span>
+						<span className="text-lg font-semibold text-green-500">
+							{gameStore.hits}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Misses:
+						</span>
+						<span className="text-lg font-semibold text-red-500">
+							{gameStore.misses}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Accuracy:
+						</span>
+						<span className="text-lg font-semibold text-blue-500">
+							{gameStore.accuracy}%
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Highest Combo:
+						</span>
+						<span className="text-lg font-semibold text-orange-500">
+							{gameStore.highestCombo}x
+						</span>
+					</div>
+				</div>
+
+				<div className="flex gap-3">
+					<Button
+						onClick={() => gameStore.startGame()}
+						className="flex-1"
+						size="lg"
+					>
+						Play Again
+					</Button>
+					<Button
+						onClick={() => gameStore.resetGame()}
+						variant="outline"
+						className="flex-1"
+						size="lg"
+					>
+						Main Menu
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+});
+```
