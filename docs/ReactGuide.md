@@ -3735,3 +3735,1455 @@ Now you can fully test the authentication system:
 -   Remember intended destination (login redirects back to protected page)
 
 **Next:** We'll build the game stats submission and leaderboard features using the same TanStack Query patterns!
+
+## Game Stats and Leaderboard with Tanstack Query
+
+Now we'll implement features to submit game scores to the backend and display a leaderboard. This demonstrates more advanced TanStack Query patterns including mutations with optimistic updates, background refetching, and pagination.
+
+### Create Game Types
+
+First, let's define the data structures for game scores and stats:
+
+```bash
+mkdir -p src/features/game/types && touch src/features/game/types/game.types.ts
+```
+
+**src/features/game/types/game.types.ts:**
+
+```typescript
+import type { Difficulty } from "@/app/stores/game.store";
+
+/**
+ * Game score entry
+ */
+export interface GameScore {
+	id: string;
+	userId: string;
+	username: string;
+	score: number;
+	difficulty: Difficulty;
+	hits: number;
+	misses: number;
+	accuracy: number;
+	highestCombo: number;
+	playedAt: string;
+}
+
+/**
+ * User statistics
+ */
+export interface UserStats {
+	totalGames: number;
+	totalScore: number;
+	averageScore: number;
+	bestScore: number;
+	totalHits: number;
+	totalMisses: number;
+	overallAccuracy: number;
+	bestCombo: number;
+	favoritesDifficulty: Difficulty;
+	gamesPerDifficulty: {
+		easy: number;
+		normal: number;
+		hard: number;
+	};
+	recentGames: GameScore[];
+}
+
+/**
+ * Leaderboard entry
+ */
+export interface LeaderboardEntry {
+	rank: number;
+	userId: string;
+	username: string;
+	score: number;
+	difficulty: Difficulty;
+	playedAt: string;
+	isCurrentUser?: boolean;
+}
+
+/**
+ * Leaderboard filter options
+ */
+export interface LeaderboardFilters {
+	difficulty?: Difficulty | "all";
+	timeframe?: "today" | "week" | "month" | "allTime";
+	limit?: number;
+}
+```
+
+### Create Game Service
+
+Create a service for game-related API calls:
+
+```bash
+mkdir -p src/features/game/services && touch src/features/game/services/game.service.ts
+```
+
+**src/features/game/services/game.service.ts:**
+
+```typescript
+import { apiClient } from "@/shared/lib/api-client";
+import type { ApiResponse, PaginatedResponse } from "@/shared/types/api.types";
+import type {
+	GameScore,
+	UserStats,
+	LeaderboardEntry,
+	LeaderboardFilters,
+} from "../types/game.types";
+import type { GameStats } from "@/app/stores/game.store";
+
+/**
+ * Submit game score request
+ */
+export interface SubmitScoreRequest extends GameStats {
+	difficulty: string;
+}
+
+/**
+ * Game service for score and stats management
+ */
+export const gameService = {
+	/**
+	 * Submit game score after completing a game
+	 */
+	async submitScore(scoreData: SubmitScoreRequest): Promise<GameScore> {
+		const response = await apiClient.post<ApiResponse<GameScore>>(
+			"/game/scores",
+			scoreData
+		);
+		return response.data.data;
+	},
+
+	/**
+	 * Get current user's statistics
+	 */
+	async getUserStats(): Promise<UserStats> {
+		const response = await apiClient.get<ApiResponse<UserStats>>(
+			"/game/stats/me"
+		);
+		return response.data.data;
+	},
+
+	/**
+	 * Get leaderboard with optional filters
+	 */
+	async getLeaderboard(
+		filters: LeaderboardFilters = {}
+	): Promise<LeaderboardEntry[]> {
+		const params = new URLSearchParams();
+
+		if (filters.difficulty && filters.difficulty !== "all") {
+			params.append("difficulty", filters.difficulty);
+		}
+		if (filters.timeframe) {
+			params.append("timeframe", filters.timeframe);
+		}
+		if (filters.limit) {
+			params.append("limit", filters.limit.toString());
+		}
+
+		const response = await apiClient.get<ApiResponse<LeaderboardEntry[]>>(
+			`/game/leaderboard?${params.toString()}`
+		);
+		return response.data.data;
+	},
+
+	/**
+	 * Get user's game history
+	 */
+	async getGameHistory(
+		page: number = 1,
+		pageSize: number = 10
+	): Promise<PaginatedResponse<GameScore>> {
+		const response = await apiClient.get<
+			ApiResponse<PaginatedResponse<GameScore>>
+		>(`/game/history?page=${page}&pageSize=${pageSize}`);
+		return response.data.data;
+	},
+};
+```
+
+### Create Game Hooks with Tanstack Query
+
+```bash
+mkdir -p src/features/game/hooks && touch src/features/game/hooks/useGameQueries.ts
+```
+
+We will use mock data so we can run without the backend.
+
+**src/features/game/hooks/useGameQueries.ts:**
+
+```typescript
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { gameService, type SubmitScoreRequest } from "../services/game.service";
+import type { LeaderboardFilters } from "../types/game.types";
+import { useStore } from "@/app/stores/useStore";
+import { toast } from "sonner";
+
+/**
+ * Mock flag - set to false when backend is ready
+ */
+const USE_MOCK = true;
+
+/**
+ * Mock delay to simulate network request
+ */
+const mockDelay = (ms: number = 500) =>
+	new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Mock user statistics
+ */
+const mockStats = {
+	totalGames: 42,
+	totalScore: 12450,
+	averageScore: 296,
+	bestScore: 850,
+	totalHits: 420,
+	totalMisses: 89,
+	overallAccuracy: 82,
+	bestCombo: 15,
+	favoritesDifficulty: "normal" as const,
+	gamesPerDifficulty: { easy: 10, normal: 25, hard: 7 },
+	recentGames: [
+		{
+			id: "1",
+			userId: "1",
+			username: "TestPlayer",
+			score: 450,
+			difficulty: "normal" as const,
+			hits: 45,
+			misses: 5,
+			accuracy: 90,
+			highestCombo: 12,
+			playedAt: new Date().toISOString(),
+		},
+		{
+			id: "2",
+			userId: "1",
+			username: "TestPlayer",
+			score: 320,
+			difficulty: "easy" as const,
+			hits: 40,
+			misses: 8,
+			accuracy: 83,
+			highestCombo: 8,
+			playedAt: new Date(Date.now() - 86400000).toISOString(),
+		},
+		{
+			id: "3",
+			userId: "1",
+			username: "TestPlayer",
+			score: 280,
+			difficulty: "hard" as const,
+			hits: 35,
+			misses: 12,
+			accuracy: 74,
+			highestCombo: 6,
+			playedAt: new Date(Date.now() - 172800000).toISOString(),
+		},
+	],
+};
+
+/**
+ * Mock leaderboard data
+ */
+const mockLeaderboard = [
+	{
+		rank: 1,
+		userId: "2",
+		username: "ProGamer",
+		score: 1200,
+		difficulty: "hard" as const,
+		playedAt: new Date().toISOString(),
+	},
+	{
+		rank: 2,
+		userId: "1",
+		username: "TestPlayer",
+		score: 850,
+		difficulty: "normal" as const,
+		playedAt: new Date(Date.now() - 3600000).toISOString(),
+		isCurrentUser: true,
+	},
+	{
+		rank: 3,
+		userId: "3",
+		username: "CasualPlayer",
+		score: 720,
+		difficulty: "normal" as const,
+		playedAt: new Date(Date.now() - 7200000).toISOString(),
+	},
+	{
+		rank: 4,
+		userId: "4",
+		username: "SpeedRunner",
+		score: 680,
+		difficulty: "easy" as const,
+		playedAt: new Date(Date.now() - 10800000).toISOString(),
+	},
+	{
+		rank: 5,
+		userId: "5",
+		username: "NightOwl",
+		score: 650,
+		difficulty: "hard" as const,
+		playedAt: new Date(Date.now() - 14400000).toISOString(),
+	},
+	{
+		rank: 6,
+		userId: "6",
+		username: "QuickClick",
+		score: 600,
+		difficulty: "normal" as const,
+		playedAt: new Date(Date.now() - 18000000).toISOString(),
+	},
+	{
+		rank: 7,
+		userId: "7",
+		username: "Sniper99",
+		score: 580,
+		difficulty: "hard" as const,
+		playedAt: new Date(Date.now() - 21600000).toISOString(),
+	},
+	{
+		rank: 8,
+		userId: "8",
+		username: "ChillGamer",
+		score: 550,
+		difficulty: "easy" as const,
+		playedAt: new Date(Date.now() - 25200000).toISOString(),
+	},
+	{
+		rank: 9,
+		userId: "9",
+		username: "AccuracyKing",
+		score: 520,
+		difficulty: "normal" as const,
+		playedAt: new Date(Date.now() - 28800000).toISOString(),
+	},
+	{
+		rank: 10,
+		userId: "10",
+		username: "Rookie2024",
+		score: 480,
+		difficulty: "easy" as const,
+		playedAt: new Date(Date.now() - 32400000).toISOString(),
+	},
+];
+
+/**
+ * Query key factory for game-related queries
+ */
+export const gameKeys = {
+	all: ["game"] as const,
+	stats: () => [...gameKeys.all, "stats"] as const,
+	leaderboard: (filters: LeaderboardFilters) =>
+		[...gameKeys.all, "leaderboard", filters] as const,
+	history: (page: number) => [...gameKeys.all, "history", page] as const,
+};
+
+/**
+ * Hook to fetch user statistics
+ */
+export const useUserStats = () => {
+	const { authStore } = useStore();
+
+	return useQuery({
+		queryKey: gameKeys.stats(),
+		queryFn: async () => {
+			if (USE_MOCK) {
+				await mockDelay();
+				return mockStats;
+			}
+			return gameService.getUserStats();
+		},
+		enabled: authStore.isAuthenticated,
+		staleTime: 1000 * 60 * 2,
+	});
+};
+
+/**
+ * Hook to fetch leaderboard with filters
+ */
+export const useLeaderboard = (filters: LeaderboardFilters = {}) => {
+	return useQuery({
+		queryKey: gameKeys.leaderboard(filters),
+		queryFn: async () => {
+			if (USE_MOCK) {
+				await mockDelay();
+
+				// Apply basic filtering to mock data
+				let filteredData = [...mockLeaderboard];
+
+				// Filter by difficulty
+				if (filters.difficulty && filters.difficulty !== "all") {
+					filteredData = filteredData.filter(
+						(entry) => entry.difficulty === filters.difficulty
+					);
+				}
+
+				// Re-rank after filtering
+				filteredData = filteredData.map((entry, index) => ({
+					...entry,
+					rank: index + 1,
+				}));
+
+				return filteredData;
+			}
+			return gameService.getLeaderboard(filters);
+		},
+		staleTime: 1000 * 30,
+		refetchInterval: USE_MOCK ? false : 1000 * 60, // Don't auto-refetch in mock mode
+	});
+};
+
+/**
+ * Hook to fetch game history with pagination
+ */
+export const useGameHistory = (page: number = 1) => {
+	const { authStore } = useStore();
+
+	return useQuery({
+		queryKey: gameKeys.history(page),
+		queryFn: async () => {
+			if (USE_MOCK) {
+				await mockDelay();
+				return {
+					data: mockStats.recentGames,
+					meta: {
+						page: 1,
+						pageSize: 10,
+						totalPages: 1,
+						totalItems: mockStats.recentGames.length,
+					},
+				};
+			}
+			return gameService.getGameHistory(page);
+		},
+		enabled: authStore.isAuthenticated,
+		staleTime: 1000 * 60 * 5,
+	});
+};
+
+/**
+ * Hook to submit game score
+ */
+export const useSubmitScore = () => {
+	const { authStore } = useStore();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (scoreData: SubmitScoreRequest) => {
+			if (USE_MOCK) {
+				await mockDelay();
+				return {
+					id: Date.now().toString(),
+					userId: authStore.user?.id || "1",
+					username: authStore.user?.username || "TestPlayer",
+					...scoreData,
+					playedAt: new Date().toISOString(),
+				};
+			}
+			return gameService.submitScore(scoreData);
+		},
+		onSuccess: (newScore) => {
+			queryClient.invalidateQueries({ queryKey: gameKeys.stats() });
+			queryClient.invalidateQueries({ queryKey: gameKeys.all });
+
+			const currentStats = queryClient.getQueryData(
+				gameKeys.stats()
+			) as any;
+			if (currentStats && newScore.score > currentStats.bestScore) {
+				toast.success("🎉 New High Score!", {
+					description: `You scored ${newScore.score} points!`,
+				});
+			} else {
+				toast.success("Score submitted successfully!");
+			}
+		},
+		onError: (error: any) => {
+			toast.error(
+				error.response?.data?.message || "Failed to submit score"
+			);
+		},
+	});
+};
+```
+
+### Update Game Store to Submit Scores
+
+Modify the game store to automatically submit scores when authenticated:
+
+**Update src/app/stores/game.store.ts** - add this method:
+
+```typescript
+	...
+	// Get final game stats for submission
+	get finalStats() {
+		return {
+			score: this.score,
+			hits: this.hits,
+			misses: this.misses,
+			accuracy: this.accuracy,
+			highestCombo: this.highestCombo,
+			difficulty: this.difficulty,
+		};
+	}
+```
+
+### Update Game Over Modal to Submit Score
+
+**Update src/features/game/components/GameOverModal.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/app/stores/useStore";
+import { Button } from "@/shared/components/ui/button";
+import { useSubmitScore } from "../hooks/useGameQueries";
+import { useEffect } from "react";
+
+export const GameOverModal = observer(() => {
+	const { gameStore, authStore } = useStore();
+	const { mutate: submitScore } = useSubmitScore();
+
+	// Submit score when game ends (only if authenticated)
+	useEffect(() => {
+		if (gameStore.gameState === "gameOver" && authStore.isAuthenticated) {
+			submitScore({
+				...gameStore.finalStats,
+			});
+		}
+	}, [gameStore.gameState, authStore.isAuthenticated, submitScore]);
+
+	if (gameStore.gameState !== "gameOver") return null;
+
+	return (
+		<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+			<div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+				<h2 className="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+					Game Over!
+				</h2>
+
+				{!authStore.isAuthenticated && (
+					<div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+						<p className="text-sm text-blue-800 dark:text-blue-200 text-center">
+							💡 Login to save your score and compete on the
+							leaderboard!
+						</p>
+					</div>
+				)}
+
+				<div className="space-y-4 mb-6">
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Final Score:
+						</span>
+						<span className="text-2xl font-bold text-gray-900 dark:text-white">
+							{gameStore.score}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Hits:
+						</span>
+						<span className="text-lg font-semibold text-green-500">
+							{gameStore.hits}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Misses:
+						</span>
+						<span className="text-lg font-semibold text-red-500">
+							{gameStore.misses}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Accuracy:
+						</span>
+						<span className="text-lg font-semibold text-blue-500">
+							{gameStore.accuracy}%
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Highest Combo:
+						</span>
+						<span className="text-lg font-semibold text-orange-500">
+							{gameStore.highestCombo}x
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-gray-600 dark:text-gray-400">
+							Difficulty:
+						</span>
+						<span className="text-lg font-semibold text-purple-500 capitalize">
+							{gameStore.difficulty}
+						</span>
+					</div>
+				</div>
+
+				<div className="flex gap-3">
+					<Button
+						onClick={() => gameStore.startGame()}
+						className="flex-1"
+						size="lg"
+					>
+						Play Again
+					</Button>
+					<Button
+						onClick={() => gameStore.resetGame()}
+						variant="outline"
+						className="flex-1"
+						size="lg"
+					>
+						Main Menu
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+});
+```
+
+### Create Leaderboard Components
+
+We will be using DataTable component from shadcn which works well with Tanstack table.
+
+**Install Shadcn Table Component**
+
+```bash
+bun add @tanstack/react-table
+bunx shadcn@latest add table dropdown-menu checkbox
+```
+
+**Create the Data Table Component**
+
+```bash
+mkdir -p src/shared/components/data-table && touch src/shared/components/data-table/data-table.tsx
+```
+
+**src/shared/components/data-table/data-table.tsx:**
+
+```typescript
+import {
+	flexRender,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	getSortedRowModel,
+	useReactTable,
+	type ColumnDef,
+	type ColumnFiltersState,
+	type SortingState,
+	type VisibilityState,
+} from "@tanstack/react-table";
+import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+	DropdownMenu,
+	DropdownMenuCheckboxItem,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/shared/components/ui/table";
+import { ChevronDown } from "lucide-react";
+
+interface DataTableProps<TData, TValue> {
+	columns: ColumnDef<TData, TValue>[];
+	data: TData[];
+	searchKey?: string;
+	searchPlaceholder?: string;
+}
+
+export function DataTable<TData, TValue>({
+	columns,
+	data,
+	searchKey,
+	searchPlaceholder = "Search...",
+}: DataTableProps<TData, TValue>) {
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+		{}
+	);
+
+	const table = useReactTable({
+		data,
+		columns,
+		onSortingChange: setSorting,
+		onColumnFiltersChange: setColumnFilters,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		onColumnVisibilityChange: setColumnVisibility,
+		state: {
+			sorting,
+			columnFilters,
+			columnVisibility,
+		},
+	});
+
+	return (
+		<div className="w-full space-y-4">
+			<div className="flex items-center justify-between">
+				{searchKey && (
+					<Input
+						placeholder={searchPlaceholder}
+						value={
+							(table
+								.getColumn(searchKey)
+								?.getFilterValue() as string) ?? ""
+						}
+						onChange={(event) =>
+							table
+								.getColumn(searchKey)
+								?.setFilterValue(event.target.value)
+						}
+						className="max-w-sm"
+					/>
+				)}
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="outline" className="ml-auto">
+							Columns <ChevronDown className="ml-2 h-4 w-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						{table
+							.getAllColumns()
+							.filter((column) => column.getCanHide())
+							.map((column) => {
+								return (
+									<DropdownMenuCheckboxItem
+										key={column.id}
+										className="capitalize"
+										checked={column.getIsVisible()}
+										onCheckedChange={(value) =>
+											column.toggleVisibility(!!value)
+										}
+									>
+										{column.id}
+									</DropdownMenuCheckboxItem>
+								);
+							})}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+
+			<div className="rounded-md border">
+				<Table>
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+														header.column.columnDef
+															.header,
+														header.getContext()
+												  )}
+										</TableHead>
+									);
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									data-state={
+										row.getIsSelected() && "selected"
+									}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext()
+											)}
+										</TableCell>
+									))}
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="h-24 text-center"
+								>
+									No results.
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			</div>
+
+			<div className="flex items-center justify-end space-x-2">
+				<div className="flex-1 text-sm text-muted-foreground">
+					{table.getFilteredRowModel().rows.length} result(s)
+				</div>
+				<div className="space-x-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+}
+```
+
+**Create Leaderboard Columns Definition:**
+
+```bash
+touch src/features/game/components/leaderboard-columns.tsx
+```
+
+**src/features/game/components/leaderboard-columns.tsx:**
+
+```typescript
+import { type ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import type { LeaderboardEntry } from "../types/game.types";
+
+export const leaderboardColumns: ColumnDef<LeaderboardEntry>[] = [
+	{
+		accessorKey: "rank",
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() =>
+						column.toggleSorting(column.getIsSorted() === "asc")
+					}
+				>
+					Rank
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			);
+		},
+		cell: ({ row }) => {
+			const rank = row.original.rank;
+			return (
+				<div className="flex items-center">
+					{rank <= 3 && (
+						<span className="mr-2 text-lg">
+							{rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
+						</span>
+					)}
+					<span className="text-sm font-medium">#{rank}</span>
+				</div>
+			);
+		},
+	},
+	{
+		accessorKey: "username",
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() =>
+						column.toggleSorting(column.getIsSorted() === "asc")
+					}
+				>
+					Player
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			);
+		},
+		cell: ({ row }) => (
+			<span className="font-medium">
+				{row.original.username}
+				{row.original.isCurrentUser && (
+					<span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+						(You)
+					</span>
+				)}
+			</span>
+		),
+	},
+	{
+		accessorKey: "score",
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() =>
+						column.toggleSorting(column.getIsSorted() === "asc")
+					}
+				>
+					Score
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			);
+		},
+		cell: ({ getValue }) => (
+			<span className="font-bold">{getValue() as number}</span>
+		),
+	},
+	{
+		accessorKey: "difficulty",
+		header: "Difficulty",
+		cell: ({ getValue }) => {
+			const difficulty = getValue() as string;
+			return (
+				<span
+					className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize
+					${
+						difficulty === "easy"
+							? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+							: difficulty === "normal"
+							? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+							: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+					}
+				`}
+				>
+					{difficulty}
+				</span>
+			);
+		},
+		filterFn: (row, id, value) => {
+			return value.includes(row.getValue(id));
+		},
+	},
+	{
+		accessorKey: "playedAt",
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() =>
+						column.toggleSorting(column.getIsSorted() === "asc")
+					}
+				>
+					Date
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			);
+		},
+		cell: ({ getValue }) => (
+			<span className="text-sm text-muted-foreground">
+				{new Date(getValue() as string).toLocaleDateString()}
+			</span>
+		),
+	},
+];
+```
+
+```bash
+touch src/features/game/components/LeaderboardTable.tsx src/features/game/components/LeaderboardFilters.tsx
+```
+
+**src/features/game/components/LeaderboardFilters.tsx:**
+
+```typescript
+import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import type { Difficulty } from "@/app/stores/game.store";
+import type { LeaderboardFilters } from "../types/game.types";
+
+interface LeaderboardFiltersProps {
+	onFilterChange: (filters: LeaderboardFilters) => void;
+}
+
+export const LeaderboardFiltersComponent = ({
+	onFilterChange,
+}: LeaderboardFiltersProps) => {
+	const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
+	const [timeframe, setTimeframe] = useState<
+		"today" | "week" | "month" | "allTime"
+	>("allTime");
+
+	const handleDifficultyChange = (newDifficulty: Difficulty | "all") => {
+		setDifficulty(newDifficulty);
+		onFilterChange({ difficulty: newDifficulty, timeframe });
+	};
+
+	const handleTimeframeChange = (
+		newTimeframe: "today" | "week" | "month" | "allTime"
+	) => {
+		setTimeframe(newTimeframe);
+		onFilterChange({ difficulty, timeframe: newTimeframe });
+	};
+
+	return (
+		<div className="space-y-4 mb-6">
+			<div>
+				<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+					Difficulty
+				</label>
+				<div className="flex flex-wrap gap-2">
+					{(["all", "easy", "normal", "hard"] as const).map(
+						(diff) => (
+							<Button
+								key={diff}
+								variant={
+									difficulty === diff ? "default" : "outline"
+								}
+								size="sm"
+								onClick={() => handleDifficultyChange(diff)}
+								className="capitalize"
+							>
+								{diff}
+							</Button>
+						)
+					)}
+				</div>
+			</div>
+
+			<div>
+				<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+					Timeframe
+				</label>
+				<div className="flex flex-wrap gap-2">
+					{(["today", "week", "month", "allTime"] as const).map(
+						(time) => (
+							<Button
+								key={time}
+								variant={
+									timeframe === time ? "default" : "outline"
+								}
+								size="sm"
+								onClick={() => handleTimeframeChange(time)}
+								className="capitalize"
+							>
+								{time === "allTime" ? "All Time" : time}
+							</Button>
+						)
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};
+```
+
+**src/features/game/components/LeaderboardTable.tsx:**
+
+```typescript
+import { DataTable } from "@/shared/components/data-table/data-table";
+import { leaderboardColumns } from "./leaderboard-columns";
+import type { LeaderboardEntry } from "../types/game.types";
+
+interface LeaderboardTableProps {
+	entries: LeaderboardEntry[];
+	isLoading?: boolean;
+}
+
+export const LeaderboardTable = ({
+	entries,
+	isLoading,
+}: LeaderboardTableProps) => {
+	if (isLoading) {
+		return (
+			<div className="text-center py-8 text-gray-500">
+				Loading leaderboard...
+			</div>
+		);
+	}
+
+	if (!entries || entries.length === 0) {
+		return (
+			<div className="text-center py-8 text-gray-500">
+				No scores yet. Be the first to play!
+			</div>
+		);
+	}
+
+	return (
+		<DataTable
+			columns={leaderboardColumns}
+			data={entries}
+			searchKey="username"
+			searchPlaceholder="Search players..."
+		/>
+	);
+};
+```
+
+### Update Leaderboard Page
+
+Our Leaderboard page will be fairly straightforward as we have already built its subcomponents.
+
+**src/pages/Leaderboard.tsx:**
+
+```typescript
+import { useState } from "react";
+import { observer } from "mobx-react-lite";
+import { PageHead } from "@/shared/components/layout/PageHead";
+import { useLeaderboard } from "@/features/game/hooks/useGameQueries";
+import { LeaderboardTable } from "@/features/game/components/LeaderboardTable";
+import { LeaderboardFiltersComponent } from "@/features/game/components/LeaderboardFilters";
+import type { LeaderboardFilters } from "@/features/game/types/game.types";
+
+const Leaderboard = observer(() => {
+	const [filters, setFilters] = useState<LeaderboardFilters>({
+		difficulty: "all",
+		timeframe: "allTime",
+	});
+
+	const { data: leaderboard, isLoading } = useLeaderboard(filters);
+
+	return (
+		<>
+			<PageHead />
+			<div className="space-y-6">
+				<div>
+					<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+						Leaderboard
+					</h1>
+					<p className="text-gray-600 dark:text-gray-400">
+						Top players ranked by score
+					</p>
+				</div>
+
+				<div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+					<LeaderboardFiltersComponent onFilterChange={setFilters} />
+					<LeaderboardTable
+						entries={leaderboard || []}
+						isLoading={isLoading}
+					/>
+				</div>
+			</div>
+		</>
+	);
+});
+
+export default Leaderboard;
+```
+
+### Create Stats Components
+
+```bash
+mkdir -p src/features/stats/components && touch src/features/stats/components/StatsOverview.tsx src/features/stats/components/RecentGames.tsx
+```
+
+**src/features/stats/components/StatsOverview.tsx:**
+
+```typescript
+import type { UserStats } from "@/features/game/types/game.types";
+
+interface StatsOverviewProps {
+	stats: UserStats;
+}
+
+export const StatsOverview = ({ stats }: StatsOverviewProps) => {
+	const statCards = [
+		{
+			label: "Total Games",
+			value: stats.totalGames,
+			color: "text-blue-600 dark:text-blue-400",
+		},
+		{
+			label: "Best Score",
+			value: stats.bestScore,
+			color: "text-green-600 dark:text-green-400",
+		},
+		{
+			label: "Average Score",
+			value: Math.round(stats.averageScore),
+			color: "text-purple-600 dark:text-purple-400",
+		},
+		{
+			label: "Overall Accuracy",
+			value: `${stats.overallAccuracy}%`,
+			color: "text-orange-600 dark:text-orange-400",
+		},
+		{
+			label: "Best Combo",
+			value: `${stats.bestCombo}x`,
+			color: "text-red-600 dark:text-red-400",
+		},
+		{
+			label: "Favorite Difficulty",
+			value: stats.favoritesDifficulty,
+			color: "text-indigo-600 dark:text-indigo-400",
+			capitalize: true,
+		},
+	];
+
+	return (
+		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+			{statCards.map((stat) => (
+				<div
+					key={stat.label}
+					className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+				>
+					<p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+						{stat.label}
+					</p>
+					<p
+						className={`text-3xl font-bold ${stat.color} ${
+							stat.capitalize ? "capitalize" : ""
+						}`}
+					>
+						{stat.value}
+					</p>
+				</div>
+			))}
+		</div>
+	);
+};
+```
+
+**src/features/stats/components/RecentGames.tsx:**
+
+```typescript
+import type { GameScore } from "@/features/game/types/game.types";
+
+interface RecentGamesProps {
+	games: GameScore[];
+}
+
+export const RecentGames = ({ games }: RecentGamesProps) => {
+	if (!games || games.length === 0) {
+		return (
+			<div className="text-center py-8 text-gray-500">
+				No games played yet. Start playing to see your history!
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-3">
+			{games.map((game) => (
+				<div
+					key={game.id}
+					className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center justify-between"
+				>
+					<div>
+						<p className="font-bold text-gray-900 dark:text-white">
+							Score: {game.score}
+						</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							{game.hits} hits, {game.misses} misses •{" "}
+							{game.accuracy}% accuracy
+						</p>
+						<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+							{new Date(game.playedAt).toLocaleString()}
+						</p>
+					</div>
+					<div>
+						<span
+							className={`px-3 py-1 text-sm font-semibold rounded-full capitalize
+							${
+								game.difficulty === "easy"
+									? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+									: game.difficulty === "normal"
+									? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+									: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+							}
+						`}
+						>
+							{game.difficulty}
+						</span>
+					</div>
+				</div>
+			))}
+		</div>
+	);
+};
+```
+
+### Update My Stats Page
+
+**src/pages/MyStats.tsx:**
+
+```typescript
+import { observer } from "mobx-react-lite";
+import { PageHead } from "@/shared/components/layout/PageHead";
+import { useUserStats } from "@/features/game/hooks/useGameQueries";
+import { StatsOverview } from "@/features/stats/components/StatsOverview";
+import { RecentGames } from "@/features/stats/components/RecentGames";
+
+const MyStats = observer(() => {
+	const { data: stats, isLoading, error } = useUserStats();
+
+	if (isLoading) {
+		return (
+			<>
+				<PageHead />
+				<div className="text-center py-12">
+					<p className="text-gray-600 dark:text-gray-400">
+						Loading your statistics...
+					</p>
+				</div>
+			</>
+		);
+	}
+
+	if (error || !stats) {
+		return (
+			<>
+				<PageHead />
+				<div className="text-center py-12">
+					<p className="text-red-600">Failed to load statistics</p>
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<PageHead />
+			<div className="space-y-6">
+				<div>
+					<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+						My Statistics
+					</h1>
+					<p className="text-gray-600 dark:text-gray-400">
+						Track your progress and performance
+					</p>
+				</div>
+
+				<StatsOverview stats={stats} />
+
+				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow p-6">
+					<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+						Recent Games
+					</h2>
+					<RecentGames games={stats.recentGames} />
+				</div>
+
+				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow p-6">
+					<h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+						Games by Difficulty
+					</h2>
+					<div className="grid grid-cols-3 gap-4">
+						<div className="text-center">
+							<p className="text-2xl font-bold text-green-600 dark:text-green-400">
+								{stats.gamesPerDifficulty.easy}
+							</p>
+							<p className="text-sm text-gray-600 dark:text-gray-400">
+								Easy
+							</p>
+						</div>
+						<div className="text-center">
+							<p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+								{stats.gamesPerDifficulty.normal}
+							</p>
+							<p className="text-sm text-gray-600 dark:text-gray-400">
+								Normal
+							</p>
+						</div>
+						<div className="text-center">
+							<p className="text-2xl font-bold text-red-600 dark:text-red-400">
+								{stats.gamesPerDifficulty.hard}
+							</p>
+							<p className="text-sm text-gray-600 dark:text-gray-400">
+								Hard
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
+	);
+});
+
+export default MyStats;
+```
+
+### Test
+
+Now you can test the entire game flow:
+
+**1. Play a Game:**
+
+-   Login (if not already)
+-   Play a game on the Game page
+-   When game ends, score is automatically submitted
+-   See toast notification
+
+**2. Check Stats:**
+
+-   Navigate to "My Stats"
+-   See your statistics update
+-   View recent games
+
+**3. Check Leaderboard:**
+
+-   Navigate to "Leaderboard"
+-   See your score in the rankings (highlighted)
+-   Filter by difficulty and timeframe
+-   Leaderboard auto-refreshes every minute
+
+**4. Play Again:**
+
+-   Play multiple games
+-   Watch stats update in real-time
+-   See "New High Score!" notification when you beat your best
+
+### Key TanStack Query / Table Features Demonstrated
+
+**Automatic Caching:**
+
+-   Stats cached for 2 minutes
+-   Leaderboard cached for 30 seconds
+-   No unnecessary API calls
+
+**Background Refetching:**
+
+-   Leaderboard refetches every minute
+-   Stale data shown while fetching fresh data
+
+**Query Invalidation:**
+
+-   After submitting score, stats and leaderboard automatically refetch
+-   No manual refresh needed
+
+**Optimistic Updates:**
+
+-   Could add optimistic updates to leaderboard (update UI before API confirms)
+
+**Loading States:**
+
+-   `isLoading` provides built-in loading indicators
+-   Smooth user experience
+
+**Error Handling:**
+
+-   Automatic error catching
+-   Toast notifications on failure
+
+**Tanstack Table:**
+
+-   Built-in sorting with one click
+-   Easy to add pagination (if required in future)
+-   Easy to add column filtering (if required in future)
+-   Type-safe throughout
+-   Reusable patterns

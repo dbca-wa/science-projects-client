@@ -208,4 +208,16 @@ export default class GameStore {
 			this.timeCheck();
 		}
 	};
+
+	// Get final game stats for submission
+	get finalStats() {
+		return {
+			score: this.score,
+			hits: this.hits,
+			misses: this.misses,
+			accuracy: this.accuracy,
+			highestCombo: this.highestCombo,
+			difficulty: this.difficulty,
+		};
+	}
 }
