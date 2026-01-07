@@ -2,13 +2,15 @@
 
 ## Overview
 
-This guide demonstrates how to set up a modern full-stack React/Django app, focusing specifically on the frontend development environment. It will cover basic setup, authentication & connecting to a backend, forms, and usage of the core technology. The guide is designed so that developers can more or less fully develop the frontend, step-by-step, before creating a simple backend and devops flow to tie it all together.
+This guide demonstrates how to set up a modern full-stack React app, focusing specifically on the frontend development with tips for connecting to a Django backend/database. It will cover basic setup, authentication, forms, and usage of the core technology listed below. The guide is designed so that developers can fully develop the frontend, step-by-step, before focusing on additional steps like containerisation, devops workflows, and creating a backend.
+
+**NOTE:** Although this guide will provide suggestions for the backend, we will only utilise mock data as the scope of this guide is the frontend.
 
 **What We're Building:** A Reaction Clicker game - a web application where players click targets that appear randomly on screen before they disappear. This application naturally demonstrates all the technologies in our stack through real-world implementation patterns.
 
-**Learning Approach:** We'll build the game using our modern stack, showcasing proper architecture, state management, API integration, and component patterns. This game format provides clear use cases for authentication (user accounts), forms (settings), real-time updates (game state), and backend integration (leaderboards and statistics).
+**Learning Approach:** We'll build the game using our modern stack, showcasing proper architecture, routing, state management, API integration, and component patterns. This game format provides clear use cases for authentication (user accounts), forms (settings), real-time updates (game state), and suggestions for backend integration with mock data (leaderboards and statistics).
 
-Note: This represents a recommended approach rather than a strict organisational requirement. It assumes developers have access to install necessary tools and are using Windows as their primary operating system, as per DBCA standard.
+**Note:** This represents a recommended approach for React development rather than a strict requirement. It assumes developers have access to install necessary tools and are using Windows as their primary operating system, as per DBCA standard.
 
 ## Stack
 
@@ -78,12 +80,12 @@ project_root/:
 
 ### Frontend Structure
 
-The guide focuses on the frontend structure:
+The guide focuses on the frontend src folder's structure:
 
 ```
 src/
 ├── app/                         # Application-wide concerns
-│   ├── providers/               # React providers (Query, Store, Theme)
+│   ├── providers/               # React providers (Query, Store, Theme - better organisation for bigger apps, not used here)
 │   ├── router/                  # Routing configuration and guards
 │   └── stores/                  # MobX stores
 │       ├── root.store.ts        # Root store orchestration
@@ -100,17 +102,16 @@ src/
 │   ├── components/              # Reusable UI components
 │   │   ├── ui/                  # shadcn/ui components
 │   │   ├── layout/              # Layout components
-│   │   └── common/              # Common components
-│   ├── hooks/                   # Custom hooks
-│   ├── services/                # API services and utilities
+│   │   └── data-table/          # Shadcn/Tanstack table custom definition
+│   ├── hooks/                   # Any custom shared hooks (not utilised here)
 │   ├── types/                   # TypeScript type definitions
-│   ├── utils/                   # Utility functions
-│   └── constants/               # Application constants
-└── lib/                         # Core library functions
-    ├── api-client.ts            # Axios configuration
-    ├── auth.ts                  # Authentication utilities
-    ├── utils.ts                 # Core utilities
-    └── validations.ts           # Zod schemas
+│   ├── styles/                  # CSS files shared between features
+│	└── lib/                     # Core library functions
+│		├── api-client.ts        # Axios configuration
+│		├── query-client.ts      # Tanstack configuration
+│		└── utils.ts             # Core utilities
+└── main.tsx					 # entrypoint
+
 ```
 
 ### Feature Module Structure
@@ -120,8 +121,8 @@ For maintainability, major components are split into features for a domain-drive
 ```
 src/features/[feature-name]/
 ├── components/                     # Feature-specific components
-│   ├── forms/                      # Form components
-│   ├── modals/                     # Modal components
+│   ├── forms/                      # Form components (if necessary)
+│   ├── modals/                     # Modal components (if necessary)
 │   └── index.ts                    # Barrel exports
 ├── hooks/                          # Feature-specific hooks
 │   ├── use[Feature].ts             # Main feature hook
@@ -133,7 +134,7 @@ src/features/[feature-name]/
 ├── types/                          # TypeScript interfaces
 │   ├── [feature].types.ts          # Type definitions
 │   └── index.ts                    # Barrel exports
-├── schemas/                        # Zod validation schemas
+├── schemas/                        # Zod validation schemas (if necessary)
 │   ├── [feature].schemas.ts        # Validation schemas
 │   └── index.ts                    # Barrel exports
 └── index.ts                        # Feature barrel export
@@ -143,7 +144,21 @@ src/features/[feature-name]/
 
 ### Prerequisites
 
-In order to establish a frontend we first require some development tools. Tools required for development may differ depending on operating system (OS), however, this guide assumes a Windows device with appropriate permissions for installing tools and performing development work.
+Tools required for development may differ depending on operating system (OS), however, this guide was designed using a fresh install of Windows 11 on a virtual machine, and assumes that you have appropriate permissions for installing tools and performing development work. The tools you will need to install are as follows:
+
+Core:
+
+-   VSCode (Recommended for useful extensions)
+-   Git (For commiting and pushing, alternative is Github Desktop)
+-   Node (Required for javascript development)
+-   Bun (Package manager, alternative is npm)
+-   Docker (Devops flow)
+
+If building out a backend:
+
+-   Python
+-   Poetry
+-   PostgreSQL
 
 ### Create the App
 
