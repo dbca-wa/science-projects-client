@@ -1,6 +1,6 @@
 // Providers
 import { RouterProvider } from "react-router";
-import "./shared/styles/index.css";
+import "./shared/styles/main.css";
 import { StoreProvider } from "./app/stores/root.store";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "@tanstack/react-query";

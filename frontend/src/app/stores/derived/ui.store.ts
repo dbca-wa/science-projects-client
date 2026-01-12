@@ -1,76 +1,140 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
+import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 
-type Theme = "light" | "dark";
-type Layout = "modern" | "traditional";
+export type Theme = "light" | "dark";
+export type Layout = "modern" | "traditional";
+export type DataView = "grid" | "list";
 
-export class UIStore {
-	theme: Theme = "light";
-	layout: Layout = "traditional";
-	sidebarCollapsed = false;
-	soundEnabled = true;
+interface UIStoreState extends BaseStoreState {
+	theme: Theme;
+	layout: Layout;
+	sidebarOpen: boolean;
+	dataViewMode: DataView;
+}
 
+export class UIStore extends BaseStore<UIStoreState> {
 	constructor() {
+		super({
+			theme: "light",
+			layout: "traditional",
+			sidebarOpen: false,
+			dataViewMode: "grid",
+			loading: false,
+			error: null,
+			initialised: false,
+		});
+
 		makeAutoObservable(this);
-		// Load theme from localStorage
-		this.loadTheme();
-		// Load layout from localStorage
-		this.loadLayout();
-		// Load sound preference from localStorage
-		this.loadSoundPreference();
+		this.initialise();
+	}
+
+	// Computed getters for accessing state
+	get theme(): Theme {
+		return this.state.theme;
+	}
+
+	get layout(): Layout {
+		return this.state.layout;
+	}
+
+	get sidebarOpen(): boolean {
+		return this.state.sidebarOpen;
+	}
+
+	get dataViewMode(): DataView {
+		return this.state.dataViewMode;
 	}
 
 	/**
-	 * Load from localStorage
+	 * Initialize store - load from localStorage
 	 */
-	private loadTheme = () => {
-		const savedTheme = localStorage.getItem("theme") as Theme;
-		if (savedTheme) {
-			this.theme = savedTheme;
-			this.applyTheme();
-		}
-	};
+	async initialise(): Promise<void> {
+		runInAction(() => {
+			// Load theme from localStorage
+			const savedTheme = localStorage.getItem("theme") as Theme;
+			if (savedTheme) {
+				this.state.theme = savedTheme;
+			}
 
-	/*
-	 * Load from localStorage
-	 */
-	private loadLayout = () => {
-		const savedLayout = localStorage.getItem("layout") as Layout;
-		if (savedLayout) {
-			this.layout = savedLayout;
-			this.applyTheme();
-		}
-	};
+			// Load layout from localStorage
+			const savedLayout = localStorage.getItem("layout") as Layout;
+			if (savedLayout) {
+				this.state.layout = savedLayout;
+			}
 
-	private loadSoundPreference = () => {
-		const savedSound = localStorage.getItem("soundEnabled");
-		if (savedSound !== null) {
-			this.soundEnabled = savedSound === "true";
-		}
-	};
+			this.state.initialised = true;
+		});
+
+		// Apply theme after loading
+		this.applyTheme();
+	}
 
 	/**
 	 * Toggle theme between light and dark
 	 */
-	toggleTheme = () => {
-		this.theme = this.theme === "light" ? "dark" : "light";
-		localStorage.setItem("theme", this.theme);
+	toggleTheme = (): void => {
+		runInAction(() => {
+			this.state.theme = this.state.theme === "light" ? "dark" : "light";
+			localStorage.setItem("theme", this.state.theme);
+		});
 		this.applyTheme();
 	};
 
 	/**
 	 * Toggle layout between modern and traditional
 	 */
+	toggleLayout = (): void => {
+		runInAction(() => {
+			this.state.layout =
+				this.state.layout === "modern" ? "traditional" : "modern";
+			localStorage.setItem("layout", this.state.layout);
+		});
+	};
 
-	toggleLayout = () => {
-		this.layout = this.layout === "modern" ? "traditional" : "modern";
-		localStorage.setItem("layout", this.layout);
+	/**
+	 * Toggle sidebar collapsed state
+	 */
+	toggleSidebar = (): void => {
+		runInAction(() => {
+			this.state.sidebarOpen = !this.state.sidebarOpen;
+		});
+	};
+
+	/**
+	 * Set theme directly
+	 */
+	setTheme = (theme: Theme): void => {
+		runInAction(() => {
+			this.state.theme = theme;
+			localStorage.setItem("theme", this.state.theme);
+		});
+		this.applyTheme();
+	};
+
+	/**
+	 * Set layout directly
+	 */
+	setLayout = (layout: Layout): void => {
+		runInAction(() => {
+			this.state.layout = layout;
+			localStorage.setItem("layout", this.state.layout);
+		});
+	};
+
+	/**
+	 * Set data view mode
+	 */
+	setDataViewMode = (mode: DataView): void => {
+		runInAction(() => {
+			this.state.dataViewMode = mode;
+		});
 	};
 
 	/**
 	 * Apply theme to document
 	 */
-	private applyTheme = () => {
-		if (this.theme === "dark") {
+	private applyTheme = (): void => {
+		if (this.state.theme === "dark") {
 			document.documentElement.classList.add("dark");
 		} else {
 			document.documentElement.classList.remove("dark");
@@ -78,21 +142,24 @@ export class UIStore {
 	};
 
 	/**
-	 * Toggle sidebar collapsed state
+	 * Reset store to defaults
 	 */
-	toggleSidebar = () => {
-		this.sidebarCollapsed = !this.sidebarCollapsed;
-	};
-
-	// Direct setters
-	setSoundEnabled = (enabled: boolean) => {
-		this.soundEnabled = enabled;
-		localStorage.setItem("soundEnabled", String(enabled));
-	};
-
-	setTheme = (theme: Theme) => {
-		this.theme = theme;
-		localStorage.setItem("theme", this.theme);
+	reset(): void {
+		runInAction(() => {
+			this.state.theme = "light";
+			this.state.layout = "traditional";
+			this.state.sidebarOpen = false;
+			this.state.dataViewMode = "grid";
+			this.state.loading = false;
+			this.state.error = null;
+		});
 		this.applyTheme();
-	};
+	}
+
+	/**
+	 * Cleanup
+	 */
+	async dispose(): Promise<void> {
+		// No async cleanup needed for UI store
+	}
 }

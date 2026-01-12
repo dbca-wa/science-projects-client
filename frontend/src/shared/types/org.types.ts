@@ -13,7 +13,7 @@ export interface IAgency {
 // AFFILIATION ============================================================================
 
 export interface IAffiliation {
-	pk?: number;
+	pk: number;
 	created_at?: Date;
 	updated_at?: Date;
 	name: string;
@@ -22,7 +22,7 @@ export interface IAffiliation {
 // BRANCH ============================================================================
 
 export interface IBranch {
-	pk?: number;
+	pk: number;
 	old_id?: number;
 
 	agency: number;
@@ -35,7 +35,7 @@ export interface IBranch {
 export interface IDepartmentalService {
 	name: string;
 	director: number;
-	pk?: number;
+	pk: number;
 	old_id?: number;
 }
 
@@ -93,7 +93,7 @@ export interface IBusinessAreaCreate {
 // DIVISIONS ============================================================================
 
 export interface IDivision {
-	pk?: number;
+	pk: number;
 	old_id?: number;
 	name: string;
 	slug: string;
@@ -105,7 +105,7 @@ export interface IDivision {
 // ADDRESS ============================================================================
 
 export interface IAddress {
-	pk?: number;
+	pk: number;
 	agency?: number;
 	branch?: number;
 	street: string;

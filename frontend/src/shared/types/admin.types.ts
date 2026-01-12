@@ -138,7 +138,7 @@ export interface IMakeRequestToAdmins {
 
 export interface IActionAdminTask {
 	action: "approve" | "reject";
-	taskPk?: number;
+	taskPk: number;
 }
 
 export interface IAdminTask {

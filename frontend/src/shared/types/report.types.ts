@@ -33,7 +33,7 @@ export interface IReportPDF {
 
 export interface IReport {
 	old_id?: number;
-	pk?: number;
+	pk: number;
 	id?: number;
 	created_at?: Date;
 	updated_at?: Date | null;

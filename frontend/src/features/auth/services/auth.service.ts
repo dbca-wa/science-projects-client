@@ -1,69 +1,40 @@
-import { apiClient } from "@/shared/lib/api-client";
-import type { ApiResponse } from "@/shared/types/api.types";
-import type { User } from "@/app/stores/derived/auth.store";
-
-// Login request payload
-
-export interface LoginRequest {
-	email: string;
-	password: string;
-}
-
-// Login response
-
-export interface LoginResponse {
-	user: User;
-	token: string;
-}
-
-// Register request payload
-
-export interface RegisterRequest {
-	username: string;
-	email: string;
-	password: string;
-}
+import type {
+	IUsernameLoginVariables,
+	IUsernameLoginSuccess,
+} from "@/features/auth/types";
+import { apiClient } from "@/shared/services/api/client.service";
+import { AUTH_ENDPOINTS } from "./auth.endpoints";
+import type { IUserData } from "@/shared/types/user.types";
 
 /**
- * Authentication service
- * All methods return promises that TanStack Query will consume
+ * Login with username and password
  */
-export const authService = {
-	// Login user
-	async login(credentials: LoginRequest): Promise<LoginResponse> {
-		const response = await apiClient.post<ApiResponse<LoginResponse>>(
-			"/auth/login",
-			credentials
-		);
-		return response.data.data;
-	},
+export const logInOrdinary = async ({
+	username,
+	password,
+}: IUsernameLoginVariables): Promise<IUsernameLoginSuccess> => {
+	const response = await apiClient.post<IUsernameLoginSuccess>(
+		AUTH_ENDPOINTS.LOGIN,
+		{ username, password }
+	);
 
-	// Register new user
-	async register(userData: RegisterRequest): Promise<LoginResponse> {
-		const response = await apiClient.post<ApiResponse<LoginResponse>>(
-			"/auth/register",
-			userData
-		);
-		return response.data.data;
-	},
+	if (!response.ok) {
+		throw new Error("Please check your credentials and try again.");
+	}
 
-	// Logout user
-	async logout(): Promise<void> {
-		await apiClient.post("/auth/logout");
-	},
+	return response;
+};
 
-	// Get current user
-	async getCurrentUser(): Promise<User> {
-		const response = await apiClient.get<ApiResponse<User>>("/auth/me");
-		return response.data.data;
-	},
+/**
+ * Logout current user
+ */
+export const logOut = async () => {
+	return apiClient.post<{ ok: string }>(AUTH_ENDPOINTS.LOGOUT);
+};
 
-	// Update user profile
-	async updateProfile(userData: Partial<User>): Promise<User> {
-		const response = await apiClient.patch<ApiResponse<User>>(
-			"/auth/profile",
-			userData
-		);
-		return response.data.data;
-	},
+/**
+ * Get current user via SSO
+ */
+export const getSSOMe = async () => {
+	return apiClient.get<IUserData>(AUTH_ENDPOINTS.ME);
 };

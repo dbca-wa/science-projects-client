@@ -216,3 +216,10 @@ export interface ICaretakerPermissions {
 	userIsCaretakerOfBaLeader: boolean;
 	userIsCaretakerOfAdmin: boolean;
 }
+
+export interface IUserSearchFilters {
+	onlyExternal?: boolean;
+	onlyStaff?: boolean;
+	onlySuperuser?: boolean;
+	businessArea?: string | number;
+}
