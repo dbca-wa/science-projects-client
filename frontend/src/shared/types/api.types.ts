@@ -1,3 +1,5 @@
+import type { AxiosError } from "axios";
+
 // Standard API response wrapper
 export interface ApiResponse<T> {
 	data: T;
@@ -25,3 +27,7 @@ export interface PaginatedResponse<T> {
 	data: T[];
 	meta: PaginationMeta;
 }
+
+export type CustomAxiosError = AxiosError<{
+	non_field_errors?: string[];
+}>;

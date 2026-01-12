@@ -1,9 +1,11 @@
 import { makeAutoObservable } from "mobx";
 
 type Theme = "light" | "dark";
+type Layout = "modern" | "traditional";
 
 export class UIStore {
 	theme: Theme = "light";
+	layout: Layout = "traditional";
 	sidebarCollapsed = false;
 	soundEnabled = true;
 
@@ -11,6 +13,8 @@ export class UIStore {
 		makeAutoObservable(this);
 		// Load theme from localStorage
 		this.loadTheme();
+		// Load layout from localStorage
+		this.loadLayout();
 		// Load sound preference from localStorage
 		this.loadSoundPreference();
 	}
@@ -22,6 +26,17 @@ export class UIStore {
 		const savedTheme = localStorage.getItem("theme") as Theme;
 		if (savedTheme) {
 			this.theme = savedTheme;
+			this.applyTheme();
+		}
+	};
+
+	/*
+	 * Load from localStorage
+	 */
+	private loadLayout = () => {
+		const savedLayout = localStorage.getItem("layout") as Layout;
+		if (savedLayout) {
+			this.layout = savedLayout;
 			this.applyTheme();
 		}
 	};
@@ -40,6 +55,15 @@ export class UIStore {
 		this.theme = this.theme === "light" ? "dark" : "light";
 		localStorage.setItem("theme", this.theme);
 		this.applyTheme();
+	};
+
+	/**
+	 * Toggle layout between modern and traditional
+	 */
+
+	toggleLayout = () => {
+		this.layout = this.layout === "modern" ? "traditional" : "modern";
+		localStorage.setItem("layout", this.layout);
 	};
 
 	/**
