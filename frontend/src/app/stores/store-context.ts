@@ -1,20 +1,26 @@
 import { createContext } from "react";
-import { AuthStore } from "./auth.store";
-import { UIStore } from "./ui.store";
-import GameStore from "./game.store";
+import { AuthStore } from "./derived/auth.store";
+import { UIStore } from "./derived/ui.store";
+import { EditorStore } from "./derived/editor.store";
 
 /**
  * Root store that combines all MobX stores
  */
 class RootStore {
 	authStore: AuthStore;
+	editorStore: EditorStore;
+	projectMapSearcStore: ProjectMapSearchStore;
+	projectSearchStore: ProjectSearchStore;
 	uiStore: UIStore;
-	gameStore: GameStore;
+	userSearchStore: UserSearchStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
+		this.editorStore = new EditorStore();
+		this.projectMapSearcStore = new ProjoectMapSearchStore();
+		this.projectSearchStore = new ProjectSearchStore();
 		this.uiStore = new UIStore();
-		this.gameStore = new GameStore();
+		this.userSearchStore = new UserSearchStore();
 	}
 }
 

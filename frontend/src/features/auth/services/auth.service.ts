@@ -1,6 +1,6 @@
 import { apiClient } from "@/shared/lib/api-client";
 import type { ApiResponse } from "@/shared/types/api.types";
-import type { User } from "@/app/stores/auth.store";
+import type { User } from "@/app/stores/derived/auth.store";
 
 // Login request payload
 
