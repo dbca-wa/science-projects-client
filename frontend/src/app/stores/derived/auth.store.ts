@@ -1,9 +1,10 @@
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { logger } from "@/shared/services/logger.service";
 import { runInAction } from "mobx";
+import Cookie from "js-cookie";
 
 interface AuthStoreState extends BaseStoreState {
-	// Client-side auth state only
+	isAuthenticated: boolean;
 	redirectPath: string | null;
 	isNavigating: boolean;
 }
@@ -16,12 +17,21 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 
 	constructor() {
 		super({
+			isAuthenticated: false,
 			redirectPath: null,
 			isNavigating: false,
 			loading: false,
 			error: null,
-			initialised: true, // Client state is immediately available
+			initialised: false,
 		});
+
+		// Listen for unauthorized events from API client
+		if (typeof window !== "undefined") {
+			window.addEventListener(
+				"auth:unauthorized",
+				this.handleUnauthorised.bind(this)
+			);
+		}
 	}
 
 	setNavigate(
@@ -31,7 +41,10 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		logger.debug("Navigation handler set for auth store", undefined);
 	}
 
-	// Client-side navigation state
+	get isAuthenticated(): boolean {
+		return this.state.isAuthenticated;
+	}
+
 	get redirectPath(): string | null {
 		return this.state.redirectPath;
 	}
@@ -40,12 +53,42 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		return this.state.isNavigating;
 	}
 
-	// Client-side initialisation (no async operations needed)
 	async initialise(): Promise<void> {
-		logger.debug("AuthStore initialised (client state only)", undefined);
+		// Check if user has valid session cookie
+		const hasSession = !!Cookie.get("sessionid");
+		const hasCsrf = !!Cookie.get("spmscsrf");
+
+		runInAction(() => {
+			this.state.isAuthenticated = hasSession && hasCsrf;
+			this.state.initialised = true;
+		});
+
+		logger.debug("AuthStore initialised", {
+			isAuthenticated: this.state.isAuthenticated,
+		});
 	}
 
-	// Client-side navigation methods
+	login(): void {
+		runInAction(() => {
+			this.state.isAuthenticated = true;
+		});
+		logger.info("User logged in", undefined);
+	}
+
+	logout(): void {
+		runInAction(() => {
+			this.state.isAuthenticated = false;
+		});
+
+		// Clear cookies
+		Cookie.remove("sessionid");
+		Cookie.remove("spmscsrf");
+		Cookie.remove("csrf");
+
+		logger.info("User logged out", undefined);
+		this.navigateAfterLogout();
+	}
+
 	setRedirectPath(path: string | null): void {
 		runInAction(() => {
 			this.state.redirectPath = path;
@@ -60,7 +103,6 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		logger.debug("Redirect path cleared", undefined);
 	}
 
-	// Client-side navigation after successful login
 	navigateAfterLogin(): void {
 		runInAction(() => {
 			this.state.isNavigating = true;
@@ -79,7 +121,6 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		});
 	}
 
-	// Client-side navigation after logout
 	navigateAfterLogout(): void {
 		runInAction(() => {
 			this.state.isNavigating = true;
@@ -96,7 +137,6 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		});
 	}
 
-	// Handle unauthorised access (client-side navigation)
 	handleUnauthorised(): void {
 		logger.warn(
 			"Handling unauthorised access - redirecting to login",
@@ -111,22 +151,30 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 			}
 		}
 
-		this.navigateAfterLogout();
+		this.logout();
 	}
 
 	reset(): void {
 		runInAction(() => {
+			this.state.isAuthenticated = false;
 			this.state.redirectPath = null;
 			this.state.isNavigating = false;
 			this.state.loading = false;
 			this.state.error = null;
-			this.state.initialised = true;
+			this.state.initialised = false;
 		});
 
 		logger.info("Auth store reset", undefined);
 	}
 
 	async dispose(): Promise<void> {
+		// Remove event listener
+		if (typeof window !== "undefined") {
+			window.removeEventListener(
+				"auth:unauthorized",
+				this.handleUnauthorised.bind(this)
+			);
+		}
 		this.reset();
 		logger.info("Auth store disposed", undefined);
 	}

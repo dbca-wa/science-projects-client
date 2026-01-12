@@ -2,14 +2,24 @@ import { createBrowserRouter, Navigate } from "react-router";
 import { ROUTES_CONFIG } from "@/config/routes.config";
 import { ProtectedRoute } from "./guards/auth.guard";
 import AppLayout from "@/shared/components/layout/AppLayout";
-import Login from "@/pages/Login";
+import Login from "@/pages/auth/Login";
 import Register from "@/pages/Register";
+import { Root } from "@/components/Base/Root";
 
 /**
  * Generate router from configuration
  */
 const generateRouter = () => {
 	return createBrowserRouter([
+		// 
+		{
+			path: "/",
+			element: (
+				<Root/>
+			)
+		}
+
+
 		// Auth routes (no layout)
 		{
 			path: "/login",

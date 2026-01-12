@@ -5,7 +5,7 @@ import { RiAdminFill, RiLoginBoxLine } from "react-icons/ri";
 import { HiMiniSquares2X2 } from "react-icons/hi2";
 
 // Completed Pages
-import Login from "@/pages/Login";
+import Login from "@/pages/auth/Login";
 
 // Pages
 import AddressesCRUD from "@/pages/admin/AddressesCRUD";
@@ -30,7 +30,6 @@ import TestPlayground from "@/pages/test/TestPlayground";
 import MyBusinessArea from "@/pages/business-area/MyBusinessArea";
 import HowTo from "@/pages/dash/HowTo";
 import { SiReadthedocs } from "react-icons/si";
-import { FaBookBookmark } from "react-icons/fa6";
 import UserGuide from "@/pages/dash/UserGuide";
 
 // Route configuration interface
@@ -61,7 +60,6 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Admin",
 		authWrapper: "admin",
-		requiresAuth: true,
 		component: Dashboard,
 		componentProps: { activeTab: 2 },
 		children: [
@@ -199,30 +197,6 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 		tooltipContent: <p>How-to guides</p>,
 		showInSidebar: false,
 		component: HowTo,
-	},
-	{
-		authWrapper: "authenticated",
-		name: "Quick Guide",
-		path: "/guide",
-		icon: <SiReadthedocs />,
-		tooltipContent: <p>User guide and documentation</p>,
-		showInSidebar: true,
-		section: "Guide",
-		component: UserGuide,
-	},
-];
-
-// Error Routes
-export const ERROR_ROUTES: RouteConfig[] = [
-	{
-		authWrapper: "authenticated",
-		name: "Not Found",
-		path: "/guide",
-		icon: <SiReadthedocs />,
-		tooltipContent: <p>User guide and documentation</p>,
-		showInSidebar: true,
-		section: "Guide",
-		component: UserGuide,
 	},
 	{
 		authWrapper: "authenticated",

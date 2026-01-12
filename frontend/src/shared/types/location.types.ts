@@ -26,7 +26,7 @@ export interface IProjectAreas {
 
 export interface IAddLocationForm {
 	old_id?: number;
-	pk?: string;
+	pk: number;
 	name: string;
 	area_type: string;
 }

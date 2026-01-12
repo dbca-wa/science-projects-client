@@ -1,4 +1,4 @@
-import { apiClient } from "@/shared/lib/api-client";
+import { apiClient } from "@/shared/services/api/api-client";
 import type { ApiResponse, PaginatedResponse } from "@/shared/types/api.types";
 import type {
 	GameScore,
