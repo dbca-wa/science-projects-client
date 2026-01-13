@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router";
 import { ROUTES_CONFIG } from "@/config/routes.config";
-import type { StaffUserData } from "@/features/staff-profile/types/staff-profile.types";
+import type { StaffUserData } from "@/features/users/types/staff-profile.types";
 
 interface PageHeadProps {
 	title?: string; // Allow manual override

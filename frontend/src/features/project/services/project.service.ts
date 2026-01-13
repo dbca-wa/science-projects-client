@@ -1,6 +1,7 @@
 import { apiClient } from "@/shared/services/api/client.service";
 import { PROJECT_ENDPOINTS } from "./project.endpoints";
 import type { IRemedyProblematicProjects } from "../types/project.types";
+import type { IUserData } from "@/shared/types/user.types";
 
 export const getAllProblematicProjects = async (): Promise<unknown[]> => {
 	return apiClient.get<unknown[]>(PROJECT_ENDPOINTS.LIST_PROBLEMATIC);
@@ -65,4 +66,8 @@ export const remedyExternallyLedProjects = async ({
 			projects: projects,
 		}
 	);
+};
+
+export const getTeamLead = async (pk: number): Promise<IUserData> => {
+	return apiClient.get<IUserData>(`projects/project_members/${pk}/leader`);
 };

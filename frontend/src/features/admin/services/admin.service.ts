@@ -3,12 +3,14 @@ import { ADMIN_ENDPOINTS } from "./admin.endpoints";
 import type {
 	IActionAdminTask,
 	IAdminOptions,
+	ICaretakerEntry,
 	IMakeRequestToAdmins,
 } from "@/shared/types/admin.types";
 import type {
 	ContentField,
 	ContentType,
 	GuideSection,
+	IExtendCaretakerProps,
 	IHTMLGuideSave,
 } from "../types/admin.types";
 
@@ -205,4 +207,107 @@ export const cancelAdminTaskRequestCall = async ({
 	return apiClient.post<{ success: boolean }>(
 		ADMIN_ENDPOINTS.TASKS.CANCEL(taskPk)
 	);
+};
+
+export const adminSetCaretaker = async ({
+	userPk,
+	caretakerPk,
+	endDate,
+	reason,
+	notes,
+}: ICaretakerEntry): Promise<{ success: boolean }> => {
+	return apiClient.post<{ success: boolean }>(
+		`adminoptions/caretakers/adminsetcaretaker`,
+		{
+			userPk,
+			caretakerPk,
+			endDate,
+			reason,
+			notes,
+		}
+	);
+};
+
+export const becomeCaretaker = async ({
+	userPk,
+	caretakerPk,
+	endDate,
+	reason,
+	notes,
+}: ICaretakerEntry): Promise<{ success: boolean }> => {
+	return apiClient.post<{ success: boolean }>(`adminoptions/tasks`, {
+		action: "setcaretaker",
+		status: "pending",
+		requester: caretakerPk,
+		primary_user: userPk,
+		secondary_users: [caretakerPk],
+		end_date: endDate,
+		reason,
+		notes,
+	});
+};
+
+export const requestCaretaker = async ({
+	userPk,
+	caretakerPk,
+	endDate,
+	reason,
+	notes,
+}: ICaretakerEntry): Promise<{ success: boolean }> => {
+	return apiClient.post<{ success: boolean }>(`adminoptions/tasks`, {
+		action: "setcaretaker",
+		status: "pending",
+		requester: userPk,
+		primary_user: userPk,
+		secondary_users: [caretakerPk],
+		end_date: endDate,
+		reason,
+		notes,
+	});
+};
+
+export const checkPendingCaretakerRequestsByPk = async (
+	pk: number
+): Promise<unknown> => {
+	return apiClient.post<unknown>(`adminoptions/caretakers/requests`, { pk });
+};
+
+export const removeCaretaker = async ({
+	id,
+}: {
+	id: number;
+}): Promise<{ success: boolean }> => {
+	return apiClient.delete<{ success: boolean }>(
+		`adminoptions/caretakers/${id}`
+	);
+};
+
+export const extendCaretaker = async ({
+	id,
+	currentEndDate,
+	newEndDate,
+}: IExtendCaretakerProps): Promise<{ success: boolean }> => {
+	if (newEndDate <= currentEndDate) {
+		throw new Error("The new end date must be after the current end date");
+	}
+	return apiClient.put<{ success: boolean }>(
+		`adminoptions/caretakers/${id}`,
+		{
+			end_date: newEndDate,
+		}
+	);
+};
+
+export const cancelCaretakerRequest = async ({
+	taskPk,
+}: {
+	taskPk: number;
+}): Promise<{ success: boolean }> => {
+	return apiClient.put<{ success: boolean }>(`adminoptions/tasks/${taskPk}`, {
+		status: "cancelled",
+	});
+};
+
+export const checkCaretakerStatus = async (): Promise<unknown> => {
+	return apiClient.get<unknown>(`adminoptions/caretakers/checkcaretaker`);
 };

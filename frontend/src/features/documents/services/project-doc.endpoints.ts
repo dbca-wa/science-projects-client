@@ -1,0 +1,11 @@
+export const PROJECT_DOC_ENDPOINTS = {
+	PROJECT_PLAN: {},
+
+	CONCEPT_PLAN: {},
+
+	PROGRESS_REPORT: {},
+
+	STUDENT_REPORT: {},
+
+	CLOSURE: {},
+};

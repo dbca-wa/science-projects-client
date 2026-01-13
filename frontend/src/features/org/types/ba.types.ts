@@ -15,3 +15,13 @@ export interface BusinessAreaUpdateProps {
 	data_custodian: number;
 	selectedImageUrl: string | null;
 }
+
+export interface IMyBAUpdateSubmissionData {
+	pk: number;
+	introduction: string;
+	image: File | null;
+}
+
+export interface IUnapprovedDocsForBAProps {
+	baArray: number[];
+}

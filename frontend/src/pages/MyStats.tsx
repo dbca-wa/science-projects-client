@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { PageHead } from "@/shared/components/layout/PageHead";
-import { useUserStats } from "@/features/game/hooks/useGameQueries";
-import { StatsOverview } from "@/features/stats/components/StatsOverview";
-import { RecentGames } from "@/features/stats/components/RecentGames";
+import { StatsOverview } from "@/features/game/stats/components/StatsOverview";
+import { RecentGames } from "@/features/game/stats/components/RecentGames";
+import { useUserStats } from "@/features/game/core/hooks/useGameQueries";
 
 const MyStats = observer(() => {
 	const { data: stats, isLoading, error } = useUserStats();

@@ -15,7 +15,11 @@ import type {
 	OrganisedLocationData,
 } from "@/shared/types/location.types";
 import { logger } from "@/shared/services/logger.service";
-import type { BusinessAreaUpdateProps } from "../types/ba.types";
+import type {
+	BusinessAreaUpdateProps,
+	IMyBAUpdateSubmissionData,
+	IUnapprovedDocsForBAProps,
+} from "../types/ba.types";
 
 // ADDRESSES
 export const getAllAddresses = async (): Promise<IAddress[]> => {
@@ -434,5 +438,46 @@ export const deleteDepartmentalService = async (
 ): Promise<{ success: boolean }> => {
 	return apiClient.delete<{ success: boolean }>(
 		ORG_ENDPOINTS.SERVICES.DELETE(pk)
+	);
+};
+
+export const updateMyBa = async ({
+	pk,
+	introduction,
+	image,
+}: IMyBAUpdateSubmissionData): Promise<unknown> => {
+	const formData = new FormData();
+
+	if (image instanceof File) {
+		formData.append("image", image);
+	} else if (typeof image === "string") {
+		formData.append("image", image);
+	}
+
+	if (introduction !== null) {
+		formData.append("introduction", introduction);
+	}
+
+	return apiClient.put<unknown>(`agencies/business_areas/${pk}`, formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+};
+
+export const getUnapprovedDocsForBusinessAreas = async ({
+	baArray,
+}: IUnapprovedDocsForBAProps): Promise<unknown> => {
+	return apiClient.post<unknown>(`agencies/business_areas/unapproved_docs`, {
+		baArray,
+	});
+};
+
+export const getProblematicProjectsForBusinessAreas = async ({
+	baArray,
+}: IUnapprovedDocsForBAProps): Promise<unknown> => {
+	return apiClient.post<unknown>(
+		`agencies/business_areas/problematic_projects`,
+		{ baArray }
 	);
 };

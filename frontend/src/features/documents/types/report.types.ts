@@ -30,3 +30,15 @@ export interface IReportMediaDeleteProps {
 		| "dbca_banner_cropped"
 		| "dbca_banner";
 }
+
+export interface INewCycle {
+	alsoUpdate: boolean;
+	shouldSendEmails: boolean;
+	shouldPrepopulate: boolean;
+}
+
+export interface PRPopulationVar {
+	writeable_document_kind: string;
+	section: string;
+	project_pk: number;
+}

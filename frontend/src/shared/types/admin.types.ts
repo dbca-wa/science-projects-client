@@ -2,21 +2,9 @@ import type { IAffiliation } from "./org.types";
 import type { ITaskDocument, ITaskUser } from "./project.types";
 import type { IMiniUser, IUserData } from "./user.types";
 
-export interface BumpEmailData {
-	documentId: number;
-	documentKind: string;
-	projectId: number;
-	projectTitle: string;
-	userToTakeAction: number;
-	userToTakeActionEmail: string;
-	userToTakeActionFirstName: string;
-	userToTakeActionLastName: string;
-	actionCapacity: string;
-	requestingUser: number;
-	requestingUserEmail: string;
-	requestingUserFirstName: string;
-	requestingUserLastName: string;
-}
+// ============================================================================
+// ADMIN OPTIONS
+// ============================================================================
 
 export interface IMaintainer {
 	maintainer: IMiniUser;
@@ -35,7 +23,7 @@ export interface IAdminOptions {
 	};
 
 	// Legacy fields - keeping for backward compatibility
-	guide_admin?: string; // Made optional since we're transitioning away from these
+	guide_admin?: string;
 	guide_about?: string;
 	guide_login?: string;
 	guide_profile?: string;
@@ -71,7 +59,7 @@ export interface IAdminOptionsTypeSafe {
 	maintainer: IMiniUser;
 	guide_content: IGuideContent;
 
-	// Legacy fields - keeping for backward compatibility
+	// Legacy fields
 	guide_admin?: string;
 	guide_about?: string;
 	guide_login?: string;
@@ -85,35 +73,22 @@ export interface IAdminOptionsTypeSafe {
 	guide_report?: string;
 }
 
-export interface ISetCaretaker {
-	primaryUserPk: number;
-	caretakerUserPk: number;
-}
-
-export interface IMergeUser {
-	primaryUser: IUserData;
-	secondaryUsers: IUserData[];
-}
-
-export interface IMergeUserPk {
-	primaryUserPk: number;
-	secondaryUserPks: number[];
-}
-
-export interface IMergeAffiliation {
-	primaryAffiliation: IAffiliation; // or IAffiliation and extract pk
-	secondaryAffiliations: IAffiliation[]; // or IAffiliation and extract pk
-}
+// ============================================================================
+// CARETAKERS (Shared across features)
+// ============================================================================
 
 export interface ICaretakerEntry {
 	pk?: number;
 	userPk: number;
 	caretakerPk: number;
-	// startDate: Date;
 	endDate: Date;
 	reason: "leave" | "resignation" | "other";
-	notes?: string; // if other is selected
+	notes?: string;
 }
+
+// ============================================================================
+// ADMIN TASKS
+// ============================================================================
 
 export interface IAdminRequestUser {
 	pk: number;
@@ -123,11 +98,7 @@ export interface IAdminRequestUser {
 
 export interface IMakeRequestToAdmins {
 	action: "deleteproject" | "mergeuser" | "setcaretaker";
-
-	// Project deletion
 	project?: number;
-
-	// Merging and caretaking
 	primaryUserPk?: number;
 	secondaryUserPks?: number[];
 	reason?: string;
@@ -143,7 +114,6 @@ export interface IActionAdminTask {
 
 export interface IAdminTask {
 	action: "deleteproject" | "mergeuser" | "setcaretaker";
-	//  | "mergeaffiliation";
 	status: "pending" | "approved" | "fulfilled" | "rejected";
 	project?: {
 		pk: number;
@@ -164,14 +134,55 @@ export interface ITaskDisplayCard {
 	pk: number;
 	creator: ITaskUser;
 	user: ITaskUser;
-	// project: ITaskProject;
 	document: ITaskDocument;
-
 	name: string;
 	description: string;
 	notes: string;
 	status: string;
 	task_type: string;
-
 	date_assigned: Date;
+}
+
+// ============================================================================
+// MERGE OPERATIONS
+// ============================================================================
+
+export interface ISetCaretaker {
+	primaryUserPk: number;
+	caretakerUserPk: number;
+}
+
+export interface IMergeUser {
+	primaryUser: IUserData;
+	secondaryUsers: IUserData[];
+}
+
+export interface IMergeUserPk {
+	primaryUserPk: number;
+	secondaryUserPks: number[];
+}
+
+export interface IMergeAffiliation {
+	primaryAffiliation: IAffiliation;
+	secondaryAffiliations: IAffiliation[];
+}
+
+// ============================================================================
+// EMAIL (Shared across features)
+// ============================================================================
+
+export interface BumpEmailData {
+	documentId: number;
+	documentKind: string;
+	projectId: number;
+	projectTitle: string;
+	userToTakeAction: number;
+	userToTakeActionEmail: string;
+	userToTakeActionFirstName: string;
+	userToTakeActionLastName: string;
+	actionCapacity: string;
+	requestingUser: number;
+	requestingUserEmail: string;
+	requestingUserFirstName: string;
+	requestingUserLastName: string;
 }

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { PageHead } from "@/shared/components/layout/PageHead";
-import { SettingsForm } from "@/features/settings/components/SettingsForm";
+import { SettingsForm } from "@/features/game/settings/components/SettingsForm";
 
 const Settings = observer(() => {
 	return (

@@ -1,7 +1,7 @@
-import { useStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/useStore";
 
 export const useNoImage = () => {
-	const uiStore = useStore().uiStore;
+	const uiStore = useUIStore();
 	const image =
 		uiStore.theme === "dark"
 			? "/no-image-dark.png"
