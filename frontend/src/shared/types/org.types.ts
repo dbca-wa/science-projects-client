@@ -34,7 +34,7 @@ export interface IBranch {
 
 export interface IDepartmentalService {
 	name: string;
-	director: number;
+	director?: number;
 	pk: number;
 	old_id?: number;
 }

@@ -9,10 +9,6 @@ export interface IEmailListUser {
 	email: string;
 }
 
-export interface IProjectLeadsEmail {
-	shouldDownloadList: boolean;
-}
-
 export interface ISendSingleEmail {
 	fromUserPk: number;
 	fromUserEmail: string;

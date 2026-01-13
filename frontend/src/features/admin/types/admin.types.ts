@@ -1,3 +1,7 @@
+// ============================================================================
+// GUIDE SECTIONS (Feature-specific)
+// ============================================================================
+
 export const GuideSections = {
 	ADMIN: "guide_admin",
 	ABOUT: "guide_about",
@@ -12,7 +16,6 @@ export const GuideSections = {
 	REPORT: "guide_report",
 } as const;
 
-// Type representing any of the guide section values
 export type GuideSectionValue =
 	(typeof GuideSections)[keyof typeof GuideSections];
 
@@ -26,12 +29,6 @@ export interface GuideSection {
 	content_fields: ContentField[];
 }
 
-export interface ContentType {
-	fieldKey: string;
-	content: string;
-	adminOptionsPk: number;
-}
-
 export interface ContentField {
 	id?: string;
 	title?: string;
@@ -40,11 +37,21 @@ export interface ContentField {
 	order: number;
 }
 
+export interface ContentType {
+	fieldKey: string;
+	content: string;
+	adminOptionsPk: number;
+}
+
+// ============================================================================
+// GUIDE HTML SAVE (Feature-specific mutation variables)
+// ============================================================================
+
 export interface IHTMLGuideSave {
 	htmlData: string;
 	isUpdate: boolean;
 	adminOptionsPk: null | number;
-	section: string | GuideSectionValue; // Changed from GuideSections to GuideSectionValue
+	section: string | GuideSectionValue;
 	softRefetch?: () => void;
 	setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 	canSave: boolean;
@@ -52,4 +59,14 @@ export interface IHTMLGuideSave {
 
 export interface IHTMLGuideSaveExtended extends IHTMLGuideSave {
 	onSave?: (content: string) => Promise<boolean>;
+}
+
+// ============================================================================
+// CARETAKER OPERATIONS (Feature-specific mutation variables)
+// ============================================================================
+
+export interface IExtendCaretakerProps {
+	id: number;
+	currentEndDate: Date;
+	newEndDate: Date;
 }

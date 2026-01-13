@@ -22,4 +22,10 @@ export const REPORT_ENDPOINTS = {
 		DELETE: (pk: number, section: string) =>
 			`medias/report_medias/${pk}/media/${section}`,
 	},
+	BATCH_APPROVE_OLD: "documents/batchapproveold",
+	BATCH_APPROVE: "documents/batchapprove",
+	GET_PREVIOUS_REPORTS_DATA: "documents/get_previous_reports_data",
+	OPEN_NEW_CYCLE: "documents/opennewcycle",
+	FINAL_APPROVAL: "documents/actions/finalApproval",
+	PROJECT_LEAD_EMAILS: "documents/get_project_lead_emails",
 };

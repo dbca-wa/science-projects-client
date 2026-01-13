@@ -5,6 +5,10 @@ import type {
 	IReportMediaDeleteProps,
 	IReportMediaUploadProps,
 } from "../types/report.types";
+import type {
+	IApproveProgressReport,
+	IProjectLeadsEmail,
+} from "../types/project-doc.types";
 
 export const getAvailableReportYearsForProgressReport = async (
 	pk: number
@@ -155,4 +159,41 @@ export const deleteReport = async (
 	pk: number
 ): Promise<{ success: boolean }> => {
 	return apiClient.delete<{ success: boolean }>(REPORT_ENDPOINTS.DELETE(pk));
+};
+
+export const batchApproveOLDProgressAndStudentReports = async (): Promise<{
+	success: boolean;
+}> => {
+	return apiClient.post<{ success: boolean }>(`documents/batchapproveold`);
+};
+
+export const batchApproveProgressAndStudentReports = async (): Promise<{
+	success: boolean;
+}> => {
+	return apiClient.post<{ success: boolean }>(`documents/batchapprove`);
+};
+
+export const getEmailProjectList = async ({
+	shouldDownloadList,
+}: IProjectLeadsEmail): Promise<unknown> => {
+	return apiClient.post<unknown>(`documents/get_project_lead_emails`, {
+		shouldDownloadList,
+	});
+};
+
+export const approveProgressReport = async ({
+	isActive,
+	kind,
+	reportPk,
+	documentPk,
+}: IApproveProgressReport): Promise<{ success: boolean }> => {
+	return apiClient.post<{ success: boolean }>(
+		`documents/actions/finalApproval`,
+		{
+			kind,
+			reportPk,
+			documentPk,
+			isActive: isActive.toString() === "1",
+		}
+	);
 };

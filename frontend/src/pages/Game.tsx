@@ -2,11 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "@/app/stores/useStore";
 import { PageHead } from "@/shared/components/layout/PageHead";
 import { Button } from "@/shared/components/ui/button";
-import { GameBoard } from "@/features/game/components/GameBoard";
-import { GameHUD } from "@/features/game/components/GameHUD";
-import { GameOverModal } from "@/features/game/components/GameOverModal";
-import { DifficultySelector } from "@/features/game/components/DifficultySelector";
-
+import { DifficultySelector } from "@/features/game/core/components/DifficultySelector";
+import { GameHUD } from "@/features/game/core/components/GameHUD";
+import { GameBoard } from "@/features/game/core/components/GameBoard";
+import { GameOverModal } from "@/features/game/core/components/GameOverModal";
 const Game = observer(() => {
 	const { gameStore } = useStore();
 

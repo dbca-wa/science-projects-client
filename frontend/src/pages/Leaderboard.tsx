@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { PageHead } from "@/shared/components/layout/PageHead";
-import { useLeaderboard } from "@/features/game/hooks/useGameQueries";
-import { LeaderboardTable } from "@/features/game/components/LeaderboardTable";
-import { LeaderboardFiltersComponent } from "@/features/game/components/LeaderboardFilters";
-import type { LeaderboardFilters } from "@/features/game/types/game.types";
+import type { LeaderboardFilters } from "@/features/game/core/types/game.types";
+import { useLeaderboard } from "@/features/game/core/hooks/useGameQueries";
+import { LeaderboardFiltersComponent } from "@/features/game/core/components/LeaderboardFilters";
+import { LeaderboardTable } from "@/features/game/core/components/LeaderboardTable";
 
 const Leaderboard = observer(() => {
 	const [filters, setFilters] = useState<LeaderboardFilters>({

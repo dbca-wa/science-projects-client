@@ -1,5 +1,3 @@
-// USER ============================================================================
-
 import type { IImageData } from "./media.types";
 import type {
 	IAffiliation,
@@ -8,26 +6,9 @@ import type {
 	IBusinessArea,
 } from "./org.types";
 
-export interface IUserData {
-	pk: number;
-	username: string;
-	email: string;
-	display_first_name: string;
-	display_last_name: string;
-	first_name: string;
-	last_name: string;
-	is_superuser: boolean;
-	is_staff: boolean;
-	is_active: boolean;
-	image: IImageData;
-	business_area: IBusinessArea | undefined;
-	role: string;
-	branch: IBranch;
-	affiliation: IAffiliation;
-	branches?: IBranch[];
-	businessAreas?: IBusinessArea[];
-	name?: string;
-}
+// ============================================================================
+// CORE USER TYPES (Domain Models)
+// ============================================================================
 
 export interface IUserData {
 	pk: number;
@@ -60,7 +41,103 @@ export interface IMiniUser {
 	is_superuser: boolean;
 }
 
-// Caretakers ================================================================================
+export interface IUserMe {
+	staff_profile_pk?: number;
+	public_email?: string;
+	custom_title?: string;
+	custom_title_on?: boolean;
+	staff_profile_hidden?: boolean;
+	id?: number;
+	pk?: number;
+	caretakers: ICaretakerSimpleUserData[];
+	caretaking_for: ICaretakerSimpleUserData[];
+	display_first_name: string;
+	display_last_name: string;
+	about: string;
+	agency: IAgency;
+	branch: IBranch;
+	business_area: IBusinessArea | undefined;
+	date_joined: Date;
+	email: string;
+	expertise: string;
+	phone: string;
+	fax: string;
+	username: string;
+	first_name: string;
+	last_name: string;
+	title: string;
+	is_superuser: boolean;
+	is_staff: boolean;
+	is_active: boolean;
+	is_biometrician: boolean;
+	is_aec: boolean;
+	is_herbarium_curator: boolean;
+	image: IImageData;
+	role: string | null;
+	affiliation: IAffiliation;
+	branches?: IBranch[];
+	businessAreas?: IBusinessArea[];
+	business_areas_led: number[];
+}
+
+export interface IMemberUserDetails {
+	pk: number;
+	is_staff: boolean;
+	is_superuser: boolean;
+	username: string | null;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	first_name: string | null;
+	last_name: string | null;
+	email: string;
+	business_area: string | null;
+	branch: string | null;
+	role: string | null;
+	image: IImageData;
+	caretaking_for: ICaretakerSimpleUserData[];
+	caretakers: ICaretakerSimpleUserData[];
+}
+
+// ============================================================================
+// USER PROFILE TYPES
+// ============================================================================
+
+export interface IPersonalInformation {
+	display_first_name: string | null;
+	display_last_name: string | null;
+	first_name: string;
+	last_name: string;
+	email: string;
+	title: string;
+	phone: string;
+	fax: string;
+}
+
+export interface IProfile {
+	image: {
+		file: string;
+		user: IUserData;
+	};
+	about: string;
+	expertise: string;
+}
+
+// ============================================================================
+// CARETAKER TYPES
+// ============================================================================
+
+export interface ICaretakerSimpleUserData {
+	pk: number;
+	is_superuser: boolean;
+	caretaker_obj_id?: number;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	email: string;
+	image: string;
+	end_date: Date | null;
+	caretakers: ICaretakerSimpleUserData[];
+	caretaking_for: ICaretakerSimpleUserData[];
+}
 
 export interface ICaretakerRequestObject {
 	id: number;
@@ -113,97 +190,6 @@ export interface ICaretakerObject {
 	notes: string | null;
 }
 
-export interface IUserMe {
-	staff_profile_pk?: number;
-	public_email?: string;
-	custom_title?: string;
-	custom_title_on?: boolean;
-	staff_profile_hidden?: boolean;
-	id?: number;
-	pk?: number;
-	caretakers: ICaretakerSimpleUserData[];
-	caretaking_for: ICaretakerSimpleUserData[];
-	display_first_name: string;
-	display_last_name: string;
-	about: string;
-	agency: IAgency;
-	branch: IBranch;
-	business_area: IBusinessArea | undefined;
-	date_joined: Date;
-	email: string;
-	expertise: string;
-	phone: string;
-	fax: string;
-	username: string;
-	first_name: string;
-	last_name: string;
-	title: string;
-	is_superuser: boolean;
-	is_staff: boolean;
-	is_active: boolean;
-	is_biometrician: boolean;
-	is_aec: boolean;
-	is_herbarium_curator: boolean;
-	image: IImageData;
-	role: string | null;
-	affiliation: IAffiliation;
-	branches?: IBranch[];
-	businessAreas?: IBusinessArea[];
-	business_areas_led: number[];
-}
-
-export interface ICaretakerSimpleUserData {
-	pk: number;
-	is_superuser: boolean;
-	caretaker_obj_id?: number;
-	display_first_name: string | null;
-	display_last_name: string | null;
-	email: string;
-	image: string;
-	end_date: Date | null;
-	caretakers: ICaretakerSimpleUserData[];
-	caretaking_for: ICaretakerSimpleUserData[];
-}
-
-export interface IMemberUserDetails {
-	pk: number;
-	is_staff: boolean;
-	is_superuser: boolean;
-	username: string | null;
-	display_first_name: string | null;
-	display_last_name: string | null;
-	first_name: string | null;
-	last_name: string | null;
-	email: string;
-	business_area: string | null;
-	branch: string | null;
-	role: string | null;
-	image: IImageData;
-	caretaking_for: ICaretakerSimpleUserData[];
-	caretakers: ICaretakerSimpleUserData[];
-}
-
-export interface IPersonalInformation {
-	display_first_name: string | null;
-	display_last_name: string | null;
-	first_name: string;
-	last_name: string;
-	email: string;
-	title: string;
-	phone: string;
-	fax: string;
-}
-
-export interface IProfile {
-	image: {
-		file: string;
-		user: IUserData;
-	};
-	// image: any;
-	about: string;
-	expertise: string;
-}
-
 export interface ICaretakerSubsections {
 	userData: IUserMe;
 	refetchCaretakerData: () => void;
@@ -216,6 +202,10 @@ export interface ICaretakerPermissions {
 	userIsCaretakerOfBaLeader: boolean;
 	userIsCaretakerOfAdmin: boolean;
 }
+
+// ============================================================================
+// SHARED QUERY/FILTER TYPES
+// ============================================================================
 
 export interface IUserSearchFilters {
 	onlyExternal?: boolean;
