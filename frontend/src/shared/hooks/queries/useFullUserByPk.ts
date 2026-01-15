@@ -1,13 +1,19 @@
+// TEMPORARILY DISABLED - depends on moved user service
+// This will be re-enabled when the users feature is integrated back
+/*
 import { useQuery } from "@tanstack/react-query";
 import type { IUserData } from "@/shared/types/user.types";
 import { getFullUser } from "@/features/users/services/user.service";
 
-export const useFullUserByPk = (pk: number) => {
-	const { isPending, data, refetch, isError, error } = useQuery<IUserData>({
+export const useFullUserByPk = (pk: number | undefined | null) => {
+	const { isPending, data, refetch, isError, error } = useQuery<
+		IUserData,
+		Error
+	>({
 		queryKey: ["user", pk],
-		queryFn: () => getFullUser(pk), // pk is in closure
+		queryFn: () => getFullUser(pk!), // We know pk exists because of enabled
 		retry: false,
-		enabled: !!pk, // Don't run query if pk is undefined/null/0
+		enabled: !!pk && pk !== 0, // Only run if pk is truthy and not 0
 	});
 
 	return {
@@ -18,3 +24,4 @@ export const useFullUserByPk = (pk: number) => {
 		error,
 	};
 };
+*/

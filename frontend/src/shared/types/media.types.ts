@@ -6,15 +6,3 @@ export interface IImageData {
 	pk: number;
 	user: number;
 }
-
-export interface ProjectImage {
-	pk: number;
-	old_file: string;
-	file: string;
-}
-
-export interface BusinessAreaImage {
-	pk: number;
-	old_file: string;
-	file: string;
-}

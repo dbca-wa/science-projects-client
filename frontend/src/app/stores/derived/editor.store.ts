@@ -1,4 +1,4 @@
-import { runInAction } from "mobx";
+import { makeObservable, action, computed, runInAction } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 import { BaseStore, type BaseStoreState } from "../base.store";
 
@@ -17,6 +17,25 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 			loading: false,
 			error: null,
 			initialised: false,
+		});
+		
+		// Use makeObservable instead of makeAutoObservable for classes with inheritance
+		makeObservable(this, {
+			// Actions
+			openEditor: action,
+			closeEditor: action,
+			setDialogOpen: action,
+			setPendingAction: action,
+			manuallyCheckAndToggleDialog: action,
+			handleProceed: action,
+			handleReset: action,
+			shouldBlockNavigation: action,
+			reset: action,
+			
+			// Computed
+			openEditorsCount: computed,
+			isDialogOpen: computed,
+			pendingAction: computed,
 		});
 	}
 

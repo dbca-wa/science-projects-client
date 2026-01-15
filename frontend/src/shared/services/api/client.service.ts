@@ -22,7 +22,7 @@ export interface ApiError {
 
 export class ApiClientService {
 	private client: AxiosInstance;
-	private onUnauthorized: (() => void) | null = null;
+	private onUnauthorised: (() => void) | null = null;
 
 	constructor() {
 		this.client = axios.create({
@@ -68,7 +68,7 @@ export class ApiClientService {
 							logger.warn(
 								"Unauthorised access - triggering logout"
 							);
-							await this.handleUnauthorized();
+							await this.handleUnauthorised();
 							break;
 						case 403:
 							logger.error("Access forbidden", {
@@ -101,15 +101,18 @@ export class ApiClientService {
 		);
 	}
 
-	private async handleUnauthorized(): Promise<void> {
+	private async handleUnauthorised(): Promise<void> {
 		// Clear cookies
 		Cookie.remove("spmscsrf");
 		Cookie.remove("csrf");
 		Cookie.remove("sessionid");
 
-		// Trigger the unauthorized handler if set
-		if (this.onUnauthorized) {
-			this.onUnauthorized();
+		// Dispatch event that authStore listens to
+		window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+
+		// Trigger the unauthorised handler if set
+		if (this.onUnauthorised) {
+			this.onUnauthorised();
 		}
 	}
 
@@ -202,8 +205,8 @@ export class ApiClientService {
 	}
 
 	// Configuration methods
-	setUnauthorizedHandler(handler: () => void): void {
-		this.onUnauthorized = handler;
+	setUnauthorisedHandler(handler: () => void): void {
+		this.onUnauthorised = handler;
 	}
 
 	// Get the raw axios instance if needed for special cases

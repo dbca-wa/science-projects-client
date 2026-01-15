@@ -9,18 +9,18 @@ import { EditorStore } from "./derived/editor.store";
 class RootStore {
 	authStore: AuthStore;
 	editorStore: EditorStore;
-	projectMapSearcStore: ProjectMapSearchStore;
-	projectSearchStore: ProjectSearchStore;
+	// projectMapSearcStore: ProjectMapSearchStore;
+	// projectSearchStore: ProjectSearchStore;
 	uiStore: UIStore;
-	userSearchStore: UserSearchStore;
+	// userSearchStore: UserSearchStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
 		this.editorStore = new EditorStore();
-		this.projectMapSearcStore = new ProjoectMapSearchStore();
-		this.projectSearchStore = new ProjectSearchStore();
+		// this.projectMapSearcStore = new ProjoectMapSearchStore();
+		// this.projectSearchStore = new ProjectSearchStore();
 		this.uiStore = new UIStore();
-		this.userSearchStore = new UserSearchStore();
+		// this.userSearchStore = new UserSearchStore();
 	}
 }
 

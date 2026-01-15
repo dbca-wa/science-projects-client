@@ -1,181 +1,139 @@
+import type { IUserData } from "@/shared/types/user.types";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { logger } from "@/shared/services/logger.service";
-import { runInAction } from "mobx";
+import {
+	makeObservable,
+	observable,
+	computed,
+	action,
+	runInAction,
+} from "mobx";
 import Cookie from "js-cookie";
 
 interface AuthStoreState extends BaseStoreState {
 	isAuthenticated: boolean;
-	redirectPath: string | null;
-	isNavigating: boolean;
 }
 
 export class AuthStore extends BaseStore<AuthStoreState> {
-	private navigate?: (
-		path: string,
-		options?: Record<string, unknown>
-	) => void;
+	user: IUserData | null = null;
+	private onUnauthorised = this.handleUnauthorised.bind(this);
 
 	constructor() {
 		super({
 			isAuthenticated: false,
-			redirectPath: null,
-			isNavigating: false,
 			loading: false,
 			error: null,
 			initialised: false,
 		});
 
-		// Listen for unauthorized events from API client
+		// methods specific to AuthStore
+		// BaseStore already declared its own observables
+		makeObservable(this, {
+			// Observable properties (new to AuthStore)
+			user: observable,
+
+			// Computed properties (new to AuthStore)
+			isAuthenticated: computed,
+			isSuperuser: computed,
+
+			// Actions (new to AuthStore)
+			setUser: action,
+			initialise: action,
+			login: action,
+			logout: action,
+			handleUnauthorised: action,
+			reset: action,
+			dispose: action,
+		});
+
 		if (typeof window !== "undefined") {
-			window.addEventListener(
-				"auth:unauthorized",
-				this.handleUnauthorised.bind(this)
-			);
+			window.addEventListener("auth:unauthorized", this.onUnauthorised);
 		}
 	}
 
-	setNavigate(
-		navigate: (path: string, options?: Record<string, unknown>) => void
-	): void {
-		this.navigate = navigate;
-		logger.debug("Navigation handler set for auth store", undefined);
-	}
-
-	get isAuthenticated(): boolean {
+	get isAuthenticated() {
 		return this.state.isAuthenticated;
 	}
 
-	get redirectPath(): string | null {
-		return this.state.redirectPath;
+	get isSuperuser() {
+		return !!this.user?.is_superuser;
 	}
 
-	get isNavigating(): boolean {
-		return this.state.isNavigating;
-	}
-
-	async initialise(): Promise<void> {
-		// Check if user has valid session cookie
-		const hasSession = !!Cookie.get("sessionid");
-		const hasCsrf = !!Cookie.get("spmscsrf");
-
+	setUser(user: IUserData | null) {
 		runInAction(() => {
-			this.state.isAuthenticated = hasSession && hasCsrf;
+			this.user = user;
+			// If we have a user, we're authenticated
+			// If we don't have a user but have a CSRF token, we might still be authenticated
+			const hasCsrf = !!Cookie.get("spmscsrf");
+			this.state.isAuthenticated = !!user || hasCsrf;
+		});
+	}
+
+	async initialise() {
+		// Note: sessionid cookie is HttpOnly and cannot be read by JavaScript
+		// We can only check for the CSRF token, which is readable
+		// The actual session validation will happen when we try to fetch user data
+		const hasCsrf = !!Cookie.get("spmscsrf");
+		
+		logger.info("Auth store initializing", {
+			hasCsrf,
+			csrfCookie: Cookie.get("spmscsrf"),
+			note: "sessionid is HttpOnly and cannot be read by JS",
+		});
+		
+		runInAction(() => {
+			// If we have a CSRF token, assume we might be authenticated
+			// The actual auth check will happen when components try to fetch user data
+			this.state.isAuthenticated = hasCsrf;
 			this.state.initialised = true;
 		});
-
-		logger.debug("AuthStore initialised", {
+		
+		logger.info("Auth store initialized", {
 			isAuthenticated: this.state.isAuthenticated,
+			initialised: this.state.initialised,
 		});
 	}
 
-	login(): void {
+	login() {
 		runInAction(() => {
 			this.state.isAuthenticated = true;
 		});
-		logger.info("User logged in", undefined);
+		logger.info("User flagged as logged in (cookies present)");
 	}
 
-	logout(): void {
+	logout() {
 		runInAction(() => {
 			this.state.isAuthenticated = false;
+			this.user = null;
 		});
-
-		// Clear cookies
 		Cookie.remove("sessionid");
 		Cookie.remove("spmscsrf");
 		Cookie.remove("csrf");
-
-		logger.info("User logged out", undefined);
-		this.navigateAfterLogout();
+		logger.info("User logged out");
 	}
 
-	setRedirectPath(path: string | null): void {
-		runInAction(() => {
-			this.state.redirectPath = path;
-		});
-		logger.debug("Redirect path set", { path });
-	}
-
-	clearRedirectPath(): void {
-		runInAction(() => {
-			this.state.redirectPath = null;
-		});
-		logger.debug("Redirect path cleared", undefined);
-	}
-
-	navigateAfterLogin(): void {
-		runInAction(() => {
-			this.state.isNavigating = true;
-		});
-
-		const targetPath = this.state.redirectPath || "/";
-
-		if (this.navigate) {
-			this.navigate(targetPath, { replace: true });
-			logger.info("Navigated after login", { targetPath });
-		}
-
-		runInAction(() => {
-			this.state.redirectPath = null;
-			this.state.isNavigating = false;
-		});
-	}
-
-	navigateAfterLogout(): void {
-		runInAction(() => {
-			this.state.isNavigating = true;
-		});
-
-		if (this.navigate) {
-			this.navigate("/auth/login", { replace: true });
-			logger.info("Navigated after logout", undefined);
-		}
-
-		runInAction(() => {
-			this.state.redirectPath = null;
-			this.state.isNavigating = false;
-		});
-	}
-
-	handleUnauthorised(): void {
-		logger.warn(
-			"Handling unauthorised access - redirecting to login",
-			undefined
-		);
-
-		// Store current path for redirect after login
-		if (typeof window !== "undefined") {
-			const currentPath = window.location.pathname;
-			if (currentPath !== "/auth/login") {
-				this.setRedirectPath(currentPath);
-			}
-		}
-
+	handleUnauthorised() {
 		this.logout();
 	}
 
-	reset(): void {
+	reset() {
 		runInAction(() => {
 			this.state.isAuthenticated = false;
-			this.state.redirectPath = null;
-			this.state.isNavigating = false;
+			this.user = null;
 			this.state.loading = false;
 			this.state.error = null;
 			this.state.initialised = false;
 		});
-
-		logger.info("Auth store reset", undefined);
+		logger.info("Auth store reset");
 	}
 
-	async dispose(): Promise<void> {
-		// Remove event listener
+	async dispose() {
 		if (typeof window !== "undefined") {
 			window.removeEventListener(
 				"auth:unauthorized",
-				this.handleUnauthorised.bind(this)
+				this.onUnauthorised
 			);
 		}
 		this.reset();
-		logger.info("Auth store disposed", undefined);
 	}
 }

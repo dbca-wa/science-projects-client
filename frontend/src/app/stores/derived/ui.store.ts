@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeObservable, action, computed, runInAction } from "mobx";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 
 export type Theme = "light" | "dark";
@@ -24,7 +24,24 @@ export class UIStore extends BaseStore<UIStoreState> {
 			initialised: false,
 		});
 
-		makeAutoObservable(this);
+		// Use makeObservable instead of makeAutoObservable for classes with inheritance
+		makeObservable(this, {
+			// Actions
+			toggleTheme: action,
+			toggleLayout: action,
+			toggleSidebar: action,
+			setTheme: action,
+			setLayout: action,
+			setDataViewMode: action,
+			reset: action,
+			
+			// Computed
+			theme: computed,
+			layout: computed,
+			sidebarOpen: computed,
+			dataViewMode: computed,
+		});
+		
 		this.initialise();
 	}
 

@@ -1,6 +1,7 @@
 // PROJECT DOCUMENTS ============================================================================
 
-import type { ProjectImage } from "./media.types";
+// TEMPORARILY DISABLED - ProjectImage type doesn't exist
+// import type { ProjectImage } from "./media.types";
 import type { IProjectData, IProjectMember } from "./project.types";
 
 interface IAECPDF {
@@ -218,7 +219,7 @@ export interface IConceptPlanGenerationData {
 	project_status: string;
 	business_area_name: string;
 	project_team: string[];
-	project_image: ProjectImage;
+	project_image: any; // TEMPORARILY using any - ProjectImage type doesn't exist
 	now: Date;
 	project_lead_approval_granted: boolean;
 	business_area_lead_approval_granted: boolean;
