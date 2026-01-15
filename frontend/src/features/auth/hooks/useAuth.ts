@@ -1,140 +1,117 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService } from "../services/auth.service";
-import type { LoginRequest, RegisterRequest } from "../services/auth.service";
-import { useStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/useStore";
+import {
+	getSSOMe,
+	logInOrdinary,
+	logOut,
+} from "@/features/auth/services/auth.service";
+import type { IUserData } from "@/shared/types/user.types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
 import { toast } from "sonner";
+import type { LoginFormData } from "../types";
 
-// Temporary mock flag - set to true to test without backend
-const USE_MOCK = true;
-
-// Mock delay to simulate network request
-const mockDelay = (ms: number = 1000) =>
-	new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * Query key factory for auth-related queries
- * Provides consistent, type-safe query keys
- */
 export const authKeys = {
 	all: ["auth"] as const,
 	user: () => [...authKeys.all, "user"] as const,
 };
 
 /**
- * Hook to fetch current user
- * Uses useQuery for data fetching with automatic caching
+ * Hook for fetching current user data
+ * - Only enabled when authenticated
+ * - Updates auth store with user data on success
+ * - Appropriate stale time for user data
  */
 export const useCurrentUser = () => {
-	const { authStore } = useStore();
+	const authStore = useAuthStore();
 
-	return useQuery({
+	const query = useQuery({
 		queryKey: authKeys.user(),
-		queryFn: authService.getCurrentUser,
-		enabled: authStore.isAuthenticated, // Only run query if user is logged in
-		staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+		queryFn: getSSOMe,
+		enabled: authStore.isAuthenticated,
+		staleTime: 5 * 60_000, // 5 minutes
+		retry: false, // Don't retry on 401
 	});
+
+	// Update auth store with user data on successful fetch
+	useEffect(() => {
+		if (query.data) {
+			authStore.setUser((query.data as IUserData) ?? null);
+		}
+	}, [query.data, authStore]);
+
+	return query;
 };
 
 /**
  * Hook for login mutation
- * Uses useMutation for one-time operations that modify server state
+ * - Handles success by updating auth store
+ * - Shows toast notifications for errors
+ * - Navigates to saved location or dashboard on success
  */
 export const useLogin = () => {
-	const { authStore } = useStore();
-	const queryClient = useQueryClient();
+	const authStore = useAuthStore();
+	const qc = useQueryClient();
+	const navigate = useNavigate();
+	const location = useLocation();
 
 	return useMutation({
-		mutationFn: async (credentials: LoginRequest) => {
-			if (USE_MOCK) {
-				// Mock implementation
-				await mockDelay(1000);
+		mutationFn: (vars: LoginFormData) => logInOrdinary(vars),
+		onSuccess: async () => {
+			// Cookies are set by the API response
+			authStore.login();
+			toast.success("Logged in successfully");
 
-				// Simulate validation
-				if (credentials.email === "error@test.com") {
-					throw new Error("Invalid credentials");
-				}
+			// Ensure we fetch the user immediately
+			await qc.invalidateQueries({ queryKey: authKeys.user() });
 
-				// Return mock user
-				return {
-					user: {
-						id: "1",
-						email: credentials.email,
-						username: credentials.email.split("@")[0],
-					},
-					token: "mock-jwt-token-" + Date.now(),
-				};
+			// Optionally wait until a fresh /me is in cache
+			try {
+				await qc.ensureQueryData({
+					queryKey: authKeys.user(),
+					queryFn: getSSOMe,
+				});
+			} catch {
+				// If /me fails, we'll handle it in the next render
 			}
 
-			// Real implementation (when backend is ready)
-			return authService.login(credentials);
+			// Check for saved location from redirect state
+			// If user was redirected to login, navigate back to original location
+			// Otherwise, navigate to dashboard
+			const from = (location.state as any)?.from?.pathname || "/";
+			navigate(from, { replace: true });
 		},
-		onSuccess: (data) => {
-			authStore.login(data.user, data.token);
-			queryClient.invalidateQueries({ queryKey: authKeys.user() });
-			toast.success("Logged in successfully!");
-		},
-		onError: (error: any) => {
-			toast.error(error.message || "Login failed");
-		},
-	});
-};
-
-/**
- * Hook for register mutation
- */
-export const useRegister = () => {
-	const { authStore } = useStore();
-	const queryClient = useQueryClient();
-
-	return useMutation({
-		mutationFn: async (userData: RegisterRequest) => {
-			if (USE_MOCK) {
-				// Mock implementation
-				await mockDelay(1000);
-
-				// Simulate validation
-				if (userData.email === "taken@test.com") {
-					throw new Error("Email already exists");
-				}
-
-				// Return mock user
-				return {
-					user: {
-						id: "1",
-						email: userData.email,
-						username: userData.username,
-					},
-					token: "mock-jwt-token-" + Date.now(),
-				};
-			}
-
-			// Real implementation (when backend is ready)
-			return authService.register(userData);
-		},
-		onSuccess: (data) => {
-			authStore.login(data.user, data.token);
-			queryClient.invalidateQueries({ queryKey: authKeys.user() });
-			toast.success("Account created successfully!");
-		},
-		onError: (error: any) => {
-			toast.error(error.message || "Registration failed");
+		//eslint-disable-next-line
+		onError: (err: any) => {
+			toast.error(err?.message ?? "Login failed");
 		},
 	});
 };
 
 /**
  * Hook for logout mutation
+ * - Clears auth store on success
+ * - Invalidates TanStack Query cache
+ * - Navigates to login page
  */
 export const useLogout = () => {
-	const { authStore } = useStore();
-	const queryClient = useQueryClient();
+	const authStore = useAuthStore();
+	const qc = useQueryClient();
+	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: authService.logout,
+		mutationFn: logOut,
 		onSuccess: () => {
+			// Clear auth store
 			authStore.logout();
-			queryClient.clear(); // Clear all cached data on logout
-			toast.success("Logged out successfully!");
+			
+			// Clear all TanStack Query cache
+			qc.clear();
+			
+			toast.success("Logged out successfully");
+			
+			// Navigate to login page
+			navigate("/login");
 		},
 	});
 };

@@ -1,3 +1,6 @@
+// TEMPORARILY DISABLED - depends on moved user service
+// This will be re-enabled when the users feature is integrated back
+/*
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { getUsersBasedOnSearchTerm } from "@/features/users/services/user.service";
 import type { IUserData } from "@/shared/types/user.types";
@@ -227,3 +230,4 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	};
 }
+*/

@@ -1,4 +1,4 @@
-import { type ApiError } from "@/shared/services/api";
+import { type ApiError } from "@/shared/services/api/client.service";
 
 // Django-specific error response types
 interface DjangoFieldError {

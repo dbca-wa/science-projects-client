@@ -1,5 +1,5 @@
 import type {
-	IUsernameLoginVariables,
+	LoginFormData,
 	IUsernameLoginSuccess,
 } from "@/features/auth/types";
 import { apiClient } from "@/shared/services/api/client.service";
@@ -12,7 +12,7 @@ import type { IUserData } from "@/shared/types/user.types";
 export const logInOrdinary = async ({
 	username,
 	password,
-}: IUsernameLoginVariables): Promise<IUsernameLoginSuccess> => {
+}: LoginFormData): Promise<IUsernameLoginSuccess> => {
 	const response = await apiClient.post<IUsernameLoginSuccess>(
 		AUTH_ENDPOINTS.LOGIN,
 		{ username, password }

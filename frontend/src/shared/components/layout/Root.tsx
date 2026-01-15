@@ -1,30 +1,27 @@
-// The base page that simply handles scrolling to the top of the page and setting the layout
+// The base page that handles scrolling to the top and setting the layout
 
-import { EditorProvider } from "@/lib/hooks/helper/EditorBlockerContext";
-import { useScrollToTop } from "@/lib/hooks/helper/useScrollToTop";
 import { ModernLayout } from "./modern/ModernLayout";
-import { TraditionalLayout } from "./traditional/TraditionalLayout";
+// TEMPORARILY DISABLED - TraditionalLayout moved to to_be_implemented
+// import { TraditionalLayout } from "./traditional/TraditionalLayout";
 import { observer } from "mobx-react-lite";
-import { useStore } from "@/app/stores/useStore";
+// import { useUIStore } from "@/app/stores/useStore"; // Not needed for baseline
+import { useScrollToTop } from "@/shared/hooks/ui/useScrollToTop";
+import { NavigationBlocker } from "./NavigationBlocker";
 
 export const Root = observer(() => {
 	useScrollToTop();
-
-	const { uiStore } = useStore();
-
-	//   const { layout } = useLayoutSwitcher();
-
-	// const {layout} =
+	// const uiStore = useUIStore(); // Not needed for baseline - only modern layout supported
 
 	return (
-		<EditorProvider>
-			{/* <ProtectedPage> */}
-			{uiStore.layout === "modern" ? (
-				<ModernLayout />
-			) : (
-				<TraditionalLayout />
-			)}
-			{/* </ProtectedPage> */}
-		</EditorProvider>
+		<>
+			{/* Navigation blocker for unsaved editor changes */}
+			<NavigationBlocker />
+
+			{/* Render layout based on user preference */}
+			{/* For baseline, only modern layout is supported */}
+			<ModernLayout />
+		</>
 	);
 });
+
+Root.displayName = "Root";

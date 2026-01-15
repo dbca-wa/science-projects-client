@@ -1,7 +1,8 @@
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router";
-import { ROUTES_CONFIG } from "@/config/routes.config";
-import type { StaffUserData } from "@/features/users/types/staff-profile.types";
+import { ALL_ROUTES } from "@/app/router/routes.config";
+// TEMPORARILY DISABLED - depends on moved staff profile types
+// import type { StaffUserData } from "@/features/users/types/staff-profile.types";
 
 interface PageHeadProps {
 	title?: string; // Allow manual override
@@ -9,7 +10,7 @@ interface PageHeadProps {
 	keywords?: string; // Allow manual override
 	isStandalone?: boolean;
 	isStaffProfile?: boolean;
-	staffUserData?: StaffUserData;
+	staffUserData?: any; // Temporarily using any until staff profile types are re-integrated
 }
 
 export const PageHead = ({
@@ -25,8 +26,8 @@ export const PageHead = ({
 	const location = useLocation();
 
 	// Find route config for current page if title not provided
-	const route = ROUTES_CONFIG.find((r) => r.path === location.pathname);
-	const pageTitle = title || route!.name || "Loading..."; // Ensure route !
+	const route = ALL_ROUTES.find((r) => r.path === location.pathname);
+	const pageTitle = title || route?.name || "Loading..."; // Use optional chaining
 
 	// Keywords
 	const defaultKeywords =

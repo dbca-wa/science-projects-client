@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/app/stores/useStore";
-import { getSidebarRoutes } from "@/config/routes.config";
+import { getSidebarRoutes } from "@/app/router/routes.config";
 import { Button } from "@/shared/components/ui/button";
 
 const AppLayout = observer(() => {
@@ -71,7 +71,7 @@ const AppLayout = observer(() => {
 									}`}
 								>
 									<span className="text-lg">
-										{route.icon}
+										{route.iconKey}
 									</span>
 									<span className="font-medium">
 										{route.name}

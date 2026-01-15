@@ -4,7 +4,7 @@ import { StoreContext } from "./store-context";
 /**
  * Hook to access stores in components
  */
-const useStore = () => {
+export const useStore = () => {
 	const context = useContext(StoreContext);
 	if (!context) {
 		throw new Error("useStore must be used within StoreProvider");
@@ -16,6 +16,6 @@ const useStore = () => {
 export const useUIStore = () => useStore().uiStore;
 export const useAuthStore = () => useStore().authStore;
 export const useEditorStore = () => useStore().editorStore;
-export const useProjectMapSearchStore = () => useStore().projectMapSearcStore;
-export const useProjectSearchStore = () => useStore().projectSearchStore;
-export const useUserSearchStore = () => useStore().userSearchStore;
+// export const useProjectMapSearchStore = () => useStore().projectMapSearcStore;
+// export const useProjectSearchStore = () => useStore().projectSearchStore;
+// export const useUserSearchStore = () => useStore().userSearchStore;

@@ -1,6 +1,6 @@
 import { logger } from "./logger.service";
-import { STORAGE_CONFIG } from "@/app/config/storage.config";
-import { getErrorMessage } from "@/shared/utils/error.utils";
+import { STORAGE_CONFIG } from "@/config/storage.config";
+import { getErrorMessage } from "@/shared/lib/error.utils";
 
 interface StorageOptions {
 	encrypt?: boolean;

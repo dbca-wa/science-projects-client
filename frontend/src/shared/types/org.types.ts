@@ -1,7 +1,6 @@
 // AGENCY ============================================================================
 
 import type { IEmailListUser } from "./email.types";
-import type { BusinessAreaImage } from "./media.types";
 
 export interface IAgency {
 	pk: number;
@@ -90,6 +89,12 @@ export interface IBusinessAreaCreate {
 	data_custodian?: number;
 }
 
+export interface BusinessAreaImage {
+	pk: number;
+	old_file: string;
+	file: string;
+}
+
 // DIVISIONS ============================================================================
 
 export interface IDivision {
@@ -115,4 +120,37 @@ export interface IAddress {
 	state: string;
 	country: string;
 	pobox?: string;
+}
+
+// LOCATION ============================================================================
+
+export interface OrganisedLocationData {
+	[key: string]: ISimpleLocationData[];
+
+	dbcaregion: ISimpleLocationData[];
+	dbcadistrict: ISimpleLocationData[];
+	ibra: ISimpleLocationData[];
+	imcra: ISimpleLocationData[];
+	nrm: ISimpleLocationData[];
+}
+
+export interface ISimpleLocationData {
+	pk: number;
+	name: string;
+	area_type: string;
+}
+
+export interface IProjectAreas {
+	created_at: Date;
+	updated_at: Date;
+	project: number;
+	id: number;
+	areas: ISimpleLocationData[];
+}
+
+export interface IAddLocationForm {
+	old_id?: number;
+	pk: number;
+	name: string;
+	area_type: string;
 }

@@ -1,8 +1,11 @@
 // PROJECT MEMBERS ============================================================================
 
-import type { ISimpleLocationData } from "./location.types";
-import type { IImageData, ProjectImage } from "./media.types";
-import type { IAffiliation, IBusinessArea } from "./org.types";
+import type { IImageData } from "./media.types";
+import type {
+	IAffiliation,
+	IBusinessArea,
+	ISimpleLocationData,
+} from "./org.types";
 import type { IMemberUserDetails } from "./user.types";
 
 export interface IProjectMember {
@@ -17,6 +20,12 @@ export interface IProjectMember {
 	position: number;
 	short_code: number | null;
 	affiliation: IAffiliation;
+}
+
+export interface ProjectImage {
+	pk: number;
+	old_file: string;
+	file: string;
 }
 
 // PROJECT DETAILS =============================================================================
@@ -133,6 +142,16 @@ export interface IProjectData {
 	role?: ProjectRoles;
 
 	hidden_from_staff_profiles?: number[];
+}
+
+export interface IProblematicData {
+	no_progress: IProjectData[];
+	open_closed: IProjectData[];
+	no_members: IProjectData[];
+	no_leader: IProjectData[];
+	multiple_leads: IProjectData[];
+	external_leader: IProjectData[];
+	inactive_lead_active_project: IProjectData[];
 }
 
 // interface IFullProjectDetails {
