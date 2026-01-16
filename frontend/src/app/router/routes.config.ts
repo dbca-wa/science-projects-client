@@ -8,6 +8,12 @@ import Dashboard from "@/pages/dash/Dashboard";
 import HowTo from "@/pages/dash/HowTo";
 import UserGuide from "@/pages/dash/UserGuide";
 
+// Pages - Users
+import { UserListPage } from "@/pages/users/UserListPage";
+import { UserCreatePage } from "@/pages/users/UserCreatePage";
+import { UserEditPage } from "@/pages/users/UserEditPage";
+import { CurrentUserPage } from "@/pages/users/CurrentUserPage";
+
 // Route configuration interface
 export interface RouteConfig {
 	name: string;
@@ -76,10 +82,64 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 	},
 ];
 
+/** ---------------- Users ---------------- */
+export const USER_ROUTES: RouteConfig[] = [
+	{
+		name: "Users",
+		path: "/users",
+		iconKey: "users",
+		tooltipKey: "users",
+		component: UserListPage,
+		requiresAuth: true,
+		showInSidebar: true,
+		section: "Management",
+		layoutWrapper: "content",
+	},
+	{
+		name: "User Detail",
+		path: "/users/:id",
+		iconKey: "users",
+		component: UserListPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "My Profile",
+		path: "/users/me",
+		iconKey: "users",
+		component: CurrentUserPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Create User",
+		path: "/users/create",
+		iconKey: "users",
+		component: UserCreatePage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Edit User",
+		path: "/users/:id/edit",
+		iconKey: "users",
+		component: UserEditPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+];
+
 /** ---------------- Combined ---------------- */
 export const ALL_ROUTES: RouteConfig[] = [
 	...AUTH_ROUTES,
 	...DASHBOARD_ROUTES,
+	...USER_ROUTES,
 ];
 
 /** Flatten helper (kept as-is) */

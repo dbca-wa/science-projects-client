@@ -1,4 +1,3 @@
-// components/errors/ErrorHandler.tsx
 import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router";
 import ErrorScreen from "./ErrorScreen";
 

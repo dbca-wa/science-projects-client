@@ -11,7 +11,7 @@ export const ModernLayout = () => {
 	return (
 		<div className="flex min-h-full max-h-full w-full overscroll-y-none fixed">
 			<ModernSidebar />
-			<div className="flex-1 h-full overflow-auto relative">
+			<div className="flex-1 h-full relative flex flex-col">
 				<ModernHeader />
 				<ModernPageWrapper>
 					<motion.div
@@ -20,9 +20,6 @@ export const ModernLayout = () => {
 						animate={{ opacity: 1 }}
 						transition={{ duration: 1 }}
 						exit={{ opacity: 0 }}
-						style={{
-							height: "100%",
-						}}
 					>
 						<Outlet />
 					</motion.div>

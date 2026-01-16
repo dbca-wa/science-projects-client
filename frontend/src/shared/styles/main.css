@@ -136,8 +136,7 @@
 		overscroll-behavior-y: none;
 	}
 	html {
-		overflow-y: scroll;
-		overflow-x: hidden;
+		overflow: hidden;
 		scrollbar-width: none;
 	}
 

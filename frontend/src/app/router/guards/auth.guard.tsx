@@ -38,6 +38,7 @@ export const ProtectedRoute = observer(
 /**
  * Admin-Only Route Guard
  * Redirects to home if user is not an admin
+ * Waits for user data to be loaded before checking admin status
  */
 export const AdminRoute = observer(
 	({ children }: { children: React.ReactNode }) => {
@@ -47,6 +48,15 @@ export const AdminRoute = observer(
 		if (!authStore.isAuthenticated) {
 			// Not logged in - redirect to login
 			return <Navigate to="/login" state={{ from: location }} replace />;
+		}
+
+		// Wait for user data to be loaded
+		if (!authStore.user) {
+			return (
+				<div className="min-h-screen flex items-center justify-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+				</div>
+			);
 		}
 
 		if (!authStore.isSuperuser) {

@@ -1,4 +1,3 @@
-// components/errors/ErrorScreen.tsx
 import {
 	Card,
 	CardContent,

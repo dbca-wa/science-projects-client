@@ -6,7 +6,6 @@ import {
 	observable,
 	computed,
 	action,
-	runInAction,
 } from "mobx";
 import Cookie from "js-cookie";
 
@@ -60,13 +59,11 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	}
 
 	setUser(user: IUserData | null) {
-		runInAction(() => {
-			this.user = user;
-			// If we have a user, we're authenticated
-			// If we don't have a user but have a CSRF token, we might still be authenticated
-			const hasCsrf = !!Cookie.get("spmscsrf");
-			this.state.isAuthenticated = !!user || hasCsrf;
-		});
+		this.user = user;
+		// If we have a user, we're authenticated
+		// If we don't have a user but have a CSRF token, we might still be authenticated
+		const hasCsrf = !!Cookie.get("spmscsrf");
+		this.state.isAuthenticated = !!user || hasCsrf;
 	}
 
 	async initialise() {
@@ -81,12 +78,10 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 			note: "sessionid is HttpOnly and cannot be read by JS",
 		});
 		
-		runInAction(() => {
-			// If we have a CSRF token, assume we might be authenticated
-			// The actual auth check will happen when components try to fetch user data
-			this.state.isAuthenticated = hasCsrf;
-			this.state.initialised = true;
-		});
+		// If we have a CSRF token, assume we might be authenticated
+		// The actual auth check will happen when components try to fetch user data
+		this.state.isAuthenticated = hasCsrf;
+		this.state.initialised = true;
 		
 		logger.info("Auth store initialized", {
 			isAuthenticated: this.state.isAuthenticated,
@@ -95,17 +90,13 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	}
 
 	login() {
-		runInAction(() => {
-			this.state.isAuthenticated = true;
-		});
+		this.state.isAuthenticated = true;
 		logger.info("User flagged as logged in (cookies present)");
 	}
 
 	logout() {
-		runInAction(() => {
-			this.state.isAuthenticated = false;
-			this.user = null;
-		});
+		this.state.isAuthenticated = false;
+		this.user = null;
 		Cookie.remove("sessionid");
 		Cookie.remove("spmscsrf");
 		Cookie.remove("csrf");
@@ -117,13 +108,11 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	}
 
 	reset() {
-		runInAction(() => {
-			this.state.isAuthenticated = false;
-			this.user = null;
-			this.state.loading = false;
-			this.state.error = null;
-			this.state.initialised = false;
-		});
+		this.state.isAuthenticated = false;
+		this.user = null;
+		this.state.loading = false;
+		this.state.error = null;
+		this.state.initialised = false;
 		logger.info("Auth store reset");
 	}
 

@@ -2,6 +2,7 @@ import { createContext } from "react";
 import { AuthStore } from "./derived/auth.store";
 import { UIStore } from "./derived/ui.store";
 import { EditorStore } from "./derived/editor.store";
+import { UserSearchStore } from "./derived/userSearch.store";
 
 /**
  * Root store that combines all MobX stores
@@ -12,7 +13,7 @@ class RootStore {
 	// projectMapSearcStore: ProjectMapSearchStore;
 	// projectSearchStore: ProjectSearchStore;
 	uiStore: UIStore;
-	// userSearchStore: UserSearchStore;
+	userSearchStore: UserSearchStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
@@ -20,7 +21,7 @@ class RootStore {
 		// this.projectMapSearcStore = new ProjoectMapSearchStore();
 		// this.projectSearchStore = new ProjectSearchStore();
 		this.uiStore = new UIStore();
-		// this.userSearchStore = new UserSearchStore();
+		this.userSearchStore = new UserSearchStore();
 	}
 }
 

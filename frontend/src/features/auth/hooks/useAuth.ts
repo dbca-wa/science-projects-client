@@ -7,7 +7,7 @@ import {
 import type { IUserData } from "@/shared/types/user.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, type Location } from "react-router";
 import { toast } from "sonner";
 import type { LoginFormData } from "../types";
 
@@ -15,6 +15,10 @@ export const authKeys = {
 	all: ["auth"] as const,
 	user: () => [...authKeys.all, "user"] as const,
 };
+
+interface LoginRedirectState {
+	from: Location;
+}
 
 /**
  * Hook for fetching current user data
@@ -36,9 +40,12 @@ export const useCurrentUser = () => {
 	// Update auth store with user data on successful fetch
 	useEffect(() => {
 		if (query.data) {
-			authStore.setUser((query.data as IUserData) ?? null);
+			authStore.setUser((query.data as IUserData));
+		} else if (query.isError) {
+			// Handle error case - clear user data
+			authStore.setUser(null);
 		}
-	}, [query.data, authStore]);
+	}, [query.data, query.isError, authStore]);
 
 	return query;
 };
@@ -78,7 +85,7 @@ export const useLogin = () => {
 			// Check for saved location from redirect state
 			// If user was redirected to login, navigate back to original location
 			// Otherwise, navigate to dashboard
-			const from = (location.state as any)?.from?.pathname || "/";
+			const from = (location.state as LoginRedirectState)?.from?.pathname || "/";
 			navigate(from, { replace: true });
 		},
 		//eslint-disable-next-line
