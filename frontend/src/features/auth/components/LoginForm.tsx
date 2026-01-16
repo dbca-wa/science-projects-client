@@ -18,7 +18,7 @@ import type { LoginFormData } from "../types";
  * - API errors are handled by the useLogin hook via toast notifications
  */
 export const LoginForm = () => {
-	const { mutate: login, isPending, error } = useLogin();
+	const { mutate: login, isPending } = useLogin();
 
 	const {
 		register,

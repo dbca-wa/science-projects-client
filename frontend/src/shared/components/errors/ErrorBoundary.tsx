@@ -1,6 +1,5 @@
-// components/errors/ErrorBoundary.tsx
 import React from "react";
-import ErrorScreen from "./ErrorScreen"; // unified UI (see below)
+import ErrorScreen from "./ErrorScreen"; 
 
 interface Props {
 	children: React.ReactNode;

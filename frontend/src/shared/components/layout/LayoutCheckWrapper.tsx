@@ -1,6 +1,4 @@
-// components/Wrappers/LayoutCheckWrapper.tsx
-import { type ReactNode } from "react";
-import { observer } from "mobx-react-lite";
+import { type ReactNode, useState } from "react";
 import { useUIStore } from "@/app/stores/useStore";
 
 interface LayoutCheckWrapperProps {
@@ -11,14 +9,15 @@ interface LayoutCheckWrapperProps {
 
 /**
  * Renders children only when the "modern" layout is active.
- * Observes uiStore.layout via MobX.
+ * Captures layout state on mount to prevent re-renders during navigation.
  */
-export const LayoutCheckWrapper = observer(
-	({ children, fallback = null }: LayoutCheckWrapperProps) => {
-		const uiStore = useUIStore();
-		const isModern = uiStore.layout === "modern";
-		return <>{isModern ? children : fallback}</>;
-	}
-);
+export const LayoutCheckWrapper = ({ children, fallback = null }: LayoutCheckWrapperProps) => {
+	const uiStore = useUIStore();
+	
+	// Capture layout once on mount
+	const [isModern] = useState(() => uiStore.layout === "modern");
+	
+	return <>{isModern ? children : fallback}</>;
+};
 
 LayoutCheckWrapper.displayName = "LayoutCheckWrapper";

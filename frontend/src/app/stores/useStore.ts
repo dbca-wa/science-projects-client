@@ -18,4 +18,4 @@ export const useAuthStore = () => useStore().authStore;
 export const useEditorStore = () => useStore().editorStore;
 // export const useProjectMapSearchStore = () => useStore().projectMapSearcStore;
 // export const useProjectSearchStore = () => useStore().projectSearchStore;
-// export const useUserSearchStore = () => useStore().userSearchStore;
+export const useUserSearchStore = () => useStore().userSearchStore;

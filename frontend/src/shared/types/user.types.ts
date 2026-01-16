@@ -29,6 +29,12 @@ export interface IUserData {
 	branches?: IBranch[];
 	businessAreas?: IBusinessArea[];
 	name?: string;
+	// Extended profile fields (from ProfilePageSerializer)
+	phone?: string;
+	fax?: string;
+	title?: string;
+	about?: string;
+	expertise?: string;
 }
 
 export interface IMiniUser {

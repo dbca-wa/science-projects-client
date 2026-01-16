@@ -17,6 +17,7 @@ import { createRoot } from "react-dom/client";
 // Initialize auth store before rendering
 const initializeApp = async () => {
 	await rootStore.authStore.initialise();
+	await rootStore.userSearchStore.initialise();
 	
 	createRoot(document.getElementById("root")!).render(
 		<StoreProvider>

@@ -1,30 +1,20 @@
 import { type ReactNode } from "react";
-import { observer } from "mobx-react-lite";
-import { useUIStore } from "@/app/stores/useStore";
-import { cn } from "@/shared/lib/utils";
 
 interface ContentWrapperProps {
 	children: ReactNode;
 }
 
 /**
- * Provides consistent page padding and height between two layouts.
+ * ContentWrapper - Structural wrapper for page content
+ * Padding is handled by layout components (ModernPageWrapper, TraditionalLayout)
+ * This component only provides structural styling
  */
-export const ContentWrapper = observer(({ children }: ContentWrapperProps) => {
-	const uiStore = useUIStore();
-
-	const isTraditional = uiStore.layout === "traditional";
-
+export function ContentWrapper({ children }: ContentWrapperProps) {
 	return (
-		<div
-			className={cn(
-				"py-4 flex-1 min-h-[70vh] h-full dark:text-gray-400",
-				isTraditional ? "px-0" : "px-9"
-			)}
-		>
-			<div className={"pb-4 h-full"}>{children}</div>
+		<div className="flex-1 min-h-[70vh] h-full dark:text-gray-400">
+			<div className="pb-4 h-full">{children}</div>
 		</div>
 	);
-});
+}
 
 ContentWrapper.displayName = "ContentWrapper";
