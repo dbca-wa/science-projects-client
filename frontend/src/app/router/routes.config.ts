@@ -5,13 +5,20 @@ import Login from "@/pages/auth/Login";
 
 // Pages - Dashboard
 import Dashboard from "@/pages/dash/Dashboard";
-import UserGuide from "@/pages/dash/UserGuide";
+// import UserGuide from "@/pages/dash/UserGuide"; // Commented out - page not yet created
 
 // Pages - Users
 import { UserListPage } from "@/pages/users/UserListPage";
 import { UserCreatePage } from "@/pages/users/UserCreatePage";
 import { UserEditPage } from "@/pages/users/UserEditPage";
 import { CurrentUserPage } from "@/pages/users/CurrentUserPage";
+
+/**
+ * Route Configuration
+ * 
+ * This file defines all application routes. Routes for unimplemented features
+ * are commented out to keep the navigation clean.
+ */
 
 // Route configuration interface
 export interface RouteConfig {
@@ -59,6 +66,8 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
+	// Quick Guide - COMMENTED OUT: Page not yet created
+	/*
 	{
 		name: "Quick Guide",
 		path: "/guide",
@@ -70,6 +79,7 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 		section: "Guide",
 		layoutWrapper: "content",
 	},
+	*/
 ];
 
 /** ---------------- Users ---------------- */
@@ -82,7 +92,18 @@ export const USER_ROUTES: RouteConfig[] = [
 		component: UserListPage,
 		requiresAuth: true,
 		showInSidebar: true,
-		section: "Management",
+		section: "Users",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Add User",
+		path: "/users/create",
+		iconKey: "userAdd",
+		tooltipKey: "users",
+		component: UserCreatePage,
+		requiresAuth: true,
+		showInSidebar: true,
+		section: "Users",
 		layoutWrapper: "content",
 	},
 	{
@@ -104,16 +125,6 @@ export const USER_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Create User",
-		path: "/users/create",
-		iconKey: "users",
-		component: UserCreatePage,
-		requiresAuth: true,
-		requiresAdmin: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
 		name: "Edit User",
 		path: "/users/:id/edit",
 		iconKey: "users",
@@ -125,11 +136,100 @@ export const USER_ROUTES: RouteConfig[] = [
 	},
 ];
 
+/** ---------------- Projects (NOT YET IMPLEMENTED) ---------------- */
+// Uncomment when projects feature is implemented
+/*
+export const PROJECT_ROUTES: RouteConfig[] = [
+	{
+		name: "Projects",
+		path: "/projects",
+		iconKey: "projects",
+		tooltipKey: "projects",
+		component: ProjectListPage,
+		requiresAuth: true,
+		showInSidebar: true,
+		section: "Projects",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Add Project",
+		path: "/projects/create",
+		iconKey: "projects",
+		component: ProjectCreatePage,
+		requiresAuth: true,
+		showInSidebar: true,
+		section: "Projects",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Detail",
+		path: "/projects/:id",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+];
+*/
+
+/** ---------------- Reports (NOT YET IMPLEMENTED) ---------------- */
+// Uncomment when reports feature is implemented
+/*
+export const REPORT_ROUTES: RouteConfig[] = [
+	{
+		name: "Reports",
+		path: "/reports",
+		iconKey: "reports",
+		tooltipKey: "reports",
+		component: ReportListPage,
+		requiresAuth: true,
+		showInSidebar: true,
+		section: "ARAR",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Current Report",
+		path: "/reports/current",
+		iconKey: "reports",
+		component: CurrentReportPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: true,
+		section: "ARAR",
+		layoutWrapper: "content",
+	},
+];
+*/
+
+/** ---------------- Admin (NOT YET IMPLEMENTED) ---------------- */
+// Uncomment when admin features are implemented
+/*
+export const ADMIN_ROUTES: RouteConfig[] = [
+	{
+		name: "Admin",
+		path: "/admin",
+		iconKey: "admin",
+		tooltipKey: "admin",
+		component: AdminDashboard,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: true,
+		section: "Admin",
+		layoutWrapper: "content",
+	},
+];
+*/
+
 /** ---------------- Combined ---------------- */
 export const ALL_ROUTES: RouteConfig[] = [
 	...AUTH_ROUTES,
 	...DASHBOARD_ROUTES,
 	...USER_ROUTES,
+	// Uncomment as features are implemented:
+	// ...PROJECT_ROUTES,
+	// ...REPORT_ROUTES,
+	// ...ADMIN_ROUTES,
 ];
 
 /** Flatten helper (kept as-is) */

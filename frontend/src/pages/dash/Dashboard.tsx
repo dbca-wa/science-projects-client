@@ -23,10 +23,7 @@ const Dashboard = observer(() => {
 		);
 	}
 
-	const displayName = user?.display_first_name || user?.username || "User";
-	const fullName = user?.display_first_name && user?.display_last_name
-		? `${user.display_first_name} ${user.display_last_name}`
-		: displayName;
+	const firstName = user?.display_first_name || user?.first_name || user?.username || "User";
 
 	return (
 		<div className="space-y-8 relative">
@@ -37,10 +34,10 @@ const Dashboard = observer(() => {
 				transition={{ duration: 0.5 }}
 			>
 				<h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-					Welcome back, {displayName}!
+					Welcome back, {firstName}!
 				</h1>
 				<p className="mt-2 text-gray-600 dark:text-gray-400">
-					Hello {fullName}! Welcome to SPMS, DBCA's portal for science project planning, approval and reporting.
+					The Science Project Management System (SPMS) is DBCA's portal for science project planning, approval and reporting.
 				</p>
 			</motion.div>
 
@@ -49,18 +46,16 @@ const Dashboard = observer(() => {
 				<h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
 					Quick Actions
 				</h2>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{/* Mobile (1 col): Create Project first */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<DashboardActionCard
-						icon={<FaCirclePlus className="w-5 h-5" />}
-						title="Create Project"
-						description="Start a new science project"
-						onClick={() => navigate("/projects/create")}
-						colorScheme="green"
+						icon={<FaQuestionCircle className="w-5 h-5" />}
+						title="Guide"
+						description="Learn how to use the system"
+						onClick={() => navigate("/guide")}
+						colorScheme="blue"
 						delay={0.1}
 					/>
 
-					{/* Mobile: Search Projects second, Desktop (3 col): top right */}
 					<DashboardActionCard
 						icon={<FaSearch className="w-5 h-5" />}
 						title="Search Projects"
@@ -70,26 +65,35 @@ const Dashboard = observer(() => {
 						delay={0.15}
 					/>
 
-					{/* Mobile: Quick Guide third */}
-					<DashboardActionCard
-						icon={<FaQuestionCircle className="w-5 h-5" />}
-						title="Quick Guide"
-						description="Learn how to use the system"
-						onClick={() => navigate("/guide")}
-						colorScheme="blue"
-						delay={0.2}
-					/>
-
-					{/* Mobile: Submit Feedback fourth */}
 					<DashboardActionCard
 						icon={<MdFeedback className="w-5 h-5" />}
 						title="Submit Feedback"
 						description="Help us improve SPMS"
 						href="mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback"
 						colorScheme="purple"
-						delay={0.25}
+						delay={0.2}
 					/>
 
+					<DashboardActionCard
+						icon={<FaCirclePlus className="w-5 h-5" />}
+						title="Create Project"
+						description="Start a new science project"
+						onClick={() => navigate("/projects/create")}
+						colorScheme="green"
+						delay={0.25}
+					/>
+				</div>
+			</div>
+
+			{/* External Resources */}
+			<div>
+				<h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+					External Resources
+				</h2>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					Quick links to related DBCA systems
+				</p>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<DashboardActionCard
 						icon={<FaDatabase className="w-5 h-5" />}
 						title="Data Catalogue"
@@ -110,8 +114,29 @@ const Dashboard = observer(() => {
 				</div>
 			</div>
 
-			{/* Version Number */}
+			{/* Tasks & Projects Section - Placeholder */}
 			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5, delay: 0.4 }}
+			>
+				<h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+					My Tasks & Projects
+				</h2>
+				<div className="border border-gray-300 dark:border-gray-600 rounded-lg p-8 bg-gray-50 dark:bg-gray-800/50">
+					<div className="text-center">
+						<p className="text-gray-600 dark:text-gray-400 mb-2">
+							Task and project management will be available after the Projects feature is refactored.
+						</p>
+						<p className="text-sm text-gray-500 dark:text-gray-500">
+							This section will include: My Tasks, Admin Tasks, Caretaker Tasks, Endorsement Tasks, and My Projects.
+						</p>
+					</div>
+				</div>
+			</motion.div>
+
+			{/* Version Number */}
+			{/* <motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.4 }}
@@ -120,7 +145,7 @@ const Dashboard = observer(() => {
 				<p className="text-sm text-gray-500 dark:text-gray-400">
 					Version {import.meta.env.VITE_SPMS_VERSION || "Development v3"}
 				</p>
-			</motion.div>
+			</motion.div> */}
 
 			{/* User Info Section (for development) */}
 			{import.meta.env.MODE === "development" && user && (

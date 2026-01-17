@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import type { UserAvatarProps } from "../types/user.types";
 import { cn } from "@/shared/lib/utils";
+import { getUserInitials, getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
  * Size variants for user avatar
@@ -20,18 +21,6 @@ const sizeClasses = {
  * @param size - Avatar size variant (sm, md, lg)
  */
 export const UserAvatar = ({ user, size = "md" }: UserAvatarProps) => {
-  // Get user initials for fallback
-  const getInitials = () => {
-    const firstName = user.display_first_name || user.first_name || "";
-    const lastName = user.display_last_name || user.last_name || "";
-    
-    if (!firstName && !lastName) {
-      return user.username?.charAt(0).toUpperCase() || "?";
-    }
-    
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
   // Get avatar image URL
   const getAvatarUrl = () => {
     if (!user.image) return undefined;
@@ -49,14 +38,15 @@ export const UserAvatar = ({ user, size = "md" }: UserAvatarProps) => {
   };
 
   const avatarUrl = getAvatarUrl();
-  const initials = getInitials();
+  const initials = getUserInitials(user);
+  const displayName = getUserDisplayName(user);
 
   return (
     <Avatar className={cn(sizeClasses[size])}>
       {avatarUrl && (
         <AvatarImage 
           src={avatarUrl} 
-          alt={`${user.display_first_name || user.first_name} ${user.display_last_name || user.last_name}`}
+          alt={displayName}
         />
       )}
       <AvatarFallback className="bg-primary/10 text-primary font-medium">
