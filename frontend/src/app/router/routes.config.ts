@@ -5,7 +5,6 @@ import Login from "@/pages/auth/Login";
 
 // Pages - Dashboard
 import Dashboard from "@/pages/dash/Dashboard";
-import HowTo from "@/pages/dash/HowTo";
 import UserGuide from "@/pages/dash/UserGuide";
 
 // Pages - Users
@@ -70,15 +69,6 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Guide",
 		layoutWrapper: "content",
-	},
-	{
-		name: "How To",
-		path: "/howto",
-		iconKey: "docs",
-		component: HowTo,
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "layoutCheck",
 	},
 ];
 

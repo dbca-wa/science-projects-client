@@ -1,18 +1,19 @@
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { observer } from "mobx-react-lite";
 import { motion } from "framer-motion";
-import { FaBook, FaQuestionCircle } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";
+import { FaCirclePlus } from "react-icons/fa6";
+import { TbWorldWww } from "react-icons/tb";
+import { MdFeedback } from "react-icons/md";
+import { useNavigate } from "react-router";
+import { DashboardActionCard } from "@/shared/components/DashboardActionCard";
 
 /**
  * Dashboard - Main landing page after authentication
- * - Displays welcome message with user's name
- * - Shows quick links to main features
- * - Uses useCurrentUser hook to fetch user data
- * - Displays loading state while fetching
  */
 const Dashboard = observer(() => {
 	const { data: user, isLoading } = useCurrentUser();
+	const navigate = useNavigate();
 
 	if (isLoading) {
 		return (
@@ -23,9 +24,12 @@ const Dashboard = observer(() => {
 	}
 
 	const displayName = user?.display_first_name || user?.username || "User";
+	const fullName = user?.display_first_name && user?.display_last_name
+		? `${user.display_first_name} ${user.display_last_name}`
+		: displayName;
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8 relative">
 			{/* Welcome Section */}
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
@@ -36,77 +40,86 @@ const Dashboard = observer(() => {
 					Welcome back, {displayName}!
 				</h1>
 				<p className="mt-2 text-gray-600 dark:text-gray-400">
-					Here's what you can do today
+					Hello {fullName}! Welcome to SPMS, DBCA's portal for science project planning, approval and reporting.
 				</p>
 			</motion.div>
 
-			{/* Quick Links Section */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, delay: 0.1 }}
-			>
+			{/* Quick Actions Grid */}
+			<div>
 				<h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-					Quick Links
+					Quick Actions
 				</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{/* Quick Guide Link */}
-					<Link
-						to="/guide"
-						className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"
-					>
-						<div className="flex items-center space-x-3">
-							<div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-								<FaBook className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-							</div>
-							<div>
-								<h3 className="font-semibold text-gray-900 dark:text-gray-100">
-									Quick Guide
-								</h3>
-								<p className="text-sm text-gray-600 dark:text-gray-400">
-									Learn how to use the system
-								</p>
-							</div>
-						</div>
-					</Link>
+					{/* Mobile (1 col): Create Project first */}
+					<DashboardActionCard
+						icon={<FaCirclePlus className="w-5 h-5" />}
+						title="Create Project"
+						description="Start a new science project"
+						onClick={() => navigate("/projects/create")}
+						colorScheme="green"
+						delay={0.1}
+					/>
 
-					{/* How To Link */}
-					<Link
-						to="/howto"
-						className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"
-					>
-						<div className="flex items-center space-x-3">
-							<div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-								<FaQuestionCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-							</div>
-							<div>
-								<h3 className="font-semibold text-gray-900 dark:text-gray-100">
-									How To
-								</h3>
-								<p className="text-sm text-gray-600 dark:text-gray-400">
-									Step-by-step instructions
-								</p>
-							</div>
-						</div>
-					</Link>
+					{/* Mobile: Search Projects second, Desktop (3 col): top right */}
+					<DashboardActionCard
+						icon={<FaSearch className="w-5 h-5" />}
+						title="Search Projects"
+						description="Browse all science projects"
+						onClick={() => navigate("/projects")}
+						colorScheme="blue"
+						delay={0.15}
+					/>
 
-					{/* Placeholder for future features */}
-					<div className="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
-						<div className="flex items-center space-x-3">
-							<div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
-								<div className="w-5 h-5 bg-gray-400 dark:bg-gray-600 rounded"></div>
-							</div>
-							<div>
-								<h3 className="font-semibold text-gray-500 dark:text-gray-400">
-									More Coming Soon
-								</h3>
-								<p className="text-sm text-gray-400 dark:text-gray-500">
-									Additional features will appear here
-								</p>
-							</div>
-						</div>
-					</div>
+					{/* Mobile: Quick Guide third */}
+					<DashboardActionCard
+						icon={<FaQuestionCircle className="w-5 h-5" />}
+						title="Quick Guide"
+						description="Learn how to use the system"
+						onClick={() => navigate("/guide")}
+						colorScheme="blue"
+						delay={0.2}
+					/>
+
+					{/* Mobile: Submit Feedback fourth */}
+					<DashboardActionCard
+						icon={<MdFeedback className="w-5 h-5" />}
+						title="Submit Feedback"
+						description="Help us improve SPMS"
+						href="mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback"
+						colorScheme="purple"
+						delay={0.25}
+					/>
+
+					<DashboardActionCard
+						icon={<FaDatabase className="w-5 h-5" />}
+						title="Data Catalogue"
+						description="Access DBCA's data portal"
+						onClick={() => window.open("https://data.bio.wa.gov.au/", "_blank")}
+						colorScheme="blue"
+						delay={0.3}
+					/>
+
+					<DashboardActionCard
+						icon={<TbWorldWww className="w-5 h-5" />}
+						title="Scientific Sites Register"
+						description="Browse scientific sites"
+						onClick={() => window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")}
+						colorScheme="blue"
+						delay={0.35}
+					/>
 				</div>
+			</div>
+
+			{/* Version Number */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.5, delay: 0.4 }}
+				className="flex justify-end"
+			>
+				<p className="text-sm text-gray-500 dark:text-gray-400">
+					Version {import.meta.env.VITE_SPMS_VERSION || "Development v3"}
+				</p>
 			</motion.div>
 
 			{/* User Info Section (for development) */}
@@ -114,7 +127,7 @@ const Dashboard = observer(() => {
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5, delay: 0.2 }}
+					transition={{ duration: 0.5, delay: 0.45 }}
 					className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
 				>
 					<h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
