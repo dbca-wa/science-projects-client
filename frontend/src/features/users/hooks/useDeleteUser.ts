@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 
 /**
  * Hook for deleting a user permanently
- * Invalidates user list cache and navigates to user list page on success
+ * Removes user from cache, invalidates user list, and navigates to user list page
  */
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
@@ -13,9 +13,12 @@ export const useDeleteUser = () => {
 
   return useMutation({
     mutationFn: (userId: number) => deleteUser(userId),
-    onMutate: () => {
+    onMutate: (userId) => {
       // Show loading toast
       toast.loading("Deleting...");
+      
+      // Remove the specific user query from cache to prevent refetch
+      queryClient.removeQueries({ queryKey: ["user", userId] });
     },
     onSuccess: () => {
       // Dismiss loading toast

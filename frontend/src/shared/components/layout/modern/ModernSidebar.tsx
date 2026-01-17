@@ -1,16 +1,29 @@
 import { ROUTE_ICONS } from "@/app/router/route-icons";
 import { getSidebarRoutes } from "@/app/router/routes.config";
+import { useAuthStore } from "@/app/stores/useStore";
 import { cn } from "@/shared/lib/utils";
 import { NavLink } from "react-router";
+import { observer } from "mobx-react-lite";
 
 /**
  * ModernSidebar - Simplified sidebar for baseline
  * - Dynamically renders routes from routes.config.ts
  * - Groups routes by section
+ * - Filters admin-only routes based on user permissions
  * - Maintains responsive behavior
  */
-const ModernSidebar = () => {
-	const sidebarRoutes = getSidebarRoutes();
+const ModernSidebar = observer(() => {
+	const authStore = useAuthStore();
+	const allSidebarRoutes = getSidebarRoutes();
+	
+	// Filter routes based on user permissions
+	const sidebarRoutes = allSidebarRoutes.filter(route => {
+		// If route requires admin, only show to admins
+		if (route.requiresAdmin) {
+			return authStore.isSuperuser;
+		}
+		return true;
+	});
 
 	// Group routes by section
 	const routesBySection = sidebarRoutes.reduce((acc, route) => {
@@ -68,7 +81,7 @@ const ModernSidebar = () => {
 			</div>
 		</aside>
 	);
-};
+});
 
 ModernSidebar.displayName = "ModernSidebar";
 

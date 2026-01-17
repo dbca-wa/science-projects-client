@@ -70,8 +70,6 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Membership</h3>
-
       {/* Staff Status - Only show in create mode */}
       {mode === "create" && (
         <FormField

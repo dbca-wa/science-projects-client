@@ -1,4 +1,4 @@
-import type { IUserData } from "@/shared/types/user.types";
+import type { IUserData, IUserMe } from "@/shared/types/user.types";
 
 // ============================================================================
 // USER FORM DATA (Feature-specific)
@@ -86,12 +86,13 @@ export interface UserSearchResponse {
 // ============================================================================
 
 export interface UserCardProps {
-  user: IUserData;
-  onClick?: (user: IUserData) => void;
+  user: IUserData | IUserMe;
+  onClick?: (user: IUserData | IUserMe) => void;
+  clickable?: boolean;
 }
 
 export interface UserAvatarProps {
-  user: IUserData;
+  user: IUserData | IUserMe;
   size?: "sm" | "md" | "lg" | "xl";
 }
 

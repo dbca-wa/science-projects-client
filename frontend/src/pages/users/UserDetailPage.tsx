@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
+import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { PersonalInfoSection } from "@/features/users/components/PersonalInfoSection";
 import { ProfileSection } from "@/features/users/components/ProfileSection";
 import { MembershipSection } from "@/features/users/components/MembershipSection";
@@ -8,7 +9,7 @@ import { UserAdminActionButtons } from "@/features/users/components/UserAdminAct
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { ArrowLeft, AlertCircle, Edit } from "lucide-react";
+import { AlertCircle, Edit } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useAuthStore } from "@/app/stores/useStore";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
@@ -20,7 +21,7 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
  * - Personal information
  * - Profile (avatar, about, expertise)
  * - Membership (branch, business area, affiliation)
- * - Back button navigation
+ * - Breadcrumb navigation
  * - Admin-only edit button
  * - Loading and error states
  * - Responsive layout
@@ -33,14 +34,18 @@ export const UserDetailPage = observer(() => {
 
   const { data: user, isLoading, error } = useUserDetail(userId);
 
-  const handleBack = () => {
-    navigate("/users");
-  };
+  const displayName = user ? getUserDisplayName(user) : "";
+  
+  const breadcrumbItems = [
+    { title: "Users", link: "/users" },
+    { title: displayName || "User" },
+  ];
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full">
+        <Skeleton className="h-10 w-full mb-6" />
         <Skeleton className="h-10 w-32 mb-8" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Skeleton className="h-96" />
@@ -63,11 +68,8 @@ export const UserDetailPage = observer(() => {
         : "Failed to load user details";
 
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={handleBack} className="mb-8">
-          <ArrowLeft className="size-4 mr-2" />
-          Back to Users
-        </Button>
+      <div className="w-full">
+        <Breadcrumb items={breadcrumbItems} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>
@@ -81,11 +83,8 @@ export const UserDetailPage = observer(() => {
   // Not found state
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={handleBack} className="mb-8">
-          <ArrowLeft className="size-4 mr-2" />
-          Back to Users
-        </Button>
+      <div className="w-full">
+        <Breadcrumb items={breadcrumbItems} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">User not found</p>
         </div>
@@ -93,15 +92,10 @@ export const UserDetailPage = observer(() => {
     );
   }
 
-  const displayName = getUserDisplayName(user);
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Back button */}
-      <Button variant="ghost" onClick={handleBack} className="mb-8">
-        <ArrowLeft className="size-4 mr-2" />
-        Back to Users
-      </Button>
+    <div className="w-full">
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
 
       {/* Page header */}
       <div className="mb-8 flex items-start justify-between">

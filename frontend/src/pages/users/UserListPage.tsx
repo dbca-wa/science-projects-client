@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
+import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { UserSearchBar } from "@/features/users/components/UserSearchBar";
 import { UserFilterPanel } from "@/features/users/components/UserFilterPanel";
 import { UserGrid } from "@/features/users/components/UserGrid";
@@ -29,6 +30,10 @@ export const UserListPage = observer(() => {
   // Sheet state - controlled by URL
   const selectedUserId = params.id ? Number(params.id) : null;
   const isSheetOpen = !!selectedUserId;
+
+  const breadcrumbItems = [
+    { title: "Users" },
+  ];
 
   // Initialize from URL params on mount
   useEffect(() => {
@@ -149,6 +154,9 @@ export const UserListPage = observer(() => {
 
   return (
     <div className="w-full">
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Page header */}
       <div className="flex w-full mt-2 mb-6 flex-row">
         <div className="flex-1 w-full flex-col">

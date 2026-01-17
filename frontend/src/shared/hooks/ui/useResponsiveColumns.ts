@@ -1,9 +1,9 @@
-import type { Breakpoint } from "@/shared/constants/breakpoints";
+import type { BreakpointKey } from "@/shared/constants/breakpoints";
 import { useScreenSize } from "./useScreenSize";
 
 export function useResponsiveColumns<T>(
 	allColumns: T[],
-	responsiveConfig: Partial<Record<Breakpoint | "xs", number>>
+	responsiveConfig: Partial<Record<BreakpointKey, number>>
 ): T[] {
 	const screenSize = useScreenSize();
 

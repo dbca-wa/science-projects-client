@@ -12,6 +12,7 @@ export const USER_ENDPOINTS = {
   PERSONAL_INFO: (userId: number | string) => `users/${userId}/pi`,
   PROFILE: (userId: number | string) => `users/${userId}/profile`,
   MEMBERSHIP: (userPk: number | string) => `users/${userPk}/membership`,
+  REMOVE_AVATAR: (userId: number | string) => `users/${userId}/remove_avatar`,
 
   // User validation
   CHECK_EMAIL_EXISTS: "users/check-email-exists",
@@ -21,4 +22,8 @@ export const USER_ENDPOINTS = {
   TOGGLE_ACTIVE: (userId: number | string) => `users/${userId}/toggleactive`,
   DELETE: (userId: number | string) => `users/${userId}`,
   REQUEST_MERGE: "adminoptions/tasks",
+
+  // Staff profile
+  TOGGLE_STAFF_PROFILE_VISIBILITY: (staffProfilePk: number | string) =>
+    `users/staffprofiles/${staffProfilePk}/toggle_visibility`,
 } as const;

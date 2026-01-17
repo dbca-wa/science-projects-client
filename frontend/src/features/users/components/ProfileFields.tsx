@@ -29,8 +29,6 @@ interface ProfileFieldsProps<T extends FieldValues & ProfileFieldsType> {
 export const ProfileFields = <T extends FieldValues & ProfileFieldsType>({ control, disabled }: ProfileFieldsProps<T>) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Profile</h3>
-
       {/* About */}
       <FormField
         control={control}

@@ -10,8 +10,9 @@ import Dashboard from "@/pages/dash/Dashboard";
 // Pages - Users
 import { UserListPage } from "@/pages/users/UserListPage";
 import { UserCreatePage } from "@/pages/users/UserCreatePage";
+import { UserCreateStaffPage } from "@/pages/users/UserCreateStaffPage";
 import { UserEditPage } from "@/pages/users/UserEditPage";
-import { CurrentUserPage } from "@/pages/users/CurrentUserPage";
+import { MyProfilePage } from "@/pages/users/MyProfilePage";
 
 /**
  * Route Configuration
@@ -107,6 +108,18 @@ export const USER_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
+		name: "Add DBCA User (Admin)",
+		path: "/users/create-staff",
+		iconKey: "userAdd",
+		tooltipKey: "users",
+		component: UserCreateStaffPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: true,
+		section: "Users",
+		layoutWrapper: "content",
+	},
+	{
 		name: "User Detail",
 		path: "/users/:id",
 		iconKey: "users",
@@ -119,7 +132,7 @@ export const USER_ROUTES: RouteConfig[] = [
 		name: "My Profile",
 		path: "/users/me",
 		iconKey: "users",
-		component: CurrentUserPage,
+		component: MyProfilePage,
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",

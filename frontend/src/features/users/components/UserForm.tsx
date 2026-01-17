@@ -2,7 +2,14 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
-import { Form } from "@/shared/components/ui/form";
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/shared/components/ui/form";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -10,7 +17,7 @@ import { AccountFields } from "./AccountFields";
 import { PersonalInfoFields } from "./PersonalInfoFields";
 import { ProfileFields } from "./ProfileFields";
 import { MembershipFields } from "./MembershipFields";
-import { ImageUploadField } from "./ImageUploadField";
+import { ImageUpload } from "@/shared/components/media/ImageUpload";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
@@ -169,7 +176,7 @@ const CreateForm = ({ createMutation, isSubmitting, onSuccess, onCancel, navigat
         
         {/* Personal Information */}
         <div className="space-y-4">
-          {/* <h3 className="text-lg font-semibold">Personal Information</h3> */}
+          <h3 className="text-lg font-semibold">Personal Information</h3>
           <PersonalInfoFields control={form.control} disabled={isSubmitting} />
         </div>
         
@@ -178,7 +185,26 @@ const CreateForm = ({ createMutation, isSubmitting, onSuccess, onCancel, navigat
           <h3 className="text-lg font-semibold">Profile</h3>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
-              <ImageUploadField control={form.control} disabled={isSubmitting} />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Avatar Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        variant="avatar"
+                        allowUrl={true}
+                        disabled={isSubmitting}
+                        helperText="Upload an image that represents you"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="space-y-4">
               <ProfileFields control={form.control} disabled={isSubmitting} />
@@ -314,7 +340,26 @@ const EditForm = ({ user, userId, updateMutation, isSubmitting, onSuccess, onCan
           <h3 className="text-lg font-semibold">Profile</h3>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
-              <ImageUploadField control={form.control} disabled={isSubmitting} />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Avatar Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        variant="avatar"
+                        allowUrl={true}
+                        disabled={isSubmitting}
+                        helperText="Upload an image that represents you"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="space-y-4">
               <ProfileFields control={form.control} disabled={isSubmitting} />
