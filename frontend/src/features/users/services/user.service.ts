@@ -142,7 +142,9 @@ export const updateProfile = async (
     formData.append("expertise", data.expertise);
   }
 
-  if (data.image !== null && data.image !== undefined) {
+  // Handle image: File/string means update, undefined means no change
+  // Note: null is handled separately via removeUserAvatar
+  if (data.image !== undefined && data.image !== null) {
     if (data.image instanceof File) {
       formData.append("image", data.image);
     } else if (typeof data.image === "string") {
@@ -155,6 +157,14 @@ export const updateProfile = async (
       "Content-Type": "multipart/form-data",
     },
   });
+};
+
+/**
+ * Remove user avatar
+ * @param userId - User primary key
+ */
+export const removeUserAvatar = async (userId: number): Promise<void> => {
+  await apiClient.post(USER_ENDPOINTS.REMOVE_AVATAR(userId));
 };
 
 /**
@@ -205,10 +215,19 @@ export const adminUpdateUser = async (
     });
   }
 
-  // Update profile
-  if (data.image !== undefined || data.about || data.expertise) {
+  // Handle image removal separately
+  if (data.image === null) {
+    await removeUserAvatar(userId);
+  }
+
+  // Update profile (about, expertise, and image if not null)
+  if (
+    (data.image !== undefined && data.image !== null) ||
+    data.about ||
+    data.expertise
+  ) {
     await updateProfile(userId, {
-      image: data.image,
+      image: data.image !== null ? data.image : undefined,
       about: data.about,
       expertise: data.expertise,
     });
@@ -301,4 +320,17 @@ export const requestMergeUsers = async (
     primaryUserPk: primaryUserId,
     secondaryUserPks: secondaryUserIds,
   });
+};
+
+/**
+ * Toggle staff profile visibility
+ * @param staffProfilePk - Staff profile primary key
+ * @returns Success response
+ */
+export const toggleStaffProfileVisibility = async (
+  staffProfilePk: number
+): Promise<{ success: boolean }> => {
+  return apiClient.post<{ success: boolean }>(
+    USER_ENDPOINTS.TOGGLE_STAFF_PROFILE_VISIBILITY(staffProfilePk)
+  );
 };

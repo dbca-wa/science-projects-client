@@ -4,7 +4,7 @@ import type {
 } from "@/features/auth/types";
 import { apiClient } from "@/shared/services/api/client.service";
 import { AUTH_ENDPOINTS } from "./auth.endpoints";
-import type { IUserData } from "@/shared/types/user.types";
+import type { IUserMe } from "@/shared/types/user.types";
 
 /**
  * Login with username and password
@@ -36,5 +36,5 @@ export const logOut = async () => {
  * Get current user via SSO
  */
 export const getSSOMe = async () => {
-	return apiClient.get<IUserData>(AUTH_ENDPOINTS.ME);
+	return apiClient.get<IUserMe>(AUTH_ENDPOINTS.ME);
 };

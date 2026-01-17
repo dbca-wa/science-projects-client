@@ -68,7 +68,7 @@ const Dashboard = observer(() => {
 					<DashboardActionCard
 						icon={<MdFeedback className="w-5 h-5" />}
 						title="Submit Feedback"
-						description="Help us improve SPMS"
+						description="ecoinformatics.admin@dbca.wa.gov.au"
 						href="mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback"
 						colorScheme="purple"
 						delay={0.2}

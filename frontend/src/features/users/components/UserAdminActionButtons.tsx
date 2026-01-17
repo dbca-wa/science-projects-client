@@ -12,10 +12,12 @@ import {
   useRequestMergeUsers,
 } from "../hooks";
 import type { IUserData } from "@/shared/types/user.types";
+import { Edit, ShieldCheck, ShieldOff, UserCheck, UserX, Trash2 } from "lucide-react";
 
 interface UserAdminActionButtonsProps {
   user: IUserData;
   currentUserId: number;
+  onClose?: () => void;
 }
 
 type ConfirmDialogType =
@@ -33,6 +35,7 @@ type ConfirmDialogType =
 export const UserAdminActionButtons = ({
   user,
   currentUserId,
+  onClose,
 }: UserAdminActionButtonsProps) => {
   const navigate = useNavigate();
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -65,6 +68,8 @@ export const UserAdminActionButtons = ({
   };
 
   const handleDelete = async () => {
+    // Close the sheet immediately to prevent refetch
+    onClose?.();
     await deleteMutation.mutateAsync(user.pk);
   };
 
@@ -154,71 +159,77 @@ export const UserAdminActionButtons = ({
             Admin
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Edit Details */}
-          <Button
-            onClick={handleEdit}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white"
-            disabled={isSelf && window.location.pathname === "/users/me"}
-          >
-            Edit Details
-          </Button>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Edit Details */}
+            <Button
+              onClick={handleEdit}
+              className="h-24 flex-col bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={isSelf && window.location.pathname === "/users/me"}
+            >
+              <Edit className="size-6 mb-2" />
+              <span className="text-xs font-semibold">Edit Details</span>
+            </Button>
 
-          {/* Toggle Admin (Promote/Demote) */}
-          <Button
-            onClick={() =>
-              setConfirmDialog({ type: "toggle-admin", open: true })
-            }
-            className={
-              user.is_superuser
-                ? "w-full bg-red-600 hover:bg-red-500 text-white"
-                : "w-full bg-green-600 hover:bg-green-500 text-white"
-            }
-            disabled={!user.is_staff || isSelf}
-          >
-            {user.is_superuser ? "Demote" : "Promote"}
-          </Button>
-
-          {/* Activate/Deactivate */}
-          {user.is_active ? (
+            {/* Toggle Admin (Promote/Demote) */}
             <Button
               onClick={() =>
-                setConfirmDialog({ type: "deactivate", open: true })
+                setConfirmDialog({ type: "toggle-admin", open: true })
               }
-              className="w-full bg-orange-600 hover:bg-orange-500 text-white"
+              className={
+                user.is_superuser
+                  ? "h-24 flex-col bg-red-600 hover:bg-red-700 text-white"
+                  : "h-24 flex-col bg-green-600 hover:bg-green-700 text-white"
+              }
+              disabled={!user.is_staff || isSelf}
+            >
+              {user.is_superuser ? (
+                <>
+                  <ShieldOff className="size-6 mb-2" />
+                  <span className="text-xs font-semibold">Demote</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="size-6 mb-2" />
+                  <span className="text-xs font-semibold">Promote</span>
+                </>
+              )}
+            </Button>
+
+            {/* Activate/Deactivate */}
+            {user.is_active ? (
+              <Button
+                onClick={() =>
+                  setConfirmDialog({ type: "deactivate", open: true })
+                }
+                className="h-24 flex-col bg-orange-600 hover:bg-orange-700 text-white"
+                disabled={user.is_superuser || isSelf}
+              >
+                <UserX className="size-6 mb-2" />
+                <span className="text-xs font-semibold">Deactivate</span>
+              </Button>
+            ) : (
+              <Button
+                onClick={() =>
+                  setConfirmDialog({ type: "activate", open: true })
+                }
+                className="h-24 flex-col bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                <UserCheck className="size-6 mb-2" />
+                <span className="text-xs font-semibold">Reactivate</span>
+              </Button>
+            )}
+
+            {/* Delete */}
+            <Button
+              onClick={() => setConfirmDialog({ type: "delete", open: true })}
+              className="h-24 flex-col bg-red-600 hover:bg-red-700 text-white"
               disabled={user.is_superuser || isSelf}
             >
-              Deactivate
+              <Trash2 className="size-6 mb-2" />
+              <span className="text-xs font-semibold">Delete</span>
             </Button>
-          ) : (
-            <Button
-              onClick={() =>
-                setConfirmDialog({ type: "activate", open: true })
-              }
-              className="w-full bg-orange-600 hover:bg-orange-500 text-white"
-            >
-              Reactivate
-            </Button>
-          )}
-
-          {/* Delete */}
-          <Button
-            onClick={() => setConfirmDialog({ type: "delete", open: true })}
-            className="w-full bg-red-600 hover:bg-red-500 text-white"
-            disabled={user.is_superuser || isSelf}
-          >
-            Delete
-          </Button>
-
-          {/* Merge (only show if not viewing self) */}
-          {!isSelf && (
-            <Button
-              onClick={() => setMergeDialogOpen(true)}
-              className="w-full bg-red-500 hover:bg-red-400 text-white"
-            >
-              Merge with My Account
-            </Button>
-          )}
+          </div>
         </CardContent>
       </Card>
 
@@ -240,6 +251,7 @@ export const UserAdminActionButtons = ({
         open={mergeDialogOpen}
         onOpenChange={setMergeDialogOpen}
         onConfirm={handleRequestMerge}
+        user={user}
       />
     </>
   );

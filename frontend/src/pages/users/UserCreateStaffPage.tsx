@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router";
 import { Breadcrumb } from "@/shared/components/Breadcrumb";
-import { ExternalUserForm } from "@/features/users/components/ExternalUserForm";
+import { StaffUserForm } from "@/features/users/components/StaffUserForm";
 
 /**
- * UserCreatePage
- * Page for creating external users (available to all authenticated users)
+ * UserCreateStaffPage
+ * Page for creating DBCA staff users (admin only)
  * 
  * Features:
- * - Available to all authenticated users
- * - External user creation form
+ * - Admin-only access (protected by route guard)
+ * - Staff user creation form
  * - Breadcrumb navigation
  */
-export const UserCreatePage = () => {
+export const UserCreateStaffPage = () => {
   const navigate = useNavigate();
 
   const handleCancel = () => {
@@ -20,7 +20,7 @@ export const UserCreatePage = () => {
 
   const breadcrumbItems = [
     { title: "Users", link: "/users" },
-    { title: "Add External User" },
+    { title: "Add DBCA User" },
   ];
 
   return (
@@ -30,15 +30,15 @@ export const UserCreatePage = () => {
 
       {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Add External User</h1>
+        <h1 className="text-3xl font-bold mb-2">Add DBCA User</h1>
         <p className="text-muted-foreground">
-          Add a new external user to the system
+          Manually create a DBCA staff user account
         </p>
       </div>
 
-      {/* External User Form */}
+      {/* Staff User Form */}
       <div className="max-w-4xl">
-        <ExternalUserForm onCancel={handleCancel} />
+        <StaffUserForm onCancel={handleCancel} />
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { AlertCircle, Copy, Mail, UserPlus, X, Check } from "lucide-react";
+import { AlertCircle, Copy, Mail, UserPlus, X, Check, GitMerge } from "lucide-react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { useAuthStore } from "@/app/stores/useStore";
 import { toast } from "sonner";
@@ -199,29 +199,59 @@ export const UserDetailSheet = observer(({ userId, open, onClose }: UserDetailSh
               />
             </div>
 
-            {/* Involved Projects Section */}
-            {/* TODO: Implement UserProjectsDataTable component */}
-            {/* <div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
-              <p className="font-bold text-sm mb-1 text-gray-600 dark:text-gray-300">
+            {/* Involved Projects Section - Placeholder */}
+            <div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
+              <p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
                 Involved Projects
               </p>
-              <UserProjectsDataTable projectData={userProjectsData} />
-            </div> */}
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">
+                  Project involvement will be displayed here after the Projects feature is implemented.
+                </p>
+              </div>
+            </div>
 
-            {/* Caretaker Section */}
-            {/* TODO: Implement Caretaker section with caretaker info and actions */}
-            {/* <div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
+            {/* Caretaker Section - Placeholder */}
+            <div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
               <p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
-                Caretaker and Merging
+                Caretaker
               </p>
-              ... caretaker content ...
-            </div> */}
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">
+                  Caretaker functionality will be available in a future update.
+                </p>
+              </div>
+            </div>
+
+            {/* Merge Section - Placeholder (only show for superusers viewing other users) */}
+            {viewingUserIsSuper && user.pk !== authStore.user?.pk && (
+              <div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
+                <p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
+                  Merge Accounts
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Merge this user account with your account. This action will transfer all projects, comments, and data to your account.
+                </p>
+                <Button
+                  onClick={() => {
+                    // TODO: Implement merge functionality
+                    toast.info("Merge functionality will be implemented soon");
+                  }}
+                  variant="outline"
+                  className="w-full border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                >
+                  <GitMerge className="size-4 mr-2" />
+                  Merge with My Account
+                </Button>
+              </div>
+            )}
 
             {/* Admin Actions - only show for superusers */}
             {viewingUserIsSuper && authStore.user && (
               <UserAdminActionButtons
                 user={user}
                 currentUserId={authStore.user.pk}
+                onClose={onClose}
               />
             )}
 

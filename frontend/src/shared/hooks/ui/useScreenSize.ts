@@ -1,18 +1,18 @@
 import { useSyncExternalStore } from "react";
-import { breakpoints, type Breakpoint } from "../../constants/breakpoints";
+import { BREAKPOINTS, type BreakpointKey } from "../../constants/breakpoints";
 
-function getSize(): Breakpoint {
+function getSize(): BreakpointKey {
 	if (typeof window === "undefined") return "xs";
 	const w = window.innerWidth;
-	if (w >= breakpoints["2xl"]) return "2xl";
-	if (w >= breakpoints.xl) return "xl";
-	if (w >= breakpoints.lg) return "lg";
-	if (w >= breakpoints.md) return "md";
-	if (w >= breakpoints.sm) return "sm";
+	if (w >= BREAKPOINTS["2xl"]) return "2xl";
+	if (w >= BREAKPOINTS.xl) return "xl";
+	if (w >= BREAKPOINTS.lg) return "lg";
+	if (w >= BREAKPOINTS.md) return "md";
+	if (w >= BREAKPOINTS.sm) return "sm";
 	return "xs";
 }
 
-export function useScreenSize(): Breakpoint {
+export function useScreenSize(): BreakpointKey {
 	const getSnapshot = () => getSize();
 
 	return useSyncExternalStore((cb) => {

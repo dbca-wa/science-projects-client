@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import type { UserAvatarProps } from "../types/user.types";
 import { cn } from "@/shared/lib/utils";
 import { getUserInitials, getUserDisplayName } from "@/shared/utils/user.utils";
+import { API_CONFIG } from "@/shared/services/api/config";
 
 /**
  * Size variants for user avatar
@@ -22,16 +23,23 @@ const sizeClasses = {
  */
 export const UserAvatar = ({ user, size = "md" }: UserAvatarProps) => {
   // Get avatar image URL
-  const getAvatarUrl = () => {
-    if (!user.image) return undefined;
+  const getAvatarUrl = (): string | undefined => {
+    const image = user.image;
     
-    // Handle different image formats
-    if (typeof user.image === "string") {
-      return user.image;
+    if (!image) return undefined;
+    
+    // IImageData object - try file first
+    if (image.file) {
+      return image.file.startsWith("http")
+        ? image.file
+        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
     }
     
-    if (user.image.file) {
-      return user.image.file;
+    // Fallback to old_file
+    if (image.old_file) {
+      return image.old_file.startsWith("http")
+        ? image.old_file
+        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
     }
     
     return undefined;

@@ -6,17 +6,29 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
 /**
  * UserCard component
  * Displays user information in a table-like row format
+ * By default, clicking navigates to user detail page
+ * Pass onClick to override with custom behavior
+ * Pass clickable={false} to make non-clickable (preview mode)
  */
-export const UserCard = ({ user, onClick }: UserCardProps) => {
+export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
+    if (!clickable) {
+      return;
+    }
+    
     if (onClick) {
+      // Custom onClick handler
       onClick(user);
     } else {
+      // Default navigation
       navigate(`/users/${user.pk}`);
     }
   };
+
+  // Card is clickable based on clickable prop
+  const isClickable = clickable;
 
   // Get display name
   const displayName = getUserDisplayName(user) || `No Name (${user.username})`;
@@ -69,8 +81,8 @@ export const UserCard = ({ user, onClick }: UserCardProps) => {
 
   return (
     <div
-      className="grid grid-cols-1 lg:grid-cols-[8fr_4fr] xl:grid-cols-[4fr_4fr_2.5fr] items-center p-4 border border-gray-300 dark:border-gray-500 w-full select-none cursor-pointer hover:shadow-md transition-shadow"
-      onClick={handleClick}
+      className={`grid grid-cols-1 lg:grid-cols-[8fr_4fr] xl:grid-cols-[4fr_4fr_2.5fr] items-center p-4 border border-gray-300 dark:border-gray-500 w-full select-none ${isClickable ? 'cursor-pointer hover:shadow-md' : 'cursor-default'} transition-shadow`}
+      onClick={isClickable ? handleClick : undefined}
     >
       {/* User info column */}
       <div className="flex ml-2">
@@ -79,12 +91,18 @@ export const UserCard = ({ user, onClick }: UserCardProps) => {
         </div>
 
         <div className="ml-2 xl:ml-4 w-full overflow-hidden">
-          <button
-            className="font-bold text-left hover:underline text-gray-600"
-            onClick={handleClick}
-          >
-            {truncatedName}
-          </button>
+          {isClickable ? (
+            <button
+              className="font-bold text-left hover:underline text-gray-600"
+              onClick={handleClick}
+            >
+              {truncatedName}
+            </button>
+          ) : (
+            <p className="font-bold text-left text-gray-600">
+              {truncatedName}
+            </p>
+          )}
           <p className={`text-sm ${roleInfo.colorClass}`}>
             {roleInfo.text}
           </p>

@@ -1,81 +1,84 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { Mail, Phone, Briefcase, Printer } from "lucide-react";
-import type { UserDetailSectionProps } from "../types/user.types";
+import { Avatar } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { Copy } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { toast } from "sonner";
+
+interface PersonalInfoSectionProps {
+  user: IUserData | IUserMe;
+  onClick?: () => void;
+}
 
 /**
  * PersonalInfoSection component
- * Displays user's personal information (name, email, title, phone, fax)
+ * Displays user's avatar, name, phone, and email with copy button
+ * Matches original horizontal flex layout
  * 
  * @param user - User data to display
+ * @param onClick - Callback when section is clicked
  */
-export const PersonalInfoSection = ({ user }: UserDetailSectionProps) => {
+export const PersonalInfoSection = ({ user, onClick }: PersonalInfoSectionProps) => {
   const displayName = getUserDisplayName(user);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering onClick
+    navigator.clipboard.writeText(user.email);
+    toast.success("Email copied to clipboard");
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Personal Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Name */}
-        <div>
-          <h3 className="text-2xl font-bold">{displayName}</h3>
-          <p className="text-sm text-muted-foreground">@{user.username}</p>
-        </div>
+    <div 
+      className={`flex gap-4 mt-4 ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Avatar */}
+      <Avatar className="size-20 rounded-full">
+        <img 
+          src={user.image?.file || user.image?.old_file || "/default-avatar.png"} 
+          alt={displayName}
+          className="size-full object-cover"
+        />
+      </Avatar>
 
-        {/* Email */}
-        <div className="flex items-start gap-3">
-          <Mail className="size-4 mt-0.5 text-muted-foreground" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium">Email</p>
-            <a 
-              href={`mailto:${user.email}`}
-              className="text-sm text-primary hover:underline break-all"
+      {/* Info */}
+      <div className="flex flex-col justify-center flex-1 overflow-auto">
+        <div className="flex items-center justify-between">
+          <p className="font-bold select-none">{displayName}</p>
+          {onClick && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isHovered ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-sm text-muted-foreground"
             >
-              {user.email}
-            </a>
-          </div>
+              Click to edit
+            </motion.span>
+          )}
         </div>
-
-        {/* Title/Role */}
-        {user.role && (
-          <div className="flex items-start gap-3">
-            <Briefcase className="size-4 mt-0.5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Title</p>
-              <p className="text-sm text-muted-foreground">{user.role}</p>
-            </div>
-          </div>
+        <p className="select-none">
+          {user.phone ? user.phone : "No Phone number"}
+        </p>
+        <p className="select-none">
+          {user.email?.startsWith("unset") ? "No Email" : user.email}
+        </p>
+        {!user.email?.startsWith("unset") && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="mt-2 w-fit px-4 bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={handleCopyEmail}
+          >
+            <Copy className="size-4 mr-2" />
+            Copy Email
+          </Button>
         )}
-
-        {/* Phone */}
-        {user.phone && (
-          <div className="flex items-start gap-3">
-            <Phone className="size-4 mt-0.5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Phone</p>
-              <a 
-                href={`tel:${user.phone}`}
-                className="text-sm text-primary hover:underline"
-              >
-                {user.phone}
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Fax */}
-        {user.fax && (
-          <div className="flex items-start gap-3">
-            <Printer className="size-4 mt-0.5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Fax</p>
-              <p className="text-sm text-muted-foreground">{user.fax}</p>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

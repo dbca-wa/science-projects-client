@@ -31,8 +31,6 @@ interface PersonalInfoFieldsProps<T extends FieldValues & PersonalInfoFields> {
 export const PersonalInfoFields = <T extends FieldValues>({ control, disabled }: PersonalInfoFieldsProps<T>) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Personal Information</h3>
-
       {/* Display First Name */}
       <FormField
         control={control}

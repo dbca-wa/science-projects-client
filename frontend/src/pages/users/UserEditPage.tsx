@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from "react-router";
-import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
-import { UserForm } from "@/features/users/components/UserForm";
+import { UserEditForm } from "@/features/users/components/UserEditForm";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
@@ -14,7 +14,7 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
  * Features:
  * - Admin-only access (protected by route guard)
  * - User edit form with pre-populated data
- * - Cancel navigation back to user detail
+ * - Breadcrumb navigation
  * - Loading and error states
  */
 export const UserEditPage = () => {
@@ -28,10 +28,19 @@ export const UserEditPage = () => {
     navigate(`/users/${id}`);
   };
 
+  const displayName = user ? getUserDisplayName(user) : "";
+  
+  const breadcrumbItems = [
+    { title: "Users", link: "/users" },
+    { title: displayName || "User", link: `/users/${id}` },
+    { title: "Edit" },
+  ];
+
   // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="w-full max-w-4xl">
+        <Skeleton className="h-10 w-full mb-6" />
         <Skeleton className="h-10 w-32 mb-8" />
         <Skeleton className="h-96" />
       </div>
@@ -49,11 +58,8 @@ export const UserEditPage = () => {
         : "Failed to load user details";
 
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Button variant="ghost" onClick={handleCancel} className="mb-8">
-          <ArrowLeft className="size-4 mr-2" />
-          Back to User
-        </Button>
+      <div className="w-full max-w-4xl">
+        <Breadcrumb items={breadcrumbItems} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>{errorMessage}</AlertDescription>
@@ -65,11 +71,8 @@ export const UserEditPage = () => {
   // Not found state
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Button variant="ghost" onClick={handleCancel} className="mb-8">
-          <ArrowLeft className="size-4 mr-2" />
-          Back to Users
-        </Button>
+      <div className="w-full max-w-4xl">
+        <Breadcrumb items={breadcrumbItems} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">User not found</p>
         </div>
@@ -77,15 +80,10 @@ export const UserEditPage = () => {
     );
   }
 
-  const displayName = getUserDisplayName(user);
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Back button */}
-      <Button variant="ghost" onClick={handleCancel} className="mb-8">
-        <ArrowLeft className="size-4 mr-2" />
-        Back to User
-      </Button>
+    <div className="w-full max-w-4xl">
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
 
       {/* Page header */}
       <div className="mb-8">
@@ -95,8 +93,8 @@ export const UserEditPage = () => {
         </p>
       </div>
 
-      {/* User Form */}
-      <UserForm mode="edit" userId={userId} onCancel={handleCancel} />
+      {/* User Edit Form */}
+      <UserEditForm userId={userId} onCancel={handleCancel} />
     </div>
   );
 };

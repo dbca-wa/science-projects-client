@@ -6,12 +6,17 @@ import { Separator } from "@/shared/components/ui/separator";
 import { User, LogOut, LayoutGrid, LayoutList, Moon, Sun, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
+import { API_CONFIG } from "@/shared/services/api/config";
+
+interface NavitarContentProps {
+  onClose: () => void;
+}
 
 /**
  * NavitarContent - The content inside the Navitar popover
  * Captures MobX state on mount to prevent flickering during close animation
  */
-export default function NavitarContent() {
+export default function NavitarContent({ onClose }: NavitarContentProps) {
   const navigate = useNavigate();
   const authStore = useAuthStore();
   const uiStore = useUIStore();
@@ -24,7 +29,27 @@ export default function NavitarContent() {
     theme: uiStore.theme,
   }));
 
-  const avatarSrc = snapshot.userData?.image?.file || undefined;
+  // Get avatar URL with base URL prepended if needed
+  const getAvatarUrl = () => {
+    const image = snapshot.userData?.image;
+    if (!image) return undefined;
+    
+    if (image.file) {
+      return image.file.startsWith("http")
+        ? image.file
+        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
+    }
+    
+    if (image.old_file) {
+      return image.old_file.startsWith("http")
+        ? image.old_file
+        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
+    }
+    
+    return undefined;
+  };
+
+  const avatarSrc = getAvatarUrl();
   const displayName = getUserDisplayName(snapshot.userData);
   const initials = getUserInitials(snapshot.userData);
 
@@ -60,7 +85,10 @@ export default function NavitarContent() {
         
         {/* Quick Guide */}
         <div
-          onClick={() => navigate("/guide")}
+          onClick={() => {
+            navigate("/guide");
+            onClose();
+          }}
           className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <div className="flex gap-2 items-center">
@@ -112,7 +140,10 @@ export default function NavitarContent() {
         
         {/* Data Catalogue */}
         <div
-          onClick={() => window.open("https://data.bio.wa.gov.au/", "_blank")}
+          onClick={() => {
+            window.open("https://data.bio.wa.gov.au/", "_blank");
+            onClose();
+          }}
           className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <div className="flex gap-2 items-center">
@@ -123,7 +154,10 @@ export default function NavitarContent() {
 
         {/* Scientific Sites Register */}
         <div
-          onClick={() => window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")}
+          onClick={() => {
+            window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
+            onClose();
+          }}
           className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <div className="flex gap-2 items-center">
@@ -145,7 +179,10 @@ export default function NavitarContent() {
         
         {/* My SPMS Profile */}
         <div
-          onClick={() => navigate("/users/me")}
+          onClick={() => {
+            navigate("/users/me");
+            onClose();
+          }}
           className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <div className="flex gap-2 items-center">
@@ -164,6 +201,7 @@ export default function NavitarContent() {
                 navigate("/login", { replace: true });
               },
             });
+            onClose();
           }}
           className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
         >

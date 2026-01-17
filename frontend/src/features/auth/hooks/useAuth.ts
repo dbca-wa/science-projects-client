@@ -4,7 +4,6 @@ import {
 	logInOrdinary,
 	logOut,
 } from "@/features/auth/services/auth.service";
-import type { IUserData } from "@/shared/types/user.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useLocation, type Location } from "react-router";
@@ -40,7 +39,7 @@ export const useCurrentUser = () => {
 	// Update auth store with user data on successful fetch
 	useEffect(() => {
 		if (query.data) {
-			authStore.setUser((query.data as IUserData));
+			authStore.setUser((query.data as any));
 		} else if (query.isError) {
 			// Handle error case - clear user data
 			authStore.setUser(null);
