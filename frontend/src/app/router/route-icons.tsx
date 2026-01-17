@@ -3,13 +3,17 @@ import { SiReadthedocs } from "react-icons/si";
 import { FaProjectDiagram, FaFileAlt, FaUsers } from "react-icons/fa";
 import { ImUsers } from "react-icons/im";
 import { RiAdminFill, RiLoginBoxLine } from "react-icons/ri";
+import { FiUserPlus } from "react-icons/fi";
+import { TbLayoutGridAdd } from "react-icons/tb";
 
 export const ROUTE_ICONS = {
 	dashboard: <HiMiniSquares2X2 />,
 	docs: <SiReadthedocs />,
 	project: <FaProjectDiagram />,
+	projectAdd: <TbLayoutGridAdd />,
 	report: <FaFileAlt />,
 	users: <FaUsers />,
+	userAdd: <FiUserPlus />,
 	staff: <ImUsers />,
 	admin: <RiAdminFill />,
 	login: <RiLoginBoxLine />,

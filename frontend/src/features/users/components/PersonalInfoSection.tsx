@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Mail, Phone, Briefcase, Printer } from "lucide-react";
 import type { UserDetailSectionProps } from "../types/user.types";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
  * PersonalInfoSection component
@@ -9,7 +10,7 @@ import type { UserDetailSectionProps } from "../types/user.types";
  * @param user - User data to display
  */
 export const PersonalInfoSection = ({ user }: UserDetailSectionProps) => {
-  const displayName = `${user.display_first_name || user.first_name} ${user.display_last_name || user.last_name}`;
+  const displayName = getUserDisplayName(user);
 
   return (
     <Card>

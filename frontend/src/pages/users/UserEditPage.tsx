@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { UserForm } from "@/features/users/components/UserForm";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
  * UserEditPage
@@ -76,7 +77,7 @@ export const UserEditPage = () => {
     );
   }
 
-  const displayName = `${user.display_first_name || user.first_name} ${user.display_last_name || user.last_name}`;
+  const displayName = getUserDisplayName(user);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import { Separator } from "@/shared/components/ui/separator";
 import { User, LogOut, LayoutGrid, LayoutList, Moon, Sun, BookOpen } from "lucide-react";
 import { useState } from "react";
+import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 
 /**
  * NavitarContent - The content inside the Navitar popover
@@ -24,9 +25,8 @@ export default function NavitarContent() {
   }));
 
   const avatarSrc = snapshot.userData?.image?.file || undefined;
-  const userInitial = snapshot.userData?.username
-    ? snapshot.userData.username.charAt(0).toUpperCase()
-    : "U";
+  const displayName = getUserDisplayName(snapshot.userData);
+  const initials = getUserInitials(snapshot.userData);
 
   return (
     <div className="flex flex-col">
@@ -34,12 +34,12 @@ export default function NavitarContent() {
       <div className="p-4">
         <div className="flex gap-3 items-center">
           <Avatar className="h-12 w-12">
-            <AvatarImage src={avatarSrc} alt={snapshot.userData?.username} />
-            <AvatarFallback>{userInitial}</AvatarFallback>
+            <AvatarImage src={avatarSrc} alt={displayName} />
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col overflow-hidden">
             <h4 className="text-lg font-bold truncate">
-              {snapshot.userData?.display_first_name} {snapshot.userData?.display_last_name}
+              {displayName}
             </h4>
             <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
               {snapshot.userData?.email}

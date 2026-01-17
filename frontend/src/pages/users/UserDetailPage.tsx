@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { ArrowLeft, AlertCircle, Edit } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useAuthStore } from "@/app/stores/useStore";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
  * UserDetailPage
@@ -92,7 +93,7 @@ export const UserDetailPage = observer(() => {
     );
   }
 
-  const displayName = `${user.display_first_name || user.first_name} ${user.display_last_name || user.last_name}`;
+  const displayName = getUserDisplayName(user);
 
   return (
     <div className="container mx-auto px-4 py-8">

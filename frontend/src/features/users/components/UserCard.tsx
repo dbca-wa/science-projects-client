@@ -1,6 +1,7 @@
 import { UserAvatar } from "./UserAvatar";
 import type { UserCardProps } from "../types/user.types";
 import { useNavigate } from "react-router";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
  * UserCard component
@@ -18,9 +19,7 @@ export const UserCard = ({ user, onClick }: UserCardProps) => {
   };
 
   // Get display name
-  const displayName = user.display_first_name && user.display_last_name
-    ? `${user.display_first_name} ${user.display_last_name}`
-    : `No Name (${user.username})`;
+  const displayName = getUserDisplayName(user) || `No Name (${user.username})`;
 
   // Truncate long names
   const truncatedName = displayName.length > 30 
@@ -34,10 +33,10 @@ export const UserCard = ({ user, onClick }: UserCardProps) => {
 
     if (user.is_superuser) {
       text = user.role === "Executive" ? "Executive" : "Admin";
-      colorClass = user.role === "Executive" ? "text-orange-500" : "text-blue-500";
+      colorClass = user.role === "Executive" ? "text-orange-600" : "text-blue-600";
     } else if (user.is_staff) {
       text = `Staff${user.business_area?.leader === user.pk ? " (Business Area Leader)" : ""}`;
-      colorClass = "text-green-500";
+      colorClass = "text-green-600";
     } else {
       text = "External User";
       colorClass = "text-gray-500";
@@ -81,7 +80,7 @@ export const UserCard = ({ user, onClick }: UserCardProps) => {
 
         <div className="ml-2 xl:ml-4 w-full overflow-hidden">
           <button
-            className="font-bold text-left hover:underline"
+            className="font-bold text-left hover:underline text-gray-600"
             onClick={handleClick}
           >
             {truncatedName}

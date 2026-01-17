@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { CgBrowse, CgViewList } from "react-icons/cg";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus } from "react-icons/fa";
-import { RiAdminFill } from "react-icons/ri";
 import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "../Navitar";
 import { Button } from "@/shared/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/shared/components/ui/custom/CustomSheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/custom/CustomSheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,14 +17,14 @@ import {
 } from "@/shared/components/ui/custom/CustomDropdownMenu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
-import { useAuthStore, useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/useStore";
 import TraditionalHeaderContent from "./TraditionalHeaderContent";
 
 /**
  * HamburgerMenuSheet - Observer-wrapped Sheet component
  * Uses CustomSheet (no animations, returns null when closed)
  */
-const HamburgerMenuSheet = observer(({ handleNavigation, isSuperuser }: { handleNavigation: (path: string) => void; isSuperuser: boolean }) => {
+const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (path: string) => void }) => {
   const uiStore = useUIStore();
 
   return (
@@ -43,14 +41,14 @@ const HamburgerMenuSheet = observer(({ handleNavigation, isSuperuser }: { handle
       
       <Sheet open={uiStore.hamburgerMenuOpen} onOpenChange={(open) => uiStore.setHamburgerMenuOpen(open)} modal={true}>
         <SheetContent side="right" className="bg-gray-900 text-white border-gray-700 w-3/4 sm:max-w-sm">
-          <SheetHeader className="border-b border-gray-500 pb-4">
-            <SheetTitle className="text-white">SPMS</SheetTitle>
-            <SheetDescription className="text-gray-400">
-              Navigation menu
-            </SheetDescription>
+          <SheetHeader className="border-b border-gray-700 pb-4">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-white text-xl font-bold">SPMS</SheetTitle>
+              <Navitar isModern={false} shouldShowName={false} />
+            </div>
           </SheetHeader>
 
-          <TraditionalHeaderContent handleNavigation={handleNavigation} isSuperuser={isSuperuser} />
+          <TraditionalHeaderContent handleNavigation={handleNavigation} />
         </SheetContent>
       </Sheet>
     </>
@@ -64,13 +62,11 @@ const HamburgerMenuSheet = observer(({ handleNavigation, isSuperuser }: { handle
 export const TraditionalHeader = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
-  const authStore = useAuthStore();
   const uiStore = useUIStore();
   const { width } = useWindowSize();
 
   // Show hamburger menu on screens smaller than lg breakpoint
   const shouldShowHamburger = width < BREAKPOINTS.lg;
-  const isSuperuser = authStore.user?.is_superuser || false;
 
   // Close drawer on route change
   useEffect(() => {
@@ -100,13 +96,14 @@ export const TraditionalHeader = observer(() => {
           {shouldShowHamburger ? (
             /* Mobile/Tablet - Hamburger Menu */
             <div className="flex items-center">
-              <HamburgerMenuSheet handleNavigation={handleNavigation} isSuperuser={isSuperuser} />
+              <HamburgerMenuSheet handleNavigation={handleNavigation} />
             </div>
           ) : (
             /* Desktop - Full Navigation */
             <div className="flex items-center justify-between flex-grow">
               <div className="flex items-center gap-1">
-                {/* Projects Menu */}
+                {/* Projects Menu - COMMENTED OUT: Not yet implemented */}
+                {/*
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -130,6 +127,7 @@ export const TraditionalHeader = observer(() => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                */}
 
                 {/* Users Menu */}
                 <DropdownMenu>
@@ -153,19 +151,18 @@ export const TraditionalHeader = observer(() => {
                       <ImUsers className="mr-2 size-4" />
                       Browse SPMS Users
                     </DropdownMenuItem>
-                    {isSuperuser && (
-                      <DropdownMenuItem
-                        onClick={() => navigate("/users/create")}
-                        className="hover:bg-gray-100 cursor-pointer select-none"
-                      >
-                        <FaUserPlus className="mr-2 size-4" />
-                        Add New User
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem
+                      onClick={() => navigate("/users/create")}
+                      className="hover:bg-gray-100 cursor-pointer select-none"
+                    >
+                      <FaUserPlus className="mr-2 size-4" />
+                      Add User
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Reports Menu */}
+                {/* Reports Menu - COMMENTED OUT: Not yet implemented */}
+                {/*
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -189,9 +186,11 @@ export const TraditionalHeader = observer(() => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                */}
 
 
-                {/* Admin Menu - Only for superusers */}
+                {/* Admin Menu - COMMENTED OUT: Not yet implemented */}
+                {/*
                 {isSuperuser && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -219,7 +218,8 @@ export const TraditionalHeader = observer(() => {
                 )}
 
 
-                {/* Guide Button */}
+                {/* Guide Button - COMMENTED OUT: Page not yet created */}
+                {/*
                 <Button
                   variant="ghost"
                   className="text-white/70 hover:text-white hover:bg-white/10 select-none"
@@ -227,6 +227,7 @@ export const TraditionalHeader = observer(() => {
                 >
                   Guide
                 </Button>
+                */}
               </div>
 
               {/* Right side - Navitar with name */}
