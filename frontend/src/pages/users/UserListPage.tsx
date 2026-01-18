@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/useStore";
 import { Loader2 } from "lucide-react";
 
@@ -129,6 +129,10 @@ export const UserListPage = observer(() => {
     userSearchStore.toggleSaveSearch();
   };
 
+  const handleClearFilters = () => {
+    userSearchStore.clearSearchAndFilters();
+  };
+
   // Error state
   if (error) {
     return (
@@ -187,23 +191,15 @@ export const UserListPage = observer(() => {
           <div className="p-4 border-b border-gray-300 dark:border-gray-500 w-full space-y-3">
             {/* Layout: UserFilterPanel on left, UserSearchBar on right */}
             <div className="flex flex-col md:flex-row gap-4">
-              {/* Left side: Business Area + Filters (stacked vertically) */}
-              <div className="w-full md:w-auto md:min-w-[280px]">
-                <UserFilterPanel 
-                  filters={userSearchStore.state.filters} 
-                  onFiltersChange={handleFiltersChange}
-                />
-              </div>
-              
-              {/* Right side: Search Input + Remember my search (stacked vertically) */}
-              <div className="flex-1 flex flex-col gap-3">
+              {/* Search Input - shows first on mobile */}
+              <div className="flex-1 order-1 md:order-2">
                 <UserSearchBar 
                   value={userSearchStore.state.searchTerm} 
                   onChange={handleSearchChange} 
                 />
                 
-                {/* Remember my search */}
-                <div className="flex">
+                {/* Remember my search - hidden on mobile, shown on desktop below search */}
+                <div className="hidden md:flex mt-3 gap-2">
                   <div className="flex items-center space-x-2 px-4 py-2 rounded-md bg-muted/50 ml-auto">
                     <Checkbox
                       id="save-search"
@@ -217,7 +213,58 @@ export const UserListPage = observer(() => {
                       Remember my search
                     </Label>
                   </div>
+                  
+                  {/* Clear button */}
+                  {userSearchStore.hasActiveFilters && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearFilters}
+                      className="gap-1.5"
+                    >
+                      <X className="size-4" />
+                      Clear
+                    </Button>
+                  )}
                 </div>
+              </div>
+              
+              {/* Business Area + Filters - shows second on mobile */}
+              <div className="w-full md:w-auto md:min-w-[280px] order-2 md:order-1">
+                <UserFilterPanel 
+                  filters={userSearchStore.state.filters} 
+                  onFiltersChange={handleFiltersChange}
+                />
+              </div>
+              
+              {/* Remember my search - shown on mobile at bottom, hidden on desktop */}
+              <div className="flex md:hidden order-3 gap-2">
+                <div className="flex items-center space-x-2 px-4 py-2 rounded-md bg-muted/50 ml-auto">
+                  <Checkbox
+                    id="save-search-mobile"
+                    checked={userSearchStore.state.saveSearch}
+                    onCheckedChange={handleToggleSaveSearch}
+                  />
+                  <Label
+                    htmlFor="save-search-mobile"
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    Remember my search
+                  </Label>
+                </div>
+                
+                {/* Clear button */}
+                {userSearchStore.hasActiveFilters && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="gap-1.5"
+                  >
+                    <X className="size-4" />
+                    Clear
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -270,7 +317,7 @@ export const UserListPage = observer(() => {
           </p>
           <Button
             variant="outline"
-            onClick={() => userSearchStore.resetFilters()}
+            onClick={handleClearFilters}
           >
             Clear search and filters
           </Button>

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
+import { ClickToEditBadge } from "@/shared/components/ClickToEditBadge";
 
 interface PersonalInformationCardProps {
   user: IUserData | IUserMe;
@@ -42,16 +43,7 @@ export const PersonalInformationCard = ({ user, onClick }: PersonalInformationCa
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-bold">Personal Information</CardTitle>
-          {onClick && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-sm text-primary"
-            >
-              Click to edit
-            </motion.span>
-          )}
+          {onClick && <ClickToEditBadge isVisible={isHovered} />}
         </div>
       </CardHeader>
       <CardContent>

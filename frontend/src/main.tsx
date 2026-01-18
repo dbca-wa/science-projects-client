@@ -9,15 +9,33 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { router } from "./app/router";
 import { queryClient } from "./shared/lib/query-client";
 
+// Services
+import { getAllBranches, getAllBusinessAreas } from "./shared/services/org.service";
+
 // Other
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
 import { createRoot } from "react-dom/client";
 
-// Initialize auth store before rendering
+// Initialize auth store and prefetch common data before rendering
 const initializeApp = async () => {
 	await rootStore.authStore.initialise();
 	await rootStore.userSearchStore.initialise();
+	
+	// Prefetch branches and business areas for instant availability
+	// Wait for both to complete before rendering to prevent race conditions
+	await Promise.all([
+		queryClient.prefetchQuery({
+			queryKey: ["branches"],
+			queryFn: getAllBranches,
+			staleTime: 10 * 60_000,
+		}),
+		queryClient.prefetchQuery({
+			queryKey: ["businessAreas"],
+			queryFn: getAllBusinessAreas,
+			staleTime: 30 * 60_000,
+		}),
+	]);
 	
 	createRoot(document.getElementById("root")!).render(
 		<StoreProvider>

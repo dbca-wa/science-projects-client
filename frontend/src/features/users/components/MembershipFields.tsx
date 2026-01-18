@@ -103,7 +103,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
           <FormItem>
             <FormLabel>Branch</FormLabel>
             <Select
-              value={field.value?.toString() || "none"}
+              value={field.value !== undefined && field.value !== null ? field.value.toString() : "none"}
               onValueChange={(value) => field.onChange(value === "none" ? null : Number(value))}
               disabled={isLoadingBranches || disabled}
             >
@@ -134,7 +134,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
           <FormItem>
             <FormLabel>Business Area</FormLabel>
             <Select
-              value={field.value?.toString() || "none"}
+              value={field.value !== undefined && field.value !== null ? field.value.toString() : "none"}
               onValueChange={(value) => field.onChange(value === "none" ? null : Number(value))}
               disabled={isLoadingBusinessAreas || disabled}
             >
@@ -165,7 +165,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
           <FormItem>
             <FormLabel>Affiliation</FormLabel>
             <Select
-              value={field.value?.toString() || "none"}
+              value={field.value !== undefined && field.value !== null ? field.value.toString() : "none"}
               onValueChange={(value) => field.onChange(value === "none" ? null : Number(value))}
               disabled={isLoadingAffiliations || disabled}
             >

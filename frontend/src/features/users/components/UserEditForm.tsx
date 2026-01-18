@@ -4,13 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { Loader2, AlertCircle, User, Phone, Printer, Mail, Award } from "lucide-react";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { ImageUpload } from "@/shared/components/media";
+import { RichTextEditor } from "@/shared/components/editor";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
 import { userEditSchema, type UserEditFormData } from "../schemas/userEdit.schema";
@@ -58,10 +58,10 @@ export const UserEditForm = ({ userId, onSuccess, onCancel }: UserEditFormProps)
     },
   });
 
-  // Pre-populate form when user data loads
+  // Pre-populate form when user data loads AND dropdown data has loaded
   useEffect(() => {
-    if (user) {
-      form.reset({
+    if (user && branches && businessAreas) {
+      const resetValues = {
         displayFirstName: user.display_first_name || "",
         displayLastName: user.display_last_name || "",
         title: user.title || "",
@@ -69,13 +69,17 @@ export const UserEditForm = ({ userId, onSuccess, onCancel }: UserEditFormProps)
         fax: user.fax || "",
         about: user.about || "",
         expertise: user.expertise || "",
-        branch: user.branch?.pk,
-        businessArea: user.business_area?.pk,
-        affiliation: user.affiliation?.pk,
+        branch: user.branch?.pk !== undefined && user.branch?.pk !== null ? user.branch.pk : undefined,
+        businessArea: user.business_area?.pk !== undefined && user.business_area?.pk !== null ? user.business_area.pk : undefined,
+        affiliation: user.affiliation?.pk ?? undefined,
         image: user.image?.file || null,
+      };
+      
+      form.reset(resetValues, {
+        keepDefaultValues: false,
       });
     }
-  }, [user, form]);
+  }, [user, branches, businessAreas, form]);
 
   // Warn user about unsaved changes
   useEffect(() => {
@@ -138,6 +142,79 @@ export const UserEditForm = ({ userId, onSuccess, onCancel }: UserEditFormProps)
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Profile */}
+        <div className="space-y-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+          <h3 className="text-lg font-semibold">Profile</h3>
+          
+          {/* Image Upload */}
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Profile Image</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    variant="avatar"
+                    allowUrl={true}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* About and Expertise */}
+          <div className="space-y-4">
+            {/* About */}
+            <FormField
+              control={form.control}
+              name="about"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>About</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="Tell us about this user..."
+                      toolbar="profile"
+                      disabled={isSubmitting}
+                      minHeight="150px"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Expertise */}
+            <FormField
+              control={form.control}
+              name="expertise"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Expertise</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="List areas of expertise..."
+                      toolbar="profile"
+                      disabled={isSubmitting}
+                      minHeight="150px"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
         {/* Personal Information */}
         <div className="space-y-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
@@ -294,77 +371,6 @@ export const UserEditForm = ({ userId, onSuccess, onCancel }: UserEditFormProps)
           </div>
         </div>
 
-        {/* Profile */}
-        <div className="space-y-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
-          <h3 className="text-lg font-semibold">Profile</h3>
-          
-          {/* Image Upload */}
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Profile Image</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value}
-                    onChange={field.onChange}
-                    variant="avatar"
-                    allowUrl={true}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* About and Expertise */}
-          <div className="space-y-4">
-            {/* About */}
-            <FormField
-              control={form.control}
-              name="about"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>About</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Tell us about this user..."
-                      className="min-h-[120px] resize-none"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Expertise */}
-            <FormField
-              control={form.control}
-              name="expertise"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Expertise</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="List areas of expertise..."
-                      className="min-h-[120px] resize-none"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
         {/* Membership */}
         <div className="space-y-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
           <h3 className="text-lg font-semibold">Membership</h3>
@@ -375,62 +381,129 @@ export const UserEditForm = ({ userId, onSuccess, onCancel }: UserEditFormProps)
               <FormField
                 control={form.control}
                 name="branch"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Branch</FormLabel>
-                    <Select
-                      value={field.value?.toString() || "none"}
-                      onValueChange={(value) => field.onChange(value === "none" ? undefined : Number(value))}
-                      disabled={isLoadingBranches || isSubmitting}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a branch" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {branches?.sort((a, b) => a.name.localeCompare(b.name)).map((branch) => (
-                          <SelectItem key={branch.pk} value={branch.pk!.toString()}>
-                            {branch.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const currentValue = field.value !== undefined && field.value !== null ? field.value.toString() : "none";
+                  const matchingBranch = branches?.find(b => b.pk?.toString() === currentValue);
+                  
+                  // Only show the actual value if we have a matching branch OR if it's "none"
+                  // This prevents Select from showing invalid values that would trigger onChange("")
+                  const displayValue = matchingBranch ? currentValue : "none";
+                  
+                  return (
+                    <FormItem>
+                      <FormLabel>Branch</FormLabel>
+                      <Select
+                        value={displayValue}
+                        onValueChange={(value) => {
+                          // Ignore empty string changes and invalid values
+                          if (!value || value === '') {
+                            return;
+                          }
+                          
+                          let newValue: number | undefined;
+                          
+                          if (value === "none") {
+                            newValue = undefined;
+                          } else {
+                            const numValue = Number(value);
+                            // Only accept the value if it corresponds to an actual branch
+                            const isValidBranch = branches?.some(b => b.pk === numValue);
+                            if (isValidBranch) {
+                              newValue = numValue;
+                            } else {
+                              return; // Ignore invalid values
+                            }
+                          }
+                          
+                          // Only update if the value actually changed
+                          if (newValue !== field.value) {
+                            field.onChange(newValue);
+                          }
+                        }}
+                        disabled={isLoadingBranches || isSubmitting}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a branch" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {branches?.sort((a, b) => a.name.localeCompare(b.name)).map((branch) => (
+                            <SelectItem key={branch.pk} value={branch.pk!.toString()}>
+                              {branch.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               {/* Business Area */}
               <FormField
                 control={form.control}
                 name="businessArea"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Area</FormLabel>
-                    <Select
-                      value={field.value?.toString() || "none"}
-                      onValueChange={(value) => field.onChange(value === "none" ? undefined : Number(value))}
-                      disabled={isLoadingBusinessAreas || isSubmitting}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a business area" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {businessAreas?.sort((a, b) => a.name.localeCompare(b.name)).map((ba) => (
-                          <SelectItem key={ba.pk} value={ba.pk!.toString()}>
-                            {ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const currentValue = field.value !== undefined && field.value !== null ? field.value.toString() : "none";
+                  const matchingBusinessArea = businessAreas?.find(ba => ba.pk?.toString() === currentValue);
+                  
+                  // Only show the actual value if we have a matching business area OR if it's "none"
+                  const displayValue = matchingBusinessArea ? currentValue : "none";
+                  
+                  return (
+                    <FormItem>
+                      <FormLabel>Business Area</FormLabel>
+                      <Select
+                        value={displayValue}
+                        onValueChange={(value) => {
+                          // Ignore empty string changes and invalid values
+                          if (!value || value === '') {
+                            return;
+                          }
+                          
+                          let newValue: number | undefined;
+                          
+                          if (value === "none") {
+                            newValue = undefined;
+                          } else {
+                            const numValue = Number(value);
+                            // Only accept the value if it corresponds to an actual business area
+                            const isValidBusinessArea = businessAreas?.some(ba => ba.pk === numValue);
+                            if (isValidBusinessArea) {
+                              newValue = numValue;
+                            } else {
+                              return; // Ignore invalid values
+                            }
+                          }
+                          
+                          // Only update if the value actually changed
+                          if (newValue !== field.value) {
+                            field.onChange(newValue);
+                          }
+                        }}
+                        disabled={isLoadingBusinessAreas || isSubmitting}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a business area" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {businessAreas?.sort((a, b) => a.name.localeCompare(b.name)).map((ba) => (
+                            <SelectItem key={ba.pk} value={ba.pk!.toString()}>
+                              {ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               {/* Affiliation */}

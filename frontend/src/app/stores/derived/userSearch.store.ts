@@ -46,6 +46,7 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			setCurrentPage: action,
 			toggleSaveSearch: action,
 			resetFilters: action,
+			clearSearchAndFilters: action,
 			clearState: action,
 			setTotalResults: action,
 			reset: action,
@@ -108,6 +109,22 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		if (this.state.saveSearch) {
 			this.saveToStorage();
 		}
+	}
+
+	clearSearchAndFilters() {
+		const currentSaveSearch = this.state.saveSearch;
+		this.state.searchTerm = "";
+		this.state.filters = { ...DEFAULT_FILTERS };
+		this.state.currentPage = 1;
+		this.state.totalResults = 0;
+		
+		if (currentSaveSearch) {
+			this.saveToStorage();
+		} else {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
+		}
+		
+		logger.info("Cleared search and filters", { saveSearch: currentSaveSearch });
 	}
 
 	clearState() {

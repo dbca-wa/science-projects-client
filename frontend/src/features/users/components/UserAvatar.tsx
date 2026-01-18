@@ -12,6 +12,8 @@ const sizeClasses = {
   md: "size-12",
   lg: "size-16",
   xl: "h-[55px] w-[55px]",
+  "2xl": "size-24", // 96px - larger for profile sections
+  "3xl": "size-32", // 128px - extra large for main profile display
 };
 
 /**

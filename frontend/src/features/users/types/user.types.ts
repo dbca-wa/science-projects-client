@@ -93,7 +93,7 @@ export interface UserCardProps {
 
 export interface UserAvatarProps {
   user: IUserData | IUserMe;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 }
 
 export interface SearchBarProps {

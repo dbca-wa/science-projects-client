@@ -26,7 +26,24 @@ export const PageHead = ({
 	const location = useLocation();
 
 	// Find route config for current page if title not provided
-	const route = ALL_ROUTES.find((r) => r.path === location.pathname);
+	// Handle both exact matches and dynamic routes (e.g., /users/:id)
+	const route = ALL_ROUTES.find((r) => {
+		if (r.path === location.pathname) return true;
+		
+		// Check if route has dynamic segments
+		if (r.path.includes(':')) {
+			const routeParts = r.path.split('/');
+			const pathParts = location.pathname.split('/');
+			
+			if (routeParts.length !== pathParts.length) return false;
+			
+			return routeParts.every((part, i) => {
+				return part.startsWith(':') || part === pathParts[i];
+			});
+		}
+		
+		return false;
+	});
 	const pageTitle = title || route?.name || "Loading..."; // Use optional chaining
 
 	// Keywords

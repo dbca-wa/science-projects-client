@@ -13,6 +13,7 @@ import { UserCreatePage } from "@/pages/users/UserCreatePage";
 import { UserCreateStaffPage } from "@/pages/users/UserCreateStaffPage";
 import { UserEditPage } from "@/pages/users/UserEditPage";
 import { MyProfilePage } from "@/pages/users/MyProfilePage";
+import { ProfileEditPage } from "@/pages/users/ProfileEditPage";
 
 /**
  * Route Configuration
@@ -35,6 +36,10 @@ export interface RouteConfig {
 	iconKey?: string;
 	tooltipKey?: string;
 	section?: string;
+
+	// Breadcrumbs
+	showBreadcrumb?: boolean; // Whether to show breadcrumb for this route
+	breadcrumbParent?: string; // Path of parent route for breadcrumb trail
 
 	// Behavior/layout
 	layoutWrapper?: "content" | "layoutCheck" | "staffProfile" | "none";
@@ -120,19 +125,31 @@ export const USER_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "User Detail",
-		path: "/users/:id",
-		iconKey: "users",
-		component: UserListPage,
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
 		name: "My Profile",
 		path: "/users/me",
 		iconKey: "users",
 		component: MyProfilePage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		showBreadcrumb: false, // No breadcrumb on profile view
+	},
+	{
+		name: "Edit Profile",
+		path: "/users/me/profile",
+		iconKey: "users",
+		component: ProfileEditPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		showBreadcrumb: true,
+		breadcrumbParent: "/users/me", // Back to My Profile
+	},
+	{
+		name: "User Detail",
+		path: "/users/:id",
+		iconKey: "users",
+		component: UserListPage,
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",

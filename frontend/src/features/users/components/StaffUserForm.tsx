@@ -335,7 +335,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
             <FormItem>
               <FormLabel>Branch *</FormLabel>
               <Select
-                value={field.value?.toString() || ""}
+                value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
                 onValueChange={(value) => field.onChange(Number(value))}
                 disabled={isLoadingBranches || isSubmitting}
               >
@@ -365,7 +365,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
             <FormItem>
               <FormLabel>Business Area *</FormLabel>
               <Select
-                value={field.value?.toString() || ""}
+                value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
                 onValueChange={(value) => field.onChange(Number(value))}
                 disabled={isLoadingBusinessAreas || isSubmitting}
               >

@@ -1,62 +1,52 @@
-// Component for displaying and quickly navigating related routes
+/**
+ * Breadcrumb Component
+ * 
+ * Automatically renders breadcrumbs based on route configuration.
+ * Reads from routes.config.ts to determine:
+ * - Whether to show breadcrumb (showBreadcrumb)
+ * - Parent route for "Back to" button (breadcrumbParent)
+ */
 
+import { useLocation, useNavigate } from "react-router";
 import { Button } from "@/shared/components/ui/button";
-import { useNavigate } from "react-router";
-import { ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
+import { ArrowLeft } from "lucide-react";
+import { ALL_ROUTES } from "@/app/router/routes.config";
 
-interface BreadcrumbItem {
-	title: string;
-	link: string;
-}
+export const Breadcrumb = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-interface BreadCrumbProps {
-	subDirOne: BreadcrumbItem;
-	subDirTwo?: BreadcrumbItem;
-	subDirThree?: BreadcrumbItem;
-	rightSideElement?: ReactNode;
-}
+  // Find current route config
+  const currentRoute = ALL_ROUTES.find((r) => r.path === location.pathname);
 
-export const BreadCrumb = ({
-	subDirOne,
-	subDirTwo,
-	subDirThree,
-	rightSideElement,
-}: BreadCrumbProps) => {
-	const navigate = useNavigate();
+  // Don't show breadcrumb if not configured or explicitly disabled
+  if (!currentRoute?.showBreadcrumb) {
+    return null;
+  }
 
-	const handleUnderscores = (text: string) => {
-		return text.replaceAll("_", " ");
-	};
+  // Find parent route if specified
+  const parentRoute = currentRoute.breadcrumbParent
+    ? ALL_ROUTES.find((r) => r.path === currentRoute.breadcrumbParent)
+    : null;
 
-	const items = [
-		{ title: "Home", link: "/" },
-		subDirOne,
-		subDirTwo,
-		subDirThree,
-	].filter(Boolean) as BreadcrumbItem[];
+  const handleBack = () => {
+    if (currentRoute.breadcrumbParent) {
+      navigate(currentRoute.breadcrumbParent);
+    } else {
+      navigate(-1); // Fallback to browser back
+    }
+  };
 
-	return (
-		<div className="flex items-center justify-between rounded-md bg-gray-100 dark:bg-gray-700 px-4 py-2 select-none">
-			<nav className="flex items-center gap-1">
-				{items.map((item, index) => (
-					<div key={item.link} className="flex items-center gap-1">
-						<Button
-							onClick={() => navigate(item.link)}
-							variant="link"
-							className="h-auto p-0 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-						>
-							{handleUnderscores(item.title)}
-						</Button>
-						{index < items.length - 1 && (
-							<ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-						)}
-					</div>
-				))}
-			</nav>
-			{rightSideElement && (
-				<div className="flex items-center">{rightSideElement}</div>
-			)}
-		</div>
-	);
+  return (
+    <div className="mb-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleBack}
+      >
+        <ArrowLeft className="size-4 mr-2" />
+        {parentRoute ? `Back to ${parentRoute.name}` : "Back"}
+      </Button>
+    </div>
+  );
 };

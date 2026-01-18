@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { UserAvatar } from "./UserAvatar";
+import { RichTextDisplay } from "@/shared/components/editor";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
+import { ClickToEditBadge } from "@/shared/components/ClickToEditBadge";
 
 interface ProfileSectionProps {
   user: IUserData | IUserMe;
@@ -29,32 +31,26 @@ export const ProfileSection = ({ user, onClick }: ProfileSectionProps) => {
     >
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Profile</CardTitle>
-          {onClick && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-sm text-muted-foreground"
-            >
-              Click to edit
-            </motion.span>
-          )}
+          <CardTitle className="text-lg font-bold">Profile</CardTitle>
+          {onClick && <ClickToEditBadge isVisible={isHovered} />}
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <p className="text-xs text-muted-foreground">
+          Your profile image, about section, and expertise. This information is visible to other users within SPMS{('is_staff' in user && user.is_staff) ? ' and will appear on your public staff profile when visibility is enabled' : ''}.
+        </p>
         {/* Avatar */}
         <div className="flex justify-center">
-          <UserAvatar user={user} size="lg" />
+          <UserAvatar user={user} size="3xl" />
         </div>
 
         {/* About */}
         <div>
           <h4 className="text-sm font-medium mb-2">About</h4>
           {user.about ? (
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {user.about}
-            </p>
+            <div className="text-sm text-muted-foreground">
+              <RichTextDisplay content={user.about} />
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">
               (Not Provided)
@@ -66,9 +62,9 @@ export const ProfileSection = ({ user, onClick }: ProfileSectionProps) => {
         <div>
           <h4 className="text-sm font-medium mb-2">Expertise</h4>
           {user.expertise ? (
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {user.expertise}
-            </p>
+            <div className="text-sm text-muted-foreground">
+              <RichTextDisplay content={user.expertise} />
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">
               (Not Provided)

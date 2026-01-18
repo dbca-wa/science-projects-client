@@ -20,7 +20,7 @@ export const StatusSection = ({ user }: { user: IUserData | IUserMe }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-bold">Details</CardTitle>
+        <CardTitle className="text-lg font-bold">Status</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Joined Date - only show for IUserMe */}

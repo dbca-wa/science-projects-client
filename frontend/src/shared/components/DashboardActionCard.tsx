@@ -31,15 +31,15 @@ export const DashboardActionCard = ({
 	};
 
 	const content = (
-		<div className="cursor-pointer flex items-center space-x-3">
-			<div className={`p-2 rounded-lg ${colorClasses[colorScheme]}`}>
+		<div className="cursor-pointer flex items-center space-x-3 overflow-hidden">
+			<div className={`p-2 rounded-lg flex-shrink-0 ${colorClasses[colorScheme]}`}>
 				{icon}
 			</div>
-			<div>
-				<h3 className="font-semibold text-gray-900 dark:text-gray-100">
+			<div className="flex-1 min-w-0 overflow-hidden">
+				<h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
 					{title}
 				</h3>
-				<p className="text-sm text-gray-600 dark:text-gray-400">
+				<p className="text-sm text-gray-600 dark:text-gray-400 truncate">
 					{description}
 				</p>
 			</div>
