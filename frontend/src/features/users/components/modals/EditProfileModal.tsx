@@ -9,6 +9,7 @@ import { authKeys } from "@/features/auth/hooks/useAuth";
 import { API_CONFIG } from "@/shared/services/api/config";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
+import { RichTextEditor } from "@/shared/components/editor";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Button } from "@/shared/components/ui/button";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -162,11 +162,13 @@ export const EditProfileModal = observer(
                   <FormItem>
                     <FormLabel>About</FormLabel>
                     <FormControl>
-                      <Textarea
-                        {...field}
+                      <RichTextEditor
+                        value={field.value || ""}
+                        onChange={field.onChange}
                         placeholder="Tell us about yourself..."
-                        rows={6}
-                        className="resize-none"
+                        toolbar="full"
+                        disabled={updateMutation.isPending}
+                        minHeight="150px"
                       />
                     </FormControl>
                     <FormMessage />
@@ -182,11 +184,13 @@ export const EditProfileModal = observer(
                   <FormItem>
                     <FormLabel>Expertise</FormLabel>
                     <FormControl>
-                      <Textarea
-                        {...field}
+                      <RichTextEditor
+                        value={field.value || ""}
+                        onChange={field.onChange}
                         placeholder="Describe your areas of expertise..."
-                        rows={6}
-                        className="resize-none"
+                        toolbar="full"
+                        disabled={updateMutation.isPending}
+                        minHeight="150px"
                       />
                     </FormControl>
                     <FormMessage />

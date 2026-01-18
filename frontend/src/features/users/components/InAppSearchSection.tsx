@@ -21,7 +21,7 @@ export const InAppSearchSection = ({ user }: InAppSearchSectionProps) => {
       </CardHeader>
       <CardContent>
         <p className="text-xs text-muted-foreground mb-4">
-          This is how your account will appear when searched within SPMS
+          This is how your account will appear when searched within SPMS. Change the above sections to adjust this.
         </p>
         <div className="p-2">
           {/* Pass clickable={false} to make it non-clickable */}

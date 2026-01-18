@@ -59,7 +59,7 @@ export default function TraditionalHeaderContent({
           >
             <span className="flex items-center gap-3">
               <ImUsers className="text-xl" />
-              <span>Browse SPMS Users</span>
+              <span>Browse Users</span>
             </span>
           </Button>
           <Button

@@ -2,6 +2,7 @@
 
 import { ModernLayout } from "./modern/ModernLayout";
 import { TraditionalLayout } from "./traditional/TraditionalLayout";
+import { PageHead } from "./PageHead";
 import { observer } from "mobx-react-lite";
 import { useUIStore } from "@/app/stores/useStore";
 import { useScrollToTop } from "@/shared/hooks/ui/useScrollToTop";
@@ -36,6 +37,9 @@ export function Root() {
 
   return (
     <UserDataLoader>
+      {/* Default PageHead - pages can override with their own PageHead */}
+      <PageHead />
+      
       {/* Navigation blocker for unsaved editor changes */}
       <NavigationBlocker />
 

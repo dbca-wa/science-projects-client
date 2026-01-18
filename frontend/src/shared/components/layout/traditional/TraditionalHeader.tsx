@@ -149,7 +149,7 @@ export const TraditionalHeader = observer(() => {
                       className="hover:bg-gray-100 cursor-pointer select-none"
                     >
                       <ImUsers className="mr-2 size-4" />
-                      Browse SPMS Users
+                      Browse Users
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => navigate("/users/create")}

@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { PersonalInformationCard } from "@/features/users/components/PersonalInformationCard";
@@ -10,7 +11,6 @@ import { InAppSearchSection } from "@/features/users/components/InAppSearchSecti
 import { StatusSection } from "@/features/users/components/StatusSection";
 import { 
   EditPersonalInformationModal,
-  EditProfileModal,
   EditMembershipModal,
   ToggleStaffProfileVisibilityModal
 } from "@/features/users/components/modals";
@@ -26,11 +26,11 @@ import { AlertCircle } from "lucide-react";
  * Includes tabbed navigation for SPMS Profile, Staff Profile, and Caretaker Mode
  */
 export const MyProfilePage = observer(() => {
+  const navigate = useNavigate();
   const { data: user, isLoading, error } = useCurrentUser();
   
   // Modal state
   const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const [isToggleVisibilityModalOpen, setIsToggleVisibilityModalOpen] = useState(false);
 
@@ -136,8 +136,11 @@ export const MyProfilePage = observer(() => {
 
         {/* My Profile Tab */}
         <TabsContent value="profile" className="space-y-4">
-          {/* In-App Search Appearance */}
-          <InAppSearchSection user={user} />
+          {/* Profile Card (About & Expertise) */}
+          <ProfileSection 
+            user={user} 
+            onClick={() => navigate("/users/me/profile")}
+          />
 
           {/* Personal Information Card */}
           <PersonalInformationCard 
@@ -145,17 +148,14 @@ export const MyProfilePage = observer(() => {
             onClick={() => setIsPersonalInfoModalOpen(true)}
           />
 
-          {/* Profile Card (About & Expertise) */}
-          <ProfileSection 
-            user={user} 
-            onClick={() => setIsProfileModalOpen(true)}
-          />
-
           {/* Membership Card */}
           <MembershipSection 
             user={user} 
             onClick={() => setIsMembershipModalOpen(true)}
           />
+
+          {/* In-App Search Appearance */}
+          <InAppSearchSection user={user} />
 
           {/* Status Card */}
           <StatusSection user={user} />
@@ -207,14 +207,6 @@ export const MyProfilePage = observer(() => {
         onSuccess={() => {
           // Refetch user data after successful update
           // TanStack Query will automatically refetch due to invalidation in the mutation
-        }}
-      />
-      <EditProfileModal
-        user={user}
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        onSuccess={() => {
-          // Refetch user data after successful update
         }}
       />
       <EditMembershipModal

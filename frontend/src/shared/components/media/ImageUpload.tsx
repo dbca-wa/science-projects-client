@@ -330,16 +330,17 @@ export const ImageUpload = ({
       {preview && (
         <div className="space-y-4">
           {renderPreview()}
-          <div className="flex gap-2 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleCropClick}
               disabled={disabled}
+              className="flex-1 sm:flex-none min-w-[80px]"
             >
-              <Crop className="size-4 mr-2" />
-              Crop
+              <Crop className="size-4 sm:mr-2" />
+              <span className="hidden sm:inline">Crop</span>
             </Button>
             <Button
               type="button"
@@ -347,9 +348,10 @@ export const ImageUpload = ({
               size="sm"
               onClick={handleRemove}
               disabled={disabled}
+              className="flex-1 sm:flex-none min-w-[80px]"
             >
-              <X className="size-4 mr-2" />
-              Remove
+              <X className="size-4 sm:mr-2" />
+              <span className="hidden sm:inline">Remove</span>
             </Button>
             <Button
               type="button"
@@ -360,8 +362,10 @@ export const ImageUpload = ({
                 handleRemove();
               }}
               disabled={disabled}
+              className="flex-1 sm:flex-none min-w-[80px]"
             >
-              Change
+              <span className="hidden sm:inline">Change</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { Building2, Briefcase, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
+import { ClickToEditBadge } from "@/shared/components/ClickToEditBadge";
 
 interface MembershipSectionProps {
   user: IUserData | IUserMe;
@@ -29,17 +30,8 @@ export const MembershipSection = ({ user, onClick }: MembershipSectionProps) => 
     >
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Membership</CardTitle>
-          {onClick && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-sm text-muted-foreground"
-            >
-              Click to edit
-            </motion.span>
-          )}
+          <CardTitle className="text-lg font-bold">Membership</CardTitle>
+          {onClick && <ClickToEditBadge isVisible={isHovered} />}
         </div>
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-0">
