@@ -75,6 +75,51 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
       <Separator />
 
+
+      {/* DBCA Account Section */}
+      <div className="py-1">
+        <div className="px-4 py-2">
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+            DBCA Account
+          </span>
+        </div>
+        
+        {/* My SPMS Profile */}
+        <div
+          onClick={() => {
+            navigate("/users/me");
+            onClose();
+          }}
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <div className="flex gap-2 items-center">
+            <User className="h-4 w-4" />
+            <span className="text-sm">
+              {snapshot.layout === "modern" ? "My Profile" : "My SPMS Profile"}
+            </span>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <div
+          onClick={() => {
+            logout(undefined, {
+              onSuccess: () => {
+                navigate("/login", { replace: true });
+              },
+            });
+            onClose();
+          }}
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <div className="flex gap-2 items-center">
+            <LogOut className="h-4 w-4" />
+            <span className="text-sm">Logout</span>
+          </div>
+        </div>
+      </div>
+      <Separator />
+
       {/* Docs & Layout Section */}
       <div className="py-1">
         <div className="px-4 py-2">
@@ -167,50 +212,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
         </div>
       </div>
 
-      <Separator />
 
-      {/* DBCA Account Section */}
-      <div className="py-1">
-        <div className="px-4 py-2">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            DBCA Account
-          </span>
-        </div>
-        
-        {/* My SPMS Profile */}
-        <div
-          onClick={() => {
-            navigate("/users/me");
-            onClose();
-          }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <div className="flex gap-2 items-center">
-            <User className="h-4 w-4" />
-            <span className="text-sm">
-              {snapshot.layout === "modern" ? "My Profile" : "My SPMS Profile"}
-            </span>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <div
-          onClick={() => {
-            logout(undefined, {
-              onSuccess: () => {
-                navigate("/login", { replace: true });
-              },
-            });
-            onClose();
-          }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <div className="flex gap-2 items-center">
-            <LogOut className="h-4 w-4" />
-            <span className="text-sm">Logout</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

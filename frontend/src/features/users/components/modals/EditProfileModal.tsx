@@ -101,9 +101,8 @@ export const EditProfileModal = observer(
         onSuccess();
         onClose();
       },
-      onError: (error: any) => {
-        const message =
-          error.response?.data?.message || "Failed to update profile";
+      onError: (error: Error) => {
+        const message = error.message || "Failed to update profile";
         toast.error(message);
       },
     });

@@ -219,7 +219,7 @@ export interface IConceptPlanGenerationData {
 	project_status: string;
 	business_area_name: string;
 	project_team: string[];
-	project_image: any; // TEMPORARILY using any - ProjectImage type doesn't exist
+	project_image: string | null; // Image URL or null if no image
 	now: Date;
 	project_lead_approval_granted: boolean;
 	business_area_lead_approval_granted: boolean;

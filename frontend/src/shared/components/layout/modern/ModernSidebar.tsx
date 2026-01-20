@@ -2,7 +2,7 @@ import { ROUTE_ICONS } from "@/app/router/route-icons";
 import { getSidebarRoutes } from "@/app/router/routes.config";
 import { useAuthStore } from "@/app/stores/useStore";
 import { cn } from "@/shared/lib/utils";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
 
 /**
@@ -14,6 +14,7 @@ import { observer } from "mobx-react-lite";
  */
 const ModernSidebar = observer(() => {
 	const authStore = useAuthStore();
+	const location = useLocation();
 	const allSidebarRoutes = getSidebarRoutes();
 	
 	// Filter routes based on user permissions
@@ -24,6 +25,14 @@ const ModernSidebar = observer(() => {
 		}
 		return true;
 	});
+
+	// Custom function to determine if a route should be highlighted
+	const isRouteActive = (routePath: string): boolean => {
+		const currentPath = location.pathname;
+		
+		// Exact match only - no parent/child highlighting
+		return currentPath === routePath;
+	};
 
 	// Group routes by section
 	const routesBySection = sidebarRoutes.reduce((acc, route) => {
@@ -48,13 +57,13 @@ const ModernSidebar = observer(() => {
 						<div className="space-y-1">
 							{routes.map((route) => {
 								const Icon = route.iconKey ? ROUTE_ICONS[route.iconKey as keyof typeof ROUTE_ICONS] : null;
+								const isActive = isRouteActive(route.path);
 								
 								return (
 									<NavLink
 										key={route.path}
 										to={route.path}
-										end={route.path === "/"}
-										className={({ isActive }) =>
+										className={() =>
 											cn(
 												"flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
 												isActive
@@ -75,9 +84,19 @@ const ModernSidebar = observer(() => {
 
 			{/* Footer info */}
 			<div className="p-4 border-t border-gray-200 dark:border-gray-800">
-				<p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-					Science Projects Management System
-				</p>
+				<div 
+					className="text-xs text-gray-500 dark:text-gray-400 text-center cursor-pointer"
+					onClick={() => console.log(import.meta.env.VITE_SPMS_VERSION || "3.0.0")}
+				>
+					<a
+						href="https://github.com/dbca-wa/science-projects-client"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+					>
+						SPMS {import.meta.env.VITE_SPMS_VERSION || "3.0.0"}
+					</a>
+				</div>
 			</div>
 		</aside>
 	);

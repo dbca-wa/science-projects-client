@@ -86,20 +86,7 @@ export interface IUserMe {
 	business_areas_led: number[];
 }
 
-export interface IMemberUserDetails {
-	pk: number;
-	is_staff: boolean;
-	is_superuser: boolean;
-	username: string | null;
-	display_first_name: string | null;
-	display_last_name: string | null;
-	first_name: string | null;
-	last_name: string | null;
-	email: string;
-	business_area: string | null;
-	branch: string | null;
-	role: string | null;
-	image: IImageData;
+export interface IMemberUserDetails extends IUserData {
 	caretaking_for: ICaretakerSimpleUserData[];
 	caretakers: ICaretakerSimpleUserData[];
 }

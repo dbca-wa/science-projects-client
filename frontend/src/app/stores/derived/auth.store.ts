@@ -1,4 +1,4 @@
-import type { IUserData } from "@/shared/types/user.types";
+import type { IUserMe } from "@/shared/types/user.types";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { logger } from "@/shared/services/logger.service";
 import {
@@ -14,7 +14,7 @@ interface AuthStoreState extends BaseStoreState {
 }
 
 export class AuthStore extends BaseStore<AuthStoreState> {
-	user: IUserData | null = null;
+	user: IUserMe | null = null;
 	private onUnauthorised = this.handleUnauthorised.bind(this);
 
 	constructor() {
@@ -58,7 +58,7 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		return !!this.user?.is_superuser;
 	}
 
-	setUser(user: IUserData | null) {
+	setUser(user: IUserMe | null) {
 		this.user = user;
 		// If we have a user, we're authenticated
 		// If we don't have a user but have a CSRF token, we might still be authenticated

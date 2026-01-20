@@ -51,12 +51,12 @@ export const StaffProfileLayout = ({ children }: { children: ReactNode }) => {
 							[scrollbar-width:none]
 							[-ms-overflow-style:none]
 						"
-						style={{
-							// Hide webkit scrollbar
-							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-							// @ts-ignore
-							"::-webkit-scrollbar": { display: "none" },
-						}}
+						style={
+							{
+								// Hide webkit scrollbar
+								"::-webkit-scrollbar": { display: "none" },
+							} as React.CSSProperties
+						}
 					>
 						<StaffProfileHeader isDesktop={isDesktop} />
 

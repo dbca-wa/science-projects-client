@@ -4,13 +4,20 @@ import { ALL_ROUTES } from "@/app/router/routes.config";
 // TEMPORARILY DISABLED - depends on moved staff profile types
 // import type { StaffUserData } from "@/features/users/types/staff-profile.types";
 
+interface StaffUserDataTemp {
+	name?: string;
+	position?: string;
+	about?: string;
+	keywords?: string;
+}
+
 interface PageHeadProps {
 	title?: string; // Allow manual override
 	description?: string; // Allow manual override
 	keywords?: string; // Allow manual override
 	isStandalone?: boolean;
 	isStaffProfile?: boolean;
-	staffUserData?: any; // Temporarily using any until staff profile types are re-integrated
+	staffUserData?: StaffUserDataTemp; // Temporary type until staff profile feature is implemented
 }
 
 export const PageHead = ({

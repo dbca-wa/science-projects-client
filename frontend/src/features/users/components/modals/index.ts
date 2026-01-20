@@ -1,4 +1,4 @@
 export { EditPersonalInformationModal } from "./EditPersonalInformationModal";
 export { EditProfileModal } from "./EditProfileModal";
-export { EditMembershipModal } from "./EditMembershipModal";
+export { EditOrgMembershipModal } from "./EditOrgMembershipModal";
 export { ToggleStaffProfileVisibilityModal } from "./ToggleStaffProfileVisibilityModal";

@@ -1,7 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
+import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
+import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { PersonalInformationCard } from "@/features/users/components/PersonalInformationCard";
 import { ProfileSection } from "@/features/users/components/ProfileSection";
@@ -9,38 +11,85 @@ import { MembershipSection } from "@/features/users/components/MembershipSection
 import { PublicAppearanceSection } from "@/features/users/components/PublicAppearanceSection";
 import { InAppSearchSection } from "@/features/users/components/InAppSearchSection";
 import { StatusSection } from "@/features/users/components/StatusSection";
+import { RequestCaretakerForm } from "@/features/users/components/caretaker/RequestCaretakerForm";
+import { PendingCaretakerRequest } from "@/features/users/components/caretaker/PendingCaretakerRequest";
+import { BecomeCaretakerRequest } from "@/features/users/components/caretaker/BecomeCaretakerRequest";
+import { ActiveCaretaker } from "@/features/users/components/caretaker/ActiveCaretaker";
+import { CaretakeesTable } from "@/features/users/components/caretaker/CaretakeesTable";
 import { 
   EditPersonalInformationModal,
-  EditMembershipModal,
+  EditOrgMembershipModal,
   ToggleStaffProfileVisibilityModal
 } from "@/features/users/components/modals";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { Separator } from "@/shared/components/ui/separator";
+import { AlertCircle, Info } from "lucide-react";
 
 /**
  * MyProfilePage
  * Displays the current user's profile at /users/me
  * Shows personal information, profile, and membership sections with modal-based editing
  * Includes tabbed navigation for SPMS Profile, Staff Profile, and Caretaker Mode
+ * Supports direct URL navigation to tabs via /users/me/caretaker
  */
 export const MyProfilePage = observer(() => {
   const navigate = useNavigate();
-  const { data: user, isLoading, error } = useCurrentUser();
+  const location = useLocation();
+  const { width } = useWindowSize();
+  const { data: user, isLoading, error, refetch: refetchUser } = useCurrentUser();
+  
+  // Fetch caretaker data for caretaker tab
+  const { 
+    data: caretakerData, 
+    isLoading: isLoadingCaretaker, 
+    error: caretakerError,
+    refetch: refetchCaretaker
+  } = useCaretakerCheck();
   
   // Modal state
   const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const [isToggleVisibilityModalOpen, setIsToggleVisibilityModalOpen] = useState(false);
 
-  // Track active tab for dynamic title/subtitle
-  const [activeTab, setActiveTab] = useState("profile");
+  // Determine if we should show short labels (mobile)
+  const showShortLabels = width < 480;
+
+  // Determine active tab from URL
+  const getTabFromPath = (pathname: string): string => {
+    if (pathname.includes("/caretaker")) return "caretaker";
+    if (pathname.includes("/staff-profile")) return "staff-profile";
+    return "profile";
+  };
+
+  const [activeTab, setActiveTab] = useState(getTabFromPath(location.pathname));
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    setActiveTab(getTabFromPath(location.pathname));
+  }, [location.pathname]);
 
   const breadcrumbItems = [
     { title: "Users", link: "/users" },
     { title: "My Profile" },
   ];
+
+  // Handle tab change - update URL
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    switch (value) {
+      case "caretaker":
+        navigate("/users/me/caretaker", { replace: true });
+        break;
+      case "staff-profile":
+        navigate("/users/me/staff-profile", { replace: true });
+        break;
+      default:
+        navigate("/users/me", { replace: true });
+        break;
+    }
+  };
 
   // Dynamic title and subtitle based on active tab
   const getPageContent = () => {
@@ -64,6 +113,70 @@ export const MyProfilePage = observer(() => {
   };
 
   const pageContent = getPageContent();
+
+  // Caretaker handlers
+  const handleCaretakerSuccess = () => {
+    refetchUser();
+    refetchCaretaker();
+  };
+
+  const handleCaretakerCancel = () => {
+    refetchUser();
+    refetchCaretaker();
+  };
+
+  const handleCaretakerRemove = () => {
+    refetchUser();
+    refetchCaretaker();
+  };
+
+  // Render caretaker section content
+  const renderMyCaretakerSection = () => {
+    if (!user?.pk) return null;
+
+    // Show active caretaker if exists
+    if (caretakerData?.caretaker_object) {
+      return (
+        <ActiveCaretaker 
+          caretaker={caretakerData.caretaker_object}
+          onRemove={handleCaretakerRemove}
+        />
+      );
+    }
+
+    // Show pending request if exists
+    if (caretakerData?.caretaker_request_object) {
+      return (
+        <PendingCaretakerRequest 
+          request={caretakerData.caretaker_request_object}
+          onCancel={handleCaretakerCancel}
+        />
+      );
+    }
+
+    // Show request form if no caretaker or requests
+    return (
+      <RequestCaretakerForm 
+        userId={user.pk}
+        onSuccess={handleCaretakerSuccess}
+      />
+    );
+  };
+
+  // Render become caretaker requests section
+  const renderBecomeCaretakerSection = () => {
+    if (!caretakerData?.become_caretaker_request_object) return null;
+
+    return (
+      <BecomeCaretakerRequest 
+        request={caretakerData.become_caretaker_request_object}
+        onResponse={() => {
+          refetchUser();
+          refetchCaretaker();
+        }}
+      />
+    );
+  };
 
   // Loading state
   if (isLoading) {
@@ -125,13 +238,19 @@ export const MyProfilePage = observer(() => {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
+      <Tabs value={activeTab} className="w-full" onValueChange={handleTabChange}>
         <TabsList className="mb-6 w-full flex">
-          <TabsTrigger value="profile" className="flex-1">SPMS Profile</TabsTrigger>
+          <TabsTrigger value="profile" className="flex-1">
+            {showShortLabels ? "SPMS" : "SPMS Profile"}
+          </TabsTrigger>
           {user.is_staff && (
-            <TabsTrigger value="staff-profile" className="flex-1">Public Profile</TabsTrigger>
+            <TabsTrigger value="staff-profile" className="flex-1">
+              {showShortLabels ? "Public" : "Public Profile"}
+            </TabsTrigger>
           )}
-          <TabsTrigger value="caretaker" className="flex-1">Caretaker Mode</TabsTrigger>
+          <TabsTrigger value="caretaker" className="flex-1">
+            {showShortLabels ? "Caretaker" : "Caretaker Mode"}
+          </TabsTrigger>
         </TabsList>
 
         {/* My Profile Tab */}
@@ -191,10 +310,68 @@ export const MyProfilePage = observer(() => {
 
         {/* Caretaker Mode Tab */}
         <TabsContent value="caretaker" className="space-y-6">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Caretaker mode functionality will be implemented in a future update.
-            </p>
+          <div className="max-w-4xl mx-auto">
+            {/* Description */}
+            <Alert className="mb-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Caretakers can manage your projects when you're unavailable (on leave, resignation, or other absence). 
+                All caretaker requests require admin approval for security and accountability.
+              </AlertDescription>
+            </Alert>
+
+            {isLoadingCaretaker ? (
+              <div className="space-y-6">
+                <Skeleton className="h-64" />
+                <Skeleton className="h-64" />
+              </div>
+            ) : caretakerError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Failed to load caretaker information. Please try again later.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-8">
+                {/* My Caretaker Section */}
+                <section>
+                  <h2 className="text-2xl font-semibold mb-4">My Caretaker</h2>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Request someone to manage your projects during your absence.
+                  </p>
+                  {renderMyCaretakerSection()}
+                </section>
+
+                {/* Requests to Become a Caretaker Section */}
+                {caretakerData?.become_caretaker_request_object && (
+                  <>
+                    <Separator />
+                    <section>
+                      <h2 className="text-2xl font-semibold mb-4">Requests to Become a Caretaker</h2>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Users who have requested you to be their caretaker.
+                      </p>
+                      {renderBecomeCaretakerSection()}
+                    </section>
+                  </>
+                )}
+
+                {/* My Caretakees Section */}
+                {user?.caretaking_for && user.caretaking_for.length > 0 && (
+                  <>
+                    <Separator />
+                    <section>
+                      <h2 className="text-2xl font-semibold mb-4">My Caretakees</h2>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Users you are currently caretaking for.
+                      </p>
+                      <CaretakeesTable caretakees={user.caretaking_for} />
+                    </section>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
@@ -209,7 +386,7 @@ export const MyProfilePage = observer(() => {
           // TanStack Query will automatically refetch due to invalidation in the mutation
         }}
       />
-      <EditMembershipModal
+      <EditOrgMembershipModal
         user={user}
         isOpen={isMembershipModalOpen}
         onClose={() => setIsMembershipModalOpen(false)}
