@@ -17,7 +17,7 @@ import {
 } from "@/shared/components/ui/custom/CustomDropdownMenu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore, useAuthStore } from "@/app/stores/useStore";
 import TraditionalHeaderContent from "./TraditionalHeaderContent";
 
 /**
@@ -63,6 +63,7 @@ export const TraditionalHeader = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const uiStore = useUIStore();
+  const authStore = useAuthStore();
   const { width } = useWindowSize();
 
   // Show hamburger menu on screens smaller than lg breakpoint
@@ -158,6 +159,15 @@ export const TraditionalHeader = observer(() => {
                       <FaUserPlus className="mr-2 size-4" />
                       Add User
                     </DropdownMenuItem>
+                    {authStore.isSuperuser && (
+                      <DropdownMenuItem
+                        onClick={() => navigate("/users/create-staff")}
+                        className="hover:bg-gray-100 cursor-pointer select-none"
+                      >
+                        <FaUserPlus className="mr-2 size-4" />
+                        Add DBCA User (Admin)
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
 

@@ -1,25 +1,12 @@
 import { Input } from "@/shared/components/ui/input";
 import { Search } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+import { debounce } from "@/shared/utils/common.utils";
 
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-}
-
-/**
- * Debounce utility function
- */
-function debounce<T extends (...args: never[]) => void>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
-  };
 }
 
 /**

@@ -220,7 +220,7 @@ export const UserListPage = observer(() => {
                       variant="outline"
                       size="sm"
                       onClick={handleClearFilters}
-                      className="gap-1.5"
+                      className="gap-1.5 py-4!"
                     >
                       <X className="size-4" />
                       Clear

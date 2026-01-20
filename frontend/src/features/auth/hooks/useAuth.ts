@@ -39,7 +39,7 @@ export const useCurrentUser = () => {
 	// Update auth store with user data on successful fetch
 	useEffect(() => {
 		if (query.data) {
-			authStore.setUser((query.data as any));
+			authStore.setUser(query.data);
 		} else if (query.isError) {
 			// Handle error case - clear user data
 			authStore.setUser(null);
@@ -87,8 +87,7 @@ export const useLogin = () => {
 			const from = (location.state as LoginRedirectState)?.from?.pathname || "/";
 			navigate(from, { replace: true });
 		},
-		//eslint-disable-next-line
-		onError: (err: any) => {
+		onError: (err: Error) => {
 			toast.error(err?.message ?? "Login failed");
 		},
 	});

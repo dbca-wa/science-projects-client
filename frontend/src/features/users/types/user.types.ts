@@ -73,6 +73,7 @@ export interface UserSearchFilters {
   onlyStaff?: boolean;
   onlySuperuser?: boolean;
   businessArea?: string | number;
+  ignoreArray?: number[];
 }
 
 export interface UserSearchResponse {

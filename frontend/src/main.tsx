@@ -17,25 +17,29 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
 import { createRoot } from "react-dom/client";
 
-// Initialize auth store and prefetch common data before rendering
-const initializeApp = async () => {
+// Initialise auth store and prefetch common data before rendering
+const initialiseApp = async () => {
 	await rootStore.authStore.initialise();
 	await rootStore.userSearchStore.initialise();
 	
-	// Prefetch branches and business areas for instant availability
-	// Wait for both to complete before rendering to prevent race conditions
-	await Promise.all([
-		queryClient.prefetchQuery({
-			queryKey: ["branches"],
-			queryFn: getAllBranches,
-			staleTime: 10 * 60_000,
-		}),
-		queryClient.prefetchQuery({
-			queryKey: ["businessAreas"],
-			queryFn: getAllBusinessAreas,
-			staleTime: 30 * 60_000,
-		}),
-	]);
+	// Only prefetch data if user is authenticated
+	// This prevents 403 errors on app load when not logged in
+	if (rootStore.authStore.isAuthenticated) {
+		// Prefetch branches and business areas for instant availability
+		// Wait for both to complete before rendering to prevent race conditions
+		await Promise.all([
+			queryClient.prefetchQuery({
+				queryKey: ["branches"],
+				queryFn: getAllBranches,
+				staleTime: 10 * 60_000,
+			}),
+			queryClient.prefetchQuery({
+				queryKey: ["businessAreas"],
+				queryFn: getAllBusinessAreas,
+				staleTime: 30 * 60_000,
+			}),
+		]);
+	}
 	
 	createRoot(document.getElementById("root")!).render(
 		<StoreProvider>
@@ -50,4 +54,4 @@ const initializeApp = async () => {
 	);
 };
 
-initializeApp();
+initialiseApp();

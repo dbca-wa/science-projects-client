@@ -13,7 +13,7 @@ const ModernHeader = () => {
         {/* Left side - Logo/Brand */}
         <div className="flex items-center space-x-4">
           <Link to="/" className="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Science Projects
+            Science Projects Management System
           </Link>
         </div>
 

@@ -148,7 +148,7 @@ export const UserDetailPage = observer(() => {
           {authStore.isSuperuser && authStore.user && (
             <UserAdminActionButtons
               user={user}
-              currentUserId={authStore.user.pk}
+              currentUserId={authStore.user.pk!}
             />
           )}
         </div>

@@ -44,15 +44,15 @@ const membershipSchema = z.object({
 
 type MembershipFormData = z.infer<typeof membershipSchema>;
 
-interface EditMembershipModalProps {
+interface EditOrgMembershipModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: IUserData | IUserMe;
   onSuccess: () => void;
 }
 
-export const EditMembershipModal = observer(
-  ({ isOpen, onClose, user, onSuccess }: EditMembershipModalProps) => {
+export const EditOrgMembershipModal = observer(
+  ({ isOpen, onClose, user, onSuccess }: EditOrgMembershipModalProps) => {
     const queryClient = useQueryClient();
     const { data: branches, isLoading: branchesLoading } = useBranches();
     const { data: businessAreas, isLoading: businessAreasLoading } =
@@ -80,9 +80,8 @@ export const EditMembershipModal = observer(
         onSuccess();
         onClose();
       },
-      onError: (error: any) => {
-        const message =
-          error.response?.data?.message || "Failed to update membership";
+      onError: (error: Error) => {
+        const message = error.message || "Failed to update membership";
         toast.error(message);
       },
     });

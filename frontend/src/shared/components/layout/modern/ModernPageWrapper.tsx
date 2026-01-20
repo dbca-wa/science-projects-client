@@ -10,8 +10,10 @@ interface IPageWrapperProps {
  */
 const ModernPageWrapper = ({ children }: IPageWrapperProps) => {
 	return (
-		<div className="h-[calc(100vh-4rem)] overflow-auto">
-			<div className="px-4 sm:px-6 md:px-9 py-4 lg:pl-64">{children}</div>
+		<div className="h-[calc(100vh-4rem)] overflow-auto no-scrollbar">
+			<div className="px-4 sm:px-6 md:px-[10%] lg:px-[15%] py-6 lg:ml-64">
+				{children}
+			</div>
 		</div>
 	);
 };

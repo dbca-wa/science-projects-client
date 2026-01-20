@@ -1,6 +1,6 @@
 import { apiClient } from "@/shared/services/api/client.service";
 import { USER_ENDPOINTS } from "./user.endpoints";
-import type { IUserData } from "@/shared/types/user.types";
+import type { IUserData, IMemberUserDetails } from "@/shared/types/user.types";
 import type {
   UserSearchFilters,
   UserSearchResponse,
@@ -14,7 +14,7 @@ import type {
  * Search users with filters and pagination
  * @param searchTerm - Search term to filter by username, first name, last name, or email
  * @param page - Page number for pagination
- * @param filters - Filter options (staff, external, superuser, business area)
+ * @param filters - Filter options (staff, external, superuser, business area, ignoreArray)
  * @returns Paginated user search results
  */
 export const getUsersBasedOnSearchTerm = async (
@@ -44,6 +44,10 @@ export const getUsersBasedOnSearchTerm = async (
     url += `&businessArea=${filters.businessArea}`;
   }
 
+  if (filters.ignoreArray && filters.ignoreArray.length > 0) {
+    url += `&ignoreArray=${filters.ignoreArray.join(",")}`;
+  }
+
   return apiClient.get<UserSearchResponse>(url);
 };
 
@@ -54,10 +58,10 @@ export const getUsersBasedOnSearchTerm = async (
 /**
  * Get full user details by primary key
  * @param pk - User primary key
- * @returns Full user data
+ * @returns Full user data with caretaker fields
  */
-export const getFullUser = async (pk: number): Promise<IUserData> => {
-  return apiClient.get<IUserData>(USER_ENDPOINTS.DETAIL(pk));
+export const getFullUser = async (pk: number): Promise<IMemberUserDetails> => {
+  return apiClient.get<IMemberUserDetails>(USER_ENDPOINTS.DETAIL(pk));
 };
 
 /**

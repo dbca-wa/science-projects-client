@@ -80,10 +80,8 @@ export const EditPersonalInformationModal = observer(
         onSuccess();
         onClose();
       },
-      onError: (error: any) => {
-        const message =
-          error.response?.data?.message ||
-          "Failed to update personal information";
+      onError: (error: Error) => {
+        const message = error.message || "Failed to update personal information";
         toast.error(message);
       },
     });

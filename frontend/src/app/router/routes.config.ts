@@ -135,6 +135,26 @@ export const USER_ROUTES: RouteConfig[] = [
 		showBreadcrumb: false, // No breadcrumb on profile view
 	},
 	{
+		name: "Caretaker Mode",
+		path: "/users/me/caretaker",
+		iconKey: "users",
+		component: MyProfilePage, // Same component, different tab
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		showBreadcrumb: false, // Handled by MyProfilePage
+	},
+	{
+		name: "Public Staff Profile",
+		path: "/users/me/staff-profile",
+		iconKey: "users",
+		component: MyProfilePage, // Same component, different tab
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		showBreadcrumb: false, // Handled by MyProfilePage
+	},
+	{
 		name: "Edit Profile",
 		path: "/users/me/profile",
 		iconKey: "users",

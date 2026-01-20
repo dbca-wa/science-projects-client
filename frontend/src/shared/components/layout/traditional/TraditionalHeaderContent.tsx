@@ -3,7 +3,7 @@ import { FaUserPlus } from "react-icons/fa";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore, useAuthStore } from "@/app/stores/useStore";
 
 interface TraditionalHeaderContentProps {
   handleNavigation: (path: string) => void;
@@ -17,6 +17,7 @@ export default function TraditionalHeaderContent({
   handleNavigation: navigateAndClose,
 }: TraditionalHeaderContentProps) {
   const uiStore = useUIStore();
+  const authStore = useAuthStore();
 
   return (
     <div className="py-4 flex flex-col gap-4">
@@ -72,6 +73,18 @@ export default function TraditionalHeaderContent({
               <span>Add User</span>
             </span>
           </Button>
+          {authStore.isSuperuser && (
+            <Button
+              variant="ghost"
+              className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+              onClick={() => navigateAndClose("/users/create-staff")}
+            >
+              <span className="flex items-center gap-3">
+                <FaUserPlus className="text-xl" />
+                <span>Add DBCA User (Admin)</span>
+              </span>
+            </Button>
+          )}
         </div>
 
         {/* Reports Menu - COMMENTED OUT: Not yet implemented */}

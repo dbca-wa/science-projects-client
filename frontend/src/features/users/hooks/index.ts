@@ -10,3 +10,11 @@ export { useActivateUser } from "./useActivateUser";
 export { useDeactivateUser } from "./useDeactivateUser";
 export { useDeleteUser } from "./useDeleteUser";
 export { useRequestMergeUsers } from "./useRequestMergeUsers";
+
+// Caretaker hooks
+export { useCaretakerCheck } from "./useCaretakerCheck";
+export { useCaretakers } from "./useCaretakers";
+export { useCaretakees } from "./useCaretakees";
+export { useRequestCaretaker } from "./useRequestCaretaker";
+export { useCancelCaretakerRequest } from "./useCancelCaretakerRequest";
+export { useRemoveCaretaker } from "./useRemoveCaretaker";
