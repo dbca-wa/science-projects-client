@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useCurrentUser } from "@/features/auth/hooks/useAuth";
+import { useCurrentUser } from "@/features/auth";
+import { useAdminTasks, MyTasksSection } from "@/features/dashboard";
 import { observer } from "mobx-react-lite";
 import { motion } from "framer-motion";
 import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";
@@ -8,8 +9,6 @@ import { TbWorldWww } from "react-icons/tb";
 import { MdFeedback } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router";
 import { DashboardActionCard } from "@/shared/components/DashboardActionCard";
-import { useAdminTasks } from "@/features/dashboard/hooks/useDashboardTasks";
-import { MyTasksSection } from "@/features/dashboard/components/MyTasksSection";
 
 /**
  * Dashboard - Main landing page after authentication

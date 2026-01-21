@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser } from "../services/user.service";
 import { toast } from "sonner";
-import type { UserCreationFormData } from "../types";
+import type { UserCreateFormData } from "../schemas/userCreate.schema";
 import type { IUserData } from "@/shared/types/user.types";
 
 /**
@@ -16,7 +16,7 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UserCreationFormData) => createUser(data),
+    mutationFn: (data: UserCreateFormData) => createUser(data),
     onSuccess: (newUser: IUserData) => {
       // Invalidate user list to show new user
       queryClient.invalidateQueries({ queryKey: ["users"] });

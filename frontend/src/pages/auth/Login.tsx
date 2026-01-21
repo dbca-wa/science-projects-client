@@ -1,4 +1,4 @@
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { LoginForm } from "@/features/auth";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/app/stores/store-context";
 import { Navigate } from "react-router";

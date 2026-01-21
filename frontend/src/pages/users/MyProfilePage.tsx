@@ -1,26 +1,26 @@
 import { observer } from "mobx-react-lite";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { useCurrentUser } from "@/features/auth/hooks/useAuth";
-import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
-import { useWindowSize } from "@/shared/hooks/useWindowSize";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
-import { PersonalInformationCard } from "@/features/users/components/PersonalInformationCard";
-import { ProfileSection } from "@/features/users/components/ProfileSection";
-import { MembershipSection } from "@/features/users/components/MembershipSection";
-import { PublicAppearanceSection } from "@/features/users/components/PublicAppearanceSection";
-import { InAppSearchSection } from "@/features/users/components/InAppSearchSection";
-import { StatusSection } from "@/features/users/components/StatusSection";
-import { RequestCaretakerForm } from "@/features/users/components/caretaker/RequestCaretakerForm";
-import { PendingCaretakerRequest } from "@/features/users/components/caretaker/PendingCaretakerRequest";
-import { OutgoingCaretakerRequest } from "@/features/users/components/caretaker/OutgoingCaretakerRequest";
-import { ActiveCaretaker } from "@/features/users/components/caretaker/ActiveCaretaker";
-import { CaretakeesTable } from "@/features/users/components/caretaker/CaretakeesTable";
+import { useCurrentUser } from "@/features/auth";
 import { 
+  useCaretakerCheck,
+  PersonalInformationCard,
+  ProfileSection,
+  MembershipSection,
+  PublicAppearanceSection,
+  InAppSearchSection,
+  StatusSection,
+  RequestCaretakerForm,
+  PendingCaretakerRequest,
+  OutgoingCaretakerRequest,
+  ActiveCaretaker,
+  CaretakeesTable,
   EditPersonalInformationModal,
   EditOrgMembershipModal,
   ToggleStaffProfileVisibilityModal
-} from "@/features/users/components/modals";
+} from "@/features/users";
+import { useWindowSize } from "@/shared/hooks/useWindowSize";
+import { Breadcrumb } from "@/shared/components/Breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";

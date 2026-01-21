@@ -7,10 +7,10 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
-import type { UserCreationFormData } from "../types";
+import type { UserCreateFormData } from "../schemas/userCreate.schema";
 
 interface AccountFieldsProps {
-  control: Control<UserCreationFormData>;
+  control: Control<UserCreateFormData>;
   disabled?: boolean;
 }
 

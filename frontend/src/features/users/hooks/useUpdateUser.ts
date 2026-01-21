@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminUpdateUser } from "../services/user.service";
 import { toast } from "sonner";
-import type { UserEditFormData } from "../types";
+import type { UserEditFormData } from "../schemas/userEdit.schema";
 import type { IUserData } from "@/shared/types/user.types";
 
 /**

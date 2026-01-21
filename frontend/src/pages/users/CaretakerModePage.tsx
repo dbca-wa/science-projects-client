@@ -1,13 +1,15 @@
 import { Loader2, AlertCircle, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Separator } from "@/shared/components/ui/separator";
-import { useCurrentUser } from "@/features/auth/hooks/useAuth";
-import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
-import { RequestCaretakerForm } from "@/features/users/components/caretaker/RequestCaretakerForm";
-import { PendingCaretakerRequest } from "@/features/users/components/caretaker/PendingCaretakerRequest";
-import { OutgoingCaretakerRequest } from "@/features/users/components/caretaker/OutgoingCaretakerRequest";
-import { ActiveCaretaker } from "@/features/users/components/caretaker/ActiveCaretaker";
-import { CaretakeesTable } from "@/features/users/components/caretaker/CaretakeesTable";
+import { useCurrentUser } from "@/features/auth";
+import { 
+  useCaretakerCheck,
+  RequestCaretakerForm,
+  PendingCaretakerRequest,
+  OutgoingCaretakerRequest,
+  ActiveCaretaker,
+  CaretakeesTable
+} from "@/features/users";
 
 /**
  * CaretakerModePage component
