@@ -4,6 +4,7 @@ import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
 import { useBecomeCaretaker } from "@/features/users/hooks/useBecomeCaretaker";
 import { useCancelBecomeCaretakerRequest } from "@/features/users/hooks/useCancelBecomeCaretakerRequest";
+import { usePendingCaretakerRequests } from "@/features/users/hooks/usePendingCaretakerRequests";
 import { UserAdminActionButtons } from "./UserAdminActionButtons";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
@@ -37,7 +38,7 @@ import {
 	Loader2,
 } from "lucide-react";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { toast } from "sonner";
 import { format, isPast } from "date-fns";
 import { useNavigate } from "react-router";
@@ -78,6 +79,16 @@ export const UserDetailSheet = observer(
 		// Fetch current user's caretaker check to see if there's a pending become_caretaker_request
 		const { data: myCaretakerData } = useCaretakerCheck();
 
+		const accountIsStaff = user?.is_staff;
+		const accountIsSuper = user?.is_superuser;
+		const viewingUserIsSuper = authStore.isSuperuser;
+		const isViewingOwnProfile = user?.id === authStore.user?.id;
+
+		// Fetch pending caretaker requests for the viewed user (only when viewing another user)
+		const { data: viewedUserPendingRequests } = usePendingCaretakerRequests(
+			!isViewingOwnProfile && userId ? userId : null
+		);
+
 		// Mutation hooks for become caretaker functionality
 		const becomeCaretakerMutation = useBecomeCaretaker();
 		const cancelBecomeCaretakerMutation = useCancelBecomeCaretakerRequest();
@@ -99,11 +110,6 @@ export const UserDetailSheet = observer(
 			// TODO: Implement add to project modal
 			toast.info("Add to project functionality will be implemented soon");
 		};
-
-		const accountIsStaff = user?.is_staff;
-		const accountIsSuper = user?.is_superuser;
-		const viewingUserIsSuper = authStore.isSuperuser;
-		const isViewingOwnProfile = user?.id === authStore.user?.id;
 
 		// Check if current user is admin or business area lead
 		const currentUserIsAdmin = authStore.user?.is_superuser || false;
@@ -133,12 +139,28 @@ export const UserDetailSheet = observer(
 			Array.isArray(user.caretakers) &&
 			user.caretakers.some((c: ICaretakerSimpleUserData) => c.id === authStore.user?.id);
 
-		// Disable button if: viewing own profile, user has caretaker, already caretaker, or not authorized
+		// Check if there are ANY pending caretaker requests for this user
+		const hasAnyPendingRequests = 
+			viewedUserPendingRequests && viewedUserPendingRequests.length > 0;
+
+		// Check if YOUR request is one of the pending requests
+		const myPendingRequestForThisUser = viewedUserPendingRequests?.find(
+			request => request.secondary_users?.[0]?.id === authStore.user?.id
+		);
+
+		// Disable button if: viewing own profile, user has caretaker, already caretaker, has OTHER pending requests, or not authorized
 		const isBecomeCaretakerDisabled =
-			isViewingOwnProfile || userHasCaretaker || isAlreadyCaretaker || !canBecomeCaretaker;
+			isViewingOwnProfile || 
+			userHasCaretaker || 
+			isAlreadyCaretaker || 
+			(hasAnyPendingRequests && !myPendingRequestForThisUser) || 
+			!canBecomeCaretaker;
 
 		const handleBecomeCaretaker = () => {
-			if (hasPendingBecomeRequest) {
+			// If you have a pending request for this user, show cancel dialog
+			if (myPendingRequestForThisUser) {
+				setShowCancelBecomeDialog(true);
+			} else if (hasPendingBecomeRequest) {
 				setShowCancelBecomeDialog(true);
 			} else {
 				setShowBecomeCaretakerDialog(true);
@@ -162,11 +184,14 @@ export const UserDetailSheet = observer(
 		};
 
 		const handleConfirmCancelBecome = () => {
-			if (!pendingBecomeRequest?.id || !user?.id) return;
+			// Use myPendingRequestForThisUser if available, otherwise use pendingBecomeRequest
+			const requestToCancel = myPendingRequestForThisUser || pendingBecomeRequest;
+			
+			if (!requestToCancel?.id || !user?.id) return;
 
 			cancelBecomeCaretakerMutation.mutate(
 				{
-					taskId: pendingBecomeRequest.id,
+					taskId: requestToCancel.id,
 					userId: user.id,
 				},
 				{
@@ -468,6 +493,49 @@ export const UserDetailSheet = observer(
 									</div>
 								)}
 
+								{/* Pending Caretaker Requests - Only show when viewing another user's profile */}
+								{!isViewingOwnProfile && viewedUserPendingRequests && viewedUserPendingRequests.length > 0 && (
+									<div className="mt-4 space-y-2">
+										<p className="font-bold text-xs text-gray-600 dark:text-gray-300 mb-2">
+											Pending Requests
+										</p>
+										{viewedUserPendingRequests.map((request) => {
+											const secondaryUser = request.secondary_users?.[0];
+											// Transform image data to match UserDisplay expectations
+											const userForDisplay = secondaryUser ? {
+												...secondaryUser,
+												image: secondaryUser.image?.file || undefined
+											} : null;
+											
+											return userForDisplay ? (
+												<div
+													key={request.id}
+													className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+												>
+													<div className="flex-1 min-w-0">
+														<UserDisplay
+															user={userForDisplay}
+															showEmail={false}
+															size="sm"
+														/>
+														<p className="text-xs text-muted-foreground mt-1">
+															Requested {format(new Date(request.created_at), "MMM d, yyyy")}
+														</p>
+														{request.end_date && (
+															<p className="text-xs text-muted-foreground">
+																Until {format(new Date(request.end_date), "MMM d, yyyy")}
+															</p>
+														)}
+													</div>
+													<Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+														Pending
+													</Badge>
+												</div>
+											) : null;
+										})}
+									</div>
+								)}
+
 								{/* Become Caretaker Button - Only show when viewing another user's profile */}
 								{!isViewingOwnProfile && (
 									<div className="mt-4 space-y-2">
@@ -476,10 +544,24 @@ export const UserDetailSheet = observer(
 												Only admins and business area leads can assign caretakers
 											</p>
 										)}
-										{canBecomeCaretaker && hasPendingBecomeRequest && (
+										{canBecomeCaretaker && (hasPendingBecomeRequest || myPendingRequestForThisUser) && (
 											<p className="text-sm text-muted-foreground text-center">
-												Your request has been made to
-												become this user's caretaker
+												Your request has been made to become this user's caretaker
+											</p>
+										)}
+										{canBecomeCaretaker && hasAnyPendingRequests && !hasPendingBecomeRequest && !myPendingRequestForThisUser && (
+											<p className="text-sm text-muted-foreground text-center">
+												This user already has a pending caretaker request
+											</p>
+										)}
+										{canBecomeCaretaker && userHasCaretaker && !hasPendingBecomeRequest && !myPendingRequestForThisUser && (
+											<p className="text-sm text-muted-foreground text-center">
+												This user already has an active caretaker
+											</p>
+										)}
+										{canBecomeCaretaker && isAlreadyCaretaker && (
+											<p className="text-sm text-muted-foreground text-center">
+												You are already this user's caretaker
 											</p>
 										)}
 										{canBecomeCaretaker && (
@@ -487,10 +569,11 @@ export const UserDetailSheet = observer(
 												onClick={handleBecomeCaretaker}
 												disabled={
 													isBecomeCaretakerDisabled &&
-													!hasPendingBecomeRequest
+													!hasPendingBecomeRequest &&
+													!myPendingRequestForThisUser
 												}
 												className={`w-full ${
-													hasPendingBecomeRequest
+													hasPendingBecomeRequest || myPendingRequestForThisUser
 														? "bg-red-500 hover:bg-red-400 text-white"
 														: "bg-green-500 hover:bg-green-400 text-white"
 												} disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -499,11 +582,11 @@ export const UserDetailSheet = observer(
 												cancelBecomeCaretakerMutation.isPending ? (
 													<>
 														<Loader2 className="size-4 mr-2 animate-spin" />
-														{hasPendingBecomeRequest
+														{hasPendingBecomeRequest || myPendingRequestForThisUser
 															? "Cancelling..."
 															: "Requesting..."}
 													</>
-												) : hasPendingBecomeRequest ? (
+												) : (hasPendingBecomeRequest || myPendingRequestForThisUser) ? (
 													"Cancel Request"
 												) : (
 													"Become Caretaker"

@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 
 interface LayoutCheckWrapperProps {
 	children: ReactNode;

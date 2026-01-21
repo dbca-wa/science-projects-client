@@ -17,7 +17,7 @@ import {
 } from "@/shared/components/ui/custom/CustomDropdownMenu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
-import { useUIStore, useAuthStore } from "@/app/stores/useStore";
+import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import TraditionalHeaderContent from "./TraditionalHeaderContent";
 
 /**

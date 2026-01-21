@@ -13,7 +13,7 @@ import { InAppSearchSection } from "@/features/users/components/InAppSearchSecti
 import { StatusSection } from "@/features/users/components/StatusSection";
 import { RequestCaretakerForm } from "@/features/users/components/caretaker/RequestCaretakerForm";
 import { PendingCaretakerRequest } from "@/features/users/components/caretaker/PendingCaretakerRequest";
-import { BecomeCaretakerRequest } from "@/features/users/components/caretaker/BecomeCaretakerRequest";
+import { OutgoingCaretakerRequest } from "@/features/users/components/caretaker/OutgoingCaretakerRequest";
 import { ActiveCaretaker } from "@/features/users/components/caretaker/ActiveCaretaker";
 import { CaretakeesTable } from "@/features/users/components/caretaker/CaretakeesTable";
 import { 
@@ -144,14 +144,28 @@ export const MyProfilePage = observer(() => {
       );
     }
 
-    // Show pending request if exists
+    // Show outgoing request if YOU requested someone to be YOUR caretaker
+    // (you are primary_user AND you are the requester)
     if (caretakerData?.caretaker_request_object) {
-      return (
-        <PendingCaretakerRequest 
-          request={caretakerData.caretaker_request_object}
-          onCancel={handleCaretakerCancel}
-        />
-      );
+      const isMyRequest = caretakerData.caretaker_request_object.requester.id === user.id;
+      
+      if (isMyRequest) {
+        return (
+          <OutgoingCaretakerRequest 
+            request={caretakerData.caretaker_request_object}
+            onCancel={handleCaretakerCancel}
+          />
+        );
+      } else {
+        // Someone else made this request on your behalf (admin action)
+        // This is unusual but possible - treat as incoming
+        return (
+          <PendingCaretakerRequest 
+            request={caretakerData.caretaker_request_object}
+            onCancel={handleCaretakerCancel}
+          />
+        );
+      }
     }
 
     // Show request form if no caretaker or requests
@@ -163,14 +177,14 @@ export const MyProfilePage = observer(() => {
     );
   };
 
-  // Render become caretaker requests section
-  const renderBecomeCaretakerSection = () => {
+  // Render incoming caretaker requests section (someone wants YOU to be THEIR caretaker)
+  const renderIncomingCaretakerSection = () => {
     if (!caretakerData?.become_caretaker_request_object) return null;
 
     return (
-      <BecomeCaretakerRequest 
+      <PendingCaretakerRequest 
         request={caretakerData.become_caretaker_request_object}
-        onResponse={() => {
+        onCancel={() => {
           refetchUser();
           refetchCaretaker();
         }}
@@ -343,16 +357,16 @@ export const MyProfilePage = observer(() => {
                   {renderMyCaretakerSection()}
                 </section>
 
-                {/* Requests to Become a Caretaker Section */}
+                {/* Caretaker Requests Section */}
                 {caretakerData?.become_caretaker_request_object && (
                   <>
                     <Separator />
                     <section>
-                      <h2 className="text-2xl font-semibold mb-4">Requests to Become a Caretaker</h2>
+                      <h2 className="text-2xl font-semibold mb-4">Caretaker Request</h2>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Users who have requested you to be their caretaker.
+                        A user needs you to be their caretaker.
                       </p>
-                      {renderBecomeCaretakerSection()}
+                      {renderIncomingCaretakerSection()}
                     </section>
                   </>
                 )}

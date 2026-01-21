@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 import { cn } from "@/shared/lib/utils";
 
 interface IProps {

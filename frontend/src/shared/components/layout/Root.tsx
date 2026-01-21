@@ -4,7 +4,7 @@ import { ModernLayout } from "./modern/ModernLayout";
 import { TraditionalLayout } from "./traditional/TraditionalLayout";
 import { PageHead } from "./PageHead";
 import { observer } from "mobx-react-lite";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 import { useScrollToTop } from "@/shared/hooks/ui/useScrollToTop";
 import { NavigationBlocker } from "./NavigationBlocker";
 import { UserDataLoader } from "@/app/components/UserDataLoader";

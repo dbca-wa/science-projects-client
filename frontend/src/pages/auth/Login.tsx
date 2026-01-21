@@ -1,6 +1,6 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { AnimatePresence, motion } from "framer-motion";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { Navigate } from "react-router";
 import { observer } from "mobx-react-lite";
 

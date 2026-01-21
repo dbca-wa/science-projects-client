@@ -1,6 +1,6 @@
 import { ROUTE_ICONS } from "@/app/router/route-icons";
 import { getSidebarRoutes } from "@/app/router/routes.config";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { cn } from "@/shared/lib/utils";
 import { NavLink, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";

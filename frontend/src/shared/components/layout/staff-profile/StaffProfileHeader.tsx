@@ -1,6 +1,6 @@
 import { Button } from "@/shared/components/ui/button";
 import { observer } from "mobx-react-lite";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 	const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;

@@ -11,7 +11,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, Edit } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**

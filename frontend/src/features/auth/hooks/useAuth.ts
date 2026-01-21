@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import {
 	getSSOMe,
 	logInOrdinary,

@@ -13,7 +13,24 @@ export default defineConfig({
 		minify: true,
 		sourcemap: false,
 	},
-	plugins: [react(), tailwindcss()],
+	plugins: [
+		react(),
+		tailwindcss(),
+		// Add CSP headers for production builds
+		{
+			name: "html-transform",
+			transformIndexHtml(html) {
+				// In production, use stricter CSP
+				if (process.env.NODE_ENV === "production") {
+					return html.replace(
+						/script-src 'self' 'unsafe-inline' 'unsafe-eval'/g,
+						"script-src 'self'"
+					);
+				}
+				return html;
+			},
+		},
+	],
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
@@ -25,7 +42,7 @@ export default defineConfig({
 		setupFiles: "./src/test/setup.ts",
 		coverage: {
 			provider: "v8",
-			reporter: ["text", "json", "html"],
+			reporter: ["text", "json", "html", "lcov"],
 			exclude: [
 				"node_modules/",
 				"src/test/",

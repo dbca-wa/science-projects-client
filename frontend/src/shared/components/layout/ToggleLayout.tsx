@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 import { Button } from "@/shared/components/ui/button";
 import { LayoutGrid, LayoutList } from "lucide-react";
 import { cn } from "@/shared/lib/utils";

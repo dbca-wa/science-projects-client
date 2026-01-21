@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useAuthStore, useUIStore } from "@/app/stores/useStore";
+import { useAuthStore, useUIStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";

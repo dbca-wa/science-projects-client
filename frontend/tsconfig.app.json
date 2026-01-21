@@ -30,5 +30,5 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src"]
+	"include": ["src", "../.kiro/dashboard.utils.test.ts"]
 }

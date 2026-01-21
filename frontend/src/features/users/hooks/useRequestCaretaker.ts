@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { requestCaretaker, approveCaretakerTask, caretakerKeys } from "../services/caretaker.endpoints";
 import { toast } from "sonner";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import type { RequestCaretakerPayload } from "../types/caretaker.types";
 
 /**

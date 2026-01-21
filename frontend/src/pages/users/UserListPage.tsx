@@ -13,7 +13,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
 import { AlertCircle, X } from "lucide-react";
-import { useAuthStore, useUserSearchStore } from "@/app/stores/useStore";
+import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { Loader2 } from "lucide-react";
 
 /**

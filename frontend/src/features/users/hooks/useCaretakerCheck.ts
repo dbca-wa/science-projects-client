@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCaretakerCheck, caretakerKeys } from "../services/caretaker.endpoints";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 
 /**
  * Hook for fetching current user's caretaker status
