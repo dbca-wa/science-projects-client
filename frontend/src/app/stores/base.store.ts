@@ -3,7 +3,6 @@ import {
 	observable,
 	action,
 	computed,
-	runInAction,
 } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 
@@ -53,18 +52,14 @@ export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 	 * @param isLoading - Whether the store is currently loading
 	 */
 	setLoading(isLoading: boolean) {
-		runInAction(() => {
-			this.state.loading = isLoading;
-		});
+		this.state.loading = isLoading;
 	}
 
 	/**
 	 * @param error - The error message, or null to clear the error
 	 */
 	setError(error: string | null) {
-		runInAction(() => {
-			this.state.error = error;
-		});
+		this.state.error = error;
 	}
 
 	/**
@@ -78,9 +73,7 @@ export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 	 * @param initialised - Whether the store has been initialised
 	 */
 	setInitialised(initialised: boolean) {
-		runInAction(() => {
-			this.state.initialised = initialised;
-		});
+		this.state.initialised = initialised;
 	}
 
 	// async action wrapper with retry logic

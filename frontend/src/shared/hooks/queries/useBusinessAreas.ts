@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllBusinessAreas } from "@/shared/services/org.service";
+import { STALE_TIME } from "@/shared/constants";
 
 /**
  * Query keys for business areas
@@ -20,6 +21,6 @@ export const useBusinessAreas = () => {
   return useQuery({
     queryKey: businessAreasKeys.all,
     queryFn: getAllBusinessAreas,
-    staleTime: 30 * 60_000, // 30 minutes (rarely changes)
+    staleTime: STALE_TIME.VERY_LONG,
   });
 };

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCaretakerCheck, caretakerKeys } from "../services/caretaker.endpoints";
 import { useAuthStore } from "@/app/stores/store-context";
+import { STALE_TIME } from "@/shared/constants";
 
 /**
  * Hook for fetching current user's caretaker status
@@ -17,7 +18,7 @@ export const useCaretakerCheck = () => {
   return useQuery({
     queryKey: caretakerKeys.check(authStore.user?.id || 0),
     queryFn: getCaretakerCheck,
-    staleTime: 5 * 60_000, // 5 minutes
+    staleTime: STALE_TIME.MEDIUM,
     enabled: authStore.isAuthenticated && !!authStore.user?.id,
   });
 };

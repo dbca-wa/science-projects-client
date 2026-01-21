@@ -1,4 +1,4 @@
-import { makeObservable, action, computed, runInAction } from "mobx";
+import { makeObservable, action, computed } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 import { BaseStore, type BaseStoreState } from "../base.store";
 
@@ -42,9 +42,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	public async initialise(): Promise<void> {
 		await this.executeAsync(
 			async () => {
-				runInAction(() => {
-					this.state.initialised = true;
-				});
+				this.state.initialised = true;
 
 				logger.info("Editor store initialised");
 			},
@@ -55,12 +53,10 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 
 	// Editor management actions
 	openEditor = () => {
-		runInAction(() => {
-			this.state.openEditorsCount = Math.max(
-				this.state.openEditorsCount + 1,
-				0
-			);
-		});
+		this.state.openEditorsCount = Math.max(
+			this.state.openEditorsCount + 1,
+			0
+		);
 
 		logger.info("Editor opened", {
 			count: this.state.openEditorsCount,
@@ -68,17 +64,15 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	};
 
 	closeEditor = () => {
-		runInAction(() => {
-			this.state.openEditorsCount = Math.max(
-				this.state.openEditorsCount - 1,
-				0
-			);
+		this.state.openEditorsCount = Math.max(
+			this.state.openEditorsCount - 1,
+			0
+		);
 
-			// Auto-close dialog if no editors are open
-			if (this.state.openEditorsCount === 0 && this.state.isDialogOpen) {
-				this.state.isDialogOpen = false;
-			}
-		});
+		// Auto-close dialog if no editors are open
+		if (this.state.openEditorsCount === 0 && this.state.isDialogOpen) {
+			this.state.isDialogOpen = false;
+		}
 
 		logger.info("Editor closed", {
 			count: this.state.openEditorsCount,
@@ -87,17 +81,13 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 
 	// Dialog management actions
 	setDialogOpen = (open: boolean) => {
-		runInAction(() => {
-			this.state.isDialogOpen = open;
-		});
+		this.state.isDialogOpen = open;
 
 		logger.info("Editor dialog state changed", { open });
 	};
 
 	setPendingAction = (action: (() => void) | null) => {
-		runInAction(() => {
-			this.state.pendingAction = action;
-		});
+		this.state.pendingAction = action;
 	};
 
 	// Main method for checking and showing dialog
@@ -114,9 +104,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	handleProceed = (blockerProceed?: () => void) => {
 		this.setDialogOpen(false);
 
-		runInAction(() => {
-			this.state.openEditorsCount = 0;
-		});
+		this.state.openEditorsCount = 0;
 
 		// Call router blocker proceed if provided
 		if (blockerProceed) {
@@ -177,14 +165,12 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	}
 
 	reset() {
-		runInAction(() => {
-			this.state.openEditorsCount = 0;
-			this.state.isDialogOpen = false;
-			this.state.pendingAction = null;
-			this.state.loading = false;
-			this.state.error = null;
-			this.state.initialised = false;
-		});
+		this.state.openEditorsCount = 0;
+		this.state.isDialogOpen = false;
+		this.state.pendingAction = null;
+		this.state.loading = false;
+		this.state.error = null;
+		this.state.initialised = false;
 
 		logger.info("Editor store reset complete");
 	}
