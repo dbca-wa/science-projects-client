@@ -74,3 +74,16 @@ export const getSanitizedHtmlOrFallback = (
   }
   return sanitizeHtml(content || `<p>${fallback}</p>`);
 };
+
+/**
+ * Extract plain text from HTML content
+ * Used to display titles and content without HTML tags
+ * 
+ * @param html - HTML string to extract text from
+ * @returns Plain text content
+ */
+export const extractTextFromHTML = (html: string): string => {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+};

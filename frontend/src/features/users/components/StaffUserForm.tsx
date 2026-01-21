@@ -346,7 +346,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
                 </FormControl>
                 <SelectContent>
                   {sortedBranches.map((branch) => (
-                    <SelectItem key={branch.pk} value={branch.pk!.toString()}>
+                    <SelectItem key={branch.id} value={branch.id!.toString()}>
                       {branch.name}
                     </SelectItem>
                   ))}
@@ -376,7 +376,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
                 </FormControl>
                 <SelectContent>
                   {sortedBusinessAreas.map((ba) => (
-                    <SelectItem key={ba.pk} value={ba.pk!.toString()}>
+                    <SelectItem key={ba.id} value={ba.id!.toString()}>
                       {ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
                     </SelectItem>
                   ))}

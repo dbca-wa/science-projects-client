@@ -9,8 +9,7 @@ import type {
 import type { IMemberUserDetails } from "./user.types";
 
 export interface IProjectMember {
-	id?: number;
-	pk?: number;
+	id: number;
 	project: number;
 	is_leader: boolean;
 	user: IMemberUserDetails;
@@ -23,7 +22,7 @@ export interface IProjectMember {
 }
 
 export interface ProjectImage {
-	pk: number;
+	id: number;
 	old_file: string;
 	file: string;
 }
@@ -41,8 +40,7 @@ interface ISmallProject {
 }
 
 export interface ISmallService {
-	id?: number;
-	pk?: number;
+	id: number;
 	name: string;
 }
 
@@ -85,22 +83,6 @@ export interface IExtendedProjectDetails {
 
 // PROJECT ============================================================================
 
-// interface IMiniEndorsement {
-// 	pk: number;
-// 	project_plan: IProjectPlan;
-// }
-
-// interface ITinyProjectData {
-// 	pk?: number | undefined;
-// 	id?: number | undefined;
-// 	title: string;
-// 	image: ProjectImage;
-// 	tag: string;
-// 	// year: number;
-// 	// kind: string;
-// 	// number: number;
-// }
-
 export interface Position {
 	x: number;
 	y: number;
@@ -118,8 +100,7 @@ type ProjectRoles =
 	| "group";
 
 export interface IProjectData {
-	pk: number | undefined;
-	id?: number;
+	id: number;
 	areas: ISimpleLocationData[];
 	kind: string;
 	title: string;
@@ -154,17 +135,10 @@ export interface IProblematicData {
 	inactive_lead_active_project: IProjectData[];
 }
 
-// interface IFullProjectDetails {
-// 	project: IProjectData;
-// 	details: IExtendedProjectDetails;
-// 	documents: IProjectDocuments;
-// 	members: IProjectMember[] | null;
-// }
-
 // TASKS ============================================================================
 
 export interface ITaskUser {
-	pk: number;
+	id: number;
 	first_name: string;
 	last_name: string;
 }
@@ -182,7 +156,7 @@ export type ProjectStatus =
 	| "suspended";
 
 interface ITaskProject {
-	pk: number;
+	id: number;
 	title: string;
 	status: string;
 	kind: string;
@@ -192,7 +166,7 @@ interface ITaskProject {
 }
 
 export interface ITaskDocument {
-	pk: number;
+	id: number;
 	kind: string;
 	status: string;
 	project: ITaskProject;
@@ -203,5 +177,5 @@ export interface IApproveDocument {
 	feedbackHTML?: string;
 	action: "approve" | "recall" | "send_back" | "reopen";
 	stage: number; // 1-3
-	documentPk: number;
+	documentId: number;
 }

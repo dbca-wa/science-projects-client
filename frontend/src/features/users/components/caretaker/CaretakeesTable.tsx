@@ -133,7 +133,7 @@ export const CaretakeesTable = ({ caretakees }: CaretakeesTableProps) => {
         <CardContent>
           <div className="space-y-4">
             {sortedCaretakees.map((caretakee) => (
-              <Card key={caretakee.pk} className="border border-gray-200">
+              <Card key={caretakee.id} className="border border-gray-200">
                 <CardContent className="p-4 space-y-3">
                   {/* User Info */}
                   <UserDisplay 
@@ -206,7 +206,7 @@ export const CaretakeesTable = ({ caretakees }: CaretakeesTableProps) => {
             </TableHeader>
             <TableBody>
               {sortedCaretakees.map((caretakee) => (
-                <TableRow key={caretakee.pk}>
+                <TableRow key={caretakee.id}>
                   <TableCell>
                     <UserDisplay 
                       user={caretakee} 

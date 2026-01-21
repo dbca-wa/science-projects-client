@@ -2,7 +2,7 @@ export const USER_ENDPOINTS = {
   // Base user endpoints
   LIST: "users/",
   ME: "users/me",
-  DETAIL: (pk: number | string) => `users/${pk}`,
+  DETAIL: (id: number | string) => `users/${id}`,
 
   // User search
   SEARCH: "users/", // With query params (?page=1&searchTerm=...)
@@ -11,7 +11,7 @@ export const USER_ENDPOINTS = {
   CREATE: "users/",
   PERSONAL_INFO: (userId: number | string) => `users/${userId}/pi`,
   PROFILE: (userId: number | string) => `users/${userId}/profile`,
-  MEMBERSHIP: (userPk: number | string) => `users/${userPk}/membership`,
+  MEMBERSHIP: (userId: number | string) => `users/${userId}/membership`,
   REMOVE_AVATAR: (userId: number | string) => `users/${userId}/remove_avatar`,
 
   // User validation
@@ -24,6 +24,6 @@ export const USER_ENDPOINTS = {
   REQUEST_MERGE: "adminoptions/tasks",
 
   // Staff profile
-  TOGGLE_STAFF_PROFILE_VISIBILITY: (staffProfilePk: number | string) =>
-    `users/staffprofiles/${staffProfilePk}/toggle_visibility`,
+  TOGGLE_STAFF_PROFILE_VISIBILITY: (staffProfileId: number | string) =>
+    `users/staffprofiles/${staffProfileId}/toggle_visibility`,
 } as const;

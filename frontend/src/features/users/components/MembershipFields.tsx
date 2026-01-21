@@ -115,7 +115,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
                 {sortedBranches.map((branch) => (
-                  <SelectItem key={branch.pk} value={branch.pk!.toString()}>
+                  <SelectItem key={branch.id} value={branch.id!.toString()}>
                     {branch.name}
                   </SelectItem>
                 ))}
@@ -146,7 +146,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
                 {sortedBusinessAreas.map((ba) => (
-                  <SelectItem key={ba.pk} value={ba.pk!.toString()}>
+                  <SelectItem key={ba.id} value={ba.id!.toString()}>
                     {ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
                   </SelectItem>
                 ))}
@@ -177,7 +177,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
                 {sortedAffiliations.map((affiliation) => (
-                  <SelectItem key={affiliation.pk} value={affiliation.pk!.toString()}>
+                  <SelectItem key={affiliation.id} value={affiliation.id!.toString()}>
                     {affiliation.name}
                   </SelectItem>
                 ))}

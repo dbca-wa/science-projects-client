@@ -3,7 +3,7 @@
 import type { IEmailListUser } from "./email.types";
 
 export interface IAgency {
-	pk: number;
+	id: number;
 	name: string;
 	key_stakeholder: number;
 	is_active: boolean;
@@ -12,7 +12,7 @@ export interface IAgency {
 // AFFILIATION ============================================================================
 
 export interface IAffiliation {
-	pk: number;
+	id: number;
 	created_at?: Date;
 	updated_at?: Date;
 	name: string;
@@ -21,7 +21,7 @@ export interface IAffiliation {
 // BRANCH ============================================================================
 
 export interface IBranch {
-	pk: number;
+	id: number;
 	old_id?: number;
 
 	agency: number;
@@ -34,7 +34,7 @@ export interface IBranch {
 export interface IDepartmentalService {
 	name: string;
 	director?: number;
-	pk: number;
+	id: number;
 	old_id?: number;
 }
 
@@ -43,7 +43,7 @@ export interface IDepartmentalService {
 export interface IBusinessAreaUpdate {
 	agency?: number;
 	old_id?: number;
-	pk?: number;
+	id?: number;
 	slug?: string;
 	division?: IDivision;
 	is_active: boolean;
@@ -59,7 +59,7 @@ export interface IBusinessAreaUpdate {
 export interface IBusinessArea {
 	agency?: number;
 	old_id?: number;
-	pk?: number;
+	id?: number;
 	slug?: string;
 	division?: IDivision | number;
 	is_active: boolean;
@@ -76,7 +76,7 @@ export interface IBusinessArea {
 export interface IBusinessAreaCreate {
 	agency?: number;
 	old_id?: number;
-	pk?: number;
+	id?: number;
 	slug?: string;
 	division?: number;
 	is_active: boolean;
@@ -90,7 +90,7 @@ export interface IBusinessAreaCreate {
 }
 
 export interface BusinessAreaImage {
-	pk: number;
+	id: number;
 	old_file: string;
 	file: string;
 }
@@ -98,7 +98,7 @@ export interface BusinessAreaImage {
 // DIVISIONS ============================================================================
 
 export interface IDivision {
-	pk: number;
+	id: number;
 	old_id?: number;
 	name: string;
 	slug: string;
@@ -110,7 +110,7 @@ export interface IDivision {
 // ADDRESS ============================================================================
 
 export interface IAddress {
-	pk: number;
+	id: number;
 	agency?: number;
 	branch?: number;
 	street: string;
@@ -135,7 +135,7 @@ export interface OrganisedLocationData {
 }
 
 export interface ISimpleLocationData {
-	pk: number;
+	id: number;
 	name: string;
 	area_type: string;
 }
@@ -150,7 +150,7 @@ export interface IProjectAreas {
 
 export interface IAddLocationForm {
 	old_id?: number;
-	pk: number;
+	id: number;
 	name: string;
 	area_type: string;
 }

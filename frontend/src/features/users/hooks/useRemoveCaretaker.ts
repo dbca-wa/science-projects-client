@@ -19,9 +19,9 @@ export const useRemoveCaretaker = () => {
     mutationFn: (caretakerId: number) => removeCaretaker(caretakerId),
     onSuccess: () => {
       // Invalidate caretaker check query to refetch updated data
-      if (authStore.user?.pk) {
+      if (authStore.user?.id) {
         queryClient.invalidateQueries({
-          queryKey: caretakerKeys.check(authStore.user.pk),
+          queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
 

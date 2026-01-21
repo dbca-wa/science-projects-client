@@ -84,11 +84,17 @@ export const ProfileEditPage = observer(() => {
   }, [user, form]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: ProfileFormData) => updateProfile(user!.pk!, data),
+    mutationFn: (data: ProfileFormData) => updateProfile(user!.id!, data),
     onSuccess: async () => {
-      await queryClient.resetQueries({ 
+      // Invalidate and refetch current user query to update Navitar
+      await queryClient.invalidateQueries({ 
         queryKey: authKeys.user(),
         exact: true
+      });
+      
+      // Also invalidate user detail if viewing own profile
+      await queryClient.invalidateQueries({
+        queryKey: ["users", "detail", user!.id],
       });
       
       toast.success("Profile updated successfully");

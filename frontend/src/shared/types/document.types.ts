@@ -1,7 +1,5 @@
 // PROJECT DOCUMENTS ============================================================================
 
-// TEMPORARILY DISABLED - ProjectImage type doesn't exist
-// import type { ProjectImage } from "./media.types";
 import type { IProjectData, IProjectMember } from "./project.types";
 
 interface IAECPDF {
@@ -9,41 +7,18 @@ interface IAECPDF {
 	updated_at: Date;
 	creator: number;
 	endorsement: number;
-	id?: number;
-	pk?: number;
+	id: number;
 	file: string;
 }
 
 interface ISmallProj {
-	pk: number;
+	id: number;
 	kind: string;
 	title: string;
 }
 
-// interface ISmallDoc {
-// 	pk: number;
-// 	project: ISmallProj;
-// }
-
-// interface IEndorsementProjectPlan {
-// 	pk: number;
-// 	document: ISmallDoc;
-// 	aims: string;
-// 	knowledge_transfer: string;
-// 	listed_references: string;
-// 	operating_budget: string;
-// 	operating_budget_external: string;
-// 	outcome: string;
-// 	related_projects: string;
-// }
-
-// interface ITaskEndorsement {
-// 	pk: number;
-// 	project_plan: IEndorsementProjectPlan;
-// }
-
 interface IEndorsement {
-	pk: number;
+	id: number;
 	project_plan: number;
 	bm_endorsement_required: boolean;
 	bm_endorsement_provided: boolean;
@@ -62,28 +37,20 @@ interface IEndorsement {
 	aec_pdf: IAECPDF;
 }
 
-// interface ProjectPDFData {
-// 	pk: number;
-// 	old_file: string | null;
-// 	file: string | null;
-// 	document: IMainDoc;
-// 	project: IProjectData;
-// }
-
 export interface IReferencedDoc {
-	pk: number;
+	id: number;
 	year?: number;
 }
 
 export interface IMidDoc {
-	pk: number;
+	id: number;
 	project: ISmallProj;
 	kind: string;
 	referenced_doc: IReferencedDoc;
 }
 
 export interface ISmallUserWithAvatar {
-	pk: number;
+	id: number;
 	email: string;
 	display_first_name: string;
 	display_last_name: string;
@@ -91,8 +58,7 @@ export interface ISmallUserWithAvatar {
 }
 
 export interface IMainDoc {
-	pk?: number;
-	id?: number;
+	id: number;
 	// report?: ISmallReport;
 	created_year: number;
 	created_at: Date;
@@ -117,8 +83,7 @@ interface IProjectDocPDF {
 }
 
 export interface IConceptPlan {
-	pk?: number;
-	id?: number;
+	id: number;
 	document: IMainDoc;
 	background: string | null;
 	aims: string | null;
@@ -130,7 +95,7 @@ export interface IConceptPlan {
 }
 
 interface IMethodologyImage {
-	pk: number;
+	id: number;
 	file: string;
 	project_plan: {
 		id: number;
@@ -142,7 +107,7 @@ interface IMethodologyImage {
 }
 
 export interface IProjectPlan {
-	pk: number;
+	id: number;
 	document: IMainDoc;
 	background: string | null;
 	aims: string | null;
@@ -161,7 +126,7 @@ export interface IProjectPlan {
 }
 
 export interface IProgressReport {
-	pk: number;
+	id: number;
 	created_at: Date;
 	updated_at: Date;
 	document: IMainDoc;
@@ -176,14 +141,14 @@ export interface IProgressReport {
 }
 
 export interface IStudentReport {
-	pk: number;
+	id: number;
 	document: IMainDoc;
 	progress_report: string;
 	year: number;
 }
 
 export interface IProjectClosure {
-	pk: number;
+	id: number;
 	document: IMainDoc;
 	intended_outcome: string | null;
 	reason: string | null;
@@ -211,9 +176,9 @@ export interface IProjectDocuments {
 }
 
 export interface IConceptPlanGenerationData {
-	project_pk: number;
-	document_pk: number;
-	concept_plan_data_pk: number;
+	project_id: number;
+	document_id: number;
+	concept_plan_data_id: number;
 	document_tag: string;
 	project_title: string;
 	project_status: string;

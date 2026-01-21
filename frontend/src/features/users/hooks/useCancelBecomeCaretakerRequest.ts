@@ -17,18 +17,18 @@ export const useCancelBecomeCaretakerRequest = () => {
   const authStore = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ taskId }: { taskId: number; userPk: number }) => 
+    mutationFn: ({ taskId }: { taskId: number; userId: number }) => 
       cancelCaretakerRequest(taskId),
     onSuccess: (_data, variables) => {
       // Invalidate user detail query to refresh caretaker section
       queryClient.invalidateQueries({
-        queryKey: userDetailKeys.detail(variables.userPk),
+        queryKey: userDetailKeys.detail(variables.userId),
       });
 
       // Invalidate current user's caretaker check to update button state
-      if (authStore.user?.pk) {
+      if (authStore.user?.id) {
         queryClient.invalidateQueries({
-          queryKey: caretakerKeys.check(authStore.user.pk),
+          queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
 

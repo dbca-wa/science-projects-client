@@ -64,31 +64,31 @@ export const UserAdminActionButtons = ({
 	const requestMergeMutation = useRequestMergeUsers();
 
 	// Self-targeting check
-	const isSelf = user.pk === currentUserId;
+	const isSelf = user.id === currentUserId;
 
 	// Handlers
 	const handleToggleAdmin = async () => {
-		await toggleAdminMutation.mutateAsync(user.pk);
+		await toggleAdminMutation.mutateAsync(user.id);
 	};
 
 	const handleActivate = async () => {
-		await activateMutation.mutateAsync(user.pk);
+		await activateMutation.mutateAsync(user.id);
 	};
 
 	const handleDeactivate = async () => {
-		await deactivateMutation.mutateAsync(user.pk);
+		await deactivateMutation.mutateAsync(user.id);
 	};
 
 	const handleDelete = async () => {
 		// Close the sheet immediately to prevent refetch
 		onClose?.();
-		await deleteMutation.mutateAsync(user.pk);
+		await deleteMutation.mutateAsync(user.id);
 	};
 
 	const handleRequestMerge = async () => {
 		await requestMergeMutation.mutateAsync({
 			primaryUserId: currentUserId,
-			secondaryUserIds: [user.pk],
+			secondaryUserIds: [user.id],
 		});
 	};
 
@@ -97,7 +97,7 @@ export const UserAdminActionButtons = ({
 		if (isSelf) {
 			navigate("/users/me");
 		} else {
-			navigate(`/users/${user.pk}/edit`);
+			navigate(`/users/${user.id}/edit`);
 		}
 	};
 

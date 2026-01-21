@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { AuthStore } from "./derived/auth.store";
 import { UIStore } from "./derived/ui.store";
 import { EditorStore } from "./derived/editor.store";
-import { UserSearchStore } from "./derived/userSearch.store";
+import { UserSearchStore } from "./derived/user-search.store";
 
 /**
  * Root store that combines all MobX stores

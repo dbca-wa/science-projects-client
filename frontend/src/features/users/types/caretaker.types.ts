@@ -9,7 +9,7 @@ import type { IUserData } from "@/shared/types/user.types";
  * Matches SecondaryUserSerializer from backend
  */
 export interface SecondaryUserData {
-  pk: number;
+  id: number;
   display_first_name: string | null;
   display_last_name: string | null;
   email: string;
@@ -70,7 +70,7 @@ export interface CaretakerCheckResponse {
  * Matches ICaretakerSimpleUserData from user.types.ts
  */
 export interface CaretakeeData {
-  pk: number;
+  id: number;
   caretaker_obj_id?: number;
   display_first_name: string | null;
   display_last_name: string | null;
@@ -87,8 +87,8 @@ export interface CaretakeeData {
  * Used when submitting caretaker request form
  */
 export interface RequestCaretakerPayload {
-  user_pk: number;
-  caretaker_pk: number;
+  user_id: number;
+  caretaker_id: number;
   reason: "leave" | "resignation" | "other";
   end_date?: string; // ISO date string
   notes?: string;

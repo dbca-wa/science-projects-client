@@ -132,7 +132,7 @@ export const MyProfilePage = observer(() => {
 
   // Render caretaker section content
   const renderMyCaretakerSection = () => {
-    if (!user?.pk) return null;
+    if (!user?.id) return null;
 
     // Show active caretaker if exists
     if (caretakerData?.caretaker_object) {
@@ -157,7 +157,7 @@ export const MyProfilePage = observer(() => {
     // Show request form if no caretaker or requests
     return (
       <RequestCaretakerForm 
-        userId={user.pk}
+        userId={user.id}
         onSuccess={handleCaretakerSuccess}
       />
     );

@@ -34,7 +34,7 @@ export const ToggleStaffProfileVisibilityModal = observer(
 
 		const toggleMutation = useMutation({
 			mutationFn: () =>
-				toggleStaffProfileVisibility(user.staff_profile_pk!),
+				toggleStaffProfileVisibility(user.staff_profile_id!),
 			onSuccess: async () => {
 				// Reset queries to force immediate refetch (ignores staleTime)
 				await queryClient.resetQueries({

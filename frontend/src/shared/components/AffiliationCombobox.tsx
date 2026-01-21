@@ -8,7 +8,7 @@ import type { IAffiliation } from "@/shared/types/org.types";
 
 interface AffiliationComboboxProps {
   value?: number;
-  onChange: (affiliationPk?: number) => void;
+  onChange: (affiliationId?: number) => void;
   label?: string;
   placeholder: string;
   helperText?: string;
@@ -38,7 +38,7 @@ export const AffiliationCombobox = ({
   const [isCreating, setIsCreating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load selected affiliation by PK
+  // Load selected affiliation by ID
   useEffect(() => {
     if (value && value > 0) {
       setIsLoadingAffiliation(true);
@@ -83,7 +83,7 @@ export const AffiliationCombobox = ({
 
   const handleSelectAffiliation = (affiliation: IAffiliation) => {
     setSelectedAffiliation(affiliation);
-    onChange(affiliation.pk);
+    onChange(affiliation.id);
     setIsMenuOpen(false);
     setSearchTerm("");
   };
@@ -107,7 +107,7 @@ export const AffiliationCombobox = ({
       });
       
       setSelectedAffiliation(newAffiliation);
-      onChange(newAffiliation.pk);
+      onChange(newAffiliation.id);
       setIsMenuOpen(false);
       setSearchTerm("");
     } catch (error) {
@@ -163,7 +163,7 @@ export const AffiliationCombobox = ({
             <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
               {filteredItems.map((affiliation) => (
                 <button
-                  key={affiliation.pk}
+                  key={affiliation.id}
                   type="button"
                   onClick={() => handleSelectAffiliation(affiliation)}
                   className="w-full text-left px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"

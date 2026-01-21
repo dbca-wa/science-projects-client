@@ -78,7 +78,7 @@ export const UserFilterPanel = observer(({
         <SelectContent>
           <SelectItem value="All">All Business Areas</SelectItem>
           {sortedBusinessAreas?.map((ba) => (
-            <SelectItem key={ba.pk} value={ba.pk!.toString()}>
+            <SelectItem key={ba.id} value={ba.id!.toString()}>
               {typeof ba.division === 'object' && ba.division?.slug ? `[${ba.division.slug}] ` : ""}
               {ba.name}
               {!ba.is_active ? " (INACTIVE)" : ""}

@@ -15,9 +15,9 @@ export const useCaretakerCheck = () => {
   const authStore = useAuthStore();
 
   return useQuery({
-    queryKey: caretakerKeys.check(authStore.user?.pk || 0),
+    queryKey: caretakerKeys.check(authStore.user?.id || 0),
     queryFn: getCaretakerCheck,
     staleTime: 5 * 60_000, // 5 minutes
-    enabled: authStore.isAuthenticated && !!authStore.user?.pk,
+    enabled: authStore.isAuthenticated && !!authStore.user?.id,
   });
 };

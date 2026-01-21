@@ -29,7 +29,7 @@ export const UserGrid = ({ users, isLoading }: UserGridProps) => {
   return (
     <div className="grid grid-cols-1">
       {users.map((user) => (
-        <UserCard key={user.pk} user={user} />
+        <UserCard key={user.id} user={user} />
       ))}
     </div>
   );

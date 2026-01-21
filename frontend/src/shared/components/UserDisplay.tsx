@@ -31,7 +31,7 @@ const sizeVariants = {
 
 export interface UserDisplayProps {
   user: {
-    pk: number;
+    id: number;
     display_first_name: string | null;
     display_last_name: string | null;
     email: string;

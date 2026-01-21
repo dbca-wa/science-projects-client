@@ -43,9 +43,9 @@ export const useApproveCaretakerTask = () => {
     mutationFn: (taskId: number) => approveCaretakerTask(taskId),
     onSuccess: () => {
       // Invalidate caretaker check query to refetch updated data
-      if (authStore.user?.pk) {
+      if (authStore.user?.id) {
         queryClient.invalidateQueries({
-          queryKey: caretakerKeys.check(authStore.user.pk),
+          queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
 

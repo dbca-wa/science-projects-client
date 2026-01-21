@@ -19,10 +19,10 @@ export const useBecomeCaretaker = () => {
   const authStore = useAuthStore();
 
   return useMutation({
-    mutationFn: (payload: { userPk: number; caretakerPk: number }) => {
+    mutationFn: (payload: { userId: number; caretakerId: number }) => {
       const requestPayload: RequestCaretakerPayload = {
-        user_pk: payload.userPk,
-        caretaker_pk: payload.caretakerPk,
+        user_id: payload.userId,
+        caretaker_id: payload.caretakerId,
         reason: "other",
         end_date: undefined,
         notes: undefined,
@@ -32,13 +32,13 @@ export const useBecomeCaretaker = () => {
     onSuccess: (_data, variables) => {
       // Invalidate user detail query to refresh caretaker section
       queryClient.invalidateQueries({
-        queryKey: userDetailKeys.detail(variables.userPk),
+        queryKey: userDetailKeys.detail(variables.userId),
       });
 
       // Invalidate current user's caretaker check to update button state
-      if (authStore.user?.pk) {
+      if (authStore.user?.id) {
         queryClient.invalidateQueries({
-          queryKey: caretakerKeys.check(authStore.user.pk),
+          queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
 

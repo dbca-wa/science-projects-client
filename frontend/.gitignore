@@ -12,6 +12,19 @@ dist
 dist-ssr
 *.local
 
+# Test coverage and results
+coverage
+*.lcov
+.nyc_output
+test-results/
+playwright-report/
+
+# Vitest
+.vitest/
+
+# Test snapshots (if using snapshot testing)
+**/__snapshots__/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

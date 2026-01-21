@@ -11,6 +11,3 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
 		</StoreContext.Provider>
 	);
 };
-
-// Export rootStore for initialization in main.tsx
-export { rootStore };

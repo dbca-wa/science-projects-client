@@ -3,7 +3,7 @@
 export interface IImageData {
 	file: string;
 	old_file: string;
-	pk: number;
+	id: number;
 	user: number;
 }
 

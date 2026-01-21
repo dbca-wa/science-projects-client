@@ -40,7 +40,7 @@ export const CaretakerModePage = () => {
     refetch: refetchCaretaker
   } = useCaretakerCheck();
 
-  const currentUserId = user?.pk;
+  const currentUserId = user?.id;
 
   // Handle loading state
   if (isLoadingUser || isLoadingCaretaker) {

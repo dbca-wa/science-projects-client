@@ -3,7 +3,7 @@
 // ============================================================================
 
 export interface IStaffUser {
-	pk: number;
+	id: number;
 	ba_lead_status?: string | null;
 	display_first_name: string;
 	display_last_name: string;
@@ -18,12 +18,12 @@ export interface IStaffUser {
 }
 
 export interface KeywordTag {
-	pk: number;
+	id: number;
 	name: string;
 }
 
 export interface IStaffProfileData {
-	pk: number;
+	id: number;
 	user: number;
 	title: string;
 	name: string;
@@ -38,14 +38,14 @@ export interface IStaffProfileData {
 }
 
 export interface IStaffProfileBaseData {
-	pk: number;
+	id: number;
 	is_hidden: boolean;
 	user: {
 		ba_lead_status: string | null;
 		display_first_name: string;
 		display_last_name: string;
 		is_active: boolean;
-		pk: number;
+		id: number;
 	};
 	title: string | null;
 	about: string | null;
@@ -59,7 +59,7 @@ export interface IStaffProfileBaseData {
 }
 
 export interface IStaffProfileHeroData {
-	pk: number;
+	id: number;
 	user: IStaffUser;
 	title: string;
 	name: string;
@@ -71,7 +71,7 @@ export interface IStaffProfileHeroData {
 }
 
 export interface IStaffOverviewData {
-	pk: number;
+	id: number;
 	user: IStaffUser;
 	about: string;
 	expertise: string;
@@ -96,7 +96,7 @@ export interface ITAssetData {
 // ============================================================================
 
 export interface IStaffProfileAddress {
-	pk: number;
+	id: number;
 	street: string;
 	city: string;
 	state: string;
@@ -111,7 +111,7 @@ export interface IStaffProfileBranch {
 }
 
 export interface IStaffUserResult {
-	pk?: number;
+	id?: number;
 	title?: string;
 	name: string;
 	position?: string;
@@ -130,7 +130,7 @@ export interface IStaffUserResult {
 // ============================================================================
 
 export interface IStaffEmploymentEntry {
-	pk?: number;
+	id?: number;
 	public_profile: number;
 	position_title: string;
 	start_year: string;
@@ -140,7 +140,7 @@ export interface IStaffEmploymentEntry {
 }
 
 export interface IStaffEducationEntry {
-	pk?: number;
+	id?: number;
 	public_profile: number;
 	qualification_name: string;
 	end_year: string;
@@ -149,8 +149,8 @@ export interface IStaffEducationEntry {
 }
 
 export interface IStaffCVData {
-	pk: number;
-	user_pk: number;
+	id: number;
+	user_id: number;
 	employment: IStaffEmploymentEntry[];
 	education: IStaffEducationEntry[];
 }
@@ -192,20 +192,20 @@ export interface LibraryPublicationResponse {
 }
 
 export interface CustomPublication {
-	pk: number;
+	id: number;
 	public_profile: number;
 	title: string;
 	year: string;
 }
 
 export interface PublicationResponse {
-	staffProfilePk: number;
+	staffProfileId: number;
 	libraryData: LibraryPublicationResponse;
 	customPublications: CustomPublication[];
 }
 
 export interface IStaffPublicationEntry {
-	pk: number;
+	id: number;
 	public_profile: number;
 	title: string;
 	year: number;
