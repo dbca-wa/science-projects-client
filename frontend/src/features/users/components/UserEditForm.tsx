@@ -99,15 +99,15 @@ export const UserEditForm = ({
 				about: user.about || "",
 				expertise: user.expertise || "",
 				branch:
-					user.branch?.pk !== undefined && user.branch?.pk !== null
-						? user.branch.pk
+					user.branch?.id !== undefined && user.branch?.id !== null
+						? user.branch.id
 						: undefined,
 				businessArea:
-					user.business_area?.pk !== undefined &&
-					user.business_area?.pk !== null
-						? user.business_area.pk
+					user.business_area?.id !== undefined &&
+					user.business_area?.id !== null
+						? user.business_area.id
 						: undefined,
-				affiliation: user.affiliation?.pk ?? undefined,
+				affiliation: user.affiliation?.id ?? undefined,
 				image: user.image?.file || null,
 			};
 
@@ -453,7 +453,7 @@ export const UserEditForm = ({
 											: "none";
 									const matchingBranch = branches?.find(
 										(b) =>
-											b.pk?.toString() === currentValue,
+											b.id?.toString() === currentValue,
 									);
 
 									// Only show the actual value if we have a matching branch OR if it's "none"
@@ -489,7 +489,7 @@ export const UserEditForm = ({
 														const isValidBranch =
 															branches?.some(
 																(b) =>
-																	b.pk ===
+																	b.id ===
 																	numValue,
 															);
 														if (isValidBranch) {
@@ -530,8 +530,8 @@ export const UserEditForm = ({
 														)
 														.map((branch) => (
 															<SelectItem
-																key={branch.pk}
-																value={branch.pk!.toString()}
+																key={branch.id}
+																value={branch.id!.toString()}
 															>
 																{branch.name}
 															</SelectItem>
@@ -557,7 +557,7 @@ export const UserEditForm = ({
 									const matchingBusinessArea =
 										businessAreas?.find(
 											(ba) =>
-												ba.pk?.toString() ===
+												ba.id?.toString() ===
 												currentValue,
 										);
 
@@ -593,7 +593,7 @@ export const UserEditForm = ({
 														const isValidBusinessArea =
 															businessAreas?.some(
 																(ba) =>
-																	ba.pk ===
+																	ba.id ===
 																	numValue,
 															);
 														if (
@@ -636,8 +636,8 @@ export const UserEditForm = ({
 														)
 														.map((ba) => (
 															<SelectItem
-																key={ba.pk}
-																value={ba.pk!.toString()}
+																key={ba.id}
+																value={ba.id!.toString()}
 															>
 																{ba.is_active
 																	? ba.name

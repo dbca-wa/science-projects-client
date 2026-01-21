@@ -11,7 +11,7 @@ export interface IMaintainer {
 }
 
 export interface IAdminOptions {
-	pk: number;
+	id: number;
 	email_options: string;
 	updated_at: Date;
 	created_at: Date;
@@ -52,7 +52,7 @@ export interface IGuideContent {
 }
 
 export interface IAdminOptionsTypeSafe {
-	pk: number;
+	id: number;
 	email_options: string;
 	updated_at: Date;
 	created_at: Date;
@@ -78,9 +78,9 @@ export interface IAdminOptionsTypeSafe {
 // ============================================================================
 
 export interface ICaretakerEntry {
-	pk?: number;
-	userPk: number;
-	caretakerPk: number;
+	id?: number;
+	userId: number;
+	caretakerId: number;
 	endDate: Date;
 	reason: "leave" | "resignation" | "other";
 	notes?: string;
@@ -91,7 +91,7 @@ export interface ICaretakerEntry {
 // ============================================================================
 
 export interface IAdminRequestUser {
-	pk: number;
+	id: number;
 	display_first_name?: string;
 	display_last_name?: string;
 }
@@ -99,8 +99,8 @@ export interface IAdminRequestUser {
 export interface IMakeRequestToAdmins {
 	action: "deleteproject" | "mergeuser" | "setcaretaker";
 	project?: number;
-	primaryUserPk?: number;
-	secondaryUserPks?: number[];
+	primaryUserId?: number;
+	secondaryUserIds?: number[];
 	reason?: string;
 	startDate?: Date;
 	endDate?: Date | null;
@@ -109,14 +109,14 @@ export interface IMakeRequestToAdmins {
 
 export interface IActionAdminTask {
 	action: "approve" | "reject";
-	taskPk: number;
+	taskId: number;
 }
 
 export interface IAdminTask {
 	action: "deleteproject" | "mergeuser" | "setcaretaker";
 	status: "pending" | "approved" | "fulfilled" | "rejected";
 	project?: {
-		pk: number;
+		id: number;
 		title: string;
 	};
 	requester?: IAdminRequestUser;
@@ -126,12 +126,12 @@ export interface IAdminTask {
 	notes?: string;
 	start_date?: Date;
 	end_date?: Date;
-	pk: number;
+	id: number;
 	created_at?: Date;
 }
 
 export interface ITaskDisplayCard {
-	pk: number;
+	id: number;
 	creator: ITaskUser;
 	user: ITaskUser;
 	document: ITaskDocument;
@@ -148,8 +148,8 @@ export interface ITaskDisplayCard {
 // ============================================================================
 
 export interface ISetCaretaker {
-	primaryUserPk: number;
-	caretakerUserPk: number;
+	primaryUserId: number;
+	caretakerUserId: number;
 }
 
 export interface IMergeUser {
@@ -157,9 +157,9 @@ export interface IMergeUser {
 	secondaryUsers: IUserData[];
 }
 
-export interface IMergeUserPk {
-	primaryUserPk: number;
-	secondaryUserPks: number[];
+export interface IMergeUserId {
+	primaryUserId: number;
+	secondaryUserIds: number[];
 }
 
 export interface IMergeAffiliation {

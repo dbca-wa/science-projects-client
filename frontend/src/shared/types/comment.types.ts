@@ -1,5 +1,5 @@
 export interface ICommentReaction {
-	pk?: number;
+	id?: number;
 	user: number;
 	// user: IUserData;
 	comment?: number | null;

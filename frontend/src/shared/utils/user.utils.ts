@@ -150,19 +150,19 @@ export const getUserPhone = (
  * ```
  */
 export const toUserDisplayFormat = (user: {
-	pk: number;
+	id: number;
 	display_first_name: string | null;
 	display_last_name: string | null;
 	email: string;
 	image?: { file: string } | string | null;
 }): {
-	pk: number;
+	id: number;
 	display_first_name: string | null;
 	display_last_name: string | null;
 	email: string;
 	image?: string;
 } => ({
-	pk: user.pk,
+	id: user.id,
 	display_first_name: user.display_first_name,
 	display_last_name: user.display_last_name,
 	email: user.email,

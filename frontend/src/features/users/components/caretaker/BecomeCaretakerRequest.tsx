@@ -116,7 +116,7 @@ export const BecomeCaretakerRequest = ({ request, onResponse }: BecomeCaretakerR
             </h4>
             <UserDisplay 
               user={{
-                pk: userNeedingCaretaker.pk,
+                id: userNeedingCaretaker.id,
                 display_first_name: userNeedingCaretaker.display_first_name,
                 display_last_name: userNeedingCaretaker.display_last_name,
                 email: userNeedingCaretaker.email,

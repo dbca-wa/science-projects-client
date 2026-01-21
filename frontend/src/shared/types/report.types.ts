@@ -1,14 +1,14 @@
 // REPORT ============================================================================
 
 export interface ILegacyPDF {
-	pk: number;
+	id: number;
 	file: string;
 	report: { id: number; year: number };
 	year: number;
 }
 
 export interface ITinyReportMedia {
-	pk: number;
+	id: number;
 	kind: string;
 	old_file: string;
 	file: string;
@@ -16,7 +16,7 @@ export interface ITinyReportMedia {
 }
 
 export interface ISmallReport {
-	pk: number;
+	id: number;
 	date_open?: Date | null;
 	date_closed?: Date | null;
 	year: number | null;
@@ -26,15 +26,14 @@ export interface ISmallReport {
 }
 
 export interface IReportPDF {
-	pk: number;
+	id: number;
 	file: string | null;
 	old_file: string | null;
 }
 
 export interface IReport {
 	old_id?: number;
-	pk: number;
-	id?: number;
+	id: number;
 	created_at?: Date;
 	updated_at?: Date | null;
 	date_open: Date | null;
@@ -53,7 +52,7 @@ export interface IReport {
 
 export interface IReportCreation {
 	old_id?: number;
-	pk?: number;
+	id?: number;
 	created_at?: Date;
 	updated_at?: Date | null;
 	// date_open: Date | null;

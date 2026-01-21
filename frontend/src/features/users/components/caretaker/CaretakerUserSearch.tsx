@@ -67,7 +67,7 @@ export const CaretakerUserSearch = ({ onSelect, excludeUserIds }: CaretakerUserS
     setSelectedUser(user);
     setSearchTerm("");
     setShowResults(false);
-    onSelect(user.pk);
+    onSelect(user.id);
   };
 
   const handleClearSelection = () => {
@@ -138,7 +138,7 @@ export const CaretakerUserSearch = ({ onSelect, excludeUserIds }: CaretakerUserS
             <div className="py-1 bg-white dark:bg-gray-800">
               {filteredUsers.map((user) => (
                 <button
-                  key={user.pk}
+                  key={user.id}
                   type="button"
                   className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 focus:outline-none bg-white dark:bg-gray-800"
                   onClick={() => handleUserSelect(user)}

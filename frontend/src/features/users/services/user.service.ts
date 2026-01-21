@@ -56,12 +56,12 @@ export const getUsersBasedOnSearchTerm = async (
 // ============================================================================
 
 /**
- * Get full user details by primary key
- * @param pk - User primary key
+ * Get full user details by ID
+ * @param id - User ID
  * @returns Full user data with caretaker fields
  */
-export const getFullUser = async (pk: number): Promise<IMemberUserDetails> => {
-  return apiClient.get<IMemberUserDetails>(USER_ENDPOINTS.DETAIL(pk));
+export const getFullUser = async (id: number): Promise<IMemberUserDetails> => {
+  return apiClient.get<IMemberUserDetails>(USER_ENDPOINTS.DETAIL(id));
 };
 
 /**
@@ -185,8 +185,8 @@ export const updateMembership = async (
   }
 ): Promise<void> => {
   await apiClient.put(USER_ENDPOINTS.MEMBERSHIP(userId), {
-    user_pk: userId,
-    branch_pk: data.branch || 0,
+    user_id: userId,
+    branch_id: data.branch || 0,
     business_area: data.business_area || 0,
     affiliation: data.affiliation,
   });
@@ -321,20 +321,20 @@ export const requestMergeUsers = async (
     action: "mergeuser",
     status: "pending",
     requester: primaryUserId,
-    primaryUserPk: primaryUserId,
-    secondaryUserPks: secondaryUserIds,
+    primaryUserId: primaryUserId,
+    secondaryUserIds: secondaryUserIds,
   });
 };
 
 /**
  * Toggle staff profile visibility
- * @param staffProfilePk - Staff profile primary key
+ * @param staffProfileId - Staff profile primary key
  * @returns Success response
  */
 export const toggleStaffProfileVisibility = async (
-  staffProfilePk: number
+  staffProfileId: number
 ): Promise<{ success: boolean }> => {
   return apiClient.post<{ success: boolean }>(
-    USER_ENDPOINTS.TOGGLE_STAFF_PROFILE_VISIBILITY(staffProfilePk)
+    USER_ENDPOINTS.TOGGLE_STAFF_PROFILE_VISIBILITY(staffProfileId)
   );
 };

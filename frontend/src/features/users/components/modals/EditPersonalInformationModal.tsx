@@ -68,7 +68,7 @@ export const EditPersonalInformationModal = observer(
 
     const updateMutation = useMutation({
       mutationFn: (data: PersonalInfoFormData) =>
-        updatePersonalInformation(user.pk!, data),
+        updatePersonalInformation(user.id!, data),
       onSuccess: async () => {
         // Reset queries to force immediate refetch (ignores staleTime)
         await queryClient.resetQueries({ 

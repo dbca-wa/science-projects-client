@@ -23,7 +23,7 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
       onClick(user);
     } else {
       // Default navigation
-      navigate(`/users/${user.pk}`);
+      navigate(`/users/${user.id}`);
     }
   };
 
@@ -47,7 +47,7 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
       text = user.role === "Executive" ? "Executive" : "Admin";
       colorClass = user.role === "Executive" ? "text-orange-600" : "text-blue-600";
     } else if (user.is_staff) {
-      text = `Staff${user.business_area?.leader === user.pk ? " (Business Area Leader)" : ""}`;
+      text = `Staff${user.business_area?.leader === user.id ? " (Business Area Leader)" : ""}`;
       colorClass = "text-green-600";
     } else {
       text = "External User";

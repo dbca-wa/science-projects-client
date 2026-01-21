@@ -1,8 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router";
 import { ALL_ROUTES } from "@/app/router/routes.config";
-// TEMPORARILY DISABLED - depends on moved staff profile types
-// import type { StaffUserData } from "@/features/users/types/staff-profile.types";
 
 interface StaffUserDataTemp {
 	name?: string;

@@ -11,7 +11,7 @@ import type {
 // ============================================================================
 
 export interface IUserData {
-	pk: number;
+	id: number;
 	username: string;
 	email: string;
 	display_first_name: string;
@@ -38,7 +38,7 @@ export interface IUserData {
 }
 
 export interface IMiniUser {
-	pk: number;
+	id: number;
 	first_name: string;
 	last_name: string;
 	username: string;
@@ -48,13 +48,12 @@ export interface IMiniUser {
 }
 
 export interface IUserMe {
-	staff_profile_pk?: number;
+	staff_profile_id?: number;
 	public_email?: string;
 	custom_title?: string;
 	custom_title_on?: boolean;
 	staff_profile_hidden?: boolean;
-	id?: number;
-	pk?: number;
+	id: number;
 	caretakers: ICaretakerSimpleUserData[];
 	caretaking_for: ICaretakerSimpleUserData[];
 	display_first_name: string;
@@ -120,7 +119,7 @@ export interface IProfile {
 // ============================================================================
 
 export interface ICaretakerSimpleUserData {
-	pk: number;
+	id: number;
 	is_superuser: boolean;
 	caretaker_obj_id?: number;
 	display_first_name: string | null;
@@ -139,14 +138,14 @@ export interface ICaretakerRequestObject {
 	end_date: Date | null;
 	notes: string | null;
 	primary_user: {
-		pk: number;
+		id: number;
 		display_first_name: string;
 		display_last_name: string;
 		image: IImageData;
 	};
 	reason: string | null;
 	secondary_users: {
-		pk: number;
+		id: number;
 		display_first_name: string;
 		display_last_name: string;
 		image: IImageData;
@@ -161,19 +160,18 @@ export interface ICheckCaretakerStatus {
 }
 
 export interface ICaretakerObject {
-	pk?: number;
-	id?: number;
+	id: number;
 	caretaker_obj_id?: number;
 	user:
 		| number
 		| {
-				pk: number;
+				id: number;
 				display_first_name: string;
 				display_last_name: string;
 				image: string;
 		  };
 	caretaker: {
-		pk: number;
+		id: number;
 		display_first_name: string;
 		display_last_name: string;
 		image: IImageData;

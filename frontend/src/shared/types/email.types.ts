@@ -4,16 +4,16 @@ import type { AxiosError, AxiosResponse } from "axios";
 import type { IUserData, IUserMe } from "./user.types";
 
 export interface IEmailListUser {
-	pk: number;
+	id: number;
 	name: string;
 	email: string;
 }
 
 export interface ISendSingleEmail {
-	fromUserPk: number;
+	fromUserId: number;
 	fromUserEmail: string;
 	fromUserName: string;
-	toUserPk?: number;
+	toUserId?: number;
 	toUserEmail: string;
 	toUserName?: string;
 	project?: number;

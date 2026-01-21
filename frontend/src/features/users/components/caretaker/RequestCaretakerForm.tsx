@@ -102,19 +102,19 @@ export const RequestCaretakerForm = ({
 	const { data: caretakerData } = useCaretakerCheck();
 
 	// Build caretaking chain (current user + all caretakees + sub-caretakees)
-	const caretakingChainPks = useCaretakingChain(currentUser);
+	const caretakingChainIds = useCaretakingChain(currentUser);
 
 	// Build ignore array: caretaking chain + users who requested you
 	const ignoreArray = useMemo(() => {
-		const pks = [...caretakingChainPks];
+		const ids = [...caretakingChainIds];
 		
 		// Add the primary user from become_caretaker_request_object (user who requested you)
-		if (caretakerData?.become_caretaker_request_object?.primary_user?.pk) {
-			pks.push(caretakerData.become_caretaker_request_object.primary_user.pk);
+		if (caretakerData?.become_caretaker_request_object?.primary_user?.id) {
+			ids.push(caretakerData.become_caretaker_request_object.primary_user.id);
 		}
 		
-		return pks;
-	}, [caretakingChainPks, caretakerData?.become_caretaker_request_object?.primary_user?.pk]);
+		return ids;
+	}, [caretakingChainIds, caretakerData?.become_caretaker_request_object?.primary_user?.id]);
 
 	const form = useForm<CaretakerRequestFormData>({
 		resolver: zodResolver(caretakerRequestSchema),
@@ -165,8 +165,8 @@ export const RequestCaretakerForm = ({
 
 		requestCaretakerMutation.mutate(
 			{
-				user_pk: userId,
-				caretaker_pk: data.caretakerUserId!,
+				user_id: userId,
+				caretaker_id: data.caretakerUserId!,
 				reason: data.reason,
 				end_date: data.endDate
 					? data.endDate.toISOString().split("T")[0]
@@ -193,10 +193,10 @@ export const RequestCaretakerForm = ({
 						// DO NOT invalidate queries yet - wait for admin decision
 					} else {
 						// Not approving as admin - invalidate queries to show pending request
-						if (authStore.user?.pk) {
+						if (authStore.user?.id) {
 							queryClient.invalidateQueries({
 								queryKey: caretakerKeys.check(
-									authStore.user.pk,
+									authStore.user.id,
 								),
 							});
 						}
@@ -226,9 +226,9 @@ export const RequestCaretakerForm = ({
 				setApproveAsAdmin(false);
 
 				// Invalidate queries to show the active caretaker
-				if (authStore.user?.pk) {
+				if (authStore.user?.id) {
 					queryClient.invalidateQueries({
-						queryKey: caretakerKeys.check(authStore.user.pk),
+						queryKey: caretakerKeys.check(authStore.user.id),
 					});
 				}
 
@@ -555,10 +555,10 @@ export const RequestCaretakerForm = ({
 								setApproveAsAdmin(false);
 
 								// Invalidate queries to show the pending request
-								if (authStore.user?.pk) {
+								if (authStore.user?.id) {
 									queryClient.invalidateQueries({
 										queryKey: caretakerKeys.check(
-											authStore.user.pk,
+											authStore.user.id,
 										),
 									});
 								}

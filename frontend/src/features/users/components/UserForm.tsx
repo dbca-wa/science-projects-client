@@ -147,7 +147,7 @@ const CreateForm = ({ createMutation, isSubmitting, onSuccess, onCancel, navigat
       if (onSuccess) {
         onSuccess(newUser);
       } else {
-        navigate(`/users/${newUser.pk}`);
+        navigate(`/users/${newUser.id}`);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
@@ -291,9 +291,9 @@ const EditForm = ({ user, userId, updateMutation, isSubmitting, onSuccess, onCan
         fax: user.fax || "",
         about: user.about || "",
         expertise: user.expertise || "",
-        branch: user.branch?.pk,
-        businessArea: user.business_area?.pk,
-        affiliation: user.affiliation?.pk,
+        branch: user.branch?.id,
+        businessArea: user.business_area?.id,
+        affiliation: user.affiliation?.id,
         image: user.image?.file || null,
       });
     }

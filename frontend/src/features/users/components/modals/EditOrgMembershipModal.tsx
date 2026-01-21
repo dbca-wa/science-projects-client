@@ -61,14 +61,14 @@ export const EditOrgMembershipModal = observer(
     const form = useForm<MembershipFormData>({
       resolver: zodResolver(membershipSchema),
       defaultValues: {
-        branch: user.branch?.pk || null,
-        business_area: user.business_area?.pk || null,
-        affiliation: user.affiliation?.pk || null,
+        branch: user.branch?.id || null,
+        business_area: user.business_area?.id || null,
+        affiliation: user.affiliation?.id || null,
       },
     });
 
     const updateMutation = useMutation({
-      mutationFn: (data: MembershipFormData) => updateMembership(user.pk!, data),
+      mutationFn: (data: MembershipFormData) => updateMembership(user.id!, data),
       onSuccess: async () => {
         // Reset queries to force immediate refetch (ignores staleTime)
         await queryClient.resetQueries({ 
@@ -145,8 +145,8 @@ export const EditOrgMembershipModal = observer(
                           <SelectItem value="0">None</SelectItem>
                           {branches?.map((branch) => (
                             <SelectItem
-                              key={branch.pk}
-                              value={branch.pk.toString()}
+                              key={branch.id}
+                              value={branch.id.toString()}
                             >
                               {branch.name}
                             </SelectItem>
@@ -182,7 +182,7 @@ export const EditOrgMembershipModal = observer(
                         <SelectContent>
                           <SelectItem value="0">None</SelectItem>
                           {businessAreas?.map((ba) => (
-                            <SelectItem key={ba.pk} value={ba.pk?.toString() || "0"}>
+                            <SelectItem key={ba.id} value={ba.id?.toString() || "0"}>
                               {ba.name}
                             </SelectItem>
                           ))}

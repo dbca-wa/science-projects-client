@@ -34,12 +34,10 @@ export interface EndorsementTasksResponse {
  */
 export interface IProjectDocument {
   id: number;
-  pk: number;
   kind: "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure";
   status: string;
   project: {
     id: number;
-    pk: number;
     title: string;
   };
   project_lead_approval_granted: boolean;
@@ -53,12 +51,10 @@ export interface IProjectDocument {
  */
 export interface IEndorsement {
   id: number;
-  pk: number;
   project_plan: {
     document: {
       project: {
         id: number;
-        pk: number;
         title: string;
         kind: string;
       };

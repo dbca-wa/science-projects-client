@@ -103,7 +103,7 @@ export const UserDetailSheet = observer(
 		const accountIsStaff = user?.is_staff;
 		const accountIsSuper = user?.is_superuser;
 		const viewingUserIsSuper = authStore.isSuperuser;
-		const isViewingOwnProfile = user?.pk === authStore.user?.pk;
+		const isViewingOwnProfile = user?.id === authStore.user?.id;
 
 		// Check if current user is admin or business area lead
 		const currentUserIsAdmin = authStore.user?.is_superuser || false;
@@ -117,7 +117,7 @@ export const UserDetailSheet = observer(
 			myCaretakerData?.become_caretaker_request_object;
 		const hasPendingBecomeRequest =
 			pendingBecomeRequest?.status === "pending" &&
-			pendingBecomeRequest?.primary_user?.pk === user?.pk;
+			pendingBecomeRequest?.primary_user?.id === user?.id;
 
 		// Check if user already has a caretaker
 		const userHasCaretaker =
@@ -131,7 +131,7 @@ export const UserDetailSheet = observer(
 			user &&
 			"caretakers" in user &&
 			Array.isArray(user.caretakers) &&
-			user.caretakers.some((c: ICaretakerSimpleUserData) => c.pk === authStore.user?.pk);
+			user.caretakers.some((c: ICaretakerSimpleUserData) => c.id === authStore.user?.id);
 
 		// Disable button if: viewing own profile, user has caretaker, already caretaker, or not authorized
 		const isBecomeCaretakerDisabled =
@@ -146,12 +146,12 @@ export const UserDetailSheet = observer(
 		};
 
 		const handleConfirmBecomeCaretaker = () => {
-			if (!user?.pk || !authStore.user?.pk) return;
+			if (!user?.id || !authStore.user?.id) return;
 
 			becomeCaretakerMutation.mutate(
 				{
-					userPk: user.pk,
-					caretakerPk: authStore.user.pk,
+					userId: user.id,
+					caretakerId: authStore.user.id,
 				},
 				{
 					onSuccess: () => {
@@ -162,12 +162,12 @@ export const UserDetailSheet = observer(
 		};
 
 		const handleConfirmCancelBecome = () => {
-			if (!pendingBecomeRequest?.id || !user?.pk) return;
+			if (!pendingBecomeRequest?.id || !user?.id) return;
 
 			cancelBecomeCaretakerMutation.mutate(
 				{
 					taskId: pendingBecomeRequest.id,
-					userPk: user.pk,
+					userId: user.id,
 				},
 				{
 					onSuccess: () => {
@@ -371,7 +371,7 @@ export const UserDetailSheet = observer(
 									<p className="font-bold text-sm text-gray-600 dark:text-gray-300">
 										Caretaker
 									</p>
-									{user.pk === authStore.user?.pk && (
+									{user.id === authStore.user?.id && (
 										<Button
 											variant="ghost"
 											size="sm"
@@ -404,7 +404,7 @@ export const UserDetailSheet = observer(
 
 												return (
 													<div
-														key={caretaker.pk}
+														key={caretaker.id}
 														className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-600 rounded-lg"
 													>
 														<div className="flex-1 min-w-0">
@@ -461,7 +461,7 @@ export const UserDetailSheet = observer(
 									<div className="text-center py-4 text-muted-foreground">
 										<Users className="mx-auto h-8 w-8 mb-2 opacity-50" />
 										<p className="text-sm">
-											{user.pk === authStore.user?.pk
+											{user.id === authStore.user?.id
 												? "You don't have any caretakers assigned"
 												: "This user doesn't have any caretakers assigned"}
 										</p>
@@ -522,7 +522,7 @@ export const UserDetailSheet = observer(
 											<p className="font-bold text-sm text-gray-600 dark:text-gray-300">
 												Caretaking For
 											</p>
-											{user.pk === authStore.user?.pk && (
+											{user.id === authStore.user?.id && (
 												<Button
 													variant="ghost"
 													size="sm"
@@ -555,7 +555,7 @@ export const UserDetailSheet = observer(
 
 													return (
 														<div
-															key={caretakee.pk}
+															key={caretakee.id}
 															className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
 														>
 															<div className="flex-1 min-w-0">
@@ -620,7 +620,7 @@ export const UserDetailSheet = observer(
 
 							{/* Merge Section - Placeholder (only show for superusers viewing other users) */}
 							{viewingUserIsSuper &&
-								user.pk !== authStore.user?.pk && (
+								user.id !== authStore.user?.id && (
 									<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
 										<p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
 											Merge Accounts
@@ -651,7 +651,7 @@ export const UserDetailSheet = observer(
 							{viewingUserIsSuper && authStore.user && (
 								<UserAdminActionButtons
 									user={user}
-									currentUserId={authStore.user.pk!}
+									currentUserId={authStore.user.id!}
 									onClose={onClose}
 								/>
 							)}

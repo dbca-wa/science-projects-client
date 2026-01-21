@@ -57,7 +57,7 @@ export const useCreateStaffUser = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
 
       // Set the new user in cache for detail page
-      queryClient.setQueryData(["users", "detail", newUser.pk], newUser);
+      queryClient.setQueryData(["users", "detail", newUser.id], newUser);
 
       // Show success toast
       toast.success("DBCA staff user created successfully");

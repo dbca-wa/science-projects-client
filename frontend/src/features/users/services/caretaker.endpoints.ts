@@ -30,7 +30,7 @@ export const CARETAKER_ENDPOINTS = {
   UPDATE_CARETAKER: (caretakerId: number) => `adminoptions/caretakers/${caretakerId}`,
   
   // Pending caretaker tasks
-  PENDING_TASKS: (userPk: number) => `adminoptions/caretakers/pending/${userPk}`,
+  PENDING_TASKS: (userId: number) => `adminoptions/caretakers/pending/${userId}`,
 } as const;
 
 // ============================================================================
@@ -98,8 +98,8 @@ export const requestCaretaker = async (
 ): Promise<AdminTask> => {
   return apiClient.post<AdminTask>(CARETAKER_ENDPOINTS.REQUEST_CARETAKER_TASK, {
     action: "setcaretaker",
-    primary_user: payload.user_pk,
-    secondary_users: [payload.caretaker_pk],
+    primary_user: payload.user_id,
+    secondary_users: [payload.caretaker_id],
     reason: payload.reason,
     end_date: payload.end_date,
     notes: payload.notes,

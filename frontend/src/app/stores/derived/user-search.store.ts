@@ -1,233 +1,249 @@
-// TEMPORARILY DISABLED - depends on moved user service
-// This will be re-enabled when the users feature is integrated back
-/*
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
-import { getUsersBasedOnSearchTerm } from "@/features/users/services/user.service";
-import type { IUserData } from "@/shared/types/user.types";
 import { logger } from "@/shared/services/logger.service";
-import { runInAction, computed, makeObservable, action } from "mobx";
+import { makeObservable, computed, action } from "mobx";
 
-interface UserSearchFilters {
-	onlySuperuser: boolean;
-	onlyExternal: boolean;
-	onlyStaff: boolean;
-	businessArea: string;
+export interface UserSearchFilters {
+	onlyExternal?: boolean;
+	onlyStaff?: boolean;
+	onlySuperuser?: boolean;
+	businessArea?: string | number;
 }
 
 interface UserSearchStoreState extends BaseStoreState {
 	searchTerm: string;
-	filteredItems: IUserData[];
-	currentUserResultsPage: number;
-	totalPages: number;
-	totalResults: number;
-	isOnUserPage: boolean;
 	filters: UserSearchFilters;
+	currentPage: number;
+	saveSearch: boolean;
+	totalResults: number;
 }
+
+const STORAGE_KEY = "userSearchState";
+
+const DEFAULT_FILTERS: UserSearchFilters = {
+	onlyExternal: false,
+	onlyStaff: false,
+	onlySuperuser: false,
+	businessArea: undefined,
+};
 
 export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 	constructor() {
 		super({
 			searchTerm: "",
-			filteredItems: [],
-			currentUserResultsPage: 1,
-			totalPages: 1,
+			filters: { ...DEFAULT_FILTERS },
+			currentPage: 1,
+			saveSearch: true, // Default to true - save search by default
 			totalResults: 0,
-			isOnUserPage: false,
-			filters: {
-				onlySuperuser: false,
-				onlyExternal: false,
-				onlyStaff: false,
-				businessArea: "All",
-			},
 			loading: false,
 			error: null,
-			initialised: true, // No async initialization needed
+			initialised: false,
 		});
 
-		// Configure observability
 		makeObservable(this, {
 			// Actions
 			setSearchTerm: action,
-			setCurrentUserResultsPage: action,
-			setIsOnUserPage: action,
-			setSearchFilters: action,
-			reFetch: action,
+			setFilters: action,
+			setCurrentPage: action,
+			toggleSaveSearch: action,
+			resetFilters: action,
+			clearSearchAndFilters: action,
+			clearState: action,
+			setTotalResults: action,
+			reset: action,
 
-			// Computed values
-			searchTerm: computed,
-			filteredItems: computed,
-			currentUserResultsPage: computed,
-			totalPages: computed,
-			totalResults: computed,
-			isOnUserPage: computed,
-			filters: computed,
+			// Computed
+			hasActiveFilters: computed,
+			searchParams: computed,
 		});
 	}
 
-	// Computed getters
-	get searchTerm() {
-		return this.state.searchTerm;
-	}
-
-	get filteredItems() {
-		return this.state.filteredItems;
-	}
-
-	get currentUserResultsPage() {
-		return this.state.currentUserResultsPage;
-	}
-
-	get totalPages() {
-		return this.state.totalPages;
-	}
-
-	get totalResults() {
-		return this.state.totalResults;
-	}
-
-	get isOnUserPage() {
-		return this.state.isOnUserPage;
-	}
-
-	get filters() {
-		return this.state.filters;
-	}
-
-	get onlySuperuser() {
-		return this.state.filters.onlySuperuser;
-	}
-
-	get onlyExternal() {
-		return this.state.filters.onlyExternal;
-	}
-
-	get onlyStaff() {
-		return this.state.filters.onlyStaff;
-	}
-
-	get businessArea() {
-		return this.state.filters.businessArea;
-	}
-
-	// Actions
-	setSearchTerm = (searchTerm: string) => {
-		runInAction(() => {
-			this.state.searchTerm = searchTerm;
+	async initialise() {
+		this.loadFromStorage();
+		this.state.initialised = true;
+		logger.info("UserSearch store initialized", {
+			saveSearch: this.state.saveSearch,
+			hasFilters: this.hasActiveFilters,
 		});
-		logger.debug("Search term updated", { searchTerm });
-	};
+	}
 
-	setCurrentUserResultsPage = (page: number) => {
-		runInAction(() => {
-			this.state.currentUserResultsPage = page;
-		});
-		logger.debug("Current page updated", { page });
-	};
-
-	setIsOnUserPage = (isOnUserPage: boolean) => {
-		runInAction(() => {
-			this.state.isOnUserPage = isOnUserPage;
-		});
-
-		// Reset filters when leaving user page
-		if (!isOnUserPage) {
-			runInAction(() => {
-				this.state.filters = {
-					onlySuperuser: false,
-					onlyExternal: false,
-					onlyStaff: false,
-					businessArea: "All",
-				};
-				this.state.searchTerm = "";
-			});
+	setSearchTerm(term: string) {
+		this.state.searchTerm = term;
+		this.state.currentPage = 1; // Reset to page 1 on search
+		if (this.state.saveSearch) {
+			this.saveToStorage();
 		}
+	}
 
-		logger.debug("User page status updated", { isOnUserPage });
-	};
-
-	setSearchFilters = (filters: UserSearchFilters) => {
-		runInAction(() => {
-			this.state.filters = { ...filters };
-			this.state.currentUserResultsPage = 1; // Reset to first page when filters change
-		});
-		logger.debug("Search filters updated", { filters });
-	};
-
-	reFetch = async () => {
-		await this.fetchUsers();
-	};
-
-	// Private method to fetch users
-	private fetchUsers = async () => {
-		if (!this.state.isOnUserPage) {
-			return;
+	setFilters(filters: Partial<UserSearchFilters>) {
+		this.state.filters = { ...this.state.filters, ...filters };
+		this.state.currentPage = 1; // Reset to page 1 on filter change
+		if (this.state.saveSearch) {
+			this.saveToStorage();
 		}
+	}
 
-		const result = await this.executeAsync(
-			async () => {
-				const data = await getUsersBasedOnSearchTerm(
-					this.state.searchTerm,
-					this.state.currentUserResultsPage,
-					this.state.filters
-				);
+	setCurrentPage(page: number) {
+		this.state.currentPage = page;
+		if (this.state.saveSearch) {
+			this.saveToStorage();
+		}
+	}
 
-				runInAction(() => {
-					this.state.filteredItems = data.users;
-					this.state.totalPages = data.total_pages;
-					this.state.totalResults = data.total_results;
-				});
+	toggleSaveSearch() {
+		this.state.saveSearch = !this.state.saveSearch;
+		if (this.state.saveSearch) {
+			// When enabling, save current state
+			this.saveToStorage();
+		} else {
+			// When disabling, save the saveSearch: false flag so we know not to restore on next load
+			// But keep current search active in memory
+			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
+		}
+		logger.info("Save search toggled", { saveSearch: this.state.saveSearch });
+	}
 
-				return data;
-			},
-			"fetch_users",
-			{ silent: false }
+	resetFilters() {
+		this.state.filters = { ...DEFAULT_FILTERS };
+		this.state.searchTerm = "";
+		this.state.currentPage = 1;
+		if (this.state.saveSearch) {
+			this.saveToStorage();
+		}
+	}
+
+	clearSearchAndFilters() {
+		const currentSaveSearch = this.state.saveSearch;
+		this.state.searchTerm = "";
+		this.state.filters = { ...DEFAULT_FILTERS };
+		this.state.currentPage = 1;
+		this.state.totalResults = 0;
+		
+		if (currentSaveSearch) {
+			this.saveToStorage();
+		} else {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
+		}
+		
+		logger.info("Cleared search and filters", { saveSearch: currentSaveSearch });
+	}
+
+	clearState() {
+		this.state.searchTerm = "";
+		this.state.filters = { ...DEFAULT_FILTERS };
+		this.state.currentPage = 1;
+		this.state.totalResults = 0;
+		// Don't clear localStorage here - we need to preserve the saveSearch flag
+	}
+
+	setTotalResults(count: number) {
+		this.state.totalResults = count;
+	}
+
+	get hasActiveFilters(): boolean {
+		return (
+			this.state.filters.onlyExternal ||
+			this.state.filters.onlyStaff ||
+			this.state.filters.onlySuperuser ||
+			this.state.filters.businessArea !== undefined ||
+			this.state.searchTerm.length > 0
 		);
-
-		if (!result.success) {
-			logger.error("Failed to fetch users", { error: result.error });
-		}
-	};
-
-	// Override initialise to set up automatic fetching
-	async initialise(): Promise<void> {
-		// Set up reactive fetching when relevant state changes
-		// This will be handled by the components using the store
-		logger.debug("UserSearchStore initialised");
 	}
 
-	reset(): void {
-		runInAction(() => {
-			this.state.searchTerm = "";
-			this.state.filteredItems = [];
-			this.state.currentUserResultsPage = 1;
-			this.state.totalPages = 1;
-			this.state.totalResults = 0;
-			this.state.isOnUserPage = false;
-			this.state.filters = {
-				onlySuperuser: false,
-				onlyExternal: false,
-				onlyStaff: false,
-				businessArea: "All",
+	get searchParams(): URLSearchParams {
+		const params = new URLSearchParams();
+
+		if (this.state.searchTerm) {
+			params.set("search", this.state.searchTerm);
+		}
+		if (this.state.currentPage > 1) {
+			params.set("page", this.state.currentPage.toString());
+		}
+		if (this.state.filters.onlyStaff) {
+			params.set("staff", "true");
+		}
+		if (this.state.filters.onlyExternal) {
+			params.set("external", "true");
+		}
+		if (this.state.filters.onlySuperuser) {
+			params.set("superuser", "true");
+		}
+		if (this.state.filters.businessArea) {
+			params.set("businessArea", this.state.filters.businessArea.toString());
+		}
+
+		return params;
+	}
+
+	private loadFromStorage() {
+		if (typeof window === "undefined") return;
+
+		try {
+			const stored = localStorage.getItem(STORAGE_KEY);
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				// Always load the saveSearch flag
+				this.state.saveSearch = parsed.saveSearch ?? true;
+				
+				// Only restore search state if saveSearch is enabled
+				if (parsed.saveSearch) {
+					this.state.searchTerm = parsed.searchTerm || "";
+					this.state.filters = parsed.filters || { ...DEFAULT_FILTERS };
+					this.state.currentPage = parsed.currentPage || 1;
+					logger.info("Loaded search state from storage", parsed);
+				} else {
+					logger.info("saveSearch disabled, not restoring search state");
+				}
+			}
+		} catch (error) {
+			logger.warn("Failed to load search state from storage", { error });
+		}
+	}
+
+	private saveToStorage() {
+		if (typeof window === "undefined") return;
+
+		try {
+			const toSave = {
+				searchTerm: this.state.searchTerm,
+				filters: this.state.filters,
+				currentPage: this.state.currentPage,
+				saveSearch: this.state.saveSearch,
 			};
-			this.state.loading = false;
-			this.state.error = null;
-			this.state.initialised = true;
-		});
-
-		logger.info("UserSearchStore reset");
-	}
-
-	async dispose(): Promise<void> {
-		this.reset();
-		logger.info("UserSearchStore disposed");
-	}
-
-	// Method to trigger search when dependencies change
-	// This will be called by components when search term, page, or filters change
-	triggerSearch = async () => {
-		if (this.state.isOnUserPage) {
-			await this.fetchUsers();
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+			logger.debug("Saved search state to storage", toSave);
+		} catch (error) {
+			logger.warn("Failed to save search state to storage", { error });
 		}
-	};
+	}
+
+	private clearStorage() {
+		if (typeof window === "undefined") return;
+
+		try {
+			localStorage.removeItem(STORAGE_KEY);
+			logger.debug("Cleared search state from storage");
+		} catch (error) {
+			logger.warn("Failed to clear search state from storage", { error });
+		}
+	}
+
+	reset() {
+		this.state.searchTerm = "";
+		this.state.filters = { ...DEFAULT_FILTERS };
+		this.state.currentPage = 1;
+		this.state.saveSearch = false;
+		this.state.totalResults = 0;
+		this.state.loading = false;
+		this.state.error = null;
+		this.state.initialised = false;
+		this.clearStorage();
+		logger.info("UserSearch store reset");
+	}
+
+	async dispose() {
+		if (!this.state.saveSearch) {
+			this.clearStorage();
+		}
+		this.reset();
+	}
 }
-*/
