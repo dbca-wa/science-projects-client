@@ -1,4 +1,4 @@
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 
 export const useNoImage = () => {
 	const uiStore = useUIStore();

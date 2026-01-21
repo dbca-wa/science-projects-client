@@ -6,7 +6,7 @@ import { ImCross } from "react-icons/im";
 import { observer } from "mobx-react-lite";
 import { API_CONFIG } from "@/shared/services/api/config";
 import { Progress } from "@/shared/components/ui/progress";
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 import { handleImageFileCompression } from "@/shared/lib/handleFileCompression";
 import { cn } from "@/shared/lib/utils";
 

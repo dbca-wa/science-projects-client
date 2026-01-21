@@ -5,7 +5,7 @@ import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
 import { RequestCaretakerForm } from "@/features/users/components/caretaker/RequestCaretakerForm";
 import { PendingCaretakerRequest } from "@/features/users/components/caretaker/PendingCaretakerRequest";
-import { BecomeCaretakerRequest } from "@/features/users/components/caretaker/BecomeCaretakerRequest";
+import { OutgoingCaretakerRequest } from "@/features/users/components/caretaker/OutgoingCaretakerRequest";
 import { ActiveCaretaker } from "@/features/users/components/caretaker/ActiveCaretaker";
 import { CaretakeesTable } from "@/features/users/components/caretaker/CaretakeesTable";
 
@@ -111,21 +111,37 @@ export const CaretakerModePage = () => {
       );
     }
 
-    // Show pending request if exists
+    // Show outgoing request if YOU requested someone to be YOUR caretaker
+    // (you are primary_user AND you are the requester)
     if (caretakerData?.caretaker_request_object) {
-      return (
-        <PendingCaretakerRequest 
-          request={caretakerData.caretaker_request_object}
-          onCancel={handleCaretakerCancel}
-        />
-      );
+      const isMyRequest = caretakerData.caretaker_request_object.requester.id === currentUserId;
+      
+      if (isMyRequest) {
+        return (
+          <OutgoingCaretakerRequest 
+            request={caretakerData.caretaker_request_object}
+            onCancel={handleCaretakerCancel}
+          />
+        );
+      } else {
+        // Someone else made this request on your behalf (admin action)
+        // This is unusual but possible - treat as incoming
+        return (
+          <PendingCaretakerRequest 
+            request={caretakerData.caretaker_request_object}
+            onCancel={handleCaretakerCancel}
+          />
+        );
+      }
     }
 
-    // Show become caretaker request if exists
+    // Show incoming request if someone wants YOU to be THEIR caretaker
+    // (you are in secondary_users)
     if (caretakerData?.become_caretaker_request_object) {
       return (
-        <BecomeCaretakerRequest 
+        <PendingCaretakerRequest 
           request={caretakerData.become_caretaker_request_object}
+          onCancel={handleCaretakerCancel}
         />
       );
     }

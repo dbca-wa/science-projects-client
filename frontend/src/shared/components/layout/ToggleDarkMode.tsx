@@ -1,4 +1,4 @@
-import { useUIStore } from "@/app/stores/useStore";
+import { useUIStore } from "@/app/stores/store-context";
 import { observer } from "mobx-react-lite";
 import { Button } from "@/shared/components/ui/button";
 import { Moon, Sun } from "lucide-react";

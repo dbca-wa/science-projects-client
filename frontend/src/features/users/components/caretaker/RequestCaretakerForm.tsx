@@ -47,7 +47,7 @@ import { CalendarIcon, Loader2, AlertCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/shared/lib/utils";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { useCaretakingChain } from "../../hooks/useCaretakingChain";
 import { useCaretakerCheck } from "../../hooks/useCaretakerCheck";
 import { CaretakerUserSearch } from "@/features/users/components/caretaker/CaretakerUserSearch";

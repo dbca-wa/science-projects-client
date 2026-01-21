@@ -23,15 +23,25 @@ import type { BecomeCaretakerRequestProps } from "../../types/caretaker.types";
 
 /**
  * BecomeCaretakerRequest component
- * Displays when you are requested to become someone's caretaker
- * Allows you to approve or reject the request directly
  * 
- * Features:
- * - Shows the user who needs a caretaker (primary_user)
- * - Displays message: "You have been requested to be [User]'s caretaker"
- * - Shows reason, end date (if applicable), notes (if provided)
- * - Approve/Reject buttons for direct response
- * - Confirmation dialogs for both actions
+ * ⚠️ IMPORTANT: This component is currently NOT USED in the application.
+ * 
+ * INTENDED USE CASE (not yet implemented):
+ * This component is designed for a scenario where someone requests YOU to become THEIR caretaker.
+ * In this case:
+ * - You would be in secondary_users array
+ * - The person needing a caretaker would be primary_user
+ * - You would see: "You have been requested to be [User]'s caretaker"
+ * - You can approve or reject the request
+ * 
+ * CURRENT IMPLEMENTATION:
+ * The current caretaker system works differently:
+ * - Users request someone to be THEIR caretaker (not the other way around)
+ * - Use PendingCaretakerRequest for incoming requests (someone wants to be YOUR caretaker)
+ * - Use OutgoingCaretakerRequest for outgoing requests (YOU want to be someone's caretaker)
+ * 
+ * This component may be useful if the system is extended to allow users to request
+ * specific people to become their caretaker (invitation-based system).
  * 
  * @param request - AdminTask representing the become caretaker request
  * @param onResponse - Callback after successful approve/reject

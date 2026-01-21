@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { AuthStore } from "./derived/auth.store";
 import { UIStore } from "./derived/ui.store";
 import { EditorStore } from "./derived/editor.store";
@@ -10,16 +10,12 @@ import { UserSearchStore } from "./derived/user-search.store";
 class RootStore {
 	authStore: AuthStore;
 	editorStore: EditorStore;
-	// projectMapSearcStore: ProjectMapSearchStore;
-	// projectSearchStore: ProjectSearchStore;
 	uiStore: UIStore;
 	userSearchStore: UserSearchStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
 		this.editorStore = new EditorStore();
-		// this.projectMapSearcStore = new ProjoectMapSearchStore();
-		// this.projectSearchStore = new ProjectSearchStore();
 		this.uiStore = new UIStore();
 		this.userSearchStore = new UserSearchStore();
 	}
@@ -30,3 +26,20 @@ export const rootStore = new RootStore();
 
 // Create React Context
 export const StoreContext = createContext<RootStore>(rootStore);
+
+/**
+ * Hook to access stores in components
+ */
+export const useStore = () => {
+	const context = useContext(StoreContext);
+	if (!context) {
+		throw new Error("useStore must be used within StoreProvider");
+	}
+	return context;
+};
+
+// Specific store hooks for better developer experience / prevent performance issues
+export const useUIStore = () => useStore().uiStore;
+export const useAuthStore = () => useStore().authStore;
+export const useEditorStore = () => useStore().editorStore;
+export const useUserSearchStore = () => useStore().userSearchStore;

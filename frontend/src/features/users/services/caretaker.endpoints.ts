@@ -23,6 +23,7 @@ export const CARETAKER_ENDPOINTS = {
   // Admin tasks for caretaker requests
   REQUEST_CARETAKER_TASK: "adminoptions/tasks", // Creates AdminTask (requires approval)
   APPROVE_TASK: (taskId: number) => `adminoptions/tasks/${taskId}/approve`, // Admin approves task
+  REJECT_TASK: (taskId: number) => `adminoptions/tasks/${taskId}/reject`, // Reject task
   CANCEL_REQUEST: (taskId: number) => `adminoptions/tasks/${taskId}/cancel`, // Cancel pending task
   
   // Caretaker management
@@ -31,6 +32,7 @@ export const CARETAKER_ENDPOINTS = {
   
   // Pending caretaker tasks
   PENDING_TASKS: (userId: number) => `adminoptions/caretakers/pending/${userId}`,
+  CHECK_PENDING_FOR_USER: (userId: number) => `adminoptions/caretakers/requests?user_id=${userId}`,
 } as const;
 
 // ============================================================================
@@ -117,6 +119,16 @@ export const approveCaretakerTask = async (taskId: number): Promise<void> => {
 };
 
 /**
+ * Reject a caretaker request
+ * Rejects the AdminTask
+ * @param taskId - AdminTask primary key
+ * @returns Success response
+ */
+export const rejectCaretakerTask = async (taskId: number): Promise<void> => {
+  return apiClient.post<void>(CARETAKER_ENDPOINTS.REJECT_TASK(taskId), {});
+};
+
+/**
  * Cancel a pending caretaker request
  * @param taskId - AdminTask primary key
  * @returns Success response
@@ -132,4 +144,14 @@ export const cancelCaretakerRequest = async (taskId: number): Promise<void> => {
  */
 export const removeCaretaker = async (caretakerId: number): Promise<void> => {
   return apiClient.delete<void>(CARETAKER_ENDPOINTS.REMOVE_CARETAKER(caretakerId));
+};
+
+/**
+ * Get pending caretaker requests for a specific user
+ * Returns requests where someone has requested to become THIS user's caretaker
+ * @param userId - User primary key
+ * @returns Array of pending AdminTask objects
+ */
+export const getPendingCaretakerRequests = async (userId: number): Promise<AdminTask[]> => {
+  return apiClient.get<AdminTask[]>(CARETAKER_ENDPOINTS.CHECK_PENDING_FOR_USER(userId));
 };

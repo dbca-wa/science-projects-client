@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelCaretakerRequest, caretakerKeys } from "../services/caretaker.endpoints";
 import { userDetailKeys } from "./useUserDetail";
 import { toast } from "sonner";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 
 /**
  * Hook for cancelling a "become caretaker" request
@@ -31,6 +31,11 @@ export const useCancelBecomeCaretakerRequest = () => {
           queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
+
+      // Invalidate pending requests for the target user
+      queryClient.invalidateQueries({
+        queryKey: ["caretakers", "pending", variables.userId],
+      });
 
       // Show success toast
       toast.success("Caretaker request cancelled successfully.");

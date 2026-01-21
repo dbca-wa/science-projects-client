@@ -3,7 +3,7 @@ import { FaUserPlus } from "react-icons/fa";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
-import { useUIStore, useAuthStore } from "@/app/stores/useStore";
+import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 
 interface TraditionalHeaderContentProps {
   handleNavigation: (path: string) => void;

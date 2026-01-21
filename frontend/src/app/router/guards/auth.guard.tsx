@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { toast } from "sonner";
 
 /**

@@ -1,6 +1,6 @@
 import { useBlocker } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useEditorStore } from "@/app/stores/useStore";
+import { useEditorStore } from "@/app/stores/store-context";
 import { OpenEditorDialog } from "../rich-text/components/OpenEditorDialog";
 
 /**

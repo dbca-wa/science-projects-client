@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { API_CONFIG } from "@/shared/services/api/config";
 import {

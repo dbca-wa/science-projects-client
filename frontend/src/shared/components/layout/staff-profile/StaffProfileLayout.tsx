@@ -7,7 +7,7 @@ import StaffProfileFooter from "./StaffProfileFooter";
 import ErrorBoundary from "@/shared/components/errors/ErrorBoundary";
 import { useMediaQuery } from "@/shared/hooks/ui/useMediaQuery";
 import { observer } from "mobx-react-lite";
-import { useAuthStore } from "@/app/stores/useStore";
+import { useAuthStore } from "@/app/stores/store-context";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 
 
