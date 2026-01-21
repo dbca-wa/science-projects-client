@@ -90,7 +90,7 @@ export const getUsers = async (): Promise<IUserData[]> => {
  * @returns Created user data
  */
 export const createUser = async (
-  data: import("../types").UserCreationFormData
+  data: import("../schemas/userCreate.schema").UserCreateFormData
 ): Promise<IUserData> => {
   return apiClient.post<IUserData>(USER_ENDPOINTS.CREATE, {
     username: data.username,
@@ -200,7 +200,7 @@ export const updateMembership = async (
  */
 export const adminUpdateUser = async (
   userId: number,
-  data: import("../types").UserEditFormData
+  data: import("../schemas/userEdit.schema").UserEditFormData
 ): Promise<IUserData> => {
   // Update personal information
   if (

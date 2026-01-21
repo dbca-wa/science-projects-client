@@ -1,6 +1,4 @@
 export type {
-  UserCreationFormData,
-  UserEditFormData,
   UserSearchParams,
   UserSearchFilters,
   UserSearchResponse,

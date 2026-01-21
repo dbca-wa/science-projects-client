@@ -2,12 +2,14 @@ import { useEffect } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { Breadcrumb } from "@/shared/components/Breadcrumb";
-import { UserSearchBar } from "@/features/users/components/UserSearchBar";
-import { UserFilterPanel } from "@/features/users/components/UserFilterPanel";
-import { UserGrid } from "@/features/users/components/UserGrid";
-import { Pagination } from "@/features/users/components/Pagination";
-import { UserDetailSheet } from "@/features/users/components/UserDetailSheet";
-import { useUserSearch } from "@/features/users/hooks/useUserSearch";
+import { 
+  UserSearchBar,
+  UserFilterPanel,
+  UserGrid,
+  Pagination,
+  UserDetailSheet,
+  useUserSearch
+} from "@/features/users";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";

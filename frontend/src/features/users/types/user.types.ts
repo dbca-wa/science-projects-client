@@ -5,58 +5,14 @@ import type { IUserData, IUserMe } from "@/shared/types/user.types";
 // ============================================================================
 
 /**
- * Form data for creating a new user
- * Used by UserForm component in create mode
+ * NOTE: User creation and edit form types are now defined in the schema files
+ * and inferred from Zod schemas for type safety and validation consistency.
+ * 
+ * Import from:
+ * - UserCreateFormData from "@/features/users/schemas/userCreate.schema"
+ * - UserEditFormData from "@/features/users/schemas/userEdit.schema"
+ * - Or from the barrel export: "@/features/users"
  */
-export interface UserCreationFormData {
-  // Required fields
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-
-  // Optional personal info
-  displayFirstName?: string;
-  displayLastName?: string;
-  title?: string;
-  phone?: string;
-  fax?: string;
-
-  // Profile
-  image?: File | null;
-  about?: string;
-  expertise?: string;
-
-  // Membership
-  isStaff?: boolean;
-  branch?: number;
-  businessArea?: number;
-  affiliation?: number;
-}
-
-/**
- * Form data for editing an existing user
- * Username is excluded (immutable)
- * Image can be File (new upload) or string (existing URL)
- */
-export interface UserEditFormData {
-  // Personal info (all optional for edit)
-  displayFirstName?: string;
-  displayLastName?: string;
-  title?: string;
-  phone?: string;
-  fax?: string;
-
-  // Profile
-  image?: File | string | null;
-  about?: string;
-  expertise?: string;
-
-  // Membership
-  branch?: number;
-  businessArea?: number;
-  affiliation?: number;
-}
 
 // ============================================================================
 // USER SEARCH & FILTERING (Feature-specific)
