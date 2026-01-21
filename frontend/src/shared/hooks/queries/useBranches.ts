@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllBranches } from "@/shared/services/org.service";
+import { STALE_TIME } from "@/shared/constants";
 
 /**
  * Hook for fetching all branches
@@ -12,6 +13,6 @@ export const useBranches = () => {
   return useQuery({
     queryKey: ["branches"],
     queryFn: getAllBranches,
-    staleTime: 10 * 60_000, // 10 minutes
+    staleTime: STALE_TIME.LONG,
   });
 };

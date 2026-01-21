@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useLocation, type Location } from "react-router";
 import { toast } from "sonner";
+import { STALE_TIME } from "@/shared/constants";
 import type { LoginFormData } from "../types";
 
 export const authKeys = {
@@ -32,7 +33,7 @@ export const useCurrentUser = () => {
 		queryKey: authKeys.user(),
 		queryFn: getSSOMe,
 		enabled: authStore.isAuthenticated,
-		staleTime: 5 * 60_000, // 5 minutes
+		staleTime: STALE_TIME.MEDIUM,
 		retry: false, // Don't retry on 401
 	});
 

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllAffiliations } from "@/shared/services/org.service";
+import { STALE_TIME } from "@/shared/constants";
 
 /**
  * Hook for fetching all affiliations
@@ -12,6 +13,6 @@ export const useAffiliations = () => {
   return useQuery({
     queryKey: ["affiliations"],
     queryFn: getAllAffiliations,
-    staleTime: 10 * 60_000, // 10 minutes
+    staleTime: STALE_TIME.LONG,
   });
 };

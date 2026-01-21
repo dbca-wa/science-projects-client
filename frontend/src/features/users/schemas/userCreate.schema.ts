@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FILE_SIZE, ACCEPTED_FILE_TYPES } from "@/shared/constants";
 
 /**
  * Zod schema for creating a new user
@@ -61,9 +62,9 @@ export const userCreateSchema = z.object({
   // Profile fields
   image: z
     .instanceof(File)
-    .refine((file) => file.size <= 5 * 1024 * 1024, "File must be less than 5MB")
+    .refine((file) => file.size <= FILE_SIZE.MAX_IMAGE_SIZE, "File must be less than 5MB")
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
+      (file) => ACCEPTED_FILE_TYPES.IMAGES.includes(file.type as any),
       "File must be JPG, PNG, or GIF"
     )
     .optional()
