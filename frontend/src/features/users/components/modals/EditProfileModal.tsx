@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "../../services/user.service";
 import { authKeys } from "@/features/auth/hooks/useAuth";
 import { API_CONFIG } from "@/shared/services/api/config";
+import { sanitizeFormData } from "@/shared/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
 import { RichTextEditor } from "@/shared/components/editor";
@@ -113,7 +114,9 @@ export const EditProfileModal = observer(
     });
 
     const handleSubmit = (data: ProfileFormData) => {
-      updateMutation.mutate(data);
+      // Sanitize form data before submission
+      const sanitizedData = sanitizeFormData(data, ["about", "expertise"]);
+      updateMutation.mutate(sanitizedData);
     };
 
     const handleClose = () => {

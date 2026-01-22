@@ -11,6 +11,7 @@ import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { useCreateExternalUser } from "../hooks/useCreateExternalUser";
 import { externalUserCreateSchema, type ExternalUserCreateFormData } from "../schemas/externalUserCreate.schema";
 import { apiClient } from "@/shared/services/api/client.service";
+import { sanitizeFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
 interface ExternalUserFormProps {
@@ -124,7 +125,10 @@ export const ExternalUserForm = ({ onSuccess, onCancel }: ExternalUserFormProps)
     }
 
     try {
-      const newUser = await createMutation.mutateAsync(data);
+      // Sanitize form data before submission
+      const sanitizedData = sanitizeFormData(data, []);
+      
+      const newUser = await createMutation.mutateAsync(sanitizedData);
       if (onSuccess) {
         onSuccess(newUser);
       } else {

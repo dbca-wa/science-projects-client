@@ -17,7 +17,7 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
  * - Breadcrumb navigation
  * - Loading and error states
  */
-export const UserEditPage = () => {
+const UserEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const userId = Number(id);
@@ -98,3 +98,5 @@ export const UserEditPage = () => {
     </div>
   );
 };
+
+export default UserEditPage;

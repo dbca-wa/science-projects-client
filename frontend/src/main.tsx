@@ -13,6 +13,9 @@ import { queryClient } from "./shared/lib/query-client";
 // Services
 import { getAllBranches, getAllBusinessAreas } from "./shared/services/org.service";
 
+// Components
+import ErrorBoundary from "./shared/components/errors/ErrorBoundary";
+
 // Other
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
@@ -43,15 +46,17 @@ const initialiseApp = async () => {
 	}
 	
 	createRoot(document.getElementById("root")!).render(
-		<StoreProvider>
-			<QueryClientProvider client={queryClient}>
-				<HelmetProvider>
-					<RouterProvider router={router} />
-					<Toaster position="top-right" richColors />
-					<ReactQueryDevtools />
-				</HelmetProvider>
-			</QueryClientProvider>
-		</StoreProvider>
+		<ErrorBoundary>
+			<StoreProvider>
+				<QueryClientProvider client={queryClient}>
+					<HelmetProvider>
+						<RouterProvider router={router} />
+						<Toaster position="top-right" richColors />
+						<ReactQueryDevtools />
+					</HelmetProvider>
+				</QueryClientProvider>
+			</StoreProvider>
+		</ErrorBoundary>
 	);
 };
 

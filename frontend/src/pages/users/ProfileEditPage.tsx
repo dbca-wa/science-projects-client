@@ -39,7 +39,7 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export const ProfileEditPage = observer(() => {
+const ProfileEditPage = observer(() => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: user, isLoading } = useCurrentUser();

@@ -38,6 +38,7 @@ import {
 	userEditSchema,
 	type UserEditFormData,
 } from "../schemas/userEdit.schema";
+import { sanitizeFormData } from "@/shared/utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
 import type { IUserData } from "@/shared/types/user.types";
@@ -132,9 +133,12 @@ export const UserEditForm = ({
 
 	const onSubmit = async (data: UserEditFormData) => {
 		try {
+			// Sanitize form data before submission
+			const sanitizedData = sanitizeFormData(data, ["about", "expertise"]);
+			
 			const updatedUser = await updateMutation.mutateAsync({
 				id: userId,
-				data,
+				data: sanitizedData,
 			});
 			if (onSuccess) {
 				onSuccess(updatedUser);

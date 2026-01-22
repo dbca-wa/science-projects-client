@@ -13,6 +13,8 @@ interface AuthStoreState extends BaseStoreState {
 	isAuthenticated: boolean;
 }
 
+// Note: Potentially give access to rootstore to impact other stores
+
 export class AuthStore extends BaseStore<AuthStoreState> {
 	user: IUserMe | null = null;
 	private onUnauthorised = this.handleUnauthorised.bind(this);

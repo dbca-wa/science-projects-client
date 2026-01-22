@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { sanitizeFormData } from "@/shared/utils";
 import {
 	Form,
 	FormControl,
@@ -160,18 +161,21 @@ export const RequestCaretakerForm = ({
 
 	const handleConfirm = () => {
 		const data = form.getValues();
+		
+		// Sanitize form data before submission
+		const sanitizedData = sanitizeFormData(data, ["notes"]);
 
-		console.log("Submitting caretaker request with data:", data);
+		console.log("Submitting caretaker request with data:", sanitizedData);
 
 		requestCaretakerMutation.mutate(
 			{
 				user_id: userId,
-				caretaker_id: data.caretakerUserId!,
-				reason: data.reason,
-				end_date: data.endDate
-					? data.endDate.toISOString().split("T")[0]
+				caretaker_id: sanitizedData.caretakerUserId!,
+				reason: sanitizedData.reason,
+				end_date: sanitizedData.endDate
+					? sanitizedData.endDate.toISOString().split("T")[0]
 					: undefined,
-				notes: data.notes || undefined,
+				notes: sanitizedData.notes || undefined,
 			},
 			{
 				onSuccess: (response) => {

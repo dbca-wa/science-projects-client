@@ -34,7 +34,7 @@ import { AlertCircle, Info } from "lucide-react";
  * Includes tabbed navigation for SPMS Profile, Staff Profile, and Caretaker Mode
  * Supports direct URL navigation to tabs via /users/me/caretaker
  */
-export const MyProfilePage = observer(() => {
+const MyProfilePage = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const { width } = useWindowSize();
@@ -419,3 +419,5 @@ export const MyProfilePage = observer(() => {
     </div>
   );
 });
+
+export default MyProfilePage;
