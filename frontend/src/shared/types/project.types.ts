@@ -1,148 +1,15 @@
-// PROJECT MEMBERS ============================================================================
-
+import type { IBusinessArea, ISimpleLocationData } from "./org.types";
+import type { IAffiliation } from "./org.types";
 import type { IImageData } from "./media.types";
-import type {
-	IAffiliation,
-	IBusinessArea,
-	ISimpleLocationData,
-} from "./org.types";
-import type { IMemberUserDetails } from "./user.types";
 
-export interface IProjectMember {
-	id: number;
-	project: number;
-	is_leader: boolean;
-	user: IMemberUserDetails;
-	// caretakers: IMemberUserDetails[] | null;
-	role: string;
-	time_allocation: number;
-	position: number;
-	short_code: number | null;
-	affiliation: IAffiliation;
-}
+/**
+ * Project Types
+ * 
+ * Type definitions for project-related data structures.
+ * These match the backend API structure.
+ */
 
-export interface ProjectImage {
-	id: number;
-	old_file: string;
-	file: string;
-}
-
-// PROJECT DETAILS =============================================================================
-
-interface ISmallUser {
-	id: number;
-	username: string;
-}
-
-interface ISmallProject {
-	id: number;
-	title: string;
-}
-
-export interface ISmallService {
-	id: number;
-	name: string;
-}
-
-interface IBaseProjectDetails {
-	id: number;
-	created_at: Date;
-	updated_at: Date;
-	creator: ISmallUser;
-	modifier: ISmallUser;
-	data_custodian: ISmallUser | null;
-	site_custodian: ISmallUser | null;
-	owner: ISmallUser;
-	project: ISmallProject;
-	service: ISmallService | null;
-}
-
-export interface IStudentProjectDetails {
-	id: number;
-	old_id: number | null;
-	level: string;
-	organisation: string;
-	project: ISmallProject;
-}
-
-export interface IExternalProjectDetails {
-	id: number;
-	old_id: number | null;
-	project: ISmallProject;
-	aims: string | null;
-	budget: string | null;
-	collaboration_with: string | null;
-	description: string | null;
-}
-
-export interface IExtendedProjectDetails {
-	base: IBaseProjectDetails;
-	external: IExternalProjectDetails | [];
-	student: IStudentProjectDetails | [];
-}
-
-// PROJECT ============================================================================
-
-export interface Position {
-	x: number;
-	y: number;
-}
-
-type ProjectRoles =
-	| "supervising"
-	| "research"
-	| "technical"
-	| "externalcol"
-	| "externalpeer"
-	| "academicsuper"
-	| "student"
-	| "consulted"
-	| "group";
-
-export interface IProjectData {
-	id: number;
-	areas: ISimpleLocationData[];
-	kind: string;
-	title: string;
-	status: string;
-	description: string;
-	tagline: string;
-	image: ProjectImage;
-	keywords: string;
-	year: number;
-	number: number;
-	start_date: Date;
-	end_date: Date;
-	business_area: IBusinessArea;
-	deletion_requested: boolean;
-	deletion_request_id: number | null;
-
-	created_at: Date;
-	updated_at: Date;
-	tag?: string;
-	role?: ProjectRoles;
-
-	hidden_from_staff_profiles?: number[];
-}
-
-export interface IProblematicData {
-	no_progress: IProjectData[];
-	open_closed: IProjectData[];
-	no_members: IProjectData[];
-	no_leader: IProjectData[];
-	multiple_leads: IProjectData[];
-	external_leader: IProjectData[];
-	inactive_lead_active_project: IProjectData[];
-}
-
-// TASKS ============================================================================
-
-export interface ITaskUser {
-	id: number;
-	first_name: string;
-	last_name: string;
-}
-
+// Project Status
 export type ProjectStatus =
 	| "new"
 	| "pending"
@@ -155,27 +22,167 @@ export type ProjectStatus =
 	| "terminated"
 	| "suspended";
 
-interface ITaskProject {
+// Project Kind
+export type ProjectKind = "core_function" | "science" | "student" | "external";
+
+// Project Roles
+export type ProjectRoles =
+	| "supervising"
+	| "research"
+	| "technical"
+	| "group";
+
+// Project Image
+export interface ProjectImage {
+	id: number;
+	file: string;
+	old_file: string;
+}
+
+// Small User (for project details)
+export interface ISmallUser {
+	id: number;
+	username: string;
+}
+
+// Small Project (for nested references)
+export interface ISmallProject {
 	id: number;
 	title: string;
-	status: string;
-	kind: string;
+}
+
+// Small Service
+export interface ISmallService {
+	id?: number;
+	name: string;
+}
+
+// Main Project Data
+export interface IProjectData {
+	id: number;
+	areas: ISimpleLocationData[];
+	kind: ProjectKind;
+	title: string;
+	status: ProjectStatus;
+	description: string;
+	tagline: string;
+	image: ProjectImage | null;
+	keywords: string;
 	year: number;
+	number: number;
+	start_date: Date;
+	end_date: Date;
 	business_area: IBusinessArea;
+	deletion_requested: boolean;
+	deletion_request_id: number | null;
+	created_at: Date;
+	updated_at: Date;
+	tag?: string;
+	role?: ProjectRoles;
+	hidden_from_staff_profiles?: number[];
+}
+
+// Base Project Details
+export interface IBaseProjectDetails {
+	id: number;
+	created_at: Date;
+	updated_at: Date;
+	creator: ISmallUser;
+	modifier: ISmallUser;
+	data_custodian: ISmallUser | null;
+	site_custodian: ISmallUser | null;
+	owner: ISmallUser;
+	project: ISmallProject;
+	service: ISmallService | null;
+}
+
+// Student Project Details
+export interface IStudentProjectDetails {
+	id: number;
+	old_id: number | null;
+	level: string;
+	organisation: string;
+	project: ISmallProject;
+}
+
+// External Project Details
+export interface IExternalProjectDetails {
+	id: number;
+	old_id: number | null;
+	project: ISmallProject;
+	aims: string | null;
+	budget: string | null;
+	collaboration_with: string | null;
+	description: string | null;
+}
+
+// Extended Project Details
+export interface IExtendedProjectDetails {
+	base: IBaseProjectDetails;
+	external: IExternalProjectDetails | [];
+	student: IStudentProjectDetails | [];
+}
+
+// Project Member User Details
+export interface IMemberUserDetails {
+	id: number;
+	is_staff: boolean;
+	is_superuser: boolean;
+	username: string | null;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	first_name: string | null;
+	last_name: string | null;
+	email: string;
+	business_area: string | null;
+	branch: string | null;
+	role: string | null;
 	image: IImageData;
 }
 
-export interface ITaskDocument {
+// Project Member
+export interface IProjectMember {
 	id: number;
-	kind: string;
-	status: string;
-	project: ITaskProject;
+	project: number;
+	is_leader: boolean;
+	user: IMemberUserDetails;
+	role: string;
+	time_allocation: number;
+	position: number;
+	short_code: number | null;
+	affiliation: IAffiliation;
 }
 
-export interface IApproveDocument {
-	shouldSendEmail?: boolean;
-	feedbackHTML?: string;
-	action: "approve" | "recall" | "send_back" | "reopen";
-	stage: number; // 1-3
-	documentId: number;
+// Project Documents (placeholder - will be expanded when implementing documents)
+export interface IProjectDocuments {
+	concept_plan: Record<string, unknown> | null;
+	project_plan: Record<string, unknown> | null;
+	progress_reports: Record<string, unknown>[];
+	student_reports: Record<string, unknown>[];
+	project_closure: Record<string, unknown> | null;
+}
+
+// Project Areas
+export interface IProjectAreas {
+	created_at: Date;
+	updated_at: Date;
+	project: number;
+	id: number;
+	areas: ISimpleLocationData[];
+}
+
+// Full Project Details (for detail page)
+export interface IFullProjectDetails {
+	project: IProjectData;
+	details: IExtendedProjectDetails;
+	documents: IProjectDocuments;
+	members: IProjectMember[] | null;
+}
+
+// Mini Project Data (for cards/lists)
+export interface ITinyProjectData {
+	id: number;
+	title: string;
+	image: ProjectImage | null;
+	tag: string;
 }
