@@ -11,7 +11,7 @@ import { ExternalUserForm } from "@/features/users/components/ExternalUserForm";
  * - External user creation form
  * - Breadcrumb navigation
  */
-export const UserCreatePage = () => {
+const UserCreatePage = () => {
   const navigate = useNavigate();
 
   const handleCancel = () => {
@@ -43,3 +43,5 @@ export const UserCreatePage = () => {
     </div>
   );
 };
+
+export default UserCreatePage;

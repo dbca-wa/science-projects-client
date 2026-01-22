@@ -11,7 +11,7 @@ import { StaffUserForm } from "@/features/users/components/StaffUserForm";
  * - Staff user creation form
  * - Breadcrumb navigation
  */
-export const UserCreateStaffPage = () => {
+const UserCreateStaffPage = () => {
   const navigate = useNavigate();
 
   const handleCancel = () => {
@@ -43,3 +43,5 @@ export const UserCreateStaffPage = () => {
     </div>
   );
 };
+
+export default UserCreateStaffPage;

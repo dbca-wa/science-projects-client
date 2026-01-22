@@ -12,6 +12,18 @@ export default defineConfig({
 	build: {
 		minify: true,
 		sourcemap: false,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					// Vendor chunks
+					"vendor-react": ["react", "react-dom", "react-router"],
+					"vendor-query": ["@tanstack/react-query"],
+					"vendor-mobx": ["mobx", "mobx-react-lite"],
+					"vendor-ui": ["lucide-react", "sonner", "framer-motion"],
+					"vendor-dompurify": ["dompurify"],
+				},
+			},
+		},
 	},
 	plugins: [
 		react(),

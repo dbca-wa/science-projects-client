@@ -25,7 +25,7 @@ import {
  * 
  * Route: /users/me/caretaker
  */
-export const CaretakerModePage = () => {
+const CaretakerModePage = () => {
   // Fetch current user data
   const { 
     data: user, 
@@ -193,3 +193,5 @@ export const CaretakerModePage = () => {
     </div>
   );
 };
+
+export default CaretakerModePage;

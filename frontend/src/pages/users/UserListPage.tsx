@@ -22,7 +22,7 @@ import { Loader2 } from "lucide-react";
  * UserListPage
  * Main page for browsing and searching users with detail sheet
  */
-export const UserListPage = observer(() => {
+const UserListPage = observer(() => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
   const userSearchStore = useUserSearchStore();
@@ -344,3 +344,5 @@ export const UserListPage = observer(() => {
     </div>
   );
 });
+
+export default UserListPage;

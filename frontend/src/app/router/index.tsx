@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import { Navigate, createBrowserRouter, type RouteObject } from "react-router";
 
 import { AdminRoute, ProtectedRoute } from "./guards/auth.guard";
@@ -10,6 +11,7 @@ import {
 } from "./routes.config";
 
 import ErrorHandler from "@/shared/components/errors/ErrorHandler";
+import { RouteLoader } from "@/shared/components/RouteLoader";
 import { ContentWrapper } from "@/shared/components/layout/ContentWrapper";
 import { LayoutCheckWrapper } from "@/shared/components/layout/LayoutCheckWrapper";
 import { Root } from "@/shared/components/layout/Root";
@@ -61,7 +63,9 @@ const toRouteObject = (config: RouteConfig, asChild = false): RouteObject => {
 
 	const element = withLayout(
 		config,
-		<Component {...(config.componentProps ?? {})} />
+		<Suspense fallback={<RouteLoader />}>
+			<Component {...(config.componentProps ?? {})} />
+		</Suspense>
 	);
 
 	// Normalize child path for nesting under Root

@@ -26,7 +26,7 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
  * - Loading and error states
  * - Responsive layout
  */
-export const UserDetailPage = observer(() => {
+const UserDetailPage = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const authStore = useAuthStore();
@@ -156,3 +156,5 @@ export const UserDetailPage = observer(() => {
     </div>
   );
 });
+
+export default UserDetailPage;

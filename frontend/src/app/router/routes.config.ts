@@ -1,19 +1,18 @@
-import { type ComponentType } from "react";
+import { type ComponentType, lazy } from "react";
 
-// Pages - Auth
-import Login from "@/pages/auth/Login";
+// Pages - Auth (lazy loaded)
+const Login = lazy(() => import("@/pages/auth/Login"));
 
-// Pages - Dashboard
-import Dashboard from "@/pages/dash/Dashboard";
-// import UserGuide from "@/pages/dash/UserGuide"; // Commented out - page not yet created
+// Pages - Dashboard (lazy loaded)
+const Dashboard = lazy(() => import("@/pages/dash/Dashboard"));
 
-// Pages - Users
-import { UserListPage } from "@/pages/users/UserListPage";
-import { UserCreatePage } from "@/pages/users/UserCreatePage";
-import { UserCreateStaffPage } from "@/pages/users/UserCreateStaffPage";
-import { UserEditPage } from "@/pages/users/UserEditPage";
-import { MyProfilePage } from "@/pages/users/MyProfilePage";
-import { ProfileEditPage } from "@/pages/users/ProfileEditPage";
+// Pages - Users (lazy loaded)
+const UserListPage = lazy(() => import("@/pages/users/UserListPage"));
+const UserCreatePage = lazy(() => import("@/pages/users/UserCreatePage"));
+const UserCreateStaffPage = lazy(() => import("@/pages/users/UserCreateStaffPage"));
+const UserEditPage = lazy(() => import("@/pages/users/UserEditPage"));
+const MyProfilePage = lazy(() => import("@/pages/users/MyProfilePage"));
+const ProfileEditPage = lazy(() => import("@/pages/users/ProfileEditPage"));
 
 /**
  * Route Configuration

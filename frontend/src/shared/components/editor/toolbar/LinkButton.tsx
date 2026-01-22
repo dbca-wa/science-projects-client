@@ -27,52 +27,8 @@ import {
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { toast } from 'sonner';
+import { sanitizeUrl } from '@/shared/utils';
 import type { LinkButtonProps } from '@/shared/types/editor.types';
-
-/**
- * Sanitize and validate URL for security
- * Only allows http, https, and mailto protocols
- * Prevents javascript:, data:, and other potentially dangerous protocols
- */
-const sanitizeUrl = (url: string): string | null => {
-  const trimmedUrl = url.trim();
-  
-  if (!trimmedUrl) {
-    return null;
-  }
-
-  // Check for dangerous protocols
-  const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:', 'about:'];
-  const lowerUrl = trimmedUrl.toLowerCase();
-  
-  for (const protocol of dangerousProtocols) {
-    if (lowerUrl.startsWith(protocol)) {
-      toast.error('Invalid URL protocol. Only http, https, and mailto are allowed.');
-      return null;
-    }
-  }
-
-  // If no protocol, assume https
-  if (!lowerUrl.startsWith('http://') && !lowerUrl.startsWith('https://') && !lowerUrl.startsWith('mailto:')) {
-    return `https://${trimmedUrl}`;
-  }
-
-  // Validate URL format
-  try {
-    const urlObj = new URL(trimmedUrl);
-    
-    // Only allow http, https, and mailto
-    if (!['http:', 'https:', 'mailto:'].includes(urlObj.protocol)) {
-      toast.error('Invalid URL protocol. Only http, https, and mailto are allowed.');
-      return null;
-    }
-    
-    return urlObj.href;
-  } catch {
-    toast.error('Invalid URL format. Please enter a valid URL.');
-    return null;
-  }
-};
 
 export const LinkButton: React.FC<LinkButtonProps> = ({ disabled = false }) => {
   const [editor] = useLexicalComposerContext();
@@ -161,11 +117,14 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ disabled = false }) => {
   const handleInsertLink = () => {
     const sanitizedUrl = sanitizeUrl(linkUrl);
     
-    if (sanitizedUrl) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizedUrl);
-      setIsDialogOpen(false);
-      setLinkUrl('');
+    if (!sanitizedUrl) {
+      toast.error('Invalid URL. Please enter a valid URL.');
+      return;
     }
+    
+    editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizedUrl);
+    setIsDialogOpen(false);
+    setLinkUrl('');
   };
 
   const handleRemoveLink = () => {
