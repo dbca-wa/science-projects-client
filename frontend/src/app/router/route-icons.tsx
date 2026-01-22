@@ -10,6 +10,7 @@ export const ROUTE_ICONS = {
 	dashboard: <HiMiniSquares2X2 />,
 	docs: <SiReadthedocs />,
 	project: <FaProjectDiagram />,
+	projects: <FaProjectDiagram />,
 	projectAdd: <TbLayoutGridAdd />,
 	report: <FaFileAlt />,
 	users: <FaUsers />,

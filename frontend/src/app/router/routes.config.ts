@@ -14,6 +14,11 @@ const UserEditPage = lazy(() => import("@/pages/users/UserEditPage"));
 const MyProfilePage = lazy(() => import("@/pages/users/MyProfilePage"));
 const ProfileEditPage = lazy(() => import("@/pages/users/ProfileEditPage"));
 
+// Pages - Projects (lazy loaded)
+const ProjectListPage = lazy(() => import("@/pages/projects/ProjectListPage"));
+const ProjectCreatePage = lazy(() => import("@/pages/projects/ProjectCreatePage"));
+const ProjectDetailPage = lazy(() => import("@/pages/projects/ProjectDetailPage"));
+
 /**
  * Route Configuration
  * 
@@ -185,9 +190,7 @@ export const USER_ROUTES: RouteConfig[] = [
 	},
 ];
 
-/** ---------------- Projects (NOT YET IMPLEMENTED) ---------------- */
-// Uncomment when projects feature is implemented
-/*
+/** ---------------- Projects ---------------- */
 export const PROJECT_ROUTES: RouteConfig[] = [
 	{
 		name: "Projects",
@@ -202,17 +205,17 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Add Project",
-		path: "/projects/create",
+		path: "/projects/add",
 		iconKey: "projects",
 		component: ProjectCreatePage,
 		requiresAuth: true,
-		showInSidebar: true,
+		showInSidebar: false,
 		section: "Projects",
 		layoutWrapper: "content",
 	},
 	{
 		name: "Project Detail",
-		path: "/projects/:id",
+		path: "/projects/:id/*",
 		iconKey: "projects",
 		component: ProjectDetailPage,
 		requiresAuth: true,
@@ -220,7 +223,6 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 ];
-*/
 
 /** ---------------- Reports (NOT YET IMPLEMENTED) ---------------- */
 // Uncomment when reports feature is implemented
@@ -275,8 +277,8 @@ export const ALL_ROUTES: RouteConfig[] = [
 	...AUTH_ROUTES,
 	...DASHBOARD_ROUTES,
 	...USER_ROUTES,
+	...PROJECT_ROUTES,
 	// Uncomment as features are implemented:
-	// ...PROJECT_ROUTES,
 	// ...REPORT_ROUTES,
 	// ...ADMIN_ROUTES,
 ];
