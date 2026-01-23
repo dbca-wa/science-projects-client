@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 import { API_CONFIG } from "@/shared/services/api/config";
 import { Progress } from "@/shared/components/ui/progress";
 import { useUIStore } from "@/app/stores/store-context";
-import { handleImageFileCompression } from "@/shared/lib/image-compression";
+import { handleImageFileCompression } from "@/shared/utils/image-compression.utils";
 import { ACCEPTED_IMAGE_TYPES } from "@/shared/constants/image.constants";
 import { cn } from "@/shared/lib/utils";
 
@@ -73,7 +73,7 @@ export const StatefulMediaChanger = observer(
 				acceptedFile: acceptedFile,
 				options: {
 					acceptedTypes: ACCEPTED_IMAGE_TYPES,
-					maxSizeMB: 3,
+					maxSizeMB: 1,
 					maxDimension: 1920,
 				},
 				callbacks: {

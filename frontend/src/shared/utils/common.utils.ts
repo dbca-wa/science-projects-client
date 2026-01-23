@@ -63,3 +63,17 @@ export function formatDate(
 export function isDateExpired(endDate?: string | Date | null): boolean {
   return endDate ? isPast(new Date(endDate)) : false;
 }
+
+
+/**
+ * Converts a string to title case (capitalizes first letter of each word)
+ * @param str - The string to convert
+ * @returns The title-cased string
+ * @example toTitleCase("hello world") // "Hello World"
+ */
+export function toTitleCase(str: string): string {
+	return str
+		.split(' ')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+		.join(' ');
+}

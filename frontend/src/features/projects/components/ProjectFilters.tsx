@@ -8,14 +8,14 @@ import {
 } from "@/shared/components/ui/select";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { SearchControls } from "@/shared/components/SearchControls";
 import { Search } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
+import { SearchControls } from "@/shared/components/SearchControls";
+import { UserSearchDropdown } from "@/features/users";
 
 interface ProjectFiltersProps {
 	searchTerm: string;
