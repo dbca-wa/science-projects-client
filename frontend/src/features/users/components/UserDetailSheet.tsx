@@ -53,6 +53,7 @@ import {
 } from "@/shared/utils/user.utils";
 import { getSanitizedHtmlOrFallback } from "@/shared/utils/html.utils";
 import { UserDisplay } from "@/shared/components/UserDisplay";
+import { getImageUrl } from "@/shared/utils/image.utils";
 
 interface UserDetailSheetProps {
 	userId: number | null;
@@ -246,10 +247,7 @@ export const UserDetailSheet = observer(
 							<div className="flex gap-4 mb-4">
 								<Avatar className="size-24">
 									<AvatarImage
-										src={
-											user.image?.file ||
-											user.image?.old_file
-										}
+										src={getImageUrl(user.image)}
 									/>
 									<AvatarFallback>
 										{getUserInitials(user)}
@@ -349,6 +347,115 @@ export const UserDetailSheet = observer(
 									)}
 								</div>
 							</div>
+
+							{/* Business Areas Led Section - Only show if user is a BA Lead */}
+							{user.business_areas_led && user.business_areas_led.length > 0 && (
+								<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-2 mt-2">
+									<p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
+										Business Areas Led
+									</p>
+									<div className="space-y-3">
+										{user.business_areas_led.map((ba) => {
+											// Handle both ID format (from list) and object format (from detail)
+											const baId = typeof ba === 'number' ? ba : ba.id;
+											const baName = typeof ba === 'object' && ba.name ? ba.name : null;
+											
+											// Use shared image utility
+											const baImage = typeof ba === 'object' && ba.image ? getImageUrl(ba.image) : null;
+											
+											const projectCount = typeof ba === 'object' && ba.project_count !== undefined ? ba.project_count : null;
+											const divisionSlug = typeof ba === 'object' && ba.division && typeof ba.division === 'object' ? ba.division.slug : null;
+											
+											// If we only have ID, show minimal version
+											if (!baName) {
+												return (
+													<div
+														key={baId}
+														className="flex items-center p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+													>
+														<Badge className="bg-orange-600 text-white">
+															BA Lead
+														</Badge>
+														<p className="ml-3 text-sm text-gray-600 dark:text-gray-300">
+															Business Area ID: {baId}
+														</p>
+													</div>
+												);
+											}
+											
+											return (
+												<div
+													key={baId}
+													className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
+												>
+													{/* Business Area Image */}
+													<div className="flex-shrink-0">
+														{baImage ? (
+															<img
+																src={baImage}
+																alt={baName}
+																className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600"
+																onError={(e) => {
+																	// Hide the broken image and show placeholder instead
+																	const parent = e.currentTarget.parentElement;
+																	if (parent) {
+																		e.currentTarget.style.display = 'none';
+																		const placeholder = document.createElement('div');
+																		placeholder.className = 'w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600';
+																		placeholder.innerHTML = `<span class="text-2xl font-bold text-gray-400 dark:text-gray-500">${baName.charAt(0)}</span>`;
+																		parent.appendChild(placeholder);
+																	}
+																}}
+															/>
+														) : (
+															<div className="w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+																<span className="text-2xl font-bold text-gray-400 dark:text-gray-500">
+																	{baName.charAt(0)}
+																</span>
+															</div>
+														)}
+													</div>
+													
+													{/* Business Area Info */}
+													<div className="flex-1 min-w-0">
+														<div className="flex items-start justify-between gap-2">
+															<div className="flex-1 min-w-0">
+																<div className="flex items-center gap-2 mb-1">
+																	<Badge className="bg-orange-600 text-white text-xs">
+																		BA Lead
+																	</Badge>
+																	{divisionSlug && (
+																		<span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+																			[{divisionSlug}]
+																		</span>
+																	)}
+																</div>
+																<h4 className="font-bold text-base text-gray-900 dark:text-gray-100 truncate">
+																	{baName}
+																</h4>
+																<div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-gray-400">
+																	<span className="flex items-center gap-1">
+																		<span className="font-medium">ID:</span>
+																		<span>{baId}</span>
+																	</span>
+																	{projectCount !== null && (
+																		<span className="flex items-center gap-1">
+																			<span className="font-medium">Projects:</span>
+																			<span className="font-semibold text-blue-600 dark:text-blue-400">
+																				{projectCount}
+																			</span>
+																		</span>
+																	)}
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</div>
+							)}
 
 							{/* About Section */}
 							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
@@ -504,7 +611,7 @@ export const UserDetailSheet = observer(
 											// Transform image data to match UserDisplay expectations
 											const userForDisplay = secondaryUser ? {
 												...secondaryUser,
-												image: secondaryUser.image?.file || undefined
+												image: getImageUrl(secondaryUser.image)
 											} : null;
 											
 											return userForDisplay ? (

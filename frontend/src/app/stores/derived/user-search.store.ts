@@ -6,6 +6,7 @@ export interface UserSearchFilters {
 	onlyExternal?: boolean;
 	onlyStaff?: boolean;
 	onlySuperuser?: boolean;
+	onlyBALead?: boolean;
 	businessArea?: string | number;
 }
 
@@ -23,6 +24,7 @@ const DEFAULT_FILTERS: UserSearchFilters = {
 	onlyExternal: false,
 	onlyStaff: false,
 	onlySuperuser: false,
+	onlyBALead: false,
 	businessArea: undefined,
 };
 
@@ -53,6 +55,7 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 
 			// Computed
 			hasActiveFilters: computed,
+			filterCount: computed,
 			searchParams: computed,
 		});
 	}
@@ -144,9 +147,21 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			this.state.filters.onlyExternal ||
 			this.state.filters.onlyStaff ||
 			this.state.filters.onlySuperuser ||
+			this.state.filters.onlyBALead ||
 			this.state.filters.businessArea !== undefined ||
 			this.state.searchTerm.length > 0
 		);
+	}
+
+	get filterCount(): number {
+		let count = 0;
+		if (this.state.searchTerm.length > 0) count++;
+		if (this.state.filters.onlyExternal) count++;
+		if (this.state.filters.onlyStaff) count++;
+		if (this.state.filters.onlySuperuser) count++;
+		if (this.state.filters.onlyBALead) count++;
+		if (this.state.filters.businessArea !== undefined) count++;
+		return count;
 	}
 
 	get searchParams(): URLSearchParams {
@@ -166,6 +181,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 		if (this.state.filters.onlySuperuser) {
 			params.set("superuser", "true");
+		}
+		if (this.state.filters.onlyBALead) {
+			params.set("baLead", "true");
 		}
 		if (this.state.filters.businessArea) {
 			params.set("businessArea", this.state.filters.businessArea.toString());

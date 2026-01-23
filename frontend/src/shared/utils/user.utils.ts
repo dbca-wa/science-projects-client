@@ -1,4 +1,5 @@
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
+import { getImageUrl } from "@/shared/utils/image.utils";
 
 /**
  * User utility functions
@@ -166,7 +167,7 @@ export const toUserDisplayFormat = (user: {
 	display_first_name: user.display_first_name,
 	display_last_name: user.display_last_name,
 	email: user.email,
-	image: typeof user.image === "string" ? user.image : user.image?.file,
+	image: getImageUrl(user.image),
 });
 
 /**

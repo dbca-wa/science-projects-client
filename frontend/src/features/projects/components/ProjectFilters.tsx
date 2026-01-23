@@ -6,11 +6,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { Button } from "@/shared/components/ui/button";
-import { Badge } from "@/shared/components/ui/badge";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { Search, X } from "lucide-react";
+import { SearchControls } from "@/shared/components/SearchControls";
+import { Search } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
@@ -113,43 +112,45 @@ export const ProjectFilters = observer(({
 				<div className="p-4 border-b border-gray-300 dark:border-gray-500 w-full space-y-3">
 					{/* Row 1: Business Area, User Filter, Search (mobile: Search first) */}
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-						{/* Search Input - first on mobile, last on desktop */}
+						{/* Search Input - first on mobile, last on desktop - EMPHASIZED */}
 						<div className="relative w-full lg:order-3">
 							<Input
 								type="text"
 								placeholder="Search projects by name, keyword, or tag..."
 								value={localSearchTerm}
 								onChange={handleSearchChange}
-								className="pl-10 bg-transparent text-sm rounded-md"
+								variant="search"
+								className="pl-10 text-sm rounded-md"
 							/>
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
 						</div>
 
 						{/* Business Area Dropdown - second on mobile, first on desktop */}
-						<Select
-							value={filters.businessArea || "All"}
-							onValueChange={(value) =>
-								onFiltersChange({ businessArea: value === "All" ? "All" : value })
-							}
-							disabled={isLoadingBusinessAreas}
-							className="lg:order-1"
-						>
-							<SelectTrigger className="w-full text-sm rounded-md">
-								<SelectValue placeholder="All Business Areas" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="All">All Business Areas</SelectItem>
-								{sortedBusinessAreas?.map((ba) => (
-									<SelectItem key={ba.id} value={ba.id!.toString()}>
-										{typeof ba.division === "object" && ba.division?.slug
-											? `[${ba.division.slug}] `
-											: ""}
-										{ba.name}
-										{!ba.is_active ? " (INACTIVE)" : ""}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<div className="lg:order-1">
+							<Select
+								value={filters.businessArea || "All"}
+								onValueChange={(value) =>
+									onFiltersChange({ businessArea: value === "All" ? "All" : value })
+								}
+								disabled={isLoadingBusinessAreas}
+							>
+								<SelectTrigger className="w-full text-sm rounded-md">
+									<SelectValue placeholder="All Business Areas" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="All">All Business Areas</SelectItem>
+									{sortedBusinessAreas?.map((ba) => (
+										<SelectItem key={ba.id} value={ba.id!.toString()}>
+											{typeof ba.division === "object" && ba.division?.slug
+												? `[${ba.division.slug}] `
+												: ""}
+											{ba.name}
+											{!ba.is_active ? " (INACTIVE)" : ""}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
 
 						{/* User Filter Dropdown - third on mobile, second on desktop */}
 						<UserSearchDropdown
@@ -304,39 +305,13 @@ export const ProjectFilters = observer(({
 						</div>
 
 						{/* Right side: Remember my search and Clear button */}
-						<div className="flex gap-3 items-center w-full sm:w-auto sm:ml-auto">
-							{/* Remember my search */}
-							<div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-muted/50 ml-auto sm:ml-0">
-								<Checkbox
-									id="save-search"
-									checked={saveSearch}
-									onCheckedChange={onToggleSaveSearch}
-								/>
-								<Label
-									htmlFor="save-search"
-									className="text-sm font-normal cursor-pointer whitespace-nowrap"
-								>
-									Remember my search
-								</Label>
-							</div>
-
-							{/* Clear button */}
-							{filterCount > 0 && (
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={onClearFilters}
-									className="gap-1.5 shrink-0"
-								>
-									<X className="size-4" />
-									<span className="hidden sm:inline">Clear Filters</span>
-									<span className="sm:hidden">Clear</span>
-									<Badge variant="secondary" className="ml-1">
-										{filterCount}
-									</Badge>
-								</Button>
-							)}
-						</div>
+						<SearchControls
+							saveSearch={saveSearch}
+							onToggleSaveSearch={onToggleSaveSearch}
+							filterCount={filterCount}
+							onClearFilters={onClearFilters}
+							className="flex gap-3 items-center w-full sm:w-auto sm:ml-auto"
+						/>
 					</div>
 				</div>
 			</div>

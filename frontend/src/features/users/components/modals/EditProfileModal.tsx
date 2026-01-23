@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "../../services/user.service";
 import { authKeys } from "@/features/auth/hooks/useAuth";
-import { API_CONFIG } from "@/shared/services/api/config";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { sanitizeFormData } from "@/shared/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
@@ -49,25 +49,6 @@ interface EditProfileModalProps {
 export const EditProfileModal = observer(
   ({ isOpen, onClose, user, onSuccess }: EditProfileModalProps) => {
     const queryClient = useQueryClient();
-    
-    // Helper to get full image URL
-    const getImageUrl = (image: IUserData['image'] | IUserMe['image']) => {
-      if (!image) return null;
-      
-      if (image.file) {
-        return image.file.startsWith("http")
-          ? image.file
-          : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
-      }
-      
-      if (image.old_file) {
-        return image.old_file.startsWith("http")
-          ? image.old_file
-          : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
-      }
-      
-      return null;
-    };
     
     const form = useForm<ProfileFormData>({
       resolver: zodResolver(profileSchema),

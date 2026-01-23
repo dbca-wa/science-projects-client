@@ -28,6 +28,7 @@ export interface IUserData {
 	affiliation: IAffiliation;
 	branches?: IBranch[];
 	businessAreas?: IBusinessArea[];
+	business_areas_led?: number[] | IBusinessArea[];
 	name?: string;
 	// Extended profile fields (from ProfilePageSerializer)
 	phone?: string;
@@ -82,7 +83,7 @@ export interface IUserMe {
 	affiliation: IAffiliation;
 	branches?: IBranch[];
 	businessAreas?: IBusinessArea[];
-	business_areas_led: number[];
+	business_areas_led: IBusinessArea[];
 }
 
 export interface IMemberUserDetails extends IUserData {

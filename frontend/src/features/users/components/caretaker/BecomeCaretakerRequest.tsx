@@ -15,6 +15,7 @@ import {
 } from "@/shared/components/ui/alert-dialog";
 import { Info, Check, X, Loader2 } from "lucide-react";
 import { UserDisplay } from "@/shared/components/UserDisplay";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { useRespondToCaretakerRequest } from "../../hooks/useRespondToCaretakerRequest";
 import { formatDate } from "@/shared/utils/common.utils";
 import { getCaretakerReasonLabel } from "@/shared/utils/user.utils";
@@ -130,7 +131,7 @@ export const BecomeCaretakerRequest = ({ request, onResponse }: BecomeCaretakerR
                 display_first_name: userNeedingCaretaker.display_first_name,
                 display_last_name: userNeedingCaretaker.display_last_name,
                 email: userNeedingCaretaker.email,
-                image: userNeedingCaretaker.image?.file || undefined,
+                image: getImageUrl(userNeedingCaretaker.image),
               }}
               showEmail={true} 
               size="md" 

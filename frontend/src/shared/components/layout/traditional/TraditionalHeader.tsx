@@ -117,7 +117,7 @@ export const TraditionalHeader = observer(() => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
                     <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                      Create or Browse
+                      Projects
                     </DropdownMenuLabel>
                     <DropdownMenuItem
                       onClick={() => navigate("/projects")}

@@ -15,6 +15,7 @@ import {
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle, X, Check } from "lucide-react";
 import { UserDisplay } from "@/shared/components/UserDisplay";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { getCaretakerReasonLabel } from "@/shared/utils/user.utils";
 import { formatDate } from "@/shared/utils/common.utils";
 import { useCancelBecomeCaretakerRequest } from "../../hooks/useCancelBecomeCaretakerRequest";
@@ -138,7 +139,7 @@ export const OutgoingCaretakerRequest = ({ request, onCancel }: OutgoingCaretake
                 display_first_name: targetUser.display_first_name,
                 display_last_name: targetUser.display_last_name,
                 email: targetUser.email,
-                image: targetUser.image?.file || undefined,
+                image: getImageUrl(targetUser.image),
               }}
               showEmail={true} 
               size="md" 

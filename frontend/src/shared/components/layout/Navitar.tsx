@@ -2,7 +2,7 @@ import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
-import { API_CONFIG } from "@/shared/services/api/config";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import {
   Avatar,
   AvatarFallback,
@@ -47,27 +47,7 @@ export const Navitar = observer(({ isModern, shouldShowName = false }: NavitarPr
       : `${userData.display_first_name.substring(0, 9)}...`
     : userData?.username;
 
-  // Get avatar URL with base URL prepended if needed
-  const getAvatarUrl = () => {
-    const image = userData?.image;
-    if (!image) return undefined;
-    
-    if (image.file) {
-      return image.file.startsWith("http")
-        ? image.file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
-    }
-    
-    if (image.old_file) {
-      return image.old_file.startsWith("http")
-        ? image.old_file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
-    }
-    
-    return undefined;
-  };
-
-  const avatarSrc = getAvatarUrl();
+  const avatarSrc = getImageUrl(userData?.image);
   const userInitial = userData?.username
     ? userData.username.charAt(0).toUpperCase()
     : "U";

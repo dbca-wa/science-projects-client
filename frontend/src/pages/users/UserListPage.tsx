@@ -14,9 +14,7 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { NoResultsState } from "@/shared/components/NoResultsState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
-import { X } from "lucide-react";
+import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { Loader2 } from "lucide-react";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
@@ -49,6 +47,7 @@ const UserListPage = observer(() => {
 			staff: (v) => v === "true",
 			external: (v) => v === "true",
 			superuser: (v) => v === "true",
+			baLead: (v) => v === "true",
 			businessArea: (v) => Number(v),
 		},
 	});
@@ -157,34 +156,15 @@ const UserListPage = observer(() => {
                   onChange={handleSearchChange} 
                 />
                 
-                {/* Remember my search - hidden on mobile, shown on desktop below search */}
-                <div className="hidden md:flex mt-3 gap-2">
-                  <div className="flex items-center space-x-2 px-4 py-2 rounded-md bg-muted/50 ml-auto">
-                    <Checkbox
-                      id="save-search"
-                      checked={userSearchStore.state.saveSearch}
-                      onCheckedChange={handleToggleSaveSearch}
-                    />
-                    <Label
-                      htmlFor="save-search"
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      Remember my search
-                    </Label>
-                  </div>
-                  
-                  {/* Clear button */}
-                  {userSearchStore.hasActiveFilters && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClearFilters}
-                      className="gap-1.5 py-4!"
-                    >
-                      <X className="size-4" />
-                      Clear
-                    </Button>
-                  )}
+                {/* Remember my search and Clear - hidden on mobile, shown on desktop below search */}
+                <div className="hidden md:flex mt-3 gap-2 justify-end">
+                  <SearchControls
+                    saveSearch={userSearchStore.state.saveSearch}
+                    onToggleSaveSearch={handleToggleSaveSearch}
+                    filterCount={userSearchStore.filterCount}
+                    onClearFilters={handleClearFilters}
+                    className="flex gap-2"
+                  />
                 </div>
               </div>
               
@@ -196,34 +176,15 @@ const UserListPage = observer(() => {
                 />
               </div>
               
-              {/* Remember my search - shown on mobile at bottom, hidden on desktop */}
-              <div className="flex md:hidden order-3 gap-2">
-                <div className="flex items-center space-x-2 px-4 py-2 rounded-md bg-muted/50 ml-auto">
-                  <Checkbox
-                    id="save-search-mobile"
-                    checked={userSearchStore.state.saveSearch}
-                    onCheckedChange={handleToggleSaveSearch}
-                  />
-                  <Label
-                    htmlFor="save-search-mobile"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Remember my search
-                  </Label>
-                </div>
-                
-                {/* Clear button */}
-                {userSearchStore.hasActiveFilters && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearFilters}
-                    className="gap-1.5"
-                  >
-                    <X className="size-4" />
-                    Clear
-                  </Button>
-                )}
+              {/* Remember my search and Clear - shown on mobile at bottom, hidden on desktop */}
+              <div className="flex md:hidden order-3 gap-2 justify-end">
+                <SearchControls
+                  saveSearch={userSearchStore.state.saveSearch}
+                  onToggleSaveSearch={handleToggleSaveSearch}
+                  filterCount={userSearchStore.filterCount}
+                  onClearFilters={handleClearFilters}
+                  className="flex gap-2 ml-auto"
+                />
               </div>
             </div>
           </div>

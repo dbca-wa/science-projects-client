@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { cn } from "@/shared/lib/utils";
 import { getUserInitials, getUserDisplayName, getUserEmail } from "@/shared/utils/user.utils";
-import { API_CONFIG } from "@/shared/services/api/config";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import type { IUserData } from "@/shared/types/user.types";
 import type { IImageData } from "@/shared/types/media.types";
 
@@ -58,37 +58,8 @@ export const UserDisplay = ({
   size = "md",
   className 
 }: UserDisplayProps) => {
-  // Get avatar image URL
-  const getAvatarUrl = (): string | undefined => {
-    const image = user.image;
-    
-    if (!image) return undefined;
-    
-    // Handle string URLs (direct image URLs)
-    if (typeof image === "string") {
-      return image.startsWith("http")
-        ? image
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image}`;
-    }
-    
-    // Handle IImageData object - try file first
-    if (image.file) {
-      return image.file.startsWith("http")
-        ? image.file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
-    }
-    
-    // Fallback to old_file
-    if (image.old_file) {
-      return image.old_file.startsWith("http")
-        ? image.old_file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
-    }
-    
-    return undefined;
-  };
-
-  const avatarUrl = getAvatarUrl();
+  // Use shared image utility
+  const avatarUrl = getImageUrl(user.image);
   const initials = getUserInitials(user as IUserData);
   const displayName = getUserDisplayName(user as IUserData);
   const email = getUserEmail(user as IUserData);

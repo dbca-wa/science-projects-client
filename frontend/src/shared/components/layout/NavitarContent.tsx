@@ -6,7 +6,7 @@ import { Separator } from "@/shared/components/ui/separator";
 import { User, LogOut, LayoutGrid, LayoutList, Moon, Sun, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
-import { API_CONFIG } from "@/shared/services/api/config";
+import { getImageUrl } from "@/shared/utils/image.utils";
 
 interface NavitarContentProps {
   onClose: () => void;
@@ -29,27 +29,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
     theme: uiStore.theme,
   }));
 
-  // Get avatar URL with base URL prepended if needed
-  const getAvatarUrl = () => {
-    const image = snapshot.userData?.image;
-    if (!image) return undefined;
-    
-    if (image.file) {
-      return image.file.startsWith("http")
-        ? image.file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
-    }
-    
-    if (image.old_file) {
-      return image.old_file.startsWith("http")
-        ? image.old_file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
-    }
-    
-    return undefined;
-  };
-
-  const avatarSrc = getAvatarUrl();
+  const avatarSrc = getImageUrl(snapshot.userData?.image);
   const displayName = getUserDisplayName(snapshot.userData);
   const initials = getUserInitials(snapshot.userData);
 
