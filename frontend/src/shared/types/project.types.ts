@@ -186,3 +186,27 @@ export interface ITinyProjectData {
 	image: ProjectImage | null;
 	tag: string;
 }
+
+// Task-related types (for admin tasks)
+export interface ITaskUser {
+	id: number;
+	display_first_name: string;
+	display_last_name: string;
+}
+
+export interface ITaskProject {
+	id: number;
+	title: string;
+	status: string;
+	kind: string;
+	year: number;
+	business_area: IBusinessArea;
+	image: IImageData;
+}
+
+export interface ITaskDocument {
+	id: number;
+	kind: string;
+	status: string;
+	project: ITaskProject;
+}

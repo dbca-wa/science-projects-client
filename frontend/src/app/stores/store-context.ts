@@ -3,6 +3,7 @@ import { AuthStore } from "./derived/auth.store";
 import { UIStore } from "./derived/ui.store";
 import { EditorStore } from "./derived/editor.store";
 import { UserSearchStore } from "./derived/user-search.store";
+import { ProjectSearchStore } from "./derived/project-search.store";
 
 /**
  * Root store that combines all MobX stores
@@ -12,12 +13,14 @@ class RootStore {
 	editorStore: EditorStore;
 	uiStore: UIStore;
 	userSearchStore: UserSearchStore;
+	projectSearchStore: ProjectSearchStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
 		this.editorStore = new EditorStore();
 		this.uiStore = new UIStore();
 		this.userSearchStore = new UserSearchStore();
+		this.projectSearchStore = new ProjectSearchStore();
 	}
 }
 
@@ -43,3 +46,4 @@ export const useUIStore = () => useStore().uiStore;
 export const useAuthStore = () => useStore().authStore;
 export const useEditorStore = () => useStore().editorStore;
 export const useUserSearchStore = () => useStore().userSearchStore;
+export const useProjectSearchStore = () => useStore().projectSearchStore;

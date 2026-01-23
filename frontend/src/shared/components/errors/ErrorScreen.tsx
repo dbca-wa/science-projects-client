@@ -89,16 +89,7 @@ const ErrorScreen = ({
 				)}
 
 				<CardFooter className="flex flex-wrap gap-3 justify-center pt-6">
-					{onReload && (
-						<Button
-							onClick={onReload}
-							className="gap-2 bg-blue-600 hover:bg-blue-700"
-							size="lg"
-						>
-							<RefreshCw className="h-4 w-4" />
-							Reload Page
-						</Button>
-					)}
+				
 					{onBack && (
 						<Button
 							variant="outline"
@@ -118,6 +109,16 @@ const ErrorScreen = ({
 						>
 							<Home className="h-4 w-4" />
 							Return Home
+						</Button>
+					)}
+						{onReload && (
+						<Button
+							onClick={onReload}
+							className="text-white agap-2 bg-blue-600 hover:bg-blue-700"
+							size="lg"
+						>
+							<RefreshCw className="h-4 w-4" />
+							Reload Page
 						</Button>
 					)}
 				</CardFooter>

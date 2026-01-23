@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus } from "react-icons/fa";
+import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "../Navitar";
 import { Button } from "@/shared/components/ui/button";
@@ -103,8 +104,7 @@ export const TraditionalHeader = observer(() => {
             /* Desktop - Full Navigation */
             <div className="flex items-center justify-between flex-grow">
               <div className="flex items-center gap-1">
-                {/* Projects Menu - COMMENTED OUT: Not yet implemented */}
-                {/*
+                {/* Projects Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -117,7 +117,7 @@ export const TraditionalHeader = observer(() => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
                     <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                      Projects
+                      Create or Browse
                     </DropdownMenuLabel>
                     <DropdownMenuItem
                       onClick={() => navigate("/projects")}
@@ -126,9 +126,15 @@ export const TraditionalHeader = observer(() => {
                       <CgBrowse className="mr-2 size-4" />
                       Browse Projects
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/projects/create")}
+                      className="hover:bg-gray-100 cursor-pointer select-none"
+                    >
+                      <CgPlayListAdd className="mr-2 size-4" />
+                      Create New Project
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                */}
 
                 {/* Users Menu */}
                 <DropdownMenu>
