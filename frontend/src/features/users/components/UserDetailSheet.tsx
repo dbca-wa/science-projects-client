@@ -348,9 +348,35 @@ export const UserDetailSheet = observer(
 								</div>
 							</div>
 
+							{/* About Section */}
+							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
+								<p className="font-bold text-sm mb-1 text-gray-600 dark:text-gray-300">
+									About
+								</p>
+								<div
+									className="mt-1"
+									dangerouslySetInnerHTML={{
+										__html: getSanitizedHtmlOrFallback(
+											user.about,
+										),
+									}}
+								/>
+								<p className="font-bold text-sm mb-1 mt-4 text-gray-600 dark:text-gray-300">
+									Expertise
+								</p>
+								<div
+									className="mt-1"
+									dangerouslySetInnerHTML={{
+										__html: getSanitizedHtmlOrFallback(
+											user.expertise,
+										),
+									}}
+								/>
+							</div>
+
 							{/* Business Areas Led Section - Only show if user is a BA Lead */}
 							{user.business_areas_led && user.business_areas_led.length > 0 && (
-								<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-2 mt-2">
+								<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
 									<p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
 										Business Areas Led
 									</p>
@@ -456,32 +482,6 @@ export const UserDetailSheet = observer(
 									</div>
 								</div>
 							)}
-
-							{/* About Section */}
-							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
-								<p className="font-bold text-sm mb-1 text-gray-600 dark:text-gray-300">
-									About
-								</p>
-								<div
-									className="mt-1"
-									dangerouslySetInnerHTML={{
-										__html: getSanitizedHtmlOrFallback(
-											user.about,
-										),
-									}}
-								/>
-								<p className="font-bold text-sm mb-1 mt-4 text-gray-600 dark:text-gray-300">
-									Expertise
-								</p>
-								<div
-									className="mt-1"
-									dangerouslySetInnerHTML={{
-										__html: getSanitizedHtmlOrFallback(
-											user.expertise,
-										),
-									}}
-								/>
-							</div>
 
 							{/* Involved Projects Section - Placeholder */}
 							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">

@@ -7,7 +7,8 @@ import { observer } from "mobx-react-lite";
 import { API_CONFIG } from "@/shared/services/api/config";
 import { Progress } from "@/shared/components/ui/progress";
 import { useUIStore } from "@/app/stores/store-context";
-import { handleImageFileCompression } from "@/shared/lib/handleFileCompression";
+import { handleImageFileCompression } from "@/shared/lib/image-compression";
+import { ACCEPTED_IMAGE_TYPES } from "@/shared/constants/image.constants";
 import { cn } from "@/shared/lib/utils";
 
 interface Props {
@@ -38,7 +39,6 @@ export const StatefulMediaChanger = observer(
 			useState<NodeJS.Timeout | null>(null);
 		const [isHovered, setIsHovered] = useState(false);
 
-		const acceptedImageTypes = ["image/jpeg", "image/png", "image/jpg"];
 		const NoImageFile = useNoImage();
 		const baseUrl = API_CONFIG.BASE_URL;
 
@@ -72,9 +72,9 @@ export const StatefulMediaChanger = observer(
 			handleImageFileCompression({
 				acceptedFile: acceptedFile,
 				options: {
-					acceptedImageTypes,
+					acceptedTypes: ACCEPTED_IMAGE_TYPES,
 					maxSizeMB: 3,
-					maxWidthOrHeight: 1920,
+					maxDimension: 1920,
 				},
 				callbacks: {
 					setIsError,
@@ -128,7 +128,7 @@ export const StatefulMediaChanger = observer(
 					type="file"
 					ref={fileInputRef}
 					className="hidden"
-					accept={acceptedImageTypes.join(",")}
+					accept={ACCEPTED_IMAGE_TYPES.join(",")}
 					onChange={handleFileInputChange}
 				/>
 

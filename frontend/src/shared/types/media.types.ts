@@ -12,6 +12,11 @@ export interface IImageData {
  * Image Upload Component Types
  */
 
+import {
+	MAX_IMAGE_SIZE_BYTES,
+	ACCEPTED_IMAGE_TYPES,
+} from "@/shared/constants/image.constants";
+
 export type ImageUploadVariant = 'avatar' | 'banner' | 'project' | 'default';
 
 export type ImageUploadMode = 'file' | 'url';
@@ -71,7 +76,7 @@ export const VARIANT_CONFIG: Record<ImageUploadVariant, VariantConfig> = {
 };
 
 export const FILE_ERRORS = {
-  INVALID_TYPE: 'Invalid file type. Please upload JPG, PNG, or GIF.',
+  INVALID_TYPE: 'Invalid file type. Please upload JPG or PNG.',
   FILE_TOO_LARGE: (maxSize: number) => `File too large. Maximum size is ${maxSize}MB.`,
   UPLOAD_FAILED: 'Failed to upload image. Please try again.',
 };
@@ -82,5 +87,6 @@ export const URL_ERRORS = {
   NOT_HTTPS: 'Only HTTPS URLs are supported for security.',
 };
 
-export const DEFAULT_MAX_SIZE = 5 * 1024 * 1024; // 5MB
-export const DEFAULT_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+// Use centralized constants from image.constants.ts
+export const DEFAULT_MAX_SIZE = MAX_IMAGE_SIZE_BYTES;
+export const DEFAULT_ACCEPTED_TYPES = [...ACCEPTED_IMAGE_TYPES];

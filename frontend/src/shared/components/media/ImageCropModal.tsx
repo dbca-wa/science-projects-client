@@ -467,7 +467,7 @@ export const ImageCropModal = ({
                     <Label className="text-sm text-muted-foreground">
                       Avatar Preview:
                     </Label>
-                    <Avatar className="h-20 w-20">
+                    <Avatar className="h-[200px] w-[200px]">
                       <AvatarImage 
                         src={previewUrls.avatar || undefined} 
                         alt="Avatar preview" 
@@ -476,16 +476,16 @@ export const ImageCropModal = ({
                     </Avatar>
                   </div>
 
-                  {/* Profile Preview */}
+                  {/* Public Profile Preview */}
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
-                      Profile Preview:
+                      Public Profile Preview:
                     </Label>
                     <div className="w-[200px] h-[200px] rounded-lg overflow-hidden border border-border">
                       {previewUrls.profile ? (
                         <img
                           src={previewUrls.profile}
-                          alt="Profile preview"
+                          alt="Public profile preview"
                           className="h-full w-full object-cover"
                         />
                       ) : (

@@ -4,10 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateProfile } from "../../services/user.service";
-import { authKeys } from "@/features/auth/hooks/useAuth";
+import { handleProfileUpdate } from "../../utils/profile-update.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { sanitizeFormData } from "@/shared/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
 import { RichTextEditor } from "@/shared/components/editor";
@@ -71,19 +69,14 @@ export const EditProfileModal = observer(
     }, [isOpen, user.image?.file, user.about, user.expertise, form]);
 
     const updateMutation = useMutation({
-      mutationFn: (data: ProfileFormData) => updateProfile(user.id!, data),
-      onSuccess: async () => {
-        // Invalidate and refetch current user query to update Navitar
-        await queryClient.invalidateQueries({ 
-          queryKey: authKeys.user(),
-          exact: true
-        });
-        
-        // Also invalidate user detail if viewing own profile
-        await queryClient.invalidateQueries({
-          queryKey: ["users", "detail", user.id],
-        });
-        
+      mutationFn: (data: ProfileFormData) =>
+        handleProfileUpdate({
+          userId: user.id!,
+          data,
+          queryClient,
+          hasExistingImage: !!user.image,
+        }),
+      onSuccess: () => {
         toast.success("Profile updated successfully");
         onSuccess();
         onClose();
@@ -95,9 +88,7 @@ export const EditProfileModal = observer(
     });
 
     const handleSubmit = (data: ProfileFormData) => {
-      // Sanitize form data before submission
-      const sanitizedData = sanitizeFormData(data, ["about", "expertise"]);
-      updateMutation.mutate(sanitizedData);
+      updateMutation.mutate(data);
     };
 
     const handleClose = () => {
