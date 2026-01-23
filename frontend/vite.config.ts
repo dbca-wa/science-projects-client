@@ -34,6 +34,7 @@ export default defineConfig({
 			transformIndexHtml(html) {
 				// In production, use stricter CSP
 				if (process.env.NODE_ENV === "production") {
+					// Remove unsafe-inline and unsafe-eval from script-src for production
 					return html.replace(
 						/script-src 'self' 'unsafe-inline' 'unsafe-eval'/g,
 						"script-src 'self'"

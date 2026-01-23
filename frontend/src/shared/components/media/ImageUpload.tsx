@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Upload, X, Link as LinkIcon, Crop } from "lucide-react";
+import { Upload, X, Link as LinkIcon, Crop, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { ImageCropModal } from "./ImageCropModal";
@@ -15,25 +15,22 @@ import {
   DEFAULT_MAX_SIZE,
   DEFAULT_ACCEPTED_TYPES,
 } from "@/shared/types/media.types";
+import {
+  ACCEPTED_IMAGE_TYPES,
+} from "@/shared/constants/image.constants";
+import { compressImage, ImageCompressionError } from "@/shared/lib/image-compression";
 
 /**
- * Validate image file type and size
+ * Validate image file type only (NOT size - compression handles that)
  */
-const validateImageFile = (
+const validateImageFileType = (
   file: File,
-  maxSize: number,
-  acceptedTypes: string[]
+  acceptedTypes: readonly string[] | string[] = ACCEPTED_IMAGE_TYPES
 ): boolean => {
   if (!acceptedTypes.includes(file.type)) {
     toast.error(FILE_ERRORS.INVALID_TYPE);
     return false;
   }
-
-  if (file.size > maxSize) {
-    toast.error(FILE_ERRORS.FILE_TOO_LARGE(maxSize / (1024 * 1024)));
-    return false;
-  }
-
   return true;
 };
 
@@ -89,6 +86,7 @@ export const ImageUpload = ({
   const [mode, setMode] = useState<ImageUploadMode>('file');
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
@@ -98,7 +96,7 @@ export const ImageUpload = ({
   const config = VARIANT_CONFIG[variant];
   const displayPlaceholder = placeholder || config.placeholder;
 
-  // Generate preview for File objects
+  // Generate preview for File objects - keep it synchronous to avoid flash
   useEffect(() => {
     if (!value || !isFile(value)) {
       setFilePreview(null);
@@ -106,11 +104,15 @@ export const ImageUpload = ({
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => setFilePreview(reader.result as string);
+    reader.onloadend = () => {
+      setFilePreview(reader.result as string);
+    };
     reader.readAsDataURL(value);
     
     return () => {
-      setFilePreview(null);
+      if (filePreview) {
+        URL.revokeObjectURL(filePreview);
+      }
     };
   }, [value]);
 
@@ -121,12 +123,59 @@ export const ImageUpload = ({
     ? value 
     : null;
 
-  const handleFileSelect = (file: File | null) => {
+  const handleFileSelect = async (file: File | null) => {
     if (!file || disabled) return;
     
-    if (validateImageFile(file, maxSize, acceptedTypes)) {
-      setOriginalFileName(file.name);
-      onChange(file);
+    // Only validate type (not size - compression handles that)
+    if (!validateImageFileType(file, acceptedTypes)) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Show loading toast for large files
+    const fileSizeMB = file.size / (1024 * 1024);
+    let loadingToast: string | number | undefined;
+    
+    if (fileSizeMB > 5) {
+      loadingToast = toast.loading(`Compressing ${fileSizeMB.toFixed(1)}MB image...`);
+    }
+
+    try {
+      // Compress the image automatically
+      const compressedFile = await compressImage(file, {
+        acceptedTypes,
+        maxSizeMB: maxSize / (1024 * 1024), // Convert bytes to MB
+      });
+
+      // Dismiss loading toast
+      if (loadingToast) {
+        toast.dismiss(loadingToast);
+      }
+
+      // Show success message for large compressions
+      if (fileSizeMB > 5) {
+        const compressedSizeMB = compressedFile.size / (1024 * 1024);
+        toast.success(
+          `Image compressed from ${fileSizeMB.toFixed(1)}MB to ${compressedSizeMB.toFixed(1)}MB`
+        );
+      }
+
+      setOriginalFileName(compressedFile.name);
+      onChange(compressedFile);
+    } catch (error) {
+      // Dismiss loading toast
+      if (loadingToast) {
+        toast.dismiss(loadingToast);
+      }
+
+      if (error instanceof ImageCompressionError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to process image. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,7 +239,34 @@ export const ImageUpload = ({
   };
 
   const renderPreview = () => {
-    if (!preview) return null;
+    if (!preview && !isLoading) return null;
+
+    // Show loading spinner while image is loading
+    if (isLoading) {
+      if (config.previewShape === 'circle') {
+        return (
+          <div className={cn(config.defaultSize, "mx-auto relative")}>
+            <Avatar className="w-full h-full">
+              <AvatarFallback className="bg-muted">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-4 border-muted-foreground/20" />
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+                </div>
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        );
+      }
+
+      return (
+        <div className={cn("relative overflow-hidden rounded-lg flex items-center justify-center bg-muted", config.defaultSize)}>
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 rounded-full border-4 border-muted-foreground/20" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+          </div>
+        </div>
+      );
+    }
 
     if (config.previewShape === 'circle') {
       return (
@@ -215,7 +291,7 @@ export const ImageUpload = ({
   return (
     <div className="space-y-4">
       {/* Mode Toggle */}
-      {allowUrl && !preview && (
+      {allowUrl && !preview && !isLoading && (
         <div className="flex gap-2">
           <Button
             type="button"
@@ -241,7 +317,7 @@ export const ImageUpload = ({
       )}
 
       {/* File Upload Mode */}
-      {mode === 'file' && !preview && (
+      {mode === 'file' && !preview && !isLoading && (
         <div
           className={cn(
             "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
@@ -282,20 +358,29 @@ export const ImageUpload = ({
           >
             Select Image
           </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={acceptedTypes.join(',')}
-            className="hidden"
-            onChange={handleFileInputChange}
-            disabled={disabled}
-            aria-label="File input"
-          />
+        </div>
+      )}
+      
+      {/* Hidden file input - always rendered so ref is always available */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={acceptedTypes.join(',')}
+        className="hidden"
+        onChange={handleFileInputChange}
+        disabled={disabled}
+        aria-label="File input"
+      />
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          {renderPreview()}
         </div>
       )}
 
       {/* URL Input Mode */}
-      {mode === 'url' && !preview && (
+      {mode === 'url' && !preview && !isLoading && (
         <div className="space-y-2">
           <div className="flex gap-2">
             <Input
@@ -327,8 +412,8 @@ export const ImageUpload = ({
       )}
 
       {/* Preview */}
-      {preview && (
-        <div className="space-y-4">
+      {preview && !isLoading && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {renderPreview()}
           <div className="flex flex-wrap gap-2 justify-center">
             <Button
@@ -357,13 +442,11 @@ export const ImageUpload = ({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => {
-                setMode('file');
-                handleRemove();
-              }}
+              onClick={handleSelectClick}
               disabled={disabled}
               className="flex-1 sm:flex-none min-w-[80px]"
             >
+              <Upload className="size-4 sm:mr-2" />
               <span className="hidden sm:inline">Change</span>
               <span className="sm:hidden">New</span>
             </Button>

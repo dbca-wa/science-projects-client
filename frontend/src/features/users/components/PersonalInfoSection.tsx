@@ -1,10 +1,10 @@
-import { Avatar } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { Copy } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
-import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { toast } from "sonner";
 
@@ -40,11 +40,13 @@ export const PersonalInfoSection = ({ user, onClick }: PersonalInfoSectionProps)
     >
       {/* Avatar */}
       <Avatar className="size-20 rounded-full">
-        <img 
+        <AvatarImage 
           src={getImageUrl(user.image) || "/default-avatar.png"} 
           alt={displayName}
-          className="size-full object-cover"
         />
+        <AvatarFallback>
+          {getUserInitials(user)}
+        </AvatarFallback>
       </Avatar>
 
       {/* Info */}

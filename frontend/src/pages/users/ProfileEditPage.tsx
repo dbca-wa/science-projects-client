@@ -12,8 +12,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateProfile } from "@/features/users/services/user.service";
-import { authKeys, useCurrentUser } from "@/features/auth/hooks/useAuth";
+import { useCurrentUser } from "@/features/auth/hooks/useAuth";
+import { handleProfileUpdate } from "@/features/users/utils/profile-update.utils";
 import { ImageUpload } from "@/shared/components/media";
 import { RichTextEditor } from "@/shared/components/editor";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -66,25 +66,19 @@ const ProfileEditPage = observer(() => {
   }, [user, form]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: ProfileFormData) => updateProfile(user!.id!, data),
-    onSuccess: async () => {
-      // Invalidate and refetch current user query to update Navitar
-      await queryClient.invalidateQueries({ 
-        queryKey: authKeys.user(),
-        exact: true
-      });
-      
-      // Also invalidate user detail if viewing own profile
-      await queryClient.invalidateQueries({
-        queryKey: ["users", "detail", user!.id],
-      });
-      
+    mutationFn: (data: ProfileFormData) =>
+      handleProfileUpdate({
+        userId: user!.id!,
+        data,
+        queryClient,
+        hasExistingImage: !!user?.image,
+      }),
+    onSuccess: () => {
       toast.success("Profile updated successfully");
       navigate("/users/me");
     },
-    onError: (error: unknown) => {
-      const message =
-        (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to update profile";
+    onError: (error: Error) => {
+      const message = error.message || "Failed to update profile";
       toast.error(message);
     },
   });
