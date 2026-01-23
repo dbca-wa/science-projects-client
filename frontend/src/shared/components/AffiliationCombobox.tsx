@@ -3,7 +3,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { X } from "lucide-react";
 import { apiClient } from "@/shared/services/api/client.service";
-import { toTitleCase } from "@/shared/lib/utils";
+import { toTitleCase } from "@/shared/utils";
 import type { IAffiliation } from "@/shared/types/org.types";
 
 interface AffiliationComboboxProps {

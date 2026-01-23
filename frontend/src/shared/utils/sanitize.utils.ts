@@ -3,10 +3,9 @@ import DOMPurifyLib from "dompurify";
 /**
  * Get the DOMPurify instance for the current environment
  * In browser: uses window directly
- * In Node.js (tests): uses JSDOM window (imported dynamically)
+ * In Node.js (tests): uses JSDOM window provided by vitest
  */
 function getPurify() {
-	// Browser environment - use window directly
 	return DOMPurifyLib(window);
 }
 

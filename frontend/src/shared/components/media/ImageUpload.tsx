@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Upload, X, Link as LinkIcon, Crop, Loader2 } from "lucide-react";
+import { Upload, X, Link as LinkIcon, Crop } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { ImageCropModal } from "./ImageCropModal";
@@ -18,7 +18,7 @@ import {
 import {
   ACCEPTED_IMAGE_TYPES,
 } from "@/shared/constants/image.constants";
-import { compressImage, ImageCompressionError } from "@/shared/lib/image-compression";
+import { compressImage, ImageCompressionError } from "@/shared/utils/image-compression.utils";
 
 /**
  * Validate image file type only (NOT size - compression handles that)
@@ -109,10 +109,9 @@ export const ImageUpload = ({
     };
     reader.readAsDataURL(value);
     
+    // Cleanup function
     return () => {
-      if (filePreview) {
-        URL.revokeObjectURL(filePreview);
-      }
+      // Only revoke if we created an object URL (we didn't in this case)
     };
   }, [value]);
 
@@ -247,6 +246,7 @@ export const ImageUpload = ({
         return (
           <div className={cn(config.defaultSize, "mx-auto relative")}>
             <Avatar className="w-full h-full">
+              <AvatarImage src={undefined} />
               <AvatarFallback className="bg-muted">
                 <div className="relative w-full h-full flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-4 border-muted-foreground/20" />
@@ -271,7 +271,7 @@ export const ImageUpload = ({
     if (config.previewShape === 'circle') {
       return (
         <Avatar className={cn(config.defaultSize, "mx-auto")}>
-          <AvatarImage src={preview} alt="Preview" />
+          <AvatarImage src={preview || undefined} alt="Preview" />
           <AvatarFallback>Preview</AvatarFallback>
         </Avatar>
       );
@@ -280,7 +280,7 @@ export const ImageUpload = ({
     return (
       <div className={cn("relative overflow-hidden rounded-lg", config.defaultSize)}>
         <img
-          src={preview}
+          src={preview || undefined}
           alt="Preview"
           className="w-full h-full object-cover"
         />
