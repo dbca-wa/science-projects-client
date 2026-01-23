@@ -40,6 +40,10 @@ export const getUsersBasedOnSearchTerm = async (
     url += "&only_superuser=true";
   }
 
+  if (filters.onlyBALead) {
+    url += "&only_ba_lead=true";
+  }
+
   if (filters.businessArea) {
     url += `&businessArea=${filters.businessArea}`;
   }

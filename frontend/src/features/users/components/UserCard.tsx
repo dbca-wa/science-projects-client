@@ -43,11 +43,21 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
     let text = "";
     let colorClass = "";
 
+    // Check if user is a BA Lead (has business_areas_led array with items)
+    // Handle both ID array format and object array format
+    const isBALead = user.business_areas_led && user.business_areas_led.length > 0;
+
     if (user.is_superuser) {
       text = user.role === "Executive" ? "Executive" : "Admin";
+      if (isBALead) {
+        text += " (BA Lead)";
+      }
       colorClass = user.role === "Executive" ? "text-orange-600" : "text-blue-600";
     } else if (user.is_staff) {
-      text = `Staff${user.business_area?.leader === user.id ? " (Business Area Leader)" : ""}`;
+      text = "Staff";
+      if (isBALead) {
+        text += " (BA Lead)";
+      }
       colorClass = "text-green-600";
     } else {
       text = "External User";

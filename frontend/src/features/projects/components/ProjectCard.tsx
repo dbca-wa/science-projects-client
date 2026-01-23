@@ -10,6 +10,7 @@ import {
 	getProjectStatusColor,
 	getProjectKindColor,
 } from "../utils/project.utils";
+import { getImageUrl } from "@/shared/utils/image.utils";
 
 interface ProjectCardProps {
 	project: IProjectData;
@@ -50,8 +51,8 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 	const statusColor = getProjectStatusColor(project.status);
 	const kindColor = getProjectKindColor(project.kind);
 
-	// Get image URL
-	const imageUrl = project.image?.file || "/no-image-placeholder.png";
+	// Get image URL using shared utility
+	const imageUrl = getImageUrl(project.image) || "/no-image-placeholder.png";
 
 	return (
 		<Card

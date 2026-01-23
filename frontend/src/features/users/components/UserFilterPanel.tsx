@@ -27,14 +27,15 @@ export const UserFilterPanel = observer(({
   const { data: businessAreas, isLoading: isLoadingBusinessAreas } = useBusinessAreas();
 
   const handleToggleFilter = (key: keyof UserSearchFilters) => {
-    // Only one of staff/external/superuser can be active at a time
+    // Only one of staff/external/superuser/baLead can be active at a time
     // Clicking a checkbox will turn off the others automatically
-    if (key === "onlyStaff" || key === "onlyExternal" || key === "onlySuperuser") {
+    if (key === "onlyStaff" || key === "onlyExternal" || key === "onlySuperuser" || key === "onlyBALead") {
       onFiltersChange({
         ...filters,
         onlyStaff: key === "onlyStaff" ? !filters.onlyStaff : false,
         onlyExternal: key === "onlyExternal" ? !filters.onlyExternal : false,
         onlySuperuser: key === "onlySuperuser" ? !filters.onlySuperuser : false,
+        onlyBALead: key === "onlyBALead" ? !filters.onlyBALead : false,
       });
     }
   };
@@ -115,6 +116,21 @@ export const UserFilterPanel = observer(({
             className="text-sm font-normal cursor-pointer"
           >
             Only Staff
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="ba-lead-filter"
+            checked={filters.onlyBALead}
+            onCheckedChange={() => handleToggleFilter("onlyBALead")}
+            className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-500"
+          />
+          <Label
+            htmlFor="ba-lead-filter"
+            className="text-sm font-normal cursor-pointer"
+          >
+            Only BA Lead
           </Label>
         </div>
 

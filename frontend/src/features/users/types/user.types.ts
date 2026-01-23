@@ -28,6 +28,7 @@ export interface UserSearchFilters {
   onlyExternal?: boolean;
   onlyStaff?: boolean;
   onlySuperuser?: boolean;
+  onlyBALead?: boolean;
   businessArea?: string | number;
   ignoreArray?: number[];
 }

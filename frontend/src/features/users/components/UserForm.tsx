@@ -18,6 +18,7 @@ import { PersonalInfoFields } from "./PersonalInfoFields";
 import { ProfileFields } from "./ProfileFields";
 import { MembershipFields } from "./MembershipFields";
 import { ImageUpload } from "@/shared/components/media/ImageUpload";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
@@ -298,7 +299,7 @@ const EditForm = ({ user, userId, updateMutation, isSubmitting, onSuccess, onCan
         branch: user.branch?.id,
         businessArea: user.business_area?.id,
         affiliation: user.affiliation?.id,
-        image: user.image?.file || null,
+        image: getImageUrl(user.image),
       });
     }
   }, [user, form]);

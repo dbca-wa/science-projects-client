@@ -14,10 +14,9 @@ import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "@/features/users/services/user.service";
 import { authKeys, useCurrentUser } from "@/features/auth/hooks/useAuth";
-import { API_CONFIG } from "@/shared/services/api/config";
-import type { IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
 import { RichTextEditor } from "@/shared/components/editor";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import {
   Form,
   FormControl,
@@ -44,24 +43,7 @@ const ProfileEditPage = observer(() => {
   const queryClient = useQueryClient();
   const { data: user, isLoading } = useCurrentUser();
 
-  // Helper to get full image URL
-  const getImageUrl = (image: IUserMe['image']) => {
-    if (!image) return null;
-    
-    if (image.file) {
-      return image.file.startsWith("http")
-        ? image.file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.file}`;
-    }
-    
-    if (image.old_file) {
-      return image.old_file.startsWith("http")
-        ? image.old_file
-        : `${API_CONFIG.BASE_URL.replace('/api/v1/', '')}${image.old_file}`;
-    }
-    
-    return null;
-  };
+
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),

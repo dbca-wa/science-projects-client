@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import type { IUserData } from "@/shared/types/user.types";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { BaseUserSearch, type BaseUserSearchRef } from "./BaseUserSearch";
 
 interface IUserSearchDropdown {
@@ -96,7 +97,7 @@ interface CustomMenuItemProps {
 }
 
 const CustomMenuItem = ({ onClick, user }: CustomMenuItemProps) => {
-	const avatarUrl = typeof user.image === "string" ? user.image : user.image?.file || "";
+	const avatarUrl = getImageUrl(user.image);
 
 	return (
 		<button
@@ -139,7 +140,7 @@ interface SelectedUserInputProps {
 }
 
 const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
-	const avatarUrl = typeof user.image === "string" ? user.image : user.image?.file || "";
+	const avatarUrl = getImageUrl(user.image);
 
 	return (
 		<div className={cn("flex items-center relative px-2 py-1.5 rounded-md bg-gray-100 dark:bg-gray-700 h-11")}>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { toast } from "sonner";
 
 interface PersonalInfoSectionProps {
@@ -40,7 +41,7 @@ export const PersonalInfoSection = ({ user, onClick }: PersonalInfoSectionProps)
       {/* Avatar */}
       <Avatar className="size-20 rounded-full">
         <img 
-          src={user.image?.file || user.image?.old_file || "/default-avatar.png"} 
+          src={getImageUrl(user.image) || "/default-avatar.png"} 
           alt={displayName}
           className="size-full object-cover"
         />

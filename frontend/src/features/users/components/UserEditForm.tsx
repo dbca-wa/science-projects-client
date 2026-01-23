@@ -32,6 +32,7 @@ import {
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { ImageUpload } from "@/shared/components/media";
 import { RichTextEditor } from "@/shared/components/editor";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
 import {
@@ -109,7 +110,7 @@ export const UserEditForm = ({
 						? user.business_area.id
 						: undefined,
 				affiliation: user.affiliation?.id ?? undefined,
-				image: user.image?.file || null,
+				image: getImageUrl(user.image),
 			};
 
 			form.reset(resetValues, {

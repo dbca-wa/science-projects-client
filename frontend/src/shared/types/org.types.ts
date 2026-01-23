@@ -66,11 +66,12 @@ export interface IBusinessArea {
 	name: string;
 	focus: string;
 	introduction: string;
-	image: BusinessAreaImage;
-	// | File | null
+	image: BusinessAreaImage | string | null;
 	leader?: number;
+	caretaker?: number;
 	finance_admin?: number;
 	data_custodian?: number;
+	project_count?: number;
 }
 
 export interface IBusinessAreaCreate {

@@ -45,9 +45,10 @@ export const UserSearchBar = ({
         placeholder={placeholder}
         value={localValue}
         onChange={handleChange}
-        className="pl-10 bg-transparent text-sm rounded-md !h-10"
+        variant="search"
+        className="pl-10 text-sm rounded-md !h-10"
       />
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
     </div>
   );
 };
