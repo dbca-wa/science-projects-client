@@ -8,7 +8,7 @@ import {
 } from "@/shared/components/ui/select";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { Search } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
@@ -107,13 +107,12 @@ export const ProjectFilters = observer(({
 	const years = Array.from({ length: currentYear - 1999 }, (_, i) => currentYear - i);
 
 	return (
-		<div className="grid grid-cols-1 items-center border border-gray-300 dark:border-gray-500 w-full select-none mb-0">
-			<div className="col-span-full pb-4">
-				<div className="p-4 border-b border-gray-300 dark:border-gray-500 w-full space-y-3">
-					{/* Row 1: Business Area, User Filter, Search (mobile: Search first) */}
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-						{/* Search Input - first on mobile, last on desktop - EMPHASIZED */}
-						<div className="relative w-full lg:order-3">
+		<div className="border border-gray-300 dark:border-gray-500 w-full select-none">
+			<div className="p-4 w-full space-y-3">
+				{/* Row 1: User Filter and Search (side by side on lg+, stacked on mobile) */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+						{/* Search Input - FIRST on mobile, right on desktop - EMPHASIZED */}
+						<div className="relative w-full order-1 lg:order-2">
 							<Input
 								type="text"
 								placeholder="Search projects by name, keyword, or tag..."
@@ -125,49 +124,53 @@ export const ProjectFilters = observer(({
 							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
 						</div>
 
-						{/* Business Area Dropdown - second on mobile, first on desktop */}
-						<div className="lg:order-1">
-							<Select
-								value={filters.businessArea || "All"}
-								onValueChange={(value) =>
-									onFiltersChange({ businessArea: value === "All" ? "All" : value })
-								}
-								disabled={isLoadingBusinessAreas}
-							>
-								<SelectTrigger className="w-full text-sm rounded-md">
-									<SelectValue placeholder="All Business Areas" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="All">All Business Areas</SelectItem>
-									{sortedBusinessAreas?.map((ba) => (
-										<SelectItem key={ba.id} value={ba.id!.toString()}>
-											{typeof ba.division === "object" && ba.division?.slug
-												? `[${ba.division.slug}] `
-												: ""}
-											{ba.name}
-											{!ba.is_active ? " (INACTIVE)" : ""}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+						{/* User Filter with icon - SECOND on mobile, left on desktop */}
+						<div className="relative w-full order-2 lg:order-1">
+							<UserSearchDropdown
+								key={filters.user || "no-user"}
+								isRequired={false}
+								setUserFunction={handleUserChange}
+								label=""
+								placeholder="Filter by user"
+								helperText=""
+								hideCannotFind={true}
+								className="pl-10 text-sm rounded-md"
+								preselectedUserPk={filters.user || undefined}
+							/>
+							{/* Only show icon when no user is selected (to avoid overlaying with avatar) */}
+							{!filters.user && (
+								<User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
+							)}
 						</div>
-
-						{/* User Filter Dropdown - third on mobile, second on desktop */}
-						<UserSearchDropdown
-							key={filters.user || "no-user"}
-							isRequired={false}
-							setUserFunction={handleUserChange}
-							label=""
-							placeholder="Filter by user"
-							helperText=""
-							hideCannotFind={true}
-							className="text-sm rounded-md lg:order-2"
-							preselectedUserPk={filters.user || undefined}
-						/>
 					</div>
 
-					{/* Row 2: Year, Project Status, Project Kind, Active/Inactive (tablet only) */}
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+					{/* Row 2: Business Area, Year, Project Status, Project Kind */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+						{/* Business Area Dropdown */}
+						<Select
+							value={filters.businessArea || "All"}
+							onValueChange={(value) =>
+								onFiltersChange({ businessArea: value === "All" ? "All" : value })
+							}
+							disabled={isLoadingBusinessAreas}
+						>
+							<SelectTrigger className="w-full text-sm rounded-md">
+								<SelectValue placeholder="All Business Areas" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="All">All Business Areas</SelectItem>
+								{sortedBusinessAreas?.map((ba) => (
+									<SelectItem key={ba.id} value={ba.id!.toString()}>
+										{typeof ba.division === "object" && ba.division?.slug
+											? `[${ba.division.slug}] `
+											: ""}
+										{ba.name}
+										{!ba.is_active ? " (INACTIVE)" : ""}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+
 						{/* Year Dropdown */}
 						<Select
 							value={filters.year?.toString() || "0"}
@@ -211,67 +214,30 @@ export const ProjectFilters = observer(({
 							</SelectContent>
 						</Select>
 
-						{/* Project Kind Dropdown and Active/Inactive (tablet: show checkboxes here) */}
-						<div className="flex gap-3 items-center sm:col-span-2 lg:col-span-1">
-							{/* Project Kind Dropdown */}
-							<Select
-								value={filters.projectKind || "All"}
-								onValueChange={(value) =>
-									onFiltersChange({ projectKind: value === "All" ? "All" : value })
-								}
-							>
-								<SelectTrigger className="w-full text-sm rounded-md">
-									<SelectValue placeholder="All Kinds" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="All">All Kinds</SelectItem>
-									<SelectItem value="core_function">Core Function</SelectItem>
-									<SelectItem value="science">Science Project</SelectItem>
-									<SelectItem value="student">Student Project</SelectItem>
-									<SelectItem value="external">External Project</SelectItem>
-								</SelectContent>
-							</Select>
-
-							{/* Active/Inactive Checkboxes - show on tablet (640px-1024px) */}
-							<div className="hidden sm:flex lg:hidden gap-4 items-center shrink-0">
-								<div className="flex items-center space-x-2">
-									<Checkbox
-										id="active-filter-tablet"
-										checked={filters.onlyActive || false}
-										onCheckedChange={handleActiveChange}
-										disabled={filters.onlyInactive || false}
-										className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
-									/>
-									<Label
-										htmlFor="active-filter-tablet"
-										className="text-sm font-normal cursor-pointer"
-									>
-										Active
-									</Label>
-								</div>
-
-								<div className="flex items-center space-x-2">
-									<Checkbox
-										id="inactive-filter-tablet"
-										checked={filters.onlyInactive || false}
-										onCheckedChange={handleInactiveChange}
-										disabled={filters.onlyInactive || false}
-									/>
-									<Label
-										htmlFor="inactive-filter-tablet"
-										className="text-sm font-normal cursor-pointer"
-									>
-										Inactive
-									</Label>
-								</div>
-							</div>
-						</div>
+						{/* Project Kind Dropdown - next to Status on sm+ */}
+						<Select
+							value={filters.projectKind || "All"}
+							onValueChange={(value) =>
+								onFiltersChange({ projectKind: value === "All" ? "All" : value })
+							}
+						>
+							<SelectTrigger className="w-full text-sm rounded-md">
+								<SelectValue placeholder="All Kinds" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="All">All Kinds</SelectItem>
+								<SelectItem value="core_function">Core Function</SelectItem>
+								<SelectItem value="science">Science Project</SelectItem>
+								<SelectItem value="student">Student Project</SelectItem>
+								<SelectItem value="external">External Project</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 
-					{/* Row 3: Active/Inactive Checkboxes (mobile/desktop), Remember my search, Clear button */}
-					<div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-						{/* Left side: Active/Inactive Checkboxes (hidden on tablet 640px-1024px) */}
-						<div className="flex gap-4 items-center sm:hidden lg:flex">
+					{/* Row 3: Active/Inactive Checkboxes and Search Controls */}
+					<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+						{/* Left side: Active/Inactive Checkboxes */}
+						<div className="flex gap-4 items-center">
 							<div className="flex items-center space-x-2">
 								<Checkbox
 									id="active-filter"
@@ -282,7 +248,7 @@ export const ProjectFilters = observer(({
 								/>
 								<Label
 									htmlFor="active-filter"
-									className="text-sm font-normal cursor-pointer"
+									className="text-sm font-normal cursor-pointer whitespace-nowrap"
 								>
 									Active
 								</Label>
@@ -297,24 +263,25 @@ export const ProjectFilters = observer(({
 								/>
 								<Label
 									htmlFor="inactive-filter"
-									className="text-sm font-normal cursor-pointer"
+									className="text-sm font-normal cursor-pointer whitespace-nowrap"
 								>
 									Inactive
 								</Label>
 							</div>
 						</div>
 
-						{/* Right side: Remember my search and Clear button */}
-						<SearchControls
-							saveSearch={saveSearch}
-							onToggleSaveSearch={onToggleSaveSearch}
-							filterCount={filterCount}
-							onClearFilters={onClearFilters}
-							className="flex gap-3 items-center w-full sm:w-auto sm:ml-auto"
-						/>
+						{/* Right side: Remember my search and Clear button - right-aligned on mobile */}
+						<div className="flex justify-end sm:justify-start">
+							<SearchControls
+								saveSearch={saveSearch}
+								onToggleSaveSearch={onToggleSaveSearch}
+								filterCount={filterCount}
+								onClearFilters={onClearFilters}
+								className="flex gap-3 items-center"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 	);
 });
