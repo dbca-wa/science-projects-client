@@ -10,13 +10,16 @@ import {
   UserDetailSheet,
   useUserSearch
 } from "@/features/users";
-import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { NoResultsState } from "@/shared/components/NoResultsState";
+import { ErrorState } from "@/shared/components/ErrorState";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { AlertCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { Loader2 } from "lucide-react";
+import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
 
 /**
  * UserListPage
@@ -26,7 +29,7 @@ const UserListPage = observer(() => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
   const userSearchStore = useUserSearchStore();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const params = useParams<{ id?: string }>();
   
   // Sheet state - controlled by URL
@@ -37,52 +40,18 @@ const UserListPage = observer(() => {
     { title: "Users" },
   ];
 
-  // Initialize from URL params on mount
-  useEffect(() => {
-    // First, let the store load from localStorage
-    // Then check if saveSearch is disabled
-    const storedState = localStorage.getItem("userSearchState");
-    let shouldClearState = false;
-    
-    if (storedState) {
-      try {
-        const parsed = JSON.parse(storedState);
-        if (parsed.saveSearch === false) {
-          shouldClearState = true;
-        }
-      } catch {
-        // Invalid JSON, ignore
-      }
-    }
-    
-    if (shouldClearState) {
-      // User disabled persistence - clear store state and URL params
-      userSearchStore.clearState();
-      userSearchStore.state.saveSearch = false;
-      setSearchParams(new URLSearchParams(), { replace: true });
-      return;
-    }
-
-    // Otherwise, read from URL params (if any)
-    const search = searchParams.get("search");
-    const page = searchParams.get("page");
-    const staff = searchParams.get("staff");
-    const external = searchParams.get("external");
-    const superuser = searchParams.get("superuser");
-    const businessArea = searchParams.get("businessArea");
-
-    if (search) userSearchStore.setSearchTerm(search);
-    if (page) userSearchStore.setCurrentPage(Number(page));
-    if (staff || external || superuser || businessArea) {
-      userSearchStore.setFilters({
-        onlyStaff: staff === "true",
-        onlyExternal: external === "true",
-        onlySuperuser: superuser === "true",
-        businessArea: businessArea ? Number(businessArea) : undefined,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+	// Initialize from URL params and localStorage
+	// TypeScript infers TFilters = UserSearchFilters from userSearchStore
+	useSearchStoreInit({
+		store: userSearchStore,
+		storageKey: "userSearchState",
+		urlParamMapping: {
+			staff: (v) => v === "true",
+			external: (v) => v === "true",
+			superuser: (v) => v === "true",
+			businessArea: (v) => Number(v),
+		},
+	});
 
   // Fetch users with search and filters from store
   const { data, isLoading, error, refetch } = useUserSearch({
@@ -137,19 +106,7 @@ const UserListPage = observer(() => {
 
   // Error state
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert variant="destructive">
-          <AlertCircle className="size-4" />
-          <AlertDescription>
-            Failed to load users. Please try again.
-          </AlertDescription>
-        </Alert>
-        <Button onClick={() => refetch()} className="mt-4">
-          Retry
-        </Button>
-      </div>
-    );
+    return <ErrorState message="Failed to load users. Please try again." onRetry={refetch} />;
   }
 
   // Empty state (no users at all)
@@ -300,30 +257,18 @@ const UserListPage = observer(() => {
 
       {/* Empty state */}
       {showEmptyState && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-2">No users found</p>
-          <p className="text-sm text-muted-foreground">
-            There are no users in the system yet.
-          </p>
-        </div>
+        <EmptyState
+          title="No users found"
+          description="There are no users in the system yet."
+        />
       )}
 
       {/* No results state */}
       {showNoResults && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-2">
-            No results for "{userSearchStore.state.searchTerm}"
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Try adjusting your search or filters
-          </p>
-          <Button
-            variant="outline"
-            onClick={handleClearFilters}
-          >
-            Clear search and filters
-          </Button>
-        </div>
+        <NoResultsState
+          searchTerm={userSearchStore.state.searchTerm}
+          onClear={handleClearFilters}
+        />
       )}
 
       {/* Pagination */}

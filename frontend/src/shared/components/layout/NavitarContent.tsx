@@ -99,47 +99,16 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             </span>
           </div>
         </div>
-
-        {/* Logout */}
-        <div
-          onClick={() => {
-            logout(undefined, {
-              onSuccess: () => {
-                navigate("/login", { replace: true });
-              },
-            });
-            onClose();
-          }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <div className="flex gap-2 items-center">
-            <LogOut className="h-4 w-4" />
-            <span className="text-sm">Logout</span>
-          </div>
-        </div>
       </div>
+      
       <Separator />
 
-      {/* Docs & Layout Section */}
+      {/* Appearance Section */}
       <div className="py-1">
         <div className="px-4 py-2">
           <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Docs & Layout
+            Appearance
           </span>
-        </div>
-        
-        {/* Quick Guide */}
-        <div
-          onClick={() => {
-            navigate("/guide");
-            onClose();
-          }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <div className="flex gap-2 items-center">
-            <BookOpen className="h-4 w-4" />
-            <span className="text-sm">Quick Guide</span>
-          </div>
         </div>
 
         {/* Toggle Layout */}
@@ -183,6 +152,20 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
           </span>
         </div>
         
+        {/* Quick Guide */}
+        <div
+          onClick={() => {
+            navigate("/guide");
+            onClose();
+          }}
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <div className="flex gap-2 items-center">
+            <BookOpen className="h-4 w-4" />
+            <span className="text-sm">Quick Guide</span>
+          </div>
+        </div>
+        
         {/* Data Catalogue */}
         <div
           onClick={() => {
@@ -212,6 +195,27 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
         </div>
       </div>
 
+      <Separator />
+
+      {/* Logout Section */}
+      <div className="py-1">
+        <div
+          onClick={() => {
+            logout(undefined, {
+              onSuccess: () => {
+                navigate("/login", { replace: true });
+              },
+            });
+            onClose();
+          }}
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-600 dark:text-red-400"
+        >
+          <div className="flex gap-2 items-center">
+            <LogOut className="h-4 w-4" />
+            <span className="text-sm font-medium">Logout</span>
+          </div>
+        </div>
+      </div>
 
     </div>
   );

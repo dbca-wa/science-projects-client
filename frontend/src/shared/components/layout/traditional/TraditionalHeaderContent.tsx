@@ -1,5 +1,6 @@
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus } from "react-icons/fa";
+import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
@@ -29,8 +30,7 @@ export default function TraditionalHeaderContent({
 
       {/* Navigation Menu Items */}
       <div className="flex flex-col gap-1">
-        {/* Projects Menu - COMMENTED OUT: Not yet implemented */}
-        {/*
+        {/* Projects Section */}
         <div className="flex flex-col gap-1">
           <div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
             Projects
@@ -41,12 +41,21 @@ export default function TraditionalHeaderContent({
             onClick={() => navigateAndClose("/projects")}
           >
             <span className="flex items-center gap-3">
-              <HiMiniSquares2X2 className="text-xl" />
+              <CgBrowse className="text-xl" />
               <span>Browse Projects</span>
             </span>
           </Button>
+          <Button
+            variant="ghost"
+            className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+            onClick={() => navigateAndClose("/projects/create")}
+          >
+            <span className="flex items-center gap-3">
+              <CgPlayListAdd className="text-xl" />
+              <span>Create New Project</span>
+            </span>
+          </Button>
         </div>
-        */}
 
         {/* Users Section */}
         <div className="flex flex-col gap-1">

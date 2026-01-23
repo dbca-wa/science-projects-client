@@ -9,7 +9,7 @@ import {
 	getProjectStatusColor,
 	getProjectKindColor,
 } from "./project.utils";
-import type { IProjectData, ProjectStatus, ProjectKind } from "@/shared/types/project.types";
+import type { IProjectData } from "@/shared/types/project.types";
 
 describe("getProjectStatusDisplay", () => {
 	it("should return formatted status for valid status", () => {
