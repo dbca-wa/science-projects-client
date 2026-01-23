@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avat
 import { Upload, X, Link as LinkIcon, Crop } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
-import { ImageCropModal } from "./ImageCropModal";
+import { AdjustImageModal } from "./AdjustImageModal";
 import {
   type ImageUploadProps,
   type ImageUploadMode,
@@ -468,9 +468,9 @@ export const ImageUpload = ({
         </p>
       )}
 
-      {/* Crop Modal */}
+      {/* Adjust Image Modal */}
       {imageToCrop && (
-        <ImageCropModal
+        <AdjustImageModal
           isOpen={isCropModalOpen}
           onClose={() => setIsCropModalOpen(false)}
           imageUrl={imageToCrop}

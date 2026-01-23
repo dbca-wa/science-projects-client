@@ -17,7 +17,6 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Slider } from "@/shared/components/ui/slider";
 import { Label } from "@/shared/components/ui/label";
-import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import {
   RotateCcw,
   RotateCw,
@@ -27,7 +26,7 @@ import {
   RectangleVertical,
 } from "lucide-react";
 
-interface ImageCropModalProps {
+interface AdjustImageModalProps {
   isOpen: boolean;
   onClose: () => void;
   imageUrl: string;
@@ -37,18 +36,18 @@ interface ImageCropModalProps {
 }
 
 /**
- * ImageCropModal Component
+ * AdjustImageModal Component
  * Modal for cropping, rotating, and scaling images
  * Uses react-image-crop library
  */
-export const ImageCropModal = ({
+export const AdjustImageModal = ({
   isOpen,
   onClose,
   imageUrl,
   onCropComplete,
   fileName = "cropped-image.jpg",
-  defaultAspect = 1, // Default to square for avatars
-}: ImageCropModalProps) => {
+  defaultAspect = 1,
+}: AdjustImageModalProps) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [crop, setCrop] = useState<Crop>({
     unit: "%",
@@ -62,13 +61,11 @@ export const ImageCropModal = ({
   const [rotate, setRotate] = useState(0);
   const [aspect, setAspect] = useState<number | undefined>(defaultAspect);
   
-  // Live preview URLs
   const [previewUrls, setPreviewUrls] = useState<{
     avatar: string | null;
     profile: string | null;
   }>({ avatar: null, profile: null });
 
-  // Set aspect ratio with centered crop
   const setAspectRatio = useCallback((aspectRatio: number | undefined) => {
     setAspect(aspectRatio);
 
@@ -79,11 +76,11 @@ export const ImageCropModal = ({
       let cropHeight = 50;
 
       if (aspectRatio > imageAspect) {
-        cropWidth = 90;
-        cropHeight = 90 / aspectRatio;
+        cropWidth = 100;
+        cropHeight = 100 / aspectRatio;
       } else {
-        cropHeight = 90;
-        cropWidth = 90 * aspectRatio;
+        cropHeight = 100;
+        cropWidth = 100 * aspectRatio;
       }
 
       const newCrop = centerCrop(
@@ -105,7 +102,6 @@ export const ImageCropModal = ({
     }
   }, []);
 
-  // Generate cropped image
   const generateCroppedImage = useCallback(
     async (
       image: HTMLImageElement,
@@ -187,7 +183,6 @@ export const ImageCropModal = ({
     []
   );
   
-  // Generate preview URL from cropped image
   const generatePreviewUrl = useCallback(
     async (
       image: HTMLImageElement,
@@ -202,9 +197,8 @@ export const ImageCropModal = ({
     [generateCroppedImage]
   );
 
-  // Update previews when crop changes
   useEffect(() => {
-    async function updatePreviews() {
+    const timeoutId = setTimeout(async () => {
       if (completedCrop && imgRef.current) {
         try {
           const previewUrl = await generatePreviewUrl(
@@ -215,32 +209,41 @@ export const ImageCropModal = ({
           );
 
           if (previewUrl) {
-            // Clean up old preview URLs
-            if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);
-            if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
+            // Store old URLs to revoke after setting new ones
+            const oldAvatarUrl = previewUrls.avatar;
+            const oldProfileUrl = previewUrls.profile;
             
-            // Use the same preview URL for both avatar and profile
+            // Set new URLs first (prevents flicker)
             setPreviewUrls({
               avatar: previewUrl,
               profile: previewUrl,
             });
+            
+            // Then revoke old URLs after a brief delay
+            setTimeout(() => {
+              if (oldAvatarUrl) URL.revokeObjectURL(oldAvatarUrl);
+              if (oldProfileUrl) URL.revokeObjectURL(oldProfileUrl);
+            }, 50);
           }
         } catch (error) {
           console.error("Error generating preview:", error);
         }
       }
-    }
-
-    updatePreviews();
+    }, 100);
     
-    // Cleanup function
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [completedCrop, scale, rotate, generatePreviewUrl]);
+  
+  // Cleanup URLs on unmount
+  useEffect(() => {
     return () => {
       if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);
       if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
     };
-  }, [completedCrop, scale, rotate, generatePreviewUrl]);
+  }, []);
 
-  // Apply crop and close modal
   const handleApplyCrop = async () => {
     if (!completedCrop || !imgRef.current) return;
 
@@ -255,7 +258,6 @@ export const ImageCropModal = ({
       if (blob) {
         const file = new File([blob], fileName, { type: "image/jpeg" });
         
-        // Clean up preview URLs
         if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);
         if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
         setPreviewUrls({ avatar: null, profile: null });
@@ -268,19 +270,17 @@ export const ImageCropModal = ({
     }
   };
 
-  // Reset transforms and crop
   const resetTransforms = () => {
     setScale(1);
     setRotate(0);
     
-    // Reset crop to center
     if (imgRef.current) {
       const { width, height } = imgRef.current;
       const newCrop = centerCrop(
         makeAspectCrop(
           {
             unit: "%",
-            width: 90,
+            width: 100,
           },
           aspect || 1,
           width,
@@ -293,14 +293,13 @@ export const ImageCropModal = ({
     }
   };
 
-  // Handle image load
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     const crop = centerCrop(
       makeAspectCrop(
         {
           unit: "%",
-          width: 90,
+          width: 100,
         },
         aspect || 1,
         width,
@@ -311,7 +310,6 @@ export const ImageCropModal = ({
     );
     setCrop(crop);
     
-    // Set completedCrop immediately so previews appear
     const pixelCrop: PixelCrop = {
       unit: "px",
       width: (crop.width * width) / 100,
@@ -326,15 +324,14 @@ export const ImageCropModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Crop and Adjust Image</DialogTitle>
+          <DialogTitle>Adjust Image</DialogTitle>
           <DialogDescription>
-            Adjust the crop area, rotation, and scale of your image
+            Crop, rotate, and scale your image
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col md:flex-row gap-6 overflow-hidden h-[calc(90vh-180px)]">
-          {/* Left side - Crop area and controls */}
-          <div className="flex-[3] space-y-4 overflow-y-auto pr-2 min-w-0">
+        <div className="flex flex-col md:flex-row gap-6 overflow-y-auto h-[calc(90vh-180px)]">
+          <div className="md:flex-[3] space-y-4 min-w-0">
             {/* Aspect Ratio Buttons */}
             <div className="flex flex-wrap gap-2">
               <Button
@@ -408,7 +405,7 @@ export const ImageCropModal = ({
             </div>
 
             {/* Rotation Controls */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <Label className="min-w-[80px]">Rotation:</Label>
               <Button
                 type="button"
@@ -445,16 +442,16 @@ export const ImageCropModal = ({
               <Slider
                 value={[scale]}
                 onValueChange={(value) => setScale(value[0])}
-                min={0.5}
+                min={1}
                 max={2}
-                step={0.1}
+                step={0.02}
                 className="w-full"
               />
             </div>
           </div>
 
           {/* Right side - Live previews */}
-          <div className="flex-1 space-y-6 overflow-y-auto min-w-[200px]">
+          <div className="md:flex-1 space-y-6 min-w-[200px]">
             {completedCrop && (
               <>
                 <div>
@@ -467,13 +464,19 @@ export const ImageCropModal = ({
                     <Label className="text-sm text-muted-foreground">
                       Avatar Preview:
                     </Label>
-                    <Avatar className="h-[200px] w-[200px]">
-                      <AvatarImage 
-                        src={previewUrls.avatar || undefined} 
-                        alt="Avatar preview" 
-                      />
-                      <AvatarFallback>Preview</AvatarFallback>
-                    </Avatar>
+                    <div className="h-[200px] w-[200px] mx-auto rounded-full overflow-hidden border border-border bg-muted">
+                      {previewUrls.avatar ? (
+                        <img
+                          src={previewUrls.avatar}
+                          alt="Avatar preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
+                          Preview
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Public Profile Preview */}
@@ -481,7 +484,7 @@ export const ImageCropModal = ({
                     <Label className="text-sm text-muted-foreground">
                       Public Profile Preview:
                     </Label>
-                    <div className="w-[200px] h-[200px] rounded-lg overflow-hidden border border-border">
+                    <div className="w-[200px] h-[200px] mx-auto rounded-lg overflow-hidden border border-border">
                       {previewUrls.profile ? (
                         <img
                           src={previewUrls.profile}
