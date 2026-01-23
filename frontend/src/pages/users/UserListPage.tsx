@@ -168,8 +168,8 @@ const UserListPage = observer(() => {
                 </div>
               </div>
               
-              {/* Business Area + Filters - shows second on mobile */}
-              <div className="w-full md:w-auto md:min-w-[280px] order-2 md:order-1">
+              {/* Business Area + Filters - shows second on mobile, expands naturally */}
+              <div className="w-full md:w-auto md:flex-1 order-2 md:order-1">
                 <UserFilterPanel 
                   filters={userSearchStore.state.filters} 
                   onFiltersChange={handleFiltersChange}

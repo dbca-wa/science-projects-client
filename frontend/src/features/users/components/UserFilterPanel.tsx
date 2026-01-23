@@ -66,8 +66,8 @@ export const UserFilterPanel = observer(({
     });
 
   return (
-    <div className="flex flex-col gap-3 w-full justify-between">
-      {/* Business Area Dropdown */}
+    <div className="flex flex-col gap-3 w-full">
+      {/* Business Area Dropdown - Full width on its own row */}
       <Select
         value={filters.businessArea?.toString() || "All"}
         onValueChange={handleBusinessAreaChange}
@@ -88,9 +88,9 @@ export const UserFilterPanel = observer(({
         </SelectContent>
       </Select>
 
-      {/* Filter Checkboxes - horizontal layout, centered */}
-      <div className="flex flex-row gap-5 w-full">
-        <div className="py-2 flex items-center space-x-2">
+      {/* Filter Checkboxes - Separate row with wrapping for mobile */}
+      <div className="flex flex-wrap gap-x-5 gap-y-2 w-full">
+        <div className="flex items-center space-x-2">
           <Checkbox
             id="external-filter"
             checked={filters.onlyExternal}
@@ -98,7 +98,7 @@ export const UserFilterPanel = observer(({
           />
           <Label
             htmlFor="external-filter"
-            className="text-sm font-normal cursor-pointer"
+            className="text-sm font-normal cursor-pointer whitespace-nowrap"
           >
             Only External
           </Label>
@@ -113,7 +113,7 @@ export const UserFilterPanel = observer(({
           />
           <Label
             htmlFor="staff-filter"
-            className="text-sm font-normal cursor-pointer"
+            className="text-sm font-normal cursor-pointer whitespace-nowrap"
           >
             Only Staff
           </Label>
@@ -128,7 +128,7 @@ export const UserFilterPanel = observer(({
           />
           <Label
             htmlFor="ba-lead-filter"
-            className="text-sm font-normal cursor-pointer"
+            className="text-sm font-normal cursor-pointer whitespace-nowrap"
           >
             Only BA Lead
           </Label>
@@ -139,11 +139,11 @@ export const UserFilterPanel = observer(({
             id="superuser-filter"
             checked={filters.onlySuperuser}
             onCheckedChange={() => handleToggleFilter("onlySuperuser")}
-            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-500"
+            className="data-[state=checked]:bg-blue-600 data-[state-checked]:border-blue-500"
           />
           <Label
             htmlFor="superuser-filter"
-            className="text-sm font-normal cursor-pointer"
+            className="text-sm font-normal cursor-pointer whitespace-nowrap"
           >
             Only Admin
           </Label>

@@ -64,10 +64,6 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
       colorClass = "text-gray-500";
     }
 
-    if (!user.is_active) {
-      text += " (Inactive)";
-    }
-
     return { text, colorClass };
   };
 
@@ -115,6 +111,9 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
           )}
           <p className={`text-sm ${roleInfo.colorClass}`}>
             {roleInfo.text}
+            {!user.is_active && (
+              <span className="text-red-600 font-bold"> (Inactive)</span>
+            )}
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-300">
             {getSecondaryText()}
