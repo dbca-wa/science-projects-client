@@ -2,7 +2,6 @@ import {
 	makeObservable,
 	observable,
 	action,
-	computed,
 } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 
@@ -18,8 +17,7 @@ export interface BaseStoreState {
 
 export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 	/**
-	 * The observable state object. All store state should be contained within this object.
-	 * Made public so it can be observed properly.
+	 * Observable state object. All store state should be contained within this object.
 	 */
 	public state: T;
 
@@ -29,22 +27,12 @@ export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 	constructor(initialState: T) {
 		this.state = initialState;
 
-		// Configure observability with explicit declarations
-		// This prevents conflicts when child stores use makeAutoObservable
 		makeObservable(this, {
-			// Observable state
 			state: observable,
-
-			// Actions for state management
 			setLoading: action,
 			setError: action,
 			clearError: action,
 			setInitialised: action,
-
-			// Computed values for common state access
-			isLoading: computed,
-			error: computed,
-			isInitialised: computed,
 		});
 	}
 
@@ -76,7 +64,9 @@ export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 		this.state.initialised = initialised;
 	}
 
-	// async action wrapper with retry logic
+	/**
+	 * Executes an async operation with error handling and optional retry logic.
+	 */
 	protected async executeAsync<TResult>(
 		operation: () => Promise<TResult>,
 		operationName: string,
@@ -141,39 +131,38 @@ export abstract class BaseStore<T extends BaseStoreState = BaseStoreState> {
 	}
 
 	/**
-	 * @returns True if the store is currently loading (computed)
-	 * */
+	 * @returns True if the store is currently loading
+	 */
 	get isLoading() {
 		return this.state.loading;
 	}
 
 	/**
-	 * @returns The current error message, or null if no error (computed)
+	 * @returns The current error message, or null if no error
 	 */
 	get error() {
 		return this.state.error;
 	}
 
 	/**
-	 * @returns True if the store has been initialised (computed)
+	 * @returns True if the store has been initialised
 	 */
 	get isInitialised() {
 		return this.state.initialised;
 	}
 
 	/**
-	 * Abstract method that child stores must implement to reset their state.
-	 * Should reset the store to its initial state.
+	 * Resets the store to its initial state.
 	 */
 	abstract reset(): void;
 
 	/**
-	 * Optional method that stores can implement for additional initialisation logic.
+	 * Initialises the store with any async setup logic.
 	 */
 	initialise?(): Promise<void>;
 
 	/**
-	 * Optional method that stores can implement for additional cleanup logic.
+	 * Performs cleanup when the store is disposed.
 	 */
 	dispose?(): Promise<void>;
 }

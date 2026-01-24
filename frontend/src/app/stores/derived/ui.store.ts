@@ -1,4 +1,4 @@
-import { makeObservable, action, computed } from "mobx";
+import { makeObservable, action } from "mobx";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 
 export type Theme = "light" | "dark";
@@ -42,20 +42,12 @@ export class UIStore extends BaseStore<UIStoreState> {
 			setNavitarOpen: action,
 			setHamburgerMenuOpen: action,
 			reset: action,
-			
 			// Computed
-			theme: computed,
-			layout: computed,
-			sidebarOpen: computed,
-			dataViewMode: computed,
-			navitarOpen: computed,
-			hamburgerMenuOpen: computed,
 		});
 		
 		this.initialise();
 	}
 
-	// Computed getters for accessing state
 	get theme(): Theme {
 		return this.state.theme;
 	}
@@ -81,7 +73,7 @@ export class UIStore extends BaseStore<UIStoreState> {
 	}
 
 	/**
-	 * Initialize store - load from localStorage
+	 * Initialises store and loads persisted settings from localStorage.
 	 */
 	async initialise(): Promise<void> {
 		// Load theme from localStorage
@@ -89,21 +81,18 @@ export class UIStore extends BaseStore<UIStoreState> {
 		if (savedTheme) {
 			this.state.theme = savedTheme;
 		}
-
 		// Load layout from localStorage
 		const savedLayout = localStorage.getItem("layout") as Layout;
 		if (savedLayout) {
 			this.state.layout = savedLayout;
 		}
-
-		this.state.initialised = true;
-
 		// Apply theme after loading
+		this.state.initialised = true;
 		this.applyTheme();
 	}
 
 	/**
-	 * Toggle theme between light and dark
+	 * Toggles theme between light and dark.
 	 */
 	toggleTheme = (): void => {
 		this.state.theme = this.state.theme === "light" ? "dark" : "light";
@@ -112,7 +101,7 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Toggle layout between modern and traditional
+	 * Toggles layout between modern and traditional.
 	 */
 	toggleLayout = (): void => {
 		this.state.layout =
@@ -121,42 +110,42 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Toggle sidebar collapsed state
+	 * Toggles sidebar open state.
 	 */
 	toggleSidebar = (): void => {
 		this.state.sidebarOpen = !this.state.sidebarOpen;
 	};
 
 	/**
-	 * Toggle navitar dropdown
+	 * Toggles navitar dropdown open state.
 	 */
 	toggleNavitar = (): void => {
 		this.state.navitarOpen = !this.state.navitarOpen;
 	};
 
 	/**
-	 * Toggle hamburger menu
+	 * Toggles hamburger menu open state.
 	 */
 	toggleHamburgerMenu = (): void => {
 		this.state.hamburgerMenuOpen = !this.state.hamburgerMenuOpen;
 	};
 
 	/**
-	 * Set navitar open state directly
+	 * Sets navitar open state.
 	 */
 	setNavitarOpen = (open: boolean): void => {
 		this.state.navitarOpen = open;
 	};
 
 	/**
-	 * Set hamburger menu open state directly
+	 * Sets hamburger menu open state.
 	 */
 	setHamburgerMenuOpen = (open: boolean): void => {
 		this.state.hamburgerMenuOpen = open;
 	};
 
 	/**
-	 * Set theme directly
+	 * Sets theme.
 	 */
 	setTheme = (theme: Theme): void => {
 		this.state.theme = theme;
@@ -165,7 +154,7 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Set layout directly
+	 * Sets layout.
 	 */
 	setLayout = (layout: Layout): void => {
 		this.state.layout = layout;
@@ -173,14 +162,14 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Set data view mode
+	 * Sets data view mode.
 	 */
 	setDataViewMode = (mode: DataView): void => {
 		this.state.dataViewMode = mode;
 	};
 
 	/**
-	 * Apply theme to document
+	 * Applies current theme to document.
 	 */
 	private applyTheme = (): void => {
 		if (this.state.theme === "dark") {
@@ -191,7 +180,7 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Reset store to defaults
+	 * Resets store to default values.
 	 */
 	reset(): void {
 		this.state.theme = "light";
@@ -199,16 +188,16 @@ export class UIStore extends BaseStore<UIStoreState> {
 		this.state.sidebarOpen = false;
 		this.state.dataViewMode = "grid";
 		this.state.navitarOpen = false;
-		this.state.hamburgerMenuOpen = false;
+		// this.state.hamburgerMenuOpen = false;
 		this.state.loading = false;
 		this.state.error = null;
 		this.applyTheme();
 	}
 
 	/**
-	 * Cleanup
+	 * Performs cleanup when store is disposed.
 	 */
 	async dispose(): Promise<void> {
-		// No async cleanup needed for UI store
+		// No async cleanup needed
 	}
 }

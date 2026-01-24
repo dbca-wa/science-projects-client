@@ -1,4 +1,4 @@
-import { makeObservable, action, computed } from "mobx";
+import { makeObservable, action } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 import { BaseStore, type BaseStoreState } from "../base.store";
 
@@ -19,9 +19,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 			initialised: false,
 		});
 		
-		// Use makeObservable instead of makeAutoObservable for classes with inheritance
 		makeObservable(this, {
-			// Actions
 			openEditor: action,
 			closeEditor: action,
 			setDialogOpen: action,
@@ -31,19 +29,16 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 			handleReset: action,
 			shouldBlockNavigation: action,
 			reset: action,
-			
-			// Computed
-			openEditorsCount: computed,
-			isDialogOpen: computed,
-			pendingAction: computed,
 		});
 	}
 
+	/**
+	 * Initialises the editor store.
+	 */
 	public async initialise(): Promise<void> {
 		await this.executeAsync(
 			async () => {
 				this.state.initialised = true;
-
 				logger.info("Editor store initialised");
 			},
 			"initialise_editor",
@@ -51,7 +46,9 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		);
 	}
 
-	// Editor management actions
+	/**
+	 * Increments the count of open editors.
+	 */
 	openEditor = () => {
 		this.state.openEditorsCount = Math.max(
 			this.state.openEditorsCount + 1,
@@ -63,13 +60,15 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		});
 	};
 
+	/**
+	 * Decrements the count of open editors and auto-closes dialog if count reaches zero.
+	 */
 	closeEditor = () => {
 		this.state.openEditorsCount = Math.max(
 			this.state.openEditorsCount - 1,
 			0
 		);
 
-		// Auto-close dialog if no editors are open
 		if (this.state.openEditorsCount === 0 && this.state.isDialogOpen) {
 			this.state.isDialogOpen = false;
 		}
@@ -79,39 +78,44 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		});
 	};
 
-	// Dialog management actions
+	/**
+	 * Sets the dialog open state.
+	 */
 	setDialogOpen = (open: boolean) => {
 		this.state.isDialogOpen = open;
-
 		logger.info("Editor dialog state changed", { open });
 	};
 
+	/**
+	 * Sets a pending action to execute after dialog is confirmed.
+	 */
 	setPendingAction = (action: (() => void) | null) => {
 		this.state.pendingAction = action;
 	};
 
-	// Main method for checking and showing dialog
+	/**
+	 * Checks if editors are open and shows dialog if needed, otherwise executes action immediately.
+	 */
 	manuallyCheckAndToggleDialog = (action: () => void) => {
 		if (this.state.openEditorsCount > 0) {
 			this.setPendingAction(() => action);
 			this.setDialogOpen(true);
 		} else {
-			action(); // Execute immediately if no editors are open
+			action();
 		}
 	};
 
-	// Dialog action handlers
+	/**
+	 * Proceeds with closing all editors and executes pending action.
+	 */
 	handleProceed = (blockerProceed?: () => void) => {
 		this.setDialogOpen(false);
-
 		this.state.openEditorsCount = 0;
 
-		// Call router blocker proceed if provided
 		if (blockerProceed) {
 			blockerProceed();
 		}
 
-		// Execute pending action if it exists
 		if (this.state.pendingAction) {
 			this.state.pendingAction();
 			this.setPendingAction(null);
@@ -120,11 +124,13 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		logger.info("Editor dialog proceeded");
 	};
 
+	/**
+	 * Resets dialog state without executing pending action.
+	 */
 	handleReset = (blockerReset?: () => void) => {
 		this.setDialogOpen(false);
 		this.setPendingAction(null);
 
-		// Call router blocker reset if provided
 		if (blockerReset) {
 			blockerReset();
 		}
@@ -132,7 +138,9 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		logger.info("Editor dialog reset");
 	};
 
-	// Navigation blocker helper
+	/**
+	 * Determines if navigation should be blocked based on open editors.
+	 */
 	shouldBlockNavigation = (
 		currentPath: string,
 		nextPath: string
@@ -147,23 +155,37 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		return shouldBlock;
 	};
 
-	// Getters
+	/**
+	 * @returns The number of currently open editors
+	 */
 	get openEditorsCount() {
 		return this.state.openEditorsCount;
 	}
 
+	/**
+	 * @returns True if the unsaved changes dialog is open
+	 */
 	get isDialogOpen() {
 		return this.state.isDialogOpen;
 	}
 
+	/**
+	 * @returns The pending action to execute after dialog confirmation
+	 */
 	get pendingAction() {
 		return this.state.pendingAction;
 	}
 
+	/**
+	 * Performs cleanup when store is disposed.
+	 */
 	async dispose() {
 		logger.info("Editor store disposed");
 	}
 
+	/**
+	 * Resets store to initial state.
+	 */
 	reset() {
 		this.state.openEditorsCount = 0;
 		this.state.isDialogOpen = false;
