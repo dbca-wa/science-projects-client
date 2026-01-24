@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/shared/components/ui/custom/CustomAlertDialog";
+} from "@/shared/components/ui/alert-dialog";
 
 interface RequestMergeUserDialogProps {
   open: boolean;
