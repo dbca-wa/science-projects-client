@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCurrentUser } from "@/features/auth";
 import { useAdminTasks, MyTasksSection } from "@/features/dashboard";
 import { observer } from "mobx-react-lite";
@@ -16,7 +16,7 @@ import { DashboardActionCard } from "@/shared/components/DashboardActionCard";
 const Dashboard = observer(() => {
 	const { data: user, isLoading } = useCurrentUser();
 	const navigate = useNavigate();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 
 	const [activeTab, setActiveTab] = useState<number>(() => {
 		const tabParam = searchParams.get("tab");
@@ -30,10 +30,6 @@ const Dashboard = observer(() => {
 		error: adminTasksErrorObj,
 		refetch: refetchAdminTasks,
 	} = useAdminTasks();
-
-	useEffect(() => {
-		setSearchParams({ tab: activeTab.toString() });
-	}, [activeTab, setSearchParams]);
 
 	if (isLoading) {
 		return (

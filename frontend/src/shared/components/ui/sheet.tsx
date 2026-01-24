@@ -1,43 +1,136 @@
 import * as React from "react";
-import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { XIcon } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import { ANIMATION_DURATIONS, ANIMATION_OPEN_DELAY } from "@/shared/constants/animations";
 
-function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-	return <SheetPrimitive.Root data-slot="sheet" {...props} />;
+/**
+ * Sheet component with MobX-compatible animations
+ * Uses delayed unmount pattern to prevent animation flicker with MobX observer()
+ */
+
+type SheetProps = {
+	children: React.ReactNode;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	modal?: boolean;
+	shouldAnimate?: boolean;
+};
+
+const SheetContext = React.createContext<{
+	onOpenChange: (open: boolean) => void;
+	isClosing?: boolean;
+	shouldAnimate: boolean;
+} | null>(null);
+
+function Sheet({ children, open, onOpenChange, modal: _modal = true, shouldAnimate = true }: SheetProps) {
+	const [isVisible, setIsVisible] = React.useState(false);
+	const [isClosing, setIsClosing] = React.useState(false);
+	const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+	// Handle open/close with animation
+	React.useEffect(() => {
+		if (open) {
+			setIsVisible(true);
+			setIsClosing(false);
+		} else if (isVisible && !isClosing) {
+			if (shouldAnimate) {
+				setIsClosing(true);
+				timeoutRef.current = setTimeout(() => {
+					setIsVisible(false);
+					setIsClosing(false);
+				}, ANIMATION_DURATIONS.SHEET);
+			} else {
+				setIsVisible(false);
+			}
+		}
+	}, [open, isVisible, isClosing, shouldAnimate]);
+
+	// Cleanup timeout on unmount
+	React.useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
+	// Handle escape key
+	React.useEffect(() => {
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && open) {
+				onOpenChange(false);
+			}
+		};
+
+		document.addEventListener("keydown", handleEscape);
+		return () => document.removeEventListener("keydown", handleEscape);
+	}, [open, onOpenChange]);
+
+	if (!isVisible) return null;
+
+	return (
+		<SheetContext.Provider value={{ onOpenChange, isClosing, shouldAnimate }}>
+			<div className="fixed inset-0 z-50">{children}</div>
+		</SheetContext.Provider>
+	);
 }
 
 function SheetTrigger({
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-	return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
+	children,
+	onClick,
+}: {
+	children: React.ReactNode;
+	onClick?: () => void;
+}) {
+	return <div onClick={onClick}>{children}</div>;
 }
 
-function SheetClose({
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Close>) {
-	return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
-}
+function SheetClose(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+	const context = React.useContext(SheetContext);
+	if (!context) throw new Error("SheetClose must be used within a Sheet");
 
-function SheetPortal({
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-	return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
-}
+	const { onOpenChange } = context;
 
-function SheetOverlay({
-	className,
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
 	return (
-		<SheetPrimitive.Overlay
-			data-slot="sheet-overlay"
-			className={cn(
-				"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
-				className
-			)}
+		<button
+			type="button"
 			{...props}
+			onClick={(e) => {
+				props.onClick?.(e);
+				onOpenChange(false);
+			}}
+		/>
+	);
+}
+
+function SheetOverlay() {
+	const context = React.useContext(SheetContext);
+	if (!context) throw new Error("SheetOverlay must be used within a Sheet");
+
+	const { onOpenChange, isClosing, shouldAnimate } = context;
+	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+
+	React.useEffect(() => {
+		if (!shouldAnimate) {
+			setIsOpening(false);
+			return;
+		}
+		const timer = setTimeout(() => setIsOpening(false), ANIMATION_OPEN_DELAY);
+		return () => clearTimeout(timer);
+	}, [shouldAnimate]);
+
+	return (
+		<div
+			className={cn(
+				"fixed inset-0 bg-black/50 z-49",
+				shouldAnimate && "transition-opacity duration-300",
+				shouldAnimate && isOpening && "opacity-0",
+				shouldAnimate && isClosing && "opacity-0",
+				shouldAnimate && !isOpening && !isClosing && "opacity-100",
+				!shouldAnimate && "opacity-100"
+			)}
+			onClick={() => onOpenChange(false)}
+			aria-hidden="true"
 		/>
 	);
 }
@@ -46,36 +139,69 @@ function SheetContent({
 	className,
 	children,
 	side = "right",
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+}: {
+	className?: string;
+	children: React.ReactNode;
 	side?: "top" | "right" | "bottom" | "left";
 }) {
+	const context = React.useContext(SheetContext);
+	if (!context) throw new Error("SheetContent must be used within a Sheet");
+
+	const { isClosing, shouldAnimate } = context;
+	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+
+	React.useEffect(() => {
+		if (!shouldAnimate) {
+			setIsOpening(false);
+			return;
+		}
+		const timer = setTimeout(() => setIsOpening(false), ANIMATION_OPEN_DELAY);
+		return () => clearTimeout(timer);
+	}, [shouldAnimate]);
+
 	return (
-		<SheetPortal>
-			<SheetOverlay />
-			<SheetPrimitive.Content
-				data-slot="sheet-content"
+		<>
+			<div
 				className={cn(
-					"bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-					side === "right" &&
-						"data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-					side === "left" &&
-						"data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-					side === "top" &&
-						"data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
-					side === "bottom" &&
-						"data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+					"fixed flex flex-col gap-4 bg-white dark:bg-gray-900 z-50",
+					shouldAnimate && "transition-transform duration-300 ease-in-out",
+					side === "left" && [
+						"left-0 inset-y-0 h-full border-r-[1px] border-gray-300 dark:border-gray-700 shadow-[5px_0_15px_rgba(0,0,0,0.1)]",
+						shouldAnimate && isOpening && "-translate-x-full",
+						shouldAnimate && isClosing && "-translate-x-full",
+						shouldAnimate && !isOpening && !isClosing && "translate-x-0",
+						!shouldAnimate && "translate-x-0",
+					],
+					side === "right" && [
+						"right-0 inset-y-0 h-full border-l-[1px] border-gray-300 dark:border-gray-700 shadow-[-5px_0_15px_rgba(0,0,0,0.1)]",
+						shouldAnimate && isOpening && "translate-x-full",
+						shouldAnimate && isClosing && "translate-x-full",
+						shouldAnimate && !isOpening && !isClosing && "translate-x-0",
+						!shouldAnimate && "translate-x-0",
+					],
+					side === "top" && [
+						"top-0 inset-x-0 w-full border-b-[1px] border-gray-300 dark:border-gray-700 shadow-[0_5px_15px_rgba(0,0,0,0.1)]",
+						shouldAnimate && isOpening && "-translate-y-full",
+						shouldAnimate && isClosing && "-translate-y-full",
+						shouldAnimate && !isOpening && !isClosing && "translate-y-0",
+						!shouldAnimate && "translate-y-0",
+					],
+					side === "bottom" && [
+						"bottom-0 inset-x-0 w-full border-t-[1px] border-gray-300 dark:border-gray-700 shadow-[0_-5px_15px_rgba(0,0,0,0.1)]",
+						shouldAnimate && isOpening && "translate-y-full",
+						shouldAnimate && isClosing && "translate-y-full",
+						shouldAnimate && !isOpening && !isClosing && "translate-y-0",
+						!shouldAnimate && "translate-y-0",
+					],
 					className
 				)}
-				{...props}
+				aria-modal="true"
+				role="dialog"
 			>
 				{children}
-				<SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
-					<XIcon className="size-4" />
-					<span className="sr-only">Close</span>
-				</SheetPrimitive.Close>
-			</SheetPrimitive.Content>
-		</SheetPortal>
+			</div>
+			<SheetOverlay />
+		</>
 	);
 }
 
@@ -99,12 +225,9 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 	);
 }
 
-function SheetTitle({
-	className,
-	...props
-}: React.ComponentProps<typeof SheetPrimitive.Title>) {
+function SheetTitle({ className, ...props }: { className?: string; children: React.ReactNode }) {
 	return (
-		<SheetPrimitive.Title
+		<h2
 			data-slot="sheet-title"
 			className={cn("text-foreground font-semibold", className)}
 			{...props}
@@ -115,9 +238,12 @@ function SheetTitle({
 function SheetDescription({
 	className,
 	...props
-}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+}: {
+	className?: string;
+	children: React.ReactNode;
+}) {
 	return (
-		<SheetPrimitive.Description
+		<p
 			data-slot="sheet-description"
 			className={cn("text-muted-foreground text-sm", className)}
 			{...props}

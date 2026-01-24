@@ -138,6 +138,7 @@
 	html {
 		overflow: hidden;
 		scrollbar-width: none;
+		user-select: none;
 	}
 
 	.drawer-content {
@@ -180,4 +181,5 @@
 		-ms-overflow-style: none;
 		scrollbar-width: none;
 	}
+
 }

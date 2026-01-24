@@ -23,6 +23,10 @@ interface ToggleStaffProfileVisibilityModalProps {
 	onSuccess: () => void;
 }
 
+/**
+ * ToggleStaffProfileVisibilityModal
+ * Uses Dialog component with MobX-compatible animations (no flicker)
+ */
 export const ToggleStaffProfileVisibilityModal = observer(
 	({
 		isOpen,
