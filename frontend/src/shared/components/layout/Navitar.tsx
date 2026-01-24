@@ -27,7 +27,6 @@ interface NavitarProps {
 /**
  * Navitar component - User avatar dropdown menu
  * Wrapped with observer to react to user data loading
- * Uses CustomPopover (no animations, returns null when closed)
  */
 export const Navitar = observer(({ isModern, shouldShowName = false }: NavitarProps) => {
   const authStore = useAuthStore();

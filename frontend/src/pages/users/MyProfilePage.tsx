@@ -75,18 +75,18 @@ const MyProfilePage = observer(() => {
     { title: "My Profile" },
   ];
 
-  // Handle tab change - update URL
+  // Handle tab change - update URL without replacing history
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     switch (value) {
       case "caretaker":
-        navigate("/users/me/caretaker", { replace: true });
+        navigate("/users/me/caretaker");
         break;
       case "staff-profile":
-        navigate("/users/me/staff-profile", { replace: true });
+        navigate("/users/me/staff-profile");
         break;
       default:
-        navigate("/users/me", { replace: true });
+        navigate("/users/me");
         break;
     }
   };

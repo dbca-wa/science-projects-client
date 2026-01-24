@@ -4,10 +4,11 @@ import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
-import { useUIStore, useAuthStore } from "@/app/stores/store-context";
+import { useAuthStore } from "@/app/stores/store-context";
 
 interface TraditionalHeaderContentProps {
   handleNavigation: (path: string) => void;
+  onClose: () => void;
 }
 
 /**
@@ -15,17 +16,22 @@ interface TraditionalHeaderContentProps {
  * Navigation menu content for hamburger menu with toggle buttons and menu items
  */
 export default function TraditionalHeaderContent({
-  handleNavigation: navigateAndClose,
+  handleNavigation,
+  onClose,
 }: TraditionalHeaderContentProps) {
-  const uiStore = useUIStore();
   const authStore = useAuthStore();
+  
+  const navigateAndClose = (path: string) => {
+    onClose(); // Trigger close animation
+    handleNavigation(path); // Navigate
+  };
 
   return (
     <div className="py-4 flex flex-col gap-4">
       {/* Toggle buttons */}
       <div className="flex justify-center items-center gap-3 pb-4 border-b border-gray-700">
-        <ToggleLayout showText onAfterToggle={() => uiStore.setHamburgerMenuOpen(false)} />
-        <ToggleDarkMode showText onAfterToggle={() => uiStore.setHamburgerMenuOpen(false)} />
+        <ToggleLayout showText onAfterToggle={onClose} />
+        <ToggleDarkMode showText onAfterToggle={onClose} />
       </div>
 
       {/* Navigation Menu Items */}

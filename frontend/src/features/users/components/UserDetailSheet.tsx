@@ -63,7 +63,8 @@ interface UserDetailSheetProps {
 
 /**
  * UserDetailSheet component
- * Displays user details in a side sheet matching the original Chakra UI design
+ * Displays user details in a side sheet
+ * Uses Sheet component with MobX-compatible animations
  */
 export const UserDetailSheet = observer(
 	({ userId, open, onClose }: UserDetailSheetProps) => {

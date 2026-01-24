@@ -23,6 +23,7 @@ interface ConfirmationDialogProps {
 
 /**
  * Reusable confirmation dialog component
+ * Uses AlertDialog with MobX-compatible animations
  * Supports default and destructive variants with loading state during async operations
  */
 export const ConfirmationDialog = ({
@@ -42,8 +43,6 @@ export const ConfirmationDialog = ({
     try {
       await onConfirm();
       onOpenChange(false);
-    } catch (error) {
-      // Error handled by mutation
     } finally {
       setIsLoading(false);
     }

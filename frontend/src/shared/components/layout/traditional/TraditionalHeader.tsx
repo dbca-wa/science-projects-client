@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
@@ -22,8 +21,10 @@ import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import TraditionalHeaderContent from "./TraditionalHeaderContent";
 
 /**
- * HamburgerMenuSheet - Observer-wrapped Sheet component
- * Uses CustomSheet (no animations, returns null when closed)
+ * HamburgerMenuSheet - Mobile navigation menu
+ * Uses Sheet component with MobX-compatible animations
+ * 
+ * Uses observer() to react to MobX state changes for open/close
  */
 const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (path: string) => void }) => {
   const uiStore = useUIStore();
@@ -49,7 +50,10 @@ const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (
             </div>
           </SheetHeader>
 
-          <TraditionalHeaderContent handleNavigation={handleNavigation} />
+          <TraditionalHeaderContent 
+            handleNavigation={handleNavigation}
+            onClose={() => uiStore.setHamburgerMenuOpen(false)}
+          />
         </SheetContent>
       </Sheet>
     </>
@@ -62,21 +66,15 @@ const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (
  */
 export const TraditionalHeader = observer(() => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const uiStore = useUIStore();
   const authStore = useAuthStore();
   const { width } = useWindowSize();
 
   // Show hamburger menu on screens smaller than lg breakpoint
   const shouldShowHamburger = width < BREAKPOINTS.lg;
 
-  // Close drawer on route change
-  useEffect(() => {
-    uiStore.setHamburgerMenuOpen(false);
-  }, [location.pathname, uiStore]);
-
   const handleNavigation = (path: string) => {
-    uiStore.setHamburgerMenuOpen(false);
+    // Don't update MobX directly - let the Sheet's animation complete
+    // The Sheet will update MobX after animation
     navigate(path);
   };
 
@@ -105,77 +103,81 @@ export const TraditionalHeader = observer(() => {
             <div className="flex items-center justify-between flex-grow">
               <div className="flex items-center gap-1">
                 {/* Projects Menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-                    >
-                      Projects
-                      <IoCaretDown className="ml-1 h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-                    <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                      Projects
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/projects")}
-                      className="hover:bg-gray-100 cursor-pointer select-none"
-                    >
-                      <CgBrowse className="mr-2 size-4" />
-                      Browse Projects
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/projects/create")}
-                      className="hover:bg-gray-100 cursor-pointer select-none"
-                    >
-                      <CgPlayListAdd className="mr-2 size-4" />
-                      Create New Project
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="relative">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-white/70 hover:text-white hover:bg-white/10 select-none"
+                      >
+                        Projects
+                        <IoCaretDown className="ml-1 h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
+                      <DropdownMenuLabel className="text-center text-xs text-gray-500">
+                        Projects
+                      </DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/projects")}
+                        className="hover:bg-gray-100 cursor-pointer select-none"
+                      >
+                        <CgBrowse className="mr-2 size-4" />
+                        Browse Projects
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/projects/create")}
+                        className="hover:bg-gray-100 cursor-pointer select-none"
+                      >
+                        <CgPlayListAdd className="mr-2 size-4" />
+                        Create New Project
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
                 {/* Users Menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-                    >
-                      Users
-                      <IoCaretDown className="ml-1 h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-                    <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                      Users
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/users")}
-                      className="hover:bg-gray-100 cursor-pointer select-none"
-                    >
-                      <ImUsers className="mr-2 size-4" />
-                      Browse Users
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/users/create")}
-                      className="hover:bg-gray-100 cursor-pointer select-none"
-                    >
-                      <FaUserPlus className="mr-2 size-4" />
-                      Add User
-                    </DropdownMenuItem>
-                    {authStore.isSuperuser && (
+                <div className="relative">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-white/70 hover:text-white hover:bg-white/10 select-none"
+                      >
+                        Users
+                        <IoCaretDown className="ml-1 h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
+                      <DropdownMenuLabel className="text-center text-xs text-gray-500">
+                        Users
+                      </DropdownMenuLabel>
                       <DropdownMenuItem
-                        onClick={() => navigate("/users/create-staff")}
+                        onClick={() => navigate("/users")}
+                        className="hover:bg-gray-100 cursor-pointer select-none"
+                      >
+                        <ImUsers className="mr-2 size-4" />
+                        Browse Users
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/users/create")}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <FaUserPlus className="mr-2 size-4" />
-                        Add DBCA User (Admin)
+                        Add User
                       </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      {authStore.isSuperuser && (
+                        <DropdownMenuItem
+                          onClick={() => navigate("/users/create-staff")}
+                          className="hover:bg-gray-100 cursor-pointer select-none"
+                        >
+                          <FaUserPlus className="mr-2 size-4" />
+                          Add DBCA User (Admin)
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
                 {/* Reports Menu - COMMENTED OUT: Not yet implemented */}
                 {/*

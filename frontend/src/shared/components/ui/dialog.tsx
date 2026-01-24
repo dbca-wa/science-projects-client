@@ -1,47 +1,160 @@
 "use client";
 
 import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import { ANIMATION_DURATIONS, ANIMATION_OPEN_DELAY } from "@/shared/constants/animations";
 
-function Dialog({
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
-	return <DialogPrimitive.Root data-slot="dialog" {...props} />;
+/**
+ * Dialog component with MobX-compatible animations
+ * Uses delayed unmount pattern to allow fade-out animations
+ */
+
+type DialogProps = {
+	children: React.ReactNode;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	modal?: boolean;
+	shouldAnimate?: boolean;
+};
+
+const DialogContext = React.createContext<{
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	isClosing?: boolean;
+	shouldAnimate: boolean;
+} | null>(null);
+
+function Dialog({ children, open, onOpenChange, modal: _modal = true, shouldAnimate = true }: DialogProps) {
+	const [isVisible, setIsVisible] = React.useState(false);
+	const [isClosing, setIsClosing] = React.useState(false);
+	const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+	// Handle open/close with animation
+	React.useEffect(() => {
+		if (open) {
+			setIsVisible(true);
+			setIsClosing(false);
+		} else if (isVisible && !isClosing) {
+			if (shouldAnimate) {
+				setIsClosing(true);
+				timeoutRef.current = setTimeout(() => {
+					setIsVisible(false);
+					setIsClosing(false);
+				}, ANIMATION_DURATIONS.DIALOG);
+			} else {
+				setIsVisible(false);
+			}
+		}
+	}, [open, isVisible, isClosing, shouldAnimate]);
+
+	// Cleanup timeout on unmount
+	React.useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
+	// Handle escape key
+	React.useEffect(() => {
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && open) {
+				onOpenChange(false);
+			}
+		};
+
+		document.addEventListener("keydown", handleEscape);
+		return () => document.removeEventListener("keydown", handleEscape);
+	}, [open, onOpenChange]);
+
+	if (!isVisible) return null;
+
+	return (
+		<DialogContext.Provider value={{ open, onOpenChange, isClosing, shouldAnimate }}>
+			{children}
+		</DialogContext.Provider>
+	);
 }
 
 function DialogTrigger({
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-	return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
+	children,
+	asChild,
+}: {
+	children: React.ReactNode;
+	asChild?: boolean;
+}) {
+	const context = React.useContext(DialogContext);
+	if (!context) throw new Error("DialogTrigger must be used within a Dialog");
+
+	const { onOpenChange } = context;
+
+	const handleClick = () => {
+		onOpenChange(true);
+	};
+
+	if (asChild && React.isValidElement(children)) {
+		return React.cloneElement(
+			children as React.ReactElement<{ onClick?: () => void }>,
+			{
+				onClick: handleClick,
+			}
+		);
+	}
+
+	return <button onClick={handleClick}>{children}</button>;
 }
 
-function DialogPortal({
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-	return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
+function DialogPortal({ children }: { children: React.ReactNode }) {
+	return <>{children}</>;
 }
 
-function DialogClose({
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Close>) {
-	return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
-}
+function DialogClose(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+	const context = React.useContext(DialogContext);
+	if (!context) throw new Error("DialogClose must be used within a Dialog");
 
-function DialogOverlay({
-	className,
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+	const { onOpenChange } = context;
+
 	return (
-		<DialogPrimitive.Overlay
-			data-slot="dialog-overlay"
-			className={cn(
-				"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
-				className
-			)}
+		<button
+			type="button"
 			{...props}
+			onClick={(e) => {
+				props.onClick?.(e);
+				onOpenChange(false);
+			}}
+		/>
+	);
+}
+
+function DialogOverlay() {
+	const context = React.useContext(DialogContext);
+	if (!context) throw new Error("DialogOverlay must be used within a Dialog");
+
+	const { isClosing, shouldAnimate } = context;
+	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+
+	React.useEffect(() => {
+		if (!shouldAnimate) {
+			setIsOpening(false);
+			return;
+		}
+		const timer = setTimeout(() => setIsOpening(false), ANIMATION_OPEN_DELAY);
+		return () => clearTimeout(timer);
+	}, [shouldAnimate]);
+
+	return (
+		<div
+			className={cn(
+				"fixed inset-0 z-50 bg-black/50",
+				shouldAnimate && "transition-opacity duration-200",
+				shouldAnimate && isOpening && "opacity-0",
+				shouldAnimate && isClosing && "opacity-0",
+				shouldAnimate && !isOpening && !isClosing && "opacity-100",
+				!shouldAnimate && "opacity-100"
+			)}
 		/>
 	);
 }
@@ -50,32 +163,74 @@ function DialogContent({
 	className,
 	children,
 	showCloseButton = true,
-	...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+}: {
+	className?: string;
+	children: React.ReactNode;
 	showCloseButton?: boolean;
 }) {
+	const context = React.useContext(DialogContext);
+	if (!context) throw new Error("DialogContent must be used within a Dialog");
+
+	const { onOpenChange, isClosing, shouldAnimate } = context;
+	const contentRef = React.useRef<HTMLDivElement>(null);
+	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+
+	React.useEffect(() => {
+		if (!shouldAnimate) {
+			setIsOpening(false);
+			return;
+		}
+		const timer = setTimeout(() => setIsOpening(false), ANIMATION_OPEN_DELAY);
+		return () => clearTimeout(timer);
+	}, [shouldAnimate]);
+
+	// Handle backdrop click to close
+	React.useEffect(() => {
+		const handleBackdropClick = (e: MouseEvent) => {
+			if (
+				contentRef.current &&
+				!contentRef.current.contains(e.target as Node)
+			) {
+				onOpenChange(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleBackdropClick);
+		return () => document.removeEventListener("mousedown", handleBackdropClick);
+	}, [onOpenChange]);
+
 	return (
 		<DialogPortal data-slot="dialog-portal">
 			<DialogOverlay />
-			<DialogPrimitive.Content
-				data-slot="dialog-content"
-				className={cn(
-					"bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 outline-none",
-					className
-				)}
-				{...props}
-			>
-				{children}
-				{showCloseButton && (
-					<DialogPrimitive.Close
-						data-slot="dialog-close"
-						className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-					>
-						<XIcon />
-						<span className="sr-only">Close</span>
-					</DialogPrimitive.Close>
-				)}
-			</DialogPrimitive.Content>
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+				<div
+					ref={contentRef}
+					data-slot="dialog-content"
+					className={cn(
+						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg",
+						shouldAnimate && "transition-all duration-200",
+						shouldAnimate && isOpening && "opacity-0 scale-95",
+						shouldAnimate && isClosing && "opacity-0 scale-95",
+						shouldAnimate && !isOpening && !isClosing && "opacity-100 scale-100",
+						!shouldAnimate && "opacity-100 scale-100",
+						className
+					)}
+					role="dialog"
+					aria-modal="true"
+				>
+					{children}
+					{showCloseButton && (
+						<button
+							data-slot="dialog-close"
+							onClick={() => onOpenChange(false)}
+							className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+						>
+							<XIcon />
+							<span className="sr-only">Close</span>
+						</button>
+					)}
+				</div>
+			</div>
 		</DialogPortal>
 	);
 }
@@ -109,9 +264,12 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
 function DialogTitle({
 	className,
 	...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+}: {
+	className?: string;
+	children: React.ReactNode;
+}) {
 	return (
-		<DialogPrimitive.Title
+		<h2
 			data-slot="dialog-title"
 			className={cn("text-lg leading-none font-semibold", className)}
 			{...props}
@@ -122,9 +280,12 @@ function DialogTitle({
 function DialogDescription({
 	className,
 	...props
-}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+}: {
+	className?: string;
+	children: React.ReactNode;
+}) {
 	return (
-		<DialogPrimitive.Description
+		<p
 			data-slot="dialog-description"
 			className={cn("text-muted-foreground text-sm", className)}
 			{...props}
