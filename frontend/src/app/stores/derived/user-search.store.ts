@@ -34,7 +34,7 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			searchTerm: "",
 			filters: { ...DEFAULT_FILTERS },
 			currentPage: 1,
-			saveSearch: true, // Default to true - save search by default
+			saveSearch: true,
 			totalResults: 0,
 			loading: false,
 			error: null,
@@ -42,7 +42,6 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		});
 
 		makeObservable(this, {
-			// Actions
 			setSearchTerm: action,
 			setFilters: action,
 			setCurrentPage: action,
@@ -52,14 +51,15 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			clearState: action,
 			setTotalResults: action,
 			reset: action,
-
-			// Computed
 			hasActiveFilters: computed,
 			filterCount: computed,
 			searchParams: computed,
 		});
 	}
 
+	/**
+	 * Initialises the store by loading saved search state from localStorage.
+	 */
 	async initialise() {
 		this.loadFromStorage();
 		this.state.initialised = true;
@@ -69,22 +69,31 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		});
 	}
 
+	/**
+	 * Sets the search term and resets to page 1.
+	 */
 	setSearchTerm(term: string) {
 		this.state.searchTerm = term;
-		this.state.currentPage = 1; // Reset to page 1 on search
+		this.state.currentPage = 1;
 		if (this.state.saveSearch) {
 			this.saveToStorage();
 		}
 	}
 
+	/**
+	 * Updates filters and resets to page 1.
+	 */
 	setFilters(filters: Partial<UserSearchFilters>) {
 		this.state.filters = { ...this.state.filters, ...filters };
-		this.state.currentPage = 1; // Reset to page 1 on filter change
+		this.state.currentPage = 1;
 		if (this.state.saveSearch) {
 			this.saveToStorage();
 		}
 	}
 
+	/**
+	 * Sets the current page number.
+	 */
 	setCurrentPage(page: number) {
 		this.state.currentPage = page;
 		if (this.state.saveSearch) {
@@ -92,19 +101,22 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Toggles whether search state should be saved to localStorage.
+	 */
 	toggleSaveSearch() {
 		this.state.saveSearch = !this.state.saveSearch;
 		if (this.state.saveSearch) {
-			// When enabling, save current state
 			this.saveToStorage();
 		} else {
-			// When disabling, save the saveSearch: false flag so we know not to restore on next load
-			// But keep current search active in memory
 			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
 		}
 		logger.info("Save search toggled", { saveSearch: this.state.saveSearch });
 	}
 
+	/**
+	 * Resets filters and search term to defaults.
+	 */
 	resetFilters() {
 		this.state.filters = { ...DEFAULT_FILTERS };
 		this.state.searchTerm = "";
@@ -114,6 +126,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Clears all search state including filters and results.
+	 */
 	clearSearchAndFilters() {
 		const currentSaveSearch = this.state.saveSearch;
 		this.state.searchTerm = "";
@@ -130,18 +145,26 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		logger.info("Cleared search and filters", { saveSearch: currentSaveSearch });
 	}
 
+	/**
+	 * Clears search state without affecting localStorage.
+	 */
 	clearState() {
 		this.state.searchTerm = "";
 		this.state.filters = { ...DEFAULT_FILTERS };
 		this.state.currentPage = 1;
 		this.state.totalResults = 0;
-		// Don't clear localStorage here - we need to preserve the saveSearch flag
 	}
 
+	/**
+	 * Sets the total number of search results.
+	 */
 	setTotalResults(count: number) {
 		this.state.totalResults = count;
 	}
 
+	/**
+	 * @returns True if any filters or search term are active
+	 */
 	get hasActiveFilters(): boolean {
 		return (
 			this.state.filters.onlyExternal ||
@@ -153,6 +176,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		);
 	}
 
+	/**
+	 * @returns The number of active filters
+	 */
 	get filterCount(): number {
 		let count = 0;
 		if (this.state.searchTerm.length > 0) count++;
@@ -164,6 +190,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		return count;
 	}
 
+	/**
+	 * @returns URLSearchParams object constructed from current search state
+	 */
 	get searchParams(): URLSearchParams {
 		const params = new URLSearchParams();
 
@@ -192,6 +221,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		return params;
 	}
 
+	/**
+	 * Loads search state from localStorage if saveSearch is enabled.
+	 */
 	private loadFromStorage() {
 		if (typeof window === "undefined") return;
 
@@ -199,10 +231,8 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			const stored = localStorage.getItem(STORAGE_KEY);
 			if (stored) {
 				const parsed = JSON.parse(stored);
-				// Always load the saveSearch flag
 				this.state.saveSearch = parsed.saveSearch ?? true;
 				
-				// Only restore search state if saveSearch is enabled
 				if (parsed.saveSearch) {
 					this.state.searchTerm = parsed.searchTerm || "";
 					this.state.filters = parsed.filters || { ...DEFAULT_FILTERS };
@@ -217,6 +247,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Saves current search state to localStorage.
+	 */
 	private saveToStorage() {
 		if (typeof window === "undefined") return;
 
@@ -234,6 +267,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Clears search state from localStorage.
+	 */
 	private clearStorage() {
 		if (typeof window === "undefined") return;
 
@@ -245,6 +281,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Resets store to initial state and clears localStorage.
+	 */
 	reset() {
 		this.state.searchTerm = "";
 		this.state.filters = { ...DEFAULT_FILTERS };
@@ -258,6 +297,9 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		logger.info("UserSearch store reset");
 	}
 
+	/**
+	 * Performs cleanup when store is disposed.
+	 */
 	async dispose() {
 		if (!this.state.saveSearch) {
 			this.clearStorage();

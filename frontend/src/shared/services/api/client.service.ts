@@ -108,7 +108,7 @@ export class ApiClientService {
 		Cookie.remove("sessionid");
 
 		// Dispatch event that authStore listens to
-		window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+		window.dispatchEvent(new CustomEvent("auth:unauthorised"));
 
 		// Trigger the unauthorised handler if set
 		if (this.onUnauthorised) {

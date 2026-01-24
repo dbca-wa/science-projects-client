@@ -21,6 +21,8 @@ interface ProjectSearchStoreState extends BaseStoreState {
 	saveSearch: boolean;
 }
 
+const STORAGE_KEY = "projectSearchState";
+
 const DEFAULT_FILTERS: ProjectSearchFilters = {
 	businessArea: "All",
 	projectKind: "All",
@@ -46,7 +48,6 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		});
 
 		makeObservable(this, {
-			// Actions
 			setSearchTerm: action,
 			setFilters: action,
 			setCurrentPage: action,
@@ -55,25 +56,29 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 			toggleSaveSearch: action,
 			clearSearchAndFilters: action,
 			setTotalResults: action,
-
-			// Computed
+			reset: action,
 			hasActiveFilters: computed,
 			filterCount: computed,
 			searchParams: computed,
 		});
 
-		// Load from localStorage if saveSearch is enabled
 		this.loadFromLocalStorage();
 	}
 
+	/**
+	 * Initialises the store.
+	 */
 	async initialise() {
 		this.state.initialised = true;
 		logger.info("ProjectSearch store initialized");
 	}
 
+	/**
+	 * Loads search state from localStorage if saveSearch is enabled.
+	 */
 	private loadFromLocalStorage() {
 		try {
-			const stored = localStorage.getItem("projectSearchState");
+			const stored = localStorage.getItem(STORAGE_KEY);
 			if (stored) {
 				const parsed = JSON.parse(stored);
 				if (parsed.saveSearch) {
@@ -87,69 +92,96 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		}
 	}
 
+	/**
+	 * Saves current search state to localStorage.
+	 */
 	private saveToLocalStorage() {
 		if (this.state.saveSearch) {
 			try {
-				localStorage.setItem("projectSearchState", JSON.stringify(this.state));
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
 			} catch (error) {
 				logger.error("Failed to save project search state to localStorage", {
 					error: error instanceof Error ? error.message : String(error),
 				});
 			}
 		} else {
-			localStorage.removeItem("projectSearchState");
+			localStorage.removeItem(STORAGE_KEY);
 		}
 	}
 
+	/**
+	 * Sets the search term and resets to page 1.
+	 */
 	setSearchTerm(term: string) {
 		this.state.searchTerm = term;
-		this.state.currentPage = 1; // Reset to page 1 on search
-		this.saveToLocalStorage();
+		this.setCurrentPage(1);
 	}
 
+	/**
+	 * Updates filters and resets to page 1.
+	 */
 	setFilters(filters: Partial<ProjectSearchFilters>) {
 		this.state.filters = { ...this.state.filters, ...filters };
-		this.state.currentPage = 1; // Reset to page 1 on filter change
-		this.saveToLocalStorage();
+		this.setCurrentPage(1);
 	}
 
+	/**
+	 * Sets the current page number.
+	 */
 	setCurrentPage(page: number) {
 		this.state.currentPage = page;
 		this.saveToLocalStorage();
 	}
 
+	/**
+	 * Sets pagination data.
+	 */
 	setPagination(data: { totalPages: number; totalResults: number }) {
 		this.state.totalPages = data.totalPages;
 		this.state.totalResults = data.totalResults;
 	}
 
+	/**
+	 * Sets the total number of search results.
+	 */
 	setTotalResults(total: number) {
 		this.state.totalResults = total;
 	}
 
+	/**
+	 * Resets filters and search term to defaults.
+	 */
 	resetFilters() {
 		this.state.filters = { ...DEFAULT_FILTERS };
-		this.state.searchTerm = "";
-		this.state.currentPage = 1;
-		this.saveToLocalStorage();
+		this.setSearchTerm("");
 	}
 
+	/**
+	 * Clears all search state including filters.
+	 */
 	clearSearchAndFilters() {
 		this.resetFilters();
 	}
 
+	/**
+	 * Toggles whether search state should be saved to localStorage.
+	 */
 	toggleSaveSearch() {
 		this.state.saveSearch = !this.state.saveSearch;
 		this.saveToLocalStorage();
 	}
 
+	/**
+	 * Clears search state and removes from localStorage.
+	 */
 	clearState() {
-		this.state.searchTerm = "";
-		this.state.filters = { ...DEFAULT_FILTERS };
-		this.state.currentPage = 1;
-		localStorage.removeItem("projectSearchState");
+		this.resetFilters();
+		localStorage.removeItem(STORAGE_KEY);
 	}
 
+	/**
+	 * Resets store to initial state.
+	 */
 	reset() {
 		this.state = {
 			searchTerm: "",
@@ -164,6 +196,9 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		};
 	}
 
+	/**
+	 * @returns True if any filters or search term are active
+	 */
 	get hasActiveFilters(): boolean {
 		return (
 			this.state.searchTerm.length > 0 ||
@@ -177,6 +212,9 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		);
 	}
 
+	/**
+	 * @returns The number of active filters
+	 */
 	get filterCount(): number {
 		let count = 0;
 
@@ -192,6 +230,9 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		return count;
 	}
 
+	/**
+	 * @returns URLSearchParams object constructed from current search state
+	 */
 	get searchParams(): URLSearchParams {
 		const params = new URLSearchParams();
 

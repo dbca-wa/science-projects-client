@@ -14,7 +14,6 @@ interface AuthStoreState extends BaseStoreState {
 }
 
 // Note: Potentially give access to rootstore to impact other stores
-
 export class AuthStore extends BaseStore<AuthStoreState> {
 	user: IUserMe | null = null;
 	private onUnauthorised = this.handleUnauthorised.bind(this);
@@ -32,12 +31,7 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		makeObservable(this, {
 			// Observable properties (new to AuthStore)
 			user: observable,
-
-			// Computed properties (new to AuthStore)
-			isAuthenticated: computed,
 			isSuperuser: computed,
-
-			// Actions (new to AuthStore)
 			setUser: action,
 			initialise: action,
 			login: action,
@@ -48,30 +42,39 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		});
 
 		if (typeof window !== "undefined") {
-			window.addEventListener("auth:unauthorized", this.onUnauthorised);
+			window.addEventListener("auth:unauthorised", this.onUnauthorised);
 		}
 	}
 
+	/**
+	 * @returns True if user is authenticate. Simple.
+	 */
 	get isAuthenticated() {
 		return this.state.isAuthenticated;
 	}
 
+	/**
+	 * @returns True if authenticated user is a superuser. Computed.
+	 */
 	get isSuperuser() {
 		return !!this.user?.is_superuser;
 	}
 
+	/**
+	 * Sets the current user and updates authentication state.
+	 */
 	setUser(user: IUserMe | null) {
 		this.user = user;
-		// If we have a user, we're authenticated
-		// If we don't have a user but have a CSRF token, we might still be authenticated
 		const hasCsrf = !!Cookie.get("spmscsrf");
 		this.state.isAuthenticated = !!user || hasCsrf;
 	}
 
+	/**
+	 * Initialises auth store by checking for existing session cookies.
+	 * Note: sessionid cookie is HttpOnly and cannot be read by JavaScript.
+	 * We check for the CSRF token to infer authentication state.
+	 */
 	async initialise() {
-		// Note: sessionid cookie is HttpOnly and cannot be read by JavaScript
-		// We can only check for the CSRF token, which is readable
-		// The actual session validation will happen when we try to fetch user data
 		const hasCsrf = !!Cookie.get("spmscsrf");
 		
 		logger.info("Auth store initializing", {
@@ -91,11 +94,17 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		});
 	}
 
+	/**
+	 * Marks user as logged in.
+	 */
 	login() {
 		this.state.isAuthenticated = true;
 		logger.info("User flagged as logged in (cookies present)");
 	}
 
+	/**
+	 * Logs out user and clears all session cookies.
+	 */
 	logout() {
 		this.state.isAuthenticated = false;
 		this.user = null;
@@ -105,10 +114,16 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		logger.info("User logged out");
 	}
 
+	/**
+	 * Handles unauthorised event by logging out user.
+	 */
 	handleUnauthorised() {
 		this.logout();
 	}
 
+	/**
+	 * Resets store to initial state.
+	 */
 	reset() {
 		this.state.isAuthenticated = false;
 		this.user = null;
@@ -118,10 +133,13 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 		logger.info("Auth store reset");
 	}
 
+	/**
+	 * Performs cleanup when store is disposed.
+	 */
 	async dispose() {
 		if (typeof window !== "undefined") {
 			window.removeEventListener(
-				"auth:unauthorized",
+				"auth:unauthorised",
 				this.onUnauthorised
 			);
 		}
