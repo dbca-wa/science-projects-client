@@ -42,7 +42,7 @@ import { useAuthStore } from "@/app/stores/store-context";
 import { toast } from "sonner";
 import { format, isPast } from "date-fns";
 import { useNavigate } from "react-router";
-import { Sheet, SheetContent } from "@/shared/components/ui/custom/CustomSheet";
+import { Sheet, SheetContent } from "@/shared/components/ui/sheet";
 import type { ICaretakerSimpleUserData } from "@/shared/types/user.types";
 import {
 	getUserDisplayName,

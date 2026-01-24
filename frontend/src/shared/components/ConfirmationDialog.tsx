@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,7 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/shared/components/ui/custom/CustomAlertDialog";
+} from "@/shared/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface ConfirmationDialogProps {
   open: boolean;

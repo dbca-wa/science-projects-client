@@ -8,14 +8,14 @@ import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "../Navitar";
 import { Button } from "@/shared/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/custom/CustomSheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/shared/components/ui/custom/CustomDropdownMenu";
+} from "@/shared/components/ui/dropdown-menu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";

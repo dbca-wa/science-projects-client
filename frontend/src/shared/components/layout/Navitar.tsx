@@ -12,7 +12,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/custom/CustomPopover";
+} from "@/shared/components/ui/popover";
 import { IoCaretDown } from "react-icons/io5";
 import { cn } from "@/shared/lib/utils";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
