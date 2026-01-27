@@ -2,6 +2,9 @@ import type { IBusinessArea, ISimpleLocationData } from "./org.types";
 import type { IAffiliation } from "./org.types";
 import type { IImageData } from "./media.types";
 
+// Re-export IImageData for convenience
+export type { IImageData };
+
 /**
  * Project Types
  * 

@@ -25,6 +25,8 @@ export const ModernLayout = () => {
 					</motion.div>
 				</ModernPageWrapper>
 			</div>
+			{/* Portal container for confetti - positioned to avoid sidebar */}
+			<div id="confetti-root" className="fixed inset-0 lg:left-64 pointer-events-none z-50" />
 		</div>
 	);
 };

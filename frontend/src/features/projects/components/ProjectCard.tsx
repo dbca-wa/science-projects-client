@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { Card } from "@/shared/components/ui/card";
-import { Badge } from "@/shared/components/ui/badge";
 import { cn } from "@/shared/lib/utils";
 import type { IProjectData } from "@/shared/types/project.types";
 import {
 	getProjectStatusDisplay,
 	getProjectTag,
-	getProjectStatusColor,
-	getProjectKindColor,
 } from "../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
+import { PROJECT_KIND_COLORS, PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {
 	project: IProjectData;
@@ -48,8 +46,10 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 
 	const projectTag = getProjectTag(project);
 	const statusDisplay = getProjectStatusDisplay(project.status);
-	const statusColor = getProjectStatusColor(project.status);
-	const kindColor = getProjectKindColor(project.kind);
+	
+	// Get colors from constants
+	const kindColor = project.kind ? PROJECT_KIND_COLORS[project.kind] : PROJECT_KIND_COLORS.science;
+	const statusColor = project.status ? PROJECT_STATUS_COLORS[project.status] : PROJECT_STATUS_COLORS.new;
 
 	// Get image URL using shared utility
 	const imageUrl = getImageUrl(project.image) || "/no-image-placeholder.png";
@@ -57,7 +57,7 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 	return (
 		<Card
 			className={cn(
-				"group relative h-[325px] cursor-pointer overflow-hidden rounded-2xl transition-all duration-300",
+				"group relative h-[325px] cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 p-0",
 				"hover:scale-105 hover:shadow-2xl",
 				"border border-gray-200 dark:border-gray-700"
 			)}
@@ -67,37 +67,23 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 		>
 			{/* Project Tag (top-left) */}
 			<div className="absolute left-2 top-2 z-10">
-				<Badge
-					className={cn(
-						"px-2 py-1 text-xs font-semibold text-white",
-						kindColor === "blue" && "bg-blue-600",
-						kindColor === "green" && "bg-green-500",
-						kindColor === "purple" && "bg-purple-500",
-						kindColor === "orange" && "bg-orange-500",
-						kindColor === "gray" && "bg-gray-500"
-					)}
+				<span
+					className="inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold text-white"
+					style={{ backgroundColor: kindColor }}
 				>
 					{projectTag}
-				</Badge>
+				</span>
 			</div>
 
 			{/* Status Badge (top-right, shows on hover) */}
 			{hovered && (
 				<div className="absolute right-0 top-2 z-10 animate-in slide-in-from-right duration-300">
-					<Badge
-						className={cn(
-							"rounded-l-2xl px-5 py-1 text-xs font-normal text-white",
-							statusColor === "blue" && "bg-blue-600",
-							statusColor === "green" && "bg-green-500",
-							statusColor === "yellow" && "bg-yellow-500",
-							statusColor === "orange" && "bg-orange-500",
-							statusColor === "purple" && "bg-purple-500",
-							statusColor === "red" && "bg-red-500",
-							statusColor === "gray" && "bg-gray-500"
-						)}
+					<span
+						className="inline-flex items-center justify-center rounded-l-2xl px-5 py-1 text-xs font-normal text-white"
+						style={{ backgroundColor: statusColor }}
 					>
 						{statusDisplay}
-					</Badge>
+					</span>
 				</div>
 			)}
 

@@ -21,8 +21,10 @@ interface IUserSearchDropdown {
 	preselectedUserPk?: number;
 	isEditable?: boolean;
 	className?: string;
+	wrapperClassName?: string;
 	hideCannotFind?: boolean;
 	placeholderColor?: string;
+	showIcon?: boolean;
 }
 
 export const UserSearchDropdown = forwardRef<BaseUserSearchRef, IUserSearchDropdown>(
@@ -40,8 +42,10 @@ export const UserSearchDropdown = forwardRef<BaseUserSearchRef, IUserSearchDropd
 			preselectedUserPk,
 			isEditable,
 			className,
+			wrapperClassName,
 			hideCannotFind,
 			placeholderColor,
+			showIcon = false,
 		},
 		ref
 	) => {
@@ -78,8 +82,10 @@ export const UserSearchDropdown = forwardRef<BaseUserSearchRef, IUserSearchDropd
 				isRequired={isRequired}
 				isEditable={isEditable}
 				className={className}
+				wrapperClassName={wrapperClassName}
 				hideCannotFind={hideCannotFind}
 				placeholderColor={placeholderColor}
+				showIcon={showIcon}
 				renderSelected={(user, onClear) => <SelectedUserInput user={user} onClear={onClear} />}
 				renderMenuItem={(user, onSelect) => <CustomMenuItem user={user} onClick={() => onSelect(user)} />}
 			/>

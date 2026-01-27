@@ -76,7 +76,7 @@ export const VARIANT_CONFIG: Record<ImageUploadVariant, VariantConfig> = {
 };
 
 export const FILE_ERRORS = {
-  INVALID_TYPE: 'Invalid file type. Please upload JPG or PNG.',
+  INVALID_TYPE: 'Invalid file type. Please upload JPG or PNG only.',
   FILE_TOO_LARGE: (maxSize: number) => `File too large. Maximum size is ${maxSize}MB.`,
   UPLOAD_FAILED: 'Failed to upload image. Please try again.',
 };

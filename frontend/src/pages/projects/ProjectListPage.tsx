@@ -130,7 +130,7 @@ const ProjectListPage = observer(() => {
 				<div className="flex flex-1 w-full justify-end items-center">
 					{authStore.isSuperuser && (
 						<Button
-							onClick={() => navigate("/projects/add")}
+							onClick={() => navigate("/projects/create")}
 							className="ml-4 bg-green-600 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-400"
 						>
 							New Project

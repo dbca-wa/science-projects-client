@@ -68,6 +68,9 @@ export function TraditionalLayout() {
         {/* Traditional Footer */}
         <TraditionalFooter />
       </div>
+      
+      {/* Portal container for confetti - full screen in traditional layout */}
+      <div id="confetti-root" className="fixed inset-0 pointer-events-none z-50" />
     </div>
   );
 }
