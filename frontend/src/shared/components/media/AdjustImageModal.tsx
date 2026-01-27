@@ -33,6 +33,7 @@ interface AdjustImageModalProps {
   onCropComplete: (croppedFile: File) => void;
   fileName?: string;
   defaultAspect?: number;
+  variant?: 'avatar' | 'project' | 'banner' | 'default';
 }
 
 /**
@@ -47,6 +48,7 @@ export const AdjustImageModal = ({
   onCropComplete,
   fileName = "cropped-image.jpg",
   defaultAspect = 1,
+  variant = 'default',
 }: AdjustImageModalProps) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const [crop, setCrop] = useState<Crop>({
@@ -64,7 +66,8 @@ export const AdjustImageModal = ({
   const [previewUrls, setPreviewUrls] = useState<{
     avatar: string | null;
     profile: string | null;
-  }>({ avatar: null, profile: null });
+    projectCard: string | null;
+  }>({ avatar: null, profile: null, projectCard: null });
 
   const setAspectRatio = useCallback((aspectRatio: number | undefined) => {
     setAspect(aspectRatio);
@@ -120,20 +123,18 @@ export const AdjustImageModal = ({
       const cropWidthNatural = crop.width * scaleX;
       const cropHeightNatural = crop.height * scaleY;
 
-      const scaledWidth = cropWidthNatural;
-      const scaledHeight = cropHeightNatural;
-
-      let canvasWidth = scaledWidth;
-      let canvasHeight = scaledHeight;
+      // Calculate canvas size based on rotation
+      let canvasWidth = cropWidthNatural;
+      let canvasHeight = cropHeightNatural;
 
       if (rotate !== 0 && rotate % 360 !== 0) {
         const rotateRads = (rotate * Math.PI) / 180;
         const rotatedWidth =
-          Math.abs(Math.cos(rotateRads) * scaledWidth) +
-          Math.abs(Math.sin(rotateRads) * scaledHeight);
+          Math.abs(Math.cos(rotateRads) * cropWidthNatural) +
+          Math.abs(Math.sin(rotateRads) * cropHeightNatural);
         const rotatedHeight =
-          Math.abs(Math.sin(rotateRads) * scaledWidth) +
-          Math.abs(Math.cos(rotateRads) * scaledHeight);
+          Math.abs(Math.sin(rotateRads) * cropWidthNatural) +
+          Math.abs(Math.cos(rotateRads) * cropHeightNatural);
 
         canvasWidth = rotatedWidth;
         canvasHeight = rotatedHeight;
@@ -154,7 +155,7 @@ export const AdjustImageModal = ({
       ctx.translate(canvasWidth / 2, canvasHeight / 2);
       ctx.rotate((rotate * Math.PI) / 180);
       ctx.scale(scale, scale);
-      ctx.translate(-scaledWidth / 2, -scaledHeight / 2);
+      ctx.translate(-cropWidthNatural / 2, -cropHeightNatural / 2);
 
       ctx.drawImage(
         image,
@@ -164,8 +165,8 @@ export const AdjustImageModal = ({
         cropHeightNatural,
         0,
         0,
-        scaledWidth,
-        scaledHeight
+        cropWidthNatural,
+        cropHeightNatural
       );
 
       ctx.restore();
@@ -212,17 +213,20 @@ export const AdjustImageModal = ({
             // Store old URLs to revoke after setting new ones
             const oldAvatarUrl = previewUrls.avatar;
             const oldProfileUrl = previewUrls.profile;
+            const oldProjectCardUrl = previewUrls.projectCard;
             
             // Set new URLs first (prevents flicker)
             setPreviewUrls({
               avatar: previewUrl,
               profile: previewUrl,
+              projectCard: previewUrl,
             });
             
             // Then revoke old URLs after a brief delay
             setTimeout(() => {
               if (oldAvatarUrl) URL.revokeObjectURL(oldAvatarUrl);
               if (oldProfileUrl) URL.revokeObjectURL(oldProfileUrl);
+              if (oldProjectCardUrl) URL.revokeObjectURL(oldProjectCardUrl);
             }, 50);
           }
         } catch (error) {
@@ -241,6 +245,7 @@ export const AdjustImageModal = ({
     return () => {
       if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);
       if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
+      if (previewUrls.projectCard) URL.revokeObjectURL(previewUrls.projectCard);
     };
   }, []);
 
@@ -260,7 +265,8 @@ export const AdjustImageModal = ({
         
         if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);
         if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
-        setPreviewUrls({ avatar: null, profile: null });
+        if (previewUrls.projectCard) URL.revokeObjectURL(previewUrls.projectCard);
+        setPreviewUrls({ avatar: null, profile: null, projectCard: null });
         
         onCropComplete(file);
         onClose();
@@ -459,45 +465,133 @@ export const AdjustImageModal = ({
                     Live Previews
                   </Label>
                   
-                  {/* Avatar Preview */}
-                  <div className="space-y-2 mb-6">
-                    <Label className="text-sm text-muted-foreground">
-                      Avatar Preview:
-                    </Label>
-                    <div className="h-[200px] w-[200px] mx-auto rounded-full overflow-hidden border border-border bg-muted">
-                      {previewUrls.avatar ? (
-                        <img
-                          src={previewUrls.avatar}
-                          alt="Avatar preview"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
-                          Preview
+                  {/* Avatar variant previews */}
+                  {variant === 'avatar' && (
+                    <>
+                      {/* Avatar Preview */}
+                      <div className="space-y-2 mb-6">
+                        <Label className="text-sm text-muted-foreground">
+                          Avatar Preview:
+                        </Label>
+                        <div className="h-[200px] w-[200px] mx-auto rounded-full overflow-hidden border border-border bg-muted">
+                          {previewUrls.avatar ? (
+                            <img
+                              src={previewUrls.avatar}
+                              alt="Avatar preview"
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
+                              Preview
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
 
-                  {/* Public Profile Preview */}
-                  <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Public Profile Preview:
-                    </Label>
-                    <div className="w-[200px] h-[200px] mx-auto rounded-lg overflow-hidden border border-border">
-                      {previewUrls.profile ? (
-                        <img
-                          src={previewUrls.profile}
-                          alt="Public profile preview"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
-                          Preview
+                      {/* Public Profile Preview */}
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Public Profile Preview:
+                        </Label>
+                        <div className="w-[200px] h-[200px] mx-auto rounded-lg overflow-hidden border border-border">
+                          {previewUrls.profile ? (
+                            <img
+                              src={previewUrls.profile}
+                              alt="Public profile preview"
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
+                              Preview
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Project variant preview */}
+                  {variant === 'project' && (
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Project Card Preview:
+                      </Label>
+                      <div className="w-full max-w-[250px] mx-auto">
+                        <div className="relative h-[200px] w-full rounded-lg overflow-hidden border border-border bg-muted">
+                          {previewUrls.projectCard ? (
+                            <>
+                              <img
+                                src={previewUrls.projectCard}
+                                alt="Project card preview"
+                                className="h-full w-full object-cover"
+                              />
+                              {/* Gradient overlay matching ProjectCard */}
+                              <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />
+                              {/* Sample project title */}
+                              <div className="absolute bottom-0 left-0 z-10 p-3">
+                                <p className="text-sm font-semibold text-white line-clamp-2">
+                                  Project Title
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
+                              Preview
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground text-center mt-2 italic">
+                          How it appears in project cards
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  
+                  {/* Banner variant preview */}
+                  {variant === 'banner' && (
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Banner Preview:
+                      </Label>
+                      <div className="w-full max-w-[250px] mx-auto">
+                        <div className="relative h-[140px] w-full rounded-lg overflow-hidden border border-border bg-muted">
+                          {previewUrls.projectCard ? (
+                            <img
+                              src={previewUrls.projectCard}
+                              alt="Banner preview"
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
+                              Preview
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Default variant preview */}
+                  {variant === 'default' && (
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Preview:
+                      </Label>
+                      <div className="w-[200px] h-[200px] mx-auto rounded-lg overflow-hidden border border-border">
+                        {previewUrls.projectCard ? (
+                          <img
+                            src={previewUrls.projectCard}
+                            alt="Image preview"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
+                            Preview
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

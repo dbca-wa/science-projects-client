@@ -30,5 +30,5 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src", "../.docs/dashboard.utils.test.ts"]
+	"include": ["src"]
 }

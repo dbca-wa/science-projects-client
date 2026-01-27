@@ -17,6 +17,7 @@ const ProfileEditPage = lazy(() => import("@/pages/users/ProfileEditPage"));
 // Pages - Projects (lazy loaded)
 const ProjectListPage = lazy(() => import("@/pages/projects/ProjectListPage"));
 const ProjectCreatePage = lazy(() => import("@/pages/projects/ProjectCreatePage"));
+const ProjectCreateWizardPage = lazy(() => import("@/pages/projects/ProjectCreateWizardPage"));
 const ProjectDetailPage = lazy(() => import("@/pages/projects/ProjectDetailPage"));
 
 /**
@@ -215,10 +216,79 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Project Detail",
-		path: "/projects/:id/*",
+		name: "Create Project Wizard",
+		path: "/projects/create/wizard",
+		iconKey: "projectAdd",
+		component: ProjectCreateWizardPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Overview",
+		path: "/projects/:id/overview",
 		iconKey: "projects",
 		component: ProjectDetailPage,
+		componentProps: { selectedTab: "overview" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Concept Plan",
+		path: "/projects/:id/concept",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		componentProps: { selectedTab: "concept" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Plan",
+		path: "/projects/:id/project",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		componentProps: { selectedTab: "project" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Progress Reports",
+		path: "/projects/:id/progress",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		componentProps: { selectedTab: "progress" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Student Reports",
+		path: "/projects/:id/student",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		componentProps: { selectedTab: "student" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Closure",
+		path: "/projects/:id/closure",
+		iconKey: "projects",
+		component: ProjectDetailPage,
+		componentProps: { selectedTab: "closure" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Edit Project",
+		path: "/projects/:id/edit",
+		iconKey: "projects",
+		component: ProjectDetailPage, // TODO: Create ProjectEditPage
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",

@@ -3,3 +3,6 @@ export { NoResultsState } from "./NoResultsState";
 export { ErrorState } from "./ErrorState";
 export { Breadcrumb } from "./Breadcrumb";
 export { Pagination } from "./Pagination";
+
+// Effects
+export { ConfettiPortal, SuccessAnimation } from "./effects";

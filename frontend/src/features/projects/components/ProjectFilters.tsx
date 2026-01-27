@@ -8,7 +8,7 @@ import {
 } from "@/shared/components/ui/select";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
-import { Search, User } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
@@ -125,7 +125,7 @@ export const ProjectFilters = observer(({
 						</div>
 
 						{/* User Filter with icon - SECOND on mobile, left on desktop */}
-						<div className="relative w-full order-2 lg:order-1">
+						<div className="w-full order-2 lg:order-1">
 							<UserSearchDropdown
 								key={filters.user || "no-user"}
 								isRequired={false}
@@ -134,13 +134,10 @@ export const ProjectFilters = observer(({
 								placeholder="Filter by user"
 								helperText=""
 								hideCannotFind={true}
-								className="pl-10 text-sm rounded-md"
+								className="text-sm rounded-md"
 								preselectedUserPk={filters.user || undefined}
+								showIcon={true}
 							/>
-							{/* Only show icon when no user is selected (to avoid overlaying with avatar) */}
-							{!filters.user && (
-								<User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
-							)}
 						</div>
 					</div>
 

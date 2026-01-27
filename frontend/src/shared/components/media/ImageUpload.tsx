@@ -268,6 +268,7 @@ export const ImageUpload = ({
       );
     }
 
+    // Circle preview for avatar variant
     if (config.previewShape === 'circle') {
       return (
         <Avatar className={cn(config.defaultSize, "mx-auto")}>
@@ -277,6 +278,7 @@ export const ImageUpload = ({
       );
     }
 
+    // Rectangular preview for project, banner, and other variants
     return (
       <div className={cn("relative overflow-hidden rounded-lg", config.defaultSize)}>
         <img
@@ -284,6 +286,10 @@ export const ImageUpload = ({
           alt="Preview"
           className="w-full h-full object-cover"
         />
+        {/* Gradient overlay for project variant (matches ProjectCard) */}
+        {variant === 'project' && (
+          <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />
+        )}
       </div>
     );
   };
@@ -346,7 +352,7 @@ export const ImageUpload = ({
               Drag and drop or click to select
             </p>
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, or GIF (max {maxSize / (1024 * 1024)}MB)
+              JPG or PNG only (max {maxSize / (1024 * 1024)}MB)
             </p>
           </div>
           <Button
@@ -477,6 +483,7 @@ export const ImageUpload = ({
           onCropComplete={handleCropComplete}
           fileName={originalFileName}
           defaultAspect={variant === 'avatar' ? 1 : variant === 'banner' ? 16 / 9 : undefined}
+          variant={variant}
         />
       )}
     </div>

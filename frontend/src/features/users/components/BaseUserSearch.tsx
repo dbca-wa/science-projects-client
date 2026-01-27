@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
+import { User } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { getUsersBasedOnSearchTerm } from "@/features/users/services/user.service";
 import { getFullUser } from "@/features/users/services/user.service";
@@ -55,8 +56,10 @@ export interface BaseUserSearchProps {
 	isRequired?: boolean;
 	isEditable?: boolean;
 	className?: string;
+	wrapperClassName?: string;
 	hideCannotFind?: boolean;
 	placeholderColor?: string;
+	showIcon?: boolean;
 	
 	// Custom rendering (composition pattern)
 	renderSelected?: (user: IUserData, onClear: () => void) => ReactNode;
@@ -81,8 +84,10 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 			isRequired,
 			isEditable = true,
 			className,
+			wrapperClassName,
 			hideCannotFind,
 			placeholderColor,
+			showIcon = false,
 			renderSelected,
 			renderMenuItem,
 		},
@@ -157,14 +162,18 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 		const filteredItems = searchResults?.users || [];
 
 		return (
-			<div className={cn("w-full", isRequired && "required")}>
-				{label && <Label>{label}</Label>}
+			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
+				{label && <Label className="mb-2">{label}</Label>}
 				{selectedUser && renderSelected ? (
 					renderSelected(selectedUser, handleClearUser)
 				) : selectedUser ? (
 					<DefaultSelectedDisplay user={selectedUser} onClear={handleClearUser} />
 				) : (
 					<div className="relative">
+						{/* Icon - only show when showIcon is true and no user is selected */}
+						{showIcon && (
+							<User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
+						)}
 						<Input
 							ref={inputRef}
 							type="text"
@@ -172,6 +181,7 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 							onChange={(event) => setSearchTerm(event.target.value)}
 							placeholder={placeholder}
 							className={cn(
+								showIcon && "pl-10",
 								className,
 								"placeholder:ml-[-4px]",
 								placeholderColor ? `placeholder:text-[${placeholderColor}]` : ""
