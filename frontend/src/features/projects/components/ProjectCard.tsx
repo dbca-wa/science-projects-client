@@ -8,6 +8,7 @@ import {
 	getProjectTag,
 } from "../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
+import { extractTextFromHTML } from "@/shared/utils/html.utils";
 import { PROJECT_KIND_COLORS, PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {
@@ -52,7 +53,11 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 	const statusColor = project.status ? PROJECT_STATUS_COLORS[project.status] : PROJECT_STATUS_COLORS.new;
 
 	// Get image URL using shared utility
-	const imageUrl = getImageUrl(project.image) || "/no-image-placeholder.png";
+	const imageUrl = getImageUrl(project.image);
+	const hasImage = !!imageUrl;
+	
+	// Extract plain text from HTML title for alt attribute
+	const plainTextTitle = extractTextFromHTML(project.title);
 
 	return (
 		<Card
@@ -92,20 +97,26 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 				{!imageLoaded && !imageError && (
 					<div className="absolute inset-0 animate-pulse bg-gray-200 dark:bg-gray-800" />
 				)}
-				<img
-					src={imageUrl}
-					alt={project.title}
-					className={cn(
-						"h-full w-full object-cover transition-opacity duration-300",
-						imageLoaded ? "opacity-100" : "opacity-0"
-					)}
-					onLoad={() => setImageLoaded(true)}
-					onError={() => {
-						setImageError(true);
-						setImageLoaded(true);
-					}}
-					loading="lazy"
-				/>
+				{hasImage && !imageError ? (
+					<img
+						src={imageUrl}
+						alt={plainTextTitle}
+						className={cn(
+							"h-full w-full object-cover transition-opacity duration-300",
+							imageLoaded ? "opacity-100" : "opacity-0"
+						)}
+						onLoad={() => setImageLoaded(true)}
+						onError={() => {
+							setImageError(true);
+							setImageLoaded(true);
+						}}
+						loading="lazy"
+					/>
+				) : (
+					<div
+						className="project-fallback-image h-full w-full bg-cover bg-center bg-no-repeat"
+					/>
+				)}
 
 				{/* Gradient overlay */}
 				<div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />

@@ -14,7 +14,7 @@ interface SearchControlsProps {
 
 /**
  * SearchControls component
- * Reusable "Remember my search" checkbox and "Clear filters" button
+ * Reusable "Remember my search" checkbox and "Clear search" button
  * Used across search pages (users, projects, etc.)
  */
 export const SearchControls = ({
@@ -47,12 +47,12 @@ export const SearchControls = ({
 					variant="outline"
 					size="sm"
 					onClick={onClearFilters}
-					className="gap-1.5 shrink-0"
+					className="gap-1 shrink-0 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 dark:bg-red-950/50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950 dark:hover:border-red-800"
 				>
 					<X className="size-4" />
-					<span className="hidden sm:inline">Clear Filters</span>
+					<span className="hidden sm:inline">Clear Search</span>
 					<span className="sm:hidden">Clear</span>
-					<Badge variant="secondary" className="ml-1">
+					<Badge variant="secondary" className="ml-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
 						{filterCount}
 					</Badge>
 				</Button>

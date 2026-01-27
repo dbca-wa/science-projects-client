@@ -134,3 +134,30 @@ export const deleteProject = async (
 export const getAllProjectYears = async (): Promise<number[]> => {
 	return apiClient.get<number[]>("projects/listofyears");
 };
+
+/**
+ * Download projects CSV (Full)
+ */
+export const downloadProjectsCSV = async (): Promise<Blob> => {
+	return apiClient.getBlob("projects/csv");
+};
+
+/**
+ * Download projects CSV (Annual Report)
+ */
+export const downloadProjectsCSVAR = async (): Promise<Blob> => {
+	return apiClient.getBlob("projects/csv/ar");
+};
+
+// Export as default service object
+export const projectService = {
+	getAllProjects,
+	getProjectById,
+	createProject,
+	updateProject,
+	updateProjectStatus,
+	deleteProject,
+	getAllProjectYears,
+	downloadProjectsCSV,
+	downloadProjectsCSVAR,
+};

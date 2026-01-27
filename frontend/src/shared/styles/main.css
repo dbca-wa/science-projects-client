@@ -184,4 +184,13 @@
 		scrollbar-width: none;
 	}
 
+	/* Project fallback images - dark mode support */
+	.project-fallback-image {
+		background-image: url('/no-image-light.jpg');
+	}
+
+	.dark .project-fallback-image {
+		background-image: url('/no-image-dark.png');
+	}
+
 }

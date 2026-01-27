@@ -9,9 +9,10 @@ import { NoResultsState } from "@/shared/components/NoResultsState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { Button } from "@/shared/components/ui/button";
 import { useAuthStore, useProjectSearchStore } from "@/app/stores/store-context";
-import { Loader2 } from "lucide-react";
+import { Loader2, MapPin, Plus } from "lucide-react";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
+import { DownloadProjectsCSVButton } from "@/features/projects/components/DownloadProjectsCSVButton";
 
 /**
  * ProjectListPage
@@ -116,7 +117,7 @@ const ProjectListPage = observer(() => {
 			<Breadcrumb items={breadcrumbItems} />
 
 			{/* Page header */}
-			<div className="flex w-full mt-2 mb-6 flex-row">
+			<div className="flex w-full mt-2 mb-6 flex-col gap-4 lg:flex-row">
 				<div className="flex-1 w-full flex-col">
 					<h1 className="text-2xl font-bold">
 						Projects ({projectSearchStore.state.totalResults})
@@ -126,17 +127,26 @@ const ProjectListPage = observer(() => {
 					</p>
 				</div>
 
-				{/* Create button - admin only */}
-				<div className="flex flex-1 w-full justify-end items-center">
-					{authStore.isSuperuser && (
+				{/* Action buttons - admin only */}
+				{authStore.isSuperuser && (
+					<div className="flex w-full lg:w-auto lg:flex-1 justify-end items-center gap-2">
+						<Button
+							onClick={() => navigate("/projects/map")}
+							className="flex-1 lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+						>
+							<MapPin className="mr-1 size-4" />
+							Map
+						</Button>
+						<DownloadProjectsCSVButton />
 						<Button
 							onClick={() => navigate("/projects/create")}
-							className="ml-4 bg-green-600 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-400"
+							className="flex-1 lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
 						>
+							<Plus className="mr-1 size-4" />
 							New Project
 						</Button>
-					)}
-				</div>
+					</div>
+				)}
 			</div>
 
 			{/* Filters */}

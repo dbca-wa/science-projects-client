@@ -3,6 +3,7 @@ import { ProjectStatusBadge } from "../ProjectStatusBadge";
 import { ProjectKindBadge } from "../ProjectKindBadge";
 import { ProjectKeywords } from "../ProjectKeywords";
 import { ProjectImage } from "../ProjectImage";
+import { extractTextFromHTML } from "@/shared/utils/html.utils";
 
 interface OverviewTabProps {
 	project: IProjectData;
@@ -11,12 +12,15 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ project, details: _details, members: _members }: OverviewTabProps) {
+	// Extract plain text from HTML title for alt attribute
+	const plainTextTitle = extractTextFromHTML(project.title);
+	
 	return (
 		<div className="space-y-6">
 			{/* Project Image */}
 			<ProjectImage
 				image={project.image}
-				alt={project.title}
+				alt={plainTextTitle}
 				className="h-[380px] xl:h-[400px] 2xl:h-[600px]"
 			/>
 

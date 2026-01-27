@@ -31,7 +31,7 @@ export const DashboardActionCard = ({
 	};
 
 	const content = (
-		<div className="cursor-pointer flex items-center space-x-3 overflow-hidden">
+		<div className="flex items-center space-x-3 overflow-hidden">
 			<div className={`p-2 rounded-lg flex-shrink-0 ${colorClasses[colorScheme]}`}>
 				{icon}
 			</div>
@@ -46,7 +46,7 @@ export const DashboardActionCard = ({
 		</div>
 	);
 
-	const cardClasses = "p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700";
+	const cardClasses = "cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700";
 
 	if (href) {
 		return (
