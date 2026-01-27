@@ -19,6 +19,7 @@ const ProjectListPage = lazy(() => import("@/pages/projects/ProjectListPage"));
 const ProjectCreatePage = lazy(() => import("@/pages/projects/ProjectCreatePage"));
 const ProjectCreateWizardPage = lazy(() => import("@/pages/projects/ProjectCreateWizardPage"));
 const ProjectDetailPage = lazy(() => import("@/pages/projects/ProjectDetailPage"));
+const ProjectMapPage = lazy(() => import("@/pages/projects/ProjectMapPage"));
 
 /**
  * Route Configuration
@@ -202,6 +203,16 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		requiresAuth: true,
 		showInSidebar: true,
 		section: "Projects",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Project Map",
+		path: "/projects/map",
+		iconKey: "projects",
+		tooltipKey: "projects",
+		component: ProjectMapPage,
+		requiresAuth: true,
+		showInSidebar: false,
 		layoutWrapper: "content",
 	},
 	{
