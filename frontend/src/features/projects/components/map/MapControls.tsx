@@ -1,150 +1,129 @@
 import { observer } from "mobx-react-lite";
-import { Layers } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw } from "lucide-react";
+import { useMap } from "react-leaflet";
+import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
-import { Separator } from "@/shared/components/ui/separator";
+import { LayerPopover } from "./LayerPopover";
 import { useProjectMapStore } from "@/app/stores/store-context";
 
 /**
- * MapControls - Floating button with popover for map display options
+ * MapControlButtons component
  * 
- * Positioned in the top-right corner of the map.
- * Contains:
- * - Layer toggles (DBCA Regions, Districts, NRM, IBRA, IMCRA)
- * - Display options (Show Labels, Show Colors)
+ * Internal component that uses useMap hook to access the Leaflet map instance.
+ * Must be rendered inside a MapContainer.
+ */
+const MapControlButtons = observer(() => {
+	const map = useMap();
+	const store = useProjectMapStore();
+	const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+
+	// Listen for fullscreen changes
+	useEffect(() => {
+		const handleFullscreenChange = () => {
+			setIsMapFullscreen(store.state.mapFullscreen || false);
+		};
+
+		// Listen to store changes for map fullscreen state
+		handleFullscreenChange();
+	}, [store.state.mapFullscreen]);
+
+	const handleZoomIn = () => {
+		map.zoomIn();
+	};
+
+	const handleZoomOut = () => {
+		map.zoomOut();
+	};
+
+	const handleMapFullscreen = () => {
+		store.toggleMapFullscreen();
+	};
+
+	const handleResetView = () => {
+		// Reset to Western Australia view
+		map.setView([-25.2744, 122.2402], 6);
+	};
+
+	return (
+		<div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+			{/* Layer Controls - Top */}
+			<LayerPopover />
+
+			{/* Zoom Controls - Individual buttons in same row, matching layers button width */}
+			<div className="flex gap-1">
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleZoomIn}
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					aria-label="Zoom in"
+					title="Zoom in"
+				>
+					<ZoomIn className="h-4 w-4" />
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleZoomOut}
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					aria-label="Zoom out"
+					title="Zoom out"
+				>
+					<ZoomOut className="h-4 w-4" />
+				</Button>
+			</div>
+
+			{/* Map Actions - Fullscreen and Reset in same row, matching layers button width */}
+			<div className="flex gap-1">
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleMapFullscreen}
+					className={`flex-1 h-8 p-0 shadow-lg hover:shadow-xl transition-shadow ${
+						isMapFullscreen 
+							? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-950/50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-950 dark:hover:border-blue-800' 
+							: 'bg-white dark:bg-gray-800'
+					}`}
+					aria-label={isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"}
+					title={isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"}
+				>
+					{isMapFullscreen ? (
+						<Minimize className="h-4 w-4" />
+					) : (
+						<Maximize className="h-4 w-4" />
+					)}
+				</Button>
+				
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleResetView}
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					aria-label="Reset map view"
+					title="Reset to Western Australia view"
+				>
+					<RotateCcw className="h-4 w-4" />
+				</Button>
+			</div>
+		</div>
+	);
+});
+
+/**
+ * MapControls component
+ * 
+ * Floating action buttons positioned in the top-right corner of the map.
+ * Provides map interaction controls and layer management.
+ * 
+ * Features:
+ * - Zoom in/out buttons (properly grouped)
+ * - Map fullscreen toggle (not browser fullscreen)
+ * - Reset view button (fit all markers)
+ * - Layer controls via LayerPopover
+ * - Proper ARIA labels and keyboard support
+ * 
+ * Note: This component must be rendered inside a MapContainer to access the map instance.
  */
 export const MapControls = observer(() => {
-  const store = useProjectMapStore();
-
-  return (
-    <div className="absolute top-4 right-4 z-[1000]">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            size="lg"
-            className="shadow-lg bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-          >
-            <Layers className="h-5 w-5 mr-2" />
-            Map Layers
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80" align="end">
-          <div className="space-y-4">
-            {/* Layer Toggles */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-sm">Map Layers</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-layer-dbca-regions"
-                    checked={store.state.visibleLayerTypes.includes("dbcaregion")}
-                    onCheckedChange={() => store.toggleLayerType("dbcaregion")}
-                  />
-                  <Label
-                    htmlFor="ctrl-layer-dbca-regions"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    DBCA Regions
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-layer-dbca-districts"
-                    checked={store.state.visibleLayerTypes.includes("dbcadistrict")}
-                    onCheckedChange={() => store.toggleLayerType("dbcadistrict")}
-                  />
-                  <Label
-                    htmlFor="ctrl-layer-dbca-districts"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    DBCA Districts
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-layer-nrm"
-                    checked={store.state.visibleLayerTypes.includes("nrm")}
-                    onCheckedChange={() => store.toggleLayerType("nrm")}
-                  />
-                  <Label
-                    htmlFor="ctrl-layer-nrm"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    NRM Regions
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-layer-ibra"
-                    checked={store.state.visibleLayerTypes.includes("ibra")}
-                    onCheckedChange={() => store.toggleLayerType("ibra")}
-                  />
-                  <Label
-                    htmlFor="ctrl-layer-ibra"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    IBRA Regions
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-layer-imcra"
-                    checked={store.state.visibleLayerTypes.includes("imcra")}
-                    onCheckedChange={() => store.toggleLayerType("imcra")}
-                  />
-                  <Label
-                    htmlFor="ctrl-layer-imcra"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    IMCRA Regions
-                  </Label>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Display Options */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-sm">Display Options</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-show-labels"
-                    checked={store.state.showLabels}
-                    onCheckedChange={() => store.toggleLabels()}
-                  />
-                  <Label
-                    htmlFor="ctrl-show-labels"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Show Region Labels
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ctrl-show-colors"
-                    checked={store.state.showColors}
-                    onCheckedChange={() => store.toggleColors()}
-                  />
-                  <Label
-                    htmlFor="ctrl-show-colors"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Show Region Colors
-                  </Label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
+	return <MapControlButtons />;
 });

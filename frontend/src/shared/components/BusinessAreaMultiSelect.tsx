@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { observer } from "mobx-react-lite";
 import { Button } from "@/shared/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -29,7 +30,7 @@ interface BusinessAreaMultiSelectProps {
  * - Keyboard navigation and accessibility
  * - Optional tags display for selected items
  */
-export const BusinessAreaMultiSelect = ({
+export const BusinessAreaMultiSelect = observer(({
   selectedBusinessAreas,
   onToggleBusinessArea,
   onSelectAll,
@@ -156,16 +157,16 @@ export const BusinessAreaMultiSelect = ({
 
       {/* Selected Business Area Tags */}
       {shouldShowTags && (
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2 max-w-full">
           {selectedBusinessAreasList.map((ba) => (
             <div
               key={ba.id}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-md text-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-md text-sm max-w-full"
             >
-              <span>{ba.name}</span>
+              <span className="truncate">{ba.name}</span>
               <button
                 onClick={() => ba.id && onToggleBusinessArea(ba.id)}
-                className="cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/50 rounded-sm p-0.5 transition-colors"
+                className="cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/50 rounded-sm p-0.5 transition-colors flex-shrink-0"
                 aria-label={`Remove ${ba.name}`}
               >
                 <X className="size-3" />
@@ -176,4 +177,4 @@ export const BusinessAreaMultiSelect = ({
       )}
     </div>
   );
-};
+});

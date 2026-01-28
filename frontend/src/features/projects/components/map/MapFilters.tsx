@@ -15,12 +15,11 @@ interface MapFiltersProps {
 }
 
 /**
- * MapFilters - Filter bar above the map
+ * MapFilters - Filter controls for the map
  * 
- * Layout:
- * - Desktop: Business Area dropdown (left) | Search (right)
- * - Mobile: Search (top) | Business Area dropdown (bottom)
- * - Bottom row: Project stats (left) | Remember/Clear (right)
+ * Layout adapts based on context:
+ * - Normal mode: Horizontal filter bar above the map
+ * - Fullscreen mode: Vertical sidebar layout
  */
 export const MapFilters = observer(({ 
   projectCount, 
@@ -64,92 +63,92 @@ export const MapFilters = observer(({
     store.setFilterUser(userId);
   };
 
+  const handleToggleSaveSearch = () => {
+    store.toggleSaveSearch();
+  };
+
   // Calculate filter count (search term + business areas + user)
   const filterCount = (store.state.searchTerm.length > 0 ? 1 : 0) + 
                      store.state.selectedBusinessAreas.length + 
                      (store.state.filterUser ? 1 : 0);
 
+  // Different layouts for normal vs fullscreen mode
+  const isFullscreen = store.state.mapFullscreen;
+
   return (
-    <div className="border-b border-gray-300 dark:border-gray-500 w-full select-none bg-background">
+    <div className={`w-full select-none bg-background ${!isFullscreen ? 'border-b border-gray-300 dark:border-gray-500' : ''}`}>
       <div className="p-4 w-full space-y-3">
-        {/* Row 1: Business Area Dropdown (left on desktop) and Search (right on desktop) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {/* Business Area Multi-Select - LEFT on desktop, SECOND on mobile */}
-          <div className="w-full order-2 lg:order-1">
-            <BusinessAreaMultiSelect
-              selectedBusinessAreas={store.state.selectedBusinessAreas}
-              onToggleBusinessArea={store.toggleBusinessArea}
-              onSelectAll={store.checkAllBusinessAreas}
-              onClearAll={store.uncheckAllBusinessAreas}
-              showTags={true}
-            />
-          </div>
-
-          {/* Search Input - RIGHT on desktop, FIRST on mobile */}
-          <div className="relative w-full order-1 lg:order-2">
-            <Input
-              type="text"
-              placeholder="Search projects..."
-              value={localSearchTerm}
-              onChange={handleSearchChange}
-              variant="search"
-              className="pl-10 pr-8 text-sm rounded-md"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
-            {localSearchTerm && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
+        {/* Search Input */}
+        <div className="relative w-full">
+          <Input
+            type="text"
+            placeholder="Search projects..."
+            value={localSearchTerm}
+            onChange={handleSearchChange}
+            variant="search"
+            className="pl-10 pr-8 text-sm rounded-md"
+          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
+          {localSearchTerm && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
 
-        {/* Row 2: User Filter */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {/* User Filter - LEFT on desktop */}
-          <div className="w-full">
-            <UserSearchDropdown
-              key={store.state.filterUser || "no-user"}
-              isRequired={false}
-              setUserFunction={handleUserChange}
-              label=""
-              placeholder="Filter by user"
-              helperText=""
-              hideCannotFind={true}
-              className="text-sm rounded-md"
-              preselectedUserPk={store.state.filterUser || undefined}
-              showIcon={true}
-            />
-          </div>
-          {/* Empty space on right */}
-          <div className="w-full"></div>
+        {/* User Filter */}
+        <div className="w-full">
+          <UserSearchDropdown
+            key={store.state.filterUser || "no-user"}
+            isRequired={false}
+            setUserFunction={handleUserChange}
+            label=""
+            placeholder="Filter by user"
+            helperText=""
+            hideCannotFind={true}
+            className="text-sm rounded-md"
+            preselectedUserPk={store.state.filterUser || undefined}
+            showIcon={true}
+          />
         </div>
 
-        {/* Row 3: Project Stats (left) and Remember/Clear (right) */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-          {/* Left side: Project Statistics */}
-          <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+        {/* Business Area Multi-Select */}
+        <div className="w-full">
+          <BusinessAreaMultiSelect
+            key={`ba-${store.state.selectedBusinessAreas.join(',')}`}
+            selectedBusinessAreas={store.state.selectedBusinessAreas}
+            onToggleBusinessArea={store.toggleBusinessArea}
+            onSelectAll={store.checkAllBusinessAreas}
+            onClearAll={store.uncheckAllBusinessAreas}
+            showTags={true}
+          />
+        </div>
+
+        {/* Project Stats and Controls */}
+        <div className="space-y-3">
+          {/* Project Statistics */}
+          <div className="text-sm text-muted-foreground">
             <div>
               <span className="font-medium text-foreground">{projectCount}</span> of{" "}
               <span className="font-medium text-foreground">{totalProjects}</span> projects shown
             </div>
             {projectsWithoutLocation > 0 && (
-              <div className="text-xs">
+              <div className="text-xs mt-1">
                 {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} without location data
               </div>
             )}
           </div>
 
-          {/* Right side: Remember my search and Clear button */}
+          {/* Search Controls */}
           <SearchControls
-            saveSearch={false}
-            onToggleSaveSearch={() => {}}
+            saveSearch={store.state.saveSearch}
+            onToggleSaveSearch={handleToggleSaveSearch}
             filterCount={filterCount}
             onClearFilters={handleClearFilters}
-            className="flex flex-wrap gap-2 items-center"
+            className="flex justify-end items-center"
           />
         </div>
       </div>

@@ -1,5 +1,7 @@
 import { GeoJSON } from "react-leaflet";
+import { useMap } from "react-leaflet";
 import type { PathOptions } from "leaflet";
+import L from "leaflet";
 
 interface RegionLayerProps {
   layerType: string;
@@ -21,16 +23,21 @@ const LAYER_COLORS: Record<string, string> = {
 /**
  * RegionLayer component
  * 
- * Renders GeoJSON boundaries for a region layer.
+ * Renders GeoJSON boundaries for a region layer with enhanced interactivity.
+ * Features:
  * - Semi-transparent fill if showColors is true
  * - Solid border always visible
  * - Different color per layer type
+ * - Hover effects for region highlighting
+ * - Click-to-zoom functionality
+ * - Smooth transitions
  */
 export const RegionLayer = ({
   layerType,
   geoJsonData,
   showColors,
 }: RegionLayerProps) => {
+  const map = useMap();
   const color = LAYER_COLORS[layerType];
 
   const style: PathOptions = {
@@ -41,5 +48,66 @@ export const RegionLayer = ({
     opacity: 1,
   };
 
-  return <GeoJSON key={layerType} data={geoJsonData} style={style} />;
+  // Enhanced event handlers for interactivity
+  const onEachFeature = (feature: GeoJSON.Feature, layer: L.Layer) => {
+    if (layer instanceof L.Path) {
+      // Store original style
+      const originalStyle = { ...style };
+
+      // Hover effects
+      layer.on({
+        mouseover: (e) => {
+          const target = e.target;
+          target.setStyle({
+            weight: 3,
+            fillOpacity: showColors ? 0.4 : 0.1,
+            opacity: 1,
+          });
+          target.bringToFront();
+        },
+        mouseout: (e) => {
+          const target = e.target;
+          target.setStyle(originalStyle);
+        },
+        click: (e) => {
+          // Click-to-zoom functionality
+          const target = e.target;
+          const bounds = target.getBounds();
+          if (bounds && bounds.isValid()) {
+            map.fitBounds(bounds, { 
+              padding: [20, 20],
+              maxZoom: 10 // Prevent zooming too far in
+            });
+          }
+        },
+      });
+
+      // Add tooltip with region name if available
+      const regionName = feature.properties?.name || 
+                        feature.properties?.NAME || 
+                        feature.properties?.DRG_REGION_NAME ||
+                        feature.properties?.DDT_DISTRICT_NAME ||
+                        feature.properties?.NRG_REGION_NAME ||
+                        feature.properties?.IWA_REG_NAME_6 ||
+                        feature.properties?.MESO_NAME ||
+                        'Unknown Region';
+
+      if (regionName && regionName !== 'Unknown Region') {
+        layer.bindTooltip(regionName, {
+          permanent: false,
+          direction: 'center',
+          className: 'region-tooltip',
+        });
+      }
+    }
+  };
+
+  return (
+    <GeoJSON 
+      key={`${layerType}-${showColors}`} // Re-render when showColors changes
+      data={geoJsonData} 
+      style={style}
+      onEachFeature={onEachFeature}
+    />
+  );
 };

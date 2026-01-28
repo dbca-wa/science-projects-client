@@ -57,6 +57,10 @@ const LAYER_TO_GEOJSON_KEY: Record<string, keyof typeof GEOJSON_PROPERTY_NAMES> 
   imcra: "imcra",
 };
 
+interface FullMapContainerProps {
+  fullscreen?: boolean;
+}
+
 /**
  * FullMapContainer component
  * 
@@ -70,7 +74,7 @@ const LAYER_TO_GEOJSON_KEY: Record<string, keyof typeof GEOJSON_PROPERTY_NAMES> 
  * - Ensures map instance persists across filter changes
  * - Includes floating MapControls button
  */
-export const FullMapContainer = observer(() => {
+export const FullMapContainer = observer(({ fullscreen = false }: FullMapContainerProps) => {
   const store = useProjectMapStore();
   const mapRef = useRef<LeafletMapType | null>(null);
 
@@ -129,7 +133,7 @@ export const FullMapContainer = observer(() => {
 
   if (projectsLoading || geoJsonLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-muted">
+      <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} flex items-center justify-center bg-muted`}>
         <div className="text-center">
           <div className="text-lg font-medium">Loading map...</div>
           <div className="text-sm text-muted-foreground mt-2">
@@ -142,7 +146,7 @@ export const FullMapContainer = observer(() => {
 
   if (projectsError) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-muted">
+      <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} flex items-center justify-center bg-muted`}>
         <div className="text-center">
           <div className="text-lg font-medium text-red-600">Error loading projects</div>
           <div className="text-sm text-muted-foreground mt-2">
@@ -154,7 +158,7 @@ export const FullMapContainer = observer(() => {
   }
 
   return (
-    <div className="flex-1 relative">
+    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative`}>
       <LeafletMap
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
@@ -162,10 +166,11 @@ export const FullMapContainer = observer(() => {
         maxZoom={MAP_CONFIG.maxZoom}
         style={{ height: "100%", width: "100%" }}
         ref={mapRef}
+        zoomControl={false} // Disable default zoom controls since we have custom ones
       >
         <MapClickHandler />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution=""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
@@ -214,10 +219,10 @@ export const FullMapContainer = observer(() => {
             position={cluster.coords}
           />
         ))}
+
+        {/* Map controls inside the map container */}
+        <MapControls />
       </LeafletMap>
-      
-      {/* Floating controls button */}
-      <MapControls />
     </div>
   );
 });
