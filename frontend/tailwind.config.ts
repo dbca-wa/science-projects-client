@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { BREAKPOINTS } from "./src/shared/constants/breakpoints";
 
 const config = {
 	important: true, // This adds `!important` to all Tailwind utilities
@@ -19,6 +20,22 @@ const config = {
 			},
 		},
 		extend: {
+			// Add custom breakpoints here
+			screens: {
+				'xs': `${BREAKPOINTS.xs}px`,
+				...Object.entries(BREAKPOINTS).reduce((acc, [key, value]) => {
+				  if (key !== '2xs' && key !== 'sm' && key !== 'md' && key !== 'lg' && key !== 'xl' && key !== '2xl') {
+				    acc[key] = `${value}px`;
+				  }
+				  return acc;
+				}, {} as Record<string, string>),
+				// Tailwind's default breakpoints are still available:
+				// sm: '640px'
+				// md: '768px'
+				// lg: '1024px'
+				// xl: '1280px'
+				// 2xl: '1536px'
+			},
 			colors: {
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",

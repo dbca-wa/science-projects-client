@@ -1,4 +1,5 @@
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
+import { FaMapMarkedAlt } from "react-icons/fa";
 
 /**
  * ProjectsMenuContent
@@ -17,6 +18,11 @@ export const ProjectsMenuContent = ({ onNavigate, variant = "dropdown" }: Projec
       path: "/projects",
       label: "Browse Projects",
       icon: CgBrowse,
+    },
+    {
+      path: "/projects/map",
+      label: "Project Map",
+      icon: FaMapMarkedAlt,
     },
     {
       path: "/projects/create",
@@ -51,6 +57,11 @@ export const projectsMenuItems = [
     path: "/projects",
     label: "Browse Projects",
     icon: CgBrowse,
+  },
+  {
+    path: "/projects/map",
+    label: "Project Map",
+    icon: FaMapMarkedAlt,
   },
   {
     path: "/projects/create",

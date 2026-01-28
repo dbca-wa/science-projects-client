@@ -1,106 +1,79 @@
+import { observer } from "mobx-react-lite";
+import { useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 import type { IProjectData } from "@/shared/types/project.types";
 import { ProjectPopup } from "./ProjectPopup";
+import { createProjectMarker } from "@/features/projects/utils/marker-creation";
+import { useProjectMapStore } from "@/app/stores/store-context";
 
 interface ProjectMarkerProps {
   projects: IProjectData[];
   position: [number, number];
-  isFiltered: boolean;
 }
 
 /**
  * ProjectMarker component
  * 
- * Renders a pin-shaped marker on the map for one or more projects.
- * - Green color if not filtered
- * - Gray color if filtered
+ * Renders a modern circular marker on the map for one or more projects.
+ * - Uses density-based colors (blue, green, amber, red) for selected markers
+ * - Uses muted colors for unselected markers
  * - Shows count number on the marker
+ * - Hover animations with scale effect
+ * - Drop shadow for depth
  * - Displays popup with project details on click
+ * - Accessible with proper ARIA labels
+ * - Handles marker selection state for visual feedback
  */
-export const ProjectMarker = ({
+export const ProjectMarker = observer(({
   projects,
   position,
-  isFiltered,
 }: ProjectMarkerProps) => {
-  const count = projects.length;
-  const displayCount = count > 100 ? "100+" : count.toString();
+  const store = useProjectMapStore();
+  const popupRef = useRef<L.Popup>(null);
+  
+  // Determine if this marker is selected
+  const isSelected = store.isMarkerSelected(position);
+  
+  // If no marker is selected, all markers show as selected (vibrant colors)
+  // If a marker is selected, only that marker shows as selected, others are muted
+  const shouldShowAsSelected = store.state.selectedMarkerCoords === null || isSelected;
+  
+  // Create the circular marker using the utility function
+  const marker = createProjectMarker(projects, position, shouldShowAsSelected);
+  const icon = marker.getIcon();
 
-  // Marker styling classes
-  const pinBgClass = isFiltered ? "bg-gray-500" : "bg-green-500";
-  const textClass = isFiltered ? "text-gray-600" : "text-green-600";
+  // Handle marker click for selection
+  const handleMarkerClick = () => {
+    store.selectMarker(position);
+  };
 
-  // Create custom DivIcon for pin-shaped marker
-  const icon = L.divIcon({
-    className: "bg-transparent border-none",
-    html: `
-      <div class="relative">
-        <div class="
-          relative
-          w-10 h-10
-          transform translate-y-0
-          transition-transform duration-200 ease-in-out
-          hover:translate-y-1
-          cursor-pointer
-        ">
-          <div class="
-            absolute
-            w-8 h-8
-            rounded-full
-            ${pinBgClass}
-            left-0
-            shadow-md
-            z-10
-          "></div>
-          
-          <div class="
-            absolute
-            w-4 h-4
-            ${pinBgClass}
-            transform rotate-45
-            top-6
-            left-2
-            shadow-lg
-            z-0
-          "></div>
-          
-          <div class="
-            absolute
-            w-6 h-6
-            rounded-full
-            bg-white
-            top-1
-            left-1
-            flex items-center justify-center
-            text-xs font-bold ${textClass}
-            z-20
-          ">${displayCount}</div>
-        </div>
-        
-        <div class="
-          absolute
-          w-4 h-1
-          rounded-full
-          bg-black
-          opacity-20
-          bottom-0
-          left-2
-          blur-xs
-        "></div>
-      </div>
-    `,
-    iconSize: [40, 46],
-    iconAnchor: [20, 46],
-    popupAnchor: [0, -36],
-  });
+  // Handle popup close
+  const handlePopupClose = () => {
+    if (popupRef.current) {
+      popupRef.current.close();
+    }
+  };
 
   return (
-    <Marker position={position} icon={icon}>
-      <Popup maxWidth={400} minWidth={250}>
+    <Marker 
+      position={position} 
+      icon={icon}
+      zIndexOffset={shouldShowAsSelected ? 1000 : 0}  // Set z-index on React Leaflet marker
+      eventHandlers={{
+        click: handleMarkerClick,
+      }}
+    >
+      <Popup 
+        ref={popupRef}
+        maxWidth={300} 
+        minWidth={250}
+        closeButton={true}
+        closeOnEscapeKey={true}
+      >
         <div className="p-2">
-          <ProjectPopup projects={projects} />
+          <ProjectPopup projects={projects} onClose={handlePopupClose} />
         </div>
       </Popup>
     </Marker>
   );
-};
+});

@@ -1,20 +1,18 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { MapContainer as LeafletMap, TileLayer } from "react-leaflet";
+import { MapContainer as LeafletMap, TileLayer, useMapEvents } from "react-leaflet";
 import type { Map as LeafletMapType } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useMapStore } from "@/app/stores/store-context";
-import { useProjects } from "@/features/projects/hooks/useProjects";
+import { useProjectMapStore } from "@/app/stores/store-context";
+import { useProjectsForMap } from "@/features/projects/hooks/useProjectsForMap";
 import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
 import { calculateProjectCoordinates } from "@/features/projects/utils/coordinate-calculation";
 import { clusterProjects } from "@/features/projects/utils/clustering";
-import { applyCombinedFilters } from "@/features/projects/utils/map-filters";
 import { ProjectMarker } from "./ProjectMarker";
 import { RegionLayer } from "./RegionLayer";
 import { RegionLabel } from "./RegionLabel";
 import { MapControls } from "./MapControls";
 import { GEOJSON_PROPERTY_NAMES } from "@/features/projects/types/map.types";
-import type { LayerType } from "@/app/stores/derived/map.store";
 
 /**
  * Map configuration
@@ -27,14 +25,36 @@ const MAP_CONFIG = {
 };
 
 /**
- * Mapping from LayerType to GeoJSON data keys
+ * MapClickHandler component
+ * 
+ * Handles map click events to clear marker selection
  */
-const LAYER_TO_GEOJSON_KEY: Record<LayerType, keyof typeof GEOJSON_PROPERTY_NAMES> = {
-  dbca_regions: "dbcaRegions",
-  dbca_districts: "dbcaDistricts",
-  nrm_regions: "nrm",
-  ibra_regions: "ibra",
-  imcra_regions: "imcra",
+/**
+ * MapClickHandler component
+ * 
+ * Handles map click events to clear marker selection
+ */
+const MapClickHandler = () => {
+  const store = useProjectMapStore();
+  
+  useMapEvents({
+    click: () => {
+      store.clearMarkerSelection();
+    },
+  });
+  
+  return null;
+};
+
+/**
+ * Mapping from layer type strings to GeoJSON data keys
+ */
+const LAYER_TO_GEOJSON_KEY: Record<string, keyof typeof GEOJSON_PROPERTY_NAMES> = {
+  dbcaregion: "dbcaRegions",
+  dbcadistrict: "dbcaDistricts",
+  nrm: "nrm",
+  ibra: "ibra",
+  imcra: "imcra",
 };
 
 /**
@@ -51,34 +71,25 @@ const LAYER_TO_GEOJSON_KEY: Record<LayerType, keyof typeof GEOJSON_PROPERTY_NAME
  * - Includes floating MapControls button
  */
 export const FullMapContainer = observer(() => {
-  const store = useMapStore();
+  const store = useProjectMapStore();
   const mapRef = useRef<LeafletMapType | null>(null);
 
-  // Fetch data
-  const { data: projectsData, isLoading: projectsLoading } = useProjects();
+  // Fetch data with reactive filters
+  const { data: mapData, isLoading: projectsLoading, error: projectsError } = useProjectsForMap(store.apiParams);
   const { data: geoJsonData, loading: geoJsonLoading } = useGeoJSON();
 
-  const projects = useMemo(() => projectsData?.projects || [], [projectsData]);
-
-  // Apply filters
-  const { projectsWithFilterFlag } = useMemo(() => {
-    return applyCombinedFilters(
-      projects,
-      store.searchTerm,
-      store.selectedBusinessAreas
-    );
-  }, [projects, store.searchTerm, store.selectedBusinessAreas]);
+  const projects = mapData?.projects || [];
 
   // Calculate coordinates for all projects using the original function
   const projectsWithCoords = useMemo(() => {
     if (!geoJsonData) return [];
     
     return calculateProjectCoordinates(
-      projectsWithFilterFlag.map((p) => p.project),
+      projects,
       [], // locationMetadata not needed with new implementation
       geoJsonData
     );
-  }, [projectsWithFilterFlag, geoJsonData]);
+  }, [projects, geoJsonData]);
 
   // Cluster projects
   const clusters = useMemo(() => {
@@ -92,6 +103,30 @@ export const FullMapContainer = observer(() => {
     }
   };
 
+  // Handle window resize events
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapRef.current) {
+        // Invalidate map size after a short delay to ensure container has resized
+        setTimeout(() => {
+          mapRef.current?.invalidateSize();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
+    };
+  }, []);
+
   if (projectsLoading || geoJsonLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-muted">
@@ -99,6 +134,19 @@ export const FullMapContainer = observer(() => {
           <div className="text-lg font-medium">Loading map...</div>
           <div className="text-sm text-muted-foreground mt-2">
             Fetching projects and region data
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (projectsError) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-muted">
+        <div className="text-center">
+          <div className="text-lg font-medium text-red-600">Error loading projects</div>
+          <div className="text-sm text-muted-foreground mt-2">
+            Unable to load project data for the map
           </div>
         </div>
       </div>
@@ -115,13 +163,14 @@ export const FullMapContainer = observer(() => {
         style={{ height: "100%", width: "100%" }}
         ref={mapRef}
       >
+        <MapClickHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         {/* Render region layers */}
-        {geoJsonData && store.visibleLayersList.map((layerType) => {
+        {geoJsonData && store.state.visibleLayerTypes.map((layerType) => {
           const geoJsonKey = LAYER_TO_GEOJSON_KEY[layerType];
           const layerData = geoJsonData[geoJsonKey];
 
@@ -132,14 +181,14 @@ export const FullMapContainer = observer(() => {
               key={layerType}
               layerType={layerType}
               geoJsonData={layerData}
-              showColors={store.showColors}
+              showColors={store.state.showColors}
             />
           );
         })}
 
         {/* Render region labels */}
-        {geoJsonData && store.showLabels &&
-          store.visibleLayersList.map((layerType) => {
+        {geoJsonData && store.state.showLabels &&
+          store.state.visibleLayerTypes.map((layerType) => {
             const geoJsonKey = LAYER_TO_GEOJSON_KEY[layerType];
             const layerData = geoJsonData[geoJsonKey];
             const propertyName = GEOJSON_PROPERTY_NAMES[geoJsonKey];
@@ -158,22 +207,13 @@ export const FullMapContainer = observer(() => {
           })}
 
         {/* Render project markers */}
-        {Array.from(clusters.values()).map((cluster, index) => {
-          // Check if any project in this cluster is filtered
-          const isFiltered = cluster.projects.some((project) => {
-            const item = projectsWithFilterFlag.find((p) => p.project.id === project.id);
-            return item?.isFiltered || false;
-          });
-
-          return (
-            <ProjectMarker
-              key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
-              projects={cluster.projects}
-              position={cluster.coords}
-              isFiltered={isFiltered}
-            />
-          );
-        })}
+        {Array.from(clusters.values()).map((cluster, index) => (
+          <ProjectMarker
+            key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
+            projects={cluster.projects}
+            position={cluster.coords}
+          />
+        ))}
       </LeafletMap>
       
       {/* Floating controls button */}

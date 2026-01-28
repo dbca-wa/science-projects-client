@@ -1,15 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Input } from "@/shared/components/ui/input";
-import { Button } from "@/shared/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
-import { Search, ChevronDown, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { debounce } from "@/shared/utils/common.utils";
-import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { useMapStore } from "@/app/stores/store-context";
+import { useProjectMapStore } from "@/app/stores/store-context";
 import { SearchControls } from "@/shared/components/SearchControls";
+import { BusinessAreaMultiSelect } from "@/shared/components/BusinessAreaMultiSelect";
+import { UserSearchDropdown } from "@/features/users";
 
 interface MapFiltersProps {
   projectCount: number;
@@ -30,17 +27,15 @@ export const MapFilters = observer(({
   totalProjects,
   projectsWithoutLocation 
 }: MapFiltersProps) => {
-  const store = useMapStore();
-  const { data: businessAreas, isLoading: isLoadingBusinessAreas } = useBusinessAreas();
+  const store = useProjectMapStore();
 
   // Local state for immediate UI updates
-  const [localSearchTerm, setLocalSearchTerm] = useState(store.searchTerm);
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [localSearchTerm, setLocalSearchTerm] = useState(store.state.searchTerm);
 
   // Sync local value when store changes
   useEffect(() => {
-    setLocalSearchTerm(store.searchTerm);
-  }, [store.searchTerm]);
+    setLocalSearchTerm(store.state.searchTerm);
+  }, [store.state.searchTerm]);
 
   // Debounce the search (300ms)
   const debouncedSetSearchTerm = useMemo(
@@ -60,38 +55,19 @@ export const MapFilters = observer(({
   };
 
   const handleClearFilters = () => {
-    store.clearBusinessAreas();
+    store.uncheckAllBusinessAreas();
+    store.setFilterUser(null);
     handleClearSearch();
   };
 
-  // Sort business areas alphabetically
-  const sortedBusinessAreas = useMemo(() => {
-    if (!businessAreas) return [];
-    return [...businessAreas].sort((a, b) => a.name.localeCompare(b.name));
-  }, [businessAreas]);
+  const handleUserChange = (userId: number | null) => {
+    store.setFilterUser(userId);
+  };
 
-  // Calculate filter count (search term + business areas)
-  const filterCount = (store.searchTerm.length > 0 ? 1 : 0) + store.selectedBusinessAreas.size;
-
-  // Get selected business area names for display
-  const selectedNames = useMemo(() => {
-    if (store.selectedBusinessAreas.size === 0) return "Business Areas";
-    if (businessAreas && store.selectedBusinessAreas.size === businessAreas.length) return "All Selected";
-    return "Business Areas";
-  }, [store.selectedBusinessAreas, businessAreas]);
-
-  // Get selected business areas for tag display
-  const selectedBusinessAreasList = useMemo(() => {
-    if (!businessAreas) return [];
-    return businessAreas.filter(ba => ba.id && store.selectedBusinessAreas.has(ba.id));
-  }, [businessAreas, store.selectedBusinessAreas]);
-
-  // Show tags only when some (but not all) are selected
-  const showTags = useMemo(() => {
-    return store.selectedBusinessAreas.size > 0 && 
-           businessAreas && 
-           store.selectedBusinessAreas.size < businessAreas.length;
-  }, [store.selectedBusinessAreas, businessAreas]);
+  // Calculate filter count (search term + business areas + user)
+  const filterCount = (store.state.searchTerm.length > 0 ? 1 : 0) + 
+                     store.state.selectedBusinessAreas.length + 
+                     (store.state.filterUser ? 1 : 0);
 
   return (
     <div className="border-b border-gray-300 dark:border-gray-500 w-full select-none bg-background">
@@ -100,73 +76,13 @@ export const MapFilters = observer(({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Business Area Multi-Select - LEFT on desktop, SECOND on mobile */}
           <div className="w-full order-2 lg:order-1">
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between text-sm font-normal h-11"
-                  disabled={isLoadingBusinessAreas}
-                >
-                  <span className="truncate">{selectedNames}</span>
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0" align="start">
-                <div className="p-3 border-b">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Business Areas</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (businessAreas) {
-                            const allIds = businessAreas.map(ba => ba.id).filter((id): id is number => id !== undefined);
-                            store.selectAllBusinessAreas(allIds);
-                          }
-                        }}
-                        className="h-7 text-xs"
-                      >
-                        Select All
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => store.clearBusinessAreas()}
-                        className="h-7 text-xs"
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="max-h-[300px] overflow-y-auto p-3">
-                  <div className="space-y-2">
-                    {isLoadingBusinessAreas && (
-                      <div className="text-sm text-muted-foreground">Loading...</div>
-                    )}
-                    {sortedBusinessAreas.map((ba) => {
-                      if (ba.id === undefined) return null;
-                      return (
-                        <div key={ba.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`ba-${ba.id}`}
-                            checked={store.selectedBusinessAreas.has(ba.id)}
-                            onCheckedChange={() => store.toggleBusinessArea(ba.id!)}
-                          />
-                          <Label
-                            htmlFor={`ba-${ba.id}`}
-                            className="text-sm font-normal cursor-pointer flex-1"
-                          >
-                            {ba.name}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <BusinessAreaMultiSelect
+              selectedBusinessAreas={store.state.selectedBusinessAreas}
+              onToggleBusinessArea={store.toggleBusinessArea}
+              onSelectAll={store.checkAllBusinessAreas}
+              onClearAll={store.uncheckAllBusinessAreas}
+              showTags={true}
+            />
           </div>
 
           {/* Search Input - RIGHT on desktop, FIRST on mobile */}
@@ -191,26 +107,26 @@ export const MapFilters = observer(({
           </div>
         </div>
 
-        {/* Row 2: Selected Business Area Tags (only shown when some but not all selected) */}
-        {showTags && (
-          <div className="flex flex-wrap gap-2">
-            {selectedBusinessAreasList.map((ba) => (
-              <div
-                key={ba.id}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-md text-sm"
-              >
-                <span>{ba.name}</span>
-                <button
-                  onClick={() => ba.id && store.toggleBusinessArea(ba.id)}
-                  className="cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/50 rounded-sm p-0.5 transition-colors"
-                  aria-label={`Remove ${ba.name}`}
-                >
-                  <X className="size-3" />
-                </button>
-              </div>
-            ))}
+        {/* Row 2: User Filter */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {/* User Filter - LEFT on desktop */}
+          <div className="w-full">
+            <UserSearchDropdown
+              key={store.state.filterUser || "no-user"}
+              isRequired={false}
+              setUserFunction={handleUserChange}
+              label=""
+              placeholder="Filter by user"
+              helperText=""
+              hideCannotFind={true}
+              className="text-sm rounded-md"
+              preselectedUserPk={store.state.filterUser || undefined}
+              showIcon={true}
+            />
           </div>
-        )}
+          {/* Empty space on right */}
+          <div className="w-full"></div>
+        </div>
 
         {/* Row 3: Project Stats (left) and Remember/Clear (right) */}
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">

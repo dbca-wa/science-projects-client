@@ -1,10 +1,9 @@
 import { Marker } from "react-leaflet";
 import L from "leaflet";
-import type { LayerType } from "@/app/stores/derived/map.store";
 
 interface RegionLabelProps {
   feature: GeoJSON.Feature;
-  layerType: LayerType;
+  layerType: string;
   propertyName: string;
   onLabelClick?: (bounds: L.LatLngBounds) => void;
 }

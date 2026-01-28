@@ -178,12 +178,21 @@ export interface ProjectMapSearchParams {
 }
 
 /**
+ * Map-specific API response
+ */
+export interface ProjectMapResponse {
+	projects: IProjectData[];
+	total_projects: number;
+	projects_without_location: number;
+}
+
+/**
  * Get projects for map display with filters
- * Returns all projects (no pagination) with location data
+ * Returns all projects (no pagination) with location data and statistics
  */
 export const getProjectsForMap = async (
 	params: ProjectMapSearchParams = {}
-): Promise<IProjectData[]> => {
+): Promise<ProjectMapResponse> => {
 	const queryParams = new URLSearchParams();
 
 	// Add search term
@@ -231,6 +240,5 @@ export const getProjectsForMap = async (
 	}
 
 	const url = `projects/map${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-	const response = await apiClient.get<{ projects: IProjectData[] }>(url);
-	return response.projects;
+	return apiClient.get<ProjectMapResponse>(url);
 };
