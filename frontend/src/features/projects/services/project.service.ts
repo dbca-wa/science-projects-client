@@ -161,3 +161,76 @@ export const projectService = {
 	downloadProjectsCSV,
 	downloadProjectsCSVAR,
 };
+
+/**
+ * Map-specific search parameters
+ */
+export interface ProjectMapSearchParams {
+	searchTerm?: string;
+	locations?: number[]; // Selected location IDs
+	businessAreas?: number[]; // Selected business area IDs
+	user?: number | null;
+	status?: string;
+	kind?: string;
+	year?: number;
+	onlyActive?: boolean;
+	onlyInactive?: boolean;
+}
+
+/**
+ * Get projects for map display with filters
+ * Returns all projects (no pagination) with location data
+ */
+export const getProjectsForMap = async (
+	params: ProjectMapSearchParams = {}
+): Promise<IProjectData[]> => {
+	const queryParams = new URLSearchParams();
+
+	// Add search term
+	if (params.searchTerm) {
+		queryParams.append("searchTerm", params.searchTerm);
+	}
+
+	// Add location filters (comma-separated IDs)
+	if (params.locations && params.locations.length > 0) {
+		queryParams.append("locations", params.locations.join(","));
+	}
+
+	// Add business area filters (comma-separated IDs)
+	if (params.businessAreas && params.businessAreas.length > 0) {
+		queryParams.append("businessarea", params.businessAreas.join(","));
+	}
+
+	// Add user filter
+	if (params.user) {
+		queryParams.append("selected_user", params.user.toString());
+	}
+
+	// Add status filter
+	if (params.status && params.status !== "All" && params.status !== "") {
+		queryParams.append("projectstatus", params.status);
+	}
+
+	// Add kind filter
+	if (params.kind && params.kind !== "All" && params.kind !== "") {
+		queryParams.append("projectkind", params.kind);
+	}
+
+	// Add year filter
+	if (params.year && params.year !== 0) {
+		queryParams.append("year", params.year.toString());
+	}
+
+	// Add active/inactive filters
+	if (params.onlyActive) {
+		queryParams.append("only_active", "true");
+	}
+
+	if (params.onlyInactive) {
+		queryParams.append("only_inactive", "true");
+	}
+
+	const url = `projects/map${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+	const response = await apiClient.get<{ projects: IProjectData[] }>(url);
+	return response.projects;
+};

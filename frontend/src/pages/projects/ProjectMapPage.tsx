@@ -1,45 +1,64 @@
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { observer } from "mobx-react-lite";
+import { useMemo } from "react";
+import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
+import { MapFilters } from "@/features/projects/components/map/MapFilters";
+import { useMapStore } from "@/app/stores/store-context";
+import { useProjects } from "@/features/projects/hooks/useProjects";
+import { applyCombinedFilters } from "@/features/projects/utils/map-filters";
 
 /**
- * ProjectMapPage
- * Map view of projects with location markers
- * TODO: Implement map functionality
+ * ProjectMapPage - Building incrementally
+ * 
+ * Progress:
+ * 1. Basic page structure ✓
+ * 2. Add Leaflet map ✓
+ * 3. Add filter bar ✓
+ * 4. Add full map with markers, layers, labels ✓
+ * 5. Add floating controls button ✓
  */
-const ProjectMapPage = () => {
-	const breadcrumbItems = [
-		{ title: "Projects", link: "/projects" },
-		{ title: "Map" },
-	];
+const ProjectMapPage = observer(() => {
+  const store = useMapStore();
+  const { data: projectsData, isLoading } = useProjects();
 
-	return (
-		<div className="w-full">
-			{/* Breadcrumb */}
-			<Breadcrumb items={breadcrumbItems} />
+  const projects = useMemo(() => projectsData?.projects || [], [projectsData]);
 
-			{/* Page header */}
-			<div className="flex w-full mt-2 mb-6 flex-row">
-				<div className="flex-1 w-full flex-col">
-					<h1 className="text-2xl font-bold">Project Map</h1>
-					<p className="text-sm text-gray-600 dark:text-gray-200">
-						View projects on a map by location
-					</p>
-				</div>
-			</div>
+  // Calculate filtered project count
+  const filteredProjectCount = useMemo(() => {
+    const { filteredProjects } = applyCombinedFilters(
+      projects,
+      store.searchTerm,
+      store.selectedBusinessAreas
+    );
+    return filteredProjects.length;
+  }, [projects, store.searchTerm, store.selectedBusinessAreas]);
 
-			{/* Placeholder */}
-			<div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 text-center">
-				<h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-					Project Map
-				</h3>
-				<p className="text-sm text-gray-600 dark:text-gray-400">
-					Map view will be implemented in a future update.
-				</p>
-				<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-					This will show all projects with location markers on an interactive map.
-				</p>
-			</div>
-		</div>
-	);
-};
+  // Calculate projects without location data
+  const projectsWithoutLocation = useMemo(() => {
+    return projects.filter(p => !p.areas || p.areas.length === 0).length;
+  }, [projects]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">Loading projects...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen">
+      <MapFilters 
+        projectCount={filteredProjectCount} 
+        totalProjects={projects.length}
+        projectsWithoutLocation={projectsWithoutLocation}
+      />
+      <FullMapContainer />
+    </div>
+  );
+});
+
+ProjectMapPage.displayName = "ProjectMapPage";
 
 export default ProjectMapPage;

@@ -194,3 +194,85 @@
 	}
 
 }
+
+/* Leaflet Map Styles */
+.region-label {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.region-label-text {
+	background: rgba(255, 255, 255, 0.9);
+	color: #1f2937;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: center;
+	white-space: nowrap;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	pointer-events: none;
+}
+
+.dark .region-label-text {
+	background: rgba(31, 41, 55, 0.9);
+	color: #f9fafb;
+}
+
+.region-tooltip {
+	background: rgba(255, 255, 255, 0.95) !important;
+	color: #1f2937 !important;
+	border: 1px solid #e5e7eb !important;
+	border-radius: 6px !important;
+	padding: 4px 8px !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .region-tooltip {
+	background: rgba(31, 41, 55, 0.95) !important;
+	color: #f9fafb !important;
+	border-color: #374151 !important;
+}
+
+.leaflet-tooltip-left.region-tooltip::before,
+.leaflet-tooltip-right.region-tooltip::before {
+	border: none !important;
+}
+
+/* Region labels for map */
+.region-label {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.region-label-text {
+	background: rgba(255, 255, 255, 0.9);
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	color: #1f2937;
+	white-space: nowrap;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	pointer-events: none;
+}
+
+.region-tooltip {
+	background: rgba(0, 0, 0, 0.8) !important;
+	color: white !important;
+	border: none !important;
+	border-radius: 4px !important;
+	padding: 4px 8px !important;
+	font-size: 12px !important;
+}
+
+/* Custom marker icon */
+.custom-marker-icon {
+	background: transparent !important;
+	border: none !important;
+}

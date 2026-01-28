@@ -51,7 +51,9 @@ export const LoginForm = () => {
 				reset();
 			},
 			onError: (error) => {
-				logger.error("Login failed", { error });
+				logger.error("Login failed", { 
+					errorMessage: error instanceof Error ? error.message : String(error) 
+				});
 			},
 		});
 	};

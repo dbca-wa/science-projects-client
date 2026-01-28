@@ -114,7 +114,9 @@ export const useWizardPersistence = () => {
 				sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 				logger.debug("Wizard draft saved to session storage");
 			} catch (error) {
-				logger.error("Failed to save wizard draft", { error });
+				logger.error("Failed to save wizard draft", { 
+					errorMessage: error instanceof Error ? error.message : String(error) 
+				});
 			}
 		}, 500);
 	}, [wizardStore]);
@@ -127,7 +129,9 @@ export const useWizardPersistence = () => {
 			sessionStorage.removeItem(STORAGE_KEY);
 			logger.debug("Wizard draft cleared from session storage");
 		} catch (error) {
-			logger.error("Failed to clear wizard draft", { error });
+			logger.error("Failed to clear wizard draft", { 
+				errorMessage: error instanceof Error ? error.message : String(error) 
+			});
 		}
 	}, []);
 
@@ -187,7 +191,9 @@ export const useWizardPersistence = () => {
 
 			return true;
 		} catch (error) {
-			logger.error("Failed to restore wizard draft", { error });
+			logger.error("Failed to restore wizard draft", { 
+				errorMessage: error instanceof Error ? error.message : String(error) 
+			});
 			clearDraft();
 			return false;
 		}
@@ -204,7 +210,9 @@ export const useWizardPersistence = () => {
 			const data: IPersistedWizardData = JSON.parse(stored);
 			return !isExpired(data.timestamp);
 		} catch (error) {
-			logger.error("Failed to check for wizard draft", { error });
+			logger.error("Failed to check for wizard draft", { 
+				errorMessage: error instanceof Error ? error.message : String(error) 
+			});
 			return false;
 		}
 	}, [isExpired]);
