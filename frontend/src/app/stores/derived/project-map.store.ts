@@ -20,12 +20,14 @@ interface ProjectMapState extends BaseStoreState {
 	filterYear: number;
 	onlyActive: boolean;
 	onlyInactive: boolean;
+	saveSearch: boolean; // Add saveSearch functionality
 
 	// Map UI (for GeoJSON LAYER visibility)
 	visibleLayerTypes: string[]; // ["dbcaregion", "nrm", etc.]
 	showLabels: boolean;
 	showColors: boolean;
 	mapLoading: boolean;
+	mapFullscreen: boolean; // For map-only fullscreen mode
 
 	// Marker Selection (for highlighting selected markers)
 	selectedMarkerCoords: [number, number] | null; // Coordinates of selected marker
@@ -60,12 +62,14 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			filterYear: new Date().getFullYear(),
 			onlyActive: false,
 			onlyInactive: false,
+			saveSearch: true, // Default to true like other search stores
 
 			// Map UI
 			visibleLayerTypes: ["dbcaregion"], // Start with DBCA Regions visible
 			showLabels: true,
 			showColors: true,
 			mapLoading: false,
+			mapFullscreen: false,
 
 			// Marker Selection
 			selectedMarkerCoords: null,
@@ -85,6 +89,8 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			selectLocations: action,
 			deselectLocations: action,
 			toggleBusinessArea: action,
+			showLayer: action,
+			hideLayer: action,
 			toggleLayerType: action,
 			showAllLayers: action,
 			hideAllLayers: action,
@@ -97,18 +103,25 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			toggleLabels: action,
 			toggleColors: action,
 			setMapLoading: action,
+			toggleMapFullscreen: action,
 			clearFilters: action,
 			resetAllFilters: action,
 			checkAllBusinessAreas: action,
 			uncheckAllBusinessAreas: action,
 			selectMarker: action,
 			clearMarkerSelection: action,
+			toggleSaveSearch: action,
+			setSaveSearch: action,
+			clearState: action,
+			setCurrentPage: action,
+			setFilters: action,
 
 			// Computed
 			filters: computed,
 			apiParams: computed,
 			hasActiveFilters: computed,
 			selectedBusinessAreas: computed,
+			selectedBusinessAreasArray: computed,
 			isMarkerSelected: computed,
 		});
 	}
@@ -162,11 +175,37 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 * Toggle business area selection
 	 */
 	toggleBusinessArea = (baId: number): void => {
+		console.log('toggleBusinessArea called with:', baId);
+		console.log('Current selectedBusinessAreas:', this.state.selectedBusinessAreas);
+		
 		const index = this.state.selectedBusinessAreas.indexOf(baId);
 		if (index > -1) {
+			console.log('Removing business area at index:', index);
 			this.state.selectedBusinessAreas.splice(index, 1);
 		} else {
+			console.log('Adding business area:', baId);
 			this.state.selectedBusinessAreas.push(baId);
+		}
+		
+		console.log('New selectedBusinessAreas:', this.state.selectedBusinessAreas);
+	};
+
+	/**
+	 * Show a specific layer type
+	 */
+	showLayer = (layerType: string): void => {
+		if (!this.state.visibleLayerTypes.includes(layerType)) {
+			this.state.visibleLayerTypes.push(layerType);
+		}
+	};
+
+	/**
+	 * Hide a specific layer type
+	 */
+	hideLayer = (layerType: string): void => {
+		const index = this.state.visibleLayerTypes.indexOf(layerType);
+		if (index > -1) {
+			this.state.visibleLayerTypes.splice(index, 1);
 		}
 	};
 
@@ -266,6 +305,13 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	};
 
 	/**
+	 * Toggle map fullscreen mode
+	 */
+	toggleMapFullscreen = (): void => {
+		this.state.mapFullscreen = !this.state.mapFullscreen;
+	};
+
+	/**
 	 * Clear all filters
 	 */
 	clearFilters = (): void => {
@@ -323,6 +369,93 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	};
 
 	/**
+	 * Toggle save search
+	 */
+	toggleSaveSearch = (): void => {
+		this.state.saveSearch = !this.state.saveSearch;
+		
+		// Immediately save the saveSearch state to localStorage
+		// This is needed so useSearchStoreInit knows the user's preference on next page load
+		if (typeof window !== "undefined") {
+			if (this.state.saveSearch) {
+				// If turning ON, save current state
+				const stateToSave = {
+					searchTerm: this.state.searchTerm,
+					selectedBusinessAreas: [...this.state.selectedBusinessAreas],
+					filterUser: this.state.filterUser,
+					saveSearch: this.state.saveSearch,
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(stateToSave));
+			} else {
+				// If turning OFF, save only the saveSearch: false flag
+				localStorage.setItem("projectMapState", JSON.stringify({ saveSearch: false }));
+			}
+		}
+	};
+
+	/**
+	 * Set save search state (action for MobX strict mode)
+	 */
+	setSaveSearch = (value: boolean): void => {
+		this.state.saveSearch = value;
+		
+		// Immediately save the saveSearch state to localStorage
+		if (typeof window !== "undefined") {
+			if (value) {
+				// If turning ON, save current state
+				const stateToSave = {
+					searchTerm: this.state.searchTerm,
+					selectedBusinessAreas: [...this.state.selectedBusinessAreas],
+					filterUser: this.state.filterUser,
+					saveSearch: value,
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(stateToSave));
+			} else {
+				// If turning OFF, save only the saveSearch: false flag
+				localStorage.setItem("projectMapState", JSON.stringify({ saveSearch: false }));
+			}
+		}
+	};
+
+	/**
+	 * Clear state (required for useSearchStoreInit)
+	 */
+	clearState = (): void => {
+		this.clearFilters();
+	};
+
+	/**
+	 * Set current page (required for useSearchStoreInit compatibility)
+	 */
+	setCurrentPage = (_page: number): void => {
+		// Map doesn't have pagination, but we need this for compatibility
+		// Could be used for future pagination if needed
+	};
+
+	/**
+	 * Set filters (required for useSearchStoreInit compatibility)
+	 */
+	setFilters = (filters: Partial<{
+		businessAreas: number[];
+		user: number | null;
+		searchTerm: string;
+		search: string; // Add search as alias for searchTerm
+	}>): void => {
+		if (filters.businessAreas !== undefined) {
+			this.state.selectedBusinessAreas = filters.businessAreas;
+		}
+		if (filters.user !== undefined) {
+			this.state.filterUser = filters.user;
+		}
+		if (filters.searchTerm !== undefined) {
+			this.state.searchTerm = filters.searchTerm;
+		}
+		if (filters.search !== undefined) {
+			this.state.searchTerm = filters.search; // Handle search as alias for searchTerm
+		}
+	};
+
+	/**
 	 * Get filters object for TanStack Query
 	 */
 	get filters(): MapFilters {
@@ -361,6 +494,13 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	get selectedBusinessAreas(): Set<number> {
 		return new Set(this.state.selectedBusinessAreas);
+	}
+
+	/**
+	 * Get selected business areas as regular array (for React useEffect)
+	 */
+	get selectedBusinessAreasArray(): number[] {
+		return [...this.state.selectedBusinessAreas];
 	}
 
 	/**
@@ -417,7 +557,9 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		this.state.showLabels = true;
 		this.state.showColors = true;
 		this.state.mapLoading = false;
+		this.state.mapFullscreen = false;
 		this.state.selectedMarkerCoords = null;
+		this.state.saveSearch = true;
 		this.state.loading = false;
 		this.state.error = null;
 	}
