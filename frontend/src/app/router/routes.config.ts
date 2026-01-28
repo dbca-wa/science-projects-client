@@ -208,11 +208,12 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 	{
 		name: "Project Map",
 		path: "/projects/map",
-		iconKey: "projects",
-		tooltipKey: "projects",
+		iconKey: "map",
+		tooltipKey: "map",
 		component: ProjectMapPage,
 		requiresAuth: true,
-		showInSidebar: false,
+		showInSidebar: true,
+		section: "Projects",
 		layoutWrapper: "content",
 	},
 	{

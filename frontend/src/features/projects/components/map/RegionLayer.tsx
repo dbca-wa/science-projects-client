@@ -1,9 +1,8 @@
 import { GeoJSON } from "react-leaflet";
-import type { LayerType } from "@/app/stores/derived/map.store";
 import type { PathOptions } from "leaflet";
 
 interface RegionLayerProps {
-  layerType: LayerType;
+  layerType: string;
   geoJsonData: GeoJSON.FeatureCollection;
   showColors: boolean;
 }
@@ -11,12 +10,12 @@ interface RegionLayerProps {
 /**
  * Layer colors for each region type
  */
-const LAYER_COLORS: Record<LayerType, string> = {
-  dbca_regions: "#3b82f6",    // blue-500
-  dbca_districts: "#8b5cf6",  // purple-500
-  nrm_regions: "#10b981",     // green-500
-  ibra_regions: "#f59e0b",    // orange-500
-  imcra_regions: "#ef4444",   // red-500
+const LAYER_COLORS: Record<string, string> = {
+  dbcaregion: "#3b82f6",      // blue-500
+  dbcadistrict: "#8b5cf6",    // purple-500
+  nrm: "#10b981",             // green-500
+  ibra: "#f59e0b",            // orange-500
+  imcra: "#ef4444",           // red-500
 };
 
 /**

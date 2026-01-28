@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   filterBySearch,
   filterByBusinessArea,
+  filterByUser,
   applyCombinedFilters,
 } from "./map-filters";
 import type { IProjectData } from "@/shared/types/project.types";
@@ -12,19 +13,34 @@ describe("map-filters", () => {
     id,
     name,
     leader: 1,
+    is_active: true,
+    focus: "Test focus",
+    introduction: "Test introduction",
+    image: null,
   });
 
   const createProject = (
     id: number,
     title: string,
     description: string,
-    businessAreaId: number
+    businessAreaId: number,
+    leader?: number
   ): IProjectData => ({
     id,
     title,
     description,
     business_area: createBusinessArea(businessAreaId, `BA ${businessAreaId}`),
+    leader,
     areas: [],
+    kind: "science",
+    status: "active",
+    tagline: "Test tagline",
+    image: null,
+    year: 2024,
+    start_date: "2024-01-01",
+    end_date: "2024-12-31",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   } as IProjectData);
 
   describe("filterBySearch", () => {
@@ -153,6 +169,41 @@ describe("map-filters", () => {
       ];
       const result = filterByBusinessArea(projectsWithNull, new Set([1]));
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe("filterByUser", () => {
+    const projects = [
+      createProject(1, "Project A", "Description A", 1, 101),
+      createProject(2, "Project B", "Description B", 1, 102),
+      createProject(3, "Project C", "Description C", 2, 101),
+      createProject(4, "Project D", "Description D", 2, 103),
+    ];
+
+    it("should return all projects when no user selected", () => {
+      const result = filterByUser(projects, null);
+      expect(result).toHaveLength(4);
+    });
+
+    it("should filter by user ID", () => {
+      const result = filterByUser(projects, 101);
+      expect(result).toHaveLength(2);
+      expect(result.map((p) => p.id)).toEqual([1, 3]);
+    });
+
+    it("should return empty array when user has no projects", () => {
+      const result = filterByUser(projects, 999);
+      expect(result).toHaveLength(0);
+    });
+
+    it("should handle projects without leader", () => {
+      const projectsWithoutLeader = [
+        createProject(1, "Project A", "Description A", 1, undefined),
+        createProject(2, "Project B", "Description B", 1, 101),
+      ];
+      const result = filterByUser(projectsWithoutLeader, 101);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(2);
     });
   });
 

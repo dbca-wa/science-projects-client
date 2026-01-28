@@ -9,7 +9,7 @@ import {
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
-import { useMapStore } from "@/app/stores/store-context";
+import { useProjectMapStore } from "@/app/stores/store-context";
 
 /**
  * MapControls - Floating button with popover for map display options
@@ -20,7 +20,7 @@ import { useMapStore } from "@/app/stores/store-context";
  * - Display options (Show Labels, Show Colors)
  */
 export const MapControls = observer(() => {
-  const store = useMapStore();
+  const store = useProjectMapStore();
 
   return (
     <div className="absolute top-4 right-4 z-[1000]">
@@ -43,8 +43,8 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-layer-dbca-regions"
-                    checked={store.visibleLayers.has("dbca_regions")}
-                    onCheckedChange={() => store.toggleLayer("dbca_regions")}
+                    checked={store.state.visibleLayerTypes.includes("dbcaregion")}
+                    onCheckedChange={() => store.toggleLayerType("dbcaregion")}
                   />
                   <Label
                     htmlFor="ctrl-layer-dbca-regions"
@@ -56,8 +56,8 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-layer-dbca-districts"
-                    checked={store.visibleLayers.has("dbca_districts")}
-                    onCheckedChange={() => store.toggleLayer("dbca_districts")}
+                    checked={store.state.visibleLayerTypes.includes("dbcadistrict")}
+                    onCheckedChange={() => store.toggleLayerType("dbcadistrict")}
                   />
                   <Label
                     htmlFor="ctrl-layer-dbca-districts"
@@ -69,8 +69,8 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-layer-nrm"
-                    checked={store.visibleLayers.has("nrm_regions")}
-                    onCheckedChange={() => store.toggleLayer("nrm_regions")}
+                    checked={store.state.visibleLayerTypes.includes("nrm")}
+                    onCheckedChange={() => store.toggleLayerType("nrm")}
                   />
                   <Label
                     htmlFor="ctrl-layer-nrm"
@@ -82,8 +82,8 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-layer-ibra"
-                    checked={store.visibleLayers.has("ibra_regions")}
-                    onCheckedChange={() => store.toggleLayer("ibra_regions")}
+                    checked={store.state.visibleLayerTypes.includes("ibra")}
+                    onCheckedChange={() => store.toggleLayerType("ibra")}
                   />
                   <Label
                     htmlFor="ctrl-layer-ibra"
@@ -95,8 +95,8 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-layer-imcra"
-                    checked={store.visibleLayers.has("imcra_regions")}
-                    onCheckedChange={() => store.toggleLayer("imcra_regions")}
+                    checked={store.state.visibleLayerTypes.includes("imcra")}
+                    onCheckedChange={() => store.toggleLayerType("imcra")}
                   />
                   <Label
                     htmlFor="ctrl-layer-imcra"
@@ -117,7 +117,7 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-show-labels"
-                    checked={store.showLabels}
+                    checked={store.state.showLabels}
                     onCheckedChange={() => store.toggleLabels()}
                   />
                   <Label
@@ -130,7 +130,7 @@ export const MapControls = observer(() => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="ctrl-show-colors"
-                    checked={store.showColors}
+                    checked={store.state.showColors}
                     onCheckedChange={() => store.toggleColors()}
                   />
                   <Label

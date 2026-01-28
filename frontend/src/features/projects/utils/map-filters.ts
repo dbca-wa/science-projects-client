@@ -66,20 +66,44 @@ export function filterByBusinessArea(
 }
 
 /**
+ * Filter projects by selected user ID.
+ * 
+ * Returns all projects if no user is selected.
+ * Matches against project leader.
+ * 
+ * @param projects - Array of projects to filter
+ * @param selectedUserId - Selected user ID (null means no filter)
+ * @returns Filtered array of projects
+ */
+export function filterByUser(
+  projects: IProjectData[],
+  selectedUserId: number | null
+): IProjectData[] {
+  // Return all projects if no user selected
+  if (selectedUserId === null) {
+    return projects;
+  }
+
+  return projects.filter((project) => project.leader === selectedUserId);
+}
+
+/**
  * Apply combined filters to projects.
  * 
- * Combines search and business area filters using AND logic.
+ * Combines search, business area, and user filters using AND logic.
  * Returns projects with isFiltered flag indicating if they match all filters.
  * 
  * @param projects - Array of projects to filter
  * @param searchTerm - Search term to match
  * @param selectedBusinessAreaIds - Set of selected business area IDs
+ * @param selectedUserId - Selected user ID (null means no filter)
  * @returns Object with filtered and all projects with isFiltered flags
  */
 export function applyCombinedFilters(
   projects: IProjectData[],
   searchTerm: string,
-  selectedBusinessAreaIds: Set<number>
+  selectedBusinessAreaIds: Set<number>,
+  selectedUserId: number | null = null
 ): {
   filteredProjects: IProjectData[];
   projectsWithFilterFlag: Array<{ project: IProjectData; isFiltered: boolean }>;
@@ -88,10 +112,13 @@ export function applyCombinedFilters(
   const searchFiltered = filterBySearch(projects, searchTerm);
 
   // Apply business area filter
-  const fullyFiltered = filterByBusinessArea(
+  const businessAreaFiltered = filterByBusinessArea(
     searchFiltered,
     selectedBusinessAreaIds
   );
+
+  // Apply user filter
+  const fullyFiltered = filterByUser(businessAreaFiltered, selectedUserId);
 
   // Create set of filtered project IDs for quick lookup
   const filteredIds = new Set(fullyFiltered.map((p) => p.id));

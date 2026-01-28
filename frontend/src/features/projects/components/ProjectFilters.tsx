@@ -321,7 +321,7 @@ export const ProjectFilters = observer(
 						</div>
 
 						{/* Right side: Remember my search and Clear button - right-aligned on mobile */}
-						<div className="flex justify-end sm:justify-start">
+						<div className="flex justify-center">
 							<SearchControls
 								saveSearch={saveSearch}
 								onToggleSaveSearch={onToggleSaveSearch}

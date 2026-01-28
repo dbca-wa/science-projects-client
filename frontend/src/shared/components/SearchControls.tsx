@@ -26,7 +26,7 @@ export const SearchControls = ({
 	className,
 }: SearchControlsProps) => {
 	return (
-		<div className={cn("", className)}>
+		<div className={cn("flex flex-col xs:flex-row xs:justify-center gap-2", className)}>
 			{/* Remember my search */}
 			<div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-muted/50">
 				<Checkbox
@@ -38,7 +38,7 @@ export const SearchControls = ({
 					htmlFor="save-search"
 					className="text-sm font-normal cursor-pointer whitespace-nowrap"
 				>
-					Remember my search
+					Remember search
 				</Label>
 			</div>
 

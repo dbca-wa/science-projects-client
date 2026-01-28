@@ -1,41 +1,25 @@
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
 import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
 import { MapFilters } from "@/features/projects/components/map/MapFilters";
-import { useMapStore } from "@/app/stores/store-context";
-import { useProjects } from "@/features/projects/hooks/useProjects";
-import { applyCombinedFilters } from "@/features/projects/utils/map-filters";
+import { useProjectMapStore } from "@/app/stores/store-context";
+import { useProjectsForMap } from "@/features/projects/hooks/useProjectsForMap";
 
 /**
- * ProjectMapPage - Building incrementally
+ * ProjectMapPage - Complete implementation
  * 
- * Progress:
- * 1. Basic page structure ✓
- * 2. Add Leaflet map ✓
- * 3. Add filter bar ✓
- * 4. Add full map with markers, layers, labels ✓
- * 5. Add floating controls button ✓
+ * Features:
+ * - Interactive Leaflet map with Western Australia focus
+ * - Modern circular markers (no traditional pins)
+ * - Comprehensive filtering (search, business areas, users)
+ * - Responsive sidebar with mobile overlay
+ * - GeoJSON layer management with popover controls
+ * - Accessibility and keyboard navigation
  */
 const ProjectMapPage = observer(() => {
-  const store = useMapStore();
-  const { data: projectsData, isLoading } = useProjects();
-
-  const projects = useMemo(() => projectsData?.projects || [], [projectsData]);
-
-  // Calculate filtered project count
-  const filteredProjectCount = useMemo(() => {
-    const { filteredProjects } = applyCombinedFilters(
-      projects,
-      store.searchTerm,
-      store.selectedBusinessAreas
-    );
-    return filteredProjects.length;
-  }, [projects, store.searchTerm, store.selectedBusinessAreas]);
-
-  // Calculate projects without location data
-  const projectsWithoutLocation = useMemo(() => {
-    return projects.filter(p => !p.areas || p.areas.length === 0).length;
-  }, [projects]);
+  const store = useProjectMapStore();
+  
+  // Get filtered projects and statistics from single API call
+  const { data: mapData, isLoading, error } = useProjectsForMap(store.apiParams);
 
   if (isLoading) {
     return (
@@ -47,11 +31,28 @@ const ProjectMapPage = observer(() => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium text-red-600">Error loading map</div>
+          <div className="text-sm text-muted-foreground mt-2">
+            Please try refreshing the page. If the problem persists, contact support.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const projects = mapData?.projects || [];
+  const totalProjects = mapData?.total_projects || 0;
+  const projectsWithoutLocation = mapData?.projects_without_location || 0;
+
   return (
     <div className="flex flex-col h-screen">
       <MapFilters 
-        projectCount={filteredProjectCount} 
-        totalProjects={projects.length}
+        projectCount={projects.length} 
+        totalProjects={totalProjects}
         projectsWithoutLocation={projectsWithoutLocation}
       />
       <FullMapContainer />

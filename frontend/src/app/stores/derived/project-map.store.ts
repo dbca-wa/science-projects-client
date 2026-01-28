@@ -1,6 +1,7 @@
 import { makeObservable, action, computed } from "mobx";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import type { MapFilters } from "@/features/projects/types/map.types";
+import type { ProjectMapSearchParams } from "@/features/projects/services/project.service";
 
 /**
  * Project Map Store State
@@ -25,6 +26,9 @@ interface ProjectMapState extends BaseStoreState {
 	showLabels: boolean;
 	showColors: boolean;
 	mapLoading: boolean;
+
+	// Marker Selection (for highlighting selected markers)
+	selectedMarkerCoords: [number, number] | null; // Coordinates of selected marker
 }
 
 /**
@@ -63,6 +67,9 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			showColors: true,
 			mapLoading: false,
 
+			// Marker Selection
+			selectedMarkerCoords: null,
+
 			// Base state
 			loading: false,
 			error: null,
@@ -91,12 +98,18 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			toggleColors: action,
 			setMapLoading: action,
 			clearFilters: action,
+			resetAllFilters: action,
 			checkAllBusinessAreas: action,
 			uncheckAllBusinessAreas: action,
+			selectMarker: action,
+			clearMarkerSelection: action,
 
 			// Computed
 			filters: computed,
+			apiParams: computed,
 			hasActiveFilters: computed,
+			selectedBusinessAreas: computed,
+			isMarkerSelected: computed,
 		});
 	}
 
@@ -268,6 +281,13 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	};
 
 	/**
+	 * Reset all filters (alias for clearFilters for better naming)
+	 */
+	resetAllFilters = (): void => {
+		this.clearFilters();
+	};
+
+	/**
 	 * Check all business areas
 	 */
 	checkAllBusinessAreas = (businessAreaIds: number[]): void => {
@@ -279,6 +299,27 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	uncheckAllBusinessAreas = (): void => {
 		this.state.selectedBusinessAreas = [];
+	};
+
+	/**
+	 * Select a marker (for highlighting)
+	 */
+	selectMarker = (coords: [number, number]): void => {
+		// If clicking the same marker, deselect it
+		if (this.state.selectedMarkerCoords && 
+			this.state.selectedMarkerCoords[0] === coords[0] && 
+			this.state.selectedMarkerCoords[1] === coords[1]) {
+			this.state.selectedMarkerCoords = null;
+		} else {
+			this.state.selectedMarkerCoords = coords;
+		}
+	};
+
+	/**
+	 * Clear marker selection
+	 */
+	clearMarkerSelection = (): void => {
+		this.state.selectedMarkerCoords = null;
 	};
 
 	/**
@@ -299,6 +340,30 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	}
 
 	/**
+	 * Get API parameters for project map queries
+	 */
+	get apiParams(): ProjectMapSearchParams {
+		return {
+			searchTerm: this.state.searchTerm || undefined,
+			locations: this.state.selectedLocations.length > 0 ? this.state.selectedLocations : undefined,
+			businessAreas: this.state.selectedBusinessAreas.length > 0 ? this.state.selectedBusinessAreas : undefined,
+			user: this.state.filterUser || undefined,
+			status: this.state.filterStatus || undefined,
+			kind: this.state.filterKind || undefined,
+			year: this.state.filterYear !== new Date().getFullYear() ? this.state.filterYear : undefined,
+			onlyActive: this.state.onlyActive || undefined,
+			onlyInactive: this.state.onlyInactive || undefined,
+		};
+	}
+
+	/**
+	 * Get selected business areas as a Set for efficient lookups
+	 */
+	get selectedBusinessAreas(): Set<number> {
+		return new Set(this.state.selectedBusinessAreas);
+	}
+
+	/**
 	 * Check if any filters are active
 	 */
 	get hasActiveFilters(): boolean {
@@ -312,6 +377,19 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			this.state.onlyActive ||
 			this.state.onlyInactive
 		);
+	}
+
+	/**
+	 * Check if a specific marker is selected
+	 */
+	get isMarkerSelected() {
+		return (coords: [number, number]): boolean => {
+			if (!this.state.selectedMarkerCoords) return false;
+			return (
+				this.state.selectedMarkerCoords[0] === coords[0] && 
+				this.state.selectedMarkerCoords[1] === coords[1]
+			);
+		};
 	}
 
 	/**
@@ -339,6 +417,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		this.state.showLabels = true;
 		this.state.showColors = true;
 		this.state.mapLoading = false;
+		this.state.selectedMarkerCoords = null;
 		this.state.loading = false;
 		this.state.error = null;
 	}
