@@ -3,6 +3,7 @@ import { Label } from "@/shared/components/ui/label";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { X } from "lucide-react";
+import { cn } from "../lib/utils";
 
 interface SearchControlsProps {
 	saveSearch: boolean;
@@ -25,7 +26,7 @@ export const SearchControls = ({
 	className,
 }: SearchControlsProps) => {
 	return (
-		<div className={className}>
+		<div className={cn("", className)}>
 			{/* Remember my search */}
 			<div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-muted/50">
 				<Checkbox
@@ -52,7 +53,10 @@ export const SearchControls = ({
 					<X className="size-4" />
 					<span className="hidden sm:inline">Clear Search</span>
 					<span className="sm:hidden">Clear</span>
-					<Badge variant="secondary" className="ml-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+					<Badge
+						variant="secondary"
+						className="ml-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+					>
 						{filterCount}
 					</Badge>
 				</Button>

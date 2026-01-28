@@ -1,3 +1,4 @@
+import { projectService } from "@/features/projects/services/project.service";
 import { Button } from "@/shared/components/ui/button";
 import {
 	DropdownMenu,
@@ -5,10 +6,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { ChevronDown, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { FaFileDownload } from "react-icons/fa";
 import { toast } from "sonner";
-import { projectService } from "@/features/projects/services/project.service";
 
 /**
  * DownloadProjectsCSVButton
@@ -20,10 +21,14 @@ export const DownloadProjectsCSVButton = () => {
 	const downloadFullCSVMutation = useMutation({
 		mutationFn: () => projectService.downloadProjectsCSV(),
 		onMutate: () => {
-			toast.loading("Generating Full Projects CSV...", { id: "csv-download" });
+			toast.loading("Generating Full Projects CSV...", {
+				id: "csv-download",
+			});
 		},
 		onSuccess: (blob) => {
-			toast.success("Full Projects CSV Downloaded", { id: "csv-download" });
+			toast.success("Full Projects CSV Downloaded", {
+				id: "csv-download",
+			});
 
 			// Handle file download
 			const downloadUrl = window.URL.createObjectURL(blob);
@@ -38,7 +43,8 @@ export const DownloadProjectsCSVButton = () => {
 		onError: (error: Error) => {
 			toast.error("Download Failed", {
 				id: "csv-download",
-				description: error.message || "Unable to download Full Projects CSV",
+				description:
+					error.message || "Unable to download Full Projects CSV",
 			});
 		},
 	});
@@ -47,10 +53,14 @@ export const DownloadProjectsCSVButton = () => {
 	const downloadAnnualReportMutation = useMutation({
 		mutationFn: () => projectService.downloadProjectsCSVAR(),
 		onMutate: () => {
-			toast.loading("Generating Annual Report CSV...", { id: "csv-download" });
+			toast.loading("Generating Annual Report CSV...", {
+				id: "csv-download",
+			});
 		},
 		onSuccess: (blob) => {
-			toast.success("Annual Report CSV Downloaded", { id: "csv-download" });
+			toast.success("Annual Report CSV Downloaded", {
+				id: "csv-download",
+			});
 
 			// Handle file download
 			const downloadUrl = window.URL.createObjectURL(blob);
@@ -65,14 +75,16 @@ export const DownloadProjectsCSVButton = () => {
 		onError: (error: Error) => {
 			toast.error("Download Failed", {
 				id: "csv-download",
-				description: error.message || "Unable to download Annual Report CSV",
+				description:
+					error.message || "Unable to download Annual Report CSV",
 			});
 		},
 	});
 
 	// Check if any mutation is running
 	const isLoading =
-		downloadFullCSVMutation.isPending || downloadAnnualReportMutation.isPending;
+		downloadFullCSVMutation.isPending ||
+		downloadAnnualReportMutation.isPending;
 
 	const handleFullDownload = () => {
 		downloadFullCSVMutation.mutate();
@@ -87,7 +99,7 @@ export const DownloadProjectsCSVButton = () => {
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant="default"
-					className="flex-1 lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
+					className="w-full lg:w-auto bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
 					disabled={isLoading}
 				>
 					{isLoading ? (
@@ -97,14 +109,14 @@ export const DownloadProjectsCSVButton = () => {
 						</>
 					) : (
 						<>
+							<FaFileDownload className="ml-1 size-4" />
 							CSV
-							<ChevronDown className="ml-1 size-4" />
 						</>
 					)}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start">
-				<DropdownMenuItem 
+				<DropdownMenuItem
 					onClick={handleFullDownload}
 					className={isLoading ? "opacity-50 cursor-not-allowed" : ""}
 					onSelect={(e) => {
@@ -113,7 +125,7 @@ export const DownloadProjectsCSVButton = () => {
 				>
 					Full
 				</DropdownMenuItem>
-				<DropdownMenuItem 
+				<DropdownMenuItem
 					onClick={handleAnnualReportDownload}
 					className={isLoading ? "opacity-50 cursor-not-allowed" : ""}
 					onSelect={(e) => {

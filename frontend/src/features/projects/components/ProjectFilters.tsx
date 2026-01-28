@@ -32,65 +32,71 @@ interface ProjectFiltersProps {
  * ProjectFilters component
  * Search input and filter dropdowns for the projects list page
  */
-export const ProjectFilters = observer(({
-	searchTerm,
-	filters,
-	filterCount,
-	saveSearch,
-	onSearchChange,
-	onFiltersChange,
-	onClearFilters,
-	onToggleSaveSearch,
-}: ProjectFiltersProps) => {
-	const { data: businessAreas, isLoading: isLoadingBusinessAreas } = useBusinessAreas();
+export const ProjectFilters = observer(
+	({
+		searchTerm,
+		filters,
+		filterCount,
+		saveSearch,
+		onSearchChange,
+		onFiltersChange,
+		onClearFilters,
+		onToggleSaveSearch,
+	}: ProjectFiltersProps) => {
+		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
+			useBusinessAreas();
 
-	// Local state for immediate UI updates
-	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+		// Local state for immediate UI updates
+		const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
-	// Sync local value when prop changes
-	useEffect(() => {
-		setLocalSearchTerm(searchTerm);
-	}, [searchTerm]);
+		// Sync local value when prop changes
+		useEffect(() => {
+			setLocalSearchTerm(searchTerm);
+		}, [searchTerm]);
 
-	// Debounce the search callback (300ms)
-	const debouncedOnSearchChange = useMemo(
-		() => debounce(onSearchChange, 300),
-		[onSearchChange]
-	);
+		// Debounce the search callback (300ms)
+		const debouncedOnSearchChange = useMemo(
+			() => debounce(onSearchChange, 300),
+			[onSearchChange],
+		);
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = e.target.value;
-		setLocalSearchTerm(newValue);
-		debouncedOnSearchChange(newValue);
-	};
+		const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+			const newValue = e.target.value;
+			setLocalSearchTerm(newValue);
+			debouncedOnSearchChange(newValue);
+		};
 
-	const handleUserChange = (userId: number | null) => {
-		onFiltersChange({ user: userId });
-	};
+		const handleUserChange = (userId: number | null) => {
+			onFiltersChange({ user: userId });
+		};
 
-	const handleActiveChange = () => {
-		if (!filters.onlyActive) {
-			onFiltersChange({ onlyActive: true, onlyInactive: false });
-		} else {
-			onFiltersChange({ onlyActive: false, onlyInactive: false });
-		}
-	};
+		const handleActiveChange = () => {
+			if (!filters.onlyActive) {
+				onFiltersChange({ onlyActive: true, onlyInactive: false });
+			} else {
+				onFiltersChange({ onlyActive: false, onlyInactive: false });
+			}
+		};
 
-	const handleInactiveChange = () => {
-		if (!filters.onlyInactive) {
-			onFiltersChange({ onlyActive: false, onlyInactive: true });
-		} else {
-			onFiltersChange({ onlyActive: false, onlyInactive: false });
-		}
-	};
+		const handleInactiveChange = () => {
+			if (!filters.onlyInactive) {
+				onFiltersChange({ onlyActive: false, onlyInactive: true });
+			} else {
+				onFiltersChange({ onlyActive: false, onlyInactive: false });
+			}
+		};
 
-	// Sort business areas by division
-	const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
-	const sortedBusinessAreas = businessAreas
-		?.slice()
-		.sort((a, b) => {
-			const aDivSlug = typeof a.division === "object" && a.division?.slug ? a.division.slug : "";
-			const bDivSlug = typeof b.division === "object" && b.division?.slug ? b.division.slug : "";
+		// Sort business areas by division
+		const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+		const sortedBusinessAreas = businessAreas?.slice().sort((a, b) => {
+			const aDivSlug =
+				typeof a.division === "object" && a.division?.slug
+					? a.division.slug
+					: "";
+			const bDivSlug =
+				typeof b.division === "object" && b.division?.slug
+					? b.division.slug
+					: "";
 
 			const aIndex = orderedDivisionSlugs.indexOf(aDivSlug);
 			const bIndex = orderedDivisionSlugs.indexOf(bDivSlug);
@@ -102,14 +108,17 @@ export const ProjectFilters = observer(({
 			return a.name.localeCompare(b.name);
 		});
 
-	// Generate year options (current year back to 2000)
-	const currentYear = new Date().getFullYear();
-	const years = Array.from({ length: currentYear - 1999 }, (_, i) => currentYear - i);
+		// Generate year options (current year back to 2000)
+		const currentYear = new Date().getFullYear();
+		const years = Array.from(
+			{ length: currentYear - 1999 },
+			(_, i) => currentYear - i,
+		);
 
-	return (
-		<div className="border border-gray-300 dark:border-gray-500 w-full select-none">
-			<div className="p-4 w-full space-y-3">
-				{/* Row 1: User Filter and Search (side by side on lg+, stacked on mobile) */}
+		return (
+			<div className="border border-gray-300 dark:border-gray-500 w-full select-none">
+				<div className="p-4 w-full space-y-3">
+					{/* Row 1: User Filter and Search (side by side on lg+, stacked on mobile) */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 						{/* Search Input - FIRST on mobile, right on desktop - EMPHASIZED */}
 						<div className="relative w-full order-1 lg:order-2">
@@ -147,7 +156,10 @@ export const ProjectFilters = observer(({
 						<Select
 							value={filters.businessArea || "All"}
 							onValueChange={(value) =>
-								onFiltersChange({ businessArea: value === "All" ? "All" : value })
+								onFiltersChange({
+									businessArea:
+										value === "All" ? "All" : value,
+								})
 							}
 							disabled={isLoadingBusinessAreas}
 						>
@@ -155,10 +167,16 @@ export const ProjectFilters = observer(({
 								<SelectValue placeholder="All Business Areas" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="All">All Business Areas</SelectItem>
+								<SelectItem value="All">
+									All Business Areas
+								</SelectItem>
 								{sortedBusinessAreas?.map((ba) => (
-									<SelectItem key={ba.id} value={ba.id!.toString()}>
-										{typeof ba.division === "object" && ba.division?.slug
+									<SelectItem
+										key={ba.id}
+										value={ba.id!.toString()}
+									>
+										{typeof ba.division === "object" &&
+										ba.division?.slug
 											? `[${ba.division.slug}] `
 											: ""}
 										{ba.name}
@@ -172,7 +190,9 @@ export const ProjectFilters = observer(({
 						<Select
 							value={filters.year?.toString() || "0"}
 							onValueChange={(value) =>
-								onFiltersChange({ year: value === "0" ? 0 : Number(value) })
+								onFiltersChange({
+									year: value === "0" ? 0 : Number(value),
+								})
 							}
 						>
 							<SelectTrigger className="w-full text-sm rounded-md">
@@ -181,7 +201,10 @@ export const ProjectFilters = observer(({
 							<SelectContent>
 								<SelectItem value="0">All Years</SelectItem>
 								{years.map((year) => (
-									<SelectItem key={year} value={year.toString()}>
+									<SelectItem
+										key={year}
+										value={year.toString()}
+									>
 										{year}
 									</SelectItem>
 								))}
@@ -192,22 +215,41 @@ export const ProjectFilters = observer(({
 						<Select
 							value={filters.projectStatus || "All"}
 							onValueChange={(value) =>
-								onFiltersChange({ projectStatus: value === "All" ? "All" : value })
+								onFiltersChange({
+									projectStatus:
+										value === "All" ? "All" : value,
+								})
 							}
 						>
 							<SelectTrigger className="w-full text-sm rounded-md">
 								<SelectValue placeholder="All Statuses" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="All">All Statuses</SelectItem>
+								<SelectItem value="All">
+									All Statuses
+								</SelectItem>
 								<SelectItem value="new">New</SelectItem>
-								<SelectItem value="pending">Pending Project Plan</SelectItem>
-								<SelectItem value="active">Active (Approved)</SelectItem>
-								<SelectItem value="updating">Update Requested</SelectItem>
-								<SelectItem value="closure_requested">Closure Requested</SelectItem>
-								<SelectItem value="completed">Completed and Closed</SelectItem>
-								<SelectItem value="terminated">Terminated</SelectItem>
-								<SelectItem value="suspended">Suspended</SelectItem>
+								<SelectItem value="pending">
+									Pending Project Plan
+								</SelectItem>
+								<SelectItem value="active">
+									Active (Approved)
+								</SelectItem>
+								<SelectItem value="updating">
+									Update Requested
+								</SelectItem>
+								<SelectItem value="closure_requested">
+									Closure Requested
+								</SelectItem>
+								<SelectItem value="completed">
+									Completed and Closed
+								</SelectItem>
+								<SelectItem value="terminated">
+									Terminated
+								</SelectItem>
+								<SelectItem value="suspended">
+									Suspended
+								</SelectItem>
 							</SelectContent>
 						</Select>
 
@@ -215,7 +257,10 @@ export const ProjectFilters = observer(({
 						<Select
 							value={filters.projectKind || "All"}
 							onValueChange={(value) =>
-								onFiltersChange({ projectKind: value === "All" ? "All" : value })
+								onFiltersChange({
+									projectKind:
+										value === "All" ? "All" : value,
+								})
 							}
 						>
 							<SelectTrigger className="w-full text-sm rounded-md">
@@ -223,10 +268,18 @@ export const ProjectFilters = observer(({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="All">All Kinds</SelectItem>
-								<SelectItem value="core_function">Core Function</SelectItem>
-								<SelectItem value="science">Science Project</SelectItem>
-								<SelectItem value="student">Student Project</SelectItem>
-								<SelectItem value="external">External Project</SelectItem>
+								<SelectItem value="core_function">
+									Core Function
+								</SelectItem>
+								<SelectItem value="science">
+									Science Project
+								</SelectItem>
+								<SelectItem value="student">
+									Student Project
+								</SelectItem>
+								<SelectItem value="external">
+									External Project
+								</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
@@ -234,7 +287,7 @@ export const ProjectFilters = observer(({
 					{/* Row 3: Active/Inactive Checkboxes and Search Controls */}
 					<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
 						{/* Left side: Active/Inactive Checkboxes */}
-						<div className="flex gap-4 items-center">
+						<div className="flex flex-row gap-4 items-center">
 							<div className="flex items-center space-x-2">
 								<Checkbox
 									id="active-filter"
@@ -280,5 +333,6 @@ export const ProjectFilters = observer(({
 					</div>
 				</div>
 			</div>
-	);
-});
+		);
+	},
+);

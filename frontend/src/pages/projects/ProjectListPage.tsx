@@ -8,7 +8,10 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { NoResultsState } from "@/shared/components/NoResultsState";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { Button } from "@/shared/components/ui/button";
-import { useAuthStore, useProjectSearchStore } from "@/app/stores/store-context";
+import {
+	useAuthStore,
+	useProjectSearchStore,
+} from "@/app/stores/store-context";
 import { Loader2, MapPin, Plus } from "lucide-react";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
@@ -81,7 +84,9 @@ const ProjectListPage = observer(() => {
 		projectSearchStore.setSearchTerm(value);
 	};
 
-	const handleFiltersChange = (newFilters: Partial<typeof projectSearchStore.state.filters>) => {
+	const handleFiltersChange = (
+		newFilters: Partial<typeof projectSearchStore.state.filters>,
+	) => {
 		projectSearchStore.setFilters(newFilters);
 	};
 
@@ -100,16 +105,25 @@ const ProjectListPage = observer(() => {
 
 	// Error state
 	if (error) {
-		return <ErrorState message="Failed to load projects. Please try again." onRetry={refetch} />;
+		return (
+			<ErrorState
+				message="Failed to load projects. Please try again."
+				onRetry={refetch}
+			/>
+		);
 	}
 
 	// Empty state (no projects at all)
 	const showEmptyState =
-		!isLoading && data?.projects.length === 0 && !projectSearchStore.hasActiveFilters;
+		!isLoading &&
+		data?.projects.length === 0 &&
+		!projectSearchStore.hasActiveFilters;
 
 	// No results state (search/filter returned nothing)
 	const showNoResults =
-		!isLoading && data?.projects.length === 0 && projectSearchStore.hasActiveFilters;
+		!isLoading &&
+		data?.projects.length === 0 &&
+		projectSearchStore.hasActiveFilters;
 
 	return (
 		<div className="w-full">
@@ -123,30 +137,30 @@ const ProjectListPage = observer(() => {
 						Projects ({projectSearchStore.state.totalResults})
 					</h1>
 					<p className="text-sm text-gray-600 dark:text-gray-200">
-						Ctrl + Click to open projects in another tab and keep filters.
+						Ctrl + Click to open projects in another tab and keep
+						filters.
 					</p>
 				</div>
 
-				{/* Action buttons - admin only */}
-				{authStore.isSuperuser && (
-					<div className="flex w-full lg:w-auto lg:flex-1 justify-end items-center gap-2">
-						<Button
-							onClick={() => navigate("/projects/map")}
-							className="flex-1 lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
-						>
-							<MapPin className="mr-1 size-4" />
-							Map
-						</Button>
-						<DownloadProjectsCSVButton />
-						<Button
-							onClick={() => navigate("/projects/create")}
-							className="flex-1 lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
-						>
-							<Plus className="mr-1 size-4" />
-							New Project
-						</Button>
-					</div>
-				)}
+				{/* Action buttons */}
+				<div className="flex w-full lg:w-auto lg:flex-1 flex-col lg:flex-row justify-end items-stretch lg:items-center gap-2">
+					<Button
+						onClick={() => navigate("/projects/map")}
+						className="w-full lg:w-auto lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+					>
+						<MapPin className="mr-1 size-4" />
+						Map
+					</Button>
+					{/* Project data - admin only */}
+					{authStore.isSuperuser && <DownloadProjectsCSVButton />}
+					<Button
+						onClick={() => navigate("/projects/create")}
+						className="w-full lg:w-auto lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
+					>
+						<Plus className="mr-1 size-4" />
+						New Project
+					</Button>
+				</div>
 			</div>
 
 			{/* Filters */}
@@ -169,7 +183,12 @@ const ProjectListPage = observer(() => {
 			)}
 
 			{/* Project list */}
-			{!isLoading && <ProjectList projects={data?.projects || []} isLoading={isLoading} />}
+			{!isLoading && (
+				<ProjectList
+					projects={data?.projects || []}
+					isLoading={isLoading}
+				/>
+			)}
 
 			{/* Empty state */}
 			{showEmptyState && (
@@ -200,4 +219,3 @@ const ProjectListPage = observer(() => {
 });
 
 export default ProjectListPage;
-
