@@ -129,18 +129,20 @@ export const MapFilters = observer(({
 
         {/* Project Stats and Controls */}
         <div className="space-y-3">
-          {/* Project Statistics */}
-          <div className="text-sm text-muted-foreground">
-            <div>
-              <span className="font-medium text-foreground">{projectCount}</span> of{" "}
-              <span className="font-medium text-foreground">{totalProjects}</span> projects shown
-            </div>
-            {projectsWithoutLocation > 0 && (
-              <div className="text-xs mt-1">
-                {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} without location data
+          {/* Project Statistics - only show in fullscreen mode */}
+          {isFullscreen && (
+            <div className="text-sm text-muted-foreground">
+              <div>
+                <span className="font-medium text-foreground">{projectCount}</span> of{" "}
+                <span className="font-medium text-foreground">{totalProjects}</span> projects shown
               </div>
-            )}
-          </div>
+              {projectsWithoutLocation > 0 && (
+                <div className="text-xs mt-1">
+                  {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} without location data
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Search Controls */}
           <SearchControls

@@ -45,7 +45,7 @@ const MapControlButtons = observer(() => {
 	};
 
 	return (
-		<div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+		<div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
 			{/* Layer Controls - Top */}
 			<LayerPopover />
 

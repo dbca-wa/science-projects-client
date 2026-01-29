@@ -26,7 +26,7 @@ export const SearchControls = ({
 	className,
 }: SearchControlsProps) => {
 	return (
-		<div className={cn("flex flex-col xs:flex-row xs:justify-center gap-2", className)}>
+		<div className={cn("flex flex-col xs:flex-row gap-2", className)}>
 			{/* Remember my search */}
 			<div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-muted/50">
 				<Checkbox
