@@ -213,7 +213,7 @@ function MultiProjectPopup({ projects, onClose }: { projects: IProjectData[]; on
 					return (
 						<div
 							key={project.id}
-							className="group relative py-2 px-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+							className="group relative py-2 px-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
 						>
 							{/* Animated caret indicator - positioned at first line height */}
 							<div className="absolute left-0 top-2 translate-y-1 w-1 h-0 bg-blue-500 rounded-full transition-all duration-300 ease-out group-hover:h-4 group-focus-within:h-4"></div>
