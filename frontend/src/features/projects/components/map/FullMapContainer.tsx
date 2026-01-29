@@ -12,6 +12,7 @@ import { ProjectMarker } from "./ProjectMarker";
 import { RegionLayer } from "./RegionLayer";
 import { RegionLabel } from "./RegionLabel";
 import { MapControls } from "./MapControls";
+import { MapStats } from "./MapStats";
 import { GEOJSON_PROPERTY_NAMES } from "@/features/projects/types/map.types";
 
 /**
@@ -59,6 +60,9 @@ const LAYER_TO_GEOJSON_KEY: Record<string, keyof typeof GEOJSON_PROPERTY_NAMES> 
 
 interface FullMapContainerProps {
   fullscreen?: boolean;
+  projectCount?: number;
+  totalProjects?: number;
+  projectsWithoutLocation?: number;
 }
 
 /**
@@ -74,7 +78,12 @@ interface FullMapContainerProps {
  * - Ensures map instance persists across filter changes
  * - Includes floating MapControls button
  */
-export const FullMapContainer = observer(({ fullscreen = false }: FullMapContainerProps) => {
+export const FullMapContainer = observer(({ 
+  fullscreen = false,
+  projectCount = 0,
+  totalProjects = 0,
+  projectsWithoutLocation = 0
+}: FullMapContainerProps) => {
   const store = useProjectMapStore();
   const mapRef = useRef<LeafletMapType | null>(null);
 
@@ -158,7 +167,7 @@ export const FullMapContainer = observer(({ fullscreen = false }: FullMapContain
   }
 
   return (
-    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative`}>
+    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative z-10`}>
       <LeafletMap
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
@@ -223,6 +232,15 @@ export const FullMapContainer = observer(({ fullscreen = false }: FullMapContain
         {/* Map controls inside the map container */}
         <MapControls />
       </LeafletMap>
+
+      {/* Map statistics overlay - only show in normal (non-fullscreen) mode */}
+      {!fullscreen && (
+        <MapStats
+          projectCount={projectCount}
+          totalProjects={totalProjects}
+          projectsWithoutLocation={projectsWithoutLocation}
+        />
+      )}
     </div>
   );
 });

@@ -106,7 +106,11 @@ const ProjectMapPage = observer(() => {
           projectsWithoutLocation={projectsWithoutLocation}
         />
         {/* Map container - takes remaining space */}
-        <FullMapContainer />
+        <FullMapContainer 
+          projectCount={projects.length}
+          totalProjects={totalProjects}
+          projectsWithoutLocation={projectsWithoutLocation}
+        />
       </div>
     );
   }
@@ -120,7 +124,7 @@ const ProjectMapPage = observer(() => {
       </div>
       
       {/* Floating sidebar */}
-      <div className="absolute top-4 left-4 w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-[1001]">
+      <div className="absolute top-4 left-4 w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40">
         {/* Sidebar header */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold">Project Map</h2>

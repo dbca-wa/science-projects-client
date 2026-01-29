@@ -278,3 +278,26 @@
 	margin: 12px 16px !important;
 	line-height: 1.4 !important;
 }
+
+/* Override Leaflet's default high z-index values to ensure navigation menu works */
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane,
+.leaflet-control-container {
+	z-index: auto !important;
+}
+
+/* Ensure popups still appear above markers but below navigation */
+.leaflet-popup-pane {
+	z-index: 20 !important;
+}
+
+/* Ensure controls appear above map but below navigation */
+.leaflet-control-container {
+	z-index: 25 !important;
+}
