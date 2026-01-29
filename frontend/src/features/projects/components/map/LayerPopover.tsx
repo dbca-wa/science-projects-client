@@ -130,7 +130,7 @@ export const LayerPopover = observer(() => {
 					<Button
 						variant="outline"
 						size="sm"
-						className="gap-2 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow"
+						className="gap-2 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 						aria-label="Layer controls - toggle map layer visibility and display options"
 					>
 						<Layers className="h-4 w-4" />

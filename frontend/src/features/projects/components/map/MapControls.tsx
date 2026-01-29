@@ -55,7 +55,7 @@ const MapControlButtons = observer(() => {
 					variant="outline"
 					size="sm"
 					onClick={handleZoomIn}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 					aria-label="Zoom in"
 					title="Zoom in"
 				>
@@ -65,7 +65,7 @@ const MapControlButtons = observer(() => {
 					variant="outline"
 					size="sm"
 					onClick={handleZoomOut}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 					aria-label="Zoom out"
 					title="Zoom out"
 				>
@@ -79,10 +79,10 @@ const MapControlButtons = observer(() => {
 					variant="outline"
 					size="sm"
 					onClick={handleMapFullscreen}
-					className={`flex-1 h-8 p-0 shadow-lg hover:shadow-xl transition-shadow ${
+					className={`flex-1 h-8 p-0 shadow-lg hover:shadow-xl transition-all ${
 						isMapFullscreen 
 							? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-950/50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-950 dark:hover:border-blue-800' 
-							: 'bg-white dark:bg-gray-800'
+							: 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
 					}`}
 					aria-label={isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"}
 					title={isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"}
@@ -98,7 +98,7 @@ const MapControlButtons = observer(() => {
 					variant="outline"
 					size="sm"
 					onClick={handleResetView}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow"
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 					aria-label="Reset map view"
 					title="Reset to Western Australia view"
 				>
