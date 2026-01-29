@@ -25,7 +25,7 @@ export const MapStats = observer(({
       </div>
       {projectsWithoutLocation > 0 && (
         <div className="text-xs mt-1">
-          {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} without location data
+          {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} lack location data
         </div>
       )}
     </div>

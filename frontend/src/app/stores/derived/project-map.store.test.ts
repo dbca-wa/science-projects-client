@@ -37,8 +37,8 @@ describe("ProjectMapStore", () => {
       expect(store.state.showColors).toBe(true);
     });
 
-    it("should initialize with current year filter", () => {
-      expect(store.state.filterYear).toBe(new Date().getFullYear());
+    it("should initialize with year filter as 0 (All Years)", () => {
+      expect(store.state.filterYear).toBe(0);
     });
   });
 
@@ -227,7 +227,7 @@ describe("ProjectMapStore", () => {
       expect(filters.search).toBe("test");
       expect(filters.businessAreas).toEqual([1]);
       expect(filters.user).toBe(123);
-      expect(filters.year).toBe(new Date().getFullYear());
+      expect(filters.year).toBe(0);
     });
   });
 

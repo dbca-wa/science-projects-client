@@ -6,6 +6,7 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
 import { Layers, Eye, EyeOff, Palette } from "lucide-react";
 import { useProjectMapStore } from "@/app/stores/store-context";
+import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
 /**
  * Layer type used by the store (kebab-case format)
  */
@@ -101,22 +102,32 @@ export const LayerPopover = observer(() => {
 	};
 
 	// Handle layer toggle
-	const handleLayerToggle = (layerType: StoreLayerType, checked: boolean) => {
+	const handleLayerToggle = (layerType: StoreLayerType, checked: boolean, e?: React.MouseEvent) => {
+		if (e) e.stopPropagation();
+		
 		if (checked) {
 			store.showLayer(layerType);
 		} else {
 			store.hideLayer(layerType);
 		}
+		
+		// Announce to screen readers
+		const layerName = LAYER_NAMES[layerType];
+		mapAnnouncements.layerToggle(layerName, checked);
 	};
 
 	// Handle show all layers
-	const handleShowAllLayers = () => {
+	const handleShowAllLayers = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		store.showAllLayers();
+		mapAnnouncements.allLayersToggle('show');
 	};
 
 	// Handle hide all layers
-	const handleHideAllLayers = () => {
+	const handleHideAllLayers = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		store.hideAllLayers();
+		mapAnnouncements.allLayersToggle('hide');
 	};
 
 	// Check if all layers are visible
@@ -130,18 +141,22 @@ export const LayerPopover = observer(() => {
 					<Button
 						variant="outline"
 						size="sm"
-						className="gap-2 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+						className="flex items-center gap-2 h-8 px-3 w-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 						aria-label="Layer controls - toggle map layer visibility and display options"
 					>
 						<Layers className="h-4 w-4" />
-						Layers
+						<span className="text-xs font-medium">Layers</span>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent 
-					className="w-80 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+					className="w-72 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
 					align="end"
+					alignOffset={0}
 					sideOffset={8}
+					avoidCollisions={true}
+					collisionPadding={8}
 					onKeyDown={handleKeyDown}
+					onClick={(e) => e.stopPropagation()}
 				>
 					<div className="space-y-4">
 						{/* Header */}
@@ -178,7 +193,11 @@ export const LayerPopover = observer(() => {
 								const layerColor = LAYER_COLORS[layerType];
 
 								return (
-									<div key={layerType} className="flex items-center space-x-3">
+									<div 
+										key={layerType} 
+										className="flex items-center space-x-3"
+										onClick={(e) => e.stopPropagation()}
+									>
 										<Checkbox
 											id={`layer-${layerType}`}
 											checked={isVisible}
@@ -235,7 +254,10 @@ export const LayerPopover = observer(() => {
 								<Switch
 									id="show-labels"
 									checked={store.state.showLabels}
-									onCheckedChange={store.toggleLabels}
+									onCheckedChange={(checked) => {
+										store.toggleLabels();
+										mapAnnouncements.displayOptionToggle('labels', checked);
+									}}
 									aria-describedby="show-labels-desc"
 								/>
 							</div>
@@ -260,7 +282,10 @@ export const LayerPopover = observer(() => {
 								<Switch
 									id="show-colors"
 									checked={store.state.showColors}
-									onCheckedChange={store.toggleColors}
+									onCheckedChange={(checked) => {
+										store.toggleColors();
+										mapAnnouncements.displayOptionToggle('colors', checked);
+									}}
 									aria-describedby="show-colors-desc"
 								/>
 							</div>

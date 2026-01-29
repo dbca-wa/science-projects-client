@@ -1,5 +1,5 @@
 import { ImUsers } from "react-icons/im";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleLayout } from "../ToggleLayout";
@@ -49,6 +49,16 @@ export default function TraditionalHeaderContent({
             <span className="flex items-center gap-3">
               <CgBrowse className="text-xl" />
               <span>Browse Projects</span>
+            </span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+            onClick={() => navigateAndClose("/projects/map")}
+          >
+            <span className="flex items-center gap-3">
+              <FaMapMarkedAlt className="text-xl" />
+              <span>Project Map</span>
             </span>
           </Button>
           <Button

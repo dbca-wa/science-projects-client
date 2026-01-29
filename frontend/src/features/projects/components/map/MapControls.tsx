@@ -4,7 +4,53 @@ import { useMap } from "react-leaflet";
 import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { LayerPopover } from "./LayerPopover";
+import { HeatmapToggle } from "./HeatmapToggle";
 import { useProjectMapStore } from "@/app/stores/store-context";
+import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
+
+/**
+ * ZoomControls component
+ * 
+ * Zoom controls positioned in the bottom-right corner where Leaflet attribution used to be.
+ */
+const ZoomControls = observer(() => {
+	const map = useMap();
+
+	const handleZoomIn = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		map.zoomIn();
+	};
+
+	const handleZoomOut = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		map.zoomOut();
+	};
+
+	return (
+		<div className="absolute bottom-4 right-4 z-30 flex flex-col gap-1">
+			<Button
+				variant="outline"
+				size="sm"
+				onClick={handleZoomIn}
+				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+				aria-label="Zoom in"
+				title="Zoom in"
+			>
+				<ZoomIn className="h-4 w-4" />
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				onClick={handleZoomOut}
+				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+				aria-label="Zoom out"
+				title="Zoom out"
+			>
+				<ZoomOut className="h-4 w-4" />
+			</Button>
+		</div>
+	);
+});
 
 /**
  * MapControlButtons component
@@ -35,47 +81,39 @@ const MapControlButtons = observer(() => {
 		map.zoomOut();
 	};
 
-	const handleMapFullscreen = () => {
+	const handleMapFullscreen = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		const wasFullscreen = store.state.mapFullscreen;
 		store.toggleMapFullscreen();
+		
+		// Announce the change after a brief delay to ensure state has updated
+		setTimeout(() => {
+			mapAnnouncements.fullscreenToggle(!wasFullscreen);
+		}, 100);
 	};
 
-	const handleResetView = () => {
+	const handleResetView = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		// Reset to Western Australia view
 		map.setView([-25.2744, 122.2402], 6);
+		mapAnnouncements.viewReset();
 	};
 
 	return (
 		<div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
-			{/* Layer Controls - Top */}
-			<LayerPopover />
-
-			{/* Zoom Controls - Individual buttons in same row, matching layers button width */}
-			<div className="flex gap-1">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={handleZoomIn}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-					aria-label="Zoom in"
-					title="Zoom in"
-				>
-					<ZoomIn className="h-4 w-4" />
-				</Button>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={handleZoomOut}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-					aria-label="Zoom out"
-					title="Zoom out"
-				>
-					<ZoomOut className="h-4 w-4" />
-				</Button>
-			</div>
-
 			{/* Map Actions - Fullscreen and Reset in same row, matching layers button width */}
 			<div className="flex gap-1">
 				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleResetView}
+					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+					aria-label="Reset map view"
+					title="Reset to Western Australia view"
+				>
+					<RotateCcw className="h-4 w-4" />
+				</Button>
+        		<Button
 					variant="outline"
 					size="sm"
 					onClick={handleMapFullscreen}
@@ -93,18 +131,13 @@ const MapControlButtons = observer(() => {
 						<Maximize className="h-4 w-4" />
 					)}
 				</Button>
-				
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={handleResetView}
-					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-					aria-label="Reset map view"
-					title="Reset to Western Australia view"
-				>
-					<RotateCcw className="h-4 w-4" />
-				</Button>
 			</div>
+
+			{/* Heatmap Toggle - Full width button */}
+			<HeatmapToggle />
+			{/* Layer Controls - Top */}
+			<LayerPopover />
+
 		</div>
 	);
 });
@@ -114,16 +147,22 @@ const MapControlButtons = observer(() => {
  * 
  * Floating action buttons positioned in the top-right corner of the map.
  * Provides map interaction controls and layer management.
+ * Zoom controls are positioned in the bottom-right corner.
  * 
  * Features:
- * - Zoom in/out buttons (properly grouped)
  * - Map fullscreen toggle (not browser fullscreen)
  * - Reset view button (fit all markers)
  * - Layer controls via LayerPopover
+ * - Zoom in/out buttons (bottom-right corner)
  * - Proper ARIA labels and keyboard support
  * 
  * Note: This component must be rendered inside a MapContainer to access the map instance.
  */
 export const MapControls = observer(() => {
-	return <MapControlButtons />;
+	return (
+		<>
+			<MapControlButtons />
+			<ZoomControls />
+		</>
+	);
 });

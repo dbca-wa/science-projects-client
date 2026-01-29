@@ -255,49 +255,116 @@
 	color: #1f2937 !important;
 	border-radius: 8px !important;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+	z-index: 1000 !important;
+	position: relative !important;
+}
+
+/* Ensure controls appear above map but below navigation */
+.leaflet-control-container {
+	z-index: 25 !important;
 }
 
 .dark .leaflet-popup-content-wrapper {
 	background: #1f2937 !important;
 	color: #f9fafb !important;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-
-.leaflet-popup-tip {
-	background: white !important;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-.dark .leaflet-popup-tip {
-	background: #1f2937 !important;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+	z-index: 1000 !important;
+	position: relative !important;
 }
 
 /* Ensure popup content has proper padding and styling */
 .leaflet-popup-content {
 	margin: 12px 16px !important;
 	line-height: 1.4 !important;
+	z-index: 1000 !important;
+	position: relative !important;
 }
 
 /* Override Leaflet's default high z-index values to ensure navigation menu works */
 .leaflet-pane,
 .leaflet-map-pane,
-.leaflet-tile-pane,
-.leaflet-overlay-pane,
-.leaflet-shadow-pane,
-.leaflet-marker-pane,
-.leaflet-tooltip-pane,
-.leaflet-popup-pane,
-.leaflet-control-container {
+.leaflet-tile-pane {
 	z-index: auto !important;
 }
 
-/* Ensure popups still appear above markers but below navigation */
-.leaflet-popup-pane {
+/* Force specific z-index values for proper layering */
+.leaflet-overlay-pane {
+	z-index: 10 !important;
+}
+
+.leaflet-shadow-pane {
+	z-index: 5 !important;
+}
+
+.leaflet-marker-pane {
+	z-index: 15 !important;
+}
+
+.leaflet-tooltip-pane {
 	z-index: 20 !important;
 }
 
-/* Ensure controls appear above map but below navigation */
 .leaflet-control-container {
 	z-index: 25 !important;
+}
+
+/* Ensure popups appear above everything on the map but below navigation */
+.leaflet-popup-pane {
+	z-index: 1000 !important;
+}
+
+/* Ensure popup wrapper has high z-index */
+.leaflet-popup {
+	z-index: 1000 !important;
+}
+
+/* Force popup to appear above all map content */
+.leaflet-popup-pane .leaflet-popup {
+	z-index: 1000 !important;
+}
+
+/* Ensure popup tip also has high z-index */
+.leaflet-popup-tip {
+	background: white !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+	z-index: 1000 !important;
+}
+
+.dark .leaflet-popup-tip {
+	background: #1f2937 !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+	z-index: 1000 !important;
+}
+
+/* Remove focus outline from map layer areas */
+.leaflet-interactive:focus {
+	outline: none !important;
+}
+
+/* Remove focus outline from SVG paths in layers */
+.leaflet-overlay-pane svg path:focus {
+	outline: none !important;
+}
+
+/* Remove focus outline from all interactive map elements */
+.leaflet-overlay-pane path,
+.leaflet-overlay-pane polygon,
+.leaflet-overlay-pane polyline,
+.leaflet-overlay-pane circle,
+.leaflet-overlay-pane rect {
+	outline: none !important;
+}
+
+/* Remove any browser default focus styling on map elements */
+.leaflet-container a:focus,
+.leaflet-container button:focus,
+.leaflet-container input:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+/* Ensure no focus rings appear on any map interactive elements */
+.leaflet-container *:focus {
+	outline: none !important;
+	box-shadow: none !important;
 }
