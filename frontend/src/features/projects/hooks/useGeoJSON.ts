@@ -5,12 +5,24 @@ import { logger } from "@/shared/services/logger.service";
 
 /**
  * Cache for loaded GeoJSON data
- * Prevents redundant network requests
+ * Prevents redundant network requests and improves performance
  */
 const geoJsonCache: Partial<Record<GeoJSONLayerType, GeoJSON.FeatureCollection>> = {};
 
 /**
- * Load a single GeoJSON file
+ * Cache timestamps to track when data was loaded
+ * Allows for cache invalidation if needed
+ */
+const cacheTimestamps: Partial<Record<GeoJSONLayerType, number>> = {};
+
+/**
+ * Maximum cache age in milliseconds (30 minutes)
+ * After this time, data will be reloaded from server
+ */
+const CACHE_MAX_AGE = 30 * 60 * 1000;
+
+/**
+ * Load a single GeoJSON file with caching and cache invalidation
  * 
  * @param layerType - Type of GeoJSON layer to load
  * @returns GeoJSON FeatureCollection or null if load fails
@@ -18,10 +30,16 @@ const geoJsonCache: Partial<Record<GeoJSONLayerType, GeoJSON.FeatureCollection>>
 async function loadGeoJSON(
 	layerType: GeoJSONLayerType
 ): Promise<GeoJSON.FeatureCollection | null> {
-	// Check cache first
-	if (geoJsonCache[layerType]) {
-		logger.debug(`Using cached GeoJSON data for ${layerType}`);
-		return geoJsonCache[layerType]!;
+	// Check cache first and validate age
+	const cachedData = geoJsonCache[layerType];
+	const cacheTime = cacheTimestamps[layerType];
+	const now = Date.now();
+	
+	if (cachedData && cacheTime && (now - cacheTime) < CACHE_MAX_AGE) {
+		logger.debug(`Using cached GeoJSON data for ${layerType}`, {
+			cacheAge: Math.round((now - cacheTime) / 1000) + 's'
+		});
+		return cachedData;
 	}
 
 	try {
@@ -34,11 +52,18 @@ async function loadGeoJSON(
 
 		const data = await response.json();
 
-		// Cache the data
+		// Validate GeoJSON structure
+		if (!data.features || !Array.isArray(data.features)) {
+			throw new Error(`Invalid GeoJSON structure for ${layerType}`);
+		}
+
+		// Cache the data with timestamp
 		geoJsonCache[layerType] = data;
+		cacheTimestamps[layerType] = now;
 
 		logger.info(`Loaded GeoJSON data for ${layerType}`, {
-			featureCount: data.features?.length || 0,
+			featureCount: data.features.length,
+			cacheUpdated: true,
 		});
 
 		return data;
@@ -47,6 +72,13 @@ async function loadGeoJSON(
 			errorMessage: error instanceof Error ? error.message : String(error),
 			path: GEOJSON_PATHS[layerType],
 		});
+		
+		// Return cached data if available, even if expired
+		if (geoJsonCache[layerType]) {
+			logger.warn(`Using expired cache for ${layerType} due to load failure`);
+			return geoJsonCache[layerType]!;
+		}
+		
 		return null;
 	}
 }

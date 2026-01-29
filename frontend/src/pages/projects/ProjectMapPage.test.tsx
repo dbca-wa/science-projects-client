@@ -51,6 +51,7 @@ Object.defineProperty(window, 'localStorage', {
 const mockStore = {
   state: {
     mapFullscreen: false,
+    filtersMinimized: false,
     searchTerm: "",
     selectedBusinessAreas: [],
     filterUser: null,
@@ -59,6 +60,7 @@ const mockStore = {
   apiParams: {},
   selectedBusinessAreasArray: [],
   toggleMapFullscreen: vi.fn(),
+  toggleFiltersMinimized: vi.fn(),
   setSearchTerm: vi.fn(),
   toggleBusinessArea: vi.fn(),
   setFilterUser: vi.fn(),
@@ -73,6 +75,7 @@ describe("ProjectMapPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockStore.state.mapFullscreen = false;
+    mockStore.state.filtersMinimized = false;
     mockStore.state.searchTerm = "";
     mockStore.state.selectedBusinessAreas = [];
     mockStore.selectedBusinessAreasArray = [];
@@ -98,13 +101,27 @@ describe("ProjectMapPage", () => {
 
   it("should render in fullscreen mode when store is in fullscreen", () => {
     mockStore.state.mapFullscreen = true;
+    mockStore.state.filtersMinimized = false; // Filters expanded by default
     renderWithProviders();
 
     expect(screen.getByTestId("map-filters")).toBeInTheDocument();
     expect(screen.getByTestId("full-map-container")).toBeInTheDocument();
     expect(screen.getByTestId("full-map-container")).toHaveAttribute("data-fullscreen", "true");
     expect(screen.getByText("Project Map")).toBeInTheDocument();
-    expect(screen.getByLabelText("Exit map fullscreen")).toBeInTheDocument();
+    expect(screen.getByLabelText("Minimize filters")).toBeInTheDocument();
+  });
+
+  it("should show minimized filter button when filters are minimized in fullscreen", () => {
+    mockStore.state.mapFullscreen = true;
+    mockStore.state.filtersMinimized = true;
+    renderWithProviders();
+
+    expect(screen.getByTestId("full-map-container")).toBeInTheDocument();
+    expect(screen.getByTestId("full-map-container")).toHaveAttribute("data-fullscreen", "true");
+    expect(screen.getByLabelText("Show filters")).toBeInTheDocument();
+    // Sidebar should not be visible when minimized
+    expect(screen.queryByText("Project Map")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-filters")).not.toBeInTheDocument();
   });
 
   it("should save to localStorage when filters change", () => {

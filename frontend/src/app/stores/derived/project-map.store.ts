@@ -28,9 +28,13 @@ interface ProjectMapState extends BaseStoreState {
 	showColors: boolean;
 	mapLoading: boolean;
 	mapFullscreen: boolean; // For map-only fullscreen mode
+	filtersMinimized: boolean; // For minimizing filters in fullscreen mode
 
 	// Marker Selection (for highlighting selected markers)
 	selectedMarkerCoords: [number, number] | null; // Coordinates of selected marker
+
+	// Heatmap Visualization
+	visualizationMode: 'markers' | 'heatmap'; // Current visualization mode
 }
 
 /**
@@ -59,7 +63,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			filterUser: null,
 			filterStatus: "",
 			filterKind: "",
-			filterYear: new Date().getFullYear(),
+			filterYear: 0,
 			onlyActive: false,
 			onlyInactive: false,
 			saveSearch: true, // Default to true like other search stores
@@ -70,9 +74,13 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			showColors: true,
 			mapLoading: false,
 			mapFullscreen: false,
+			filtersMinimized: false, // Default to expanded filters
 
 			// Marker Selection
 			selectedMarkerCoords: null,
+
+			// Heatmap Visualization
+			visualizationMode: 'markers', // Default to marker mode
 
 			// Base state
 			loading: false,
@@ -104,6 +112,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			toggleColors: action,
 			setMapLoading: action,
 			toggleMapFullscreen: action,
+			toggleFiltersMinimized: action,
 			clearFilters: action,
 			resetAllFilters: action,
 			checkAllBusinessAreas: action,
@@ -116,6 +125,10 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			setCurrentPage: action,
 			setFilters: action,
 
+			// Heatmap actions
+			toggleVisualizationMode: action,
+			setVisualizationMode: action,
+
 			// Computed
 			filters: computed,
 			apiParams: computed,
@@ -123,6 +136,10 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			selectedBusinessAreas: computed,
 			selectedBusinessAreasArray: computed,
 			isMarkerSelected: computed,
+
+			// Heatmap computed
+			isHeatmapMode: computed,
+			isMarkerMode: computed,
 		});
 	}
 
@@ -175,19 +192,12 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 * Toggle business area selection
 	 */
 	toggleBusinessArea = (baId: number): void => {
-		console.log('toggleBusinessArea called with:', baId);
-		console.log('Current selectedBusinessAreas:', this.state.selectedBusinessAreas);
-		
 		const index = this.state.selectedBusinessAreas.indexOf(baId);
 		if (index > -1) {
-			console.log('Removing business area at index:', index);
 			this.state.selectedBusinessAreas.splice(index, 1);
 		} else {
-			console.log('Adding business area:', baId);
 			this.state.selectedBusinessAreas.push(baId);
 		}
-		
-		console.log('New selectedBusinessAreas:', this.state.selectedBusinessAreas);
 	};
 
 	/**
@@ -309,6 +319,17 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	toggleMapFullscreen = (): void => {
 		this.state.mapFullscreen = !this.state.mapFullscreen;
+		// Reset filters minimized when exiting fullscreen
+		if (!this.state.mapFullscreen) {
+			this.state.filtersMinimized = false;
+		}
+	};
+
+	/**
+	 * Toggle filters minimized state (only in fullscreen mode)
+	 */
+	toggleFiltersMinimized = (): void => {
+		this.state.filtersMinimized = !this.state.filtersMinimized;
 	};
 
 	/**
@@ -321,7 +342,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		this.state.filterUser = null;
 		this.state.filterStatus = "";
 		this.state.filterKind = "";
-		this.state.filterYear = new Date().getFullYear();
+		this.state.filterYear = 0;
 		this.state.onlyActive = false;
 		this.state.onlyInactive = false;
 	};
@@ -378,11 +399,16 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		// This is needed so useSearchStoreInit knows the user's preference on next page load
 		if (typeof window !== "undefined") {
 			if (this.state.saveSearch) {
-				// If turning ON, save current state
+				// If turning ON, save current state with ALL filters
 				const stateToSave = {
 					searchTerm: this.state.searchTerm,
 					selectedBusinessAreas: [...this.state.selectedBusinessAreas],
 					filterUser: this.state.filterUser,
+					filterStatus: this.state.filterStatus,
+					filterKind: this.state.filterKind,
+					filterYear: this.state.filterYear,
+					onlyActive: this.state.onlyActive,
+					onlyInactive: this.state.onlyInactive,
 					saveSearch: this.state.saveSearch,
 				};
 				localStorage.setItem("projectMapState", JSON.stringify(stateToSave));
@@ -402,11 +428,16 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		// Immediately save the saveSearch state to localStorage
 		if (typeof window !== "undefined") {
 			if (value) {
-				// If turning ON, save current state
+				// If turning ON, save current state with ALL filters
 				const stateToSave = {
 					searchTerm: this.state.searchTerm,
 					selectedBusinessAreas: [...this.state.selectedBusinessAreas],
 					filterUser: this.state.filterUser,
+					filterStatus: this.state.filterStatus,
+					filterKind: this.state.filterKind,
+					filterYear: this.state.filterYear,
+					onlyActive: this.state.onlyActive,
+					onlyInactive: this.state.onlyInactive,
 					saveSearch: value,
 				};
 				localStorage.setItem("projectMapState", JSON.stringify(stateToSave));
@@ -440,6 +471,11 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		user: number | null;
 		searchTerm: string;
 		search: string; // Add search as alias for searchTerm
+		status: string;
+		kind: string;
+		year: number;
+		onlyActive: boolean;
+		onlyInactive: boolean;
 	}>): void => {
 		if (filters.businessAreas !== undefined) {
 			this.state.selectedBusinessAreas = filters.businessAreas;
@@ -453,6 +489,36 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		if (filters.search !== undefined) {
 			this.state.searchTerm = filters.search; // Handle search as alias for searchTerm
 		}
+		if (filters.status !== undefined) {
+			this.state.filterStatus = filters.status;
+		}
+		if (filters.kind !== undefined) {
+			this.state.filterKind = filters.kind;
+		}
+		if (filters.year !== undefined) {
+			this.state.filterYear = filters.year;
+		}
+		if (filters.onlyActive !== undefined) {
+			this.state.onlyActive = filters.onlyActive;
+		}
+		if (filters.onlyInactive !== undefined) {
+			this.state.onlyInactive = filters.onlyInactive;
+		}
+	};
+
+	/**
+	 * Toggle visualization mode between markers and heatmap
+	 */
+	toggleVisualizationMode = (): void => {
+		this.state.visualizationMode = 
+			this.state.visualizationMode === 'markers' ? 'heatmap' : 'markers';
+	};
+
+	/**
+	 * Set specific visualization mode
+	 */
+	setVisualizationMode = (mode: 'markers' | 'heatmap'): void => {
+		this.state.visualizationMode = mode;
 	};
 
 	/**
@@ -483,7 +549,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			user: this.state.filterUser || undefined,
 			status: this.state.filterStatus || undefined,
 			kind: this.state.filterKind || undefined,
-			year: this.state.filterYear !== new Date().getFullYear() ? this.state.filterYear : undefined,
+			year: this.state.filterYear !== 0 ? this.state.filterYear : undefined,
 			onlyActive: this.state.onlyActive || undefined,
 			onlyInactive: this.state.onlyInactive || undefined,
 		};
@@ -533,6 +599,20 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	}
 
 	/**
+	 * Check if currently in heatmap mode
+	 */
+	get isHeatmapMode(): boolean {
+		return this.state.visualizationMode === 'heatmap';
+	}
+
+	/**
+	 * Check if currently in marker mode
+	 */
+	get isMarkerMode(): boolean {
+		return this.state.visualizationMode === 'markers';
+	}
+
+	/**
 	 * Initialize store (required by BaseStore)
 	 */
 	async initialise(): Promise<void> {
@@ -558,7 +638,9 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		this.state.showColors = true;
 		this.state.mapLoading = false;
 		this.state.mapFullscreen = false;
+		this.state.filtersMinimized = false;
 		this.state.selectedMarkerCoords = null;
+		this.state.visualizationMode = 'markers'; // Reset to marker mode
 		this.state.saveSearch = true;
 		this.state.loading = false;
 		this.state.error = null;

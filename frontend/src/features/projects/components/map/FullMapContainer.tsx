@@ -9,10 +9,12 @@ import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
 import { calculateProjectCoordinates } from "@/features/projects/utils/coordinate-calculation";
 import { clusterProjects } from "@/features/projects/utils/clustering";
 import { ProjectMarker } from "./ProjectMarker";
+import { HeatmapLayer } from "./HeatmapLayer";
 import { RegionLayer } from "./RegionLayer";
 import { RegionLabel } from "./RegionLabel";
 import { MapControls } from "./MapControls";
 import { MapStats } from "./MapStats";
+import { Spinner } from "@/shared/components/ui/spinner";
 import { GEOJSON_PROPERTY_NAMES } from "@/features/projects/types/map.types";
 
 /**
@@ -131,11 +133,21 @@ export const FullMapContainer = observer(({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Cleanup on unmount
+  // Cleanup on unmount - prevent memory leaks
   useEffect(() => {
     return () => {
       if (mapRef.current) {
+        // Clear all event listeners
+        mapRef.current.off();
+        
+        // Remove all layers
+        mapRef.current.eachLayer((layer) => {
+          mapRef.current?.removeLayer(layer);
+        });
+        
+        // Remove the map instance
         mapRef.current.remove();
+        mapRef.current = null;
       }
     };
   }, []);
@@ -143,10 +155,12 @@ export const FullMapContainer = observer(({
   if (projectsLoading || geoJsonLoading) {
     return (
       <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} flex items-center justify-center bg-muted`}>
-        <div className="text-center">
+        <div className="text-center space-y-4">
+          <Spinner className="size-8 mx-auto text-blue-600" />
           <div className="text-lg font-medium">Loading map...</div>
-          <div className="text-sm text-muted-foreground mt-2">
-            Fetching projects and region data
+          <div className="text-sm text-muted-foreground">
+            {projectsLoading && geoJsonLoading ? 'Fetching projects and region data' :
+             projectsLoading ? 'Loading project data' : 'Loading map layers'}
           </div>
         </div>
       </div>
@@ -156,10 +170,11 @@ export const FullMapContainer = observer(({
   if (projectsError) {
     return (
       <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} flex items-center justify-center bg-muted`}>
-        <div className="text-center">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="text-4xl">⚠️</div>
           <div className="text-lg font-medium text-red-600">Error loading projects</div>
-          <div className="text-sm text-muted-foreground mt-2">
-            Unable to load project data for the map
+          <div className="text-sm text-muted-foreground">
+            Unable to load project data for the map. Please try refreshing the page.
           </div>
         </div>
       </div>
@@ -167,7 +182,7 @@ export const FullMapContainer = observer(({
   }
 
   return (
-    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative z-10`}>
+    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative z-10 rounded-md overflow-hidden`}>
       <LeafletMap
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
@@ -176,6 +191,7 @@ export const FullMapContainer = observer(({
         style={{ height: "100%", width: "100%" }}
         ref={mapRef}
         zoomControl={false} // Disable default zoom controls since we have custom ones
+        attributionControl={false} // Disable attribution control
       >
         <MapClickHandler />
         <TileLayer
@@ -220,14 +236,26 @@ export const FullMapContainer = observer(({
             ));
           })}
 
-        {/* Render project markers */}
-        {Array.from(clusters.values()).map((cluster, index) => (
-          <ProjectMarker
-            key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
-            projects={cluster.projects}
-            position={cluster.coords}
+        {/* Conditional rendering based on visualization mode */}
+        {store.isMarkerMode && (
+          /* Render project markers */
+          Array.from(clusters.values()).map((cluster, index) => (
+            <ProjectMarker
+              key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
+              projects={cluster.projects}
+              position={cluster.coords}
+            />
+          ))
+        )}
+
+        {store.isHeatmapMode && geoJsonData && (
+          /* Render heatmap layer */
+          <HeatmapLayer
+            projects={projects}
+            geoJsonData={geoJsonData}
+            isVisible={true}
           />
-        ))}
+        )}
 
         {/* Map controls inside the map container */}
         <MapControls />

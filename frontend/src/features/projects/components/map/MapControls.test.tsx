@@ -95,37 +95,50 @@ describe("MapControls", () => {
 	it("should have proper styling classes", () => {
 		render(<MapControlsWrapper />);
 
-		// Use more specific selectors to target our custom buttons
-		const customControls = document.querySelector('.absolute.top-4.right-4');
-		expect(customControls).toBeInTheDocument();
+		// Check top-right controls
+		const topControls = document.querySelector('.absolute.top-4.right-4');
+		expect(topControls).toBeInTheDocument();
 
-		const zoomInButton = customControls?.querySelector('button[title="Zoom in"]');
-		const zoomOutButton = customControls?.querySelector('button[title="Zoom out"]');
-		const fullscreenButton = customControls?.querySelector('button[title="Enter map fullscreen"]');
-		const resetButton = customControls?.querySelector('button[title="Reset to Western Australia view"]');
+		const fullscreenButton = topControls?.querySelector('button[title="Enter map fullscreen"]');
+		const resetButton = topControls?.querySelector('button[title="Reset to Western Australia view"]');
 
-		// Check that buttons have proper styling (flex-1 h-8 for matching layers button width)
-		expect(zoomInButton).toHaveClass("flex-1", "h-8", "p-0");
-		expect(zoomOutButton).toHaveClass("flex-1", "h-8", "p-0");
+		// Check that top buttons have proper styling (flex-1 h-8 for matching layers button width)
 		expect(fullscreenButton).toHaveClass("flex-1", "h-8", "p-0");
 		expect(resetButton).toHaveClass("flex-1", "h-8", "p-0");
+
+		// Check bottom-right zoom controls
+		const bottomControls = document.querySelector('.absolute.bottom-4.right-4');
+		expect(bottomControls).toBeInTheDocument();
+
+		const zoomInButton = bottomControls?.querySelector('button[title="Zoom in"]');
+		const zoomOutButton = bottomControls?.querySelector('button[title="Zoom out"]');
+
+		// Check that zoom buttons have proper styling (h-8 w-8 for square buttons)
+		expect(zoomInButton).toHaveClass("h-8", "w-8", "p-0");
+		expect(zoomOutButton).toHaveClass("h-8", "w-8", "p-0");
 	});
 
 	it("should have proper accessibility attributes", () => {
 		render(<MapControlsWrapper />);
 
-		// Use more specific selectors to target our custom buttons
-		const customControls = document.querySelector('.absolute.top-4.right-4');
-		expect(customControls).toBeInTheDocument();
+		// Check top-right controls
+		const topControls = document.querySelector('.absolute.top-4.right-4');
+		expect(topControls).toBeInTheDocument();
 
-		const zoomInButton = customControls?.querySelector('button[title="Zoom in"]');
-		const zoomOutButton = customControls?.querySelector('button[title="Zoom out"]');
-		const fullscreenButton = customControls?.querySelector('button[title="Enter map fullscreen"]');
-		const resetButton = customControls?.querySelector('button[title="Reset to Western Australia view"]');
+		const fullscreenButton = topControls?.querySelector('button[title="Enter map fullscreen"]');
+		const resetButton = topControls?.querySelector('button[title="Reset to Western Australia view"]');
+
+		expect(fullscreenButton).toHaveAttribute("aria-label", "Enter map fullscreen");
+		expect(resetButton).toHaveAttribute("aria-label", "Reset map view");
+
+		// Check bottom-right zoom controls
+		const bottomControls = document.querySelector('.absolute.bottom-4.right-4');
+		expect(bottomControls).toBeInTheDocument();
+
+		const zoomInButton = bottomControls?.querySelector('button[title="Zoom in"]');
+		const zoomOutButton = bottomControls?.querySelector('button[title="Zoom out"]');
 
 		expect(zoomInButton).toHaveAttribute("aria-label", "Zoom in");
 		expect(zoomOutButton).toHaveAttribute("aria-label", "Zoom out");
-		expect(fullscreenButton).toHaveAttribute("aria-label", "Enter map fullscreen");
-		expect(resetButton).toHaveAttribute("aria-label", "Reset map view");
 	});
 });

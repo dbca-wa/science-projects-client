@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useRef } from "react";
+import { useRef, memo, useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 import type { IProjectData } from "@/shared/types/project.types";
 import { ProjectPopup } from "./ProjectPopup";
@@ -18,18 +18,21 @@ interface ProjectMarkerProps {
  * - Uses density-based colors (blue, green, amber, red) for selected markers
  * - Uses muted colors for unselected markers
  * - Shows count number on the marker
- * - Hover animations with scale effect
+ * - Hover animations with scale effect and elevated z-index
  * - Drop shadow for depth
  * - Displays popup with project details on click
  * - Accessible with proper ARIA labels
  * - Handles marker selection state for visual feedback
+ * - Hovered markers get highest z-index (2000), selected markers get medium z-index (1000)
+ * - Optimized with React.memo to prevent unnecessary re-renders
  */
-export const ProjectMarker = observer(({
+const ProjectMarkerComponent = observer(({
   projects,
   position,
 }: ProjectMarkerProps) => {
   const store = useProjectMapStore();
   const popupRef = useRef<L.Popup>(null);
+  const [isHovered, setIsHovered] = useState(false);
   
   // Determine if this marker is selected
   const isSelected = store.isMarkerSelected(position);
@@ -54,13 +57,32 @@ export const ProjectMarker = observer(({
     }
   };
 
+  // Handle mouse enter
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  // Handle mouse leave
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  // Calculate z-index: hovered markers get highest priority, then selected, then normal
+  const getZIndexOffset = () => {
+    if (isHovered) return 2000; // Highest priority for hovered markers
+    if (shouldShowAsSelected) return 1000; // Selected markers
+    return 0; // Normal markers
+  };
+
   return (
     <Marker 
       position={position} 
       icon={icon}
-      zIndexOffset={shouldShowAsSelected ? 1000 : 0}  // Set z-index on React Leaflet marker
+      zIndexOffset={getZIndexOffset()}  // Dynamic z-index based on hover and selection state
       eventHandlers={{
         click: handleMarkerClick,
+        mouseover: handleMouseEnter,
+        mouseout: handleMouseLeave,
       }}
     >
       <Popup 
@@ -75,5 +97,19 @@ export const ProjectMarker = observer(({
         </div>
       </Popup>
     </Marker>
+  );
+});
+
+// Memoize the component to prevent unnecessary re-renders
+// Only re-render when projects, position, or selection state changes
+export const ProjectMarker = memo(ProjectMarkerComponent, (prevProps, nextProps) => {
+  // Custom comparison function for better performance
+  return (
+    prevProps.projects.length === nextProps.projects.length &&
+    prevProps.projects.every((project, index) => 
+      project.id === nextProps.projects[index]?.id
+    ) &&
+    prevProps.position[0] === nextProps.position[0] &&
+    prevProps.position[1] === nextProps.position[1]
   );
 });

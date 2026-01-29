@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "../Navitar";
@@ -124,6 +124,13 @@ export const TraditionalHeader = observer(() => {
                       >
                         <CgBrowse className="mr-2 size-4" />
                         Browse Projects
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/projects/map")}
+                        className="hover:bg-gray-100 cursor-pointer select-none"
+                      >
+                        <FaMapMarkedAlt className="mr-2 size-4" />
+                        Project Map
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => navigate("/projects/create")}
