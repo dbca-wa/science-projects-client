@@ -123,14 +123,6 @@ const ProjectListPage = observer(() => {
 
 	return (
 		<PageTransition isLoading={isLoading}>
-			{isLoading ? (
-				<div className="flex items-center justify-center min-h-[400px]">
-					<div className="text-center space-y-4">
-						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
-						<div className="text-lg font-medium text-muted-foreground">Loading projects...</div>
-					</div>
-				</div>
-			) : (
 			<div className="w-full">
 				{/* Breadcrumb */}
 				<AutoBreadcrumb />
@@ -211,7 +203,6 @@ const ProjectListPage = observer(() => {
 					/>
 				)}
 			</div>
-			)}
 		</PageTransition>
 	);
 });

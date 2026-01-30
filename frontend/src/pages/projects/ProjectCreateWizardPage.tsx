@@ -18,6 +18,7 @@ import { ArrowLeft, Info, X } from "lucide-react";
 import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { Button } from "@/shared/components/ui/button";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 const PROJECT_TYPE_NAMES: Record<ProjectKind, string> = {
 	science: "Science Project",
@@ -177,6 +178,7 @@ const ProjectCreateWizardPage = observer(() => {
 	const currentStep = wizardStore.state.currentStep;
 
 	return (
+		<PageTransition>
 		<div className="container mx-auto max-w-5xl px-4 sm:px-6 py-4 sm:py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			{/* Header */}
 			<div className="mb-6 sm:mb-8">
@@ -296,6 +298,7 @@ const ProjectCreateWizardPage = observer(() => {
 				primaryColor={projectColor}
 			/>
 		</div>
+		</PageTransition>
 	);
 });
 

@@ -2,17 +2,16 @@ import { useParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
-import { PersonalInfoSection } from "@/features/users/components/PersonalInfoSection";
 import { ProfileSection } from "@/features/users/components/ProfileSection";
 import { MembershipSection } from "@/features/users/components/MembershipSection";
 import { UserAdminActionButtons } from "@/features/users/components/UserAdminActionButtons";
 import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
-import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { AlertCircle, Edit } from "lucide-react";
+import { AlertCircle, Edit, Loader2 } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useAuthStore } from "@/app/stores/store-context";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 /**
  * UserDetailPage
@@ -42,21 +41,6 @@ const UserDetailPage = observer(() => {
     { title: displayName || "User" },
   ];
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="w-full">
-        <Skeleton className="h-10 w-full mb-6" />
-        <Skeleton className="h-10 w-32 mb-8" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-96" />
-          <Skeleton className="h-96" />
-          <Skeleton className="h-64" />
-        </div>
-      </div>
-    );
-  }
-
   // Error state
   if (error) {
     // Type guard for API errors with status
@@ -82,7 +66,7 @@ const UserDetailPage = observer(() => {
   }
 
   // Not found state
-  if (!user) {
+  if (!isLoading && !user) {
     return (
       <div className="w-full">
         <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
@@ -94,6 +78,15 @@ const UserDetailPage = observer(() => {
   }
 
   return (
+    <PageTransition isLoading={isLoading}>
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+            <div className="text-lg font-medium text-muted-foreground">Loading user...</div>
+          </div>
+        </div>
+      ) : (
     <div className="w-full">
       {/* Breadcrumb */}
       <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
@@ -133,28 +126,22 @@ const UserDetailPage = observer(() => {
         )}
       </div>
 
-      {/* Content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column */}
-        <div className="space-y-6">
-          <PersonalInfoSection user={user} />
-          <MembershipSection user={user} />
-        </div>
-
-        {/* Right column */}
-        <div className="space-y-6">
-          <ProfileSection user={user} />
-          
-          {/* Admin Actions - only show for superusers */}
-          {authStore.isSuperuser && authStore.user && (
-            <UserAdminActionButtons
-              user={user}
-              currentUserId={authStore.user.id!}
-            />
-          )}
-        </div>
+      {/* Content - single column layout */}
+      <div className="space-y-6">
+        <ProfileSection user={user} />
+        <MembershipSection user={user} />
+        
+        {/* Admin Actions - only show for superusers */}
+        {authStore.isSuperuser && authStore.user && (
+          <UserAdminActionButtons
+            user={user}
+            currentUserId={authStore.user.id!}
+          />
+        )}
       </div>
     </div>
+      )}
+    </PageTransition>
   );
 });
 
