@@ -2,20 +2,21 @@ import { useState } from "react";
 import { useCurrentUser } from "@/features/auth";
 import { useAdminTasks, MyTasksSection } from "@/features/dashboard";
 import { observer } from "mobx-react-lite";
-import { motion } from "framer-motion";
 import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { MdFeedback } from "react-icons/md";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { DashboardActionCard } from "@/features/dashboard/components/DashboardActionCard";
+import { PageTransition } from "@/shared/components/PageTransition";
+import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 /**
  * Dashboard - Main landing page after authentication
  */
 const Dashboard = observer(() => {
 	const { data: user, isLoading } = useCurrentUser();
-	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 
 	const [activeTab, setActiveTab] = useState<number>(() => {
@@ -31,14 +32,6 @@ const Dashboard = observer(() => {
 		refetch: refetchAdminTasks,
 	} = useAdminTasks();
 
-	if (isLoading) {
-		return (
-			<div className="flex items-center justify-center min-h-[400px]">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-			</div>
-		);
-	}
-
 	const firstName = user?.display_first_name || user?.first_name || user?.username || "User";
 
 	// Check if user is a business area lead
@@ -49,20 +42,25 @@ const Dashboard = observer(() => {
 	const adminTasksCount = adminTasks.length;
 
 	return (
+		<PageTransition isLoading={isLoading}>
+			{isLoading ? (
+				<div className="flex items-center justify-center min-h-[400px]">
+					<div className="text-center space-y-4">
+						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+						<div className="text-lg font-medium text-muted-foreground">Loading dashboard...</div>
+					</div>
+				</div>
+			) : (
 		<div className="space-y-8 relative">
 			{/* Welcome Section */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-			>
+			<div>
 				<h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
 					Welcome back, {firstName}!
 				</h1>
 				<p className="mt-2 text-gray-600 dark:text-gray-400">
 					The Science Project Management System (SPMS) is DBCA's portal for science project planning, approval and reporting.
 				</p>
-			</motion.div>
+			</div>
 
 			{/* Quick Actions Grid */}
 			<div>
@@ -150,11 +148,7 @@ const Dashboard = observer(() => {
 			</div>
 
 			{/* Tasks & Projects Tabs */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, delay: 0.4 }}
-			>
+			<div>
 				{/* Tab Navigation */}
 				<div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
 					{/* Admin Tasks Tab (superuser only) - First tab */}
@@ -333,16 +327,11 @@ const Dashboard = observer(() => {
 						</motion.div>
 					)}
 				</div>
-			</motion.div>
+			</div>
 
 			{/* User Info Section (for development) */}
 			{import.meta.env.MODE === "development" && user && (
-				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5, delay: 0.45 }}
-					className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
-				>
+				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
 					<h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
 						Development Info
 					</h3>
@@ -361,9 +350,11 @@ const Dashboard = observer(() => {
 							<p>Business Area Lead: Yes ({user.business_areas_led?.length} area{user.business_areas_led?.length !== 1 ? 's' : ''})</p>
 						)}
 					</div>
-				</motion.div>
+				</div>
 			)}
 		</div>
+			)}
+		</PageTransition>
 	);
 });
 

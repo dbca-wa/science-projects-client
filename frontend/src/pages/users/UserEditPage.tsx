@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router";
-import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { UserEditForm } from "@/features/users/components/UserEditForm";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 /**
  * UserEditPage
@@ -37,17 +37,6 @@ const UserEditPage = () => {
     { title: "Edit" },
   ];
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="w-full max-w-4xl">
-        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
-        <Skeleton className="h-10 w-32 mb-8" />
-        <Skeleton className="h-96" />
-      </div>
-    );
-  }
-
   // Error state
   if (error) {
     const apiError = error as { status?: number; message?: string };
@@ -59,7 +48,7 @@ const UserEditPage = () => {
         : "Failed to load user details";
 
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
@@ -70,9 +59,9 @@ const UserEditPage = () => {
   }
 
   // Not found state
-  if (!user) {
+  if (!isLoading && !user) {
     return (
-      <div className="w-full max-w-4xl">
+      <div className="w-full">
         <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">User not found</p>
@@ -81,22 +70,36 @@ const UserEditPage = () => {
     );
   }
 
-  return (
-    <div className="w-full max-w-4xl">
-      {/* Breadcrumb */}
-      <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
-
-      {/* Page header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Edit User</h1>
-        <p className="text-muted-foreground">
-          Update information for {displayName}
-        </p>
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+          <div className="text-lg font-medium text-muted-foreground">Loading user...</div>
+        </div>
       </div>
+    );
+  }
 
-      {/* User Edit Form */}
-      <UserEditForm userId={userId} onCancel={handleCancel} />
-    </div>
+  return (
+    <PageTransition>
+      <div className="w-full">
+        {/* Breadcrumb */}
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
+
+        {/* Page header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Edit User</h1>
+          <p className="text-muted-foreground">
+            Update information for {displayName}
+          </p>
+        </div>
+
+        {/* User Edit Form */}
+        <UserEditForm userId={userId} onCancel={handleCancel} />
+      </div>
+    </PageTransition>
   );
 };
 

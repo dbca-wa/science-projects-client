@@ -22,10 +22,11 @@ import {
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Separator } from "@/shared/components/ui/separator";
-import { AlertCircle, Info } from "lucide-react";
+import { AlertCircle, Info, Loader2 } from "lucide-react";
+import { PageTransition } from "@/shared/components/PageTransition";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 /**
  * MyProfilePage
@@ -205,21 +206,6 @@ const MyProfilePage = observer(() => {
     );
   };
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="w-full">
-        <Skeleton className="h-10 w-full mb-6" />
-        <Skeleton className="h-10 w-32 mb-8" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-96" />
-          <Skeleton className="h-96" />
-          <Skeleton className="h-64" />
-        </div>
-      </div>
-    );
-  }
-
   // Error state
   if (error) {
     const apiError = error as { status?: number; message?: string };
@@ -240,7 +226,7 @@ const MyProfilePage = observer(() => {
   }
 
   // Not found state
-  if (!user) {
+  if (!isLoading && !user) {
     return (
       <div className="w-full">
         <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
@@ -251,185 +237,203 @@ const MyProfilePage = observer(() => {
     );
   }
 
-  return (
-    <div className="w-full">
-      {/* Breadcrumb */}
-      <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
-
-      {/* Page header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{pageContent.title}</h1>
-        <p className="text-muted-foreground">
-          {pageContent.subtitle}
-        </p>
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+          <div className="text-lg font-medium text-muted-foreground">Loading profile...</div>
+        </div>
       </div>
+    );
+  }
 
-      {/* Tabs */}
-      <Tabs value={activeTab} className="w-full" onValueChange={handleTabChange}>
-        <TabsList className="mb-6 w-full flex">
-          <TabsTrigger value="profile" className="flex-1">
-            {showShortLabels ? "SPMS" : "SPMS Profile"}
-          </TabsTrigger>
-          {user.is_staff && (
-            <TabsTrigger value="staff-profile" className="flex-1">
-              {showShortLabels ? "Public" : "Public Profile"}
+  return (
+    <PageTransition>
+      <div className="w-full">
+        {/* Breadcrumb */}
+        <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
+
+        {/* Page header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">{pageContent.title}</h1>
+          <p className="text-muted-foreground">
+            {pageContent.subtitle}
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} className="w-full" onValueChange={handleTabChange}>
+          <TabsList className="mb-6 w-full flex">
+            <TabsTrigger value="profile" className="flex-1">
+              {showShortLabels ? "SPMS" : "SPMS Profile"}
             </TabsTrigger>
-          )}
-          <TabsTrigger value="caretaker" className="flex-1">
-            {showShortLabels ? "Caretaker" : "Caretaker Mode"}
-          </TabsTrigger>
-        </TabsList>
+            {user?.is_staff && (
+              <TabsTrigger value="staff-profile" className="flex-1">
+                {showShortLabels ? "Public" : "Public Profile"}
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="caretaker" className="flex-1">
+              {showShortLabels ? "Caretaker" : "Caretaker Mode"}
+            </TabsTrigger>
+          </TabsList>
 
-        {/* My Profile Tab */}
-        <TabsContent value="profile" className="space-y-4">
-          {/* Profile Card (About & Expertise) */}
-          <ProfileSection 
-            user={user} 
-            onClick={() => navigate("/users/me/profile")}
-          />
+          {/* My Profile Tab */}
+          <TabsContent value="profile" className="space-y-4">
+            {/* Profile Card (About & Expertise) */}
+            <ProfileSection 
+              user={user!} 
+              onClick={() => navigate("/users/me/profile")}
+            />
 
-          {/* Personal Information Card */}
-          <PersonalInformationCard 
-            user={user} 
-            onClick={() => setIsPersonalInfoModalOpen(true)}
-          />
+            {/* Personal Information Card */}
+            <PersonalInformationCard 
+              user={user!} 
+              onClick={() => setIsPersonalInfoModalOpen(true)}
+            />
 
-          {/* Membership Card */}
-          <MembershipSection 
-            user={user} 
-            onClick={() => setIsMembershipModalOpen(true)}
-          />
+            {/* Membership Card */}
+            <MembershipSection 
+              user={user!} 
+              onClick={() => setIsMembershipModalOpen(true)}
+            />
 
-          {/* In-App Search Appearance */}
-          <InAppSearchSection user={user} />
+            {/* In-App Search Appearance */}
+            <InAppSearchSection user={user!} />
 
-          {/* Status Card */}
-          <StatusSection user={user} />
-        </TabsContent>
-
-        {/* Staff Profile Tab (Staff only) */}
-        {user.is_staff && (
-          <TabsContent value="staff-profile" className="space-y-6">
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-2">Public Staff Profile</h2>
-                <p className="text-muted-foreground">
-                  Manage how you appear on the public staff directory
-                </p>
-              </div>
-              
-              <PublicAppearanceSection 
-                user={user} 
-                onClick={() => setIsToggleVisibilityModalOpen(true)}
-              />
-              
-              <div className="text-sm text-muted-foreground text-center pt-4 border-t">
-                <p>
-                  Your staff profile is {user.staff_profile_hidden ? "hidden" : "visible"} to the public.
-                  {user.staff_profile_hidden 
-                    ? " Click above to make it visible on the staff directory."
-                    : " Click above to hide it from the staff directory."}
-                </p>
-              </div>
-            </div>
+            {/* Status Card */}
+            <StatusSection user={user!} />
           </TabsContent>
-        )}
 
-        {/* Caretaker Mode Tab */}
-        <TabsContent value="caretaker" className="space-y-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Description */}
-            <Alert className="mb-6">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                Caretakers can manage your projects when you're unavailable (on leave, resignation, or other absence). 
-                All caretaker requests require admin approval for security and accountability.
-              </AlertDescription>
-            </Alert>
-
-            {isLoadingCaretaker ? (
-              <div className="space-y-6">
-                <Skeleton className="h-64" />
-                <Skeleton className="h-64" />
+          {/* Staff Profile Tab (Staff only) */}
+          {user?.is_staff && (
+            <TabsContent value="staff-profile" className="space-y-6">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold mb-2">Public Staff Profile</h2>
+                  <p className="text-muted-foreground">
+                    Manage how you appear on the public staff directory
+                  </p>
+                </div>
+                
+                <PublicAppearanceSection 
+                  user={user} 
+                  onClick={() => setIsToggleVisibilityModalOpen(true)}
+                />
+                
+                <div className="text-sm text-muted-foreground text-center pt-4 border-t">
+                  <p>
+                    Your staff profile is {user.staff_profile_hidden ? "hidden" : "visible"} to the public.
+                    {user.staff_profile_hidden 
+                      ? " Click above to make it visible on the staff directory."
+                      : " Click above to hide it from the staff directory."}
+                  </p>
+                </div>
               </div>
-            ) : caretakerError ? (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
+            </TabsContent>
+          )}
+
+          {/* Caretaker Mode Tab */}
+          <TabsContent value="caretaker" className="space-y-6">
+            <div className="max-w-4xl mx-auto">
+              {/* Description */}
+              <Alert className="mb-6">
+                <Info className="h-4 w-4" />
                 <AlertDescription>
-                  Failed to load caretaker information. Please try again later.
+                  Caretakers can manage your projects when you're unavailable (on leave, resignation, or other absence). 
+                  All caretaker requests require admin approval for security and accountability.
                 </AlertDescription>
               </Alert>
-            ) : (
-              <div className="space-y-8">
-                {/* My Caretaker Section */}
-                <section>
-                  <h2 className="text-2xl font-semibold mb-4">My Caretaker</h2>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Request someone to manage your projects during your absence.
-                  </p>
-                  {renderMyCaretakerSection()}
-                </section>
 
-                {/* Caretaker Requests Section */}
-                {caretakerData?.become_caretaker_request_object && (
-                  <>
-                    <Separator />
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Caretaker Request</h2>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        A user needs you to be their caretaker.
-                      </p>
-                      {renderIncomingCaretakerSection()}
-                    </section>
-                  </>
-                )}
+              {isLoadingCaretaker ? (
+                <div className="space-y-6">
+                  <Skeleton className="h-64" />
+                  <Skeleton className="h-64" />
+                </div>
+              ) : caretakerError ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Failed to load caretaker information. Please try again later.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-8">
+                  {/* My Caretaker Section */}
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-4">My Caretaker</h2>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Request someone to manage your projects during your absence.
+                    </p>
+                    {renderMyCaretakerSection()}
+                  </section>
 
-                {/* My Caretakees Section */}
-                {user?.caretaking_for && user.caretaking_for.length > 0 && (
-                  <>
-                    <Separator />
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">My Caretakees</h2>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Users you are currently caretaking for.
-                      </p>
-                      <CaretakeesTable caretakees={user.caretaking_for} />
-                    </section>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+                  {/* Caretaker Requests Section */}
+                  {caretakerData?.become_caretaker_request_object && (
+                    <>
+                      <Separator />
+                      <section>
+                        <h2 className="text-2xl font-semibold mb-4">Caretaker Request</h2>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          A user needs you to be their caretaker.
+                        </p>
+                        {renderIncomingCaretakerSection()}
+                      </section>
+                    </>
+                  )}
 
-      {/* Modals */}
-      <EditPersonalInformationModal
-        user={user}
-        isOpen={isPersonalInfoModalOpen}
-        onClose={() => setIsPersonalInfoModalOpen(false)}
-        onSuccess={() => {
-          // Refetch user data after successful update
-          // TanStack Query will automatically refetch due to invalidation in the mutation
-        }}
-      />
-      <EditOrgMembershipModal
-        user={user}
-        isOpen={isMembershipModalOpen}
-        onClose={() => setIsMembershipModalOpen(false)}
-        onSuccess={() => {
-          // Refetch user data after successful update
-        }}
-      />
-      <ToggleStaffProfileVisibilityModal
-        user={user}
-        isOpen={isToggleVisibilityModalOpen}
-        onClose={() => setIsToggleVisibilityModalOpen(false)}
-        onSuccess={() => {
-          // Refetch user data after successful update
-        }}
-      />
-    </div>
+                  {/* My Caretakees Section */}
+                  {user?.caretaking_for && user.caretaking_for.length > 0 && (
+                    <>
+                      <Separator />
+                      <section>
+                        <h2 className="text-2xl font-semibold mb-4">My Caretakees</h2>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Users you are currently caretaking for.
+                        </p>
+                        <CaretakeesTable caretakees={user.caretaking_for} />
+                      </section>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Modals */}
+        {user && (
+          <>
+            <EditPersonalInformationModal
+              user={user}
+              isOpen={isPersonalInfoModalOpen}
+              onClose={() => setIsPersonalInfoModalOpen(false)}
+              onSuccess={() => {
+                // Refetch user data after successful update
+                // TanStack Query will automatically refetch due to invalidation in the mutation
+              }}
+            />
+            <EditOrgMembershipModal
+              user={user}
+              isOpen={isMembershipModalOpen}
+              onClose={() => setIsMembershipModalOpen(false)}
+              onSuccess={() => {
+                // Refetch user data after successful update
+              }}
+            />
+            <ToggleStaffProfileVisibilityModal
+              user={user}
+              isOpen={isToggleVisibilityModalOpen}
+              onClose={() => setIsToggleVisibilityModalOpen(false)}
+              onSuccess={() => {
+                // Refetch user data after successful update
+              }}
+            />
+          </>
+        )}
+      </div>
+    </PageTransition>
   );
 });
 

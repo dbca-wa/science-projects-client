@@ -157,7 +157,7 @@ export const UserEditForm = ({
 	if (isLoadingUser) {
 		return (
 			<div className="flex items-center justify-center py-12">
-				<Loader2 className="size-8 animate-spin text-muted-foreground" />
+				<Loader2 className="size-8 animate-spin text-blue-600" />
 			</div>
 		);
 	}
