@@ -182,7 +182,7 @@ export const FullMapContainer = observer(({
   }
 
   return (
-    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1'} relative z-10 rounded-md overflow-hidden`}>
+    <div className={`${fullscreen ? 'w-full h-full' : 'flex-1 min-h-[375px] sm:min-h-[400px]'} relative z-10 rounded-md overflow-hidden`}>
       <LeafletMap
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}

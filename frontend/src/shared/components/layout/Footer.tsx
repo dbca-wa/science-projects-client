@@ -1,6 +1,6 @@
 /**
- * TraditionalFooter component
- * Footer for the traditional layout
+ * Footer component
+ * Footer for the application layout
  * 
  * Features:
  * - SPMS version and copyright information
@@ -8,7 +8,7 @@
  * - Dark background styling
  * - Centered content
  */
-export const TraditionalFooter = () => {
+export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.0.0";
 

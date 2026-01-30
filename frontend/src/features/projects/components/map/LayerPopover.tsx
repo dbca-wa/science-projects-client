@@ -220,7 +220,7 @@ export const LayerPopover = observer(() => {
 											</label>
 											<p 
 												id={`layer-${layerType}-desc`}
-												className="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+												className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 mt-0.5"
 											>
 												{LAYER_DESCRIPTIONS[layerType]}
 											</p>
@@ -263,7 +263,7 @@ export const LayerPopover = observer(() => {
 							</div>
 							<p 
 								id="show-labels-desc"
-								className="text-xs text-gray-500 dark:text-gray-400 ml-6"
+								className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 ml-6"
 							>
 								Display region names on the map
 							</p>
@@ -291,7 +291,7 @@ export const LayerPopover = observer(() => {
 							</div>
 							<p 
 								id="show-colors-desc"
-								className="text-xs text-gray-500 dark:text-gray-400 ml-6"
+								className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 ml-6"
 							>
 								Fill regions with colors or show outline only
 							</p>

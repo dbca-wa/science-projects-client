@@ -16,7 +16,7 @@ export const PROJECT_KIND_COLORS = {
 } as const;
 
 /**
- * Project Status Colors (from original ModernProjectCard)
+ * Project Status Colors (from original ProjectCard)
  * Using Chakra UI color values converted to hex approximations
  */
 export const PROJECT_STATUS_COLORS = {

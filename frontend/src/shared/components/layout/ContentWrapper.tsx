@@ -6,7 +6,7 @@ interface ContentWrapperProps {
 
 /**
  * ContentWrapper - Structural wrapper for page content
- * Padding is handled by layout components (ModernPageWrapper, TraditionalLayout)
+ * Padding is handled by layout components
  * Pages are responsible for rendering their own breadcrumbs
  */
 export function ContentWrapper({ children }: ContentWrapperProps) {

@@ -1,8 +1,12 @@
+import { PageTransition } from "@/shared/components/PageTransition";
+
 const HowTo = () => {
 	return (
-		<div>
-			<span>HowTo</span>
-		</div>
+		<PageTransition>
+			<div>
+				<span>HowTo</span>
+			</div>
+		</PageTransition>
 	);
 };
 

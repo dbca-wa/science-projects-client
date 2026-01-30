@@ -2,12 +2,10 @@ import { makeObservable, action } from "mobx";
 import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 
 export type Theme = "light" | "dark";
-export type Layout = "modern" | "traditional";
 export type DataView = "grid" | "list";
 
 interface UIStoreState extends BaseStoreState {
 	theme: Theme;
-	layout: Layout;
 	sidebarOpen: boolean;
 	dataViewMode: DataView;
 	navitarOpen: boolean;
@@ -18,7 +16,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 	constructor() {
 		super({
 			theme: "light",
-			layout: "traditional",
 			sidebarOpen: false,
 			dataViewMode: "grid",
 			navitarOpen: false,
@@ -32,12 +29,10 @@ export class UIStore extends BaseStore<UIStoreState> {
 		makeObservable(this, {
 			// Actions
 			toggleTheme: action,
-			toggleLayout: action,
 			toggleSidebar: action,
 			toggleNavitar: action,
 			toggleHamburgerMenu: action,
 			setTheme: action,
-			setLayout: action,
 			setDataViewMode: action,
 			setNavitarOpen: action,
 			setHamburgerMenuOpen: action,
@@ -50,10 +45,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 
 	get theme(): Theme {
 		return this.state.theme;
-	}
-
-	get layout(): Layout {
-		return this.state.layout;
 	}
 
 	get sidebarOpen(): boolean {
@@ -81,11 +72,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 		if (savedTheme) {
 			this.state.theme = savedTheme;
 		}
-		// Load layout from localStorage
-		const savedLayout = localStorage.getItem("layout") as Layout;
-		if (savedLayout) {
-			this.state.layout = savedLayout;
-		}
 		// Apply theme after loading
 		this.state.initialised = true;
 		this.applyTheme();
@@ -98,15 +84,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 		this.state.theme = this.state.theme === "light" ? "dark" : "light";
 		localStorage.setItem("theme", this.state.theme);
 		this.applyTheme();
-	};
-
-	/**
-	 * Toggles layout between modern and traditional.
-	 */
-	toggleLayout = (): void => {
-		this.state.layout =
-			this.state.layout === "modern" ? "traditional" : "modern";
-		localStorage.setItem("layout", this.state.layout);
 	};
 
 	/**
@@ -154,14 +131,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 	};
 
 	/**
-	 * Sets layout.
-	 */
-	setLayout = (layout: Layout): void => {
-		this.state.layout = layout;
-		localStorage.setItem("layout", this.state.layout);
-	};
-
-	/**
 	 * Sets data view mode.
 	 */
 	setDataViewMode = (mode: DataView): void => {
@@ -184,7 +153,6 @@ export class UIStore extends BaseStore<UIStoreState> {
 	 */
 	reset(): void {
 		this.state.theme = "light";
-		this.state.layout = "traditional";
 		this.state.sidebarOpen = false;
 		this.state.dataViewMode = "grid";
 		this.state.navitarOpen = false;

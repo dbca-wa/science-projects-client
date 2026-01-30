@@ -12,14 +12,13 @@ function getConfettiColors(): string[] {
  * Hook to trigger confetti programmatically
  * 
  * Uses React Portal to render canvas at layout level for proper positioning.
- * Confetti appears in the #confetti-root container added to both Modern and Traditional layouts.
+ * Confetti appears in the #confetti-root container added to the layout.
  * 
  * Features:
  * - Single burst of 100 particles (like original HomeConfetti)
  * - 360-degree spread from center
  * - Particles fall naturally over ~3-4 seconds
  * - No abrupt disappearance - particles fade naturally
- * - Respects layout boundaries (no sidebar coverage in Modern layout)
  * - Uses active color scheme from project-colors.ts
  * 
  * @example

@@ -139,14 +139,14 @@ export const getAllProjectYears = async (): Promise<number[]> => {
  * Download projects CSV (Full)
  */
 export const downloadProjectsCSV = async (): Promise<Blob> => {
-	return apiClient.getBlob("projects/csv");
+	return apiClient.getBlob("projects/download");
 };
 
 /**
  * Download projects CSV (Annual Report)
  */
 export const downloadProjectsCSVAR = async (): Promise<Blob> => {
-	return apiClient.getBlob("projects/csv/ar");
+	return apiClient.getBlob("projects/download-ar");
 };
 
 // Export as default service object

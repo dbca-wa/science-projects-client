@@ -17,13 +17,11 @@ interface ConfettiPortalProps {
  * 
  * This component uses React Portal to render the confetti canvas in the
  * #confetti-root container that exists at the layout level. This ensures
- * proper positioning relative to the sidebar in Modern layout and full-screen
- * coverage in Traditional layout.
+ * proper full-screen positioning.
  * 
  * Features:
  * - Renders at layout level (not nested in page content)
- * - Respects sidebar boundaries in Modern layout
- * - Full-screen in Traditional layout
+ * - Full-screen coverage
  * - Proper z-index management
  * - Pointer-events-none to avoid blocking interactions
  * 

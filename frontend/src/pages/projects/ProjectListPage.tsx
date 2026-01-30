@@ -16,6 +16,7 @@ import { Loader2, MapPin, Plus } from "lucide-react";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
 import { DownloadProjectsCSVButton } from "@/features/projects/components/DownloadProjectsCSVButton";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 /**
  * ProjectListPage
@@ -112,106 +113,106 @@ const ProjectListPage = observer(() => {
 
 	// Empty state (no projects at all)
 	const showEmptyState =
-		!isLoading &&
 		data?.projects.length === 0 &&
 		!projectSearchStore.hasActiveFilters;
 
 	// No results state (search/filter returned nothing)
 	const showNoResults =
-		!isLoading &&
 		data?.projects.length === 0 &&
 		projectSearchStore.hasActiveFilters;
 
 	return (
-		<div className="w-full">
-			{/* Breadcrumb */}
-			<AutoBreadcrumb />
+		<PageTransition isLoading={isLoading}>
+			{isLoading ? (
+				<div className="flex items-center justify-center min-h-[400px]">
+					<div className="text-center space-y-4">
+						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+						<div className="text-lg font-medium text-muted-foreground">Loading projects...</div>
+					</div>
+				</div>
+			) : (
+			<div className="w-full">
+				{/* Breadcrumb */}
+				<AutoBreadcrumb />
 
-			{/* Page header */}
-			<div className="flex w-full mt-2 mb-6 flex-col gap-4 lg:flex-row">
-				<div className="flex-1 w-full flex-col">
-					<h1 className="text-2xl font-bold">
-						Projects ({projectSearchStore.state.totalResults})
-					</h1>
-					<p className="text-sm text-gray-600 dark:text-gray-200">
-						Ctrl + Click to open projects in another tab and keep
-						filters.
-					</p>
+				{/* Page header */}
+				<div className="flex w-full mt-2 mb-6 flex-col gap-4 lg:flex-row">
+					<div className="flex-1 w-full flex-col">
+						<h1 className="text-2xl font-bold">
+							Projects ({projectSearchStore.state.totalResults})
+						</h1>
+						<p className="text-sm text-gray-600 dark:text-gray-200">
+							Ctrl + Click to open projects in another tab and keep
+							filters.
+						</p>
+					</div>
+
+					{/* Action buttons */}
+					<div className="flex w-full lg:w-auto lg:flex-1 flex-col lg:flex-row justify-end items-stretch lg:items-center gap-2">
+						<NavigationButton
+							targetPath="/projects/map"
+							className="w-full lg:w-auto lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+						>
+							<MapPin className="mr-1 size-4" />
+							Map
+						</NavigationButton>
+						{/* Project data - admin only */}
+						{authStore.isSuperuser && <DownloadProjectsCSVButton />}
+						<NavigationButton
+							targetPath="/projects/create"
+							className="w-full lg:w-auto lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
+						>
+							<Plus className="mr-1 size-4" />
+							New Project
+						</NavigationButton>
+					</div>
 				</div>
 
-				{/* Action buttons */}
-				<div className="flex w-full lg:w-auto lg:flex-1 flex-col lg:flex-row justify-end items-stretch lg:items-center gap-2">
-					<NavigationButton
-						targetPath="/projects/map"
-						className="w-full lg:w-auto lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
-					>
-						<MapPin className="mr-1 size-4" />
-						Map
-					</NavigationButton>
-					{/* Project data - admin only */}
-					{authStore.isSuperuser && <DownloadProjectsCSVButton />}
-					<NavigationButton
-						targetPath="/projects/create"
-						className="w-full lg:w-auto lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
-					>
-						<Plus className="mr-1 size-4" />
-						New Project
-					</NavigationButton>
-				</div>
-			</div>
+				{/* Filters */}
+				<ProjectFilters
+					searchTerm={projectSearchStore.state.searchTerm}
+					filters={projectSearchStore.state.filters}
+					filterCount={projectSearchStore.filterCount}
+					saveSearch={projectSearchStore.state.saveSearch}
+					onSearchChange={handleSearchChange}
+					onFiltersChange={handleFiltersChange}
+					onClearFilters={handleClearFilters}
+					onToggleSaveSearch={handleToggleSaveSearch}
+				/>
 
-			{/* Filters */}
-			<ProjectFilters
-				searchTerm={projectSearchStore.state.searchTerm}
-				filters={projectSearchStore.state.filters}
-				filterCount={projectSearchStore.filterCount}
-				saveSearch={projectSearchStore.state.saveSearch}
-				onSearchChange={handleSearchChange}
-				onFiltersChange={handleFiltersChange}
-				onClearFilters={handleClearFilters}
-				onToggleSaveSearch={handleToggleSaveSearch}
-			/>
-
-			{/* Loading state */}
-			{isLoading && (
-				<div className="flex w-full min-h-[100px] pt-10 justify-center">
-					<Loader2 className="size-8 animate-spin text-muted-foreground" />
-				</div>
-			)}
-
-			{/* Project list */}
-			{!isLoading && (
+				{/* Project list */}
 				<ProjectList
 					projects={data?.projects || []}
-					isLoading={isLoading}
+					isLoading={false}
 				/>
-			)}
 
-			{/* Empty state */}
-			{showEmptyState && (
-				<EmptyState
-					title="No projects found"
-					description="There are no projects in the system yet."
-				/>
-			)}
+				{/* Empty state */}
+				{showEmptyState && (
+					<EmptyState
+						title="No projects found"
+						description="There are no projects in the system yet."
+					/>
+				)}
 
-			{/* No results state */}
-			{showNoResults && (
-				<NoResultsState
-					searchTerm={projectSearchStore.state.searchTerm}
-					onClear={handleClearFilters}
-				/>
-			)}
+				{/* No results state */}
+				{showNoResults && (
+					<NoResultsState
+						searchTerm={projectSearchStore.state.searchTerm}
+						onClear={handleClearFilters}
+					/>
+				)}
 
-			{/* Pagination */}
-			{data && data.total_pages > 1 && (
-				<Pagination
-					currentPage={projectSearchStore.state.currentPage}
-					totalPages={data.total_pages}
-					onPageChange={handlePageChange}
-				/>
+				{/* Pagination */}
+				{data && data.total_pages > 1 && (
+					<Pagination
+						currentPage={projectSearchStore.state.currentPage}
+						totalPages={data.total_pages}
+						onPageChange={handlePageChange}
+					/>
+				)}
+			</div>
 			)}
-		</div>
+		</PageTransition>
 	);
 });
 
