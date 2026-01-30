@@ -10,6 +10,7 @@ const Dashboard = lazy(() => import("@/pages/dash/Dashboard"));
 const UserListPage = lazy(() => import("@/pages/users/UserListPage"));
 const UserCreatePage = lazy(() => import("@/pages/users/UserCreatePage"));
 const UserCreateStaffPage = lazy(() => import("@/pages/users/UserCreateStaffPage"));
+const UserDetailPage = lazy(() => import("@/pages/users/UserDetailPage"));
 const UserEditPage = lazy(() => import("@/pages/users/UserEditPage"));
 const MyProfilePage = lazy(() => import("@/pages/users/MyProfilePage"));
 const ProfileEditPage = lazy(() => import("@/pages/users/ProfileEditPage"));
@@ -117,6 +118,7 @@ export const USER_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Users",
 		layoutWrapper: "content",
+		breadcrumbParent: "/users",
 	},
 	{
 		name: "Add DBCA User (Admin)",
@@ -129,6 +131,7 @@ export const USER_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Users",
 		layoutWrapper: "content",
+		breadcrumbParent: "/users",
 	},
 	{
 		name: "My Profile",
@@ -175,7 +178,16 @@ export const USER_ROUTES: RouteConfig[] = [
 		name: "User Detail",
 		path: "/users/:id",
 		iconKey: "users",
-		component: UserListPage,
+		component: UserListPage, // Shows sheet overlay
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "User Detail Page",
+		path: "/users/:id/details",
+		iconKey: "users",
+		component: UserDetailPage, // Dedicated full page
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
@@ -206,7 +218,7 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Project Map",
+		name: "Map",
 		path: "/projects/map",
 		iconKey: "map",
 		tooltipKey: "map",
@@ -215,6 +227,7 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Projects",
 		layoutWrapper: "content",
+		breadcrumbParent: "/projects",
 	},
 	{
 		name: "Create New Project",
@@ -226,6 +239,7 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		showInSidebar: true,
 		section: "Projects",
 		layoutWrapper: "content",
+		breadcrumbParent: "/projects",
 	},
 	{
 		name: "Create Project Wizard",
@@ -235,6 +249,7 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
+		breadcrumbParent: "/projects",
 	},
 	{
 		name: "Project Overview",

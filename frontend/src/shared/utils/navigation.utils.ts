@@ -1,60 +1,26 @@
 /**
- * Navigation utilities for handling ctrl/cmd+click to open in new tab
+ * Navigation utilities for handling Ctrl+Click and cross-platform navigation
  */
 
 /**
- * Handle navigation with support for opening in new tab
- * @param event - Mouse event from click
- * @param path - Path to navigate to
- * @param navigate - React Router navigate function
- * 
- * @example
- * ```tsx
- * <button onClick={(e) => handleNavigation(e, '/users', navigate)}>
- *   Users
- * </button>
- * ```
+ * Platform detection utility
+ * Returns the appropriate modifier key for the current platform
  */
-export const handleNavigation = (
-  event: React.MouseEvent,
-  path: string,
-  navigate: (path: string) => void
-): void => {
-  // Check if ctrl/cmd key is pressed or middle mouse button
-  if (event.ctrlKey || event.metaKey || event.button === 1) {
-    // Open in new tab
-    window.open(path, "_blank");
-  } else if (event.button === 0) {
-    // Normal left click - use React Router navigation
-    event.preventDefault();
-    navigate(path);
+export const getPlatformModifierKey = (): 'ctrlKey' | 'metaKey' => {
+  try {
+    const platform = navigator.platform?.toLowerCase() || '';
+    return platform.includes('mac') ? 'metaKey' : 'ctrlKey';
+  } catch (error) {
+    console.warn('Platform detection failed, defaulting to ctrlKey:', error);
+    return 'ctrlKey';
   }
 };
 
 /**
- * Get props for a clickable element that supports ctrl/cmd+click
- * @param path - Path to navigate to
- * @param navigate - React Router navigate function
- * @returns Props object with onClick and onAuxClick handlers
- * 
- * @example
- * ```tsx
- * <div {...getNavigationProps('/users', navigate)}>
- *   Users
- * </div>
- * ```
+ * Modifier key detection
+ * Checks if the appropriate modifier key is pressed for the current platform
  */
-export const getNavigationProps = (
-  path: string,
-  navigate: (path: string) => void
-) => ({
-  onClick: (e: React.MouseEvent) => handleNavigation(e, path, navigate),
-  onAuxClick: (e: React.MouseEvent) => {
-    // Handle middle mouse button click
-    if (e.button === 1) {
-      e.preventDefault();
-      window.open(path, "_blank");
-    }
-  },
-  style: { cursor: "pointer" },
-});
+export const hasModifierKey = (event: MouseEvent | KeyboardEvent): boolean => {
+  const modifierKey = getPlatformModifierKey();
+  return event[modifierKey] === true;
+};

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { UserEditForm } from "@/features/users/components/UserEditForm";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
@@ -25,14 +25,15 @@ const UserEditPage = () => {
   const { data: user, isLoading, error } = useUserDetail(userId);
 
   const handleCancel = () => {
-    navigate(`/users/${id}`);
+    navigate(`/users/${id}/details`);
   };
 
   const displayName = user ? getUserDisplayName(user) : "";
   
-  const breadcrumbItems = [
+  // Manual breadcrumbs with dynamic user name
+  const manualBreadcrumbs = [
     { title: "Users", link: "/users" },
-    { title: displayName || "User", link: `/users/${id}` },
+    { title: displayName || "User", link: `/users/${id}/details` },
     { title: "Edit" },
   ];
 
@@ -40,7 +41,7 @@ const UserEditPage = () => {
   if (isLoading) {
     return (
       <div className="w-full max-w-4xl">
-        <Skeleton className="h-10 w-full mb-6" />
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <Skeleton className="h-10 w-32 mb-8" />
         <Skeleton className="h-96" />
       </div>
@@ -59,7 +60,7 @@ const UserEditPage = () => {
 
     return (
       <div className="w-full max-w-4xl">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>{errorMessage}</AlertDescription>
@@ -72,7 +73,7 @@ const UserEditPage = () => {
   if (!user) {
     return (
       <div className="w-full max-w-4xl">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">User not found</p>
         </div>
@@ -83,7 +84,7 @@ const UserEditPage = () => {
   return (
     <div className="w-full max-w-4xl">
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
+      <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
       {/* Page header */}
       <div className="mb-8">

@@ -8,7 +8,7 @@ import {
 	getProjectTag,
 } from "../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { extractTextFromHTML } from "@/shared/utils/html.utils";
+import { sanitizeInput } from "@/shared/utils/sanitize.utils";
 import { PROJECT_KIND_COLORS, PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {
@@ -56,8 +56,8 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 	const imageUrl = getImageUrl(project.image);
 	const hasImage = !!imageUrl;
 	
-	// Extract plain text from HTML title for alt attribute
-	const plainTextTitle = extractTextFromHTML(project.title);
+	// Sanitize title to remove HTML tags (including bold)
+	const plainTextTitle = sanitizeInput(project.title);
 
 	return (
 		<Card
@@ -123,10 +123,9 @@ export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCard
 
 				{/* Title (bottom-left) */}
 				<div className="absolute bottom-0 left-0 z-10 p-4">
-					<h3
-						className="line-clamp-3 text-[17px] font-semibold text-white"
-						dangerouslySetInnerHTML={{ __html: project.title }}
-					/>
+					<h3 className="line-clamp-3 text-[17px] font-semibold text-white">
+						{plainTextTitle}
+					</h3>
 				</div>
 			</div>
 		</Card>

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { ExternalUserForm } from "@/features/users/components/ExternalUserForm";
 
 /**
@@ -18,15 +18,10 @@ const UserCreatePage = () => {
     navigate("/users");
   };
 
-  const breadcrumbItems = [
-    { title: "Users", link: "/users" },
-    { title: "Add External User" },
-  ];
-
   return (
     <div className="w-full">
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
+      <AutoBreadcrumb />
 
       {/* Page header */}
       <div className="mb-8">

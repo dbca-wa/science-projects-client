@@ -2,8 +2,9 @@ import { ROUTE_ICONS } from "@/app/router/route-icons";
 import { getSidebarRoutes } from "@/app/router/routes.config";
 import { useAuthStore } from "@/app/stores/store-context";
 import { cn } from "@/shared/lib/utils";
-import { NavLink, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
+import { useNavigationHandler } from "@/shared/hooks/useNavigationHandler";
 
 /**
  * ModernSidebar - Simplified sidebar for baseline
@@ -58,23 +59,23 @@ const ModernSidebar = observer(() => {
 							{routes.map((route) => {
 								const Icon = route.iconKey ? ROUTE_ICONS[route.iconKey as keyof typeof ROUTE_ICONS] : null;
 								const isActive = isRouteActive(route.path);
+								const handleClick = useNavigationHandler(route.path);
 								
 								return (
-									<NavLink
+									<a
 										key={route.path}
-										to={route.path}
-										className={() =>
-											cn(
-												"flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-												isActive
-													? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-													: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-											)
-										}
+										href={route.path}
+										onClick={handleClick}
+										className={cn(
+											"flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left no-underline",
+											isActive
+												? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+												: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+										)}
 									>
 										{Icon && <span className="w-5 h-5 flex items-center justify-center">{Icon}</span>}
 										<span>{route.name}</span>
-									</NavLink>
+									</a>
 								);
 							})}
 						</div>

@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
 import { MapFilters } from "@/features/projects/components/map/MapFilters";
 import { useProjectMapStore } from "@/app/stores/store-context";
@@ -145,6 +146,9 @@ const ProjectMapPage = observer(() => {
   if (!store.state.mapFullscreen) {
     return (
       <div className="flex flex-col h-screen">
+        {/* Breadcrumb */}
+        <AutoBreadcrumb />
+        
         {/* Filter bar - always visible in normal mode */}
         <MapFilters 
           projectCount={projects.length} 

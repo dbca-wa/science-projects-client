@@ -1,12 +1,12 @@
 import { useParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { PersonalInfoSection } from "@/features/users/components/PersonalInfoSection";
 import { ProfileSection } from "@/features/users/components/ProfileSection";
 import { MembershipSection } from "@/features/users/components/MembershipSection";
 import { UserAdminActionButtons } from "@/features/users/components/UserAdminActionButtons";
-import { Button } from "@/shared/components/ui/button";
+import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, Edit } from "lucide-react";
@@ -36,7 +36,8 @@ const UserDetailPage = observer(() => {
 
   const displayName = user ? getUserDisplayName(user) : "";
   
-  const breadcrumbItems = [
+  // Manual breadcrumbs for dynamic user name
+  const manualBreadcrumbs = [
     { title: "Users", link: "/users" },
     { title: displayName || "User" },
   ];
@@ -69,7 +70,7 @@ const UserDetailPage = observer(() => {
 
     return (
       <div className="w-full">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>
@@ -84,7 +85,7 @@ const UserDetailPage = observer(() => {
   if (!user) {
     return (
       <div className="w-full">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">User not found</p>
         </div>
@@ -95,7 +96,7 @@ const UserDetailPage = observer(() => {
   return (
     <div className="w-full">
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
+      <AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
       {/* Page header */}
       <div className="mb-8 flex items-start justify-between">
@@ -125,10 +126,10 @@ const UserDetailPage = observer(() => {
 
         {/* Edit button - admin only */}
         {authStore.isSuperuser && (
-          <Button onClick={() => navigate(`/users/${userId}/edit`)}>
+          <NavigationButton targetPath={`/users/${userId}/edit`}>
             <Edit className="size-4 mr-2" />
             Edit User
-          </Button>
+          </NavigationButton>
         )}
       </div>
 

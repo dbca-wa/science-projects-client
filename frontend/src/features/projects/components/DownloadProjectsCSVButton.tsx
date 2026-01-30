@@ -95,28 +95,29 @@ export const DownloadProjectsCSVButton = () => {
 	};
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					variant="default"
-					className="w-full lg:w-auto bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
-					disabled={isLoading}
-				>
-					{isLoading ? (
-						<>
-							<Loader2 className="mr-1 size-4 animate-spin" />
-							Downloading...
-						</>
-					) : (
-						<>
-							<FaFileDownload className="ml-1 size-4" />
-							CSV
-						</>
-					)}
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start">
-				<DropdownMenuItem
+		<div className="relative">
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant="default"
+						className="w-full lg:w-auto bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
+						disabled={isLoading}
+					>
+						{isLoading ? (
+							<>
+								<Loader2 className="mr-1 size-4 animate-spin" />
+								Downloading...
+							</>
+						) : (
+							<>
+								<FaFileDownload className="ml-1 size-4" />
+								CSV
+							</>
+						)}
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" sideOffset={4}>
+					<DropdownMenuItem
 					onClick={handleFullDownload}
 					className={isLoading ? "opacity-50 cursor-not-allowed" : ""}
 					onSelect={(e) => {
@@ -136,5 +137,6 @@ export const DownloadProjectsCSVButton = () => {
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
+		</div>
 	);
 };

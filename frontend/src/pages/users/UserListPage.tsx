@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { 
   UserSearchBar,
   UserFilterPanel,
@@ -13,7 +13,7 @@ import {
 import { EmptyState } from "@/shared/components/EmptyState";
 import { NoResultsState } from "@/shared/components/NoResultsState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { Button } from "@/shared/components/ui/button";
+import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { Loader2 } from "lucide-react";
@@ -33,10 +33,6 @@ const UserListPage = observer(() => {
   // Sheet state - controlled by URL
   const selectedUserId = params.id ? Number(params.id) : null;
   const isSheetOpen = !!selectedUserId;
-
-  const breadcrumbItems = [
-    { title: "Users" },
-  ];
 
 	// Initialize from URL params and localStorage
 	// TypeScript infers TFilters = UserSearchFilters from userSearchStore
@@ -117,7 +113,7 @@ const UserListPage = observer(() => {
   return (
     <div className="w-full">
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
+      <AutoBreadcrumb />
 
       {/* Page header */}
       <div className="flex w-full mt-2 mb-6 flex-row">
@@ -133,12 +129,12 @@ const UserListPage = observer(() => {
         {/* Create button - admin only */}
         <div className="flex flex-1 w-full justify-end items-center">
           {authStore.isSuperuser && (
-            <Button 
-              onClick={() => navigate("/users/create")}
+            <NavigationButton 
+              targetPath="/users/create"
               className="ml-4 bg-green-600 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-400"
             >
               Add User
-            </Button>
+            </NavigationButton>
           )}
         </div>
       </div>
