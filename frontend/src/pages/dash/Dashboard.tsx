@@ -8,7 +8,7 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { MdFeedback } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router";
-import { DashboardActionCard } from "@/shared/components/DashboardActionCard";
+import { DashboardActionCard } from "@/features/dashboard/components/DashboardActionCard";
 
 /**
  * Dashboard - Main landing page after authentication
@@ -74,7 +74,7 @@ const Dashboard = observer(() => {
 						icon={<FaQuestionCircle className="w-5 h-5" />}
 						title="Guide"
 						description="Learn how to use the system"
-						onClick={() => navigate("/guide")}
+						targetPath="/guide"
 						colorScheme="blue"
 						delay={0.1}
 					/>
@@ -83,7 +83,7 @@ const Dashboard = observer(() => {
 						icon={<FaSearch className="w-5 h-5" />}
 						title="Search Projects"
 						description="Browse all science projects"
-						onClick={() => navigate("/projects")}
+						targetPath="/projects"
 						colorScheme="blue"
 						delay={0.15}
 					/>
@@ -101,7 +101,7 @@ const Dashboard = observer(() => {
 						icon={<FaCirclePlus className="w-5 h-5" />}
 						title="Create Project"
 						description="Start a new science project"
-						onClick={() => navigate("/projects/create")}
+						targetPath="/projects/create"
 						colorScheme="green"
 						delay={0.25}
 					/>
@@ -121,7 +121,7 @@ const Dashboard = observer(() => {
 						icon={<FaDatabase className="w-5 h-5" />}
 						title="Data Catalogue"
 						description="Access DBCA's data portal"
-						onClick={() => window.open("https://data.bio.wa.gov.au/", "_blank")}
+						href="https://data.bio.wa.gov.au/"
 						colorScheme="blue"
 						delay={0.3}
 					/>
@@ -130,7 +130,7 @@ const Dashboard = observer(() => {
 						icon={<TbWorldWww className="w-5 h-5" />}
 						title="Scientific Sites Register"
 						description="Browse scientific sites"
-						onClick={() => window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")}
+						href="https://scientificsites.dpaw.wa.gov.au/"
 						colorScheme="blue"
 						delay={0.35}
 					/>

@@ -20,7 +20,7 @@ import {
   ToggleStaffProfileVisibilityModal
 } from "@/features/users";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
@@ -70,10 +70,23 @@ const MyProfilePage = observer(() => {
     setActiveTab(getTabFromPath(location.pathname));
   }, [location.pathname]);
 
-  const breadcrumbItems = [
-    { title: "Users", link: "/users" },
-    { title: "My Profile" },
-  ];
+  // Generate breadcrumbs based on active tab
+  const getBreadcrumbItems = () => {
+    switch (activeTab) {
+      case "staff-profile":
+        return [
+          { title: "My Profile", link: "/users/me" },
+          { title: "Public Profile" },
+        ];
+      case "caretaker":
+        return [
+          { title: "My Profile", link: "/users/me" },
+          { title: "Caretaker Mode" },
+        ];
+      default:
+        return [{ title: "My Profile" }];
+    }
+  };
 
   // Handle tab change - update URL without replacing history
   const handleTabChange = (value: string) => {
@@ -217,7 +230,7 @@ const MyProfilePage = observer(() => {
 
     return (
       <div className="w-full">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>{errorMessage}</AlertDescription>
@@ -230,7 +243,7 @@ const MyProfilePage = observer(() => {
   if (!user) {
     return (
       <div className="w-full">
-        <Breadcrumb items={breadcrumbItems} />
+        <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
         <div className="text-center py-12">
           <p className="text-muted-foreground">Profile not found</p>
         </div>
@@ -241,7 +254,7 @@ const MyProfilePage = observer(() => {
   return (
     <div className="w-full">
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
+      <AutoBreadcrumb overrideItems={getBreadcrumbItems()} />
 
       {/* Page header */}
       <div className="mb-8">

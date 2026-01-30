@@ -3,9 +3,12 @@ import { useEffect, useState } from "react";
 import { useProject } from "@/features/projects/hooks/useProject";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Button } from "@/shared/components/ui/button";
+import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { AlertCircle, ArrowLeft, Mail } from "lucide-react";
+import { sanitizeInput } from "@/shared/utils/sanitize.utils";
 import {
 	Select,
 	SelectContent,
@@ -94,10 +97,10 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 					</Alert>
 
 					<div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-						<Button onClick={() => navigate("/projects")} variant="default">
+						<NavigationButton targetPath="/projects" variant="default">
 							<ArrowLeft className="mr-2 h-4 w-4" />
 							Back to Projects
-						</Button>
+						</NavigationButton>
 						<Button
 							onClick={() => {
 								const email = "ecoinformatics.admin@dbca.wa.gov.au";
@@ -115,6 +118,12 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 	}
 
 	const { project, documents, details, members } = data;
+
+	// Manual breadcrumbs with project title (sanitized to remove HTML)
+	const manualBreadcrumbs = [
+		{ title: "Projects", link: "/projects" },
+		{ title: sanitizeInput(project.title || "Project") },
+	];
 
 	// Determine which tabs to show based on available documents
 	const availableTabs = [
@@ -136,18 +145,8 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 
 	return (
 		<div className="space-y-6">
-			{/* Back to Projects Button */}
-			<div>
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => navigate("/projects")}
-					className="gap-2"
-				>
-					<ArrowLeft className="h-4 w-4" />
-					Back to Projects
-				</Button>
-			</div>
+			{/* Breadcrumbs */}
+			<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
 			<Tabs value={selectedTab} onValueChange={handleTabChange}>
 				{/* Desktop: Horizontal tabs */}

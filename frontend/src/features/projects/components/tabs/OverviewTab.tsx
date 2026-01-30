@@ -3,7 +3,7 @@ import { ProjectStatusBadge } from "../ProjectStatusBadge";
 import { ProjectKindBadge } from "../ProjectKindBadge";
 import { ProjectKeywords } from "../ProjectKeywords";
 import { ProjectImage } from "../ProjectImage";
-import { extractTextFromHTML } from "@/shared/utils/html.utils";
+import { sanitizeInput } from "@/shared/utils/sanitize.utils";
 
 interface OverviewTabProps {
 	project: IProjectData;
@@ -12,8 +12,8 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ project, details: _details, members: _members }: OverviewTabProps) {
-	// Extract plain text from HTML title for alt attribute
-	const plainTextTitle = extractTextFromHTML(project.title);
+	// Sanitize title to remove HTML tags (including bold)
+	const plainTextTitle = sanitizeInput(project.title);
 	
 	return (
 		<div className="space-y-6">
@@ -26,10 +26,9 @@ export function OverviewTab({ project, details: _details, members: _members }: O
 
 			{/* Project Header Card */}
 			<div className="rounded-lg border bg-card p-6">
-				<h1
-					className="text-2xl font-bold"
-					dangerouslySetInnerHTML={{ __html: project.title }}
-				/>
+				<h1 className="text-2xl font-bold">
+					{plainTextTitle}
+				</h1>
 				<div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					<div>
 						<p className="text-sm font-semibold text-muted-foreground">Status</p>

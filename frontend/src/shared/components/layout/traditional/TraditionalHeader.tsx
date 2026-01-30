@@ -7,6 +7,7 @@ import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "../Navitar";
 import { Button } from "@/shared/components/ui/button";
+import { NavigationDropdownMenuItem } from "@/shared/components/navigation/NavigationDropdownMenuItem";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
 import {
   DropdownMenu,
@@ -118,27 +119,27 @@ export const TraditionalHeader = observer(() => {
                       <DropdownMenuLabel className="text-center text-xs text-gray-500">
                         Projects
                       </DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/projects")}
+                      <NavigationDropdownMenuItem
+                        targetPath="/projects"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <CgBrowse className="mr-2 size-4" />
                         Browse Projects
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/projects/map")}
+                      </NavigationDropdownMenuItem>
+                      <NavigationDropdownMenuItem
+                        targetPath="/projects/map"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <FaMapMarkedAlt className="mr-2 size-4" />
                         Project Map
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/projects/create")}
+                      </NavigationDropdownMenuItem>
+                      <NavigationDropdownMenuItem
+                        targetPath="/projects/create"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <CgPlayListAdd className="mr-2 size-4" />
                         Create New Project
-                      </DropdownMenuItem>
+                      </NavigationDropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -159,28 +160,28 @@ export const TraditionalHeader = observer(() => {
                       <DropdownMenuLabel className="text-center text-xs text-gray-500">
                         Users
                       </DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/users")}
+                      <NavigationDropdownMenuItem
+                        targetPath="/users"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <ImUsers className="mr-2 size-4" />
                         Browse Users
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/users/create")}
+                      </NavigationDropdownMenuItem>
+                      <NavigationDropdownMenuItem
+                        targetPath="/users/create"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <FaUserPlus className="mr-2 size-4" />
                         Add User
-                      </DropdownMenuItem>
+                      </NavigationDropdownMenuItem>
                       {authStore.isSuperuser && (
-                        <DropdownMenuItem
-                          onClick={() => navigate("/users/create-staff")}
+                        <NavigationDropdownMenuItem
+                          targetPath="/users/create-staff"
                           className="hover:bg-gray-100 cursor-pointer select-none"
                         >
                           <FaUserPlus className="mr-2 size-4" />
                           Add DBCA User (Admin)
-                        </DropdownMenuItem>
+                        </NavigationDropdownMenuItem>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -202,13 +203,13 @@ export const TraditionalHeader = observer(() => {
                     <DropdownMenuLabel className="text-center text-xs text-gray-500">
                       Annual Research Activity Report
                     </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/reports")}
+                    <NavigationDropdownMenuItem
+                      targetPath="/reports"
                       className="hover:bg-gray-100 cursor-pointer select-none"
                     >
                       <CgViewList className="mr-2 size-4" />
                       Published Reports
-                    </DropdownMenuItem>
+                    </NavigationDropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 */}
@@ -231,13 +232,13 @@ export const TraditionalHeader = observer(() => {
                       <DropdownMenuLabel className="text-center text-xs text-gray-500">
                         Manage
                       </DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => navigate("/admin")}
+                      <NavigationDropdownMenuItem
+                        targetPath="/admin"
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <RiAdminFill className="mr-2 size-4" />
                         Admin Dashboard
-                      </DropdownMenuItem>
+                      </NavigationDropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { useNavigationHandler } from "@/shared/hooks/useNavigationHandler";
 
 interface DashboardActionCardProps {
 	icon: ReactNode;
@@ -7,6 +8,7 @@ interface DashboardActionCardProps {
 	description: string;
 	onClick?: () => void;
 	href?: string;
+	targetPath?: string; // New prop for internal navigation
 	colorScheme?: "blue" | "green" | "purple";
 	delay?: number;
 }
@@ -21,9 +23,11 @@ export const DashboardActionCard = ({
 	description,
 	onClick,
 	href,
+	targetPath, // New prop for navigation path
 	colorScheme = "blue",
 	delay = 0,
 }: DashboardActionCardProps) => {
+	const handleClick = useNavigationHandler(targetPath || '', onClick);
 	const colorClasses = {
 		blue: "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400",
 		green: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400",
@@ -48,10 +52,13 @@ export const DashboardActionCard = ({
 
 	const cardClasses = "cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700";
 
-	if (href) {
+	if (href && !targetPath) {
+		// External link - use existing behavior
 		return (
 			<motion.a
 				href={href}
+				target="_blank"
+				rel="noopener noreferrer"
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, delay }}
@@ -63,14 +70,15 @@ export const DashboardActionCard = ({
 	}
 
 	return (
-		<motion.button
-			onClick={onClick}
+		<motion.a
+			href={targetPath || '#'}
+			onClick={targetPath ? handleClick : onClick}
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, delay }}
-			className={`${cardClasses} text-left w-full`}
+			className={`${cardClasses} text-left w-full block no-underline`}
 		>
 			{content}
-		</motion.button>
+		</motion.a>
 	);
 };

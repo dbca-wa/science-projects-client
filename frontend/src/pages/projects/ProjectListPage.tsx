@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { observer } from "mobx-react-lite";
-import { Breadcrumb } from "@/shared/components/Breadcrumb";
+import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { ProjectFilters, ProjectList } from "@/features/projects/components";
 import { Pagination } from "@/shared/components/Pagination";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { NoResultsState } from "@/shared/components/NoResultsState";
 import { ErrorState } from "@/shared/components/ErrorState";
-import { Button } from "@/shared/components/ui/button";
+import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import {
 	useAuthStore,
 	useProjectSearchStore,
@@ -22,12 +22,9 @@ import { DownloadProjectsCSVButton } from "@/features/projects/components/Downlo
  * Main page for browsing and searching projects
  */
 const ProjectListPage = observer(() => {
-	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const projectSearchStore = useProjectSearchStore();
 	const [, setSearchParams] = useSearchParams();
-
-	const breadcrumbItems = [{ title: "Projects" }];
 
 	// Initialize from URL params and localStorage
 	// TypeScript infers TFilters = ProjectSearchFilters from projectSearchStore
@@ -128,7 +125,7 @@ const ProjectListPage = observer(() => {
 	return (
 		<div className="w-full">
 			{/* Breadcrumb */}
-			<Breadcrumb items={breadcrumbItems} />
+			<AutoBreadcrumb />
 
 			{/* Page header */}
 			<div className="flex w-full mt-2 mb-6 flex-col gap-4 lg:flex-row">
@@ -144,22 +141,22 @@ const ProjectListPage = observer(() => {
 
 				{/* Action buttons */}
 				<div className="flex w-full lg:w-auto lg:flex-1 flex-col lg:flex-row justify-end items-stretch lg:items-center gap-2">
-					<Button
-						onClick={() => navigate("/projects/map")}
+					<NavigationButton
+						targetPath="/projects/map"
 						className="w-full lg:w-auto lg:flex-initial bg-blue-600 hover:bg-blue-500 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
 					>
 						<MapPin className="mr-1 size-4" />
 						Map
-					</Button>
+					</NavigationButton>
 					{/* Project data - admin only */}
 					{authStore.isSuperuser && <DownloadProjectsCSVButton />}
-					<Button
-						onClick={() => navigate("/projects/create")}
+					<NavigationButton
+						targetPath="/projects/create"
 						className="w-full lg:w-auto lg:flex-initial bg-green-600 hover:bg-green-500 text-white dark:bg-green-600 dark:hover:bg-green-500"
 					>
 						<Plus className="mr-1 size-4" />
 						New Project
-					</Button>
+					</NavigationButton>
 				</div>
 			</div>
 
