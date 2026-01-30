@@ -18,6 +18,7 @@ import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { Loader2 } from "lucide-react";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 /**
  * UserListPage
@@ -105,13 +106,22 @@ const UserListPage = observer(() => {
   }
 
   // Empty state (no users at all)
-  const showEmptyState = !isLoading && data?.users.length === 0 && !userSearchStore.hasActiveFilters;
+  const showEmptyState = data?.users.length === 0 && !userSearchStore.hasActiveFilters;
 
   // No results state (search/filter returned nothing)
-  const showNoResults = !isLoading && data?.users.length === 0 && userSearchStore.hasActiveFilters;
+  const showNoResults = data?.users.length === 0 && userSearchStore.hasActiveFilters;
 
   return (
-    <div className="w-full">
+    <PageTransition isLoading={isLoading}>
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+            <div className="text-lg font-medium text-muted-foreground">Loading users...</div>
+          </div>
+        </div>
+      ) : (
+      <div className="w-full">
       {/* Breadcrumb */}
       <AutoBreadcrumb />
 
@@ -208,9 +218,7 @@ const UserListPage = observer(() => {
       )}
 
       {/* User grid */}
-      {!isLoading && (
-        <UserGrid users={data?.users || []} isLoading={isLoading} />
-      )}
+      <UserGrid users={data?.users || []} isLoading={false} />
 
       {/* Empty state */}
       {showEmptyState && (
@@ -244,6 +252,8 @@ const UserListPage = observer(() => {
         onClose={handleCloseSheet}
       />
     </div>
+      )}
+    </PageTransition>
   );
 });
 

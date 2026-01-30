@@ -57,49 +57,34 @@ export const MapFilters = observer(({
   };
 
   const handleClearFilters = () => {
-    store.uncheckAllBusinessAreas();
-    store.setFilterUser(null);
-    store.setFilterStatus("");
-    store.setFilterKind("");
-    store.setFilterYear(0);
-    store.setOnlyActive(false);
-    store.setOnlyInactive(false);
-    handleClearSearch();
+    // Use store's resetFilters method which handles localStorage (matches ProjectFilters pattern)
+    store.resetFilters();
+    // Also clear local search term state
+    setLocalSearchTerm("");
   };
 
   const handleUserChange = (userId: number | null) => {
-    store.setFilterUser(userId);
-  };
-
-  const handleToggleSaveSearch = () => {
-    store.toggleSaveSearch();
+    store.setFilters({ user: userId });
   };
 
   const handleActiveChange = () => {
-    if (!store.state.onlyActive) {
-      store.setOnlyActive(true);
+    if (!store.state.filters.onlyActive) {
+      store.setFilters({ onlyActive: true, onlyInactive: false });
     } else {
-      store.setOnlyActive(false);
+      store.setFilters({ onlyActive: false });
     }
   };
 
   const handleInactiveChange = () => {
-    if (!store.state.onlyInactive) {
-      store.setOnlyInactive(true);
+    if (!store.state.filters.onlyInactive) {
+      store.setFilters({ onlyActive: false, onlyInactive: true });
     } else {
-      store.setOnlyInactive(false);
+      store.setFilters({ onlyInactive: false });
     }
   };
 
-  // Calculate filter count (search term + business areas + user + status + kind + year + active/inactive)
-  const filterCount = (store.state.searchTerm.length > 0 ? 1 : 0) + 
-                     store.state.selectedBusinessAreas.length + 
-                     (store.state.filterUser ? 1 : 0) +
-                     (store.state.filterStatus && store.state.filterStatus !== "" ? 1 : 0) +
-                     (store.state.filterKind && store.state.filterKind !== "" ? 1 : 0) +
-                     (store.state.filterYear && store.state.filterYear !== 0 ? 1 : 0) +
-                     (store.state.onlyActive ? 1 : 0) +
-                     (store.state.onlyInactive ? 1 : 0);
+  // Calculate filter count using store's computed property
+  const filterCount = store.filterCount;
 
   // Generate year options (current year back to 2000)
   const currentYear = new Date().getFullYear();
@@ -140,7 +125,7 @@ export const MapFilters = observer(({
           {/* User Filter with icon - SECOND on mobile, left on desktop */}
           <div className={`w-full order-2 ${!isFullscreen ? 'lg:order-1' : ''}`}>
             <UserSearchDropdown
-              key={store.state.filterUser || "no-user"}
+              key={store.state.filters.user || "no-user"}
               isRequired={false}
               setUserFunction={handleUserChange}
               label=""
@@ -148,7 +133,7 @@ export const MapFilters = observer(({
               helperText=""
               hideCannotFind={true}
               className="text-sm rounded-md"
-              preselectedUserPk={store.state.filterUser || undefined}
+              preselectedUserPk={store.state.filters.user || undefined}
               showIcon={true}
             />
           </div>
@@ -158,8 +143,8 @@ export const MapFilters = observer(({
         <div className={`grid grid-cols-1 ${!isFullscreen ? 'sm:grid-cols-2 lg:grid-cols-4' : ''} gap-3`}>
           {/* Year Dropdown */}
           <Select
-            value={store.state.filterYear?.toString() || "0"}
-            onValueChange={(value) => store.setFilterYear(value === "0" ? 0 : Number(value))}
+            value={store.state.filters.year?.toString() || "0"}
+            onValueChange={(value) => store.setFilters({ year: value === "0" ? 0 : Number(value) })}
           >
             <SelectTrigger className="w-full text-sm rounded-md">
               <SelectValue placeholder="All Years" />
@@ -176,8 +161,8 @@ export const MapFilters = observer(({
 
           {/* Project Status Dropdown */}
           <Select
-            value={store.state.filterStatus || "All"}
-            onValueChange={(value) => store.setFilterStatus(value === "All" ? "" : value)}
+            value={store.state.filters.status || "All"}
+            onValueChange={(value) => store.setFilters({ status: value === "All" ? "" : value })}
           >
             <SelectTrigger className="w-full text-sm rounded-md">
               <SelectValue placeholder="All Statuses" />
@@ -197,8 +182,8 @@ export const MapFilters = observer(({
 
           {/* Project Kind Dropdown */}
           <Select
-            value={store.state.filterKind || "All"}
-            onValueChange={(value) => store.setFilterKind(value === "All" ? "" : value)}
+            value={store.state.filters.kind || "All"}
+            onValueChange={(value) => store.setFilters({ kind: value === "All" ? "" : value })}
           >
             <SelectTrigger className="w-full text-sm rounded-md">
               <SelectValue placeholder="All Kinds" />
@@ -215,11 +200,19 @@ export const MapFilters = observer(({
           {/* Business Area Multi-Select */}
           <div className="w-full">
             <BusinessAreaMultiSelect
-              key={`ba-${store.state.selectedBusinessAreas.join(',')}`}
-              selectedBusinessAreas={store.state.selectedBusinessAreas}
-              onToggleBusinessArea={store.toggleBusinessArea}
-              onSelectAll={store.checkAllBusinessAreas}
-              onClearAll={store.uncheckAllBusinessAreas}
+              key={`ba-${store.state.filters.selectedBusinessAreas.join(',')}`}
+              selectedBusinessAreas={store.state.filters.selectedBusinessAreas}
+              onToggleBusinessArea={(baId) => {
+                const current = store.state.filters.selectedBusinessAreas;
+                const index = current.indexOf(baId);
+                if (index > -1) {
+                  store.setFilters({ selectedBusinessAreas: current.filter(id => id !== baId) });
+                } else {
+                  store.setFilters({ selectedBusinessAreas: [...current, baId] });
+                }
+              }}
+              onSelectAll={(businessAreaIds) => store.setFilters({ selectedBusinessAreas: businessAreaIds })}
+              onClearAll={() => store.setFilters({ selectedBusinessAreas: [] })}
               showTags={false}
             />
           </div>
@@ -232,9 +225,9 @@ export const MapFilters = observer(({
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="map-active-filter"
-                checked={store.state.onlyActive || false}
+                checked={store.state.filters.onlyActive || false}
                 onCheckedChange={handleActiveChange}
-                disabled={store.state.onlyInactive || false}
+                disabled={store.state.filters.onlyInactive || false}
                 className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
               />
               <Label
@@ -248,9 +241,9 @@ export const MapFilters = observer(({
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="map-inactive-filter"
-                checked={store.state.onlyInactive || false}
+                checked={store.state.filters.onlyInactive || false}
                 onCheckedChange={handleInactiveChange}
-                disabled={store.state.onlyActive || false}
+                disabled={store.state.filters.onlyActive || false}
               />
               <Label
                 htmlFor="map-inactive-filter"
@@ -264,7 +257,7 @@ export const MapFilters = observer(({
           {/* Right side: Search Controls */}
           <SearchControls
             saveSearch={store.state.saveSearch}
-            onToggleSaveSearch={handleToggleSaveSearch}
+            onToggleSaveSearch={() => store.toggleSaveSearch()}
             filterCount={filterCount}
             onClearFilters={handleClearFilters}
             className="flex gap-3 items-center"

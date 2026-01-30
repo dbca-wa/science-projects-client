@@ -13,7 +13,6 @@ import { PROJECT_KIND_COLORS, PROJECT_STATUS_COLORS } from "@/shared/constants/p
 
 interface ProjectCardProps {
 	project: IProjectData;
-	layout?: "modern" | "traditional";
 }
 
 /**
@@ -24,7 +23,7 @@ interface ProjectCardProps {
  * - Ctrl+click to open in new tab
  * - Responsive layout
  */
-export function ProjectCard({ project, layout: _layout = "modern" }: ProjectCardProps) {
+export function ProjectCard({ project }: ProjectCardProps) {
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [hovered, setHovered] = useState(false);

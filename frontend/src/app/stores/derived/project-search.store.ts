@@ -54,6 +54,7 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 			setPagination: action,
 			resetFilters: action,
 			toggleSaveSearch: action,
+			setSaveSearch: action,
 			clearSearchAndFilters: action,
 			setTotalResults: action,
 			reset: action,
@@ -82,7 +83,7 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 			if (stored) {
 				const parsed = JSON.parse(stored);
 				if (parsed.saveSearch) {
-					this.state = { ...this.state, ...parsed };
+					this.restoreFromStorage(parsed);
 				}
 			}
 		} catch (error) {
@@ -91,6 +92,13 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 			});
 		}
 	}
+
+	/**
+	 * Restores state from parsed storage data (action).
+	 */
+	private restoreFromStorage = action((parsed: any) => {
+		this.state = { ...this.state, ...parsed };
+	});
 
 	/**
 	 * Saves current search state to localStorage.
@@ -168,6 +176,14 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 	 */
 	toggleSaveSearch() {
 		this.state.saveSearch = !this.state.saveSearch;
+		this.saveToLocalStorage();
+	}
+
+	/**
+	 * Sets whether search state should be saved to localStorage (action for MobX strict mode).
+	 */
+	setSaveSearch(value: boolean) {
+		this.state.saveSearch = value;
 		this.saveToLocalStorage();
 	}
 

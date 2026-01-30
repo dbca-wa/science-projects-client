@@ -12,6 +12,7 @@ import { Minimize2, Filter } from "lucide-react";
 import { MapErrorBoundary } from "@/features/projects/components/map/MapErrorBoundary";
 import { Button } from "@/shared/components/ui/button";
 import { useScreenReaderAnnouncements } from "@/shared/utils/screen-reader.utils";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 /**
  * ProjectMapPage - Complete implementation
@@ -48,74 +49,18 @@ const ProjectMapPage = observer(() => {
     },
   });
 
-  // Sync store state to URL params
+  // Sync store state to URL params (using computed searchParams property - matches ProjectListPage)
   useEffect(() => {
-    // Use computed property that MobX can properly track
-    const businessAreasArray = store.selectedBusinessAreasArray;
-    
-    // Build URL params
-    const params = new URLSearchParams();
-    
-    if (store.state.searchTerm) {
-      params.set('search', store.state.searchTerm);
-    }
-    
-    if (businessAreasArray.length > 0) {
-      params.set('businessAreas', businessAreasArray.join(','));
-    }
-    
-    if (store.state.filterUser) {
-      params.set('user', store.state.filterUser.toString());
-    }
-
-    if (store.state.filterStatus) {
-      params.set('status', store.state.filterStatus);
-    }
-
-    if (store.state.filterKind) {
-      params.set('kind', store.state.filterKind);
-    }
-
-    if (store.state.filterYear && store.state.filterYear !== 0) {
-      params.set('year', store.state.filterYear.toString());
-    }
-
-    if (store.state.onlyActive) {
-      params.set('onlyActive', 'true');
-    }
-
-    if (store.state.onlyInactive) {
-      params.set('onlyInactive', 'true');
-    }
-
-    // Update URL params
-    setSearchParams(params, { replace: true });
+    setSearchParams(store.searchParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     store.state.searchTerm,
-    store.selectedBusinessAreasArray,
-    store.state.filterUser,
-    store.state.filterStatus,
-    store.state.filterKind,
-    store.state.filterYear,
-    store.state.onlyActive,
-    store.state.onlyInactive,
+    store.state.filters,
     setSearchParams,
   ]);
   
   // Get filtered projects and statistics from single API call
   const { data: mapData, isLoading, error } = useProjectsForMap(store.apiParams);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center space-y-4">
-          <Spinner className="size-8 mx-auto text-blue-600" />
-          <div className="text-lg font-medium text-muted-foreground">Loading projects...</div>
-          <div className="text-sm text-muted-foreground">Fetching project data and map layers</div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -145,7 +90,8 @@ const ProjectMapPage = observer(() => {
   // Normal mode: filter bar on top, map below
   if (!store.state.mapFullscreen) {
     return (
-      <div className="flex flex-col h-screen">
+      <PageTransition>
+        <div className="flex flex-col h-screen">
         {/* Breadcrumb */}
         <AutoBreadcrumb />
         
@@ -155,15 +101,26 @@ const ProjectMapPage = observer(() => {
           totalProjects={totalProjects}
           projectsWithoutLocation={projectsWithoutLocation}
         />
-        {/* Map container - takes remaining space */}
-        <MapErrorBoundary>
-          <FullMapContainer 
-            projectCount={projects.length}
-            totalProjects={totalProjects}
-            projectsWithoutLocation={projectsWithoutLocation}
-          />
-        </MapErrorBoundary>
+        
+        {/* Map container - shows loading state while data loads */}
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <Spinner className="size-12 mx-auto text-blue-600" />
+              <div className="text-lg font-medium text-muted-foreground">Loading map...</div>
+            </div>
+          </div>
+        ) : (
+          <MapErrorBoundary>
+            <FullMapContainer 
+              projectCount={projects.length}
+              totalProjects={totalProjects}
+              projectsWithoutLocation={projectsWithoutLocation}
+            />
+          </MapErrorBoundary>
+        )}
       </div>
+      </PageTransition>
     );
   }
 
@@ -198,10 +155,10 @@ const ProjectMapPage = observer(() => {
       
       {/* Floating sidebar - animated */}
       {!store.state.filtersMinimized && (
-        <div className="absolute top-4 left-4 w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300">
+        <div className="absolute top-4 left-4 w-[calc(100vw-2rem)] sm:w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300 overflow-hidden">
           {/* Sidebar header */}
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Project Map</h2>
+          <div className="p-3 sm:p-4 border-b border-border flex items-center justify-between flex-shrink-0">
+            <h2 className="text-base sm:text-lg font-semibold">Project Map</h2>
             <Button
               variant="ghost"
               size="sm"

@@ -1,13 +1,13 @@
 import { Outlet } from "react-router";
-import { TraditionalFooter } from "./TraditionalFooter";
-import { TraditionalHeader } from "./TraditionalHeader";
+import { Footer } from "./Footer";
+import { Header } from "./Header";
 
 /**
  * BackgroundImage - Isolated component that reacts to theme changes
  * Prevents parent layout from re-rendering 
  * NOTE: Swapped to pure tailwind class and removed observer
  */
-const TraditionalBackgroundImage = () => {
+const BackgroundImage = () => {
 
   return (
     <>
@@ -27,7 +27,7 @@ const TraditionalBackgroundImage = () => {
   );
 };
 
-TraditionalBackgroundImage.displayName = "TraditionalBackgroundImage";
+BackgroundImage.displayName = "BackgroundImage";
 
 const ContentBox = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -44,16 +44,16 @@ const ContentBox = ({ children }: { children: React.ReactNode }) => {
 ContentBox.displayName = "ContentBox";
 
 /**
- * TraditionalLayout component
- * Provides the traditional layout structure with header, content area, and footer
+ * AppLayout component
+ * Provides the main layout structure with header, content area, and footer
  */
-export function TraditionalLayout() {
+export function AppLayout() {
   return (
     <div className="fixed top-0 left-0 w-screen h-screen overflow-hidden flex flex-col">
       {/* Scrollable container */}
       <div className="top-0 left-0 right-0 overflow-y-auto no-scrollbar">
-        {/* Traditional Header */}
-        <TraditionalHeader />
+        {/* Header */}
+        <Header />
 
         {/* Content Wrapper with responsive padding */}
         <div className="mx-4 sm:mx-6 md:mx-[10%] lg:mx-[15%] py-2 flex flex-col min-h-screen">
@@ -62,17 +62,17 @@ export function TraditionalLayout() {
           </ContentBox>
 
           {/* Background Image - Handles its own theme reactivity */}
-          <TraditionalBackgroundImage />
+          <BackgroundImage />
         </div>
 
-        {/* Traditional Footer */}
-        <TraditionalFooter />
+        {/* Footer */}
+        <Footer />
       </div>
       
-      {/* Portal container for confetti - full screen in traditional layout */}
+      {/* Portal container for confetti - full screen */}
       <div id="confetti-root" className="fixed inset-0 pointer-events-none z-50" />
     </div>
   );
 }
 
-TraditionalLayout.displayName = "TraditionalLayout";
+AppLayout.displayName = "AppLayout";

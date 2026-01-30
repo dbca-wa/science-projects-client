@@ -1,25 +1,25 @@
 import { Link, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { IoCaretDown } from "react-icons/io5";
-import { Navitar } from "../Navitar";
+import { Navitar } from "./Navitar";
 import { Button } from "@/shared/components/ui/button";
 import { NavigationDropdownMenuItem } from "@/shared/components/navigation/NavigationDropdownMenuItem";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";
-import TraditionalHeaderContent from "./TraditionalHeaderContent";
+import HeaderContent from "./HeaderContent";
 
 /**
  * HamburgerMenuSheet - Mobile navigation menu
@@ -43,15 +43,8 @@ const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (
       </Button>
       
       <Sheet open={uiStore.hamburgerMenuOpen} onOpenChange={(open) => uiStore.setHamburgerMenuOpen(open)} modal={true}>
-        <SheetContent side="right" className="bg-gray-900 text-white border-gray-700 w-3/4 sm:max-w-sm">
-          <SheetHeader className="border-b border-gray-700 pb-4">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="text-white text-xl font-bold">SPMS</SheetTitle>
-              <Navitar isModern={false} shouldShowName={false} />
-            </div>
-          </SheetHeader>
-
-          <TraditionalHeaderContent 
+        <SheetContent side="right" className="bg-gray-900 text-white border-gray-700 w-3/4 sm:max-w-sm flex flex-col">
+          <HeaderContent 
             handleNavigation={handleNavigation}
             onClose={() => uiStore.setHamburgerMenuOpen(false)}
           />
@@ -62,13 +55,17 @@ const HamburgerMenuSheet = observer(({ handleNavigation }: { handleNavigation: (
 });
 
 /**
- * TraditionalHeader component
+ * Header component
  * Header with navigation menu, user avatar, and responsive hamburger menu
  */
-export const TraditionalHeader = observer(() => {
+export const Header = observer(() => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
   const { width } = useWindowSize();
+
+  // Controlled dropdown state
+  const [projectsOpen, setProjectsOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false);
 
   // Show hamburger menu on screens smaller than lg breakpoint
   const shouldShowHamburger = width < BREAKPOINTS.lg;
@@ -105,7 +102,7 @@ export const TraditionalHeader = observer(() => {
               <div className="flex items-center gap-1">
                 {/* Projects Menu */}
                 <div className="relative">
-                  <DropdownMenu>
+                  <DropdownMenu open={projectsOpen} onOpenChange={setProjectsOpen}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -121,6 +118,7 @@ export const TraditionalHeader = observer(() => {
                       </DropdownMenuLabel>
                       <NavigationDropdownMenuItem
                         targetPath="/projects"
+                        onNavigate={() => setProjectsOpen(false)}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <CgBrowse className="mr-2 size-4" />
@@ -128,6 +126,7 @@ export const TraditionalHeader = observer(() => {
                       </NavigationDropdownMenuItem>
                       <NavigationDropdownMenuItem
                         targetPath="/projects/map"
+                        onNavigate={() => setProjectsOpen(false)}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <FaMapMarkedAlt className="mr-2 size-4" />
@@ -135,6 +134,7 @@ export const TraditionalHeader = observer(() => {
                       </NavigationDropdownMenuItem>
                       <NavigationDropdownMenuItem
                         targetPath="/projects/create"
+                        onNavigate={() => setProjectsOpen(false)}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <CgPlayListAdd className="mr-2 size-4" />
@@ -146,7 +146,7 @@ export const TraditionalHeader = observer(() => {
 
                 {/* Users Menu */}
                 <div className="relative">
-                  <DropdownMenu>
+                  <DropdownMenu open={usersOpen} onOpenChange={setUsersOpen}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -162,6 +162,7 @@ export const TraditionalHeader = observer(() => {
                       </DropdownMenuLabel>
                       <NavigationDropdownMenuItem
                         targetPath="/users"
+                        onNavigate={() => setUsersOpen(false)}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <ImUsers className="mr-2 size-4" />
@@ -169,6 +170,7 @@ export const TraditionalHeader = observer(() => {
                       </NavigationDropdownMenuItem>
                       <NavigationDropdownMenuItem
                         targetPath="/users/create"
+                        onNavigate={() => setUsersOpen(false)}
                         className="hover:bg-gray-100 cursor-pointer select-none"
                       >
                         <FaUserPlus className="mr-2 size-4" />
@@ -177,6 +179,7 @@ export const TraditionalHeader = observer(() => {
                       {authStore.isSuperuser && (
                         <NavigationDropdownMenuItem
                           targetPath="/users/create-staff"
+                          onNavigate={() => setUsersOpen(false)}
                           className="hover:bg-gray-100 cursor-pointer select-none"
                         >
                           <FaUserPlus className="mr-2 size-4" />
@@ -258,7 +261,7 @@ export const TraditionalHeader = observer(() => {
 
               {/* Right side - Navitar with name */}
               <div className="flex items-center px-3">
-                <Navitar isModern={false} shouldShowName />
+                <Navitar shouldShowName />
               </div>
             </div>
           )}

@@ -46,6 +46,7 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			setFilters: action,
 			setCurrentPage: action,
 			toggleSaveSearch: action,
+			setSaveSearch: action,
 			resetFilters: action,
 			clearSearchAndFilters: action,
 			clearState: action,
@@ -112,6 +113,19 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
 		}
 		logger.info("Save search toggled", { saveSearch: this.state.saveSearch });
+	}
+
+	/**
+	 * Sets whether search state should be saved to localStorage (action for MobX strict mode).
+	 */
+	setSaveSearch(value: boolean) {
+		this.state.saveSearch = value;
+		if (value) {
+			this.saveToStorage();
+		} else {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveSearch: false }));
+		}
+		logger.info("Save search set", { saveSearch: value });
 	}
 
 	/**
@@ -231,21 +245,29 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			const stored = localStorage.getItem(STORAGE_KEY);
 			if (stored) {
 				const parsed = JSON.parse(stored);
-				this.state.saveSearch = parsed.saveSearch ?? true;
-				
-				if (parsed.saveSearch) {
-					this.state.searchTerm = parsed.searchTerm || "";
-					this.state.filters = parsed.filters || { ...DEFAULT_FILTERS };
-					this.state.currentPage = parsed.currentPage || 1;
-					logger.info("Loaded search state from storage", parsed);
-				} else {
-					logger.info("saveSearch disabled, not restoring search state");
-				}
+				// Use action to update state
+				this.restoreFromStorage(parsed);
 			}
 		} catch (error) {
 			logger.warn("Failed to load search state from storage", { error });
 		}
 	}
+
+	/**
+	 * Restores state from parsed storage data (action).
+	 */
+	private restoreFromStorage = action((parsed: any) => {
+		this.state.saveSearch = parsed.saveSearch ?? true;
+		
+		if (parsed.saveSearch) {
+			this.state.searchTerm = parsed.searchTerm || "";
+			this.state.filters = parsed.filters || { ...DEFAULT_FILTERS };
+			this.state.currentPage = parsed.currentPage || 1;
+			logger.info("Loaded search state from storage", parsed);
+		} else {
+			logger.info("saveSearch disabled, not restoring search state");
+		}
+	});
 
 	/**
 	 * Saves current search state to localStorage.

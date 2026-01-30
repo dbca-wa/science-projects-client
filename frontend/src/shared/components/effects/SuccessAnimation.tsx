@@ -40,7 +40,6 @@ function getConfettiColors(): string[] {
  * - Particles fall naturally over ~3-4 seconds
  * - No abrupt disappearance
  * - Properly positioned using React Portal at layout level
- * - Respects layout boundaries (no sidebar coverage in Modern layout)
  * - Uses active color scheme from project-colors.ts
  * - Accessible and performant
  */

@@ -13,7 +13,6 @@ import {
 import ErrorHandler from "@/shared/components/errors/ErrorHandler";
 import { RouteLoader } from "@/shared/components/RouteLoader";
 import { ContentWrapper } from "@/shared/components/layout/ContentWrapper";
-import { LayoutCheckWrapper } from "@/shared/components/layout/LayoutCheckWrapper";
 import { Root } from "@/shared/components/layout/Root";
 import { StaffProfileLayout } from "@/shared/components/layout/staff-profile/StaffProfileLayout";
 
@@ -35,13 +34,6 @@ const withLayout = (config: RouteConfig, element: ReactNode) => {
 	switch (config.layoutWrapper) {
 		case "content":
 			return <ContentWrapper>{secured}</ContentWrapper>;
-
-		case "layoutCheck":
-			return (
-				<ContentWrapper>
-					<LayoutCheckWrapper>{secured}</LayoutCheckWrapper>
-				</ContentWrapper>
-			);
 
 		case "staffProfile":
 			// Staff routes are public, but this still composes correctly if they are later secured/disabled

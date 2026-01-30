@@ -2,7 +2,6 @@ import type { LexicalEditor } from "lexical";
 import type { ReactNode } from "react";
 
 export interface INavitar {
-	isModern: boolean;
 	shouldShowName?: boolean;
 	// userData: IUserData;
 	windowSize: number;
@@ -13,7 +12,7 @@ export interface ISearchTerm {
 }
 
 export interface IDesignProps {
-	isModern?: boolean;
+	// Reserved for future design props
 }
 
 export interface SubDirectory {

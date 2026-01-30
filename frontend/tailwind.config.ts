@@ -20,21 +20,16 @@ const config = {
 			},
 		},
 		extend: {
-			// Add custom breakpoints here
+			// Explicit breakpoint definitions (overrides Tailwind defaults)
 			screens: {
-				'xs': `${BREAKPOINTS.xs}px`,
-				...Object.entries(BREAKPOINTS).reduce((acc, [key, value]) => {
-				  if (key !== '2xs' && key !== 'sm' && key !== 'md' && key !== 'lg' && key !== 'xl' && key !== '2xl') {
-				    acc[key] = `${value}px`;
-				  }
-				  return acc;
-				}, {} as Record<string, string>),
-				// Tailwind's default breakpoints are still available:
-				// sm: '640px'
-				// md: '768px'
-				// lg: '1024px'
-				// xl: '1280px'
-				// 2xl: '1536px'
+				'xs': `${BREAKPOINTS.xs}px`,      // 320px
+				'sm': `${BREAKPOINTS.sm}px`,      // 640px
+				'md': `${BREAKPOINTS.md}px`,      // 768px
+				'lg': `${BREAKPOINTS.lg}px`,      // 1024px
+				'xl': `${BREAKPOINTS.xl}px`,      // 1280px - 3 columns
+				'2xl': `${BREAKPOINTS["2xl"]}px`, // 1536px - 3 columns (Tailwind default)
+				'3xl': `${BREAKPOINTS["3xl"]}px`, // 2048px - 4 columns (2K standard)
+				'4xl': `${BREAKPOINTS["4xl"]}px`, // 3200px - 6 columns (ultra-wide)
 			},
 			colors: {
 				border: "hsl(var(--border))",

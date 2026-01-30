@@ -4,7 +4,7 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 /**
  * ProjectsMenuContent
  * Reusable content for Projects dropdown menu
- * Used in TraditionalHeader, ModernSidebar, and HamburgerMenu
+ * Used in Header and HamburgerMenu
  */
 
 interface ProjectsMenuContentProps {

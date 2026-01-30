@@ -135,8 +135,11 @@ const MapControlButtons = observer(() => {
 
 			{/* Heatmap Toggle - Full width button */}
 			<HeatmapToggle />
-			{/* Layer Controls - Top */}
-			<LayerPopover />
+			
+			{/* Layer Controls - Hidden on small screens unless fullscreen */}
+			<div className={isMapFullscreen ? '' : 'hidden sm:block'}>
+				<LayerPopover />
+			</div>
 
 		</div>
 	);

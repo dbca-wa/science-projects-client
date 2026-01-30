@@ -49,7 +49,7 @@ export interface RouteConfig {
 	breadcrumbParent?: string; // Path of parent route for breadcrumb trail
 
 	// Behavior/layout
-	layoutWrapper?: "content" | "layoutCheck" | "staffProfile" | "none";
+	layoutWrapper?: "content" | "staffProfile" | "none";
 	componentProps?: Record<string, any>; //eslint-disable-line
 	children?: RouteConfig[];
 }

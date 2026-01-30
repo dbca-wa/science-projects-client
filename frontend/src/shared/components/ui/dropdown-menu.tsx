@@ -210,11 +210,14 @@ function DropdownMenuItem({
 	inset,
 	variant = "default",
 	onClick,
+	asChild,
+	children,
 	...props
 }: React.ComponentProps<"div"> & {
 	inset?: boolean;
 	variant?: "default" | "destructive";
 	onClick?: () => void;
+	asChild?: boolean;
 }) {
 	const context = React.useContext(DropdownMenuContext);
 	
@@ -223,19 +226,48 @@ function DropdownMenuItem({
 		context?.onOpenChange(false);
 	};
 
+	const itemClassName = cn(
+		"focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+		className
+	);
+
+	if (asChild && React.isValidElement(children)) {
+		return React.cloneElement(
+			children as React.ReactElement<{ 
+				className?: string;
+				onClick?: (e: React.MouseEvent) => void;
+				"data-slot"?: string;
+				"data-inset"?: boolean;
+				"data-variant"?: string;
+				role?: string;
+			}>,
+			{
+				className: cn(itemClassName, (children.props as { className?: string }).className),
+				onClick: (e: React.MouseEvent) => {
+					(children.props as { onClick?: (e: React.MouseEvent) => void }).onClick?.(e);
+					handleClick();
+				},
+				"data-slot": "dropdown-menu-item",
+				"data-inset": inset,
+				"data-variant": variant,
+				role: "menuitem",
+				...props,
+			}
+		);
+	}
+
 	return (
 		<div
 			data-slot="dropdown-menu-item"
 			data-inset={inset}
 			data-variant={variant}
-			className={cn(
-				"focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
-				className
-			)}
+			className={itemClassName}
 			onClick={handleClick}
 			role="menuitem"
 			{...props}
-		/>
+		>
+			{children}
+		</div>
 	);
 }
 

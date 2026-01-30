@@ -55,13 +55,18 @@ export const Pagination = ({
 			{/* Page number buttons */}
 			{Array.from({ length: endPage - startPage + 1 }, (_, i) => {
 				const pageNum = startPage + i;
+				const isActive = pageNum === currentPage;
 				return (
 					<Button
 						key={pageNum}
 						size="sm"
-						variant={pageNum === currentPage ? "default" : "outline"}
+						variant="outline"
 						onClick={() => handleClick(pageNum)}
-						className="mx-0.5 min-w-[2.5rem]"
+						className={`mx-0.5 min-w-[2.5rem] ${
+							isActive
+								? "bg-blue-500 text-white hover:bg-blue-600 border-blue-500"
+								: ""
+						}`}
 					>
 						{pageNum}
 					</Button>

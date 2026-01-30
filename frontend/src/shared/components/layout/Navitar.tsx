@@ -14,13 +14,11 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { IoCaretDown } from "react-icons/io5";
-import { cn } from "@/shared/lib/utils";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import NavitarContent from "./NavitarContent";
 
 interface NavitarProps {
-  isModern: boolean;
   shouldShowName?: boolean;
 }
 
@@ -28,7 +26,7 @@ interface NavitarProps {
  * Navitar component - User avatar dropdown menu
  * Wrapped with observer to react to user data loading
  */
-export const Navitar = observer(({ isModern, shouldShowName = false }: NavitarProps) => {
+export const Navitar = observer(({ shouldShowName = false }: NavitarProps) => {
   const authStore = useAuthStore();
   const { data: currentUser } = useCurrentUser();
   const { width: windowSize } = useWindowSize();
@@ -56,14 +54,7 @@ export const Navitar = observer(({ isModern, shouldShowName = false }: NavitarPr
       <PopoverTrigger asChild>
         <button className="flex items-center gap-1 cursor-pointer select-none">
           {shouldShowName && displayName && (
-            <span
-              className={cn(
-                "mx-3 text-sm font-medium",
-                isModern
-                  ? "text-gray-800 dark:text-gray-200"
-                  : "text-white/90"
-              )}
-            >
+            <span className="mx-3 text-sm font-medium text-white/90">
               {displayName}
             </span>
           )}
@@ -73,12 +64,7 @@ export const Navitar = observer(({ isModern, shouldShowName = false }: NavitarPr
           </Avatar>
           <IoCaretDown
             size={13}
-            className={cn(
-              "ml-1",
-              isModern
-                ? "text-gray-800 dark:text-gray-200"
-                : "text-white/90"
-            )}
+            className="ml-1 text-white/90"
           />
         </button>
       </PopoverTrigger>

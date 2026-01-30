@@ -3,7 +3,7 @@ import { useAuthStore, useUIStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
-import { User, LogOut, LayoutGrid, LayoutList, Moon, Sun, BookOpen } from "lucide-react";
+import { User, LogOut, Moon, Sun, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -25,7 +25,6 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
   // Capture store values once on mount using useState with initializer function
   const [snapshot] = useState(() => ({
     userData: authStore.user,
-    layout: uiStore.layout,
     theme: uiStore.theme,
   }));
 
@@ -74,9 +73,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
         >
           <div className="flex gap-2 items-center">
             <User className="h-4 w-4" />
-            <span className="text-sm">
-              {snapshot.layout === "modern" ? "My Profile" : "My SPMS Profile"}
-            </span>
+            <span className="text-sm">My SPMS Profile</span>
           </div>
         </div>
       </div>
@@ -89,21 +86,6 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
           <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
             Appearance
           </span>
-        </div>
-
-        {/* Toggle Layout */}
-        <div
-          onClick={() => uiStore.toggleLayout()}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <div className="flex gap-2 items-center">
-            {snapshot.layout === "modern" ? (
-              <LayoutList className="h-4 w-4" />
-            ) : (
-              <LayoutGrid className="h-4 w-4" />
-            )}
-            <span className="text-sm">Toggle Layout</span>
-          </div>
         </div>
 
         {/* Toggle Dark Mode */}

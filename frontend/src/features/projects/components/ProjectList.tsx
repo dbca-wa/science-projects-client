@@ -17,7 +17,7 @@ export const ProjectList = ({ projects, isLoading = false }: ProjectListProps) =
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-6 gap-6 mt-8">
       {projects.map((project) => (
         <ProjectCard key={project.id} project={project} />
       ))}

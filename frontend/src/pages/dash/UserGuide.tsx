@@ -1,8 +1,12 @@
+import { PageTransition } from "@/shared/components/PageTransition";
+
 const UserGuide = () => {
 	return (
-		<div>
-			<span>UserGuide</span>
-		</div>
+		<PageTransition>
+			<div>
+				<span>UserGuide</span>
+			</div>
+		</PageTransition>
 	);
 };
 

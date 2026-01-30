@@ -9,6 +9,7 @@ interface ToggleDarkModeProps {
   showText?: boolean;
   asMenuItem?: boolean;
   onAfterToggle?: () => void;
+  withBackground?: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ interface ToggleDarkModeProps {
  * - Color scheme: blue for light mode, orange for dark mode
  */
 export const ToggleDarkMode = observer(
-  ({ showText, asMenuItem, onAfterToggle }: ToggleDarkModeProps) => {
+  ({ showText, asMenuItem, onAfterToggle, withBackground }: ToggleDarkModeProps) => {
     const { theme, setTheme } = useUIStore();
 
     const isDark = theme === "dark";
@@ -69,6 +70,7 @@ export const ToggleDarkMode = observer(
               onClick={handleClick}
               className={cn(
                 "transition-all duration-200",
+                withBackground && "bg-white/10",
                 isDark
                   ? "text-orange-400 hover:bg-white/40 dark:hover:bg-white/50 hover:text-orange-300"
                   : "text-blue-400 hover:bg-white/40 hover:text-blue-300"
@@ -84,6 +86,7 @@ export const ToggleDarkMode = observer(
               onClick={handleClick}
               className={cn(
                 "transition-all duration-200",
+                withBackground && "bg-white/10",
                 isDark
                   ? "text-orange-400 hover:bg-white/40 dark:hover:bg-white/50 hover:text-orange-300"
                   : "text-blue-400 hover:bg-white/40 hover:text-blue-300"

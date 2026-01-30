@@ -18,14 +18,15 @@ export const MapStats = observer(({
   projectsWithoutLocation 
 }: MapStatsProps) => {
   return (
-    <div className="absolute top-4 left-4 z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-3 py-2 text-sm text-muted-foreground backdrop-blur-sm bg-white/95 dark:bg-gray-800/95">
-      <div>
-        <span className="font-medium text-foreground">{projectCount}</span> of{" "}
-        <span className="font-medium text-foreground">{totalProjects}</span> projects shown
+    <div className="absolute top-4 left-4 z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-muted-foreground backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 max-w-[calc(100vw-8rem)]">
+      <div className="whitespace-nowrap">
+        <span className="font-medium text-foreground">{projectCount}</span>
+        {" / "}
+        <span className="font-medium text-foreground">{totalProjects}</span>
       </div>
       {projectsWithoutLocation > 0 && (
-        <div className="text-xs mt-1">
-          {projectsWithoutLocation} project{projectsWithoutLocation !== 1 ? "s" : ""} lack location data
+        <div className="text-[10px] sm:text-xs mt-0.5 sm:mt-1">
+          {projectsWithoutLocation} lack location
         </div>
       )}
     </div>

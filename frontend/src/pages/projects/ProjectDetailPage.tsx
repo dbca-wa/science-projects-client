@@ -6,8 +6,7 @@ import { Button } from "@/shared/components/ui/button";
 import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { AlertCircle, ArrowLeft, Mail } from "lucide-react";
+import { AlertCircle, ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { sanitizeInput } from "@/shared/utils/sanitize.utils";
 import {
 	Select,
@@ -23,6 +22,7 @@ import { ProgressReportsTab } from "@/features/projects/components/tabs/Progress
 import { StudentReportsTab } from "@/features/projects/components/tabs/StudentReportsTab";
 import { ProjectClosureTab } from "@/features/projects/components/tabs/ProjectClosureTab";
 import { useConfetti } from "@/shared/hooks/effects/useConfetti";
+import { PageTransition } from "@/shared/components/PageTransition";
 
 interface ProjectDetailPageProps {
 	selectedTab?: string;
@@ -65,16 +65,6 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 	const handleTabChange = (value: string) => {
 		navigate(`/projects/${id}/${value}`);
 	};
-
-	// Loading state
-	if (isLoading) {
-		return (
-			<div className="space-y-6">
-				<Skeleton className="h-12 w-full" />
-				<Skeleton className="h-96 w-full" />
-			</div>
-		);
-	}
 
 	// Error state - project not found
 	if (error || !data) {
@@ -144,11 +134,20 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 	].filter((tab) => tab.show);
 
 	return (
-		<div className="space-y-6">
-			{/* Breadcrumbs */}
-			<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
+		<PageTransition isLoading={isLoading}>
+			{isLoading ? (
+				<div className="flex items-center justify-center min-h-[400px]">
+					<div className="text-center space-y-4">
+						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+						<div className="text-lg font-medium text-muted-foreground">Loading project...</div>
+					</div>
+				</div>
+			) : (
+			<div className="space-y-6">
+				{/* Breadcrumbs */}
+				<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
-			<Tabs value={selectedTab} onValueChange={handleTabChange}>
+				<Tabs value={selectedTab} onValueChange={handleTabChange}>
 				{/* Desktop: Horizontal tabs */}
 				<TabsList className="hidden w-full justify-start md:inline-flex">
 					{availableTabs.map((tabItem) => (
@@ -215,5 +214,7 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 				)}
 			</Tabs>
 		</div>
+			)}
+		</PageTransition>
 	);
 }
