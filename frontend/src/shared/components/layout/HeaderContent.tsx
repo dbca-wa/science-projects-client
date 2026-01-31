@@ -3,7 +3,6 @@ import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { User, LogOut, BookOpen } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Separator } from "@/shared/components/ui/separator";
 import { ToggleDarkMode } from "./ToggleDarkMode";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";

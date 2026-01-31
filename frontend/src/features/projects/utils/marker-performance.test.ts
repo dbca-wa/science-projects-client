@@ -2,6 +2,15 @@ import { describe, it, expect, vi } from "vitest";
 import { createProjectMarker, createClusterMarker } from "./marker-creation";
 import type { IProjectData } from "@/shared/types/project.types";
 
+// Type guard for DivIcon options (since we're mocking divIcon to return options)
+interface DivIconOptions {
+  html: string;
+  className: string;
+  iconSize: [number, number];
+  iconAnchor: [number, number];
+  popupAnchor: [number, number];
+}
+
 // Mock Leaflet
 vi.mock("leaflet", () => ({
   default: {
@@ -17,7 +26,13 @@ vi.mock("leaflet", () => ({
 const createMockProject = (id: number): IProjectData => ({
   id,
   title: `Test Project ${id}`,
+  description: "Test description",
+  tagline: "Test tagline",
+  keywords: "test",
   year: 2024,
+  number: id,
+  start_date: new Date("2024-01-01"),
+  end_date: new Date("2024-12-31"),
   kind: "science",
   status: "active",
   business_area: {
@@ -25,11 +40,16 @@ const createMockProject = (id: number): IProjectData => ({
     name: "Test Business Area",
     slug: "test-ba",
     is_active: true,
+    focus: "Test focus",
+    introduction: "Test introduction",
+    image: null,
   },
-  location_areas: [],
+  areas: [],
   image: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
+  deletion_requested: false,
+  deletion_request_id: null,
+  created_at: new Date("2024-01-01T00:00:00Z"),
+  updated_at: new Date("2024-01-01T00:00:00Z"),
 });
 
 describe("marker-creation performance", () => {
@@ -87,8 +107,8 @@ describe("marker-creation performance", () => {
     const marker1 = createProjectMarker([project], coords, true);
     const marker2 = createProjectMarker([project], coords, true);
     
-    const icon1 = marker1.getIcon();
-    const icon2 = marker2.getIcon();
+    const icon1 = marker1.getIcon() as unknown as DivIconOptions;
+    const icon2 = marker2.getIcon() as unknown as DivIconOptions;
     
     // HTML should be identical for same inputs
     expect(icon1.html).toBe(icon2.html);

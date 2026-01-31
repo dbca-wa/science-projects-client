@@ -12,7 +12,7 @@ import {
 	useAuthStore,
 	useProjectSearchStore,
 } from "@/app/stores/store-context";
-import { Loader2, MapPin, Plus } from "lucide-react";
+import { MapPin, Plus } from "lucide-react";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
 import { DownloadProjectsCSVButton } from "@/features/projects/components/DownloadProjectsCSVButton";
@@ -200,6 +200,10 @@ const ProjectListPage = observer(() => {
 						currentPage={projectSearchStore.state.currentPage}
 						totalPages={data.total_pages}
 						onPageChange={handlePageChange}
+						startIndex={(projectSearchStore.state.currentPage - 1) * 20}
+						endIndex={Math.min(projectSearchStore.state.currentPage * 20, data.total_results)}
+						totalItems={data.total_results}
+						itemLabel="projects"
 					/>
 				)}
 			</div>

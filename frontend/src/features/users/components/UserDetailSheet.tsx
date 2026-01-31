@@ -402,7 +402,7 @@ export const UserDetailSheet = observer(
 										Business Areas Led
 									</p>
 									<div className="space-y-3">
-										{user.business_areas_led.map((ba) => {
+										{user.business_areas_led.map((ba, index) => {
 											// Handle both ID format (from list) and object format (from detail)
 											const baId = typeof ba === 'number' ? ba : ba.id;
 											const baName = typeof ba === 'object' && ba.name ? ba.name : null;
@@ -413,11 +413,14 @@ export const UserDetailSheet = observer(
 											const projectCount = typeof ba === 'object' && ba.project_count !== undefined ? ba.project_count : null;
 											const divisionSlug = typeof ba === 'object' && ba.division && typeof ba.division === 'object' ? ba.division.slug : null;
 											
+											// Always use a stable key - prefer baId, fallback to index-based key
+											const key = `ba-${baId ?? index}`;
+											
 											// If we only have ID, show minimal version
 											if (!baName) {
 												return (
 													<div
-														key={baId}
+														key={key}
 														className="flex items-center p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
 													>
 														<Badge className="bg-orange-600 text-white">
@@ -432,7 +435,7 @@ export const UserDetailSheet = observer(
 											
 											return (
 												<div
-													key={baId}
+													key={key}
 													className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
 												>
 													{/* Business Area Image */}
@@ -575,7 +578,7 @@ export const UserDetailSheet = observer(
 									<div className="space-y-3">
 										{user.caretakers
 											.slice(0, 2)
-											.map((caretaker: ICaretakerSimpleUserData) => {
+											.map((caretaker: ICaretakerSimpleUserData, index: number) => {
 												const isExpired =
 													caretaker.end_date
 														? isPast(
@@ -587,7 +590,7 @@ export const UserDetailSheet = observer(
 
 												return (
 													<div
-														key={caretaker.id}
+														key={`caretaker-${caretaker.id}-${index}`}
 														className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-600 rounded-lg"
 													>
 														<div className="flex-1 min-w-0">
@@ -657,40 +660,42 @@ export const UserDetailSheet = observer(
 										<p className="font-bold text-xs text-gray-600 dark:text-gray-300 mb-2">
 											Pending Requests
 										</p>
-										{viewedUserPendingRequests.map((request) => {
-											const secondaryUser = request.secondary_users?.[0];
-											// Transform image data to match UserDisplay expectations
-											const userForDisplay = secondaryUser ? {
-												...secondaryUser,
-												image: getImageUrl(secondaryUser.image)
-											} : null;
-											
-											return userForDisplay ? (
-												<div
-													key={request.id}
-													className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
-												>
-													<div className="flex-1 min-w-0">
-														<UserDisplay
-															user={userForDisplay}
-															showEmail={false}
-															size="sm"
-														/>
-														<p className="text-xs text-muted-foreground mt-1">
-															Requested {format(new Date(request.created_at), "MMM d, yyyy")}
-														</p>
-														{request.end_date && (
-															<p className="text-xs text-muted-foreground">
-																Until {format(new Date(request.end_date), "MMM d, yyyy")}
+										{viewedUserPendingRequests
+											.filter((request) => request.secondary_users?.[0])
+											.map((request) => {
+												const secondaryUser = request.secondary_users![0];
+												// Transform image data to match UserDisplay expectations
+												const userForDisplay = {
+													...secondaryUser,
+													image: getImageUrl(secondaryUser.image)
+												};
+												
+												return (
+													<div
+														key={request.id}
+														className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+													>
+														<div className="flex-1 min-w-0">
+															<UserDisplay
+																user={userForDisplay}
+																showEmail={false}
+																size="sm"
+															/>
+															<p className="text-xs text-muted-foreground mt-1">
+																Requested {format(new Date(request.created_at), "MMM d, yyyy")}
 															</p>
-														)}
+															{request.end_date && (
+																<p className="text-xs text-muted-foreground">
+																	Until {format(new Date(request.end_date), "MMM d, yyyy")}
+																</p>
+															)}
+														</div>
+														<Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+															Pending
+														</Badge>
 													</div>
-													<Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-														Pending
-													</Badge>
-												</div>
-											) : null;
-										})}
+												);
+											})}
 									</div>
 								)}
 
@@ -784,7 +789,7 @@ export const UserDetailSheet = observer(
 										<div className="space-y-3">
 											{user.caretaking_for
 												.slice(0, 2)
-												.map((caretakee: ICaretakerSimpleUserData) => {
+												.map((caretakee: ICaretakerSimpleUserData, index: number) => {
 													const isExpired =
 														caretakee.end_date
 															? isPast(
@@ -796,7 +801,7 @@ export const UserDetailSheet = observer(
 
 													return (
 														<div
-															key={caretakee.id}
+															key={`caretakee-${caretakee.id}-${index}`}
 															className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
 														>
 															<div className="flex-1 min-w-0">

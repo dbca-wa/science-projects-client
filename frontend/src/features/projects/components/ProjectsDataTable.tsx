@@ -1,14 +1,6 @@
-import { useMemo, useState } from "react";
-import {
-	useReactTable,
-	getCoreRowModel,
-	getSortedRowModel,
-	flexRender,
-	type ColumnDef,
-	type SortingState,
-} from "@tanstack/react-table";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { useState, useMemo } from "react";
 import type { IProjectData, ProjectRoles } from "@/shared/types/project.types";
+import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { ProjectKindBadge } from "./ProjectKindBadge";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -99,7 +91,7 @@ function ProjectImage({ project }: { project: IProjectData }) {
  * ProjectsDataTable Component
  * 
  * Reusable table component for displaying projects with configurable columns and sorting.
- * Uses TanStack Table for sorting logic.
+ * Uses generic DataTable component.
  * 
  * Features:
  * - Sortable columns (click header to sort)
@@ -115,43 +107,36 @@ export function ProjectsDataTable({
 	emptyMessage,
 	onProjectClick,
 }: ProjectsDataTableProps) {
-	const [sorting, setSorting] = useState<SortingState>([
-		{ id: defaultSort, desc: false },
-	]);
-
-	// Define columns based on configuration
+	// Build columns based on configuration
 	const columns = useMemo<ColumnDef<IProjectData>[]>(() => {
 		const cols: ColumnDef<IProjectData>[] = [];
 
 		// Title column (always included)
 		cols.push({
 			id: "title",
-			accessorKey: "title",
 			header: "Title",
-			sortingFn: (rowA, rowB) => {
-				// Simple alphabetical sort for title
-				return rowA.original.title.localeCompare(rowB.original.title);
-			},
-			cell: ({ row }) => {
-				const project = row.original;
-				const plainTextTitle = sanitizeInput(project.title);
-
+			accessor: (row) => row.title,
+			sortable: true,
+			sortFn: (a, b) => a.title.localeCompare(b.title),
+			width: "2fr",
+			cell: (row) => {
+				const plainTextTitle = sanitizeInput(row.title);
 				return (
 					<div className="flex items-center gap-3">
-						{columnConfig.image && <ProjectImage project={project} />}
+						{columnConfig.image && <ProjectImage project={row} />}
 						<div className="flex flex-col gap-1">
 							<span className="font-bold text-blue-400 dark:text-blue-200 hover:text-blue-300 dark:hover:text-blue-100 hover:underline cursor-pointer">
 								{plainTextTitle}
 							</span>
 							<div className="flex flex-col gap-0.5">
-								{project.tag && (
+								{row.tag && (
 									<span className="text-xs font-semibold text-gray-400">
-										{project.tag}
+										{row.tag}
 									</span>
 								)}
-								{!columnConfig.createdAt && project.created_at && (
+								{!columnConfig.createdAt && row.created_at && (
 									<span className="text-xs font-semibold text-gray-400">
-										Created on {new Date(project.created_at).toLocaleDateString("en-AU", {
+										Created on {new Date(row.created_at).toLocaleDateString("en-AU", {
 											year: "numeric",
 											month: "long",
 											day: "numeric",
@@ -169,25 +154,28 @@ export function ProjectsDataTable({
 		if (columnConfig.kind) {
 			cols.push({
 				id: "kind",
-				accessorKey: "kind",
 				header: "Kind",
-				cell: ({ row }) => <ProjectKindBadge kind={row.original.kind} />,
+				accessor: (row) => row.kind,
+				sortable: true,
+				width: "auto",
+				cell: (row) => <ProjectKindBadge kind={row.kind} />,
 			});
 		}
 
-		// Status column (separate column)
+		// Status column
 		if (columnConfig.status) {
 			cols.push({
 				id: "status",
-				accessorKey: "status",
 				header: "Status",
-				sortingFn: (rowA, rowB) => {
-					// Sort by status first, then by title
-					const statusCompare = rowA.original.status.localeCompare(rowB.original.status);
+				accessor: (row) => row.status,
+				sortable: true,
+				sortFn: (a, b) => {
+					const statusCompare = a.status.localeCompare(b.status);
 					if (statusCompare !== 0) return statusCompare;
-					return rowA.original.title.localeCompare(rowB.original.title);
+					return a.title.localeCompare(b.title);
 				},
-				cell: ({ row }) => <ProjectStatusBadge status={row.original.status} />,
+				width: "auto",
+				cell: (row) => <ProjectStatusBadge status={row.status} />,
 			});
 		}
 
@@ -195,10 +183,12 @@ export function ProjectsDataTable({
 		if (columnConfig.businessArea) {
 			cols.push({
 				id: "businessArea",
-				accessorFn: (row) => row.business_area?.name || "",
 				header: "Business Area",
-				cell: ({ row }) => (
-					<span className="text-sm">{row.original.business_area?.name || "—"}</span>
+				accessor: (row) => row.business_area?.name || "",
+				sortable: true,
+				width: "1fr",
+				cell: (row) => (
+					<span className="text-sm">{row.business_area?.name || "—"}</span>
 				),
 			});
 		}
@@ -207,18 +197,19 @@ export function ProjectsDataTable({
 		if (columnConfig.role) {
 			cols.push({
 				id: "role",
-				accessorKey: "role",
 				header: "Role",
-				sortingFn: (rowA, rowB) => {
-					// Sort by role first, then by title
-					const roleA = rowA.original.role || "";
-					const roleB = rowB.original.role || "";
+				accessor: (row) => row.role || "",
+				sortable: true,
+				sortFn: (a, b) => {
+					const roleA = a.role || "";
+					const roleB = b.role || "";
 					const roleCompare = roleA.localeCompare(roleB);
 					if (roleCompare !== 0) return roleCompare;
-					return rowA.original.title.localeCompare(rowB.original.title);
+					return a.title.localeCompare(b.title);
 				},
-				cell: ({ row }) => {
-					const role = row.original.role;
+				width: "auto",
+				cell: (row) => {
+					const role = row.role;
 					return role ? <RoleText role={role} /> : <span className="text-sm text-muted-foreground">—</span>;
 				},
 			});
@@ -228,10 +219,12 @@ export function ProjectsDataTable({
 		if (columnConfig.createdAt) {
 			cols.push({
 				id: "createdAt",
-				accessorKey: "created_at",
 				header: "Created",
-				cell: ({ row }) => {
-					const date = row.original.created_at;
+				accessor: (row) => row.created_at || "",
+				sortable: true,
+				width: "auto",
+				cell: (row) => {
+					const date = row.created_at;
 					if (!date) return <span className="text-sm text-muted-foreground">—</span>;
 					
 					const formatted = new Date(date).toLocaleDateString("en-AU", {
@@ -248,84 +241,20 @@ export function ProjectsDataTable({
 		return cols;
 	}, [columnConfig]);
 
-	const table = useReactTable({
-		data: projects,
-		columns,
-		state: {
-			sorting,
-		},
-		onSortingChange: setSorting,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-	});
-
-	// Handle row click
+	// Handle row click - extract project ID
 	const handleRowClick = (project: IProjectData, event: React.MouseEvent) => {
 		onProjectClick(project.id, event);
 	};
 
-	// Empty state
-	if (projects.length === 0) {
-		return (
-			<div className="flex items-center justify-center rounded-lg border border-dashed p-8 text-center">
-				<p className="text-sm text-muted-foreground">{emptyMessage}</p>
-			</div>
-		);
-	}
-
 	return (
-		<div className="w-full overflow-auto rounded-lg border">
-			<table className="w-full">
-				<thead className="bg-muted/50">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<tr key={headerGroup.id}>
-							{headerGroup.headers.map((header) => (
-								<th
-									key={header.id}
-									className="px-4 py-3 text-left text-sm font-medium"
-								>
-									{header.isPlaceholder ? null : (
-										<button
-											type="button"
-											className={cn(
-												"flex items-center gap-2 hover:text-foreground",
-												header.column.getCanSort() && "cursor-pointer select-none"
-											)}
-											onClick={header.column.getToggleSortingHandler()}
-										>
-											{flexRender(
-												header.column.columnDef.header,
-												header.getContext()
-											)}
-											{header.column.getIsSorted() === "asc" && (
-												<ChevronUp className="h-4 w-4" />
-											)}
-											{header.column.getIsSorted() === "desc" && (
-												<ChevronDown className="h-4 w-4" />
-											)}
-										</button>
-									)}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody>
-					{table.getRowModel().rows.map((row) => (
-						<tr
-							key={row.id}
-							className="cursor-pointer border-t transition-colors hover:bg-muted/50"
-							onClick={(e) => handleRowClick(row.original, e)}
-						>
-							{row.getVisibleCells().map((cell) => (
-								<td key={cell.id} className="px-4 py-3">
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</td>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+		<DataTable
+			data={projects}
+			columns={columns}
+			getRowKey={(project) => project.id}
+			onRowClick={handleRowClick}
+			defaultSort={{ column: defaultSort, direction: "asc" }}
+			emptyMessage={emptyMessage}
+			ariaLabel="Projects table"
+		/>
 	);
 }

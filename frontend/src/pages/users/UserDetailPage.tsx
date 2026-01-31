@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
@@ -27,7 +27,6 @@ import { PageTransition } from "@/shared/components/PageTransition";
  */
 const UserDetailPage = observer(() => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const authStore = useAuthStore();
   const userId = Number(id);
 
@@ -98,16 +97,16 @@ const UserDetailPage = observer(() => {
             <h1 className="text-3xl font-bold">{displayName}</h1>
             {/* Status badges */}
             <div className="flex gap-2">
-              {user.is_superuser && (
+              {user?.is_superuser && (
                 <Badge variant="destructive">Admin</Badge>
               )}
-              {user.is_staff && (
+              {user?.is_staff && (
                 <Badge variant="default">Staff</Badge>
               )}
-              {!user.is_staff && (
+              {user && !user.is_staff && (
                 <Badge variant="secondary">External</Badge>
               )}
-              {!user.is_active && (
+              {user && !user.is_active && (
                 <Badge variant="outline">Inactive</Badge>
               )}
             </div>
@@ -127,18 +126,20 @@ const UserDetailPage = observer(() => {
       </div>
 
       {/* Content - single column layout */}
-      <div className="space-y-6">
-        <ProfileSection user={user} />
-        <MembershipSection user={user} />
-        
-        {/* Admin Actions - only show for superusers */}
-        {authStore.isSuperuser && authStore.user && (
-          <UserAdminActionButtons
-            user={user}
-            currentUserId={authStore.user.id!}
-          />
-        )}
-      </div>
+      {user && (
+        <div className="space-y-6">
+          <ProfileSection user={user} />
+          <MembershipSection user={user} />
+          
+          {/* Admin Actions - only show for superusers */}
+          {authStore.isSuperuser && authStore.user && (
+            <UserAdminActionButtons
+              user={user}
+              currentUserId={authStore.user.id!}
+            />
+          )}
+        </div>
+      )}
     </div>
       )}
     </PageTransition>

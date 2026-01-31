@@ -151,14 +151,13 @@ export const LayerPopover = observer(() => {
 				<PopoverContent 
 					className="w-72 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
 					align="end"
-					alignOffset={0}
 					sideOffset={8}
-					avoidCollisions={true}
-					collisionPadding={8}
-					onKeyDown={handleKeyDown}
-					onClick={(e) => e.stopPropagation()}
 				>
-					<div className="space-y-4">
+					<div 
+						onKeyDown={handleKeyDown}
+						onClick={(e: React.MouseEvent) => e.stopPropagation()}
+					>
+						<div className="space-y-4">
 						{/* Header */}
 						<div className="flex items-center justify-between">
 							<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -303,6 +302,7 @@ export const LayerPopover = observer(() => {
 								{store.state.visibleLayerTypes.length} of 5 layers visible
 							</p>
 						</div>
+					</div>
 					</div>
 				</PopoverContent>
 			</Popover>

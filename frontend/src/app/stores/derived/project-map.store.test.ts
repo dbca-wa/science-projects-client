@@ -1,325 +1,553 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { ProjectMapStore } from "./project-map.store";
 
 describe("ProjectMapStore", () => {
-  let store: ProjectMapStore;
+	let store: ProjectMapStore;
 
-  beforeEach(() => {
-    store = new ProjectMapStore();
-  });
+	beforeEach(() => {
+		// Clear localStorage before each test
+		localStorage.clear();
+		store = new ProjectMapStore();
+	});
 
-  describe("initialization", () => {
-    it("should initialize with empty search term", () => {
-      expect(store.state.searchTerm).toBe("");
-    });
+	afterEach(() => {
+		localStorage.clear();
+	});
 
-    it("should initialize with empty business areas array", () => {
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-    });
+	describe("Initialization", () => {
+		it("should initialize with default state", () => {
+			expect(store.state.searchTerm).toBe("");
+			expect(store.state.filters.selectedBusinessAreas).toEqual([]);
+			expect(store.state.filters.user).toBe(null);
+			expect(store.state.filters.status).toBe("");
+			expect(store.state.filters.kind).toBe("");
+			expect(store.state.filters.year).toBe(0);
+			expect(store.state.filters.onlyActive).toBe(false);
+			expect(store.state.filters.onlyInactive).toBe(false);
+			expect(store.state.selectedLocations).toEqual([]);
+			expect(store.state.sidebarOpen).toBe(true);
+			expect(store.state.visibleLayerTypes).toEqual(["dbcaregion"]);
+			expect(store.state.showLabels).toBe(true);
+			expect(store.state.showColors).toBe(true);
+			expect(store.state.mapLoading).toBe(false);
+			expect(store.state.mapFullscreen).toBe(false);
+			expect(store.state.filtersMinimized).toBe(false);
+			expect(store.state.selectedMarkerCoords).toBe(null);
+			expect(store.state.visualizationMode).toBe('markers');
+			expect(store.state.saveSearch).toBe(true);
+		});
 
-    it("should initialize with empty locations array", () => {
-      expect(store.state.selectedLocations).toEqual([]);
-    });
+		it("should mark as initialized after calling initialise", async () => {
+			expect(store.state.initialised).toBe(false);
+			await store.initialise();
+			expect(store.state.initialised).toBe(true);
+		});
+	});
 
-    it("should initialize with sidebar open", () => {
-      expect(store.state.sidebarOpen).toBe(true);
-    });
+	describe("Search Term", () => {
+		it("should set search term", () => {
+			store.setSearchTerm("test project");
+			expect(store.state.searchTerm).toBe("test project");
+		});
 
-    it("should initialize with DBCA regions visible", () => {
-      expect(store.state.visibleLayerTypes).toEqual(["dbcaregion"]);
-    });
+		it("should save to localStorage when setting search term", () => {
+			store.setSearchTerm("test");
+			const stored = localStorage.getItem("projectMapState");
+			expect(stored).toBeTruthy();
+			const parsed = JSON.parse(stored!);
+			expect(parsed.searchTerm).toBe("test");
+		});
+	});
 
-    it("should initialize with labels enabled", () => {
-      expect(store.state.showLabels).toBe(true);
-    });
+	describe("Business Area Filters", () => {
+		it("should set business area filters", () => {
+			store.setFilters({ selectedBusinessAreas: [1, 2, 3] });
+			expect(store.state.filters.selectedBusinessAreas).toEqual([1, 2, 3]);
+		});
 
-    it("should initialize with colors enabled", () => {
-      expect(store.state.showColors).toBe(true);
-    });
+		it("should get selected business areas as Set", () => {
+			store.setFilters({ selectedBusinessAreas: [1, 2, 3] });
+			const set = store.selectedBusinessAreas;
+			expect(set.has(1)).toBe(true);
+			expect(set.has(2)).toBe(true);
+			expect(set.has(3)).toBe(true);
+			expect(set.has(4)).toBe(false);
+		});
 
-    it("should initialize with year filter as 0 (All Years)", () => {
-      expect(store.state.filterYear).toBe(0);
-    });
-  });
+		it("should get selected business areas as array", () => {
+			store.setFilters({ selectedBusinessAreas: [1, 2, 3] });
+			expect(store.selectedBusinessAreasArray).toEqual([1, 2, 3]);
+		});
+	});
 
-  describe("setSearchTerm", () => {
-    it("should set search term", () => {
-      store.setSearchTerm("test");
-      expect(store.state.searchTerm).toBe("test");
-    });
+	describe("Other Filters", () => {
+		it("should set user filter", () => {
+			store.setFilters({ user: 123 });
+			expect(store.state.filters.user).toBe(123);
+		});
 
-    it("should update search term", () => {
-      store.setSearchTerm("first");
-      store.setSearchTerm("second");
-      expect(store.state.searchTerm).toBe("second");
-    });
+		it("should set status filter", () => {
+			store.setFilters({ status: "active" });
+			expect(store.state.filters.status).toBe("active");
+		});
 
-    it("should handle empty string", () => {
-      store.setSearchTerm("test");
-      store.setSearchTerm("");
-      expect(store.state.searchTerm).toBe("");
-    });
-  });
+		it("should set kind filter", () => {
+			store.setFilters({ kind: "science" });
+			expect(store.state.filters.kind).toBe("science");
+		});
 
-  describe("toggleBusinessArea", () => {
-    it("should add business area when not present", () => {
-      store.toggleBusinessArea(1);
-      expect(store.state.selectedBusinessAreas).toContain(1);
-    });
+		it("should set year filter", () => {
+			store.setFilters({ year: 2024 });
+			expect(store.state.filters.year).toBe(2024);
+		});
 
-    it("should remove business area when present", () => {
-      store.toggleBusinessArea(1);
-      store.toggleBusinessArea(1);
-      expect(store.state.selectedBusinessAreas).not.toContain(1);
-    });
+		it("should set onlyActive filter", () => {
+			store.setFilters({ onlyActive: true });
+			expect(store.state.filters.onlyActive).toBe(true);
+		});
 
-    it("should handle multiple business areas", () => {
-      store.toggleBusinessArea(1);
-      store.toggleBusinessArea(2);
-      store.toggleBusinessArea(3);
-      expect(store.state.selectedBusinessAreas).toEqual([1, 2, 3]);
-    });
+		it("should set onlyInactive filter", () => {
+			store.setFilters({ onlyInactive: true });
+			expect(store.state.filters.onlyInactive).toBe(true);
+		});
 
-    it("should toggle specific business area without affecting others", () => {
-      store.toggleBusinessArea(1);
-      store.toggleBusinessArea(2);
-      store.toggleBusinessArea(1);
-      expect(store.state.selectedBusinessAreas).toEqual([2]);
-    });
-  });
+		it("should set multiple filters at once", () => {
+			store.setFilters({
+				selectedBusinessAreas: [1, 2],
+				user: 123,
+				status: "active",
+				year: 2024,
+			});
+			expect(store.state.filters.selectedBusinessAreas).toEqual([1, 2]);
+			expect(store.state.filters.user).toBe(123);
+			expect(store.state.filters.status).toBe("active");
+			expect(store.state.filters.year).toBe(2024);
+		});
+	});
 
-  describe("checkAllBusinessAreas", () => {
-    it("should select all provided business areas", () => {
-      store.checkAllBusinessAreas([1, 2, 3]);
-      expect(store.state.selectedBusinessAreas).toEqual([1, 2, 3]);
-    });
+	describe("Reset Filters", () => {
+		it("should reset all filters to defaults", () => {
+			store.setSearchTerm("test");
+			store.setFilters({
+				selectedBusinessAreas: [1, 2],
+				user: 123,
+				status: "active",
+				year: 2024,
+				onlyActive: true,
+			});
 
-    it("should replace existing selections", () => {
-      store.toggleBusinessArea(1);
-      store.checkAllBusinessAreas([2, 3]);
-      expect(store.state.selectedBusinessAreas).toEqual([2, 3]);
-    });
+			store.resetFilters();
 
-    it("should handle empty array", () => {
-      store.toggleBusinessArea(1);
-      store.checkAllBusinessAreas([]);
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-    });
-  });
+			expect(store.state.searchTerm).toBe("");
+			expect(store.state.filters.selectedBusinessAreas).toEqual([]);
+			expect(store.state.filters.user).toBe(null);
+			expect(store.state.filters.status).toBe("");
+			expect(store.state.filters.kind).toBe("");
+			expect(store.state.filters.year).toBe(0);
+			expect(store.state.filters.onlyActive).toBe(false);
+			expect(store.state.filters.onlyInactive).toBe(false);
+		});
+	});
 
-  describe("uncheckAllBusinessAreas", () => {
-    it("should clear all selected business areas", () => {
-      store.toggleBusinessArea(1);
-      store.toggleBusinessArea(2);
-      store.uncheckAllBusinessAreas();
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-    });
+	describe("hasActiveFilters", () => {
+		it("should return false when no filters are active", () => {
+			expect(store.hasActiveFilters).toBe(false);
+		});
 
-    it("should work when no business areas are selected", () => {
-      store.uncheckAllBusinessAreas();
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-    });
-  });
+		it("should return true when search term is set", () => {
+			store.setSearchTerm("test");
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-  describe("toggleLayerType", () => {
-    it("should add layer when not present", () => {
-      store.toggleLayerType("nrm");
-      expect(store.state.visibleLayerTypes).toContain("nrm");
-    });
+		it("should return true when business areas are selected", () => {
+			store.setFilters({ selectedBusinessAreas: [1] });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-    it("should remove layer when present", () => {
-      store.toggleLayerType("dbcaregion");
-      expect(store.state.visibleLayerTypes).not.toContain("dbcaregion");
-    });
+		it("should return true when user filter is set", () => {
+			store.setFilters({ user: 123 });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-    it("should handle multiple layers", () => {
-      store.toggleLayerType("nrm");
-      store.toggleLayerType("ibra");
-      expect(store.state.visibleLayerTypes).toEqual(["dbcaregion", "nrm", "ibra"]);
-    });
-  });
+		it("should return true when status filter is set", () => {
+			store.setFilters({ status: "active" });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-  describe("showAllLayers", () => {
-    it("should show all layer types", () => {
-      store.showAllLayers();
-      expect(store.state.visibleLayerTypes).toEqual(["dbcaregion", "dbcadistrict", "nrm", "ibra", "imcra"]);
-    });
-  });
+		it("should return true when kind filter is set", () => {
+			store.setFilters({ kind: "science" });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-  describe("hideAllLayers", () => {
-    it("should hide all layer types", () => {
-      store.hideAllLayers();
-      expect(store.state.visibleLayerTypes).toEqual([]);
-    });
-  });
+		it("should return true when year filter is set", () => {
+			store.setFilters({ year: 2024 });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-  describe("toggleSidebar", () => {
-    it("should toggle sidebar from open to closed", () => {
-      expect(store.state.sidebarOpen).toBe(true);
-      store.toggleSidebar();
-      expect(store.state.sidebarOpen).toBe(false);
-    });
+		it("should return true when onlyActive is set", () => {
+			store.setFilters({ onlyActive: true });
+			expect(store.hasActiveFilters).toBe(true);
+		});
 
-    it("should toggle sidebar from closed to open", () => {
-      store.toggleSidebar();
-      store.toggleSidebar();
-      expect(store.state.sidebarOpen).toBe(true);
-    });
-  });
+		it("should return true when onlyInactive is set", () => {
+			store.setFilters({ onlyInactive: true });
+			expect(store.hasActiveFilters).toBe(true);
+		});
+	});
 
-  describe("toggleLabels", () => {
-    it("should toggle labels from true to false", () => {
-      expect(store.state.showLabels).toBe(true);
-      store.toggleLabels();
-      expect(store.state.showLabels).toBe(false);
-    });
+	describe("filterCount", () => {
+		it("should return 0 when no filters are active", () => {
+			expect(store.filterCount).toBe(0);
+		});
 
-    it("should toggle labels from false to true", () => {
-      store.toggleLabels();
-      store.toggleLabels();
-      expect(store.state.showLabels).toBe(true);
-    });
-  });
+		it("should count search term as 1", () => {
+			store.setSearchTerm("test");
+			expect(store.filterCount).toBe(1);
+		});
 
-  describe("toggleColors", () => {
-    it("should toggle colors from true to false", () => {
-      expect(store.state.showColors).toBe(true);
-      store.toggleColors();
-      expect(store.state.showColors).toBe(false);
-    });
+		it("should count each business area", () => {
+			store.setFilters({ selectedBusinessAreas: [1, 2, 3] });
+			expect(store.filterCount).toBe(3);
+		});
 
-    it("should toggle colors from false to true", () => {
-      store.toggleColors();
-      store.toggleColors();
-      expect(store.state.showColors).toBe(true);
-    });
-  });
+		it("should count all active filters", () => {
+			store.setSearchTerm("test");
+			store.setFilters({
+				selectedBusinessAreas: [1, 2],
+				user: 123,
+				status: "active",
+				year: 2024,
+				onlyActive: true,
+			});
+			// 1 (search) + 2 (business areas) + 1 (user) + 1 (status) + 1 (year) + 1 (onlyActive) = 7
+			expect(store.filterCount).toBe(7);
+		});
+	});
 
-  describe("selectedBusinessAreas computed property", () => {
-    it("should return empty Set when no business areas selected", () => {
-      expect(store.selectedBusinessAreas.size).toBe(0);
-    });
+	describe("searchParams", () => {
+		it("should return empty params when no filters are active", () => {
+			const params = store.searchParams;
+			expect(params.toString()).toBe("");
+		});
 
-    it("should return Set with selected business areas", () => {
-      store.toggleBusinessArea(1);
-      store.toggleBusinessArea(2);
-      expect(store.selectedBusinessAreas.size).toBe(2);
-      expect(store.selectedBusinessAreas.has(1)).toBe(true);
-      expect(store.selectedBusinessAreas.has(2)).toBe(true);
-    });
+		it("should include search term", () => {
+			store.setSearchTerm("test");
+			const params = store.searchParams;
+			expect(params.get("search")).toBe("test");
+		});
 
-    it("should update reactively when business areas change", () => {
-      expect(store.selectedBusinessAreas.size).toBe(0);
-      store.toggleBusinessArea(1);
-      expect(store.selectedBusinessAreas.size).toBe(1);
-      store.toggleBusinessArea(1);
-      expect(store.selectedBusinessAreas.size).toBe(0);
-    });
-  });
+		it("should include business areas as comma-separated", () => {
+			store.setFilters({ selectedBusinessAreas: [1, 2, 3] });
+			const params = store.searchParams;
+			expect(params.get("businessAreas")).toBe("1,2,3");
+		});
 
-  describe("filters computed property", () => {
-    it("should return correct filter object", () => {
-      store.setSearchTerm("test");
-      store.toggleBusinessArea(1);
-      store.setFilterUser(123);
-      
-      const filters = store.filters;
-      expect(filters.search).toBe("test");
-      expect(filters.businessAreas).toEqual([1]);
-      expect(filters.user).toBe(123);
-      expect(filters.year).toBe(0);
-    });
-  });
+		it("should include all filters", () => {
+			store.setSearchTerm("test");
+			store.setFilters({
+				selectedBusinessAreas: [1, 2],
+				user: 123,
+				status: "active",
+				kind: "science",
+				year: 2024,
+				onlyActive: true,
+			});
+			const params = store.searchParams;
+			expect(params.get("search")).toBe("test");
+			expect(params.get("businessAreas")).toBe("1,2");
+			expect(params.get("user")).toBe("123");
+			expect(params.get("status")).toBe("active");
+			expect(params.get("kind")).toBe("science");
+			expect(params.get("year")).toBe("2024");
+			expect(params.get("onlyActive")).toBe("true");
+		});
+	});
 
-  describe("hasActiveFilters computed property", () => {
-    it("should return false when no filters are active", () => {
-      expect(store.hasActiveFilters).toBe(false);
-    });
+	describe("Location Filtering", () => {
+		it("should toggle location selection", () => {
+			store.toggleLocation(1);
+			expect(store.state.selectedLocations).toContain(1);
 
-    it("should return true when search term is set", () => {
-      store.setSearchTerm("test");
-      expect(store.hasActiveFilters).toBe(true);
-    });
+			store.toggleLocation(1);
+			expect(store.state.selectedLocations).not.toContain(1);
+		});
 
-    it("should return true when business areas are selected", () => {
-      store.toggleBusinessArea(1);
-      expect(store.hasActiveFilters).toBe(true);
-    });
+		it("should select multiple locations", () => {
+			store.selectLocations([1, 2, 3]);
+			expect(store.state.selectedLocations).toEqual([1, 2, 3]);
+		});
 
-    it("should return true when user filter is set", () => {
-      store.setFilterUser(123);
-      expect(store.hasActiveFilters).toBe(true);
-    });
+		it("should not duplicate locations when selecting", () => {
+			store.selectLocations([1, 2]);
+			store.selectLocations([2, 3]);
+			expect(store.state.selectedLocations).toEqual([1, 2, 3]);
+		});
 
-    it("should return true when status filter is set", () => {
-      store.setFilterStatus("active");
-      expect(store.hasActiveFilters).toBe(true);
-    });
+		it("should deselect multiple locations", () => {
+			store.selectLocations([1, 2, 3, 4]);
+			store.deselectLocations([2, 3]);
+			expect(store.state.selectedLocations).toEqual([1, 4]);
+		});
+	});
 
-    it("should return true when onlyActive is set", () => {
-      store.setOnlyActive(true);
-      expect(store.hasActiveFilters).toBe(true);
-    });
-  });
+	describe("Layer Visibility", () => {
+		it("should toggle layer type", () => {
+			expect(store.state.visibleLayerTypes).toContain("dbcaregion");
+			store.toggleLayerType("dbcaregion");
+			expect(store.state.visibleLayerTypes).not.toContain("dbcaregion");
+			store.toggleLayerType("dbcaregion");
+			expect(store.state.visibleLayerTypes).toContain("dbcaregion");
+		});
 
-  describe("clearFilters", () => {
-    it("should clear all filters", () => {
-      store.setSearchTerm("test");
-      store.toggleBusinessArea(1);
-      store.setFilterUser(123);
-      store.setFilterStatus("active");
-      store.setOnlyActive(true);
-      
-      store.clearFilters();
-      
-      expect(store.state.searchTerm).toBe("");
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-      expect(store.state.filterUser).toBe(null);
-      expect(store.state.filterStatus).toBe("");
-      expect(store.state.onlyActive).toBe(false);
-      expect(store.hasActiveFilters).toBe(false);
-    });
-  });
+		it("should show layer", () => {
+			store.showLayer("nrm");
+			expect(store.state.visibleLayerTypes).toContain("nrm");
+		});
 
-  describe("reset", () => {
-    it("should reset all state to initial values", () => {
-      store.setSearchTerm("test");
-      store.toggleBusinessArea(1);
-      store.toggleSidebar();
-      store.toggleLabels();
-      store.hideAllLayers();
-      
-      store.reset();
-      
-      expect(store.state.searchTerm).toBe("");
-      expect(store.state.selectedBusinessAreas).toEqual([]);
-      expect(store.state.sidebarOpen).toBe(true);
-      expect(store.state.showLabels).toBe(true);
-      expect(store.state.visibleLayerTypes).toEqual(["dbcaregion"]);
-    });
-  });
+		it("should not duplicate layer when showing", () => {
+			store.showLayer("nrm");
+			store.showLayer("nrm");
+			const count = store.state.visibleLayerTypes.filter(l => l === "nrm").length;
+			expect(count).toBe(1);
+		});
 
-  describe("complex interactions", () => {
-    it("should handle multiple state changes independently", () => {
-      store.setSearchTerm("test");
-      store.toggleBusinessArea(1);
-      store.toggleLayerType("nrm");
-      store.toggleLabels();
-      store.setFilterUser(123);
-      
-      expect(store.state.searchTerm).toBe("test");
-      expect(store.state.selectedBusinessAreas).toEqual([1]);
-      expect(store.state.visibleLayerTypes).toEqual(["dbcaregion", "nrm"]);
-      expect(store.state.showLabels).toBe(false);
-      expect(store.state.filterUser).toBe(123);
-    });
+		it("should hide layer", () => {
+			store.showLayer("nrm");
+			store.hideLayer("nrm");
+			expect(store.state.visibleLayerTypes).not.toContain("nrm");
+		});
 
-    it("should maintain filter consistency", () => {
-      store.setOnlyActive(true);
-      store.setOnlyInactive(true);
-      
-      expect(store.state.onlyActive).toBe(false);
-      expect(store.state.onlyInactive).toBe(true);
-    });
-  });
+		it("should show all layers", () => {
+			store.showAllLayers();
+			expect(store.state.visibleLayerTypes).toEqual([
+				"dbcaregion",
+				"dbcadistrict",
+				"nrm",
+				"ibra",
+				"imcra",
+			]);
+		});
+
+		it("should hide all layers", () => {
+			store.hideAllLayers();
+			expect(store.state.visibleLayerTypes).toEqual([]);
+		});
+	});
+
+	describe("UI State", () => {
+		it("should toggle sidebar", () => {
+			expect(store.state.sidebarOpen).toBe(true);
+			store.toggleSidebar();
+			expect(store.state.sidebarOpen).toBe(false);
+			store.toggleSidebar();
+			expect(store.state.sidebarOpen).toBe(true);
+		});
+
+		it("should toggle labels", () => {
+			expect(store.state.showLabels).toBe(true);
+			store.toggleLabels();
+			expect(store.state.showLabels).toBe(false);
+			store.toggleLabels();
+			expect(store.state.showLabels).toBe(true);
+		});
+
+		it("should toggle colors", () => {
+			expect(store.state.showColors).toBe(true);
+			store.toggleColors();
+			expect(store.state.showColors).toBe(false);
+			store.toggleColors();
+			expect(store.state.showColors).toBe(true);
+		});
+
+		it("should set map loading", () => {
+			store.setMapLoading(true);
+			expect(store.state.mapLoading).toBe(true);
+			store.setMapLoading(false);
+			expect(store.state.mapLoading).toBe(false);
+		});
+
+		it("should toggle map fullscreen", () => {
+			store.toggleMapFullscreen();
+			expect(store.state.mapFullscreen).toBe(true);
+			store.toggleMapFullscreen();
+			expect(store.state.mapFullscreen).toBe(false);
+		});
+
+		it("should reset filters minimized when exiting fullscreen", () => {
+			store.toggleMapFullscreen(); // Enter fullscreen
+			store.toggleFiltersMinimized(); // Minimize filters
+			expect(store.state.filtersMinimized).toBe(true);
+			store.toggleMapFullscreen(); // Exit fullscreen
+			expect(store.state.filtersMinimized).toBe(false);
+		});
+
+		it("should toggle filters minimized", () => {
+			store.toggleFiltersMinimized();
+			expect(store.state.filtersMinimized).toBe(true);
+			store.toggleFiltersMinimized();
+			expect(store.state.filtersMinimized).toBe(false);
+		});
+	});
+
+	describe("Marker Selection", () => {
+		it("should select marker", () => {
+			const coords: [number, number] = [115.8, -32.0];
+			store.selectMarker(coords);
+			expect(store.state.selectedMarkerCoords).toEqual(coords);
+		});
+
+		it("should deselect marker when clicking same marker", () => {
+			const coords: [number, number] = [115.8, -32.0];
+			store.selectMarker(coords);
+			store.selectMarker(coords);
+			expect(store.state.selectedMarkerCoords).toBe(null);
+		});
+
+		it("should clear marker selection", () => {
+			const coords: [number, number] = [115.8, -32.0];
+			store.selectMarker(coords);
+			store.clearMarkerSelection();
+			expect(store.state.selectedMarkerCoords).toBe(null);
+		});
+
+		it("should check if marker is selected", () => {
+			const coords: [number, number] = [115.8, -32.0];
+			store.selectMarker(coords);
+			expect(store.isMarkerSelected(coords)).toBe(true);
+			expect(store.isMarkerSelected([115.9, -32.1])).toBe(false);
+		});
+	});
+
+	describe("Visualization Mode", () => {
+		it("should toggle visualization mode", () => {
+			expect(store.state.visualizationMode).toBe('markers');
+			store.toggleVisualizationMode();
+			expect(store.state.visualizationMode).toBe('heatmap');
+			store.toggleVisualizationMode();
+			expect(store.state.visualizationMode).toBe('markers');
+		});
+
+		it("should set visualization mode", () => {
+			store.setVisualizationMode('heatmap');
+			expect(store.state.visualizationMode).toBe('heatmap');
+			store.setVisualizationMode('markers');
+			expect(store.state.visualizationMode).toBe('markers');
+		});
+
+		it("should check if in heatmap mode", () => {
+			store.setVisualizationMode('heatmap');
+			expect(store.isHeatmapMode).toBe(true);
+			expect(store.isMarkerMode).toBe(false);
+		});
+
+		it("should check if in marker mode", () => {
+			store.setVisualizationMode('markers');
+			expect(store.isMarkerMode).toBe(true);
+			expect(store.isHeatmapMode).toBe(false);
+		});
+	});
+
+	describe("API Parameters", () => {
+		it("should return empty object when no filters", () => {
+			const params = store.apiParams;
+			expect(params.searchTerm).toBeUndefined();
+			expect(params.locations).toBeUndefined();
+			expect(params.businessAreas).toBeUndefined();
+			expect(params.user).toBeUndefined();
+			expect(params.status).toBeUndefined();
+			expect(params.kind).toBeUndefined();
+			expect(params.year).toBeUndefined();
+			expect(params.onlyActive).toBeUndefined();
+			expect(params.onlyInactive).toBeUndefined();
+		});
+
+		it("should include all active filters", () => {
+			store.setSearchTerm("test");
+			store.selectLocations([1, 2]);
+			store.setFilters({
+				selectedBusinessAreas: [3, 4],
+				user: 123,
+				status: "active",
+				kind: "science",
+				year: 2024,
+				onlyActive: true,
+			});
+
+			const params = store.apiParams;
+			expect(params.searchTerm).toBe("test");
+			expect(params.locations).toEqual([1, 2]);
+			expect(params.businessAreas).toEqual([3, 4]);
+			expect(params.user).toBe(123);
+			expect(params.status).toBe("active");
+			expect(params.kind).toBe("science");
+			expect(params.year).toBe(2024);
+			expect(params.onlyActive).toBe(true);
+		});
+	});
+
+	describe("LocalStorage Persistence", () => {
+		it("should save state to localStorage when saveSearch is true", () => {
+			store.setSearchTerm("test");
+			const stored = localStorage.getItem("projectMapState");
+			expect(stored).toBeTruthy();
+		});
+
+		it("should not save to localStorage when saveSearch is false", () => {
+			store.setSaveSearch(false);
+			store.setSearchTerm("test");
+			const stored = localStorage.getItem("projectMapState");
+			expect(stored).toBeFalsy();
+		});
+
+		it("should restore state from localStorage on initialization", () => {
+			// Set some state and save
+			store.setSearchTerm("test");
+			store.setFilters({ selectedBusinessAreas: [1, 2] });
+
+			// Create new store instance
+			const newStore = new ProjectMapStore();
+			expect(newStore.state.searchTerm).toBe("test");
+			expect(newStore.state.filters.selectedBusinessAreas).toEqual([1, 2]);
+		});
+
+		it("should clear state and remove from localStorage", () => {
+			store.setSearchTerm("test");
+			store.setFilters({ selectedBusinessAreas: [1, 2] });
+			store.clearState();
+
+			expect(store.state.searchTerm).toBe("");
+			expect(store.state.filters.selectedBusinessAreas).toEqual([]);
+			expect(localStorage.getItem("projectMapState")).toBeFalsy();
+		});
+
+		it("should toggle saveSearch", () => {
+			expect(store.state.saveSearch).toBe(true);
+			store.toggleSaveSearch();
+			expect(store.state.saveSearch).toBe(false);
+			store.toggleSaveSearch();
+			expect(store.state.saveSearch).toBe(true);
+		});
+	});
+
+	describe("Reset", () => {
+		it("should reset store to initial state", () => {
+			// Set various state
+			store.setSearchTerm("test");
+			store.setFilters({ selectedBusinessAreas: [1, 2], user: 123 });
+			store.selectLocations([1, 2]);
+			store.toggleSidebar();
+			store.setVisualizationMode('heatmap');
+
+			// Reset
+			store.reset();
+
+			// Verify all state is reset
+			expect(store.state.searchTerm).toBe("");
+			expect(store.state.filters.selectedBusinessAreas).toEqual([]);
+			expect(store.state.filters.user).toBe(null);
+			expect(store.state.selectedLocations).toEqual([]);
+			expect(store.state.sidebarOpen).toBe(true);
+			expect(store.state.visualizationMode).toBe('markers');
+		});
+	});
 });

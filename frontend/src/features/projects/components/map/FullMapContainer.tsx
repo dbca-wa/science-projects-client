@@ -229,7 +229,6 @@ export const FullMapContainer = observer(({
               <RegionLabel
                 key={`${layerType}-label-${index}`}
                 feature={feature}
-                layerType={layerType}
                 propertyName={propertyName}
                 onLabelClick={handleLabelClick}
               />

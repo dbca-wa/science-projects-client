@@ -9,7 +9,7 @@ import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "./Navitar";
 import { Button } from "@/shared/components/ui/button";
 import { NavigationDropdownMenuItem } from "@/shared/components/navigation/NavigationDropdownMenuItem";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
+import { Sheet, SheetContent } from "@/shared/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,

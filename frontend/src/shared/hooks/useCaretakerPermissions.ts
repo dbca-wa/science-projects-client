@@ -1,8 +1,13 @@
 import { useCallback, useMemo } from "react";
 import { useCurrentUser } from "@/features/auth";
 import { isValidCaretaking, hasNestedCaretakee } from "@/shared/utils/caretaker.utils";
-import type { IProjectMember, IProject } from "@/shared/types";
+import type { IProjectMember, IProjectData } from "@/shared/types/project.types";
 import type { IBusinessArea } from "@/shared/types/org.types";
+
+// Extended project type with members for permission checking
+type IProjectWithMembers = IProjectData & {
+  members?: IProjectMember[];
+};
 
 /**
  * Hook to check if user can act on behalf of caretakees
@@ -72,11 +77,11 @@ export const useCaretakerPermissions = () => {
    * @param project - Project object
    * @returns True if user can act as project lead
    */
-  const canActAsProjectLead = useCallback((project: IProject): boolean => {
+  const canActAsProjectLead = useCallback((project: IProjectWithMembers): boolean => {
     if (!project?.members) return false;
     
     return project.members.some(
-      (member) => member.is_leader && canActForUser(member.user.id)
+      (member: IProjectMember) => member.is_leader && canActForUser(member.user.id)
     );
   }, [canActForUser]);
   
@@ -90,7 +95,8 @@ export const useCaretakerPermissions = () => {
   const canActAsBusinessAreaLead = useCallback((businessArea: IBusinessArea | undefined): boolean => {
     if (!businessArea?.leader) return false;
     
-    return canActForUser(businessArea.leader.id);
+    // leader is a number (user ID)
+    return canActForUser(businessArea.leader);
   }, [canActForUser]);
   
   return useMemo(() => ({

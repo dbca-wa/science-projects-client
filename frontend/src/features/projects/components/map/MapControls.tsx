@@ -73,14 +73,6 @@ const MapControlButtons = observer(() => {
 		handleFullscreenChange();
 	}, [store.state.mapFullscreen]);
 
-	const handleZoomIn = () => {
-		map.zoomIn();
-	};
-
-	const handleZoomOut = () => {
-		map.zoomOut();
-	};
-
 	const handleMapFullscreen = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		const wasFullscreen = store.state.mapFullscreen;

@@ -23,6 +23,9 @@ export const createMockDocumentTask = (
 	project: {
 		id: 1,
 		title: "Test Project",
+		kind: "science",
+		year: 2024,
+		number: 1,
 	},
 	project_lead_approval_granted: false,
 	business_area_lead_approval_granted: false,
