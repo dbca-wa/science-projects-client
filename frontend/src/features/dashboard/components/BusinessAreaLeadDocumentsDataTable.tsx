@@ -10,6 +10,8 @@ import {
 	extractPlainTextTitle,
 	type IDocumentTaskWithLevel,
 } from "../utils/document-tasks.utils";
+import { usePagination } from "@/shared/hooks/usePagination";
+import { Pagination } from "@/shared/components/Pagination";
 
 interface BusinessAreaLeadDocumentsDataTableProps {
 	tasks: IProjectDocument[];
@@ -55,6 +57,12 @@ export const BusinessAreaLeadDocumentsDataTable = ({
 		return sorted;
 	}, [tasksWithLevel, sorting]);
 
+	// Apply pagination
+	const pagination = usePagination({
+		data: sortedTasks,
+		pageSize: 50,
+	});
+
 	const handleRowClick = (
 		task: IDocumentTaskWithLevel,
 		event: React.MouseEvent
@@ -99,7 +107,8 @@ export const BusinessAreaLeadDocumentsDataTable = ({
 	}
 
 	return (
-		<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+		<div className="space-y-4">
+			<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 			{/* Desktop Header */}
 			<div className="hidden md:grid md:grid-cols-[200px_1fr] gap-4 bg-orange-50 dark:bg-orange-900/20 border-b border-gray-200 dark:border-gray-700">
 				<div className="px-4 py-3">
@@ -124,7 +133,7 @@ export const BusinessAreaLeadDocumentsDataTable = ({
 
 			{/* Rows */}
 			<div>
-				{sortedTasks.map((task) => {
+				{pagination.paginatedData.map((task) => {
 					const plainTitle = extractPlainTextTitle(task.project.title);
 
 					return (
@@ -162,6 +171,20 @@ export const BusinessAreaLeadDocumentsDataTable = ({
 					);
 				})}
 			</div>
+		</div>
+
+		{/* Pagination controls (only show if needed) */}
+		{pagination.totalPages > 1 && (
+			<Pagination
+				currentPage={pagination.currentPage}
+				totalPages={pagination.totalPages}
+				onPageChange={pagination.goToPage}
+				startIndex={pagination.startIndex}
+				endIndex={pagination.endIndex}
+				totalItems={pagination.totalItems}
+				itemLabel="documents"
+			/>
+		)}
 		</div>
 	);
 };

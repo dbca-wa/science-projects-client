@@ -66,8 +66,8 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 		navigate(`/projects/${id}/${value}`);
 	};
 
-	// Error state - project not found
-	if (error || !data) {
+	// Error state - project not found (only show when not loading)
+	if (!isLoading && (error || !data)) {
 		return (
 			<div className="flex min-h-[60vh] items-center justify-center">
 				<div className="max-w-2xl space-y-6 text-center">
@@ -105,6 +105,11 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 				</div>
 			</div>
 		);
+	}
+
+	// Don't destructure until we know data exists
+	if (!data) {
+		return null;
 	}
 
 	const { project, documents, details, members } = data;

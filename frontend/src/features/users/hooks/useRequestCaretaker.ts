@@ -8,15 +8,20 @@ import type { RequestCaretakerPayload } from "../types/caretaker.types";
  * Hook for requesting a caretaker
  * - Creates AdminTask with status "pending" for all users
  * - Returns the task ID for optional immediate approval by admins
- * - Does NOT invalidate queries automatically (caller handles this)
+ * - Invalidates admin tasks cache to show new pending request
  * - Shows success/error toast notifications
  * 
  * @returns TanStack Query mutation for caretaker request
  */
 export const useRequestCaretaker = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: RequestCaretakerPayload) => requestCaretaker(payload),
     onSuccess: () => {
+      // Invalidate admin tasks to show new pending request
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
+      
       // Show success toast
       toast.success("Caretaker request submitted successfully.");
     },

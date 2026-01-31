@@ -147,6 +147,15 @@ export const removeCaretaker = async (caretakerId: number): Promise<void> => {
 };
 
 /**
+ * Stop caretaking for a user (alias for removeCaretaker)
+ * @param caretakerId - Caretaker primary key (from caretakee.caretaker_id)
+ * @returns Success response
+ */
+export const stopCaretaking = async (caretakerId: number): Promise<void> => {
+  return removeCaretaker(caretakerId);
+};
+
+/**
  * Get pending caretaker requests for a specific user
  * Returns requests where someone has requested to become THIS user's caretaker
  * @param userId - User primary key

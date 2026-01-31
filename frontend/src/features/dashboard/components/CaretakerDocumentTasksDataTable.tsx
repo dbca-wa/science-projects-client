@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import type { IProjectDocument } from "../types/dashboard.types";
 import {
-	combineProjectLevelTasks,
 	sortTasksByLevel,
 	sortTasksByDocumentKind,
 	getDocumentUrlPath,
@@ -21,22 +20,29 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { usePagination } from "@/shared/hooks/usePagination";
-import { Pagination } from "@/shared/components/Pagination";
+import { CaretakeeCell } from "./CaretakeeCell";
 
-interface ProjectTeamDocumentsDataTableProps {
+interface CaretakerDocumentTasksDataTableProps {
 	teamTasks: IProjectDocument[];
 	leadTasks: IProjectDocument[];
+	baTasks: IProjectDocument[];
+	directorateTasks: IProjectDocument[];
 }
 
-type FilterOption = "all" | "team" | "lead";
-type SortColumn = "level" | "kind" | "title";
+type FilterOption = "all" | "team" | "lead" | "ba" | "directorate";
+type SortColumn = "level" | "kind" | "title" | "caretakee";
 type SortDirection = "asc" | "desc";
 
-export const ProjectTeamDocumentsDataTable = ({
+/**
+ * Data table for displaying caretaker document tasks
+ * Shows document tasks for users you're caretaking for with caretakee information and visual distinction
+ */
+export const CaretakerDocumentTasksDataTable = ({
 	teamTasks,
 	leadTasks,
-}: ProjectTeamDocumentsDataTableProps) => {
+	baTasks,
+	directorateTasks,
+}: CaretakerDocumentTasksDataTableProps) => {
 	const navigate = useNavigate();
 	const [filter, setFilter] = useState<FilterOption>("all");
 	const [sorting, setSorting] = useState<{
@@ -47,21 +53,46 @@ export const ProjectTeamDocumentsDataTable = ({
 		direction: "asc",
 	});
 
-	const combinedTasks = useMemo(
-		() => combineProjectLevelTasks(teamTasks, leadTasks),
-		[teamTasks, leadTasks]
-	);
+	// Combine all tasks with level information
+	const combinedTasks = useMemo(() => {
+		const teamWithLevel = (teamTasks || []).map((task) => ({
+			...task,
+			taskLevel: "team" as const,
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+			taskDescription: "Review as team member",
+		}));
 
+		const leadWithLevel = (leadTasks || []).map((task) => ({
+			...task,
+			taskLevel: "lead" as const,
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+			taskDescription: "Approve as project lead",
+		}));
+
+		const baWithLevel = (baTasks || []).map((task) => ({
+			...task,
+			taskLevel: "ba" as const,
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+			taskDescription: "Approve as business area lead",
+		}));
+
+		const directorateWithLevel = (directorateTasks || []).map((task) => ({
+			...task,
+			taskLevel: "directorate" as const,
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+			taskDescription: "Approve as directorate",
+		}));
+
+		return [...teamWithLevel, ...leadWithLevel, ...baWithLevel, ...directorateWithLevel];
+	}, [teamTasks, leadTasks, baTasks, directorateTasks]);
+
+	// Filter tasks
 	const filteredTasks = useMemo(() => {
-		if (filter === "team") {
-			return combinedTasks.filter((t) => t.taskLevel === "team");
-		}
-		if (filter === "lead") {
-			return combinedTasks.filter((t) => t.taskLevel === "lead");
-		}
-		return combinedTasks;
+		if (filter === "all") return combinedTasks;
+		return combinedTasks.filter((t) => t.taskLevel === filter);
 	}, [combinedTasks, filter]);
 
+	// Sort tasks
 	const sortedTasks = useMemo(() => {
 		let sorted = [...filteredTasks];
 
@@ -75,6 +106,16 @@ export const ProjectTeamDocumentsDataTable = ({
 				const titleB = extractPlainTextTitle(b.project.title);
 				return titleA.localeCompare(titleB);
 			});
+		} else if (sorting.column === "caretakee") {
+			sorted.sort((a, b) => {
+				const nameA = a.for_user
+					? `${a.for_user.display_first_name} ${a.for_user.display_last_name}`
+					: "";
+				const nameB = b.for_user
+					? `${b.for_user.display_first_name} ${b.for_user.display_last_name}`
+					: "";
+				return nameA.localeCompare(nameB);
+			});
 		}
 
 		if (sorting.direction === "desc") {
@@ -83,13 +124,6 @@ export const ProjectTeamDocumentsDataTable = ({
 
 		return sorted;
 	}, [filteredTasks, sorting]);
-
-	// Apply pagination (resets when filter changes)
-	const pagination = usePagination({
-		data: sortedTasks,
-		pageSize: 50,
-		resetDeps: [filter],
-	});
 
 	const handleRowClick = (
 		task: IDocumentTaskWithLevel,
@@ -128,7 +162,7 @@ export const ProjectTeamDocumentsDataTable = ({
 		return (
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
 				<div className="text-gray-500 dark:text-gray-400">
-					No pending project team tasks.
+					No pending caretaker tasks.
 				</div>
 			</div>
 		);
@@ -146,27 +180,45 @@ export const ProjectTeamDocumentsDataTable = ({
 						className="flex gap-4"
 					>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="all" id="filter-all" />
-							<Label htmlFor="filter-all" className="cursor-pointer font-normal">
+							<RadioGroupItem value="all" id="caretaker-filter-all" />
+							<Label htmlFor="caretaker-filter-all" className="cursor-pointer font-normal">
 								Show All
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="team" id="filter-team" />
+							<RadioGroupItem value="team" id="caretaker-filter-team" />
 							<Label
-								htmlFor="filter-team"
+								htmlFor="caretaker-filter-team"
 								className="cursor-pointer font-normal"
 							>
-								Team Tasks Only
+								Team Tasks
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="lead" id="filter-lead" />
+							<RadioGroupItem value="lead" id="caretaker-filter-lead" />
 							<Label
-								htmlFor="filter-lead"
+								htmlFor="caretaker-filter-lead"
 								className="cursor-pointer font-normal"
 							>
-								Lead Tasks Only
+								Lead Tasks
+							</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="ba" id="caretaker-filter-ba" />
+							<Label
+								htmlFor="caretaker-filter-ba"
+								className="cursor-pointer font-normal"
+							>
+								BA Tasks
+							</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="directorate" id="caretaker-filter-directorate" />
+							<Label
+								htmlFor="caretaker-filter-directorate"
+								className="cursor-pointer font-normal"
+							>
+								Directorate Tasks
 							</Label>
 						</div>
 					</RadioGroup>
@@ -180,8 +232,10 @@ export const ProjectTeamDocumentsDataTable = ({
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">Show All</SelectItem>
-							<SelectItem value="team">Team Tasks Only</SelectItem>
-							<SelectItem value="lead">Lead Tasks Only</SelectItem>
+							<SelectItem value="team">Team Tasks</SelectItem>
+							<SelectItem value="lead">Lead Tasks</SelectItem>
+							<SelectItem value="ba">BA Tasks</SelectItem>
+							<SelectItem value="directorate">Directorate Tasks</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -190,7 +244,7 @@ export const ProjectTeamDocumentsDataTable = ({
 			{/* Table */}
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 				{/* Desktop Header */}
-				<div className="hidden md:grid md:grid-cols-[150px_200px_1fr] gap-4 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
+				<div className="hidden md:grid md:grid-cols-[150px_200px_200px_1fr] gap-4 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
 					<div className="px-4 py-3">
 						<button
 							onClick={() => toggleSort("level")}
@@ -211,6 +265,15 @@ export const ProjectTeamDocumentsDataTable = ({
 					</div>
 					<div className="px-4 py-3">
 						<button
+							onClick={() => toggleSort("caretakee")}
+							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+						>
+							For User
+							{getSortIcon("caretakee")}
+						</button>
+					</div>
+					<div className="px-4 py-3">
+						<button
 							onClick={() => toggleSort("title")}
 							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
 						>
@@ -222,7 +285,7 @@ export const ProjectTeamDocumentsDataTable = ({
 
 				{/* Rows */}
 				<div>
-					{pagination.paginatedData.map((task) => {
+					{sortedTasks.map((task) => {
 						const levelConfig = TASK_LEVEL_CONFIG[task.taskLevel];
 						const plainTitle = extractPlainTextTitle(task.project.title);
 
@@ -230,7 +293,7 @@ export const ProjectTeamDocumentsDataTable = ({
 							<div
 								key={task.id}
 								onClick={(e) => handleRowClick(task, e)}
-								className="grid grid-cols-1 md:grid-cols-[150px_200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
+								className="grid grid-cols-1 md:grid-cols-[150px_200px_200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors bg-blue-50/30 dark:bg-blue-900/5"
 							>
 								{/* Level Column */}
 								<div className="px-4 py-4">
@@ -254,6 +317,14 @@ export const ProjectTeamDocumentsDataTable = ({
 									</div>
 								</div>
 
+								{/* For User Column */}
+								<div className="px-4 py-4">
+									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+										For User
+									</div>
+									{task.for_user && <CaretakeeCell user={task.for_user} />}
+								</div>
+
 								{/* Project Title Column */}
 								<div className="px-4 py-4 space-y-1">
 									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -274,19 +345,6 @@ export const ProjectTeamDocumentsDataTable = ({
 					})}
 				</div>
 			</div>
-
-			{/* Pagination controls (only show if needed) */}
-			{pagination.totalPages > 1 && (
-				<Pagination
-					currentPage={pagination.currentPage}
-					totalPages={pagination.totalPages}
-					onPageChange={pagination.goToPage}
-					startIndex={pagination.startIndex}
-					endIndex={pagination.endIndex}
-					totalItems={pagination.totalItems}
-					itemLabel="documents"
-				/>
-			)}
 		</div>
 	);
 };
