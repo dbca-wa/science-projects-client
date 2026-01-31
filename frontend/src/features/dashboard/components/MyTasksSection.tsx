@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { CaretakerTasksDataTable } from "./CaretakerTasksDataTable";
-import {
-	filterCaretakerTasks,
-	filterAdminTasks,
-} from "../utils/dashboard.utils";
+import { EndorsementTasksDataTable } from "./EndorsementTasksDataTable";
+import { ProjectDeletionTasksDataTable } from "./ProjectDeletionTasksDataTable";
+import { filterCaretakerTasks } from "../utils/dashboard.utils";
 import type { MyTasksSectionPhase1Props } from "../types/admin-tasks.types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
@@ -29,7 +27,7 @@ const TaskSection = ({
 		<div className="mb-6">
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="w-full flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+				className="w-full flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
 			>
 				<div className="flex items-center gap-3">
 					{isOpen ? (
@@ -68,6 +66,9 @@ export const MyTasksSection = ({
 	adminTasksLoading,
 	adminTasksError,
 	refetchAdminTasks,
+	endorsementTasks,
+	endorsementTasksLoading,
+	endorsementTasksError,
 }: MyTasksSectionPhase1Props) => {
 	if (adminTasksLoading) {
 		return (
@@ -108,7 +109,13 @@ export const MyTasksSection = ({
 	}
 
 	const caretakerTasks = filterCaretakerTasks(adminTasks);
-	const nonCaretakerAdminTasks = filterAdminTasks(adminTasks);
+	const projectDeletionTasks = adminTasks.filter(task => task.action === "deleteproject");
+	
+	// Filter endorsement tasks by type
+	const aecTasks = endorsementTasks?.aec || [];
+	const bmTasks = endorsementTasks?.bm || [];
+	const hcTasks = endorsementTasks?.hc || [];
+	const totalEndorsementTasks = aecTasks.length + bmTasks.length + hcTasks.length;
 
 	return (
 		<div className="flex flex-col w-full h-full">
@@ -122,43 +129,69 @@ export const MyTasksSection = ({
 				</TaskSection>
 			)}
 
-			{nonCaretakerAdminTasks.length > 0 && (
+			{projectDeletionTasks.length > 0 && (
 				<TaskSection
-					title="Admin Tasks"
-					count={nonCaretakerAdminTasks.length}
+					title="Project Deletion"
+					count={projectDeletionTasks.length}
 					defaultOpen={true}
 				>
-					<AdminTasksDataTable tasks={nonCaretakerAdminTasks} />
+					<ProjectDeletionTasksDataTable tasks={projectDeletionTasks} />
 				</TaskSection>
 			)}
 
-			{/* TODO: Add document tasks section when projects feature is implemented */}
-			<div className="mt-4 p-6 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-				<h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-					Document Tasks
-				</h3>
-				<p className="text-sm text-gray-600 dark:text-gray-400">
-					Will be available after Projects feature is implemented.
-				</p>
-				<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-					This section will include: Concept Plans, Project Plans,
-					Progress Reports, Student Reports, and Project Closures.
-				</p>
-			</div>
-
-			{/* TODO: Add endorsement tasks section when projects feature is implemented */}
-			<div className="mt-4 p-6 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-				<h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-					Endorsement Tasks
-				</h3>
-				<p className="text-sm text-gray-600 dark:text-gray-400">
-					Will be available after Projects feature is implemented.
-				</p>
-				<p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-					This section will include: AEC, Biometrician, and Herbarium
-					Curator endorsements.
-				</p>
-			</div>
+			{/* Endorsement Tasks */}
+			{endorsementTasksLoading ? (
+				<div className="mb-6">
+					<div className="w-full flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+						<div className="flex items-center gap-3">
+							<ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+							<h3 className="text-lg font-semibold text-gray-700 dark:text-gray-400">
+								Endorsement Tasks
+							</h3>
+							<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500" />
+						</div>
+					</div>
+				</div>
+			) : endorsementTasksError ? (
+				<div className="mb-6">
+					<div className="w-full flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+						<div className="flex items-center gap-3">
+							<ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+							<h3 className="text-lg font-semibold text-gray-700 dark:text-gray-400">
+								Endorsement Tasks
+							</h3>
+							<span className="inline-flex items-center justify-center px-2.5 py-1 text-sm font-bold leading-none text-gray-500 bg-gray-300 dark:bg-gray-600 rounded-full">
+								?
+							</span>
+						</div>
+					</div>
+					<div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+						<p className="text-sm text-red-600 dark:text-red-400">
+							Failed to load endorsement tasks: {endorsementTasksError.message || "Unknown error"}
+						</p>
+					</div>
+				</div>
+			) : totalEndorsementTasks > 0 ? (
+				<TaskSection
+					title="Endorsement Tasks"
+					count={totalEndorsementTasks}
+					defaultOpen={true}
+				>
+					<div className="space-y-6">
+						{aecTasks.length > 0 && (
+							<EndorsementTasksDataTable tasks={aecTasks} kind="aec" />
+						)}
+						
+						{bmTasks.length > 0 && (
+							<EndorsementTasksDataTable tasks={bmTasks} kind="bm" />
+						)}
+						
+						{hcTasks.length > 0 && (
+							<EndorsementTasksDataTable tasks={hcTasks} kind="hc" />
+						)}
+					</div>
+				</TaskSection>
+			) : null}
 		</div>
 	);
 };

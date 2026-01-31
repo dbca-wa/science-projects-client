@@ -52,7 +52,7 @@ const initialiseApp = async () => {
 					<HelmetProvider>
 						<RouterProvider router={router} />
 						<Toaster position="top-right" richColors />
-						<ReactQueryDevtools />
+						{import.meta.env.DEV && <ReactQueryDevtools />}
 					</HelmetProvider>
 				</QueryClientProvider>
 			</StoreProvider>

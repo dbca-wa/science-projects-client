@@ -7,6 +7,7 @@ import { ProjectSearchStore } from "./derived/project-search.store";
 import { ProjectWizardStore } from "./derived/project-wizard.store";
 import { ProjectMapStore } from "./derived/project-map.store";
 import { MapStore } from "./derived/map.store";
+import { MyProjectsStore } from "./derived/my-projects.store";
 
 /**
  * Root store that combines all MobX stores
@@ -20,6 +21,7 @@ class RootStore {
 	projectWizardStore: ProjectWizardStore;
 	projectMapStore: ProjectMapStore;
 	mapStore: MapStore;
+	myProjectsStore: MyProjectsStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
@@ -30,6 +32,7 @@ class RootStore {
 		this.projectWizardStore = new ProjectWizardStore();
 		this.projectMapStore = new ProjectMapStore();
 		this.mapStore = new MapStore();
+		this.myProjectsStore = new MyProjectsStore();
 	}
 }
 
@@ -59,3 +62,4 @@ export const useProjectSearchStore = () => useStore().projectSearchStore;
 export const useProjectWizardStore = () => useStore().projectWizardStore;
 export const useProjectMapStore = () => useStore().projectMapStore;
 export const useMapStore = () => useStore().mapStore;
+export const useMyProjectsStore = () => useStore().myProjectsStore;

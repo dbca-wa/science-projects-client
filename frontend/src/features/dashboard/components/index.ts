@@ -1,2 +1,9 @@
 export { DashboardActionCard } from "./DashboardActionCard";
 export { MyTasksSection } from "./MyTasksSection";
+export { DocumentTasksTabContent } from "./DocumentTasksTabContent";
+export { EndorsementTasksDataTable } from "./EndorsementTasksDataTable";
+export { ProjectDeletionTasksDataTable } from "./ProjectDeletionTasksDataTable";
+export { ProjectTeamDocumentsDataTable } from "./ProjectTeamDocumentsDataTable";
+export { BusinessAreaLeadDocumentsDataTable } from "./BusinessAreaLeadDocumentsDataTable";
+export { DirectorateDocumentsDataTable } from "./DirectorateDocumentsDataTable";
+export { CaretakerTasksDataTable } from "./CaretakerTasksDataTable";

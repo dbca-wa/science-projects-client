@@ -69,57 +69,6 @@ export const AdminTasksDataTable = ({ tasks }: AdminTasksDataTableProps) => {
 
 	const columns: ColumnDef<IAdminTask>[] = [
 		{
-			accessorKey: "action",
-			header: ({ column }) => {
-				const isSorted = column.getIsSorted();
-				let SortIcon = ArrowUpDown;
-
-				if (isSorted === "asc") {
-					SortIcon = ArrowDown;
-				} else if (isSorted === "desc") {
-					SortIcon = ArrowUp;
-				}
-
-				return (
-					<button
-						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-						className="flex items-center gap-2 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-					>
-						Type
-						<SortIcon className="h-4 w-4" />
-					</button>
-				);
-			},
-			cell: ({ row }) => {
-				const action = row.original.action as TaskAction;
-				const config = taskActionConfig[action];
-				const Icon = config.icon;
-
-				return (
-					<div className="flex items-center gap-3">
-						<div className={`p-2 rounded-lg ${config.bgColor}`}>
-							<Icon className={`w-5 h-5 ${config.color}`} />
-						</div>
-						<div>
-							<div className={`font-semibold ${config.color}`}>
-								{config.title}
-							</div>
-							<div className="text-xs text-gray-500 dark:text-gray-400">
-								{config.description}
-							</div>
-						</div>
-					</div>
-				);
-			},
-			sortingFn: (rowA, rowB) => {
-				const kindA = rowA.original.action as TaskAction;
-				const kindB = rowB.original.action as TaskAction;
-				const indexA = taskActionOrder.indexOf(kindA);
-				const indexB = taskActionOrder.indexOf(kindB);
-				return indexA - indexB;
-			},
-		},
-		{
 			accessorKey: "requester",
 			header: ({ column }) => {
 				const isSorted = column.getIsSorted();
@@ -198,7 +147,7 @@ export const AdminTasksDataTable = ({ tasks }: AdminTasksDataTableProps) => {
 
 	const [sorting, setSorting] = useState<SortingState>([
 		{
-			id: "action",
+			id: "requester",
 			desc: false,
 		},
 	]);

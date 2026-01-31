@@ -51,6 +51,9 @@ export interface MyTasksSectionPhase1Props {
 	adminTasksLoading: boolean;
 	adminTasksError?: Error | null;
 	refetchAdminTasks?: () => void;
+	endorsementTasks?: import("../types/dashboard.types").EndorsementTasksResponse;
+	endorsementTasksLoading: boolean;
+	endorsementTasksError?: Error | null;
 }
 
 export interface SectionDividerProps {
