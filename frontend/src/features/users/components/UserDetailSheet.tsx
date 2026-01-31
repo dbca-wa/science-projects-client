@@ -5,7 +5,9 @@ import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
 import { useBecomeCaretaker } from "@/features/users/hooks/useBecomeCaretaker";
 import { useCancelBecomeCaretakerRequest } from "@/features/users/hooks/useCancelBecomeCaretakerRequest";
 import { usePendingCaretakerRequests } from "@/features/users/hooks/usePendingCaretakerRequests";
+import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
 import { UserAdminActionButtons } from "./UserAdminActionButtons";
+import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {
@@ -78,6 +80,13 @@ export const UserDetailSheet = observer(
 		// Fetch user details
 		const { data: user, isLoading, error } = useUserDetail(userId || 0);
 
+		// Fetch involved projects for this user
+		const {
+			data: involvedProjects,
+			isLoading: projectsLoading,
+			isError: projectsError,
+		} = useInvolvedProjects(userId || 0);
+
 		// Fetch current user's caretaker check to see if there's a pending become_caretaker_request
 		const { data: myCaretakerData } = useCaretakerCheck();
 
@@ -111,6 +120,17 @@ export const UserDetailSheet = observer(
 		const handleAddToProject = () => {
 			// TODO: Implement add to project modal
 			toast.info("Add to project functionality will be implemented soon");
+		};
+
+		const handleProjectClick = (projectId: number, event: React.MouseEvent) => {
+			const url = `/projects/${projectId}/overview`;
+			
+			if (event.ctrlKey || event.metaKey) {
+				window.open(url, "_blank");
+			} else {
+				onClose();
+				navigate(url);
+			}
 		};
 
 		// Check if current user is admin or business area lead
@@ -484,19 +504,49 @@ export const UserDetailSheet = observer(
 								</div>
 							)}
 
-							{/* Involved Projects Section - Placeholder */}
-							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
-								<p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
-									Involved Projects
-								</p>
-								<div className="text-center py-8 text-muted-foreground">
-									<p className="text-sm">
-										Project involvement will be displayed
-										here after the Projects feature is
-										implemented.
+							{/* Involved Projects Section */}
+							{involvedProjects && involvedProjects.length > 0 && (
+								<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">
+									<p className="font-bold text-sm mb-3 text-gray-600 dark:text-gray-300">
+										Involved Projects
 									</p>
+									{projectsLoading ? (
+										<div className="space-y-2">
+											<Skeleton className="h-16 w-full" />
+											<Skeleton className="h-16 w-full" />
+										</div>
+									) : projectsError ? (
+										<Alert variant="destructive">
+											<AlertCircle className="size-4" />
+											<AlertDescription>
+												Failed to load projects
+											</AlertDescription>
+										</Alert>
+									) : involvedProjects.length === 0 ? (
+										<div className="text-center py-8 text-muted-foreground">
+											<p className="text-sm">
+												Not associated with any projects
+											</p>
+										</div>
+									) : (
+										<ProjectsDataTable
+											projects={involvedProjects}
+											columns={{
+												title: true,
+												image: true,
+												kind: false,
+												status: false,
+												businessArea: false,
+												role: true,
+												createdAt: false,
+											}}
+											defaultSort="title"
+											emptyMessage="Not associated with any projects"
+											onProjectClick={handleProjectClick}
+										/>
+									)}
 								</div>
-							</div>
+							)}
 
 							{/* Caretaker Section - Who is caretaking FOR this user */}
 							<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-4 mt-2">

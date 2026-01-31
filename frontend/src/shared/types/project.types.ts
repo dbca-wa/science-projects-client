@@ -33,6 +33,11 @@ export type ProjectRoles =
 	| "supervising"
 	| "research"
 	| "technical"
+	| "externalcol"
+	| "externalpeer"
+	| "academicsuper"
+	| "student"
+	| "consulted"
 	| "group";
 
 // Project Image

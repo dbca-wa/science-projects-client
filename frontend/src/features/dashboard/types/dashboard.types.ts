@@ -39,6 +39,9 @@ export interface IProjectDocument {
   project: {
     id: number;
     title: string;
+    kind: string;
+    year: number;
+    number: number;
   };
   project_lead_approval_granted: boolean;
   business_area_lead_approval_granted: boolean;
