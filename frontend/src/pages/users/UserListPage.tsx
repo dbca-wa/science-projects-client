@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
@@ -16,7 +16,6 @@ import { ErrorState } from "@/shared/components/ErrorState";
 import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
-import { Loader2 } from "lucide-react";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
 import { PageTransition } from "@/shared/components/PageTransition";
 
@@ -55,6 +54,32 @@ const UserListPage = observer(() => {
     filters: userSearchStore.state.filters,
     page: userSearchStore.state.currentPage,
   });
+  
+  // Delay sheet opening until after page transition completes
+  const [shouldShowSheet, setShouldShowSheet] = useState(false);
+  const wasLoadingRef = useRef(false);
+  
+  useEffect(() => {
+    // Only track loading if sheet should be open (direct link/refresh to /users/:id)
+    if (isLoading && isSheetOpen) {
+      wasLoadingRef.current = true;
+    }
+  }, [isLoading, isSheetOpen]);
+  
+  useEffect(() => {
+    if (isSheetOpen && !isLoading) {
+      // Only delay if we just finished loading WITH sheet open (refresh/direct link to /users/:id)
+      // If wasLoadingRef is false, user clicked from list (no delay needed)
+      const delay = wasLoadingRef.current ? 600 : 0;
+      const timer = setTimeout(() => {
+        setShouldShowSheet(true);
+        wasLoadingRef.current = false; // Reset after first use
+      }, delay);
+      return () => clearTimeout(timer);
+    } else if (!isSheetOpen) {
+      setShouldShowSheet(false);
+    }
+  }, [isSheetOpen, isLoading]);
 
   // Update total results in store
   useEffect(() => {
@@ -235,7 +260,7 @@ const UserListPage = observer(() => {
         {/* User Detail Sheet */}
         <UserDetailSheet
           userId={selectedUserId}
-          open={isSheetOpen}
+          open={shouldShowSheet}
           onClose={handleCloseSheet}
         />
       </div>
