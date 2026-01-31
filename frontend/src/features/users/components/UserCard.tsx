@@ -96,10 +96,10 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
           <UserAvatar user={user} size="xl" />
         </div>
 
-        <div className="ml-2 xl:ml-4 w-full overflow-hidden">
+        <div className="ml-2 xl:ml-4 w-full overflow-hidden ">
           {isClickable ? (
             <button
-              className="font-bold text-left hover:underline text-gray-600"
+              className="font-bold text-left hover:underline text-gray-600 cursor-pointer"
               onClick={handleClick}
             >
               {truncatedName}
