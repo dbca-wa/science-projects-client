@@ -1,7 +1,7 @@
 export { EmptyState } from "./EmptyState";
 export { NoResultsState } from "./NoResultsState";
 export { ErrorState } from "./ErrorState";
-export { Breadcrumb } from "./Breadcrumb";
+// Breadcrumb is exported from navigation/Breadcrumb.tsx
 export { Pagination } from "./Pagination";
 
 // Effects

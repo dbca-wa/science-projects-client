@@ -30,6 +30,35 @@ vi.mock("@/shared/services/logger.service", () => ({
   },
 }));
 
+const mockBaseProject: IProjectData = {
+  id: 1,
+  title: "Test Project",
+  description: "Test description",
+  tagline: "Test tagline",
+  keywords: "test",
+  year: 2024,
+  number: 1,
+  start_date: new Date("2024-01-01"),
+  end_date: new Date("2024-12-31"),
+  kind: "science",
+  status: "active",
+  business_area: {
+    id: 1,
+    name: "Test Business Area",
+    slug: "test-ba",
+    is_active: true,
+    focus: "Test focus",
+    introduction: "Test introduction",
+    image: null,
+  },
+  areas: [],
+  image: null,
+  deletion_requested: false,
+  deletion_request_id: null,
+  created_at: new Date("2024-01-01"),
+  updated_at: new Date("2024-01-01"),
+};
+
 describe("coordinate-calculation", () => {
   describe("fuzzyMatch", () => {
     it("should match exact strings", () => {
@@ -206,10 +235,11 @@ describe("coordinate-calculation", () => {
     };
 
     it("should return null for project with no areas", () => {
-      const project = {
+      const project: IProjectData = {
+        ...mockBaseProject,
         id: 1,
         areas: [],
-      } as IProjectData;
+      };
 
       const result = calculateCoordinates(project, mockGeoJsonData);
       expect(result).toBeNull();

@@ -1,6 +1,36 @@
 import { describe, it, expect } from "vitest";
 import { clusterProjects, getClusterCountDisplay } from "./clustering";
 import type { ProjectWithCoords } from "@/features/projects/types/map.types";
+import type { IProjectData } from "@/shared/types/project.types";
+
+const mockBaseProject: IProjectData = {
+  id: 1,
+  title: "Test Project",
+  description: "Test description",
+  tagline: "Test tagline",
+  keywords: "test",
+  year: 2024,
+  number: 1,
+  start_date: new Date("2024-01-01"),
+  end_date: new Date("2024-12-31"),
+  kind: "science",
+  status: "active",
+  business_area: {
+    id: 1,
+    name: "Test Business Area",
+    slug: "test-ba",
+    is_active: true,
+    focus: "Test focus",
+    introduction: "Test introduction",
+    image: null,
+  },
+  areas: [],
+  image: null,
+  deletion_requested: false,
+  deletion_request_id: null,
+  created_at: new Date("2024-01-01"),
+  updated_at: new Date("2024-01-01"),
+};
 
 describe("clustering", () => {
   const createProjectWithCoords = (
@@ -8,11 +38,11 @@ describe("clustering", () => {
     coords: [number, number],
     title = `Project ${id}`
   ): ProjectWithCoords => ({
+    ...mockBaseProject,
     id,
     title,
     coords,
-    areas: [],
-  } as ProjectWithCoords);
+  });
 
   describe("clusterProjects", () => {
     it("should return empty map for empty input", () => {

@@ -6,7 +6,6 @@ import { UserSearchStore } from "./derived/user-search.store";
 import { ProjectSearchStore } from "./derived/project-search.store";
 import { ProjectWizardStore } from "./derived/project-wizard.store";
 import { ProjectMapStore } from "./derived/project-map.store";
-import { MapStore } from "./derived/map.store";
 import { MyProjectsStore } from "./derived/my-projects.store";
 
 /**
@@ -20,7 +19,6 @@ class RootStore {
 	projectSearchStore: ProjectSearchStore;
 	projectWizardStore: ProjectWizardStore;
 	projectMapStore: ProjectMapStore;
-	mapStore: MapStore;
 	myProjectsStore: MyProjectsStore;
 
 	constructor() {
@@ -31,7 +29,6 @@ class RootStore {
 		this.projectSearchStore = new ProjectSearchStore();
 		this.projectWizardStore = new ProjectWizardStore();
 		this.projectMapStore = new ProjectMapStore();
-		this.mapStore = new MapStore();
 		this.myProjectsStore = new MyProjectsStore();
 	}
 }
@@ -61,5 +58,4 @@ export const useUserSearchStore = () => useStore().userSearchStore;
 export const useProjectSearchStore = () => useStore().projectSearchStore;
 export const useProjectWizardStore = () => useStore().projectWizardStore;
 export const useProjectMapStore = () => useStore().projectMapStore;
-export const useMapStore = () => useStore().mapStore;
 export const useMyProjectsStore = () => useStore().myProjectsStore;

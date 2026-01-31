@@ -1,6 +1,22 @@
+/**
+ * ProjectTeamDocumentsDataTable Component
+ * 
+ * Displays project team document tasks using the generic DataTable.
+ * Includes filtering by task level (team/lead).
+ */
+
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
+import { Label } from "@/shared/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import type { IProjectDocument } from "../types/dashboard.types";
 import {
 	combineProjectLevelTasks,
@@ -12,17 +28,6 @@ import {
 	type IDocumentTaskWithLevel,
 } from "../utils/document-tasks.utils";
 import { TASK_LEVEL_CONFIG } from "../constants/document-tasks.constants";
-import { Label } from "@/shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/shared/components/ui/select";
-import { usePagination } from "@/shared/hooks/usePagination";
-import { Pagination } from "@/shared/components/Pagination";
 
 interface ProjectTeamDocumentsDataTableProps {
 	teamTasks: IProjectDocument[];
@@ -30,8 +35,13 @@ interface ProjectTeamDocumentsDataTableProps {
 }
 
 type FilterOption = "all" | "team" | "lead";
-type SortColumn = "level" | "kind" | "title";
-type SortDirection = "asc" | "desc";
+
+// Blue theme for project team tasks
+const projectTeamTheme = {
+	headerBg: "bg-blue-50 dark:bg-blue-900/20",
+	rowHover: "hover:bg-blue-50 dark:hover:bg-blue-900/10",
+	accentColor: "hover:text-blue-600 dark:hover:text-blue-400",
+};
 
 export const ProjectTeamDocumentsDataTable = ({
 	teamTasks,
@@ -39,14 +49,8 @@ export const ProjectTeamDocumentsDataTable = ({
 }: ProjectTeamDocumentsDataTableProps) => {
 	const navigate = useNavigate();
 	const [filter, setFilter] = useState<FilterOption>("all");
-	const [sorting, setSorting] = useState<{
-		column: SortColumn;
-		direction: SortDirection;
-	}>({
-		column: "level",
-		direction: "asc",
-	});
 
+	// Combine and filter tasks
 	const combinedTasks = useMemo(
 		() => combineProjectLevelTasks(teamTasks, leadTasks),
 		[teamTasks, leadTasks]
@@ -62,39 +66,79 @@ export const ProjectTeamDocumentsDataTable = ({
 		return combinedTasks;
 	}, [combinedTasks, filter]);
 
-	const sortedTasks = useMemo(() => {
-		let sorted = [...filteredTasks];
+	// Column definitions
+	const columns: ColumnDef<IDocumentTaskWithLevel>[] = useMemo(
+		() => [
+			{
+				id: "level",
+				header: "Level",
+				accessor: (row) => row.taskLevel,
+				cell: (row) => {
+					const levelConfig = TASK_LEVEL_CONFIG[row.taskLevel];
+					return (
+						<span
+							className={`font-semibold text-${levelConfig.color}-600 dark:text-${levelConfig.color}-400`}
+						>
+							{levelConfig.title}
+						</span>
+					);
+				},
+				sortable: true,
+				sortFn: (a, b) => {
+					const sorted = sortTasksByLevel([a, b]);
+					return sorted[0] === a ? -1 : 1;
+				},
+				width: "150px",
+			},
+			{
+				id: "kind",
+				header: "Document Type",
+				accessor: (row) => row.kind,
+				cell: (row) => (
+					<div className="font-medium text-gray-900 dark:text-gray-100">
+						{getDocumentKindTitle(row.kind)}
+					</div>
+				),
+				sortable: true,
+				sortFn: (a, b) => {
+					const sorted = sortTasksByDocumentKind([a, b]);
+					return sorted[0] === a ? -1 : 1;
+				},
+				width: "200px",
+			},
+			{
+				id: "title",
+				header: "Project Title",
+				accessor: (row) => extractPlainTextTitle(row.project.title),
+				cell: (row) => {
+					const plainTitle = extractPlainTextTitle(row.project.title);
+					return (
+						<div className="space-y-1">
+							<div className="font-semibold text-blue-600 dark:text-blue-400 break-words">
+								{plainTitle}
+							</div>
+							<div className="text-sm text-gray-600 dark:text-gray-400">
+								{row.projectCode}
+							</div>
+							<div className="text-xs text-gray-500 dark:text-gray-500">
+								{row.taskDescription}
+							</div>
+						</div>
+					);
+				},
+				sortable: true,
+				sortFn: (a, b) => {
+					const titleA = extractPlainTextTitle(a.project.title);
+					const titleB = extractPlainTextTitle(b.project.title);
+					return titleA.localeCompare(titleB);
+				},
+			},
+		],
+		[]
+	);
 
-		if (sorting.column === "level") {
-			sorted = sortTasksByLevel(sorted);
-		} else if (sorting.column === "kind") {
-			sorted = sortTasksByDocumentKind(sorted);
-		} else if (sorting.column === "title") {
-			sorted.sort((a, b) => {
-				const titleA = extractPlainTextTitle(a.project.title);
-				const titleB = extractPlainTextTitle(b.project.title);
-				return titleA.localeCompare(titleB);
-			});
-		}
-
-		if (sorting.direction === "desc") {
-			sorted.reverse();
-		}
-
-		return sorted;
-	}, [filteredTasks, sorting]);
-
-	// Apply pagination (resets when filter changes)
-	const pagination = usePagination({
-		data: sortedTasks,
-		pageSize: 50,
-		resetDeps: [filter],
-	});
-
-	const handleRowClick = (
-		task: IDocumentTaskWithLevel,
-		event: React.MouseEvent
-	) => {
+	// Handle row click - navigate to document
+	const handleRowClick = (task: IDocumentTaskWithLevel, event: React.MouseEvent) => {
 		const urlPath = getDocumentUrlPath(task.kind);
 		const url = `/projects/${task.project.id}/${urlPath}`;
 
@@ -105,25 +149,7 @@ export const ProjectTeamDocumentsDataTable = ({
 		}
 	};
 
-	const toggleSort = (column: SortColumn) => {
-		setSorting((prev) => ({
-			column,
-			direction:
-				prev.column === column && prev.direction === "asc" ? "desc" : "asc",
-		}));
-	};
-
-	const getSortIcon = (column: SortColumn) => {
-		if (sorting.column !== column) {
-			return <ArrowUpDown className="ml-2 h-4 w-4" />;
-		}
-		return sorting.direction === "asc" ? (
-			<ArrowDown className="ml-2 h-4 w-4" />
-		) : (
-			<ArrowUp className="ml-2 h-4 w-4" />
-		);
-	};
-
+	// Empty state for combined tasks
 	if (combinedTasks.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
@@ -146,26 +172,20 @@ export const ProjectTeamDocumentsDataTable = ({
 						className="flex gap-4"
 					>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="all" id="filter-all" />
-							<Label htmlFor="filter-all" className="cursor-pointer font-normal">
+							<RadioGroupItem value="all" id="project-filter-all" />
+							<Label htmlFor="project-filter-all" className="cursor-pointer font-normal">
 								Show All
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="team" id="filter-team" />
-							<Label
-								htmlFor="filter-team"
-								className="cursor-pointer font-normal"
-							>
+							<RadioGroupItem value="team" id="project-filter-team" />
+							<Label htmlFor="project-filter-team" className="cursor-pointer font-normal">
 								Team Tasks Only
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
-							<RadioGroupItem value="lead" id="filter-lead" />
-							<Label
-								htmlFor="filter-lead"
-								className="cursor-pointer font-normal"
-							>
+							<RadioGroupItem value="lead" id="project-filter-lead" />
+							<Label htmlFor="project-filter-lead" className="cursor-pointer font-normal">
 								Lead Tasks Only
 							</Label>
 						</div>
@@ -187,106 +207,22 @@ export const ProjectTeamDocumentsDataTable = ({
 				</div>
 			</div>
 
-			{/* Table */}
-			<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-				{/* Desktop Header */}
-				<div className="hidden md:grid md:grid-cols-[150px_200px_1fr] gap-4 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
-					<div className="px-4 py-3">
-						<button
-							onClick={() => toggleSort("level")}
-							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-						>
-							Level
-							{getSortIcon("level")}
-						</button>
-					</div>
-					<div className="px-4 py-3">
-						<button
-							onClick={() => toggleSort("kind")}
-							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-						>
-							Document Type
-							{getSortIcon("kind")}
-						</button>
-					</div>
-					<div className="px-4 py-3">
-						<button
-							onClick={() => toggleSort("title")}
-							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-						>
-							Project Title
-							{getSortIcon("title")}
-						</button>
-					</div>
-				</div>
-
-				{/* Rows */}
-				<div>
-					{pagination.paginatedData.map((task) => {
-						const levelConfig = TASK_LEVEL_CONFIG[task.taskLevel];
-						const plainTitle = extractPlainTextTitle(task.project.title);
-
-						return (
-							<div
-								key={task.id}
-								onClick={(e) => handleRowClick(task, e)}
-								className="grid grid-cols-1 md:grid-cols-[150px_200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
-							>
-								{/* Level Column */}
-								<div className="px-4 py-4">
-									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-										Level
-									</div>
-									<span
-										className={`font-semibold text-${levelConfig.color}-600 dark:text-${levelConfig.color}-400`}
-									>
-										{levelConfig.title}
-									</span>
-								</div>
-
-								{/* Document Type Column */}
-								<div className="px-4 py-4">
-									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-										Document Type
-									</div>
-									<div className="font-medium text-gray-900 dark:text-gray-100">
-										{getDocumentKindTitle(task.kind)}
-									</div>
-								</div>
-
-								{/* Project Title Column */}
-								<div className="px-4 py-4 space-y-1">
-									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-										Project
-									</div>
-									<div className="font-semibold text-blue-600 dark:text-blue-400 break-words">
-										{plainTitle}
-									</div>
-									<div className="text-sm text-gray-600 dark:text-gray-400">
-										{task.projectCode}
-									</div>
-									<div className="text-xs text-gray-500 dark:text-gray-500">
-										{task.taskDescription}
-									</div>
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
-
-			{/* Pagination controls (only show if needed) */}
-			{pagination.totalPages > 1 && (
-				<Pagination
-					currentPage={pagination.currentPage}
-					totalPages={pagination.totalPages}
-					onPageChange={pagination.goToPage}
-					startIndex={pagination.startIndex}
-					endIndex={pagination.endIndex}
-					totalItems={pagination.totalItems}
-					itemLabel="documents"
-				/>
-			)}
+			{/* DataTable */}
+			<DataTable
+				data={filteredTasks}
+				columns={columns}
+				getRowKey={(row) => row.id}
+				onRowClick={handleRowClick}
+				defaultSort={{ column: "level", direction: "asc" }}
+				pagination={{
+					enabled: true,
+					pageSize: 50,
+					itemLabel: "documents",
+				}}
+				emptyMessage="No tasks match the current filter."
+				ariaLabel="Project team document tasks"
+				theme={projectTeamTheme}
+			/>
 		</div>
 	);
 };

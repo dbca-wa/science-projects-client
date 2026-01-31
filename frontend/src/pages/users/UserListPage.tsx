@@ -254,6 +254,10 @@ const UserListPage = observer(() => {
             currentPage={userSearchStore.state.currentPage}
             totalPages={data.total_pages}
             onPageChange={handlePageChange}
+            startIndex={(userSearchStore.state.currentPage - 1) * 20}
+            endIndex={Math.min(userSearchStore.state.currentPage * 20, data.total_results)}
+            totalItems={data.total_results}
+            itemLabel="users"
           />
         )}
 

@@ -24,7 +24,7 @@ export const CaretakerSection = ({ userId, caretakees }: CaretakerSectionProps) 
 	const [activeTab, setActiveTab] = useState<number>(0);
 	
 	// Fetch caretaker document tasks
-	const { data: caretakerTasks, isLoading: tasksLoading, isError: tasksError, error: tasksErrorObj, refetch: refetchTasks } = useCaretakerTasks(userId);
+	const { data: caretakerTasks, isLoading: tasksLoading, isError: tasksError, error: tasksErrorObj } = useCaretakerTasks(userId);
 	
 	// Fetch incoming caretaker requests (someone wants YOU to be THEIR caretaker)
 	const { data: incomingRequests, isLoading: requestsLoading, isError: requestsError, error: requestsErrorObj, refetch: refetchRequests } = usePendingCaretakerRequests(userId);

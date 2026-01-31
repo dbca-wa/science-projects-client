@@ -53,17 +53,22 @@ const mockStore = {
     mapFullscreen: false,
     filtersMinimized: false,
     searchTerm: "",
-    selectedBusinessAreas: [],
-    filterUser: null,
+    filters: {
+      selectedBusinessAreas: [] as number[],
+      user: null as number | null,
+      status: "",
+      kind: "",
+      year: 0,
+      onlyActive: false,
+      onlyInactive: false,
+    },
     saveSearch: true,
   },
   apiParams: {},
-  selectedBusinessAreasArray: [],
+  selectedBusinessAreasArray: [] as number[],
   toggleMapFullscreen: vi.fn(),
   toggleFiltersMinimized: vi.fn(),
   setSearchTerm: vi.fn(),
-  toggleBusinessArea: vi.fn(),
-  setFilterUser: vi.fn(),
   setFilters: vi.fn(),
 };
 
@@ -77,9 +82,9 @@ describe("ProjectMapPage", () => {
     mockStore.state.mapFullscreen = false;
     mockStore.state.filtersMinimized = false;
     mockStore.state.searchTerm = "";
-    mockStore.state.selectedBusinessAreas = [];
+    mockStore.state.filters.selectedBusinessAreas = [];
     mockStore.selectedBusinessAreasArray = [];
-    mockStore.state.filterUser = null;
+    mockStore.state.filters.user = null;
     mockStore.state.saveSearch = true;
   });
 
@@ -126,9 +131,8 @@ describe("ProjectMapPage", () => {
 
   it("should save to localStorage when filters change", () => {
     mockStore.state.searchTerm = "test search";
-    mockStore.state.selectedBusinessAreas = [1];
-    mockStore.selectedBusinessAreasArray = [1];
-    mockStore.state.filterUser = 123;
+    mockStore.state.filters.selectedBusinessAreas = [1];
+    mockStore.state.filters.user = 123;
     mockStore.state.saveSearch = true;
 
     renderWithProviders(["/projects/map?search=test&businessAreas=1&user=123"]);

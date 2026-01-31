@@ -99,6 +99,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		makeObservable(this, {
 			// Actions - search and filters (matches ProjectSearchStore)
 			setSearchTerm: action,
+			setCurrentPage: action,
 			setFilters: action,
 			resetFilters: action,
 			toggleSaveSearch: action,
@@ -202,6 +203,14 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	setSearchTerm(term: string) {
 		this.state.searchTerm = term;
 		this.saveToLocalStorage();
+	}
+
+	/**
+	 * Dummy method for compatibility with useSearchStoreInit.
+	 * Map doesn't use pagination, so this is a no-op.
+	 */
+	setCurrentPage(_page: number) {
+		// No-op: Map doesn't have pagination
 	}
 
 	/**

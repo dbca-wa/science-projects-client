@@ -1,4 +1,3 @@
-import { Link, useNavigate } from "react-router";
 import { cn } from "@/shared/lib/utils";
 import { useNavigationHandler } from "@/shared/hooks/useNavigationHandler";
 

@@ -38,10 +38,9 @@ function calculateCentroid(feature: GeoJSON.Feature): [number, number] | null {
  */
 export const RegionLabel = ({
   feature,
-  layerType,
   propertyName,
   onLabelClick,
-}: RegionLabelProps) => {
+}: Omit<RegionLabelProps, 'layerType'>) => {
   const centroid = calculateCentroid(feature);
   
   if (!centroid) {

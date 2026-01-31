@@ -20,7 +20,12 @@ const mockProject: IProjectData = {
   description: "This is a test project description that should be displayed in the popup.",
   status: "active",
   kind: "science",
+  tagline: "Test tagline",
+  keywords: "test, project",
   year: 2024,
+  number: 1,
+  start_date: new Date("2024-01-01"),
+  end_date: new Date("2024-12-31"),
   business_area: {
     id: 1,
     name: "Test Business Area",
@@ -30,8 +35,10 @@ const mockProject: IProjectData = {
     introduction: "Test introduction",
     image: null,
   },
-  location_areas: [],
+  areas: [],
   image: null,
+  deletion_requested: false,
+  deletion_request_id: null,
   created_at: new Date("2024-01-01"),
   updated_at: new Date("2024-01-01"),
 };
@@ -128,10 +135,10 @@ describe("ProjectPopup", () => {
   });
 
   describe("Multi Project Popup", () => {
-    const multipleProjects = [
-      { ...mockProject, id: 1, title: "Project 1", status: "active" },
-      { ...mockProject, id: 2, title: "Project 2", status: "pending" },
-      { ...mockProject, id: 3, title: "Project 3", status: "completed" },
+    const multipleProjects: IProjectData[] = [
+      { ...mockProject, id: 1, title: "Project 1", status: "active" as const },
+      { ...mockProject, id: 2, title: "Project 2", status: "pending" as const },
+      { ...mockProject, id: 3, title: "Project 3", status: "completed" as const },
     ];
 
     it("should render multiple projects header", () => {
@@ -176,10 +183,10 @@ describe("ProjectPopup", () => {
     });
 
     it("should sort projects by status priority", () => {
-      const unsortedProjects = [
-        { ...mockProject, id: 1, title: "Completed Project", status: "completed" },
-        { ...mockProject, id: 2, title: "Active Project", status: "active" },
-        { ...mockProject, id: 3, title: "Pending Project", status: "pending" },
+      const unsortedProjects: IProjectData[] = [
+        { ...mockProject, id: 1, title: "Completed Project", status: "completed" as const },
+        { ...mockProject, id: 2, title: "Active Project", status: "active" as const },
+        { ...mockProject, id: 3, title: "Pending Project", status: "pending" as const },
       ];
       
       renderWithRouter(<ProjectPopup projects={unsortedProjects} />);

@@ -4,7 +4,7 @@
 
 interface ICaretakee {
   id: number;
-  end_date?: string | null;
+  end_date?: string | Date | null;
   caretaking_for?: ICaretakee[];
 }
 

@@ -1,0 +1,21 @@
+/**
+ * DataTable CSS
+ * 
+ * Responsive grid styles for DataTable component.
+ * Uses CSS custom properties for dynamic column widths.
+ * 
+ * Note: Tailwind config has `important: true`, so we need double !important
+ * to override Tailwind utilities.
+ */
+
+/* Mobile: Single column layout */
+.datatable-row {
+	grid-template-columns: 1fr !important;
+}
+
+/* Desktop: Apply custom grid columns */
+@media (min-width: 768px) {
+	.datatable-row {
+		grid-template-columns: var(--grid-cols, 1fr) !important;
+	}
+}
