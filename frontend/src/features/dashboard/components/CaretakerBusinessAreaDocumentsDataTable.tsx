@@ -10,19 +10,21 @@ import {
 	extractPlainTextTitle,
 	type IDocumentTaskWithLevel,
 } from "../utils/document-tasks.utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import { usePagination } from "@/shared/hooks/usePagination";
 import { Pagination } from "@/shared/components/Pagination";
 
-interface DirectorateDocumentsDataTableProps {
+interface CaretakerBusinessAreaDocumentsDataTableProps {
 	tasks: IProjectDocument[];
 }
 
-type SortColumn = "kind" | "title";
+type SortColumn = "kind" | "title" | "user";
 type SortDirection = "asc" | "desc";
 
-export const DirectorateDocumentsDataTable = ({
+export const CaretakerBusinessAreaDocumentsDataTable = ({
 	tasks,
-}: DirectorateDocumentsDataTableProps) => {
+}: CaretakerBusinessAreaDocumentsDataTableProps) => {
 	const navigate = useNavigate();
 	const [sorting, setSorting] = useState<{
 		column: SortColumn;
@@ -33,7 +35,7 @@ export const DirectorateDocumentsDataTable = ({
 	});
 
 	const tasksWithLevel = useMemo(
-		() => addTaskLevelMetadata(tasks, "directorate"),
+		() => addTaskLevelMetadata(tasks, "ba"),
 		[tasks]
 	);
 
@@ -47,6 +49,16 @@ export const DirectorateDocumentsDataTable = ({
 				const titleA = extractPlainTextTitle(a.project.title);
 				const titleB = extractPlainTextTitle(b.project.title);
 				return titleA.localeCompare(titleB);
+			});
+		} else if (sorting.column === "user") {
+			sorted.sort((a, b) => {
+				const nameA = a.for_user
+					? `${a.for_user.display_first_name} ${a.for_user.display_last_name}`
+					: "";
+				const nameB = b.for_user
+					? `${b.for_user.display_first_name} ${b.for_user.display_last_name}`
+					: "";
+				return nameA.localeCompare(nameB);
 			});
 		}
 
@@ -100,7 +112,7 @@ export const DirectorateDocumentsDataTable = ({
 		return (
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
 				<div className="text-gray-500 dark:text-gray-400">
-					No pending directorate tasks.
+					No pending business area lead tasks.
 				</div>
 			</div>
 		);
@@ -110,11 +122,11 @@ export const DirectorateDocumentsDataTable = ({
 		<div className="space-y-4">
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 			{/* Desktop Header */}
-			<div className="hidden md:grid md:grid-cols-[200px_1fr] gap-4 bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700">
+			<div className="hidden md:grid md:grid-cols-[200px_180px_1fr] gap-4 bg-orange-50 dark:bg-orange-900/20 border-b border-gray-200 dark:border-gray-700">
 				<div className="px-4 py-3">
 					<button
 						onClick={() => toggleSort("kind")}
-						className="flex items-center gap-2 font-semibold text-sm hover:text-red-600 dark:hover:text-red-400 transition-colors"
+						className="flex items-center gap-2 font-semibold text-sm hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
 					>
 						Document Type
 						{getSortIcon("kind")}
@@ -122,8 +134,17 @@ export const DirectorateDocumentsDataTable = ({
 				</div>
 				<div className="px-4 py-3">
 					<button
+						onClick={() => toggleSort("user")}
+						className="flex items-center gap-2 font-semibold text-sm hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+					>
+						For User
+						{getSortIcon("user")}
+					</button>
+				</div>
+				<div className="px-4 py-3">
+					<button
 						onClick={() => toggleSort("title")}
-						className="flex items-center gap-2 font-semibold text-sm hover:text-red-600 dark:hover:text-red-400 transition-colors"
+						className="flex items-center gap-2 font-semibold text-sm hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
 					>
 						Project Title
 						{getSortIcon("title")}
@@ -135,12 +156,13 @@ export const DirectorateDocumentsDataTable = ({
 			<div>
 				{pagination.paginatedData.map((task) => {
 					const plainTitle = extractPlainTextTitle(task.project.title);
+					const forUser = task.for_user;
 
 					return (
 						<div
-							key={task.id}
+							key={`${task.id}-${task.for_user?.id || 'unknown'}`}
 							onClick={(e) => handleRowClick(task, e)}
-							className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+							className="grid grid-cols-1 md:grid-cols-[200px_180px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors"
 						>
 							{/* Document Type Column */}
 							<div className="px-4 py-4">
@@ -152,12 +174,39 @@ export const DirectorateDocumentsDataTable = ({
 								</div>
 							</div>
 
+							{/* For User Column */}
+							<div className="px-4 py-4">
+								<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+									For User
+								</div>
+								{forUser ? (
+									<div className="flex items-center gap-2">
+										<Avatar className="size-6">
+											<AvatarImage src={getImageUrl(forUser.image)} />
+											<AvatarFallback>
+												{forUser.display_first_name[0]}
+												{forUser.display_last_name[0]}
+											</AvatarFallback>
+										</Avatar>
+										<div className="text-sm">
+											<div className="font-medium text-gray-900 dark:text-gray-100">
+												{forUser.display_first_name} {forUser.display_last_name}
+											</div>
+										</div>
+									</div>
+								) : (
+									<div className="text-sm text-gray-500 dark:text-gray-400">
+										—
+									</div>
+								)}
+							</div>
+
 							{/* Project Title Column */}
 							<div className="px-4 py-4 space-y-1">
 								<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
 									Project
 								</div>
-								<div className="font-semibold text-red-600 dark:text-red-400 break-words">
+								<div className="font-semibold text-orange-600 dark:text-orange-400 break-words">
 									{plainTitle}
 								</div>
 								<div className="text-sm text-gray-600 dark:text-gray-400">

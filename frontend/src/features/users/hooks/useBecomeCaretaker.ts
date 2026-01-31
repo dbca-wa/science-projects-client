@@ -9,7 +9,7 @@ import type { RequestCaretakerPayload } from "../types/caretaker.types";
  * Hook for requesting to become a caretaker for another user
  * - Creates AdminTask with current user as caretaker and target user as primary_user
  * - Sets reason="other" and endDate=null (admin will configure these)
- * - Invalidates user detail query and caretaker check query on success to refresh UI
+ * - Invalidates user detail query, caretaker check query, and admin tasks on success to refresh UI
  * - Shows success/error toast notifications
  * 
  * @returns TanStack Query mutation for become caretaker request
@@ -46,6 +46,9 @@ export const useBecomeCaretaker = () => {
       queryClient.invalidateQueries({
         queryKey: ["caretakers", "pending", variables.userId],
       });
+
+      // Invalidate admin tasks to update dashboard
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
 
       // Show success toast
       toast.success("Caretaker request submitted successfully. Awaiting admin approval.");

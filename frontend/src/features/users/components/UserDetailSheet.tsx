@@ -967,7 +967,7 @@ export const UserDetailSheet = observer(
 								</span>
 							</AlertDialogDescription>
 						</AlertDialogHeader>
-						<AlertDialogFooter>
+						<AlertDialogFooter className="mt-4">
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
 							<AlertDialogAction
 								onClick={handleConfirmBecomeCaretaker}

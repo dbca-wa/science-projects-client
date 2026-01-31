@@ -21,22 +21,26 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { usePagination } from "@/shared/hooks/usePagination";
-import { Pagination } from "@/shared/components/Pagination";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { getImageUrl } from "@/shared/utils/image.utils";
 
-interface ProjectTeamDocumentsDataTableProps {
+interface CaretakerDocumentsDataTableProps {
 	teamTasks: IProjectDocument[];
 	leadTasks: IProjectDocument[];
+	baTasks: IProjectDocument[];
+	directorateTasks: IProjectDocument[];
 }
 
-type FilterOption = "all" | "team" | "lead";
-type SortColumn = "level" | "kind" | "title";
+type FilterOption = "all" | "team" | "lead" | "ba" | "directorate";
+type SortColumn = "level" | "kind" | "title" | "user";
 type SortDirection = "asc" | "desc";
 
-export const ProjectTeamDocumentsDataTable = ({
+export const CaretakerDocumentsDataTable = ({
 	teamTasks,
 	leadTasks,
-}: ProjectTeamDocumentsDataTableProps) => {
+	baTasks,
+	directorateTasks,
+}: CaretakerDocumentsDataTableProps) => {
 	const navigate = useNavigate();
 	const [filter, setFilter] = useState<FilterOption>("all");
 	const [sorting, setSorting] = useState<{
@@ -47,10 +51,27 @@ export const ProjectTeamDocumentsDataTable = ({
 		direction: "asc",
 	});
 
-	const combinedTasks = useMemo(
-		() => combineProjectLevelTasks(teamTasks, leadTasks),
-		[teamTasks, leadTasks]
-	);
+	const combinedTasks = useMemo(() => {
+		const combined = combineProjectLevelTasks(teamTasks, leadTasks);
+		
+		// Add BA tasks
+		const baCombined = baTasks.map((task) => ({
+			...task,
+			taskLevel: "ba" as const,
+			taskDescription: "Requires Business Area Lead approval",
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+		}));
+		
+		// Add Directorate tasks
+		const directorateCombined = directorateTasks.map((task) => ({
+			...task,
+			taskLevel: "directorate" as const,
+			taskDescription: "Requires Directorate approval",
+			projectCode: `${task.project.kind.toUpperCase()}-${task.project.year}-${task.project.number}`,
+		}));
+		
+		return [...combined, ...baCombined, ...directorateCombined];
+	}, [teamTasks, leadTasks, baTasks, directorateTasks]);
 
 	const filteredTasks = useMemo(() => {
 		if (filter === "team") {
@@ -58,6 +79,12 @@ export const ProjectTeamDocumentsDataTable = ({
 		}
 		if (filter === "lead") {
 			return combinedTasks.filter((t) => t.taskLevel === "lead");
+		}
+		if (filter === "ba") {
+			return combinedTasks.filter((t) => t.taskLevel === "ba");
+		}
+		if (filter === "directorate") {
+			return combinedTasks.filter((t) => t.taskLevel === "directorate");
 		}
 		return combinedTasks;
 	}, [combinedTasks, filter]);
@@ -75,6 +102,16 @@ export const ProjectTeamDocumentsDataTable = ({
 				const titleB = extractPlainTextTitle(b.project.title);
 				return titleA.localeCompare(titleB);
 			});
+		} else if (sorting.column === "user") {
+			sorted.sort((a, b) => {
+				const nameA = a.for_user
+					? `${a.for_user.display_first_name} ${a.for_user.display_last_name}`
+					: "";
+				const nameB = b.for_user
+					? `${b.for_user.display_first_name} ${b.for_user.display_last_name}`
+					: "";
+				return nameA.localeCompare(nameB);
+			});
 		}
 
 		if (sorting.direction === "desc") {
@@ -83,13 +120,6 @@ export const ProjectTeamDocumentsDataTable = ({
 
 		return sorted;
 	}, [filteredTasks, sorting]);
-
-	// Apply pagination (resets when filter changes)
-	const pagination = usePagination({
-		data: sortedTasks,
-		pageSize: 50,
-		resetDeps: [filter],
-	});
 
 	const handleRowClick = (
 		task: IDocumentTaskWithLevel,
@@ -128,7 +158,7 @@ export const ProjectTeamDocumentsDataTable = ({
 		return (
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
 				<div className="text-gray-500 dark:text-gray-400">
-					No pending project team tasks.
+					No pending caretaker document tasks.
 				</div>
 			</div>
 		);
@@ -157,7 +187,7 @@ export const ProjectTeamDocumentsDataTable = ({
 								htmlFor="filter-team"
 								className="cursor-pointer font-normal"
 							>
-								Team Tasks Only
+								Team
 							</Label>
 						</div>
 						<div className="flex items-center space-x-2">
@@ -166,7 +196,22 @@ export const ProjectTeamDocumentsDataTable = ({
 								htmlFor="filter-lead"
 								className="cursor-pointer font-normal"
 							>
-								Lead Tasks Only
+								Lead
+							</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="ba" id="filter-ba" />
+							<Label htmlFor="filter-ba" className="cursor-pointer font-normal">
+								BA
+							</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<RadioGroupItem value="directorate" id="filter-directorate" />
+							<Label
+								htmlFor="filter-directorate"
+								className="cursor-pointer font-normal"
+							>
+								Directorate
 							</Label>
 						</div>
 					</RadioGroup>
@@ -174,14 +219,19 @@ export const ProjectTeamDocumentsDataTable = ({
 
 				{/* Mobile: Dropdown */}
 				<div className="md:hidden w-full">
-					<Select value={filter} onValueChange={(value) => setFilter(value as FilterOption)}>
+					<Select
+						value={filter}
+						onValueChange={(value) => setFilter(value as FilterOption)}
+					>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Filter tasks" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">Show All</SelectItem>
-							<SelectItem value="team">Team Tasks Only</SelectItem>
-							<SelectItem value="lead">Lead Tasks Only</SelectItem>
+							<SelectItem value="team">Team Tasks</SelectItem>
+							<SelectItem value="lead">Lead Tasks</SelectItem>
+							<SelectItem value="ba">BA Tasks</SelectItem>
+							<SelectItem value="directorate">Directorate Tasks</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -190,7 +240,7 @@ export const ProjectTeamDocumentsDataTable = ({
 			{/* Table */}
 			<div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
 				{/* Desktop Header */}
-				<div className="hidden md:grid md:grid-cols-[150px_200px_1fr] gap-4 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
+				<div className="hidden md:grid md:grid-cols-[120px_180px_200px_1fr] gap-4 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
 					<div className="px-4 py-3">
 						<button
 							onClick={() => toggleSort("level")}
@@ -211,6 +261,15 @@ export const ProjectTeamDocumentsDataTable = ({
 					</div>
 					<div className="px-4 py-3">
 						<button
+							onClick={() => toggleSort("user")}
+							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+						>
+							For User
+							{getSortIcon("user")}
+						</button>
+					</div>
+					<div className="px-4 py-3">
+						<button
 							onClick={() => toggleSort("title")}
 							className="flex items-center gap-2 font-semibold text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
 						>
@@ -222,15 +281,16 @@ export const ProjectTeamDocumentsDataTable = ({
 
 				{/* Rows */}
 				<div>
-					{pagination.paginatedData.map((task) => {
+					{sortedTasks.map((task) => {
 						const levelConfig = TASK_LEVEL_CONFIG[task.taskLevel];
 						const plainTitle = extractPlainTextTitle(task.project.title);
+						const forUser = task.for_user;
 
 						return (
 							<div
 								key={task.id}
 								onClick={(e) => handleRowClick(task, e)}
-								className="grid grid-cols-1 md:grid-cols-[150px_200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
+								className="grid grid-cols-1 md:grid-cols-[120px_180px_200px_1fr] gap-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
 							>
 								{/* Level Column */}
 								<div className="px-4 py-4">
@@ -254,6 +314,33 @@ export const ProjectTeamDocumentsDataTable = ({
 									</div>
 								</div>
 
+								{/* For User Column */}
+								<div className="px-4 py-4">
+									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+										For User
+									</div>
+									{forUser ? (
+										<div className="flex items-center gap-2">
+											<Avatar className="size-6">
+												<AvatarImage src={getImageUrl(forUser.image)} />
+												<AvatarFallback>
+													{forUser.display_first_name[0]}
+													{forUser.display_last_name[0]}
+												</AvatarFallback>
+											</Avatar>
+											<div className="text-sm">
+												<div className="font-medium text-gray-900 dark:text-gray-100">
+													{forUser.display_first_name} {forUser.display_last_name}
+												</div>
+											</div>
+										</div>
+									) : (
+										<div className="text-sm text-gray-500 dark:text-gray-400">
+											—
+										</div>
+									)}
+								</div>
+
 								{/* Project Title Column */}
 								<div className="px-4 py-4 space-y-1">
 									<div className="md:hidden text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -274,19 +361,6 @@ export const ProjectTeamDocumentsDataTable = ({
 					})}
 				</div>
 			</div>
-
-			{/* Pagination controls (only show if needed) */}
-			{pagination.totalPages > 1 && (
-				<Pagination
-					currentPage={pagination.currentPage}
-					totalPages={pagination.totalPages}
-					onPageChange={pagination.goToPage}
-					startIndex={pagination.startIndex}
-					endIndex={pagination.endIndex}
-					totalItems={pagination.totalItems}
-					itemLabel="documents"
-				/>
-			)}
 		</div>
 	);
 };

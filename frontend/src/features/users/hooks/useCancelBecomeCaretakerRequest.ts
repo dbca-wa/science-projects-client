@@ -7,7 +7,7 @@ import { useAuthStore } from "@/app/stores/store-context";
 /**
  * Hook for cancelling a "become caretaker" request
  * - Updates AdminTask status to "cancelled"
- * - Invalidates user detail query and caretaker check query on success to refresh UI
+ * - Invalidates user detail query, caretaker check query, and admin tasks on success to refresh UI
  * - Shows success/error toast notifications
  * 
  * @returns TanStack Query mutation for cancelling become caretaker request
@@ -36,6 +36,9 @@ export const useCancelBecomeCaretakerRequest = () => {
       queryClient.invalidateQueries({
         queryKey: ["caretakers", "pending", variables.userId],
       });
+
+      // Invalidate admin tasks to update dashboard
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
 
       // Show success toast
       toast.success("Caretaker request cancelled successfully.");

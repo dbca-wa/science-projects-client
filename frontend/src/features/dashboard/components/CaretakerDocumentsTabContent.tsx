@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { DocumentTasksResponse } from "../types/dashboard.types";
-import { ProjectTeamDocumentsDataTable } from "./ProjectTeamDocumentsDataTable";
-import { BusinessAreaLeadDocumentsDataTable } from "./BusinessAreaLeadDocumentsDataTable";
-import { DirectorateDocumentsDataTable } from "./DirectorateDocumentsDataTable";
+import type { ICaretakerTasksResponse } from "../types/caretaker-tasks.types";
+import { CaretakerProjectTeamDocumentsDataTable } from "./CaretakerProjectTeamDocumentsDataTable";
+import { CaretakerBusinessAreaDocumentsDataTable } from "./CaretakerBusinessAreaDocumentsDataTable";
+import { CaretakerDirectorateDocumentsDataTable } from "./CaretakerDirectorateDocumentsDataTable";
 
-interface DocumentTasksTabContentProps {
-	documentTasks?: DocumentTasksResponse;
-	documentTasksLoading: boolean;
-	documentTasksError?: Error | null;
-	isBusinessAreaLead: boolean;
-	isSuperuser: boolean;
+interface CaretakerDocumentsTabContentProps {
+	caretakerTasks?: ICaretakerTasksResponse;
+	caretakerTasksLoading: boolean;
+	caretakerTasksError?: Error | null;
 }
 
 /**
@@ -68,14 +66,12 @@ const TaskSection = ({
 	);
 };
 
-export const DocumentTasksTabContent = ({
-	documentTasks,
-	documentTasksLoading,
-	documentTasksError,
-	isBusinessAreaLead,
-	isSuperuser,
-}: DocumentTasksTabContentProps) => {
-	if (documentTasksLoading) {
+export const CaretakerDocumentsTabContent = ({
+	caretakerTasks,
+	caretakerTasksLoading,
+	caretakerTasksError,
+}: CaretakerDocumentsTabContentProps) => {
+	if (caretakerTasksLoading) {
 		return (
 			<div className="flex items-center justify-center py-20">
 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
@@ -83,20 +79,20 @@ export const DocumentTasksTabContent = ({
 		);
 	}
 
-	if (documentTasksError) {
+	if (caretakerTasksError) {
 		return (
 			<div className="text-center py-8">
 				<p className="text-red-600 dark:text-red-400 mb-4">
-					Failed to load tasks: {documentTasksError.message || "Unknown error"}
+					Failed to load caretaker tasks: {caretakerTasksError.message || "Unknown error"}
 				</p>
 			</div>
 		);
 	}
 
-	const teamTasks = documentTasks?.team || [];
-	const leadTasks = documentTasks?.lead || [];
-	const baTasks = documentTasks?.ba || [];
-	const directorateTasks = documentTasks?.directorate || [];
+	const teamTasks = caretakerTasks?.team || [];
+	const leadTasks = caretakerTasks?.lead || [];
+	const baTasks = caretakerTasks?.ba || [];
+	const directorateTasks = caretakerTasks?.directorate || [];
 
 	const projectTeamCount = teamTasks.length + leadTasks.length;
 	const totalTasks = projectTeamCount + baTasks.length + directorateTasks.length;
@@ -105,7 +101,7 @@ export const DocumentTasksTabContent = ({
 		return (
 			<div className="w-full h-full">
 				<p className="text-gray-600 dark:text-gray-400 text-center py-8">
-					No pending document tasks.
+					No pending caretaker document tasks.
 				</p>
 			</div>
 		);
@@ -120,32 +116,32 @@ export const DocumentTasksTabContent = ({
 					count={projectTeamCount}
 					defaultOpen={true}
 				>
-					<ProjectTeamDocumentsDataTable
+					<CaretakerProjectTeamDocumentsDataTable
 						teamTasks={teamTasks}
 						leadTasks={leadTasks}
 					/>
 				</TaskSection>
 			)}
 
-			{/* Business Area Lead Documents - Only show if user is BA lead AND has tasks */}
-			{isBusinessAreaLead && baTasks.length > 0 && (
+			{/* Business Area Lead Documents */}
+			{baTasks.length > 0 && (
 				<TaskSection
 					title="Business Area Lead Documents"
 					count={baTasks.length}
 					defaultOpen={true}
 				>
-					<BusinessAreaLeadDocumentsDataTable tasks={baTasks} />
+					<CaretakerBusinessAreaDocumentsDataTable tasks={baTasks} />
 				</TaskSection>
 			)}
 
-			{/* Directorate Documents - Only show if user is superuser AND has tasks */}
-			{isSuperuser && directorateTasks.length > 0 && (
+			{/* Directorate Documents */}
+			{directorateTasks.length > 0 && (
 				<TaskSection
 					title="Directorate Documents"
 					count={directorateTasks.length}
 					defaultOpen={true}
 				>
-					<DirectorateDocumentsDataTable tasks={directorateTasks} />
+					<CaretakerDirectorateDocumentsDataTable tasks={directorateTasks} />
 				</TaskSection>
 			)}
 		</div>

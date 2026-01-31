@@ -16,7 +16,8 @@ export const usePendingCaretakerRequests = (userId: number | null) => {
   return useQuery({
     queryKey: pendingCaretakerRequestsKeys.forUser(userId || 0),
     queryFn: () => getPendingCaretakerRequests(userId!),
-    staleTime: 5 * 60_000, // 5 minutes
+    staleTime: 10 * 60_000, // 10 minutes - requests don't change frequently
+    refetchOnWindowFocus: false, // Don't refetch on every window focus
     enabled: !!userId, // Only fetch if userId is provided
   });
 };

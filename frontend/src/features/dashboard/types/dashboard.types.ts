@@ -46,6 +46,13 @@ export interface IProjectDocument {
   project_lead_approval_granted: boolean;
   business_area_lead_approval_granted: boolean;
   directorate_approval_granted: boolean;
+  for_user?: {
+    id: number;
+    display_first_name: string;
+    display_last_name: string;
+    email: string;
+    image: string | null;
+  };
 }
 
 /**

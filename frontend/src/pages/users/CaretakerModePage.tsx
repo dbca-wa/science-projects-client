@@ -1,9 +1,11 @@
 import { Loader2, AlertCircle, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Separator } from "@/shared/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { useCurrentUser } from "@/features/auth";
 import { 
   useCaretakerCheck,
+  usePendingCaretakerRequests,
   RequestCaretakerForm,
   PendingCaretakerRequest,
   OutgoingCaretakerRequest,
@@ -42,10 +44,18 @@ const CaretakerModePage = () => {
     refetch: refetchCaretaker
   } = useCaretakerCheck();
 
+  // Fetch incoming caretaker requests (people who want YOU to be THEIR caretaker)
+  const {
+    data: incomingRequests,
+    isLoading: isLoadingRequests,
+    error: requestsError,
+    refetch: refetchRequests
+  } = usePendingCaretakerRequests(user?.id || null);
+
   const currentUserId = user?.id;
 
   // Handle loading state
-  if (isLoadingUser || isLoadingCaretaker) {
+  if (isLoadingUser || isLoadingCaretaker || isLoadingRequests) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -59,7 +69,7 @@ const CaretakerModePage = () => {
   }
 
   // Handle error state
-  if (userError || caretakerError) {
+  if (userError || caretakerError || requestsError) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert variant="destructive">
@@ -89,16 +99,19 @@ const CaretakerModePage = () => {
   const handleCaretakerSuccess = () => {
     refetchUser();
     refetchCaretaker();
+    refetchRequests();
   };
 
   const handleCaretakerCancel = () => {
     refetchUser();
     refetchCaretaker();
+    refetchRequests();
   };
 
   const handleCaretakerRemove = () => {
     refetchUser();
     refetchCaretaker();
+    refetchRequests();
   };
 
   // Determine which component to show in "My Caretaker" section
@@ -157,6 +170,38 @@ const CaretakerModePage = () => {
     );
   };
 
+  // Render incoming requests section (people who want YOU to be THEIR caretaker)
+  const renderIncomingRequestsSection = () => {
+    if (!incomingRequests || incomingRequests.length === 0) {
+      return null;
+    }
+
+    return (
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">
+          Incoming Caretaker Requests
+        </h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Requests for You to Become a Caretaker</CardTitle>
+            <CardDescription>
+              These users have requested you to manage their projects while they're unavailable.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {incomingRequests.map((request) => (
+              <PendingCaretakerRequest
+                key={request.id}
+                request={request}
+                onCancel={handleCaretakerCancel}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Page Header */}
@@ -180,14 +225,18 @@ const CaretakerModePage = () => {
           {renderMyCaretakerSection()}
         </section>
 
-        <Separator />
+        {/* Incoming Requests Section */}
+        {renderIncomingRequestsSection()}
 
         {/* My Caretakees Section */}
         {user?.caretaking_for && user.caretaking_for.length > 0 && (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">My Caretakees</h2>
-            <CaretakeesTable caretakees={user.caretaking_for} />
-          </section>
+          <>
+            <Separator />
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">My Caretakees</h2>
+              <CaretakeesTable caretakees={user.caretaking_for} />
+            </section>
+          </>
         )}
       </div>
     </div>

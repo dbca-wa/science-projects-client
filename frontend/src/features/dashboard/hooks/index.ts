@@ -9,3 +9,5 @@ export {
   useAdminTasks,
   dashboardKeys
 } from "./useDashboardTasks";
+
+export { useCaretakerTasks } from "./useCaretakerTasks";

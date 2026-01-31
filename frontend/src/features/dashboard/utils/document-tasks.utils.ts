@@ -86,20 +86,27 @@ export const sortTasksByDocumentKind = <T extends { kind: DocumentKind }>(
 
 /**
  * Combine team and lead tasks into project level tasks
+ * Prioritizes lead tasks - if a document appears in both arrays, only the lead version is included
  * @param teamTasks Tasks where user is team member
  * @param leadTasks Tasks where user is project lead
- * @returns Combined array with task levels assigned
+ * @returns Combined array with task levels assigned, lead tasks taking precedence
  */
 export const combineProjectLevelTasks = (
 	teamTasks: IProjectDocument[],
 	leadTasks: IProjectDocument[]
 ): IDocumentTaskWithLevel[] => {
-	const teamWithLevel: IDocumentTaskWithLevel[] = teamTasks.map((task) => ({
-		...task,
-		taskLevel: "team" as const,
-		projectCode: formatProjectCode(task.project),
-		taskDescription: TASK_LEVEL_CONFIG.team.description,
-	}));
+	// Create a Set of lead task document IDs for quick lookup
+	const leadDocumentIds = new Set(leadTasks.map((task) => task.id));
+
+	// Only include team tasks that don't have a corresponding lead task
+	const teamWithLevel: IDocumentTaskWithLevel[] = teamTasks
+		.filter((task) => !leadDocumentIds.has(task.id))
+		.map((task) => ({
+			...task,
+			taskLevel: "team" as const,
+			projectCode: formatProjectCode(task.project),
+			taskDescription: TASK_LEVEL_CONFIG.team.description,
+		}));
 
 	const leadWithLevel: IDocumentTaskWithLevel[] = leadTasks.map((task) => ({
 		...task,
@@ -108,7 +115,7 @@ export const combineProjectLevelTasks = (
 		taskDescription: TASK_LEVEL_CONFIG.lead.description,
 	}));
 
-	return [...teamWithLevel, ...leadWithLevel];
+	return [...leadWithLevel, ...teamWithLevel];
 };
 
 /**

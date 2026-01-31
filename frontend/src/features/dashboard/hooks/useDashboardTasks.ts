@@ -12,25 +12,28 @@ export const dashboardKeys = {
 	endorsementTasks: ["dashboard", "endorsementTasks"] as const,
 	myProjects: ["dashboard", "myProjects"] as const,
 	adminTasks: ["dashboard", "adminTasks"] as const,
+	caretakerTasks: (userId: number) => ["dashboard", "caretakerTasks", userId] as const,
 };
 
-export const useDocumentTasks = () => {
+export const useDocumentTasks = (enabled = true) => {
 	return useQuery({
 		queryKey: dashboardKeys.documentTasks,
 		queryFn: getDocumentTasks,
 		staleTime: STALE_TIME.SHORT,
 		refetchOnWindowFocus: true,
 		refetchOnReconnect: true,
+		enabled,
 	});
 };
 
-export const useEndorsementTasks = () => {
+export const useEndorsementTasks = (enabled = true) => {
 	return useQuery({
 		queryKey: dashboardKeys.endorsementTasks,
 		queryFn: getEndorsementTasks,
 		staleTime: STALE_TIME.SHORT,
 		refetchOnWindowFocus: true,
 		refetchOnReconnect: true,
+		enabled,
 	});
 };
 
@@ -44,12 +47,13 @@ export const useMyProjects = () => {
 	});
 };
 
-export const useAdminTasks = () => {
+export const useAdminTasks = (enabled = true) => {
 	return useQuery({
 		queryKey: dashboardKeys.adminTasks,
 		queryFn: getAdminTasks,
 		staleTime: STALE_TIME.SHORT,
 		refetchOnWindowFocus: true,
 		refetchOnReconnect: true,
+		enabled,
 	});
 };

@@ -57,9 +57,20 @@ export const CaretakeesTable = ({ caretakees }: CaretakeesTableProps) => {
   
   const removeCaretakerMutation = useRemoveCaretaker();
 
-  // Sort caretakees by end date (soonest first, null dates last)
+  // Deduplicate and sort caretakees by end date (soonest first, null dates last)
   const sortedCaretakees = useMemo(() => {
-    return [...caretakees].sort((a, b) => {
+    // Deduplicate by caretaker_obj_id (unique relationship ID)
+    const seen = new Set<number>();
+    const uniqueCaretakees = caretakees.filter((caretakee) => {
+      const key = caretakee.caretaker_obj_id || caretakee.id;
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+
+    return uniqueCaretakees.sort((a, b) => {
       // If both have end dates, sort by date
       if (a.end_date && b.end_date) {
         return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
@@ -133,7 +144,7 @@ export const CaretakeesTable = ({ caretakees }: CaretakeesTableProps) => {
         <CardContent>
           <div className="space-y-4">
             {sortedCaretakees.map((caretakee) => (
-              <Card key={caretakee.id} className="border border-gray-200">
+              <Card key={caretakee.caretaker_obj_id || caretakee.id} className="border border-gray-200">
                 <CardContent className="p-4 space-y-3">
                   {/* User Info */}
                   <UserDisplay 
@@ -206,7 +217,7 @@ export const CaretakeesTable = ({ caretakees }: CaretakeesTableProps) => {
             </TableHeader>
             <TableBody>
               {sortedCaretakees.map((caretakee) => (
-                <TableRow key={caretakee.id}>
+                <TableRow key={caretakee.caretaker_obj_id || caretakee.id}>
                   <TableCell>
                     <UserDisplay 
                       user={caretakee} 

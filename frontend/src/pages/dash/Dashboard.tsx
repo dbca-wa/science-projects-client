@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/features/auth";
 import { 
 	useAdminTasks, 
@@ -6,7 +6,9 @@ import {
 	useDocumentTasks,
 	MyTasksSection,
 	DocumentTasksTabContent,
+	CaretakerSection,
 } from "@/features/dashboard";
+import { CaretakerApprovalModal } from "@/features/dashboard/components/CaretakerApprovalModal";
 import { useMyProjects } from "@/features/projects/hooks/useMyProjects";
 import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";
 import { useMyProjectsStore } from "@/app/stores/store-context";
@@ -31,9 +33,39 @@ import { motion } from "framer-motion";
  */
 const Dashboard = observer(() => {
 	const { data: user, isLoading } = useCurrentUser();
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const myProjectsStore = useMyProjectsStore();
+
+	// Modal state - controlled by URL
+	const selectedTaskId = searchParams.get("caretaker_task");
+	const isModalOpen = !!selectedTaskId;
+
+	// Delay modal opening until after page transition completes
+	const [shouldShowModal, setShouldShowModal] = useState(false);
+	const wasLoadingRef = useRef(false);
+	
+	useEffect(() => {
+		// Only track loading if modal should be open (direct link/refresh to /?caretaker_task=X)
+		if (isLoading && isModalOpen) {
+			wasLoadingRef.current = true;
+		}
+	}, [isLoading, isModalOpen]);
+	
+	useEffect(() => {
+		if (isModalOpen && !isLoading) {
+			// Only delay if we just finished loading WITH modal open (refresh/direct link to /?caretaker_task=X)
+			// If wasLoadingRef is false, user clicked from table (no delay needed)
+			const delay = wasLoadingRef.current ? 600 : 0;
+			const timer = setTimeout(() => {
+				setShouldShowModal(true);
+				wasLoadingRef.current = false; // Reset after first use
+			}, delay);
+			return () => clearTimeout(timer);
+		} else if (!isModalOpen) {
+			setShouldShowModal(false);
+		}
+	}, [isModalOpen, isLoading]);
 
 	const [activeTab, setActiveTab] = useState<number>(() => {
 		const tabParam = searchParams.get("tab");
@@ -90,7 +122,15 @@ const Dashboard = observer(() => {
 	
 	const myTasksCount = documentTasksCount;
 	const myProjectsCount = filteredProjects.length;
-	const adminTasksCount = adminTasks.length;
+	
+	// Admin tasks count should include caretaker requests + project deletions + endorsements
+	const caretakerTasksCount = adminTasks.filter(task => task.action === "setcaretaker").length;
+	const projectDeletionTasksCount = adminTasks.filter(task => task.action === "deleteproject").length;
+	const endorsementTasksCount = 
+		(endorsementTasks?.aec?.length || 0) +
+		(endorsementTasks?.bm?.length || 0) +
+		(endorsementTasks?.hc?.length || 0);
+	const adminTasksCount = caretakerTasksCount + projectDeletionTasksCount + endorsementTasksCount;
 
 	const handleProjectClick = (projectId: number, event: React.MouseEvent) => {
 		const url = `/projects/${projectId}/overview`;
@@ -102,17 +142,22 @@ const Dashboard = observer(() => {
 		}
 	};
 
+	const handleCloseSheet = () => {
+		setSearchParams({}, { replace: true });
+	};
+
 	return (
-		<PageTransition isLoading={isLoading}>
-			{isLoading ? (
-				<div className="flex items-center justify-center min-h-[400px]">
-					<div className="text-center space-y-4">
-						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
-						<div className="text-lg font-medium text-muted-foreground">Loading dashboard...</div>
+		<>
+			<PageTransition isLoading={isLoading}>
+				{isLoading ? (
+					<div className="flex items-center justify-center min-h-[400px]">
+						<div className="text-center space-y-4">
+							<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+							<div className="text-lg font-medium text-muted-foreground">Loading dashboard...</div>
+						</div>
 					</div>
-				</div>
-			) : (
-		<div className="space-y-8 relative">
+				) : (
+			<div className="space-y-8 relative">
 			{/* Welcome Section */}
 			<div>
 				<h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -286,7 +331,7 @@ const Dashboard = observer(() => {
 				</div>
 
 				{/* Tab Content */}
-				<div className="min-h-[400px]">
+				<div>
 					{/* Admin Panel - First panel for superusers */}
 					{activeTab === 0 && user?.is_superuser && (
 						<motion.div
@@ -418,9 +463,22 @@ const Dashboard = observer(() => {
 					)}
 				</div>
 			</div>
-		</div>
+
+			{/* Caretaker Section - Standalone after "Your Work" */}
+			{user && (
+				<CaretakerSection userId={user.id} caretakees={user.caretaking_for || []} />
 			)}
-		</PageTransition>
+		</div>
+				)}
+			</PageTransition>
+
+			{/* Caretaker Approval Modal - Outside PageTransition to avoid animation conflicts */}
+			<CaretakerApprovalModal
+				taskId={selectedTaskId ? Number(selectedTaskId) : null}
+				open={shouldShowModal}
+				onClose={handleCloseSheet}
+			/>
+		</>
 	);
 });
 

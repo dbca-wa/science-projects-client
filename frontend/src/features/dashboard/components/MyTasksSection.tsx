@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CaretakerTasksDataTable } from "./CaretakerTasksDataTable";
+import { AdminCaretakerTasksDataTable } from "./AdminCaretakerTasksDataTable";
 import { EndorsementTasksDataTable } from "./EndorsementTasksDataTable";
 import { ProjectDeletionTasksDataTable } from "./ProjectDeletionTasksDataTable";
 import { filterCaretakerTasks } from "../utils/dashboard.utils";
@@ -125,7 +125,7 @@ export const MyTasksSection = ({
 					count={caretakerTasks.length}
 					defaultOpen={true}
 				>
-					<CaretakerTasksDataTable tasks={caretakerTasks} />
+					<AdminCaretakerTasksDataTable tasks={caretakerTasks} />
 				</TaskSection>
 			)}
 

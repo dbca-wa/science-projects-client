@@ -6,11 +6,12 @@ import { getMyProjects } from "../services/project.service";
  * 
  * @returns TanStack Query result with projects data sorted by created date (newest first)
  */
-export function useMyProjects() {
+export function useMyProjects(enabled = true) {
 	return useQuery({
 		queryKey: ["projects", "my"],
 		queryFn: getMyProjects,
 		staleTime: 5 * 60 * 1000, // 5 minutes
+		enabled,
 		select: (data) => {
 			// Sort by created_at descending (newest first)
 			return [...data].sort((a, b) => {

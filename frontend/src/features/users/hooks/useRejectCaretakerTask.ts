@@ -16,6 +16,15 @@ export const useRejectCaretakerTask = () => {
       queryClient.invalidateQueries({ queryKey: ["caretakers"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
       
+      // Invalidate admin tasks to update dashboard
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
+      
+      // Invalidate caretaker tasks (Documents tab) for all users
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "caretakerTasks"] });
+      
+      // Invalidate pending caretaker requests (Requests tab)
+      queryClient.invalidateQueries({ queryKey: ["caretakers", "pending"] });
+      
       toast.success("Caretaker request rejected");
     },
     onError: (error: Error) => {

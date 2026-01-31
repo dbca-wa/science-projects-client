@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { approveCaretakerTask } from "../services/caretaker.endpoints";
+import { approveCaretakerTask } from "@/features/users/services/caretaker.endpoints";
 import { toast } from "sonner";
+import { dashboardKeys } from "./useDashboardTasks";
 
 /**
- * Hook to approve a caretaker request
- * Approves the AdminTask and creates the Caretaker object
+ * Hook for approving caretaker requests
+ * Invalidates admin tasks query on success to refresh the dashboard
  */
 export const useApproveCaretakerTask = () => {
   const queryClient = useQueryClient();
@@ -12,12 +13,12 @@ export const useApproveCaretakerTask = () => {
   return useMutation({
     mutationFn: (taskId: number) => approveCaretakerTask(taskId),
     onSuccess: () => {
+      // Invalidate admin tasks
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.adminTasks });
+      
       // Invalidate all caretaker-related queries
       queryClient.invalidateQueries({ queryKey: ["caretakers"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      
-      // Invalidate admin tasks to update dashboard
-      queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
       
       // Invalidate caretaker tasks (Documents tab) for all users
       queryClient.invalidateQueries({ queryKey: ["dashboard", "caretakerTasks"] });
