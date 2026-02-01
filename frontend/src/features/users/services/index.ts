@@ -4,4 +4,3 @@
 
 export * from "./user.service";
 export * from "./user.endpoints";
-export * from "./caretaker.endpoints";

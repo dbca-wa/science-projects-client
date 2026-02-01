@@ -1,10 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
-import { useCaretakerCheck } from "@/features/users/hooks/useCaretakerCheck";
-import { useBecomeCaretaker } from "@/features/users/hooks/useBecomeCaretaker";
-import { useCancelBecomeCaretakerRequest } from "@/features/users/hooks/useCancelBecomeCaretakerRequest";
-import { usePendingCaretakerRequests } from "@/features/users/hooks/usePendingCaretakerRequests";
+import { useCaretakerCheck, usePendingCaretakerRequests, useBecomeCaretaker, useCancelBecomeCaretakerRequest } from "@/features/caretakers/hooks";
 import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
 import { UserAdminActionButtons } from "./UserAdminActionButtons";
 import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";

@@ -40,8 +40,5 @@ export { UserAdminActionButtons } from "./UserAdminActionButtons";
 export { RequestMergeUserDialog } from "./RequestMergeUserDialog";
 export { InAppSearchSection } from "./InAppSearchSection";
 
-// Caretaker components
-export * from "./caretaker";
-
 // Modals
 export * from "./modals";
