@@ -6,9 +6,9 @@ import {
 	useDocumentTasks,
 	MyTasksSection,
 	DocumentTasksTabContent,
-	CaretakerSection,
 } from "@/features/dashboard";
-import { CaretakerApprovalModal } from "@/features/dashboard/components/CaretakerApprovalModal";
+import { CaretakerSection, CaretakerNotification } from "@/features/caretakers";
+import { CaretakerApprovalModal } from "@/features/caretakers/components/CaretakerApprovalModal";
 import { useMyProjects } from "@/features/projects/hooks/useMyProjects";
 import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";
 import { useMyProjectsStore } from "@/app/stores/store-context";
@@ -250,6 +250,11 @@ const Dashboard = observer(() => {
 					Manage your tasks, documents, and projects
 				</p>
 			</div>
+
+			{/* Caretaker Notification - Shows if user has active caretakers */}
+			{user && user.caretakers && user.caretakers.length > 0 && (
+				<CaretakerNotification caretakers={user.caretakers} />
+			)}
 
 			{/* Tasks & Projects Tabs */}
 			<div className="">

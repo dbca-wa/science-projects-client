@@ -3,22 +3,24 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useCurrentUser } from "@/features/auth";
 import { 
-  useCaretakerCheck,
   PersonalInformationCard,
   ProfileSection,
   MembershipSection,
   PublicAppearanceSection,
   InAppSearchSection,
   StatusSection,
+  EditPersonalInformationModal,
+  EditOrgMembershipModal,
+  ToggleStaffProfileVisibilityModal
+} from "@/features/users";
+import {
+  useCaretakerCheck,
   RequestCaretakerForm,
   PendingCaretakerRequest,
   OutgoingCaretakerRequest,
   ActiveCaretaker,
   CaretakeesTable,
-  EditPersonalInformationModal,
-  EditOrgMembershipModal,
-  ToggleStaffProfileVisibilityModal
-} from "@/features/users";
+} from "@/features/caretakers";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";

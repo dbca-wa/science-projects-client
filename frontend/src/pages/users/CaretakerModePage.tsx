@@ -11,7 +11,7 @@ import {
   OutgoingCaretakerRequest,
   ActiveCaretaker,
   CaretakeesTable
-} from "@/features/users";
+} from "@/features/caretakers";
 
 /**
  * CaretakerModePage component

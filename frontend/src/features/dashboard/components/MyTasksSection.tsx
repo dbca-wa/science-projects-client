@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AdminCaretakerTasksDataTable } from "./AdminCaretakerTasksDataTable";
+import { AdminCaretakerTasksDataTable } from "@/features/caretakers/components/AdminCaretakerTasksDataTable";
 import { EndorsementTasksDataTable } from "./EndorsementTasksDataTable";
 import { ProjectDeletionTasksDataTable } from "./ProjectDeletionTasksDataTable";
 import { filterCaretakerTasks } from "../utils/dashboard.utils";

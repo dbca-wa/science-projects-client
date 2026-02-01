@@ -22,22 +22,6 @@ export type {
   UserDetailSectionProps,
 } from "./types";
 
-// Types (from caretaker types)
-export type {
-  AdminTask,
-  Caretaker,
-  CaretakerCheckResponse,
-  CaretakeeData,
-  RequestCaretakerPayload,
-  CaretakerRequestFormData,
-  RequestCaretakerFormProps,
-  PendingCaretakerRequestProps,
-  BecomeCaretakerRequestProps,
-  ActiveCaretakerProps,
-  CaretakeesTableProps,
-  CaretakerUserSearchProps,
-} from "./types";
-
 // Schemas (exports both schemas and their inferred types)
 // These are the canonical form data types - use these instead of manual interfaces
 export { 
