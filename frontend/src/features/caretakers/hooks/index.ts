@@ -9,7 +9,7 @@ export { useCaretakerPermissions } from "./useCaretakerPermissions";
 // User caretaker request hooks
 export { useRequestCaretaker } from "./useRequestCaretaker";
 export { useRespondToCaretakerRequest } from "./useRespondToCaretakerRequest";
-export { useCancelCaretakerRequest, caretakerCheckKeys } from "./useCancelCaretakerRequest";
+export { useCancelCaretakerRequest } from "./useCancelCaretakerRequest";
 export { useRemoveCaretaker } from "./useRemoveCaretaker";
 export { useBecomeCaretaker } from "./useBecomeCaretaker";
 export { usePendingCaretakerRequests, pendingCaretakerRequestsKeys } from "./usePendingCaretakerRequests";

@@ -69,7 +69,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             navigate("/users/me");
             onClose();
           }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
           <div className="flex gap-2 items-center">
             <User className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
         {/* Toggle Dark Mode */}
         <div
           onClick={() => uiStore.toggleTheme()}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
           <div className="flex gap-2 items-center">
             {snapshot.theme === "dark" ? (
@@ -120,7 +120,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             navigate("/guide");
             onClose();
           }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
           <div className="flex gap-2 items-center">
             <BookOpen className="h-4 w-4" />
@@ -134,7 +134,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             window.open("https://data.bio.wa.gov.au/", "_blank");
             onClose();
           }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
           <div className="flex gap-2 items-center">
             <BookOpen className="h-4 w-4" />
@@ -148,7 +148,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
             onClose();
           }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
           <div className="flex gap-2 items-center">
             <BookOpen className="h-4 w-4" />
@@ -170,7 +170,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
             });
             onClose();
           }}
-          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-600 dark:text-red-400"
+          className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-red-600 dark:text-red-400"
         >
           <div className="flex gap-2 items-center">
             <LogOut className="h-4 w-4" />

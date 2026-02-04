@@ -6,7 +6,7 @@ import { cn } from "@/shared/lib/utils";
 import type { IUserData } from "@/shared/types/user.types";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { BaseUserSearch, type BaseUserSearchRef } from "./BaseUserSearch";
+import { BaseUserSearch, type BaseUserSearchRef } from "@/shared/components/user";
 
 interface IUserSearchDropdown {
 	onlyInternal?: boolean;

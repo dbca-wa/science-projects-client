@@ -10,9 +10,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { UserSearchDropdown } from "@/shared/components/user";
 import { useRef } from "react";
-import type { BaseUserSearchRef } from "@/features/users/components/BaseUserSearch";
+import type { BaseUserSearchRef } from "@/shared/components/user";
 import { AlertCircle } from "lucide-react";
 
 /**

@@ -24,33 +24,55 @@ export const AdminCaretakerTasksDataTable = ({ tasks }: AdminCaretakerTasksDataT
 	const columns: ColumnDef<IAdminTask>[] = useMemo(
 		() => [
 			{
-				id: "requester",
+				id: "caretaker",
 				header: "Caretaker",
-				accessor: (row) =>
-					`${row.requester.display_first_name} ${row.requester.display_last_name}`,
-				cell: (row) => (
-					<div className="flex items-center gap-3">
-						<Avatar className="size-10">
-							<AvatarImage src={getImageUrl(row.requester.image)} />
-							<AvatarFallback>
-								{row.requester.display_first_name[0]}
-								{row.requester.display_last_name[0]}
-							</AvatarFallback>
-						</Avatar>
-						<div>
-							<div className="font-semibold text-gray-900 dark:text-gray-100">
-								{row.requester.display_first_name} {row.requester.display_last_name}
+				accessor: (row) => {
+					const caretaker = row.secondary_users?.[0];
+					return caretaker
+						? `${caretaker.display_first_name} ${caretaker.display_last_name}`
+						: "";
+				},
+				cell: (row) => {
+					const caretaker = row.secondary_users?.[0];
+					
+					if (!caretaker) {
+						return (
+							<div className="text-sm text-gray-500 dark:text-gray-400">
+								No caretaker specified
 							</div>
-							<div className="text-sm text-gray-600 dark:text-gray-400">
-								{row.requester.email}
+						);
+					}
+					
+					return (
+						<div className="flex items-center gap-3">
+							<Avatar className="size-10">
+								<AvatarImage src={getImageUrl(caretaker.image)} />
+								<AvatarFallback>
+									{caretaker.display_first_name[0]}
+									{caretaker.display_last_name[0]}
+								</AvatarFallback>
+							</Avatar>
+							<div>
+								<div className="font-semibold text-gray-900 dark:text-gray-100">
+									{caretaker.display_first_name} {caretaker.display_last_name}
+								</div>
+								<div className="text-sm text-gray-600 dark:text-gray-400">
+									{caretaker.email}
+								</div>
 							</div>
 						</div>
-					</div>
-				),
+					);
+				},
 				sortable: true,
 				sortFn: (a, b) => {
-					const nameA = `${a.requester.display_first_name} ${a.requester.display_last_name}`;
-					const nameB = `${b.requester.display_first_name} ${b.requester.display_last_name}`;
+					const caretakerA = a.secondary_users?.[0];
+					const caretakerB = b.secondary_users?.[0];
+					const nameA = caretakerA
+						? `${caretakerA.display_first_name} ${caretakerA.display_last_name}`
+						: "";
+					const nameB = caretakerB
+						? `${caretakerB.display_first_name} ${caretakerB.display_last_name}`
+						: "";
 					return nameA.localeCompare(nameB);
 				},
 			},

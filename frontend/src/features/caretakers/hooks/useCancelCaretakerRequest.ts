@@ -1,28 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/shared/services/api/client.service";
 import { toast } from "sonner";
 import { useAuthStore } from "@/app/stores/store-context";
-
-/**
- * Cancel a pending caretaker request
- */
-const cancelCaretakerRequest = async (taskId: number): Promise<void> => {
-  await apiClient.patch(`/adminoptions/tasks/${taskId}/`, {
-    status: "cancelled",
-  });
-};
-
-/**
- * Query keys for caretaker check
- */
-export const caretakerCheckKeys = {
-  check: (userId: number) => ["caretakers", "check", userId] as const,
-};
+import { caretakerKeys } from "../services/caretaker.endpoints";
+import { cancelCaretakerRequest } from "../services/caretaker.service";
 
 /**
  * Hook for cancelling a pending caretaker request
  * - Updates AdminTask status to "cancelled"
- * - Invalidates caretaker check query and admin tasks on success to refresh UI
+ * - Invalidates all caretaker queries and admin tasks on success
  * - Shows success/error toast notifications
  * 
  * @returns TanStack Query mutation for caretaker request cancellation
@@ -34,15 +19,23 @@ export const useCancelCaretakerRequest = () => {
   return useMutation({
     mutationFn: (taskId: number) => cancelCaretakerRequest(taskId),
     onSuccess: () => {
-      // Invalidate caretaker check query to refetch updated data
-      if (authStore.user?.id) {
-        queryClient.invalidateQueries({
-          queryKey: caretakerCheckKeys.check(authStore.user.id),
-        });
-      }
+      // Invalidate ALL caretaker queries
+      queryClient.invalidateQueries({
+        queryKey: caretakerKeys.all,
+      });
 
       // Invalidate admin tasks to update dashboard
       queryClient.invalidateQueries({ queryKey: ["dashboard", "adminTasks"] });
+      
+      // Invalidate auth user
+      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      
+      // Invalidate current user detail
+      if (authStore.user?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ["users", "detail", authStore.user.id],
+        });
+      }
 
       toast.success("Caretaker request cancelled successfully.");
     },

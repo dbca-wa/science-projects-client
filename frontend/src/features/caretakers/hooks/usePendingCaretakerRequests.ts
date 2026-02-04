@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPendingCaretakerRequests, caretakerKeys } from "../services/caretaker.endpoints";
+import { getPendingCaretakerRequests } from "../services/caretaker.service";
+import { caretakerKeys } from "../services/caretaker.endpoints";
 
 /**
  * Query key factory for pending caretaker requests

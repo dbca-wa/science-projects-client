@@ -25,7 +25,7 @@ export const getUsersBasedOnSearchTerm = async (
   let url = `${USER_ENDPOINTS.SEARCH}?page=${page}`;
 
   if (searchTerm !== "") {
-    url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+    url += `&search=${encodeURIComponent(searchTerm)}`;
   }
 
   if (filters.onlyExternal) {

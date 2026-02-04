@@ -7,12 +7,12 @@ import {
 } from "./breakpoints";
 
 describe("BREAKPOINTS", () => {
-	it("should have 2xl at 1536px", () => {
-		expect(BREAKPOINTS["2xl"]).toBe(1536);
+	it("should have 2xl at 1880px", () => {
+		expect(BREAKPOINTS["2xl"]).toBe(1880);
 	});
 
-	it("should have 3xl at 2048px", () => {
-		expect(BREAKPOINTS["3xl"]).toBe(2048);
+	it("should have 3xl at 2200px", () => {
+		expect(BREAKPOINTS["3xl"]).toBe(2200);
 	});
 
 	it("should have 4xl at 3200px", () => {
@@ -32,9 +32,9 @@ describe("BREAKPOINTS", () => {
 		expect(BREAKPOINTS.sm).toBe(640);
 		expect(BREAKPOINTS.md).toBe(768);
 		expect(BREAKPOINTS.lg).toBe(1024);
-		expect(BREAKPOINTS.xl).toBe(1280);
-		expect(BREAKPOINTS["2xl"]).toBe(1536);
-		expect(BREAKPOINTS["3xl"]).toBe(2048);
+		expect(BREAKPOINTS.xl).toBe(1600);
+		expect(BREAKPOINTS["2xl"]).toBe(1880);
+		expect(BREAKPOINTS["3xl"]).toBe(2200);
 		expect(BREAKPOINTS["4xl"]).toBe(3200);
 	});
 });
@@ -50,28 +50,28 @@ describe("getCurrentBreakpoint", () => {
 		expect(getCurrentBreakpoint(3840)).toBe("4xl");
 	});
 
-	it("should return 3xl for widths between 2048-3199px", () => {
-		expect(getCurrentBreakpoint(2048)).toBe("3xl");
+	it("should return 3xl for widths between 2200-3199px", () => {
+		expect(getCurrentBreakpoint(2200)).toBe("3xl");
 		expect(getCurrentBreakpoint(2500)).toBe("3xl");
 		expect(getCurrentBreakpoint(3199)).toBe("3xl");
 	});
 
-	it("should return 2xl for widths between 1536-2047px", () => {
-		expect(getCurrentBreakpoint(1536)).toBe("2xl");
-		expect(getCurrentBreakpoint(1700)).toBe("2xl");
-		expect(getCurrentBreakpoint(2047)).toBe("2xl");
+	it("should return 2xl for widths between 1880-2199px", () => {
+		expect(getCurrentBreakpoint(1880)).toBe("2xl");
+		expect(getCurrentBreakpoint(2000)).toBe("2xl");
+		expect(getCurrentBreakpoint(2199)).toBe("2xl");
 	});
 
-	it("should return xl for widths between 1280-1535px", () => {
-		expect(getCurrentBreakpoint(1280)).toBe("xl");
-		expect(getCurrentBreakpoint(1400)).toBe("xl");
-		expect(getCurrentBreakpoint(1535)).toBe("xl");
+	it("should return xl for widths between 1600-1879px", () => {
+		expect(getCurrentBreakpoint(1600)).toBe("xl");
+		expect(getCurrentBreakpoint(1700)).toBe("xl");
+		expect(getCurrentBreakpoint(1879)).toBe("xl");
 	});
 
-	it("should return lg for widths between 1024-1279px", () => {
+	it("should return lg for widths between 1024-1599px", () => {
 		expect(getCurrentBreakpoint(1024)).toBe("lg");
 		expect(getCurrentBreakpoint(1100)).toBe("lg");
-		expect(getCurrentBreakpoint(1279)).toBe("lg");
+		expect(getCurrentBreakpoint(1599)).toBe("lg");
 	});
 
 	it("should return md for widths between 768-1023px", () => {
@@ -95,7 +95,7 @@ describe("getCurrentBreakpoint", () => {
 	it("should handle edge cases", () => {
 		expect(getCurrentBreakpoint(0)).toBe("2xs");
 		expect(getCurrentBreakpoint(-100)).toBe("2xs");
-		expect(getCurrentBreakpoint(10000)).toBe("3xl");
+		expect(getCurrentBreakpoint(10000)).toBe("4xl");
 	});
 });
 
@@ -107,20 +107,20 @@ describe("isAtLeast", () => {
 	});
 
 	it("should work with 3xl breakpoint", () => {
-		expect(isAtLeast(2048, "3xl")).toBe(true);
-		expect(isAtLeast(2047, "3xl")).toBe(false);
+		expect(isAtLeast(2200, "3xl")).toBe(true);
+		expect(isAtLeast(2199, "3xl")).toBe(false);
 		expect(isAtLeast(3000, "3xl")).toBe(true);
 	});
 
 	it("should work with 2xl breakpoint", () => {
-		expect(isAtLeast(1536, "2xl")).toBe(true);
-		expect(isAtLeast(1535, "2xl")).toBe(false);
-		expect(isAtLeast(1700, "2xl")).toBe(true);
+		expect(isAtLeast(1880, "2xl")).toBe(true);
+		expect(isAtLeast(1879, "2xl")).toBe(false);
+		expect(isAtLeast(2000, "2xl")).toBe(true);
 	});
 
 	it("should work with xl breakpoint", () => {
-		expect(isAtLeast(1280, "xl")).toBe(true);
-		expect(isAtLeast(1279, "xl")).toBe(false);
+		expect(isAtLeast(1600, "xl")).toBe(true);
+		expect(isAtLeast(1599, "xl")).toBe(false);
 	});
 
 	it("should work with all breakpoints", () => {
@@ -134,20 +134,20 @@ describe("isAtLeast", () => {
 
 describe("isBelow", () => {
 	it("should work with 3xl breakpoint", () => {
-		expect(isBelow(1799, "3xl")).toBe(true);
-		expect(isBelow(1800, "3xl")).toBe(false);
+		expect(isBelow(2199, "3xl")).toBe(true);
+		expect(isBelow(2200, "3xl")).toBe(false);
 		expect(isBelow(3840, "3xl")).toBe(false);
 	});
 
 	it("should work with 2xl breakpoint", () => {
-		expect(isBelow(1599, "2xl")).toBe(true);
-		expect(isBelow(1600, "2xl")).toBe(false);
-		expect(isBelow(1700, "2xl")).toBe(false);
+		expect(isBelow(1879, "2xl")).toBe(true);
+		expect(isBelow(1880, "2xl")).toBe(false);
+		expect(isBelow(2000, "2xl")).toBe(false);
 	});
 
 	it("should work with xl breakpoint", () => {
-		expect(isBelow(1279, "xl")).toBe(true);
-		expect(isBelow(1280, "xl")).toBe(false);
+		expect(isBelow(1599, "xl")).toBe(true);
+		expect(isBelow(1600, "xl")).toBe(false);
 	});
 
 	it("should work with all breakpoints", () => {

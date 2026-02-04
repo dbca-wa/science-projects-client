@@ -69,22 +69,31 @@ export const useSearchStoreInit = <TFilters = Record<string, unknown>>({
 		// First, try to load from localStorage if saveSearch is enabled
 		const storedState = localStorage.getItem(storageKey);
 		let shouldLoadFromStorage = false;
-		let savedData: any = null;
+		let savedData: unknown = null;
 
 		if (storedState) {
 			try {
 				savedData = JSON.parse(storedState);
-				if (savedData.saveSearch === false) {
-					// User disabled persistence - clear store state and URL params
-					store.clearState();
-					if (store.setSaveSearch) {
-						store.setSaveSearch(false);
+				// Type guard: check if savedData has saveSearch property
+				if (
+					typeof savedData === 'object' &&
+					savedData !== null &&
+					'saveSearch' in savedData
+				) {
+					const data = savedData as { saveSearch: boolean; [key: string]: unknown };
+					
+					if (data.saveSearch === false) {
+						// User disabled persistence - clear store state and URL params
+						store.clearState();
+						if (store.setSaveSearch) {
+							store.setSaveSearch(false);
+						}
+						setSearchParams(new URLSearchParams(), { replace: true });
+						return;
+					} else if (data.saveSearch === true) {
+						// Load saved state
+						shouldLoadFromStorage = true;
 					}
-					setSearchParams(new URLSearchParams(), { replace: true });
-					return;
-				} else if (savedData.saveSearch === true) {
-					// Load saved state
-					shouldLoadFromStorage = true;
 				}
 			} catch {
 				// Invalid JSON, ignore
@@ -93,8 +102,15 @@ export const useSearchStoreInit = <TFilters = Record<string, unknown>>({
 
 		// Load from localStorage first (if enabled)
 		if (shouldLoadFromStorage && savedData) {
-			if (savedData.searchTerm) {
-				store.setSearchTerm(savedData.searchTerm);
+			// Type guard: ensure savedData is an object
+			if (typeof savedData !== 'object' || savedData === null) {
+				return;
+			}
+			
+			const data = savedData as Record<string, unknown>;
+			
+			if (typeof data.searchTerm === 'string') {
+				store.setSearchTerm(data.searchTerm);
 			}
 			
 			// Build filters object for setFilters
@@ -102,53 +118,55 @@ export const useSearchStoreInit = <TFilters = Record<string, unknown>>({
 			let hasSavedFilters = false;
 
 			// Support both old flat structure and new nested structure
-			const filters = savedData.filters || savedData; // Try nested first, fallback to flat
+			const filtersData = (typeof data.filters === 'object' && data.filters !== null) 
+				? data.filters as Record<string, unknown>
+				: data;
 
 			// Map saved data to filter format expected by store
 			// Business areas (check both old and new field names)
-			const businessAreas = filters.selectedBusinessAreas || savedData.selectedBusinessAreas;
+			const businessAreas = filtersData.selectedBusinessAreas || data.selectedBusinessAreas;
 			if (businessAreas && Array.isArray(businessAreas) && businessAreas.length > 0) {
 				(savedFilters as Record<string, unknown>).businessAreas = businessAreas;
 				hasSavedFilters = true;
 			}
 			
 			// User filter (check both old and new field names, allow null)
-			const userFilter = filters.user !== undefined ? filters.user : savedData.filterUser;
+			const userFilter = filtersData.user !== undefined ? filtersData.user : data.filterUser;
 			if (userFilter !== undefined) {
 				(savedFilters as Record<string, unknown>).user = userFilter;
 				hasSavedFilters = true;
 			}
 			
 			// Status filter (check both old and new field names)
-			const statusFilter = filters.status !== undefined ? filters.status : savedData.filterStatus;
+			const statusFilter = filtersData.status !== undefined ? filtersData.status : data.filterStatus;
 			if (statusFilter !== undefined) {
 				(savedFilters as Record<string, unknown>).status = statusFilter;
 				hasSavedFilters = true;
 			}
 			
 			// Kind filter (check both old and new field names)
-			const kindFilter = filters.kind !== undefined ? filters.kind : savedData.filterKind;
+			const kindFilter = filtersData.kind !== undefined ? filtersData.kind : data.filterKind;
 			if (kindFilter !== undefined) {
 				(savedFilters as Record<string, unknown>).kind = kindFilter;
 				hasSavedFilters = true;
 			}
 			
 			// Year filter (check both old and new field names)
-			const yearFilter = filters.year !== undefined ? filters.year : savedData.filterYear;
+			const yearFilter = filtersData.year !== undefined ? filtersData.year : data.filterYear;
 			if (yearFilter !== undefined) {
 				(savedFilters as Record<string, unknown>).year = yearFilter;
 				hasSavedFilters = true;
 			}
 			
 			// Only active (check both old and new field names)
-			const onlyActive = filters.onlyActive !== undefined ? filters.onlyActive : savedData.onlyActive;
+			const onlyActive = filtersData.onlyActive !== undefined ? filtersData.onlyActive : data.onlyActive;
 			if (onlyActive !== undefined) {
 				(savedFilters as Record<string, unknown>).onlyActive = onlyActive;
 				hasSavedFilters = true;
 			}
 			
 			// Only inactive (check both old and new field names)
-			const onlyInactive = filters.onlyInactive !== undefined ? filters.onlyInactive : savedData.onlyInactive;
+			const onlyInactive = filtersData.onlyInactive !== undefined ? filtersData.onlyInactive : data.onlyInactive;
 			if (onlyInactive !== undefined) {
 				(savedFilters as Record<string, unknown>).onlyInactive = onlyInactive;
 				hasSavedFilters = true;
@@ -159,8 +177,8 @@ export const useSearchStoreInit = <TFilters = Record<string, unknown>>({
 			}
 
 			// Set saveSearch state
-			if (store.setSaveSearch) {
-				store.setSaveSearch(savedData.saveSearch);
+			if (store.setSaveSearch && typeof data.saveSearch === 'boolean') {
+				store.setSaveSearch(data.saveSearch);
 			}
 		}
 

@@ -7,7 +7,7 @@ export const USER_ENDPOINTS = {
   // User search
   SEARCH: "users/", // With query params (?page=1&searchTerm=...)
 
-  // User mutations (Phase 2)
+  // User mutations
   CREATE: "users/",
   PERSONAL_INFO: (userId: number | string) => `users/${userId}/pi`,
   PROFILE: (userId: number | string) => `users/${userId}/profile`,
@@ -17,7 +17,7 @@ export const USER_ENDPOINTS = {
   // User validation
   CHECK_EMAIL_EXISTS: "users/check-email-exists",
 
-  // Admin actions (Phase 3)
+  // Admin actions
   TOGGLE_ADMIN: (userId: number | string) => `users/${userId}/admin`,
   TOGGLE_ACTIVE: (userId: number | string) => `users/${userId}/toggleactive`,
   DELETE: (userId: number | string) => `users/${userId}`,

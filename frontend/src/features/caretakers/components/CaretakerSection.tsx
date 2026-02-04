@@ -119,7 +119,7 @@ export const CaretakerSection = ({ userId, caretakees }: CaretakerSectionProps) 
 				</div>
 
 				{/* Tab Content */}
-				<div className="min-h-[400px]">
+				<div className="min-h-[400px] overflow-visible">
 					{/* Caretaking For Tab */}
 					{tabs[validActiveTab]?.id === 0 && (
 						<motion.div
@@ -127,6 +127,7 @@ export const CaretakerSection = ({ userId, caretakees }: CaretakerSectionProps) 
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -10 }}
 							transition={{ duration: 0.2 }}
+							className="overflow-visible"
 						>
 							<CaretakeesTable caretakees={caretakees} />
 						</motion.div>

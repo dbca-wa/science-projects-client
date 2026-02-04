@@ -9,7 +9,7 @@ import { debounce } from "@/shared/utils/common.utils";
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { BusinessAreaMultiSelect } from "@/shared/components/BusinessAreaMultiSelect";
-import { UserSearchDropdown } from "@/features/users";
+import { UserSearchDropdown } from "@/shared/components/user";
 
 interface MapFiltersProps {
   projectCount: number;

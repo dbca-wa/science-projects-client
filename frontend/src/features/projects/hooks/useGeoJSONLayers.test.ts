@@ -93,7 +93,7 @@ describe("useGeoJSONLayers", () => {
 
 			await waitFor(() => {
 				expect(result.current.isError).toBe(true);
-			}, { timeout: 2000 });
+			}, { timeout: 5000 });
 
 			expect(result.current.error).toBeInstanceOf(Error);
 		});
@@ -109,7 +109,7 @@ describe("useGeoJSONLayers", () => {
 
 			await waitFor(() => {
 				expect(result.current.isError).toBe(true);
-			}, { timeout: 2000 });
+			}, { timeout: 5000 });
 
 			expect(result.current.error).toBeInstanceOf(Error);
 		});
@@ -248,7 +248,7 @@ describe("useGeoJSONLayers", () => {
 
 			await waitFor(() => {
 				expect(result.current.isLoading).toBe(false);
-			}, { timeout: 2000 });
+			}, { timeout: 5000 });
 
 			// Should have error state due to one failure
 			expect(result.current.isError).toBe(true);

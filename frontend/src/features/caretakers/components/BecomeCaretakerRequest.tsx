@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/shared/components/ui/alert-dialog";
 import { Info, Check, X, Loader2 } from "lucide-react";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useRespondToCaretakerRequest } from "../hooks/useRespondToCaretakerRequest";
 import { formatDate } from "@/shared/utils/common.utils";
