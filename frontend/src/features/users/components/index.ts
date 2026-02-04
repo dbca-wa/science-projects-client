@@ -9,8 +9,7 @@ export { UserAvatar } from "./UserAvatar";
 export { UserSearchBar } from "./UserSearchBar";
 export { UserFilterPanel } from "./UserFilterPanel";
 export { UserDetailSheet } from "./UserDetailSheet";
-export { UserSearchDropdown } from "./UserSearchDropdown";
-export { BaseUserSearch, type BaseUserSearchProps, type BaseUserSearchRef } from "./BaseUserSearch";
+// UserSearchDropdown moved to @/shared/components/user
 
 // Re-export Pagination from shared (for backward compatibility)
 export { Pagination } from "@/shared/components/Pagination";

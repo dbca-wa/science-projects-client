@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCaretakerCheck, caretakerKeys } from "../services/caretaker.endpoints";
+import { getCaretakerCheck } from "../services/caretaker.service";
+import { caretakerKeys } from "../services/caretaker.endpoints";
 import { useAuthStore } from "@/app/stores/store-context";
 import { STALE_TIME } from "@/shared/constants";
 

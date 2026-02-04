@@ -51,7 +51,7 @@ import {
 	getUserPhone,
 } from "@/shared/utils/user.utils";
 import { getSanitizedHtmlOrFallback } from "@/shared/utils/html.utils";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import { getImageUrl } from "@/shared/utils/image.utils";
 
 interface UserDetailSheetProps {

@@ -96,8 +96,47 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 	/**
 	 * Restores state from parsed storage data (action).
 	 */
-	private restoreFromStorage = action((parsed: any) => {
-		this.state = { ...this.state, ...parsed };
+	private restoreFromStorage = action((parsed: unknown) => {
+		// Type guard: ensure parsed is an object
+		if (typeof parsed !== 'object' || parsed === null) {
+			return;
+		}
+		
+		const data = parsed as Record<string, unknown>;
+		
+		// Restore each property with type validation
+		if (typeof data.searchTerm === 'string') {
+			this.state.searchTerm = data.searchTerm;
+		}
+		
+		if (typeof data.filters === 'object' && data.filters !== null) {
+			const filters = data.filters as Record<string, unknown>;
+			this.state.filters = {
+				businessArea: typeof filters.businessArea === 'string' ? filters.businessArea : "All",
+				projectKind: typeof filters.projectKind === 'string' ? filters.projectKind : "All",
+				projectStatus: typeof filters.projectStatus === 'string' ? filters.projectStatus : "All",
+				year: typeof filters.year === 'number' ? filters.year : 0,
+				user: typeof filters.user === 'number' ? filters.user : null,
+				onlyActive: typeof filters.onlyActive === 'boolean' ? filters.onlyActive : false,
+				onlyInactive: typeof filters.onlyInactive === 'boolean' ? filters.onlyInactive : false,
+			};
+		}
+		
+		if (typeof data.currentPage === 'number') {
+			this.state.currentPage = data.currentPage;
+		}
+		
+		if (typeof data.totalPages === 'number') {
+			this.state.totalPages = data.totalPages;
+		}
+		
+		if (typeof data.totalResults === 'number') {
+			this.state.totalResults = data.totalResults;
+		}
+		
+		if (typeof data.saveSearch === 'boolean') {
+			this.state.saveSearch = data.saveSearch;
+		}
 	});
 
 	/**

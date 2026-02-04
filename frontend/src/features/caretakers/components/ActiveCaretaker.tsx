@@ -14,7 +14,7 @@ import {
 } from "@/shared/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle, UserX, AlertTriangle } from "lucide-react";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import { useRemoveCaretaker } from "../hooks/useRemoveCaretaker";
 import { formatDate, isDateExpired } from "@/shared/utils/common.utils";
 import { getCaretakerReasonLabel } from "@/shared/utils/user.utils";

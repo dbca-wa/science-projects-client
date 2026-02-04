@@ -2,6 +2,7 @@ node_modules
 dist
 .old
 .docs
+.backup
 .vscode
 README.md
 *.env

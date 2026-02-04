@@ -14,7 +14,7 @@ import {
 } from "@/shared/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle, X, Check } from "lucide-react";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { getCaretakerReasonLabel } from "@/shared/utils/user.utils";
 import { formatDate } from "@/shared/utils/common.utils";

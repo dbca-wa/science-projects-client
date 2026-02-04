@@ -172,7 +172,7 @@ function DropdownMenuContent({
 			ref={contentRef}
 			data-slot="dropdown-menu-content"
 			className={cn(
-				"absolute z-50 min-w-[12rem] overflow-hidden rounded-md border bg-white p-1 shadow-md dark:bg-gray-800",
+				"absolute z-50 min-w-[12rem] overflow-hidden rounded-md border dark:border-gray-700 bg-white p-1 shadow-md dark:bg-gray-800",
 				shouldAnimate && "transition-all duration-150 ease-out",
 				shouldAnimate && isOpening && "opacity-0 scale-95 -translate-y-1",
 				shouldAnimate && isClosing && "opacity-0 scale-95 -translate-y-1",
@@ -227,7 +227,7 @@ function DropdownMenuItem({
 	};
 
 	const itemClassName = cn(
-		"focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+		"dark:text-white dark:hover:text-black focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
 		className
 	);
 

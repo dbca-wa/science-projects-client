@@ -256,14 +256,35 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 	/**
 	 * Restores state from parsed storage data (action).
 	 */
-	private restoreFromStorage = action((parsed: any) => {
-		this.state.saveSearch = parsed.saveSearch ?? true;
+	private restoreFromStorage = action((parsed: unknown) => {
+		// Type guard: ensure parsed is an object with expected properties
+		if (typeof parsed !== 'object' || parsed === null) {
+			return;
+		}
 		
-		if (parsed.saveSearch) {
-			this.state.searchTerm = parsed.searchTerm || "";
-			this.state.filters = parsed.filters || { ...DEFAULT_FILTERS };
-			this.state.currentPage = parsed.currentPage || 1;
-			logger.info("Loaded search state from storage", parsed);
+		const data = parsed as Record<string, unknown>;
+		
+		this.state.saveSearch = typeof data.saveSearch === 'boolean' ? data.saveSearch : true;
+		
+		if (this.state.saveSearch) {
+			this.state.searchTerm = typeof data.searchTerm === 'string' ? data.searchTerm : "";
+			
+			// Validate and restore filters
+			if (typeof data.filters === 'object' && data.filters !== null) {
+				const filters = data.filters as Record<string, unknown>;
+				this.state.filters = {
+					onlyExternal: typeof filters.onlyExternal === 'boolean' ? filters.onlyExternal : false,
+					onlyStaff: typeof filters.onlyStaff === 'boolean' ? filters.onlyStaff : false,
+					onlySuperuser: typeof filters.onlySuperuser === 'boolean' ? filters.onlySuperuser : false,
+					onlyBALead: typeof filters.onlyBALead === 'boolean' ? filters.onlyBALead : false,
+					businessArea: filters.businessArea !== undefined ? filters.businessArea as string | number : undefined,
+				};
+			} else {
+				this.state.filters = { ...DEFAULT_FILTERS };
+			}
+			
+			this.state.currentPage = typeof data.currentPage === 'number' ? data.currentPage : 1;
+			logger.info("Loaded search state from storage", { saveSearch: this.state.saveSearch });
 		} else {
 			logger.info("saveSearch disabled, not restoring search state");
 		}

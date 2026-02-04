@@ -1,9 +1,9 @@
 import { Button } from "@/shared/components/ui/button";
 import { X } from "lucide-react";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import type { ICaretakerUserSearchProps } from "../types/caretaker.types";
 import type { IUserData } from "@/shared/types/user.types";
-import { BaseUserSearch } from "@/features/users/components/BaseUserSearch";
+import { BaseUserSearch } from "@/shared/components/user";
 
 /**
  * CaretakerUserSearch component

@@ -15,7 +15,7 @@ import { debounce } from "@/shared/utils/common.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
 import { SearchControls } from "@/shared/components/SearchControls";
-import { UserSearchDropdown } from "@/features/users";
+import { UserSearchDropdown } from "@/shared/components/user";
 
 interface ProjectFiltersProps {
 	searchTerm: string;

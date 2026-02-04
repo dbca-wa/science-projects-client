@@ -14,37 +14,61 @@ import {
 } from "@/shared/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle, X, Check } from "lucide-react";
-import { UserDisplay } from "@/shared/components/UserDisplay";
+import { UserDisplay } from "@/shared/components/user";
 import { toUserDisplayFormat, getCaretakerReasonLabel } from "@/shared/utils/user.utils";
 import { formatDate } from "@/shared/utils/common.utils";
+import { useCurrentUser } from "@/features/auth";
 import { useApproveCaretakerTask } from "../hooks/useApproveCaretakerTask";
 import { useRejectCaretakerTask } from "../hooks/useRejectCaretakerTask";
+import { useCancelCaretakerRequest } from "../hooks/useCancelCaretakerRequest";
 import type { IPendingCaretakerRequestProps } from "../types/caretaker.types";
 
 /**
  * PendingCaretakerRequest component
- * Displays a pending caretaker request where someone wants YOU to be THEIR caretaker
+ * Displays a pending caretaker request in different contexts:
+ * 1. Outgoing: Current user requested someone to be THEIR caretaker (show cancel only)
+ * 2. Incoming: Someone wants current user to be THEIR caretaker (show approve/reject)
  * 
  * Features:
- * - Shows the user who needs a caretaker (primary_user)
- * - Displays reason, end date (if applicable), notes (if provided)
- * - Shows status badge: "Pending Your Approval"
- * - Approve and Reject buttons with confirmation dialogs
+ * - Detects request type based on current user's role
+ * - Shows appropriate badge and buttons based on context
+ * - Displays reason, end date, notes
  * - Success/error handling
  * 
- * @param request - AdminTask representing the pending request (you are in secondary_users)
+ * @param request - AdminTask representing the pending request
  * @param onCancel - Callback when request is cancelled/approved/rejected
  */
 export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretakerRequestProps) => {
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   
   const approveMutation = useApproveCaretakerTask();
   const rejectMutation = useRejectCaretakerTask();
+  const cancelMutation = useCancelCaretakerRequest();
+  const { data: currentUser } = useCurrentUser();
 
-  // The primary_user is the person who needs a caretaker
-  // You (current user) are being asked to be their caretaker
+  // Determine the request type based on current user's role
   const userNeedingCaretaker = request.primary_user;
+  const caretakerId = request.secondary_users?.[0]?.id;
+  const requesterId = request.requester?.id;
+  
+  // Debug logging
+  console.log('PendingCaretakerRequest Debug:', {
+    currentUserId: currentUser?.id,
+    caretakerId,
+    requesterId,
+    primaryUserId: userNeedingCaretaker?.id,
+    request
+  });
+  
+  // Outgoing: I am the requester (I made this request)
+  const isOutgoingRequest = currentUser?.id === requesterId;
+  
+  // Incoming: Someone else made this request and I'm the caretaker being asked
+  const isIncomingRequest = currentUser?.id === caretakerId && currentUser?.id !== requesterId;
+  
+  console.log('Request Type:', { isIncomingRequest, isOutgoingRequest });
 
   if (!userNeedingCaretaker) {
     return (
@@ -65,6 +89,10 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
     setShowRejectDialog(true);
   };
 
+  const handleCancelClick = () => {
+    setShowCancelDialog(true);
+  };
+
   const handleConfirmApprove = () => {
     approveMutation.mutate(request.id, {
       onSuccess: () => {
@@ -83,14 +111,45 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
     });
   };
 
+  const handleConfirmCancel = () => {
+    cancelMutation.mutate(request.id, {
+      onSuccess: () => {
+        setShowCancelDialog(false);
+        onCancel();
+      },
+    });
+  };
+
+  // Determine badge text and color
+  const getBadgeContent = () => {
+    if (isIncomingRequest) {
+      return {
+        text: "Pending Your Approval",
+        className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+      };
+    }
+    if (isOutgoingRequest) {
+      return {
+        text: "Outgoing Request",
+        className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+      };
+    }
+    return {
+      text: "Pending Approval",
+      className: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+    };
+  };
+
+  const badgeContent = getBadgeContent();
+
   return (
     <>
       <Card className="border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Caretaker Request</CardTitle>
-            <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-              Pending Your Approval
+            <Badge className={badgeContent.className}>
+              {badgeContent.text}
             </Badge>
           </div>
         </CardHeader>
@@ -170,53 +229,88 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
           </div>
 
           {/* Error Display */}
-          {(approveMutation.isError || rejectMutation.isError) && (
+          {(approveMutation.isError || rejectMutation.isError || cancelMutation.isError) && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {approveMutation.error?.message || rejectMutation.error?.message || "Failed to process request"}
+                {approveMutation.error?.message || rejectMutation.error?.message || cancelMutation.error?.message || "Failed to process request"}
               </AlertDescription>
             </Alert>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
-            <Button
-              onClick={handleApproveClick}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-            >
-              {approveMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Approving...
-                </>
-              ) : (
-                <>
-                  <Check className="mr-2 h-4 w-4" />
-                  Approve
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleRejectClick}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
-              className="flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-            >
-              {rejectMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Rejecting...
-                </>
-              ) : (
-                <>
-                  <X className="mr-2 h-4 w-4" />
-                  Reject
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Action Buttons - Show based on request type */}
+          {isIncomingRequest && (
+            <div className="flex gap-2 pt-2">
+              <Button
+                onClick={handleApproveClick}
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                {approveMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Approving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Approve
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRejectClick}
+                disabled={approveMutation.isPending || rejectMutation.isPending}
+                className="flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                {rejectMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Rejecting...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Reject
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {isOutgoingRequest && (
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                onClick={handleCancelClick}
+                disabled={cancelMutation.isPending}
+                className="w-full border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                {cancelMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel Request
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Show message if current user has no action available */}
+          {!isIncomingRequest && !isOutgoingRequest && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                This request is pending approval from the proposed caretaker or an administrator.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
@@ -270,6 +364,34 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
                 </>
               ) : (
                 "Reject"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Caretaker Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this caretaker request? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Request</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmCancel}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {cancelMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                "Cancel Request"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

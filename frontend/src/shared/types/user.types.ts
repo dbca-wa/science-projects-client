@@ -75,9 +75,7 @@ export interface IUserMe {
 	is_superuser: boolean;
 	is_staff: boolean;
 	is_active: boolean;
-	is_biometrician: boolean;
 	is_aec: boolean;
-	is_herbarium_curator: boolean;
 	image: IImageData;
 	role: string | null;
 	affiliation: IAffiliation;

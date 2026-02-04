@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCaretaker } from "../services";
+import { deleteCaretaker } from "../services/caretaker.service";
+import { caretakerKeys } from "../services/caretaker.endpoints";
 import { toast } from "sonner";
 import { useAuthStore } from "@/app/stores/store-context";
-import { caretakerCheckKeys } from "./useCancelCaretakerRequest";
 
 /**
  * Hook for removing an active caretaker
@@ -22,7 +22,7 @@ export const useRemoveCaretaker = () => {
       // Invalidate caretaker check query to refetch updated data
       if (authStore.user?.id) {
         queryClient.invalidateQueries({
-          queryKey: caretakerCheckKeys.check(authStore.user.id),
+          queryKey: caretakerKeys.check(authStore.user.id),
         });
       }
 

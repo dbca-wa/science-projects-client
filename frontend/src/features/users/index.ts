@@ -27,11 +27,11 @@ export type {
 export { 
   userCreateSchema,
   userEditSchema,
-  caretakerRequestSchema,
   type UserCreateFormData,
   type UserEditFormData,
-  type CaretakerRequestFormData as CaretakerRequestSchemaFormData
 } from "./schemas";
+
+// Note: caretakerRequestSchema moved to @/features/caretakers/schemas
 
 // Services
 export * from "./services";
