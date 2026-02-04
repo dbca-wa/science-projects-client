@@ -243,7 +243,7 @@ export const CaretakeesTable = ({ caretakees }: ICaretakeesTableProps) => {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem className="dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white">
                                   <ExternalLink className="mr-2 h-4 w-4" />
-                                  View Projects
+                                  Projects
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleRemoveCaretaker(caretakee)}
@@ -263,7 +263,7 @@ export const CaretakeesTable = ({ caretakees }: ICaretakeesTableProps) => {
                               className="text-blue-600 hover:text-blue-700"
                             >
                               <ExternalLink className="mr-1 h-3 w-3" />
-                              View Projects
+                              Projects
                             </Button>
                             <Button
                               variant="outline"

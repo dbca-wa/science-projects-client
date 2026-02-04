@@ -87,7 +87,9 @@ export const UserSearchDropdown = forwardRef<BaseUserSearchRef, IUserSearchDropd
 				placeholderColor={placeholderColor}
 				showIcon={showIcon}
 				renderSelected={(user, onClear) => <SelectedUserInput user={user} onClear={onClear} />}
-				renderMenuItem={(user, onSelect) => <CustomMenuItem user={user} onClick={() => onSelect(user)} />}
+				renderMenuItem={(user, onSelect, isHighlighted) => (
+					<CustomMenuItem user={user} onClick={() => onSelect(user)} isHighlighted={isHighlighted} />
+				)}
 			/>
 		);
 	}
@@ -100,19 +102,26 @@ UserSearchDropdown.displayName = "UserSearchDropdown";
 interface CustomMenuItemProps {
 	onClick: () => void;
 	user: IUserData;
+	isHighlighted: boolean;
 }
 
-const CustomMenuItem = ({ onClick, user }: CustomMenuItemProps) => {
+const CustomMenuItem = ({ onClick, user, isHighlighted }: CustomMenuItemProps) => {
 	const avatarUrl = getImageUrl(user.image);
 
 	return (
 		<button
 			type="button"
 			className={cn(
-				"w-full text-left p-2 flex items-center transition-colors",
-				"hover:bg-gray-200 dark:hover:bg-gray-600"
+				"w-full text-left p-2 flex items-center transition-colors cursor-pointer",
+				isHighlighted && "bg-gray-200 dark:bg-gray-600"
 			)}
-			onClick={onClick}
+			onMouseDown={(e) => {
+				e.stopPropagation();
+			}}
+			onClick={(e) => {
+				e.stopPropagation();
+				onClick();
+			}}
 		>
 			<Avatar className="w-10 h-10">
 				<AvatarImage src={avatarUrl} alt={getUserDisplayName(user)} />

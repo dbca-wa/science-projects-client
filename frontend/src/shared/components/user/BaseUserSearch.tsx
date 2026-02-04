@@ -30,15 +30,20 @@ import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
  * - Preselected user support
  * - Custom rendering for selected state and menu items
  * - Exclude users from search results
+ * - Keyboard navigation (ArrowUp, ArrowDown, Enter, Escape)
  * 
  * @example
  * ```tsx
  * <BaseUserSearch
  *   onSelect={(user) => setUserId(user.id)}
  *   renderSelected={(user, onClear) => <CustomSelectedDisplay user={user} onClear={onClear} />}
- *   renderMenuItem={(user, onSelect) => <CustomMenuItem user={user} onClick={() => onSelect(user)} />}
+ *   renderMenuItem={(user, onSelect, isHighlighted) => (
+ *     <CustomMenuItem user={user} onClick={() => onSelect(user)} highlighted={isHighlighted} />
+ *   )}
  * />
  * ```
+ * 
+ * @note Breaking Change: renderMenuItem signature now includes isHighlighted parameter
  */
 
 export interface BaseUserSearchProps {
@@ -63,7 +68,14 @@ export interface BaseUserSearchProps {
 	
 	// Custom rendering (composition pattern)
 	renderSelected?: (user: IUserData, onClear: () => void) => ReactNode;
-	renderMenuItem?: (user: IUserData, onSelect: (user: IUserData) => void) => ReactNode;
+	/**
+	 * Custom menu item renderer
+	 * @param user - The user data to render
+	 * @param onSelect - Callback to select the user
+	 * @param isHighlighted - Whether this item is currently keyboard-highlighted
+	 * @note Breaking Change: Third parameter (isHighlighted) added for keyboard navigation support
+	 */
+	renderMenuItem?: (user: IUserData, onSelect: (user: IUserData) => void, isHighlighted: boolean) => ReactNode;
 }
 
 export interface BaseUserSearchRef {
@@ -94,9 +106,11 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 		ref
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
+		const wrapperRef = useRef<HTMLDivElement>(null);
 		const [searchTerm, setSearchTerm] = useState("");
 		const [isMenuOpen, setIsMenuOpen] = useState(true);
 		const [selectedUser, setSelectedUser] = useState<IUserData | null>(null);
+		const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
 
 		// Debounce search term (300ms)
 		const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
@@ -135,8 +149,24 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 			}
 		}, [preselectedUser, selectedUser, onSelect]);
 
+		// Click-away detection
+		useEffect(() => {
+			const handleClickOutside = (event: MouseEvent) => {
+				if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+					setIsMenuOpen(false);
+					setHighlightedIndex(-1);
+				}
+			};
+
+			if (isMenuOpen) {
+				document.addEventListener("mousedown", handleClickOutside);
+				return () => document.removeEventListener("mousedown", handleClickOutside);
+			}
+		}, [isMenuOpen]);
+
 		const handleSelectUser = (user: IUserData) => {
 			setIsMenuOpen(false);
+			setHighlightedIndex(-1);
 			setSelectedUser(user);
 			setSearchTerm("");
 			onSelect(user);
@@ -151,6 +181,38 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 			onSelect(null);
 		};
 
+		const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+			const { key } = event;
+			const resultsCount = filteredItems.length;
+
+			if (resultsCount === 0) return;
+
+			switch (key) {
+				case "ArrowDown":
+					event.preventDefault();
+					setHighlightedIndex((prev) => (prev < resultsCount - 1 ? prev + 1 : prev));
+					break;
+
+				case "ArrowUp":
+					event.preventDefault();
+					setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+					break;
+
+				case "Enter":
+					event.preventDefault();
+					if (highlightedIndex >= 0 && highlightedIndex < resultsCount) {
+						handleSelectUser(filteredItems[highlightedIndex]);
+					}
+					break;
+
+				case "Escape":
+					event.preventDefault();
+					setIsMenuOpen(false);
+					setHighlightedIndex(-1);
+					break;
+			}
+		};
+
 		useImperativeHandle(ref, () => ({
 			focusInput: () => {
 				if (inputRef.current) {
@@ -162,14 +224,30 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 		const filteredItems = searchResults?.users || [];
 
 		return (
-			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
+			<div ref={wrapperRef} className={cn("w-full", isRequired && "required", wrapperClassName)}>
 				{label && <Label className="mb-2">{label}</Label>}
 				{selectedUser && renderSelected ? (
 					renderSelected(selectedUser, handleClearUser)
 				) : selectedUser ? (
 					<DefaultSelectedDisplay user={selectedUser} onClear={handleClearUser} />
 				) : (
-					<div className="relative">
+					<div 
+						className="relative"
+						onMouseDown={(e) => {
+							// Only handle clicks on the wrapper itself, not on the input
+							if (e.target !== e.currentTarget) return;
+							
+							// Prevent default to avoid cursor jumping to start first
+							e.preventDefault();
+							// When clicking the wrapper, focus input and move cursor to end
+							if (inputRef.current) {
+								inputRef.current.focus();
+								// Move cursor to end of text
+								const length = inputRef.current.value.length;
+								inputRef.current.setSelectionRange(length, length);
+							}
+						}}
+					>
 						{/* Icon - only show when showIcon is true and no user is selected */}
 						{showIcon && (
 							<User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
@@ -178,7 +256,16 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 							ref={inputRef}
 							type="text"
 							value={searchTerm}
-							onChange={(event) => setSearchTerm(event.target.value)}
+							onChange={(event) => {
+								setSearchTerm(event.target.value);
+								// Reset highlight when search term changes
+								setHighlightedIndex(-1);
+								// Reopen menu when user starts typing (only if currently closed)
+								if (event.target.value.trim().length > 0 && !isMenuOpen) {
+									setIsMenuOpen(true);
+								}
+							}}
+							onKeyDown={handleKeyDown}
 							placeholder={placeholder}
 							className={cn(
 								showIcon && "pl-10",
@@ -200,6 +287,8 @@ export const BaseUserSearch = forwardRef<BaseUserSearchRef, BaseUserSearchProps>
 							users={filteredItems.slice(0, 10)}
 							onSelect={handleSelectUser}
 							renderMenuItem={renderMenuItem}
+							highlightedIndex={highlightedIndex}
+							onHighlightChange={setHighlightedIndex}
 						/>
 					</div>
 				)}
@@ -220,7 +309,9 @@ interface SearchResultsPortalProps {
 	inputRef: RefObject<HTMLInputElement | null>;
 	users: IUserData[];
 	onSelect: (user: IUserData) => void;
-	renderMenuItem?: (user: IUserData, onSelect: (user: IUserData) => void) => ReactNode;
+	renderMenuItem?: (user: IUserData, onSelect: (user: IUserData) => void, isHighlighted: boolean) => ReactNode;
+	highlightedIndex: number;
+	onHighlightChange: (index: number) => void;
 }
 
 const SearchResultsPortal = ({
@@ -229,6 +320,8 @@ const SearchResultsPortal = ({
 	users,
 	onSelect,
 	renderMenuItem,
+	highlightedIndex,
+	onHighlightChange,
 }: SearchResultsPortalProps) => {
 	const portalElement = useState<HTMLElement>(() => {
 		const el = document.createElement("div");
@@ -287,11 +380,22 @@ const SearchResultsPortal = ({
 			}}
 		>
 			<div className="relative w-full">
-				{users.map((user) =>
+				{users.map((user, index) =>
 					renderMenuItem ? (
-						<div key={user.id}>{renderMenuItem(user, onSelect)}</div>
+						<div 
+							key={user.id}
+							onMouseEnter={() => onHighlightChange(index)}
+						>
+							{renderMenuItem(user, onSelect, index === highlightedIndex)}
+						</div>
 					) : (
-						<DefaultMenuItem key={user.id} user={user} onSelect={onSelect} />
+						<DefaultMenuItem 
+							key={user.id} 
+							user={user} 
+							onSelect={onSelect} 
+							isHighlighted={index === highlightedIndex}
+							onHover={() => onHighlightChange(index)}
+						/>
 					)
 				)}
 			</div>
@@ -318,19 +422,33 @@ const DefaultSelectedDisplay = ({ user, onClear }: { user: IUserData; onClear: (
 	);
 };
 
-const DefaultMenuItem = ({ user, onSelect }: { user: IUserData; onSelect: (user: IUserData) => void }) => {
-	const [isHovered, setIsHovered] = useState(false);
-
+const DefaultMenuItem = ({ 
+	user, 
+	onSelect, 
+	isHighlighted,
+	onHover,
+}: { 
+	user: IUserData; 
+	onSelect: (user: IUserData) => void;
+	isHighlighted: boolean;
+	onHover?: () => void;
+}) => {
 	return (
 		<button
 			type="button"
 			className={cn(
-				"w-full text-left p-2 transition-colors",
-				isHovered ? "bg-gray-200 dark:bg-gray-600" : "transparent"
+				"w-full text-left p-2 transition-colors cursor-pointer",
+				isHighlighted && "bg-gray-200 dark:bg-gray-600"
 			)}
-			onClick={() => onSelect(user)}
-			onMouseOver={() => setIsHovered(true)}
-			onMouseOut={() => setIsHovered(false)}
+			onMouseDown={(e) => {
+				// Prevent the wrapper's onMouseDown from interfering
+				e.stopPropagation();
+			}}
+			onClick={(e) => {
+				e.stopPropagation();
+				onSelect(user);
+			}}
+			onMouseEnter={() => onHover?.()}
 		>
 			<p className="text-sm">
 				{user.display_first_name} {user.display_last_name}
