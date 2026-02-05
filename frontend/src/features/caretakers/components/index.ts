@@ -16,8 +16,8 @@ export { CaretakerNotification } from "./CaretakerNotification";
 // User caretaker components
 export { ActiveCaretaker } from "./ActiveCaretaker";
 export { OutgoingCaretakerRequest } from "./OutgoingCaretakerRequest";
+export { OutgoingRequestsList } from "./OutgoingRequestsList";
 export { PendingCaretakerRequest } from "./PendingCaretakerRequest";
 export { BecomeCaretakerRequest } from "./BecomeCaretakerRequest";
 export { RequestCaretakerForm } from "./RequestCaretakerForm";
-export { CaretakerUserSearch } from "./CaretakerUserSearch";
 export { CaretakeesTable } from "./CaretakeesTable";

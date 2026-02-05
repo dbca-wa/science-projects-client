@@ -192,7 +192,7 @@ export const ActiveCaretaker = ({ caretaker, onRemove }: IActiveCaretakerProps) 
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel>Keep Caretaker</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmRemove}

@@ -13,6 +13,7 @@ export { useCancelCaretakerRequest } from "./useCancelCaretakerRequest";
 export { useRemoveCaretaker } from "./useRemoveCaretaker";
 export { useBecomeCaretaker } from "./useBecomeCaretaker";
 export { usePendingCaretakerRequests, pendingCaretakerRequestsKeys } from "./usePendingCaretakerRequests";
+export { useOutgoingCaretakerRequests } from "./useOutgoingCaretakerRequests";
 
 // Additional hooks
 export { useCaretakingChain } from "./useCaretakingChain";

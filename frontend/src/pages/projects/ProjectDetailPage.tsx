@@ -107,8 +107,8 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 		);
 	}
 
-	// Don't destructure until we know data exists
-	if (!data) {
+	// Don't destructure until we know data exists and has required fields
+	if (!data || !data.project) {
 		return null;
 	}
 
@@ -117,7 +117,7 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 	// Manual breadcrumbs with project title (sanitized to remove HTML)
 	const manualBreadcrumbs = [
 		{ title: "Projects", link: "/projects" },
-		{ title: sanitizeInput(project.title || "Project") },
+		{ title: sanitizeInput(project?.title || "Project") },
 	];
 
 	// Determine which tabs to show based on available documents
@@ -139,7 +139,7 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 	].filter((tab) => tab.show);
 
 	return (
-		<PageTransition isLoading={isLoading}>
+		<>
 			{isLoading ? (
 				<div className="flex items-center justify-center min-h-[400px]">
 					<div className="text-center space-y-4">
@@ -148,78 +148,80 @@ export default function ProjectDetailPage({ selectedTab = "overview" }: ProjectD
 					</div>
 				</div>
 			) : (
-			<div className="space-y-6">
-				{/* Breadcrumbs */}
-				<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
+				<PageTransition>
+					<div className="space-y-6">
+						{/* Breadcrumbs */}
+						<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
-				<Tabs value={selectedTab} onValueChange={handleTabChange}>
-				{/* Desktop: Horizontal tabs */}
-				<TabsList className="hidden w-full justify-start md:inline-flex">
-					{availableTabs.map((tabItem) => (
-						<TabsTrigger key={tabItem.value} value={tabItem.value}>
-							{tabItem.label}
-						</TabsTrigger>
-					))}
-				</TabsList>
+						<Tabs value={selectedTab} onValueChange={handleTabChange}>
+							{/* Desktop: Horizontal tabs */}
+							<TabsList className="hidden w-full justify-start md:inline-flex">
+								{availableTabs.map((tabItem) => (
+									<TabsTrigger key={tabItem.value} value={tabItem.value}>
+										{tabItem.label}
+									</TabsTrigger>
+								))}
+							</TabsList>
 
-				{/* Mobile: Shadcn Select dropdown */}
-				<div className="md:hidden">
-					<Select value={selectedTab} onValueChange={handleTabChange}>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Select a tab" />
-						</SelectTrigger>
-						<SelectContent>
-							{availableTabs.map((tabItem) => (
-								<SelectItem key={tabItem.value} value={tabItem.value}>
-									{tabItem.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
+							{/* Mobile: Shadcn Select dropdown */}
+							<div className="md:hidden">
+								<Select value={selectedTab} onValueChange={handleTabChange}>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Select a tab" />
+									</SelectTrigger>
+									<SelectContent>
+										{availableTabs.map((tabItem) => (
+											<SelectItem key={tabItem.value} value={tabItem.value}>
+												{tabItem.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 
-				{/* Overview Tab */}
-				<TabsContent value="overview">
-					<OverviewTab project={project} details={details} members={members} />
-				</TabsContent>
+							{/* Overview Tab */}
+							<TabsContent value="overview">
+								<OverviewTab project={project} details={details} members={members} />
+							</TabsContent>
 
-				{/* Concept Plan Tab */}
-				{documents?.concept_plan && (
-					<TabsContent value="concept">
-						<ConceptPlanTab document={documents.concept_plan} />
-					</TabsContent>
-				)}
+							{/* Concept Plan Tab */}
+							{documents?.concept_plan && (
+								<TabsContent value="concept">
+									<ConceptPlanTab document={documents.concept_plan} />
+								</TabsContent>
+							)}
 
-				{/* Project Plan Tab */}
-				{documents?.project_plan && (
-					<TabsContent value="project">
-						<ProjectPlanTab document={documents.project_plan} />
-					</TabsContent>
-				)}
+							{/* Project Plan Tab */}
+							{documents?.project_plan && (
+								<TabsContent value="project">
+									<ProjectPlanTab document={documents.project_plan} />
+								</TabsContent>
+							)}
 
-				{/* Progress Reports Tab */}
-				{documents?.progress_reports && documents.progress_reports.length > 0 && (
-					<TabsContent value="progress">
-						<ProgressReportsTab documents={documents.progress_reports} />
-					</TabsContent>
-				)}
+							{/* Progress Reports Tab */}
+							{documents?.progress_reports && documents.progress_reports.length > 0 && (
+								<TabsContent value="progress">
+									<ProgressReportsTab documents={documents.progress_reports} />
+								</TabsContent>
+							)}
 
-				{/* Student Reports Tab */}
-				{documents?.student_reports && documents.student_reports.length > 0 && (
-					<TabsContent value="student">
-						<StudentReportsTab documents={documents.student_reports} />
-					</TabsContent>
-				)}
+							{/* Student Reports Tab */}
+							{documents?.student_reports && documents.student_reports.length > 0 && (
+								<TabsContent value="student">
+									<StudentReportsTab documents={documents.student_reports} />
+								</TabsContent>
+							)}
 
-				{/* Project Closure Tab */}
-				{documents?.project_closure && (
-					<TabsContent value="closure">
-						<ProjectClosureTab document={documents.project_closure} />
-					</TabsContent>
-				)}
-			</Tabs>
-		</div>
+							{/* Project Closure Tab */}
+							{documents?.project_closure && (
+								<TabsContent value="closure">
+									<ProjectClosureTab document={documents.project_closure} />
+								</TabsContent>
+							)}
+						</Tabs>
+					</div>
+				</PageTransition>
 			)}
-		</PageTransition>
+		</>
 	);
 }
