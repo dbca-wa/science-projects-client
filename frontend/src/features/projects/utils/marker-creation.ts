@@ -1,5 +1,6 @@
 import L from "leaflet";
 import type { IProjectData } from "@/shared/types/project.types";
+import { extractTextFromHTML } from "@/shared/utils/html.utils";
 
 /**
  * Marker creation utilities for the project map
@@ -11,6 +12,22 @@ import type { IProjectData } from "@/shared/types/project.types";
  * - Drop shadow for depth
  * - Proper ARIA labels for accessibility
  */
+
+/**
+ * Escape special characters for safe use in HTML attributes
+ * Prevents HTML injection and ensures proper rendering
+ * 
+ * @param text - Plain text to escape
+ * @returns Escaped text safe for HTML attributes
+ */
+const escapeHtmlAttribute = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+};
 
 /**
  * Color constants for markers
@@ -93,10 +110,14 @@ export const createProjectMarker = (
   const color = getMarkerColor(count, isSelected);
   const densityLabel = getMarkerDensityLabel(count);
   
-  // Create accessible label
+  // Create accessible label with sanitized plain text
+  const plainTextTitle = count === 1 ? extractTextFromHTML(projects[0].title) : "";
   const ariaLabel = count === 1 
-    ? `Project: ${projects[0].title}`
+    ? `Project: ${plainTextTitle}`
     : `${count} projects at this location (${densityLabel})`;
+  
+  // Escape for safe use in HTML attribute
+  const safeAriaLabel = escapeHtmlAttribute(ariaLabel);
 
   // Add visual emphasis for selected state
   const ringClass = isSelected 
@@ -113,7 +134,7 @@ export const createProjectMarker = (
   const icon = L.divIcon({
     className: "project-marker",
     html: `
-      <div class="relative group cursor-pointer ${zIndexClass}" role="button" aria-label="${ariaLabel}" tabindex="0">
+      <div class="relative group cursor-pointer ${zIndexClass}" role="button" aria-label="${safeAriaLabel}" tabindex="0">
         <div class="w-10 h-10 rounded-full shadow-lg transition-transform ${scaleClass} focus:outline-none focus:ring-2 ${ringClass}"
              style="background-color: ${color}">
           <div class="absolute inset-0 flex items-center justify-center">
@@ -206,10 +227,14 @@ export const createSizedMarker = (
   const densityLabel = getMarkerDensityLabel(count);
   const sizeConfig = getMarkerSize(count);
   
-  // Create accessible label
+  // Create accessible label with sanitized plain text
+  const plainTextTitle = count === 1 ? extractTextFromHTML(projects[0].title) : "";
   const ariaLabel = count === 1 
-    ? `Project: ${projects[0].title}`
+    ? `Project: ${plainTextTitle}`
     : `${count} projects at this location (${densityLabel})`;
+  
+  // Escape for safe use in HTML attribute
+  const safeAriaLabel = escapeHtmlAttribute(ariaLabel);
 
   // Add visual emphasis for selected state
   const ringClass = isSelected 
@@ -226,7 +251,7 @@ export const createSizedMarker = (
   const icon = L.divIcon({
     className: "project-marker",
     html: `
-      <div class="relative group cursor-pointer ${zIndexClass}" role="button" aria-label="${ariaLabel}" tabindex="0">
+      <div class="relative group cursor-pointer ${zIndexClass}" role="button" aria-label="${safeAriaLabel}" tabindex="0">
         <div class="rounded-full shadow-lg transition-transform ${scaleClass} focus:outline-none focus:ring-2 ${ringClass}"
              style="background-color: ${color}; width: ${sizeConfig.size}px; height: ${sizeConfig.size}px;">
           <div class="absolute inset-0 flex items-center justify-center">

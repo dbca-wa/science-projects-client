@@ -189,10 +189,9 @@ export const updateMembership = async (
   }
 ): Promise<void> => {
   await apiClient.put(USER_ENDPOINTS.MEMBERSHIP(userId), {
-    user_id: userId,
-    branch_id: data.branch || 0,
-    business_area: data.business_area || 0,
-    affiliation: data.affiliation,
+    branch: data.branch || null,
+    business_area: data.business_area || null,
+    affiliation: data.affiliation || null,
   });
 };
 

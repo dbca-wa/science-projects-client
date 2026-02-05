@@ -12,5 +12,5 @@ import type { ISimpleLocationData } from "@/features/projects/types/map.types";
  * Returns all location areas with their IDs, names, and types
  */
 export const getLocationMetadata = async (): Promise<ISimpleLocationData[]> => {
-	return apiClient.get<ISimpleLocationData[]>("locations");
+	return apiClient.get<ISimpleLocationData[]>("locations/list");
 };

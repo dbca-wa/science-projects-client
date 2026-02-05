@@ -1,14 +1,14 @@
 export const USER_ENDPOINTS = {
   // Base user endpoints
-  LIST: "users/",
+  LIST: "users/list",
   ME: "users/me",
   DETAIL: (id: number | string) => `users/${id}`,
 
   // User search
-  SEARCH: "users/", // With query params (?page=1&searchTerm=...)
+  SEARCH: "users/list", // With query params (?page=1&searchTerm=...)
 
   // User mutations
-  CREATE: "users/",
+  CREATE: "users/list",
   PERSONAL_INFO: (userId: number | string) => `users/${userId}/pi`,
   PROFILE: (userId: number | string) => `users/${userId}/profile`,
   MEMBERSHIP: (userId: number | string) => `users/${userId}/membership`,

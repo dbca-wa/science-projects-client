@@ -15,7 +15,7 @@ import { debounce } from "@/shared/utils/common.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
 import { SearchControls } from "@/shared/components/SearchControls";
-import { UserSearchDropdown } from "@/shared/components/user";
+import { UserCombobox } from "@/shared/components/user";
 
 interface ProjectFiltersProps {
 	searchTerm: string;
@@ -135,16 +135,11 @@ export const ProjectFilters = observer(
 
 						{/* User Filter with icon - SECOND on mobile, left on desktop */}
 						<div className="w-full order-2 lg:order-1">
-							<UserSearchDropdown
-								key={filters.user || "no-user"}
-								isRequired={false}
-								setUserFunction={handleUserChange}
-								label=""
+							<UserCombobox
+								value={filters.user || null}
+								onValueChange={handleUserChange}
 								placeholder="Filter by user"
-								helperText=""
-								hideCannotFind={true}
 								className="text-sm rounded-md"
-								preselectedUserPk={filters.user || undefined}
 								showIcon={true}
 							/>
 						</div>

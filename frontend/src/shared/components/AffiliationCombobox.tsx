@@ -1,18 +1,11 @@
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-	type RefObject,
-} from "react";
-import { createPortal } from "react-dom";
+import { forwardRef, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/shared/components/ui/badge";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
 import { Building2, X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+import { BaseCombobox } from "@/shared/components/combobox";
 import { apiClient } from "@/shared/services/api/client.service";
 import { toTitleCase } from "@/shared/utils";
 import type { IAffiliation } from "@/shared/types/org.types";
@@ -48,7 +41,9 @@ export interface AffiliationComboboxRef {
 /**
  * AffiliationCombobox component
  * Searchable dropdown for selecting affiliations (single or multi-select)
- * Based on BaseUserSearch design patterns
+ * 
+ * Single-select mode uses BaseCombobox for consistency.
+ * Multi-select mode uses custom implementation (will be refactored in separate spec).
  * 
  * @example Single-select
  * ```tsx
@@ -70,11 +65,97 @@ export interface AffiliationComboboxRef {
  * ```
  */
 export const AffiliationCombobox = forwardRef<AffiliationComboboxRef, AffiliationComboboxProps>(
+	(props, ref) => {
+		const { multiple = false } = props;
+
+		// Route to appropriate implementation
+		if (multiple) {
+			return <MultiSelectAffiliationCombobox {...props} ref={ref} />;
+		} else {
+			return <SingleSelectAffiliationCombobox {...props} ref={ref} />;
+		}
+	}
+);
+
+AffiliationCombobox.displayName = "AffiliationCombobox";
+
+// =========================================== SINGLE-SELECT IMPLEMENTATION ====================================================
+
+const SingleSelectAffiliationCombobox = forwardRef<AffiliationComboboxRef, AffiliationComboboxProps>(
 	(
 		{
 			value,
 			onChange,
-			multiple = false,
+			placeholder = "Search for or add an affiliation",
+			showIcon = true,
+			...props
+		},
+		ref
+	) => {
+		// Load selected affiliation if value provided
+		const { data: selectedAffiliation } = useQuery({
+			queryKey: ["affiliations", "detail", value],
+			queryFn: () => apiClient.get<IAffiliation>(`agencies/affiliations/${value}`),
+			enabled: !!value && value > 0,
+			staleTime: 10 * 60_000, // 10 minutes
+		});
+
+		// Search function wrapper
+		const searchAffiliations = async (searchTerm: string): Promise<IAffiliation[]> => {
+			const result = await apiClient.get<{
+				affiliations: IAffiliation[];
+				total_results: number;
+				total_pages: number;
+			}>("agencies/affiliations", {
+				params: { searchTerm, page: 1 },
+			});
+			return result.affiliations || [];
+		};
+
+		// Create new affiliation
+		const createAffiliation = async (searchTerm: string): Promise<IAffiliation> => {
+			const titleCasedName = toTitleCase(searchTerm.trim());
+			return await apiClient.post<IAffiliation>("agencies/affiliations", {
+				name: titleCasedName,
+			});
+		};
+
+		return (
+			<BaseCombobox<IAffiliation>
+				searchFn={searchAffiliations}
+				value={selectedAffiliation ?? null}
+				onChange={(affiliation: IAffiliation | null) => onChange?.(affiliation?.id)}
+				getItemKey={(affiliation: IAffiliation) => affiliation.id}
+				renderSelected={(affiliation: IAffiliation, onClear: () => void) => (
+					<SelectedAffiliationDisplay affiliation={affiliation} onClear={onClear} />
+				)}
+				renderMenuItem={(
+					affiliation: IAffiliation,
+					onSelect: (affiliation: IAffiliation) => void,
+					isHighlighted: boolean
+				) => <AffiliationMenuItem affiliation={affiliation} onSelect={onSelect} isHighlighted={isHighlighted} />}
+				onCreateNew={createAffiliation}
+				createNewLabel={(term: string) =>
+					`Click to add "${toTitleCase(term)}" as an organisation/affiliation`
+				}
+				icon={showIcon ? <Building2 className="size-4 text-gray-500 dark:text-gray-400" /> : undefined}
+				showIcon={showIcon}
+				placeholder={placeholder}
+				{...props}
+				ref={ref}
+			/>
+		);
+	}
+);
+
+SingleSelectAffiliationCombobox.displayName = "SingleSelectAffiliationCombobox";
+
+// =========================================== MULTI-SELECT IMPLEMENTATION ====================================================
+// NOTE: This will be refactored in a separate spec to use BaseCombobox with multi-select support
+
+const MultiSelectAffiliationCombobox = forwardRef<AffiliationComboboxRef, AffiliationComboboxProps>(
+	(
+		{
 			values = [],
 			onChangeMultiple,
 			label,
@@ -88,127 +169,37 @@ export const AffiliationCombobox = forwardRef<AffiliationComboboxRef, Affiliatio
 			className,
 			wrapperClassName,
 		},
-		ref
+		_ref
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
 		const [searchTerm, setSearchTerm] = useState("");
-		const [filteredItems, setFilteredItems] = useState<IAffiliation[]>([]);
-		const [isMenuOpen, setIsMenuOpen] = useState(false);
-		const [selectedAffiliation, setSelectedAffiliation] = useState<IAffiliation | null>(null);
-		const [isLoadingAffiliation, setIsLoadingAffiliation] = useState(false);
-		const [isCreating, setIsCreating] = useState(false);
+		const [_filteredItems, _setFilteredItems] = useState<IAffiliation[]>([]);
+		const [_isMenuOpen, _setIsMenuOpen] = useState(false);
+		const [_isCreating, _setIsCreating] = useState(false);
 
 		// Debounce search term (300ms)
-		const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
-
-		// Load selected affiliation by ID (single-select mode)
-		useEffect(() => {
-			if (!multiple && value && value > 0) {
-				setIsLoadingAffiliation(true);
-				apiClient
-					.get<IAffiliation>(`agencies/affiliations/${value}`)
-					.then((affiliation) => {
-						setSelectedAffiliation(affiliation);
-						setIsMenuOpen(false);
-					})
-					.catch((error) => {
-						console.error("Error loading affiliation:", error);
-					})
-					.finally(() => {
-						setIsLoadingAffiliation(false);
-					});
-			} else if (!multiple) {
-				setSelectedAffiliation(null);
-			}
-		}, [value, multiple]);
+		const _debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
 		// Search affiliations based on debounced search term
-		useEffect(() => {
-			if (debouncedSearchTerm.trim() !== "") {
-				apiClient
-					.get<{ affiliations: IAffiliation[]; total_results: number; total_pages: number }>(
-						"agencies/affiliations",
-						{
-							params: { searchTerm: debouncedSearchTerm, page: 1 },
-						}
-					)
-					.then((data) => {
-						setFilteredItems(data.affiliations || []);
-					})
-					.catch((error) => {
-						console.error("Error fetching affiliations:", error);
-						setFilteredItems([]);
-					});
-			} else {
-				setFilteredItems([]);
-			}
-		}, [debouncedSearchTerm]);
+		// TODO: Implement search for multi-select mode
+		// This will be refactored in separate spec
 
-		const handleSelectAffiliation = (affiliation: IAffiliation) => {
-			if (multiple) {
-				// Multi-select mode
-				if (values.some(a => a.id === affiliation.id)) {
-					return; // Already selected
-				}
-				onChangeMultiple?.([...values, affiliation]);
-				setSearchTerm("");
-				// Refocus for adding more
-				setTimeout(() => inputRef.current?.focus(), 0);
-			} else {
-				// Single-select mode
-				setSelectedAffiliation(affiliation);
-				onChange?.(affiliation.id);
-				setIsMenuOpen(false);
-				setSearchTerm("");
-			}
-		};
-
-		const handleClearAffiliation = () => {
-			if (!isEditable) return;
-			setSelectedAffiliation(null);
-			onChange?.(undefined);
-			setIsMenuOpen(true);
-			setSearchTerm("");
+		const _handleSelectAffiliation = (_affiliation: IAffiliation) => {
+			// TODO: Implement for multi-select mode
+			// This will be refactored in separate spec
 		};
 
 		const handleRemoveAffiliation = (affiliation: IAffiliation) => {
-			if (!isEditable || !multiple) return;
-			onChangeMultiple?.(values.filter(a => a.id !== affiliation.id));
+			if (!isEditable) return;
+			onChangeMultiple?.(values.filter((a) => a.id !== affiliation.id));
 		};
 
-		const handleCreateAffiliation = async () => {
-			if (!searchTerm.trim() || isCreating) return;
-
-			setIsCreating(true);
-			try {
-				const titleCasedName = toTitleCase(searchTerm.trim());
-				const newAffiliation = await apiClient.post<IAffiliation>("agencies/affiliations", {
-					name: titleCasedName,
-				});
-				
-				handleSelectAffiliation(newAffiliation);
-			} catch (error) {
-				console.error("Error creating affiliation:", error);
-			} finally {
-				setIsCreating(false);
-			}
+		const _handleCreateAffiliation = async () => {
+			// TODO: Implement for multi-select mode
+			// This will be refactored in separate spec
 		};
 
-		useImperativeHandle(ref, () => ({
-			focusInput: () => {
-				if (inputRef.current) {
-					inputRef.current.focus();
-				}
-			},
-		}));
-
-		const showCreateOption = searchTerm.trim() !== "" && 
-			filteredItems.length === 0 && 
-			!isCreating;
-
-		if (isLoadingAffiliation) {
-			return <div className="text-sm text-muted-foreground">Loading...</div>;
-		}
+		const _showCreateOption = false; // TODO: Implement for multi-select mode
 
 		return (
 			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
@@ -217,16 +208,12 @@ export const AffiliationCombobox = forwardRef<AffiliationComboboxRef, Affiliatio
 						{label} {isRequired && <span className="text-destructive">*</span>}
 					</Label>
 				)}
-				
-				{/* Multi-select: Show selected chips */}
-				{multiple && values.length > 0 && (
+
+				{/* Show selected chips */}
+				{values.length > 0 && (
 					<div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-md border mb-2">
 						{values.map((affiliation) => (
-							<Badge
-								key={affiliation.id}
-								variant="secondary"
-								className="gap-1 pr-1 text-sm"
-							>
+							<Badge key={affiliation.id} variant="secondary" className="gap-1 pr-1 text-sm">
 								<Building2 className="h-3 w-3" />
 								{affiliation.name}
 								{isEditable && (
@@ -243,209 +230,84 @@ export const AffiliationCombobox = forwardRef<AffiliationComboboxRef, Affiliatio
 					</div>
 				)}
 
-				{/* Single-select: Show selected affiliation */}
-				{!multiple && selectedAffiliation ? (
-					<div className="relative flex items-center bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-2">
-						<span className="text-green-500 dark:text-green-400 flex-1">
-							{selectedAffiliation.name}
-						</span>
-						{isEditable && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								onClick={handleClearAffiliation}
-								disabled={disabled}
-								className="h-6 w-6 p-0"
-							>
-								<X className="size-4" />
-							</Button>
-						)}
-					</div>
-				) : (
-					<div className="relative">
-						{showIcon && (
-							<Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
-						)}
-						<Input
-							ref={inputRef}
-							type="text"
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							placeholder={placeholder}
-							autoComplete="off"
-							onFocus={() => setIsMenuOpen(true)}
-							disabled={disabled}
-							autoFocus={autoFocus}
-							className={cn(
-								showIcon && "pl-10",
-								className
-							)}
-						/>
-					</div>
-				)}
+				<div className="relative">
+					{showIcon && (
+						<Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
+					)}
+					<Input
+						ref={inputRef}
+						type="text"
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						placeholder={placeholder}
+						autoComplete="off"
+						onFocus={() => {
+							// TODO: Implement dropdown for multi-select mode
+						}}
+						disabled={disabled}
+						autoFocus={autoFocus}
+						className={cn(showIcon && "pl-10", className)}
+					/>
+				</div>
 
-				{/* Search Results Portal */}
-				<SearchResultsPortal
-					isOpen={(filteredItems.length > 0 || showCreateOption) && isMenuOpen && (!selectedAffiliation || multiple)}
-					inputRef={inputRef}
-					affiliations={filteredItems}
-					onSelect={handleSelectAffiliation}
-					showCreateOption={showCreateOption}
-					searchTerm={searchTerm}
-					onCreateNew={handleCreateAffiliation}
-					isCreating={isCreating}
-				/>
+				{/* TODO: Implement portal dropdown for multi-select */}
+				{/* This will be refactored in separate spec */}
 
-				{helperText && (
-					<p className="text-sm text-muted-foreground mt-2">{helperText}</p>
-				)}
+				{helperText && <p className="text-sm text-muted-foreground mt-2">{helperText}</p>}
 			</div>
 		);
 	}
 );
 
-AffiliationCombobox.displayName = "AffiliationCombobox";
+MultiSelectAffiliationCombobox.displayName = "MultiSelectAffiliationCombobox";
 
+// =========================================== CUSTOM RENDERING COMPONENTS ====================================================
 
-// =========================================== INTERNAL COMPONENTS ====================================================
-
-interface SearchResultsPortalProps {
-	isOpen: boolean;
-	inputRef: RefObject<HTMLInputElement | null>;
-	affiliations: IAffiliation[];
-	onSelect: (affiliation: IAffiliation) => void;
-	showCreateOption: boolean;
-	searchTerm: string;
-	onCreateNew: () => void;
-	isCreating: boolean;
+interface SelectedAffiliationDisplayProps {
+	affiliation: IAffiliation;
+	onClear: () => void;
 }
 
-const SearchResultsPortal = ({
-	isOpen,
-	inputRef,
-	affiliations,
-	onSelect,
-	showCreateOption,
-	searchTerm,
-	onCreateNew,
-	isCreating,
-}: SearchResultsPortalProps) => {
-	const portalElement = useState<HTMLElement>(() => {
-		const el = document.createElement("div");
-		el.style.position = "fixed";
-		el.style.zIndex = "9999";
-		return el;
-	})[0];
-	const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
-
-	// Append/remove portal element
-	useEffect(() => {
-		if (portalElement) {
-			document.body.appendChild(portalElement);
-			return () => {
-				if (document.body.contains(portalElement)) {
-					document.body.removeChild(portalElement);
-				}
-			};
-		}
-	}, [portalElement]);
-
-	// Update position when inputRef changes or when isOpen changes
-	useEffect(() => {
-		if (inputRef.current && isOpen) {
-			const updatePosition = () => {
-				if (!inputRef.current) return;
-				const rect = inputRef.current.getBoundingClientRect();
-				setPosition({
-					top: rect.bottom + window.scrollY,
-					left: rect.left + window.scrollX,
-					width: rect.width,
-				});
-			};
-
-			updatePosition();
-
-			window.addEventListener("scroll", updatePosition);
-			window.addEventListener("resize", updatePosition);
-
-			return () => {
-				window.removeEventListener("scroll", updatePosition);
-				window.removeEventListener("resize", updatePosition);
-			};
-		}
-	}, [inputRef, isOpen]);
-
-	if (!isOpen || !portalElement) return null;
-
-	return createPortal(
-		<div
-			className="fixed min-w-[200px] shadow-md z-[9999] rounded-md bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-			style={{
-				top: `${position.top}px`,
-				left: `${position.left}px`,
-				width: `${position.width}px`,
-			}}
-		>
-			<div className="relative w-full max-h-60 overflow-auto">
-				{affiliations.map((affiliation) => (
-					<AffiliationMenuItem
-						key={affiliation.id}
-						affiliation={affiliation}
-						onSelect={onSelect}
-					/>
-				))}
-				
-				{/* Create new affiliation option */}
-				{showCreateOption && (
-					<button
-						type="button"
-						onClick={onCreateNew}
-						disabled={isCreating}
-						className="w-full text-left px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border-t border-gray-200 dark:border-gray-600"
-					>
-						<span className="text-green-600 dark:text-green-400 flex items-center gap-2 text-sm">
-							{isCreating ? (
-								<>Creating...</>
-							) : (
-								<>
-									<Building2 className="h-4 w-4" />
-									Click to add "{toTitleCase(searchTerm)}" as an organisation/affiliation
-								</>
-							)}
-						</span>
-					</button>
-				)}
-			</div>
-		</div>,
-		portalElement
+const SelectedAffiliationDisplay = ({ affiliation, onClear }: SelectedAffiliationDisplayProps) => {
+	return (
+		<div className="relative flex items-center bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-2 h-11">
+			<Building2 className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mr-2" />
+			<span className="text-green-500 dark:text-green-400 flex-1 text-sm truncate">{affiliation.name}</span>
+			<button
+				type="button"
+				onClick={onClear}
+				className="ml-2 h-6 w-6 p-0 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+			>
+				<X className="size-4" />
+			</button>
+		</div>
 	);
 };
 
-const AffiliationMenuItem = ({
-	affiliation,
-	onSelect,
-}: {
+interface AffiliationMenuItemProps {
 	affiliation: IAffiliation;
 	onSelect: (affiliation: IAffiliation) => void;
-}) => {
-	const [isHovered, setIsHovered] = useState(false);
+	isHighlighted: boolean;
+}
 
+const AffiliationMenuItem = ({ affiliation, onSelect, isHighlighted }: AffiliationMenuItemProps) => {
 	return (
 		<button
 			type="button"
 			className={cn(
-				"w-full text-left px-3 py-2 transition-colors flex items-center gap-2",
-				isHovered ? "bg-gray-200 dark:bg-gray-600" : "transparent"
+				"w-full text-left px-3 py-2 transition-colors flex items-center gap-2 cursor-pointer",
+				isHighlighted && "bg-gray-200 dark:bg-gray-600"
 			)}
-			onClick={() => onSelect(affiliation)}
-			onMouseOver={() => setIsHovered(true)}
-			onMouseOut={() => setIsHovered(false)}
+			onMouseDown={(e) => {
+				e.stopPropagation();
+			}}
+			onClick={(e) => {
+				e.stopPropagation();
+				onSelect(affiliation);
+			}}
 		>
 			<Building2 className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-			<span className="text-sm text-green-600 dark:text-green-400 truncate">
-				{affiliation.name}
-			</span>
+			<span className="text-sm text-green-600 dark:text-green-400 truncate">{affiliation.name}</span>
 		</button>
 	);
 };
