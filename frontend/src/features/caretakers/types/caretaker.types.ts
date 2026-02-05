@@ -91,6 +91,7 @@ export interface ICaretakerRequest {
   reason: "leave" | "resignation" | "other";
   end_date?: string;
   notes?: string;
+  approve_immediately?: boolean; // Admin can approve immediately
 }
 
 // ============================================================================

@@ -98,6 +98,7 @@ export const requestCaretaker = async (
       reason: data.reason,
       end_date: data.end_date,
       notes: data.notes,
+      approve_immediately: data.approve_immediately,
     }
   );
 };
@@ -111,6 +112,17 @@ export const getPendingCaretakerRequests = async (
   userId: number
 ): Promise<IAdminTask[]> => {
   return apiClient.get<IAdminTask[]>(CARETAKER_ENDPOINTS.REQUESTS_LIST(userId));
+};
+
+/**
+ * Get outgoing caretaker requests for a user
+ * @param userId - User ID to get outgoing requests for
+ * @returns Array of pending AdminTask objects where user is primary_user
+ */
+export const getOutgoingCaretakerRequests = async (
+  userId: number
+): Promise<IAdminTask[]> => {
+  return apiClient.get<IAdminTask[]>(CARETAKER_ENDPOINTS.REQUESTS_OUTGOING(userId));
 };
 
 /**

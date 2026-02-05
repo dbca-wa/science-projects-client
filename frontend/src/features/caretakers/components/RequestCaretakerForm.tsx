@@ -84,9 +84,7 @@ export const RequestCaretakerForm = ({
 	onSuccess,
 }: IRequestCaretakerFormProps) => {
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-	const [showApproveDialog, setShowApproveDialog] = useState(false);
 	const [approveAsAdmin, setApproveAsAdmin] = useState(false);
-	const [pendingTaskId, setPendingTaskId] = useState<number | null>(null);
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
 	const authStore = useAuthStore();
@@ -94,7 +92,6 @@ export const RequestCaretakerForm = ({
 
 	const queryClient = useQueryClient();
 	const requestCaretakerMutation = useRequestCaretaker();
-	const approveTaskMutation = useApproveCaretakerTask();
 
 	// Get current user data to build caretaking chain
 	const { data: currentUser } = useCurrentUser();
@@ -166,6 +163,7 @@ export const RequestCaretakerForm = ({
 		const sanitizedData = sanitizeFormData(data, ["notes"]);
 
 		console.log("Submitting caretaker request with data:", sanitizedData);
+		console.log("Approve as admin:", approveAsAdmin);
 
 		requestCaretakerMutation.mutate(
 			{
@@ -176,72 +174,26 @@ export const RequestCaretakerForm = ({
 					? sanitizedData.endDate.toISOString().split("T")[0]
 					: undefined,
 				notes: sanitizedData.notes || undefined,
+				approve_immediately: approveAsAdmin, // Send flag to backend
 			},
 			{
 				onSuccess: (response) => {
-					console.log(
-						"Request created successfully. Response:",
-						response,
-					);
-					console.log("Response task_id:", response.task_id);
-					console.log("Is admin?", isAdmin);
-					console.log("Approve as admin?", approveAsAdmin);
-
+					console.log("Request created successfully. Response:", response);
 					setShowConfirmDialog(false);
 
-					// If admin wants to approve immediately, show approval dialog
-					if (isAdmin && approveAsAdmin && response.task_id) {
-						console.log("Setting pending task ID to:", response.task_id);
-						setPendingTaskId(response.task_id);
-						setShowApproveDialog(true);
-						// DO NOT invalidate queries yet - wait for admin decision
-					} else {
-						// Not approving as admin - invalidate queries to show pending request
-						if (authStore.user?.id) {
-							queryClient.invalidateQueries({
-								queryKey: caretakerKeys.check(
-									authStore.user.id,
-								),
-							});
-						}
-						form.reset();
-						setApproveAsAdmin(false);
-						onSuccess();
+					// Invalidate queries to refresh the UI
+					if (authStore.user?.id) {
+						queryClient.invalidateQueries({
+							queryKey: caretakerKeys.check(authStore.user.id),
+						});
 					}
+					
+					form.reset();
+					setApproveAsAdmin(false);
+					onSuccess();
 				},
 			},
 		);
-	};
-
-	const handleApprove = () => {
-		if (!pendingTaskId) {
-			console.error("Cannot approve: pendingTaskId is null");
-			return;
-		}
-
-		console.log("Approving task with ID:", pendingTaskId);
-
-		approveTaskMutation.mutate(pendingTaskId, {
-			onSuccess: () => {
-				console.log("Task approved successfully");
-				setShowApproveDialog(false);
-				setPendingTaskId(null);
-				form.reset();
-				setApproveAsAdmin(false);
-
-				// Invalidate queries to show the active caretaker
-				if (authStore.user?.id) {
-					queryClient.invalidateQueries({
-						queryKey: caretakerKeys.check(authStore.user.id),
-					});
-				}
-
-				onSuccess();
-			},
-			onError: (error: Error) => {
-				console.error("Failed to approve task:", error);
-			},
-		});
 	};
 
 	return (
@@ -500,8 +452,7 @@ export const RequestCaretakerForm = ({
 							Are you sure you want to request a caretaker?
 							{isAdmin && approveAsAdmin ? (
 								<span className="block mt-2 font-medium text-foreground">
-									You will be prompted to approve this request
-									immediately after submission.
+									This request will be approved immediately.
 								</span>
 							) : (
 								<span className="block mt-2">
@@ -511,81 +462,22 @@ export const RequestCaretakerForm = ({
 							)}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogFooter className="mt-4">
+						<AlertDialogCancel disabled={requestCaretakerMutation.isPending}>
+							Cancel
+						</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={handleConfirm}
+							disabled={requestCaretakerMutation.isPending}
 							className="dark:text-black"
 						>
 							{requestCaretakerMutation.isPending ? (
 								<>
 									<Loader2 className="mr-2 h-4 w-4 animate-spin " />
-									Submitting...
+									{approveAsAdmin ? "Creating & Approving..." : "Submitting..."}
 								</>
 							) : (
 								"Confirm Request"
-							)}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-
-			{/* Admin Approval Dialog */}
-			<AlertDialog
-				open={showApproveDialog}
-				onOpenChange={setShowApproveDialog}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>
-							Approve Caretaker Request
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							The caretaker request has been created successfully.
-							<span className="block mt-2 font-medium text-foreground">
-								Do you want to approve this request now as an
-								admin?
-							</span>
-							<span className="block mt-2 text-sm">
-								Approving will immediately assign the caretaker.
-								If you cancel, the request will remain pending
-								for later approval.
-							</span>
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel
-							onClick={() => {
-								setShowApproveDialog(false);
-								setPendingTaskId(null);
-								form.reset();
-								setApproveAsAdmin(false);
-
-								// Invalidate queries to show the pending request
-								if (authStore.user?.id) {
-									queryClient.invalidateQueries({
-										queryKey: caretakerKeys.check(
-											authStore.user.id,
-										),
-									});
-								}
-
-								onSuccess();
-							}}
-						>
-							Leave Pending
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={handleApprove}
-							className="bg-green-600 dark:hover:bg-green-800 hover:bg-green-700"
-						>
-							{approveTaskMutation.isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Approving...
-								</>
-							) : (
-								"Approve Now"
 							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>

@@ -194,12 +194,12 @@ export const OutgoingCaretakerRequest = ({ request, onCancel }: OutgoingCaretake
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
-            {isAdmin && (
+          {isAdmin ? (
+            <div className="flex flex-col md:flex-row gap-2 pt-2">
               <Button
                 onClick={handleApproveClick}
                 disabled={cancelMutation.isPending || approveMutation.isPending}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="w-full md:flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 {approveMutation.isPending ? (
                   <>
@@ -213,26 +213,47 @@ export const OutgoingCaretakerRequest = ({ request, onCancel }: OutgoingCaretake
                   </>
                 )}
               </Button>
-            )}
-            <Button
-              variant="outline"
-              onClick={handleCancelClick}
-              disabled={cancelMutation.isPending || approveMutation.isPending}
-              className={`${isAdmin ? 'flex-1' : 'w-full'} border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950`}
-            >
-              {cancelMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Cancelling...
-                </>
-              ) : (
-                <>
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel Request
-                </>
-              )}
-            </Button>
-          </div>
+              <Button
+                variant="outline"
+                onClick={handleCancelClick}
+                disabled={cancelMutation.isPending || approveMutation.isPending}
+                className="w-full md:flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                {cancelMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel Request
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                onClick={handleCancelClick}
+                disabled={cancelMutation.isPending}
+                className="w-full border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                {cancelMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel Request
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -277,7 +298,7 @@ export const OutgoingCaretakerRequest = ({ request, onCancel }: OutgoingCaretake
                 </span>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <AlertDialogFooter className="mt-4">
               <AlertDialogCancel disabled={approveMutation.isPending}>
                 Cancel
               </AlertDialogCancel>

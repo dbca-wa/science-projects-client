@@ -17,9 +17,10 @@ import {
   useCaretakerCheck,
   RequestCaretakerForm,
   PendingCaretakerRequest,
-  OutgoingCaretakerRequest,
   ActiveCaretaker,
   CaretakeesTable,
+  OutgoingRequestsList,
+  useOutgoingCaretakerRequests,
 } from "@/features/caretakers";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
@@ -50,6 +51,9 @@ const MyProfilePage = observer(() => {
     error: caretakerError,
     refetch: refetchCaretaker
   } = useCaretakerCheck();
+  
+  // Fetch outgoing requests to check if user has pending requests
+  const { data: outgoingRequests } = useOutgoingCaretakerRequests(user?.id || 0);
   
   // Modal state
   const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);
@@ -136,11 +140,6 @@ const MyProfilePage = observer(() => {
     refetchCaretaker();
   };
 
-  const handleCaretakerCancel = () => {
-    refetchUser();
-    refetchCaretaker();
-  };
-
   const handleCaretakerRemove = () => {
     refetchUser();
     refetchCaretaker();
@@ -160,31 +159,22 @@ const MyProfilePage = observer(() => {
       );
     }
 
-    // Show outgoing request if YOU requested someone to be YOUR caretaker
-    // (you are primary_user AND you are the requester)
-    if (caretakerData?.caretaker_request_object) {
-      const isMyRequest = caretakerData.caretaker_request_object.requester.id === user.id;
-      
-      if (isMyRequest) {
-        return (
-          <OutgoingCaretakerRequest 
-            request={caretakerData.caretaker_request_object}
-            onCancel={handleCaretakerCancel}
-          />
-        );
-      } else {
-        // Someone else made this request on your behalf (admin action)
-        // This is unusual but possible - treat as incoming
-        return (
-          <PendingCaretakerRequest 
-            request={caretakerData.caretaker_request_object}
-            onCancel={handleCaretakerCancel}
-          />
-        );
-      }
+    // Check if user has pending outgoing requests
+    const hasPendingRequests = outgoingRequests && outgoingRequests.length > 0;
+
+    // Show alert if user has pending outgoing requests
+    if (hasPendingRequests) {
+      return (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            You have a pending caretaker request. Please wait for it to be approved or cancel it before requesting a new caretaker.
+          </AlertDescription>
+        </Alert>
+      );
     }
 
-    // Show request form if no caretaker or requests
+    // Show request form if no caretaker and no pending requests
     return (
       <RequestCaretakerForm 
         userId={user.id}
@@ -371,12 +361,30 @@ const MyProfilePage = observer(() => {
                     {renderMyCaretakerSection()}
                   </section>
 
-                  {/* Caretaker Requests Section */}
+                  {/* Outgoing Request Section */}
+                  <Separator />
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-4">Outgoing Request</h2>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Pending caretaker request you have made.
+                    </p>
+                    {user && (
+                      <OutgoingRequestsList 
+                        userId={user.id}
+                        onRequestChange={() => {
+                          refetchUser();
+                          refetchCaretaker();
+                        }}
+                      />
+                    )}
+                  </section>
+
+                  {/* Incoming Request Section */}
                   {caretakerData?.become_caretaker_request_object && (
                     <>
                       <Separator />
                       <section>
-                        <h2 className="text-2xl font-semibold mb-4">Caretaker Request</h2>
+                        <h2 className="text-2xl font-semibold mb-4">Incoming Request</h2>
                         <p className="text-sm text-muted-foreground mb-4">
                           A user needs you to be their caretaker.
                         </p>

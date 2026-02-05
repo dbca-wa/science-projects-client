@@ -1,4 +1,3 @@
-
 /**
  * Caretaker API endpoints
  */
@@ -12,6 +11,7 @@ export const CARETAKER_ENDPOINTS = {
 
   // Caretaker requests
   REQUESTS_LIST: (userId: number) => `caretakers/requests?user_id=${userId}`,
+  REQUESTS_OUTGOING: (userId: number) => `caretakers/requests/outgoing?user_id=${userId}`,
   REQUESTS_CREATE: "caretakers/requests/create",
   REQUESTS_APPROVE: (requestId: number) => `caretakers/requests/${requestId}/approve`,
   REQUESTS_REJECT: (requestId: number) => `caretakers/requests/${requestId}/reject`,
@@ -33,4 +33,5 @@ export const caretakerKeys = {
   detail: (id: number) => [...caretakerKeys.details(), id] as const,
   check: (userId: number) => [...caretakerKeys.all, "check", userId] as const,
   pending: (userId: number) => [...caretakerKeys.all, "pending", userId] as const,
+  outgoing: (userId: number) => [...caretakerKeys.all, "outgoing", userId] as const,
 };

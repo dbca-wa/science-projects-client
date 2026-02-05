@@ -240,11 +240,11 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
 
           {/* Action Buttons - Show based on request type */}
           {isIncomingRequest && (
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-col md:flex-row gap-2 pt-2">
               <Button
                 onClick={handleApproveClick}
                 disabled={approveMutation.isPending || rejectMutation.isPending}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="w-full md:flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 {approveMutation.isPending ? (
                   <>
@@ -262,7 +262,7 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
                 variant="outline"
                 onClick={handleRejectClick}
                 disabled={approveMutation.isPending || rejectMutation.isPending}
-                className="flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                className="w-full md:flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
               >
                 {rejectMutation.isPending ? (
                   <>
@@ -279,7 +279,49 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
             </div>
           )}
 
-          {isOutgoingRequest && (
+          {/* Admin Approve + Cancel Button - Show for non-incoming requests if user is admin */}
+          {!isIncomingRequest && currentUser?.is_superuser && isOutgoingRequest && (
+            <div className="flex flex-col md:flex-row gap-2 pt-2">
+              <Button
+                onClick={handleApproveClick}
+                disabled={approveMutation.isPending || cancelMutation.isPending}
+                className="w-full md:flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                {approveMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Approving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Approve as Admin
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCancelClick}
+                disabled={approveMutation.isPending || cancelMutation.isPending}
+                className="w-full md:flex-1 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                {cancelMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel Request
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Cancel Only - Show for outgoing requests if user is NOT admin */}
+          {isOutgoingRequest && !currentUser?.is_superuser && (
             <div className="pt-2">
               <Button
                 variant="outline"
@@ -318,15 +360,34 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
       <AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve Caretaker Request</AlertDialogTitle>
+            <AlertDialogTitle>
+              {currentUser?.is_superuser && !isIncomingRequest 
+                ? "Approve Caretaker Request as Admin"
+                : "Approve Caretaker Request"
+              }
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve this caretaker request? You will become the caretaker for {userNeedingCaretaker.display_first_name} {userNeedingCaretaker.display_last_name} and be able to manage their projects.
+              {currentUser?.is_superuser && !isIncomingRequest ? (
+                <>
+                  Are you sure you want to approve this caretaker request? This will establish the caretaker relationship immediately.
+                  <span className="block mt-2 font-medium text-foreground">
+                    This will bypass the normal approval process.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Are you sure you want to approve this caretaker request? You will become the caretaker for {userNeedingCaretaker.display_first_name} {userNeedingCaretaker.display_last_name} and be able to manage their projects.
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={approveMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmApprove}
+              disabled={approveMutation.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
               {approveMutation.isPending ? (
@@ -335,7 +396,7 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
                   Approving...
                 </>
               ) : (
-                "Approve"
+                currentUser?.is_superuser && !isIncomingRequest ? "Approve as Admin" : "Approve"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -379,7 +440,7 @@ export const PendingCaretakerRequest = ({ request, onCancel }: IPendingCaretaker
               Are you sure you want to cancel this caretaker request? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel>Keep Request</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmCancel}

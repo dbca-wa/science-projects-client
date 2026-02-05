@@ -30,6 +30,11 @@ export const useCancelBecomeCaretakerRequest = () => {
         queryClient.invalidateQueries({
           queryKey: caretakerKeys.check(authStore.user.id),
         });
+        
+        // Invalidate outgoing requests for current user
+        queryClient.invalidateQueries({
+          queryKey: caretakerKeys.outgoing(authStore.user.id),
+        });
       }
 
       // Invalidate pending requests for the target user
