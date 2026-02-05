@@ -133,8 +133,9 @@ function DialogOverlay() {
 	const context = React.useContext(DialogContext);
 	if (!context) throw new Error("DialogOverlay must be used within a Dialog");
 
-	const { isClosing, shouldAnimate } = context;
+	const { isClosing, shouldAnimate, onOpenChange } = context;
 	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+	const overlayRef = React.useRef<HTMLDivElement>(null);
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
@@ -145,8 +146,18 @@ function DialogOverlay() {
 		return () => clearTimeout(timer);
 	}, [shouldAnimate]);
 
+	// Handle click on overlay to close dialog
+	const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		// Only close if clicking directly on the overlay (not on children)
+		if (e.target === overlayRef.current) {
+			onOpenChange(false);
+		}
+	};
+
 	return (
 		<div
+			ref={overlayRef}
+			onClick={handleOverlayClick}
 			className={cn(
 				"fixed inset-0 z-50 bg-black/50",
 				shouldAnimate && "transition-opacity duration-200",
@@ -184,30 +195,15 @@ function DialogContent({
 		return () => clearTimeout(timer);
 	}, [shouldAnimate]);
 
-	// Handle backdrop click to close
-	React.useEffect(() => {
-		const handleBackdropClick = (e: MouseEvent) => {
-			if (
-				contentRef.current &&
-				!contentRef.current.contains(e.target as Node)
-			) {
-				onOpenChange(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleBackdropClick);
-		return () => document.removeEventListener("mousedown", handleBackdropClick);
-	}, [onOpenChange]);
-
 	return (
 		<DialogPortal data-slot="dialog-portal">
 			<DialogOverlay />
-			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
 				<div
 					ref={contentRef}
 					data-slot="dialog-content"
 					className={cn(
-						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg",
+						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg pointer-events-auto",
 						shouldAnimate && "transition-all duration-200",
 						shouldAnimate && isOpening && "opacity-0 scale-95",
 						shouldAnimate && isClosing && "opacity-0 scale-95",

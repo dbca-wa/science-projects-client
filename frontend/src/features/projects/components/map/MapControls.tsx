@@ -111,7 +111,7 @@ const MapControlButtons = observer(() => {
 					onClick={handleMapFullscreen}
 					className={`flex-1 h-8 p-0 shadow-lg hover:shadow-xl transition-all ${
 						isMapFullscreen 
-							? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-950/50 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-950 dark:hover:border-blue-800' 
+							? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-900/80 dark:border-blue-700 dark:text-blue-200 dark:hover:bg-blue-800 dark:hover:border-blue-600' 
 							: 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
 					}`}
 					aria-label={isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"}

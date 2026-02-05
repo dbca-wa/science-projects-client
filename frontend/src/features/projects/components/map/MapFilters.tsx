@@ -9,7 +9,7 @@ import { debounce } from "@/shared/utils/common.utils";
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { BusinessAreaMultiSelect } from "@/shared/components/BusinessAreaMultiSelect";
-import { UserSearchDropdown } from "@/shared/components/user";
+import { UserCombobox } from "@/shared/components/user";
 
 interface MapFiltersProps {
   projectCount: number;
@@ -124,16 +124,11 @@ export const MapFilters = observer(({
 
           {/* User Filter with icon - SECOND on mobile, left on desktop */}
           <div className={`w-full order-2 ${!isFullscreen ? 'lg:order-1' : ''}`}>
-            <UserSearchDropdown
-              key={store.state.filters.user || "no-user"}
-              isRequired={false}
-              setUserFunction={handleUserChange}
-              label=""
+            <UserCombobox
+              value={store.state.filters.user || null}
+              onValueChange={handleUserChange}
               placeholder="Filter by user"
-              helperText=""
-              hideCannotFind={true}
               className="text-sm rounded-md"
-              preselectedUserPk={store.state.filters.user || undefined}
               showIcon={true}
             />
           </div>

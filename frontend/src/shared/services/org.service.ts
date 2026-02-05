@@ -14,6 +14,9 @@ const ORG_ENDPOINTS = {
   AFFILIATIONS: {
     LIST: "agencies/affiliations",
   },
+  AGENCIES: {
+    LIST: "agencies/list",
+  },
 } as const;
 
 /**

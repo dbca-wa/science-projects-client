@@ -77,7 +77,7 @@ export const getAllProjects = async (
 		queryParams.append("only_inactive", "true");
 	}
 
-	const url = `projects${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+	const url = `projects/list${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
 	return apiClient.get<ProjectListResponse>(url);
 };
 
@@ -96,7 +96,7 @@ export const getProjectById = async (
 export const createProject = async (
 	data: Partial<IProjectData>
 ): Promise<IProjectData> => {
-	return apiClient.post<IProjectData>("projects/", data);
+	return apiClient.post<IProjectData>("projects/list", data);
 };
 
 /**

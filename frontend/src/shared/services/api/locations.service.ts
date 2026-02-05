@@ -5,7 +5,7 @@ import type { OrganisedLocationData, ISimpleLocationData } from "@/shared/types/
  * Get all locations organized by area type
  */
 export const getAllLocations = async (): Promise<OrganisedLocationData> => {
-	const locationsData = await apiClient.get<ISimpleLocationData[]>("locations");
+	const locationsData = await apiClient.get<ISimpleLocationData[]>("locations/list");
 
 	// Organize locations based on their 'area_type'
 	const organizedLocations: OrganisedLocationData = {

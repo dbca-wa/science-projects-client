@@ -4,22 +4,22 @@
  */
 export const CARETAKER_ENDPOINTS = {
   // Caretaker relationships
-  LIST: "caretakers/",
-  DETAIL: (id: number) => `caretakers/${id}/`,
-  CREATE: "caretakers/",
-  UPDATE: (id: number) => `caretakers/${id}/`,
-  DELETE: (id: number) => `caretakers/${id}/`,
+  LIST: "caretakers/list",
+  DETAIL: (id: number) => `caretakers/${id}`,
+  CREATE: "caretakers",
+  UPDATE: (id: number) => `caretakers/${id}`,
+  DELETE: (id: number) => `caretakers/${id}`,
 
   // Caretaker requests
-  REQUESTS_LIST: (userId: number) => `caretakers/requests/?user_id=${userId}`,
-  REQUESTS_CREATE: "caretakers/requests/create/",
-  REQUESTS_APPROVE: (requestId: number) => `caretakers/requests/${requestId}/approve/`,
-  REQUESTS_REJECT: (requestId: number) => `caretakers/requests/${requestId}/reject/`,
-  REQUESTS_CANCEL: (requestId: number) => `caretakers/requests/${requestId}/cancel/`,
+  REQUESTS_LIST: (userId: number) => `caretakers/requests?user_id=${userId}`,
+  REQUESTS_CREATE: "caretakers/requests/create",
+  REQUESTS_APPROVE: (requestId: number) => `caretakers/requests/${requestId}/approve`,
+  REQUESTS_REJECT: (requestId: number) => `caretakers/requests/${requestId}/reject`,
+  REQUESTS_CANCEL: (requestId: number) => `caretakers/requests/${requestId}/cancel`,
 
   // Caretaker utilities
-  CHECK: "caretakers/check/",
-  ADMIN_SET: "caretakers/admin-set/",
+  CHECK: "caretakers/check",
+  ADMIN_SET: "caretakers/admin-set",
 } as const;
 
 /**

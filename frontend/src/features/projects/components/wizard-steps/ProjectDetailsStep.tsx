@@ -10,9 +10,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { UserSearchDropdown } from "@/shared/components/user";
+import { UserCombobox } from "@/shared/components/user";
 import { useRef } from "react";
-import type { BaseUserSearchRef } from "@/shared/components/user";
+import type { UserComboboxRef } from "@/shared/components/user";
 import { AlertCircle } from "lucide-react";
 
 /**
@@ -44,8 +44,8 @@ const ProjectDetailsStep = observer(() => {
 	const formData = wizardStore.state.formData.projectDetails;
 	const validation = wizardStore.state.validation[1]; // Step 1 is Project Details
 	const { data: businessAreas, isLoading: baLoading } = useBusinessAreas();
-	const leaderRef = useRef<BaseUserSearchRef>(null);
-	const custodianRef = useRef<BaseUserSearchRef>(null);
+	const leaderRef = useRef<UserComboboxRef>(null);
+	const custodianRef = useRef<UserComboboxRef>(null);
 
 	const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		wizardStore.setProjectDetails({ start_date: new Date(e.target.value) });
@@ -221,15 +221,14 @@ const ProjectDetailsStep = observer(() => {
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				{/* Project Leader */}
 				<div className="space-y-2">
-					<UserSearchDropdown
+					<UserCombobox
 						ref={leaderRef}
 						label="Project Leader"
 						placeholder="Search for a Project Leader"
 						helperText="The Project Leader"
 						isRequired={true}
-						setUserFunction={handleLeaderSelect}
-						preselectedUserPk={formData.project_leader || undefined}
-						hideCannotFind={true}
+						value={formData.project_leader || null}
+						onValueChange={handleLeaderSelect}
 						showIcon={true}
 						className="text-base"
 						wrapperClassName="space-y-2"
@@ -239,16 +238,15 @@ const ProjectDetailsStep = observer(() => {
 
 				{/* Data Custodian */}
 				<div className="space-y-2">
-					<UserSearchDropdown
+					<UserCombobox
 						ref={custodianRef}
 						label="Data Custodian"
 						placeholder="Search for a data custodian"
 						helperText="The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
 						isRequired={true}
-						setUserFunction={handleCustodianSelect}
-						preselectedUserPk={formData.data_custodian || undefined}
+						value={formData.data_custodian || null}
+						onValueChange={handleCustodianSelect}
 						isEditable={true}
-						hideCannotFind={true}
 						showIcon={true}
 						className="text-base"
 						wrapperClassName="space-y-2"

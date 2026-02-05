@@ -51,7 +51,7 @@ import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useCaretakingChain } from "../hooks/useCaretakingChain";
 import { useCaretakerCheck } from "../hooks/useCaretakerCheck";
-import { CaretakerUserSearch } from "./CaretakerUserSearch";
+import { UserCombobox } from "@/shared/components/user";
 import {
 	useRequestCaretaker,
 } from "../hooks/useRequestCaretaker";
@@ -387,9 +387,12 @@ export const RequestCaretakerForm = ({
 								<FormItem>
 									<FormLabel>Select Caretaker</FormLabel>
 									<FormControl>
-										<CaretakerUserSearch
-											onSelect={field.onChange}
-											excludeUserIds={ignoreArray} // Exclude current user + caretaking chain
+										<UserCombobox
+											value={field.value || null}
+											onValueChange={field.onChange}
+											excludeUserIds={ignoreArray}
+											placeholder="Search for a caretaker..."
+											onlyInternal={true}
 										/>
 									</FormControl>
 									<p className="text-sm text-muted-foreground mt-2">
