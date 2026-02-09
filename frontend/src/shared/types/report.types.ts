@@ -32,7 +32,6 @@ export interface IReportPDF {
 }
 
 export interface IReport {
-	old_id?: number;
 	id: number;
 	created_at?: Date;
 	updated_at?: Date | null;
@@ -51,7 +50,6 @@ export interface IReport {
 }
 
 export interface IReportCreation {
-	old_id?: number;
 	id?: number;
 	created_at?: Date;
 	updated_at?: Date | null;
