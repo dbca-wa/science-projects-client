@@ -2,7 +2,10 @@
 Agency service - Business logic for agency, branch, division, business area, and affiliation operations
 """
 
+import logging
+
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Q
 from rest_framework.exceptions import NotFound
 
@@ -14,6 +17,8 @@ from agencies.models import (
     DepartmentalService,
     Division,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AgencyService:
@@ -103,11 +108,48 @@ class AgencyService:
     # Branch operations
     @staticmethod
     def list_branches(search=None):
-        """List branches with optional search"""
-        queryset = Branch.objects.all()
+        """List branches with optional search and caching"""
+        # Don't cache search results (too variable)
         if search:
-            queryset = queryset.filter(Q(name__icontains=search))
-        return queryset.order_by("name")
+            queryset = Branch.objects.filter(Q(name__icontains=search))
+            return list(queryset.order_by("name"))
+
+        # Cache all branches (rarely changes, frequently accessed)
+        cache_key = "agency:all:branches"
+
+        try:
+            cached_branches = cache.get(cache_key)
+            if cached_branches is not None:
+                logger.debug("Cache hit for all branches")
+                # Return cached list directly to avoid database query
+                return cached_branches
+        except Exception as e:
+            logger.warning(f"Cache error for branches: {e}")
+
+        # Cache miss - query database
+        logger.debug("Cache miss for all branches")
+        queryset = Branch.objects.all().order_by("name")
+        branches = list(queryset)
+
+        # Cache for 1 hour
+        try:
+            cache.set(
+                cache_key, branches, timeout=settings.CACHE_TTL["agency_branches"]
+            )
+        except Exception as e:
+            logger.warning(f"Failed to cache branches: {e}")
+
+        return branches
+
+    @staticmethod
+    def invalidate_branches_cache():
+        """Invalidate the branches cache"""
+        cache_key = "agency:all:branches"
+        try:
+            cache.delete(cache_key)
+            logger.debug("Invalidated branches cache")
+        except Exception as e:
+            logger.warning(f"Failed to invalidate branches cache: {e}")
 
     @staticmethod
     def get_branch(pk):
@@ -121,7 +163,9 @@ class AgencyService:
     def create_branch(user, data):
         """Create new branch"""
         settings.LOGGER.info(f"{user} is creating branch")
-        return Branch.objects.create(**data)
+        branch = Branch.objects.create(**data)
+        AgencyService.invalidate_branches_cache()
+        return branch
 
     @staticmethod
     def update_branch(pk, user, data):
@@ -133,6 +177,7 @@ class AgencyService:
             setattr(branch, field, value)
         branch.save()
 
+        AgencyService.invalidate_branches_cache()
         return branch
 
     @staticmethod
@@ -141,6 +186,7 @@ class AgencyService:
         branch = AgencyService.get_branch(pk)
         settings.LOGGER.info(f"{user} is deleting branch {branch}")
         branch.delete()
+        AgencyService.invalidate_branches_cache()
 
     # Business Area operations
     @staticmethod
