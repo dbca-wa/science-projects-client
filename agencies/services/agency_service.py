@@ -121,8 +121,8 @@ class AgencyService:
             cached_branches = cache.get(cache_key)
             if cached_branches is not None:
                 logger.debug("Cache hit for all branches")
-                # Return QuerySet from cached list for consistency
-                return Branch.objects.filter(pk__in=[b.pk for b in cached_branches])
+                # Return cached list directly to avoid database query
+                return cached_branches
         except Exception as e:
             logger.warning(f"Cache error for branches: {e}")
 

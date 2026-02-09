@@ -405,6 +405,166 @@ class TestBranchService:
         # Assert
         assert not Branch.objects.filter(id=branch_id).exists()
 
+    def test_list_branches_caching_cache_miss(self, branch, db, settings):
+        """Test that list_branches caches results on cache miss"""
+        from django.core.cache import cache
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache",
+            }
+        }
+        cache.clear()
+
+        # Act - First call should cache
+        branches = AgencyService.list_branches()
+
+        # Assert - Results are correct
+        assert len(branches) == 1
+        assert branch in branches
+
+        # Assert - Cache was populated
+        cached = cache.get("agency:all:branches")
+        assert cached is not None
+        assert len(cached) == 1
+        assert branch in cached
+
+    def test_list_branches_caching_cache_hit(self, branch, db, settings):
+        """Test that list_branches returns cached results without database query"""
+        from django.core.cache import cache
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache-2",
+            }
+        }
+        cache.clear()
+        AgencyService.list_branches()  # Populate cache
+
+        # Act - Second call should use cache
+        with CaptureQueriesContext(connection) as queries:
+            branches = AgencyService.list_branches()
+
+        # Assert - Results are correct
+        assert len(branches) == 1
+        assert branch in branches
+
+        # Assert - No database queries were made (cache hit)
+        # Note: There might be 0 queries if cache works perfectly
+        # or minimal queries for session/auth, but NOT a Branch query
+        branch_queries = [
+            q for q in queries.captured_queries if "agencies_branch" in q["sql"]
+        ]
+        assert len(branch_queries) == 0, "Cache hit should not query Branch table"
+
+    def test_list_branches_search_bypasses_cache(self, branch, db, settings):
+        """Test that search queries bypass cache"""
+        from django.core.cache import cache
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache-3",
+            }
+        }
+        cache.clear()
+
+        # Act - Search should not cache
+        branches = AgencyService.list_branches(search="Test")
+
+        # Assert - Results are correct
+        assert len(branches) == 1
+        assert branch in branches
+
+        # Assert - Cache was NOT populated (search bypasses cache)
+        cached = cache.get("agency:all:branches")
+        assert cached is None
+
+    def test_create_branch_invalidates_cache(self, agency, user, db, settings):
+        """Test that creating a branch invalidates the cache"""
+        from django.core.cache import cache
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache-4",
+            }
+        }
+        cache.clear()
+        AgencyService.list_branches()  # Populate cache
+        assert cache.get("agency:all:branches") is not None
+
+        # Act - Create new branch
+        data = {
+            "agency": agency,
+            "name": "New Branch",
+            "manager": user,
+        }
+        AgencyService.create_branch(user, data)
+
+        # Assert - Cache was invalidated
+        cached = cache.get("agency:all:branches")
+        assert cached is None
+
+    def test_update_branch_invalidates_cache(self, branch, user, db, settings):
+        """Test that updating a branch invalidates the cache"""
+        from django.core.cache import cache
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache-5",
+            }
+        }
+        cache.clear()
+        AgencyService.list_branches()  # Populate cache
+        assert cache.get("agency:all:branches") is not None
+
+        # Act - Update branch
+        data = {"name": "Updated Branch"}
+        AgencyService.update_branch(branch.id, user, data)
+
+        # Assert - Cache was invalidated
+        cached = cache.get("agency:all:branches")
+        assert cached is None
+
+    def test_delete_branch_invalidates_cache(self, agency, user, db, settings):
+        """Test that deleting a branch invalidates the cache"""
+        from django.core.cache import cache
+
+        # Arrange - Use LocMemCache for this test
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "unique-test-cache-6",
+            }
+        }
+        # Create a branch and populate cache
+        branch = Branch.objects.create(
+            agency=agency,
+            name="Test Branch",
+            manager=user,
+        )
+        cache.clear()
+        AgencyService.list_branches()  # Populate cache
+        assert cache.get("agency:all:branches") is not None
+
+        # Act - Delete branch
+        AgencyService.delete_branch(branch.id, user)
+
+        # Assert - Cache was invalidated
+        cached = cache.get("agency:all:branches")
+        assert cached is None
+
 
 class TestBusinessAreaService:
     """Tests for business area service operations"""
