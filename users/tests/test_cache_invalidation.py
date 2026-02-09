@@ -100,7 +100,6 @@ class TestUserCacheInvalidation:
         user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
-            password="testpass123",
         )
         UserService.get_user(user.pk)
         assert cache.get(f"user:{user.pk}:profile") is not None
@@ -225,12 +224,10 @@ class TestUserCacheInvalidation:
         user1 = User.objects.create_user(
             username="user1",
             email="user1@example.com",
-            password="pass123",
         )
         user2 = User.objects.create_user(
             username="user2",
             email="user2@example.com",
-            password="pass123",
         )
 
         UserService.get_user(user1.pk)
