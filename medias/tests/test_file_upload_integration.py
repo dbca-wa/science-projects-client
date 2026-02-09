@@ -404,8 +404,8 @@ class TestFileSizeValidation:
 
     def test_oversized_pdf_rejected(self, user, annual_report):
         """Test that oversized PDF is rejected."""
-        # Create 11MB PDF file (exceeds 10MB limit)
-        large_content = b"%PDF-1.4\n" + b"\x00" * (11 * 1024 * 1024)
+        # Create 101MB PDF file (exceeds 100MB limit for annual reports)
+        large_content = b"%PDF-1.4\n" + b"\x00" * (101 * 1024 * 1024)
         large_file = SimpleUploadedFile(
             "large.pdf", large_content, content_type="application/pdf"
         )
