@@ -2,8 +2,11 @@
 User service for core user operations
 """
 
+import logging
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
@@ -11,6 +14,8 @@ from django.utils.crypto import get_random_string
 from rest_framework.exceptions import NotFound, ValidationError
 
 from users.models import User
+
+logger = logging.getLogger(__name__)
 
 
 class UserService:
@@ -212,7 +217,7 @@ class UserService:
     @staticmethod
     def get_user(user_id):
         """
-        Get user by ID
+        Get user by ID with caching
 
         Args:
             user_id: User ID
@@ -223,8 +228,20 @@ class UserService:
         Raises:
             NotFound: If user doesn't exist
         """
+        cache_key = settings.CACHE_KEYS["user_profile"].format(user_id=user_id)
+
         try:
-            return (
+            cached_user = cache.get(cache_key)
+            if cached_user is not None:
+                logger.debug(f"Cache hit for user {user_id} profile")
+                return cached_user
+        except Exception as e:
+            logger.warning(f"Cache error for user {user_id} profile: {e}")
+
+        # Cache miss - query database
+        logger.debug(f"Cache miss for user {user_id} profile")
+        try:
+            user = (
                 User.objects.select_related(
                     "profile",
                     "work",
@@ -235,8 +252,31 @@ class UserService:
                 )
                 .get(pk=user_id)
             )
+
+            # Cache for 10 minutes
+            try:
+                cache.set(cache_key, user, timeout=settings.CACHE_TTL["user_profile"])
+            except Exception as e:
+                logger.warning(f"Failed to cache user {user_id} profile: {e}")
+
+            return user
         except User.DoesNotExist:
             raise NotFound(f"User {user_id} not found")
+
+    @staticmethod
+    def invalidate_user_profile_cache(user_id):
+        """
+        Invalidate cache for a specific user's profile
+
+        Args:
+            user_id: User ID to invalidate cache for
+        """
+        cache_key = settings.CACHE_KEYS["user_profile"].format(user_id=user_id)
+        try:
+            cache.delete(cache_key)
+            logger.debug(f"Invalidated cache for user {user_id} profile")
+        except Exception as e:
+            logger.warning(f"Failed to invalidate cache for user {user_id}: {e}")
 
     @staticmethod
     @transaction.atomic
@@ -287,6 +327,10 @@ class UserService:
                 setattr(user, field, value)
 
         user.save()
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user
 
     @staticmethod
@@ -300,6 +344,10 @@ class UserService:
         """
         user = UserService.get_user(user_id)
         settings.LOGGER.info(f"Deleting user {user}")
+
+        # Invalidate user profile cache before deletion
+        UserService.invalidate_user_profile_cache(user_id)
+
         user.delete()
 
     @staticmethod
@@ -319,6 +367,10 @@ class UserService:
         user.save()
 
         settings.LOGGER.info(f"Toggled active status for {user}: {user.is_active}")
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user
 
     @staticmethod
@@ -338,6 +390,10 @@ class UserService:
         user.save()
 
         settings.LOGGER.info(f"Toggled admin status for {user}: {user.is_superuser}")
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user
 
     @staticmethod

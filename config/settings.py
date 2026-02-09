@@ -21,6 +21,7 @@ env.read_env(
 # Environ detection
 ENVIRONMENT = env("ENVIRONMENT", default="development")
 DEBUG = ENVIRONMENT == "development"
+TESTING = os.environ.get("PYTEST_RUNNING", "0") == "1"
 
 # Core settings
 SECRET_KEY = env("SECRET_KEY")
@@ -245,6 +246,10 @@ THIRD_PARTY_APPS = [
     "corsheaders",
 ]
 
+# Add Django Debug Toolbar in development (but not in tests)
+if DEBUG and not os.environ.get("PYTEST_RUNNING"):
+    THIRD_PARTY_APPS.append("debug_toolbar")
+
 CUSTOM_APPS = [
     "quotes.apps.QuotesConfig",
     "common.apps.CommonConfig",
@@ -275,6 +280,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Add Django Debug Toolbar middleware in development (but not in tests)
+if DEBUG and not TESTING:
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -315,6 +324,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+# endregion ========================================================================================
+
+# region Cache Configuration ======================================================
+# Import cache keys and TTL values (needed by services)
+from config.cache_settings import CACHE_KEYS, CACHE_TTL  # noqa: E402, F401
+
+# Use dummy cache for tests, Redis for production/development
+if os.environ.get("PYTEST_RUNNING"):
+    # Dummy cache for tests (no Redis required)
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
+else:
+    # Redis cache for production/development
+    from config.cache_settings import CACHES  # noqa: E402, F401
 
 # endregion ========================================================================================
 
@@ -406,5 +433,39 @@ LOGGING = {
 }
 
 LOGGER = logging.getLogger(__name__)
+
+# endregion ========================================================================================
+
+# region Django Debug Toolbar (Development Only) ======================================
+if DEBUG:
+    # Internal IPs for Debug Toolbar
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        "localhost",
+    ]
+
+    # Debug Toolbar configuration
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
+        "SHOW_COLLAPSED": True,
+        "SHOW_TEMPLATE_CONTEXT": True,
+    }
+
+    # Panels to display
+    DEBUG_TOOLBAR_PANELS = [
+        "debug_toolbar.panels.history.HistoryPanel",
+        "debug_toolbar.panels.versions.VersionsPanel",
+        "debug_toolbar.panels.timer.TimerPanel",
+        "debug_toolbar.panels.settings.SettingsPanel",
+        "debug_toolbar.panels.headers.HeadersPanel",
+        "debug_toolbar.panels.request.RequestPanel",
+        "debug_toolbar.panels.sql.SQLPanel",
+        "debug_toolbar.panels.staticfiles.StaticFilesPanel",
+        "debug_toolbar.panels.templates.TemplatesPanel",
+        "debug_toolbar.panels.cache.CachePanel",
+        "debug_toolbar.panels.signals.SignalsPanel",
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+        "debug_toolbar.panels.profiling.ProfilingPanel",
+    ]
 
 # endregion ========================================================================================

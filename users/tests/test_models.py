@@ -111,18 +111,14 @@ class TestUserModel:
         assert "User" in result
         assert "T." in result
 
-    def test_get_image_with_avatar(self, user, db):
+    def test_get_image_with_avatar(self, user, mock_image, db):
         """Test getting user image when avatar exists"""
         # Arrange
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
         from medias.models import UserAvatar
 
         UserAvatar.objects.create(
             user=user,
-            file=SimpleUploadedFile(
-                "test.jpg", b"file_content", content_type="image/jpeg"
-            ),
+            file=mock_image,
         )
 
         # Act

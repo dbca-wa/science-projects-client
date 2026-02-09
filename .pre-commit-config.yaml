@@ -97,6 +97,18 @@ repos:
   #         - types-requests
   #         - types-python-dateutil
 
+  # Final summary (runs after all other checks)
+  - repo: local
+    hooks:
+      - id: commit-summary
+        name: Commit Summary
+        entry: ./.pre-commit-confirm-wrapper.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+        verbose: true
+
 # Global settings
 default_language_version:
   python: python3.13

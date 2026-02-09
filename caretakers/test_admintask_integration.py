@@ -7,7 +7,7 @@ with the new caretakers.models.Caretaker model.
 
 from datetime import timedelta
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from adminoptions.models import AdminTask
@@ -229,6 +229,14 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         )
         self.assertEqual(caretaking_relationships.count(), 2)
 
+    @override_settings(
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "test-cache",
+            }
+        }
+    )
     def test_caretaker_cache_clearing_on_save(self):
         """Test that cache is cleared when caretaker is saved"""
         from django.core.cache import cache
@@ -262,6 +270,14 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertIsNone(cache.get(f"caretakers_{self.caretaker_user.pk}"))
         self.assertIsNone(cache.get(f"caretaking_{self.caretaker_user.pk}"))
 
+    @override_settings(
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "test-cache",
+            }
+        }
+    )
     def test_caretaker_cache_clearing_on_delete(self):
         """Test that cache is cleared when caretaker is deleted"""
         from django.core.cache import cache
