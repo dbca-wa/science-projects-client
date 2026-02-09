@@ -1,11 +1,22 @@
 node_modules
 dist
+.old
 .docs
+.backup
 .vscode
 README.md
-*.env
+# Environment files (but keep .env.example)
+.env
+.env.local
+.env.*.local
 *.unlighthouse/*
 *.DS_Store
 .vscode
 **/.vite.config.ts.timestamp*
 .DS_Store
+from_github
+to_be_implemented
+.guide
+.docs
+backend
+docs/AdjustmentDuringRefactor.md

@@ -1,0 +1,6 @@
+# Components directory for dashboard feature
+# Will contain:
+# - MyTasksSection.tsx
+# - DocumentTaskCard.tsx
+# - EndorsementTaskCard.tsx
+# - SectionDivider.tsx
