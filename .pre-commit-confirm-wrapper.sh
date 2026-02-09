@@ -59,28 +59,6 @@ else
     echo ""
 fi
 
-# If checks passed, run tests
-if [ $ISSUES_FOUND -eq 0 ]; then
-    echo -e "${BLUE}▶ Running test suite...${NC}"
-    echo ""
-
-    if command -v poetry &> /dev/null; then
-        if poetry run pytest --maxfail=5 -q; then
-            echo ""
-            echo -e "${GREEN}✓ Test suite passed${NC}"
-            echo ""
-        else
-            echo ""
-            echo -e "${RED}✗ Test suite FAILED${NC}"
-            echo ""
-            ISSUES_FOUND=1
-        fi
-    else
-        echo -e "${YELLOW}⚠ Poetry not found, skipping tests${NC}"
-        echo ""
-    fi
-fi
-
 # Final summary
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║         Final Summary                                      ║${NC}"
@@ -88,13 +66,15 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 if [ $ISSUES_FOUND -eq 0 ]; then
-    echo -e "${GREEN}✓ All checks and tests passed! Proceeding with commit...${NC}"
+    echo -e "${GREEN}✓ All checks passed! Proceeding with commit...${NC}"
+    echo ""
+    echo -e "${YELLOW}Note: Full test suite will run in CI/CD pipeline${NC}"
     echo ""
     echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
     echo ""
     exit 0
 else
-    echo -e "${RED}✗ Checks or tests failed! Please fix the issues above before committing.${NC}"
+    echo -e "${RED}✗ Checks failed! Please fix the issues above before committing.${NC}"
     echo ""
     echo -e "${YELLOW}To bypass these checks (not recommended), use:${NC}"
     echo -e "${YELLOW}  git commit --no-verify${NC}"
