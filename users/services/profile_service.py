@@ -8,6 +8,7 @@ from django.db.models import Q
 from rest_framework.exceptions import NotFound, ValidationError
 
 from users.models import PublicStaffProfile, User, UserProfile
+from users.services.user_service import UserService
 
 
 class ProfileService:
@@ -297,6 +298,10 @@ class ProfileService:
             setattr(profile, field, value)
 
         profile.save()
+
+        # Invalidate user profile cache (UserProfile is cached via select_related)
+        UserService.invalidate_user_profile_cache(profile.user_id)
+
         return profile
 
     @staticmethod
@@ -323,4 +328,8 @@ class ProfileService:
             setattr(user, field, value)
 
         user.save()
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user

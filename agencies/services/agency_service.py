@@ -112,7 +112,7 @@ class AgencyService:
         # Don't cache search results (too variable)
         if search:
             queryset = Branch.objects.filter(Q(name__icontains=search))
-            return queryset.order_by("name")
+            return list(queryset.order_by("name"))
 
         # Cache all branches (rarely changes, frequently accessed)
         cache_key = "agency:all:branches"
@@ -139,7 +139,7 @@ class AgencyService:
         except Exception as e:
             logger.warning(f"Failed to cache branches: {e}")
 
-        return queryset
+        return branches
 
     @staticmethod
     def invalidate_branches_cache():

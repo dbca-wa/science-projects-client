@@ -323,7 +323,7 @@ class TestBranchService:
         branches = AgencyService.list_branches()
 
         # Assert
-        assert branches.count() == 1
+        assert len(branches) == 1
         assert branch in branches
 
     def test_list_branches_with_search(self, branch, db):
@@ -332,7 +332,7 @@ class TestBranchService:
         branches = AgencyService.list_branches(search="Test")
 
         # Assert
-        assert branches.count() == 1
+        assert len(branches) == 1
         assert branch in branches
 
     def test_list_branches_with_search_no_results(self, branch, db):
@@ -341,7 +341,7 @@ class TestBranchService:
         branches = AgencyService.list_branches(search="NonExistent")
 
         # Assert
-        assert branches.count() == 0
+        assert len(branches) == 0
 
     def test_list_branches_case_insensitive_search(self, branch, db):
         """Test listing branches with case-insensitive search"""
@@ -349,7 +349,7 @@ class TestBranchService:
         branches = AgencyService.list_branches(search="test")
 
         # Assert
-        assert branches.count() == 1
+        assert len(branches) == 1
         assert branch in branches
 
     def test_get_branch(self, branch, db):

@@ -76,6 +76,7 @@ class UpdatePersonalInformation(APIView):
         # Get the user
         try:
             from users.models import User
+            from users.services.user_service import UserService
 
             user = User.objects.select_related("profile", "contact").get(pk=pk)
         except User.DoesNotExist:
@@ -87,6 +88,9 @@ class UpdatePersonalInformation(APIView):
         if "display_last_name" in request.data:
             user.display_last_name = request.data["display_last_name"]
         user.save()
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(pk)
 
         # Update profile fields (title)
         if "title" in request.data and hasattr(user, "profile") and user.profile:
@@ -173,6 +177,7 @@ class UpdateMembership(APIView):
         # Get the user by pk
         try:
             from users.models import User
+            from users.services.user_service import UserService
 
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -184,6 +189,10 @@ class UpdateMembership(APIView):
             for field, value in serializer.validated_data.items():
                 setattr(work, field, value)
             work.save()
+
+            # Invalidate user profile cache (UserWork is cached via select_related)
+            UserService.invalidate_user_profile_cache(pk)
+
             result = UpdateMembershipSerializer(work)
             return Response(result.data, status=HTTP_202_ACCEPTED)
 
