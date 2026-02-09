@@ -367,6 +367,10 @@ class UserService:
         user.save()
 
         settings.LOGGER.info(f"Toggled active status for {user}: {user.is_active}")
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user
 
     @staticmethod
@@ -386,6 +390,10 @@ class UserService:
         user.save()
 
         settings.LOGGER.info(f"Toggled admin status for {user}: {user.is_superuser}")
+
+        # Invalidate user profile cache
+        UserService.invalidate_user_profile_cache(user_id)
+
         return user
 
     @staticmethod
