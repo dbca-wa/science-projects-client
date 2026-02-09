@@ -1,6 +1,6 @@
 #!/bin/bash
-# Pre-commit confirmation wrapper
-# Runs all checks and prompts user to confirm commit
+# Pre-commit summary wrapper
+# Runs all checks and displays a summary (blocking on failures)
 
 set -e
 
@@ -14,8 +14,12 @@ NC='\033[0m' # No Colour
 # Track if any issues were found
 ISSUES_FOUND=0
 
+# Force output to stderr so it shows in pre-commit
+exec 1>&2
+
+echo ""
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║         Running Pre-Commit Checks                          ║${NC}"
+echo -e "${BLUE}║         Pre-Commit Check Summary                           ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -30,7 +34,7 @@ run_check() {
         echo -e "${GREEN}✓ ${check_name} passed${NC}"
         echo ""
     else
-        echo -e "${YELLOW}⚠ ${check_name} found issues:${NC}"
+        echo -e "${RED}✗ ${check_name} FAILED:${NC}"
         cat /tmp/precommit_output.txt
         echo ""
         ISSUES_FOUND=1
@@ -55,52 +59,25 @@ else
     echo ""
 fi
 
-# Summary
+# Final summary
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║         Pre-Commit Check Summary                           ║${NC}"
+echo -e "${BLUE}║         Final Summary                                      ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 if [ $ISSUES_FOUND -eq 0 ]; then
-    echo -e "${GREEN}✓ All checks passed!${NC}"
+    echo -e "${GREEN}✓ All checks passed! Proceeding with commit...${NC}"
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo ""
+    exit 0
 else
-    echo -e "${YELLOW}⚠ Some checks found issues (see above)${NC}"
+    echo -e "${RED}✗ Checks failed! Please fix the issues above before committing.${NC}"
+    echo ""
+    echo -e "${YELLOW}To bypass these checks (not recommended), use:${NC}"
+    echo -e "${YELLOW}  git commit --no-verify${NC}"
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo ""
+    exit 1
 fi
-
-echo ""
-echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
-echo ""
-
-# Prompt for confirmation
-echo -e "${YELLOW}Do you want to proceed with the commit?${NC}"
-echo -e "  ${GREEN}y${NC} or ${GREEN}yes${NC} - Proceed with commit"
-echo -e "  ${RED}n${NC}, ${RED}no${NC}, ${RED}q${NC}, or ${RED}Ctrl+C${NC} - Cancel commit"
-echo ""
-echo -n "Your choice: "
-
-# Read user input from terminal directly (no timeout for now to debug)
-read -r response < /dev/tty
-
-# Convert to lowercase
-response=$(echo "$response" | tr '[:upper:]' '[:lower:]')
-
-case "$response" in
-    y|yes)
-        echo ""
-        echo -e "${GREEN}✓ Proceeding with commit...${NC}"
-        echo ""
-        exit 0
-        ;;
-    n|no|q|quit)
-        echo ""
-        echo -e "${RED}✗ Commit cancelled by user${NC}"
-        echo ""
-        exit 1
-        ;;
-    *)
-        echo ""
-        echo -e "${RED}✗ Invalid response. Commit cancelled.${NC}"
-        echo ""
-        exit 1
-        ;;
-esac
