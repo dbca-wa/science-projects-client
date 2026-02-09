@@ -1,15 +1,14 @@
 name: "Test Suite and Coverage"
 
 on:
-  # Run on pull requests
+  # Run on pull requests (primary testing)
   pull_request:
     branches: [main, develop]
 
-  # Run on pushes to main and develop branches
-  # main: for Codecov upload after merge
-  # develop: for continuous testing
+  # Run on pushes to develop for continuous testing
+  # Note: Pushes to main are skipped since tests already ran on the PR
   push:
-    branches: [main, develop]
+    branches: [develop]
 
 permissions:
   contents: write  # Required for pushing to badges branch
@@ -353,59 +352,6 @@ jobs:
           # Verify minimum coverage
           poetry run coverage report --fail-under=80
 
-      - name: Update README with coverage badge
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Read coverage percentage
-          COVERAGE=$(cat coverage-percentage.txt)
-
-          # Determine badge colour
-          if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
-            COLOR="brightgreen"
-          elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
-            COLOR="green"
-          elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
-            COLOR="yellow"
-          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
-            COLOR="orange"
-          else
-            COLOR="red"
-          fi
-
-          # Create new badge markdown
-          NEW_BADGE="![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})"
-
-          # Update README.md (replace the coverage badge line)
-          # Pattern matches both integer (84) and decimal (84.52) percentages
-          sed -i "s|!\[Coverage\](https://img.shields.io/badge/coverage-[0-9.]*%25-[a-z]*)|${NEW_BADGE}|g" README.md
-
-          echo "Updated coverage badge to: ${NEW_BADGE}"
-
-          # Check if there are changes
-          if git diff --quiet README.md; then
-            echo "No changes to README.md"
-          else
-            echo "README.md updated with new coverage badge"
-          fi
-
-      - name: Commit and push README changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Check if there are changes to commit
-          if git diff --quiet README.md; then
-            echo "✅ No changes to commit"
-          else
-            # Commit and push
-            git add README.md
-            git commit -m "chore: update coverage badge to $(cat coverage-percentage.txt)% [skip ci]"
-            git push origin main
-            echo "✅ Coverage badge updated in README"
-          fi
-
       - name: Upload combined coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -427,3 +373,5 @@ jobs:
 
           echo "🎯 Minimum coverage: 80%" >> $GITHUB_STEP_SUMMARY
           echo "⚡ Sharding reduces wall time by ~75%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Coverage badge updates on tagged releases only" >> $GITHUB_STEP_SUMMARY
