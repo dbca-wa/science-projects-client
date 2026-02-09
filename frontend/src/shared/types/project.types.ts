@@ -107,7 +107,6 @@ export interface IBaseProjectDetails {
 // Student Project Details
 export interface IStudentProjectDetails {
 	id: number;
-	old_id: number | null;
 	level: string;
 	organisation: string;
 	project: ISmallProject;
@@ -116,7 +115,6 @@ export interface IStudentProjectDetails {
 // External Project Details
 export interface IExternalProjectDetails {
 	id: number;
-	old_id: number | null;
 	project: ISmallProject;
 	aims: string | null;
 	budget: string | null;

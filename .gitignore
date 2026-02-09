@@ -5,7 +5,10 @@ dist
 .backup
 .vscode
 README.md
-*.env
+# Environment files (but keep .env.example)
+.env
+.env.local
+.env.*.local
 *.unlighthouse/*
 *.DS_Store
 .vscode

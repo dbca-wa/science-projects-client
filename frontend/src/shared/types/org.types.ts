@@ -22,7 +22,6 @@ export interface IAffiliation {
 
 export interface IBranch {
 	id: number;
-	old_id?: number;
 
 	agency: number;
 	name: string;
@@ -35,14 +34,12 @@ export interface IDepartmentalService {
 	name: string;
 	director?: number;
 	id: number;
-	old_id?: number;
 }
 
 // BUSINESS AREA ============================================================================
 
 export interface IBusinessAreaUpdate {
 	agency?: number;
-	old_id?: number;
 	id?: number;
 	slug?: string;
 	division?: IDivision;
@@ -58,7 +55,6 @@ export interface IBusinessAreaUpdate {
 
 export interface IBusinessArea {
 	agency?: number;
-	old_id?: number;
 	id?: number;
 	slug?: string;
 	division?: IDivision | number;
@@ -76,7 +72,6 @@ export interface IBusinessArea {
 
 export interface IBusinessAreaCreate {
 	agency?: number;
-	old_id?: number;
 	id?: number;
 	slug?: string;
 	division?: number;
@@ -100,7 +95,6 @@ export interface BusinessAreaImage {
 
 export interface IDivision {
 	id: number;
-	old_id?: number;
 	name: string;
 	slug: string;
 	director: number;
@@ -150,7 +144,6 @@ export interface IProjectAreas {
 }
 
 export interface IAddLocationForm {
-	old_id?: number;
 	id: number;
 	name: string;
 	area_type: string;
