@@ -2,9 +2,11 @@
 Project service - Core project operations
 """
 
+import logging
 import os
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import transaction
@@ -14,9 +16,105 @@ from rest_framework.exceptions import NotFound
 
 from ..models import Project
 
+logger = logging.getLogger(__name__)
+
 
 class ProjectService:
     """Business logic for project operations"""
+
+    @staticmethod
+    def get_user_projects(user_id):
+        """
+        Get projects for a specific user with caching
+
+        Args:
+            user_id: User ID to get projects for
+
+        Returns:
+            QuerySet of Project objects for the user
+        """
+        cache_key = settings.CACHE_KEYS["user_projects"].format(user_id=user_id)
+
+        try:
+            # Try cache first
+            cached_projects = cache.get(cache_key)
+            if cached_projects is not None:
+                logger.debug(f"Cache hit for user {user_id} projects")
+                return cached_projects
+        except Exception as e:
+            logger.warning(f"Cache error for user {user_id} projects: {e}")
+            # Fall through to database query
+
+        # Cache miss - query database
+        logger.debug(f"Cache miss for user {user_id} projects")
+        projects = (
+            Project.objects.filter(members__user_id=user_id)
+            .select_related(
+                "business_area",
+                "business_area__division",
+                "business_area__division__director",
+                "business_area__division__approver",
+                "business_area__leader",
+                "business_area__caretaker",
+                "business_area__finance_admin",
+                "business_area__data_custodian",
+                "business_area__image",
+                "image",
+                "image__uploader",
+                "area",
+            )
+            .prefetch_related(
+                "members",
+                "members__user",
+                "members__user__profile",
+                "members__user__work",
+                "members__user__work__business_area",
+                "members__user__caretakers",
+                "members__user__caretaking_for",
+                "business_area__division__directorate_email_list",
+                "admintasks",
+            )
+            .distinct()
+        )
+
+        # Convert to list for caching
+        projects_list = list(projects)
+
+        # Cache for 5 minutes
+        try:
+            cache.set(
+                cache_key, projects_list, timeout=settings.CACHE_TTL["user_projects"]
+            )
+        except Exception as e:
+            logger.warning(f"Failed to cache user {user_id} projects: {e}")
+
+        return projects_list
+
+    @staticmethod
+    def invalidate_user_projects_cache(user_id):
+        """
+        Invalidate cache for a specific user's projects
+
+        Args:
+            user_id: User ID to invalidate cache for
+        """
+        cache_key = settings.CACHE_KEYS["user_projects"].format(user_id=user_id)
+        try:
+            cache.delete(cache_key)
+            logger.debug(f"Invalidated cache for user {user_id} projects")
+        except Exception as e:
+            logger.warning(f"Failed to invalidate cache for user {user_id}: {e}")
+
+    @staticmethod
+    def invalidate_project_member_caches(project):
+        """
+        Invalidate cache for all members of a project
+
+        Args:
+            project: Project instance
+        """
+        for member in project.members.all():
+            ProjectService.invalidate_user_projects_cache(member.user_id)
 
     @staticmethod
     def list_projects(user, filters=None):
@@ -330,6 +428,10 @@ class ProjectService:
                 setattr(project, field, value)
 
         project.save()
+
+        # Invalidate cache for all project members
+        ProjectService.invalidate_project_member_caches(project)
+
         return project
 
     @staticmethod
@@ -344,6 +446,10 @@ class ProjectService:
         """
         project = ProjectService.get_project(pk)
         settings.LOGGER.info(f"{user} is deleting project: {project}")
+
+        # Invalidate cache for all project members before deletion
+        ProjectService.invalidate_project_member_caches(project)
+
         project.delete()
 
     @staticmethod

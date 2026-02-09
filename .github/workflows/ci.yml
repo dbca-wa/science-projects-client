@@ -1,0 +1,251 @@
+on:
+  # Build, push, and release on version tags
+  push:
+    tags:
+      - "*.*.*"           # Matches 3.4.13, 1.0.0, etc.
+      - "v*.*.*"          # Also matches v3.4.13 for compatibility
+
+  # Manual release trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 3.4.13)'
+        required: true
+        type: string
+      skip_tests:
+        description: 'Skip tests (use for hotfixes only)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test:
+    name: Test (shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    # Only skip if manual dispatch with skip_tests=true, or if tag contains 'hotfix'
+    if: |
+      (github.event_name != 'workflow_dispatch' || !github.event.inputs.skip_tests) &&
+      !contains(github.ref, 'hotfix')
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+          DJANGO_SETTINGS_MODULE: config.settings
+          SECRET_KEY: test-secret-key-${{ github.run_id }}
+          DEBUG: "False"
+          ENVIRONMENT: development
+          EXTERNAL_PASS: "test-external-pass"
+          LIBRARY_API_URL: "https://library-test.example.com/api"
+          LIBRARY_BEARER_TOKEN: "test-bearer-token"
+          IT_ASSETS_ACCESS_TOKEN: "test-it-assets-token"
+          IT_ASSETS_USER: "test-user"
+          PRINCE_SERVER_URL: ""
+          DEFAULT_FROM_EMAIL: "test-noreply@example.com"
+          SPMS_MAINTAINER_EMAIL: "test-maintainer@example.com"
+          EMAIL_HOST: "localhost"
+          EMAIL_PORT: "25"
+        run: |
+          poetry run pytest \
+            --splits 4 \
+            --group ${{ matrix.shard }} \
+            -n auto \
+            --tb=short \
+            --cov=. \
+            --cov-report= \
+            -v \
+            --maxfail=1
+
+  build-and-push:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: [test]
+    # Run if tests passed or were skipped (hotfix/manual skip)
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # Extract from tag
+            VERSION="${GITHUB_REF_NAME#v}"
+            VERSION="${VERSION%-official}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest
+            type=raw,value=${{ steps.version.outputs.version }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Summary
+        run: |
+          echo "## Release Results" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Tests passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Docker image built and pushed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Published Images" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Version: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Registry: ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
+
+  update-kustomize:
+    name: Update Kustomize configurations
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Kustomize versions
+        run: |
+          VERSION="${{ needs.build-and-push.outputs.version }}"
+
+          echo "=== Updating Kustomize image tags to ${VERSION} ==="
+
+          # Update production kustomization.yaml
+          sed -i "s|newTag: .*|newTag: ${VERSION}|g" kustomize/overlays/prod/kustomization.yaml
+          echo "✅ Updated production kustomization.yaml"
+
+          # Update test/staging kustomization.yaml
+          sed -i "s|newTag: .*|newTag: ${VERSION}|g" kustomize/overlays/test/kustomization.yaml
+          echo "✅ Updated test kustomization.yaml"
+
+          # Show changes
+          echo ""
+          echo "=== Changes to production ==="
+          git diff kustomize/overlays/prod/kustomization.yaml
+          echo ""
+          echo "=== Changes to test/staging ==="
+          git diff kustomize/overlays/test/kustomization.yaml
+
+      - name: Commit and push Kustomize changes
+        run: |
+          VERSION="${{ needs.build-and-push.outputs.version }}"
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are changes to commit
+          if git diff --quiet kustomize/; then
+            echo "✅ No changes to commit (versions already up to date)"
+          else
+            # Commit and push
+            git add kustomize/overlays/prod/kustomization.yaml
+            git add kustomize/overlays/test/kustomization.yaml
+            git commit -m "chore: update Kustomize versions to ${VERSION} [skip ci]"
+            git push origin HEAD:main
+            echo "✅ Kustomize versions updated to ${VERSION}"
+          fi
+
+      - name: Deployment Summary
+        run: |
+          VERSION="${{ needs.build-and-push.outputs.version }}"
+          echo "## Deployment Configuration Updated" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Kustomize overlays updated to version ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Test environment will deploy automatically" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify functionality in test/staging" >> $GITHUB_STEP_SUMMARY
+          echo "3. Approve production deployment when ready" >> $GITHUB_STEP_SUMMARY

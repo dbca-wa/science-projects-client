@@ -145,36 +145,48 @@ Repository: https://github.com/dbca-wa/science-projects-client
 
 ## Documentation
 
-### Getting Started
-- [Getting Started](docs/getting-started.md) - Quick setup guide (< 30 minutes)
-- [Local Setup](docs/local-setup.md) - Detailed setup instructions
+**[Complete Documentation →](docs/)**
 
-### Development
-- [Feature Development](docs/feature-development.md) - Complete development workflow
-- [Code Style](docs/code-style.md) - Python and Django coding standards
-- [Architecture](docs/architecture.md) - Application structure and patterns
+### Quick Links
 
-### Testing and Quality
-- [Testing](docs/testing.md) - Testing strategy and guidelines
-- [Pre-commit](docs/pre-commit.md) - Code quality automation
+**Getting Started**:
+- [Getting Started](docs/development/getting-started.md) - Quick setup (< 30 minutes)
+- [Local Setup](docs/development/local-setup.md) - Detailed setup
+- [Testing](docs/development/testing.md) - Run your first tests
 
-### Deployment
-- [CI/CD](docs/ci-cd.md) - Continuous integration and deployment
-- [Kustomize](docs/kustomize.md) - Kubernetes deployment configuration
+**Development**:
+- [Feature Development](docs/development/feature-development.md) - Development workflow
+- [Code Style](docs/development/code-style.md) - Coding standards
+- [Pre-commit](docs/development/pre-commit.md) - Code quality checks
 
-### Reference
-- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
-- [Documentation Index](docs/README.md) - Complete documentation overview
+**Architecture**:
+- [Overview](docs/architecture/overview.md) - Application structure
+- [ADRs](docs/architecture/) - Architectural decisions
+- [API Design](docs/architecture/api-design.md) - REST API principles
+
+**Deployment**:
+- [CI/CD](docs/deployment/ci-cd.md) - Continuous integration
+- [Kubernetes](docs/deployment/kubernetes-setup.md) - Deployment setup
+- [Monitoring](docs/deployment/monitoring-setup.md) - Observability
+
+**Operations**:
+- [Troubleshooting](docs/operations/troubleshooting.md) - Common issues
+- [Error Tracking](docs/operations/error-tracking.md) - Monitoring errors
+- [Disaster Recovery](docs/operations/disaster-recovery.md) - Recovery procedures
+
+**Security**:
+- [Security Overview](docs/security/) - Security tools and processes
+- [Review Process](docs/security/security-review-process.md) - PR security checklist
 
 ## Contributing
 
 1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make changes following our [Code Style](docs/code-style.md)
+2. Make changes following our [Code Style](docs/development/code-style.md)
 3. Write tests (maintain >80% coverage)
 4. Run pre-commit hooks: `pre-commit run --all-files`
 5. Push and create a pull request
 
-See [Feature Development](docs/feature-development.md) for the complete workflow.
+See [Feature Development](docs/development/feature-development.md) for the complete workflow.
 
 ## Testing
 
@@ -257,6 +269,6 @@ Unauthorised copying, distribution, modification, or use of this software is str
 ## Support
 
 For issues and questions:
-- Check [Troubleshooting](docs/troubleshooting.md)
-- Review [Documentation](docs/README.md)
+- Check [Troubleshooting](docs/operations/troubleshooting.md)
+- Review [Documentation](docs/)
 - Create an issue on GitHub

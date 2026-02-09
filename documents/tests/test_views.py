@@ -5,6 +5,7 @@ Tests for document views
 from unittest.mock import Mock, patch
 
 import pytest
+from django.test import override_settings
 from rest_framework import status
 
 from common.tests.factories import ProjectDocumentFactory, ProjectFactory, UserFactory
@@ -1819,6 +1820,14 @@ class TestUserPublications:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["libraryData"]["isError"] is True
 
+    @override_settings(
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "test-cache",
+            }
+        }
+    )
     @patch("documents.views.notifications.requests.get")
     def test_get_user_publications_cached(
         self, mock_get, api_client, user, staff_profile, db
@@ -3754,7 +3763,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
-    def test_seek_endorsement_with_existing_pdf(self, api_client, user, db):
+    def test_seek_endorsement_with_existing_pdf(self, api_client, user, mock_file, db):
         """Test seeking endorsement with existing PDF file - covers lines 175-178"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -3775,21 +3784,19 @@ class TestSeekEndorsement:
             ae_endorsement_provided=False,
         )
 
-        # Create existing PDF
+        # Create existing PDF using fixture
         from django.core.files.uploadedfile import SimpleUploadedFile
 
-        existing_pdf = SimpleUploadedFile(
-            "existing.pdf", b"Old PDF content", content_type="application/pdf"
-        )
         AECEndorsementPDF.objects.create(
             endorsement=endorsement,
-            file=existing_pdf,
+            file=mock_file,
             creator=user,
         )
 
-        # Create new PDF file
+        # Create new PDF file using fixture (need to create a new one)
+        pdf_content = b"%PDF-1.4\n%\xE2\xE3\xCF\xD3\n1 0 obj\n<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj\n<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000015 00000 n\n0000000068 00000 n\n0000000127 00000 n\ntrailer\n<</Size 4/Root 1 0 R>>\nstartxref\n225\n%%EOF"
         new_pdf_file = SimpleUploadedFile(
-            "new.pdf", b"New PDF content", content_type="application/pdf"
+            "new.pdf", pdf_content, content_type="application/pdf"
         )
 
         data = {
@@ -4000,7 +4007,7 @@ class TestSeekEndorsement:
 class TestDeleteAECEndorsement:
     """Tests for delete AEC endorsement endpoint"""
 
-    def test_delete_aec_endorsement_with_pdf(self, api_client, user, db):
+    def test_delete_aec_endorsement_with_pdf(self, api_client, user, mock_file, db):
         """Test deleting AEC endorsement with PDF - covers lines 237-238"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -4021,15 +4028,10 @@ class TestDeleteAECEndorsement:
             ae_endorsement_provided=True,
         )
 
-        # Create PDF
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
-        pdf_file = SimpleUploadedFile(
-            "test.pdf", b"PDF content", content_type="application/pdf"
-        )
+        # Create PDF using fixture
         AECEndorsementPDF.objects.create(
             endorsement=endorsement,
-            file=pdf_file,
+            file=mock_file,
             creator=user,
         )
 
@@ -5958,25 +5960,18 @@ class TestGetConceptPlanData:
         assert "Project Lead" in response.data["project_team"][0]
 
     def test_get_concept_plan_data_with_image(
-        self, api_client, project_lead, concept_plan_with_details, db
+        self, api_client, project_lead, concept_plan_with_details, mock_image, db
     ):
         """Test getting concept plan data with project image"""
         # Arrange
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
         from medias.models import ProjectPhoto
 
         api_client.force_authenticate(user=project_lead)
 
-        # Create a simple uploaded file
-        test_file = SimpleUploadedFile(
-            "test.jpg", b"file_content", content_type="image/jpeg"
-        )
-
-        # Create project photo with uploaded file
+        # Create project photo with uploaded file using fixture
         ProjectPhoto.objects.create(
             project=concept_plan_with_details.project,
-            file=test_file,
+            file=mock_image,
         )
 
         # Act
