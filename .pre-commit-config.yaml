@@ -97,11 +97,11 @@ repos:
   #         - types-requests
   #         - types-python-dateutil
 
-  # Final confirmation prompt (runs after all other checks)
+  # Final summary (runs after all other checks)
   - repo: local
     hooks:
-      - id: commit-confirmation
-        name: Commit Confirmation
+      - id: commit-summary
+        name: Commit Summary
         entry: ./.pre-commit-confirm-wrapper.sh
         language: script
         pass_filenames: false
