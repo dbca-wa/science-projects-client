@@ -5,7 +5,6 @@ Medias app pytest fixtures
 import datetime
 
 import pytest
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 from medias.models import (
     AECEndorsementPDF,
@@ -20,31 +19,8 @@ from medias.models import (
     UserAvatar,
 )
 
-
-@pytest.fixture
-def mock_file():
-    """Provide a mock file for testing"""
-    return SimpleUploadedFile(
-        "test_file.pdf", b"file_content", content_type="application/pdf"
-    )
-
-
-@pytest.fixture
-def mock_image():
-    """Provide a mock image for testing"""
-    from io import BytesIO
-
-    from PIL import Image
-
-    # Create a simple 10x10 red image
-    image = Image.new("RGB", (10, 10), color="red")
-    image_io = BytesIO()
-    image.save(image_io, format="JPEG")
-    image_io.seek(0)
-
-    return SimpleUploadedFile(
-        "test_image.jpg", image_io.read(), content_type="image/jpeg"
-    )
+# Note: mock_file and mock_image fixtures are now in common/tests/conftest.py
+# to avoid duplication and make them available to all tests
 
 
 @pytest.fixture

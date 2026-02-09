@@ -1,10 +1,66 @@
 # region IMPORTS =====================================================================================================
 
+import logging
+import os
+import tempfile
+
+from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
 from common.models import CommonModel
+from common.utils.file_validation import validate_document_upload, validate_image_upload
+
+logger = logging.getLogger(__name__)
+
+# endregion ===========================================================================================================
+
+
+# region HELPER FUNCTIONS ======================================================================================================
+
+
+def _validate_and_save_file(file_field, validator_func, max_size=10 * 1024 * 1024):
+    """
+    Helper function to validate a file before saving.
+
+    Args:
+        file_field: Django FileField or ImageField
+        validator_func: Validation function (validate_image_upload or validate_document_upload)
+        max_size: Maximum file size in bytes
+
+    Raises:
+        FileValidationError: If validation fails
+    """
+    if not file_field:
+        return
+
+    # Write uploaded file to temporary location for validation
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        for chunk in file_field.chunks():
+            temp_file.write(chunk)
+        temp_path = temp_file.name
+
+    try:
+        # Validate the file
+        sanitised_name, mime_type = validator_func(temp_path, file_field.name, max_size)
+
+        # Update filename if sanitised
+        if sanitised_name != file_field.name:
+            logger.info(f"Filename sanitised: {file_field.name} -> {sanitised_name}")
+            # Read file content
+            with open(temp_path, "rb") as f:
+                file_content = f.read()
+            # Replace file with sanitised name
+            file_field.save(sanitised_name, ContentFile(file_content), save=False)
+
+        logger.info(f"File validation successful: {sanitised_name} ({mime_type})")
+
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
+
 
 # endregion ===========================================================================================================
 
@@ -31,6 +87,10 @@ class ProjectDocumentPDF(CommonModel):
         return f"PDF for {self.document.kind} - {self.project.title}"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_document_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -81,6 +141,10 @@ class AnnualReportMedia(CommonModel):
         return f"({self.report.year}) {self.kind.capitalize()} Annual Report Media"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -118,6 +182,10 @@ class LegacyAnnualReportPDF(CommonModel):
     )
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_document_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -151,6 +219,10 @@ class AnnualReportPDF(CommonModel):  # The latest pdf for a given annual report
     )
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_document_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -193,6 +265,10 @@ class AECEndorsementPDF(CommonModel):  # The latest pdf for a given annual repor
         return f" AEC PDF ({self.endorsement})"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_document_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -223,6 +299,10 @@ class ProjectPhoto(CommonModel):
     size = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -259,6 +339,10 @@ class ProjectPlanMethodologyPhoto(CommonModel):
         return f"Methodology Image File: {self.file}"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -299,6 +383,10 @@ class BusinessAreaPhoto(CommonModel):
         return "Business Area Photo File"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -325,6 +413,10 @@ class AgencyImage(CommonModel):
         return "Agency Photo File"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
@@ -357,6 +449,10 @@ class UserAvatar(CommonModel):
         return f"User: {self.user} | {self.file.name}"
 
     def save(self, *args, **kwargs):
+        # Validate file before saving
+        if self.file and not self.pk:  # Only validate on creation
+            _validate_and_save_file(self.file, validate_image_upload)
+
         if self.file:
             self.size = self.file.size
         super().save(*args, **kwargs)
