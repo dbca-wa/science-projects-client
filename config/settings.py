@@ -328,6 +328,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # endregion ========================================================================================
 
 # region Cache Configuration ======================================================
+# Import cache keys and TTL values (needed by services)
+from config.cache_settings import CACHE_KEYS, CACHE_TTL  # noqa: E402, F401
+
 # Use dummy cache for tests, Redis for production/development
 if os.environ.get("PYTEST_RUNNING"):
     # Dummy cache for tests (no Redis required)
@@ -338,10 +341,7 @@ if os.environ.get("PYTEST_RUNNING"):
     }
 else:
     # Redis cache for production/development
-    # Import and use CACHES from cache_settings
-    from config.cache_settings import CACHES as _REDIS_CACHES  # noqa: E402, F401
-
-    CACHES = _REDIS_CACHES
+    from config.cache_settings import CACHES  # noqa: E402, F401
 
 # endregion ========================================================================================
 
