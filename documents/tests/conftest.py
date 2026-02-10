@@ -535,10 +535,18 @@ def user_with_avatar(db):
         email="avatar@example.com",
     )
 
-    # Create a simple test image file
-    image_content = b"GIF89a\x01\x00\x01\x00\x00\xff\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x00;"
+    # Create a minimal valid PNG file (1x1 pixel, transparent)
+    # PNG signature + IHDR chunk + IDAT chunk + IEND chunk
+    image_content = (
+        b"\x89PNG\r\n\x1a\n"  # PNG signature
+        b"\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
+        b"\x08\x06\x00\x00\x00\x1f\x15\xc4\x89"  # IHDR chunk
+        b"\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01"
+        b"\r\n-\xb4"  # IDAT chunk
+        b"\x00\x00\x00\x00IEND\xaeB`\x82"  # IEND chunk
+    )
     image_file = SimpleUploadedFile(
-        name="test_avatar.gif", content=image_content, content_type="image/gif"
+        name="test_avatar.png", content=image_content, content_type="image/png"
     )
 
     # Create avatar
