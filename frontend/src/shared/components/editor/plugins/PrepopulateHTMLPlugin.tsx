@@ -2,34 +2,21 @@
  * PrepopulateHTMLPlugin
  * 
  * Lexical plugin that loads initial HTML content into the editor.
- * Sanitizes HTML to prevent XSS attacks.
+ * 
+ * Security: All HTML content is sanitised using DOMPurify before rendering
+ * to prevent XSS attacks from stored content. This addresses CodeQL/Seer
+ * vulnerabilities related to incomplete regex-based sanitisation.
  */
 
 import React, { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes } from 'lexical';
+import { sanitizeRichText } from '@/shared/utils/sanitise.utils';
 
 interface PrepopulateHTMLPluginProps {
   html?: string;
 }
-
-// Simple HTML sanitizer - removes script tags and dangerous attributes
-const sanitizeHTML = (html: string): string => {
-  if (!html) return '';
-  
-  // Remove script tags
-  let sanitized = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
-  // Remove event handlers (onclick, onerror, etc.)
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
-  
-  // Remove javascript: protocol
-  sanitized = sanitized.replace(/javascript:/gi, '');
-  
-  return sanitized;
-};
 
 export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({ html }) => {
   const [editor] = useLexicalComposerContext();
@@ -39,7 +26,13 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({ ht
     if (!html || isInitialized) return;
 
     try {
-      const sanitizedHTML = sanitizeHTML(html);
+      // SECURITY: Sanitise HTML using DOMPurify to prevent XSS attacks
+      // This replaces the previous incomplete regex-based sanitisation
+      // and addresses all CodeQL/Seer vulnerabilities in this file:
+      // - Script tag variations
+      // - Event handler attribute variations  
+      // - Dangerous URL protocols (javascript:, data:, vbscript:)
+      const sanitisedHTML = sanitizeRichText(html);
       
       // Store current scroll position
       const scrollX = window.scrollX;
@@ -54,7 +47,7 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({ ht
         
         editor.update(() => {
           const parser = new DOMParser();
-          const dom = parser.parseFromString(sanitizedHTML, 'text/html');
+          const dom = parser.parseFromString(sanitisedHTML, 'text/html');
           const nodes = $generateNodesFromDOM(editor, dom);
           
           const root = $getRoot();

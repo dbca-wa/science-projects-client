@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { updateProfile, removeUserAvatar } from "../services/user.service";
 import { authKeys } from "@/features/auth/hooks/useAuth";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 
 /**
  * Profile form data structure
@@ -47,16 +47,16 @@ export async function handleProfileUpdate({
   queryClient,
   hasExistingImage,
 }: ProfileUpdateOptions): Promise<void> {
-  // Sanitize form data before submission
-  const sanitizedData = sanitizeFormData(data as Record<string, unknown>, ["about", "expertise"]);
+  // Sanitise form data before submission
+  const sanitisedData = sanitiseFormData(data as Record<string, unknown>, ["about", "expertise"]);
 
   // Handle image removal separately if image is null
-  if (sanitizedData.image === null && hasExistingImage) {
+  if (sanitisedData.image === null && hasExistingImage) {
     // First remove the avatar
     await removeUserAvatar(userId);
 
     // Then update other fields (without image)
-    const { image, ...restData } = sanitizedData;
+    const { image, ...restData } = sanitisedData;
     if (Object.keys(restData).length > 0) {
       await updateProfile(userId, restData);
     }
@@ -71,7 +71,7 @@ export async function handleProfileUpdate({
     });
   } else {
     // Normal update (no removal)
-    await updateProfile(userId, sanitizedData);
+    await updateProfile(userId, sanitisedData);
 
     // Invalidate queries to refresh UI
     await queryClient.invalidateQueries({

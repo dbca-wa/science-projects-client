@@ -7,7 +7,7 @@ import { NavigationButton } from "@/shared/components/navigation/NavigationButto
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, ArrowLeft, Mail, Loader2 } from "lucide-react";
-import { sanitizeInput } from "@/shared/utils/sanitize.utils";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import {
 	Select,
 	SelectContent,
