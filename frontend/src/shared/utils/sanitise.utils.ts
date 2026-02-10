@@ -153,9 +153,36 @@ export function sanitizeUrl(url: string): string {
 /**
  * Sanitizes HTML content for rich text editors.
  * More permissive than sanitizeHtml, allows additional formatting tags.
+ * 
+ * Security Features:
+ * - Removes all script tags and content
+ * - Removes all event handler attributes (onclick, onerror, etc.)
+ * - Blocks dangerous URL protocols (javascript:, data:, vbscript:)
+ * - Preserves safe HTML formatting for rich text editing
+ * 
+ * This function is specifically designed for Lexical editor plugins
+ * to prevent XSS attacks whilst maintaining rich text capabilities.
  *
  * @param html - The HTML string to sanitize
  * @returns Sanitized HTML string safe for rendering
+ * 
+ * @example
+ * ```ts
+ * // Remove malicious script
+ * const unsafe = '<p>Hello</p><script>alert("XSS")</script>';
+ * const safe = sanitizeRichText(unsafe);
+ * // Returns: '<p>Hello</p>'
+ * 
+ * // Remove event handlers
+ * const unsafe = '<div onclick="alert(1)">Click me</div>';
+ * const safe = sanitizeRichText(unsafe);
+ * // Returns: '<div>Click me</div>'
+ * 
+ * // Remove dangerous protocols
+ * const unsafe = '<a href="javascript:alert(1)">Link</a>';
+ * const safe = sanitizeRichText(unsafe);
+ * // Returns: '<a>Link</a>'
+ * ```
  */
 export function sanitizeRichText(html: string): string {
 	const purify = getPurify();
@@ -192,5 +219,54 @@ export function sanitizeRichText(html: string): string {
 		],
 		ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "title", "class"],
 		ALLOW_DATA_ATTR: false,
+		// Explicitly forbid dangerous tags
+		FORBID_TAGS: [
+			"script",
+			"iframe",
+			"object",
+			"embed",
+			"applet",
+			"meta",
+			"link",
+			"style",
+		],
+		// Explicitly forbid all event handler attributes
+		FORBID_ATTR: [
+			"onclick",
+			"onload",
+			"onerror",
+			"onmouseover",
+			"onmouseout",
+			"onmouseenter",
+			"onmouseleave",
+			"onmousedown",
+			"onmouseup",
+			"onfocus",
+			"onblur",
+			"onchange",
+			"onsubmit",
+			"onkeydown",
+			"onkeyup",
+			"onkeypress",
+			"ondblclick",
+			"oncontextmenu",
+			"oninput",
+			"oninvalid",
+			"onreset",
+			"onsearch",
+			"onselect",
+			"ondrag",
+			"ondrop",
+			"ondragstart",
+			"ondragend",
+			"ondragover",
+			"ondragenter",
+			"ondragleave",
+			"onscroll",
+			"onwheel",
+			"oncopy",
+			"oncut",
+			"onpaste",
+		],
 	});
 }

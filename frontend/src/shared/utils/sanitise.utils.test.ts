@@ -4,9 +4,9 @@ import {
 	sanitizeInput,
 	sanitizeUrl,
 	sanitizeRichText,
-} from "./sanitize.utils";
+} from "./sanitise.utils";
 
-describe("sanitize.utils", () => {
+describe("sanitise.utils", () => {
 	describe("sanitizeHtmlContent", () => {
 		it("should remove script tags", () => {
 			const malicious = '<script>alert("XSS")</script><p>Safe content</p>';
@@ -103,6 +103,12 @@ describe("sanitize.utils", () => {
 			expect(result).toBe("");
 		});
 
+		it("should block vbscript: protocol", () => {
+			const malicious = "vbscript:msgbox('XSS')";
+			const result = sanitizeUrl(malicious);
+			expect(result).toBe("");
+		});
+
 		it("should return empty string for invalid URLs", () => {
 			const invalid = "not a url";
 			const result = sanitizeUrl(invalid);
@@ -128,6 +134,58 @@ describe("sanitize.utils", () => {
 			expect(result).toContain("<p>Safe</p>");
 		});
 
+		it("should remove script tags with variations (CodeQL fix)", () => {
+			const variations = [
+				'<script>alert(1)</script>',
+				'<script >alert(1)</script>',
+				'<script>alert(1)</script >',
+				'<SCRIPT>alert(1)</SCRIPT>',
+			];
+			
+			variations.forEach(malicious => {
+				const result = sanitizeRichText(malicious);
+				expect(result).not.toContain("script");
+				expect(result).not.toContain("SCRIPT");
+				expect(result).not.toContain("alert");
+			});
+		});
+
+		it("should remove all event handler attributes (CodeQL fix)", () => {
+			const handlers = [
+				'<div onclick="alert(1)">Click</div>',
+				'<div onerror="alert(1)">Error</div>',
+				'<div onload="alert(1)">Load</div>',
+				'<div onmouseover="alert(1)">Hover</div>',
+			];
+			
+			handlers.forEach(malicious => {
+				const result = sanitizeRichText(malicious);
+				expect(result).not.toContain("onclick");
+				expect(result).not.toContain("onerror");
+				expect(result).not.toContain("onload");
+				expect(result).not.toContain("onmouseover");
+				expect(result).toContain("<div>");
+			});
+		});
+
+		it("should remove javascript: protocol (CodeQL fix)", () => {
+			const malicious = '<a href="javascript:alert(1)">Link</a>';
+			const result = sanitizeRichText(malicious);
+			expect(result).not.toContain("javascript:");
+		});
+
+		it("should remove data: protocol (CodeQL fix)", () => {
+			const malicious = '<a href="data:text/html,<script>alert(1)</script>">Link</a>';
+			const result = sanitizeRichText(malicious);
+			expect(result).not.toContain("data:");
+		});
+
+		it("should remove vbscript: protocol (CodeQL fix)", () => {
+			const malicious = '<a href="vbscript:msgbox(1)">Link</a>';
+			const result = sanitizeRichText(malicious);
+			expect(result).not.toContain("vbscript:");
+		});
+
 		it("should allow table elements", () => {
 			const table =
 				"<table><thead><tr><th>Header</th></tr></thead><tbody><tr><td>Data</td></tr></tbody></table>";
@@ -135,6 +193,31 @@ describe("sanitize.utils", () => {
 			expect(result).toContain("<table>");
 			expect(result).toContain("<thead>");
 			expect(result).toContain("<tbody>");
+		});
+
+		it("should preserve safe HTML structure", () => {
+			const safe = '<p><strong>Bold</strong> and <em>italic</em></p>';
+			const result = sanitizeRichText(safe);
+			expect(result).toBe('<p><strong>Bold</strong> and <em>italic</em></p>');
+		});
+
+		it("should handle empty input", () => {
+			expect(sanitizeRichText("")).toBe("");
+		});
+
+		it("should remove iframe tags", () => {
+			const malicious = '<iframe src="evil.com"></iframe><p>Safe</p>';
+			const result = sanitizeRichText(malicious);
+			expect(result).not.toContain("iframe");
+			expect(result).toContain("<p>Safe</p>");
+		});
+
+		it("should remove object and embed tags", () => {
+			const malicious = '<object data="evil.swf"></object><embed src="evil.swf"><p>Safe</p>';
+			const result = sanitizeRichText(malicious);
+			expect(result).not.toContain("object");
+			expect(result).not.toContain("embed");
+			expect(result).toContain("<p>Safe</p>");
 		});
 	});
 });
