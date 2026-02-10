@@ -13,21 +13,31 @@ The SPMS backend uses GitHub Actions for continuous integration and deployment. 
 ### Branch Strategy
 
 **develop** - Main development branch
-- Feature branches merge here
-- CI runs on every push and PR
-- Continuous testing and validation
+- Active development happens here
+- Push commits directly or merge feature branches
+- CI runs only on pull requests (not on direct pushes)
 
 **main** - Production branch
-- Only updated via releases
-- CI runs on every push and PR
-- Triggers deployment workflows
+- Only updated via pull requests from `develop`
+- Represents stable, release-ready code
+- CI runs on pull requests
 
 ### CI Triggers
 
-Tests run on:
+**Test workflow runs on**:
 - Pull requests to `main` or `develop`
-- Pushes to `main` or `develop`
-- Version tags (for releases)
+- Does NOT run on direct pushes to branches (avoids duplicate runs)
+
+**Why this approach**:
+- Prevents duplicate test runs when pushing to a branch with an open PR
+- Saves CI minutes
+- Tests still run on every PR update
+
+**Example workflow**:
+1. Push to `develop` (no PR) → No tests run
+2. Create PR from `develop` → `main` → Tests run
+3. Push more commits to `develop` → Tests run (PR exists)
+4. Merge PR → No duplicate test run
 
 ## Creating Releases
 
@@ -56,14 +66,14 @@ Examples:
 
 **Triggers**:
 - Pull requests to `main` or `develop`
-- Pushes to `main` or `develop`
-- Changes to `backend/**` or workflow file
 
 **Purpose**: Run tests and generate coverage reports.
 
 **Jobs**:
 1. **Test** (4 parallel shards)
 2. **Coverage** (combine and upload)
+
+**Note**: Tests do NOT run on direct pushes to branches. This prevents duplicate runs when you push to a branch that has an open PR.
 
 ### Build Workflow (build.yml)
 
