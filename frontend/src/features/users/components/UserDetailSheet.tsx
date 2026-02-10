@@ -50,7 +50,7 @@ import {
 	getUserEmail,
 	getUserPhone,
 } from "@/shared/utils/user.utils";
-import { getSanitizedHtmlOrFallback } from "@/shared/utils/html.utils";
+import { getStyledHtmlOrFallback } from "@/shared/utils/html-display.utils";
 import { UserDisplay } from "@/shared/components/user";
 import { getImageUrl } from "@/shared/utils/image.utils";
 
@@ -374,7 +374,7 @@ export const UserDetailSheet = observer(
 								<div
 									className="mt-1"
 									dangerouslySetInnerHTML={{
-										__html: getSanitizedHtmlOrFallback(
+										__html: getStyledHtmlOrFallback(
 											user.about,
 										),
 									}}
@@ -385,7 +385,7 @@ export const UserDetailSheet = observer(
 								<div
 									className="mt-1"
 									dangerouslySetInnerHTML={{
-										__html: getSanitizedHtmlOrFallback(
+										__html: getStyledHtmlOrFallback(
 											user.expertise,
 										),
 									}}

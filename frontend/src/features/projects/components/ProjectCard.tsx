@@ -8,7 +8,7 @@ import {
 	getProjectTag,
 } from "../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { sanitizeInput } from "@/shared/utils/sanitize.utils";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { PROJECT_KIND_COLORS, PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {

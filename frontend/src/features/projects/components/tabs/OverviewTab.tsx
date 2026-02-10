@@ -3,7 +3,7 @@ import { ProjectStatusBadge } from "../ProjectStatusBadge";
 import { ProjectKindBadge } from "../ProjectKindBadge";
 import { ProjectKeywords } from "../ProjectKeywords";
 import { ProjectImage } from "../ProjectImage";
-import { sanitizeInput } from "@/shared/utils/sanitize.utils";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 
 interface OverviewTabProps {
 	project: IProjectData;

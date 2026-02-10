@@ -1,6 +1,6 @@
 import L from "leaflet";
 import type { IProjectData } from "@/shared/types/project.types";
-import { extractTextFromHTML } from "@/shared/utils/html.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 
 /**
  * Marker creation utilities for the project map
