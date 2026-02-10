@@ -78,8 +78,21 @@ export const UserCard = ({ user, onClick, clickable = true }: UserCardProps) => 
   };
 
   // Handle email display
+  // SECURITY FIX: Use specific pattern to match placeholder emails only
+  // Previous code used .endsWith("email.com") which incorrectly flagged
+  // legitimate emails like "contact@myemail.com" as placeholders.
+  // 
+  // Placeholder emails follow the pattern: user{id}@email.com
+  // Examples: user123@email.com, user1@email.com
+  // 
+  // This pattern ensures we only match exact placeholder format:
+  // - ^ and $ ensure full string match (no partial matches)
+  // - \d+ matches one or more digits (user IDs)
+  // - \. escapes the dot to match literal "."
+  const PLACEHOLDER_EMAIL_PATTERN = /^user\d+@email\.com$/;
+  
   const getEmailDisplay = () => {
-    if (!user.email || user.email.endsWith("email.com")) {
+    if (!user.email || PLACEHOLDER_EMAIL_PATTERN.test(user.email)) {
       return "(Not Provided)";
     }
     return user.email;

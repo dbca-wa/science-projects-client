@@ -4,7 +4,7 @@ import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { ProjectKindBadge } from "./ProjectKindBadge";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { sanitizeInput } from "@/shared/utils/sanitize.utils";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { PROJECT_ROLE_CONFIG } from "@/shared/constants/project.constants";
 import { cn } from "@/shared/lib/utils";
 

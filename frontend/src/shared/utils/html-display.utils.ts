@@ -1,11 +1,14 @@
 /**
- * Sanitize HTML string by removing inline styles but preserving link colors
- * Used for displaying rich text editor content safely
+ * Style HTML string by removing inline styles but preserving link colours
+ * Used for displaying rich text editor content with consistent styling
+ * 
+ * NOTE: This is NOT a security function. For security sanitisation,
+ * use sanitizeRichText() from sanitise.utils.ts
  * 
  * @param htmlString - Raw HTML string from rich text editor
- * @returns Sanitized HTML string
+ * @returns Styled HTML string
  */
-export const sanitizeHtml = (htmlString: string): string => {
+export const styleHtmlForDisplay = (htmlString: string): string => {
   if (!htmlString) return "";
 
   const parser = new DOMParser();
@@ -59,20 +62,20 @@ export const isEmptyRichTextContent = (content: string | undefined): boolean => 
 };
 
 /**
- * Get sanitized HTML with fallback for empty content
+ * Get styled HTML with fallback for empty content
  * 
  * @param content - HTML content string
  * @param fallback - Fallback text to display when content is empty
- * @returns Sanitized HTML or fallback message
+ * @returns Styled HTML or fallback message
  */
-export const getSanitizedHtmlOrFallback = (
+export const getStyledHtmlOrFallback = (
   content: string | undefined,
   fallback: string = "(Not Provided)"
 ): string => {
   if (isEmptyRichTextContent(content)) {
     return `<p>${fallback}</p>`;
   }
-  return sanitizeHtml(content || `<p>${fallback}</p>`);
+  return styleHtmlForDisplay(content || `<p>${fallback}</p>`);
 };
 
 /**

@@ -3,6 +3,9 @@
  * 
  * Handles paste events from Microsoft Word documents.
  * Converts Word HTML to Lexical nodes while stripping unsupported formatting.
+ * 
+ * Security: All pasted HTML is sanitised using DOMPurify before processing
+ * to prevent XSS attacks. This protects against malicious content in clipboard.
  */
 
 import { useEffect } from 'react';
@@ -10,6 +13,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { PASTE_COMMAND, COMMAND_PRIORITY_HIGH } from 'lexical';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $insertNodes, $getSelection, $isRangeSelection } from 'lexical';
+import { sanitizeRichText } from '@/shared/utils/sanitise.utils';
 
 export const PastePlugin = () => {
   const [editor] = useLexicalComposerContext();
@@ -37,8 +41,12 @@ export const PastePlugin = () => {
           const selection = $getSelection();
           if (!$isRangeSelection(selection)) return;
 
-          // Clean Word HTML
-          const cleanedHTML = cleanWordHTML(html);
+          // SECURITY: Sanitise clipboard HTML first to prevent XSS attacks
+          // This removes script tags, event handlers, and dangerous protocols
+          const sanitisedHTML = sanitizeRichText(html);
+
+          // Clean Word HTML (remove Word-specific formatting)
+          const cleanedHTML = cleanWordHTML(sanitisedHTML);
 
           // Parse cleaned HTML
           const parser = new DOMParser();
