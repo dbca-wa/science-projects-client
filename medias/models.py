@@ -359,7 +359,7 @@ class AECEndorsementPDF(CommonModel):  # The latest pdf for a given annual repor
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
             _validate_and_save_file(
-                self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
+                self.file, validate_document_upload, max_size=PROJECT_PDF_MAX_SIZE
             )
 
         if self.file:
