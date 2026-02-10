@@ -1,14 +1,9 @@
 name: "Test Suite and Coverage"
 
 on:
-  # Run on pull requests (primary testing)
+  # Run on pull requests only
   pull_request:
     branches: [main, develop]
-
-  # Run on pushes to develop for continuous testing
-  # Note: Pushes to main are skipped since tests already ran on the PR
-  push:
-    branches: [develop]
 
 permissions:
   contents: write  # Required for pushing to badges branch
