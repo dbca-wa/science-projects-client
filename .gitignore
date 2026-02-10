@@ -1,6 +1,6 @@
 *.lnk
 .docs/
-docs
+.benchmarks
 .vscode/
 
 publish-ghcr.yaml
