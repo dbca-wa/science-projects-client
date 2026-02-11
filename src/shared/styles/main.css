@@ -196,6 +196,16 @@
 }
 
 /* Leaflet Map Styles */
+
+/* Disable map dragging on control elements */
+.leaflet-control {
+	pointer-events: auto !important;
+}
+
+.leaflet-control * {
+	pointer-events: auto !important;
+}
+
 .region-label {
 	background: transparent !important;
 	border: none !important;

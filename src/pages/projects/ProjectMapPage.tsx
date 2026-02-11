@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
@@ -13,6 +13,7 @@ import { MapErrorBoundary } from "@/features/projects/components/map/MapErrorBou
 import { Button } from "@/shared/components/ui/button";
 import { useScreenReaderAnnouncements } from "@/shared/utils/screen-reader.utils";
 import { PageTransition } from "@/shared/components/PageTransition";
+import L from "leaflet";
 
 /**
  * ProjectMapPage - Complete implementation
@@ -28,9 +29,23 @@ import { PageTransition } from "@/shared/components/PageTransition";
 const ProjectMapPage = observer(() => {
 	const store = useProjectMapStore();
 	const [, setSearchParams] = useSearchParams();
+	const filterButtonRef = useRef<HTMLDivElement>(null);
+	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	// Initialize screen reader announcements
 	useScreenReaderAnnouncements();
+
+	// Disable Leaflet drag on control elements
+	useEffect(() => {
+		if (filterButtonRef.current) {
+			L.DomEvent.disableClickPropagation(filterButtonRef.current);
+			L.DomEvent.disableScrollPropagation(filterButtonRef.current);
+		}
+		if (sidebarRef.current) {
+			L.DomEvent.disableClickPropagation(sidebarRef.current);
+			L.DomEvent.disableScrollPropagation(sidebarRef.current);
+		}
+	}, [store.state.filtersMinimized]);
 
 	// Initialize from URL params and localStorage
 	// TypeScript infers TFilters from projectMapStore
@@ -161,10 +176,15 @@ const ProjectMapPage = observer(() => {
 			{/* Minimized filter button - top right corner, positioned to not conflict with map controls */}
 			{store.state.filtersMinimized && (
 				<div
-					className="absolute top-4 left-4 z-40"
+					ref={filterButtonRef}
+					className="absolute top-4 left-4 z-40 leaflet-control"
 					onMouseDown={(e) => e.stopPropagation()}
 					onMouseMove={(e) => e.stopPropagation()}
 					onMouseUp={(e) => e.stopPropagation()}
+					onDragStart={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
 					onDoubleClick={(e) => {
 						e.stopPropagation();
 						e.preventDefault();
@@ -178,7 +198,11 @@ const ProjectMapPage = observer(() => {
 							e.preventDefault();
 							store.toggleFiltersMinimized();
 						}}
-						className="h-10 w-10 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all animate-in fade-in slide-in-from-right-2 duration-300"
+						onMouseDown={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+						}}
+						className="h-10 w-10 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all animate-in fade-in slide-in-from-right-2 duration-300 pointer-events-auto"
 						aria-label="Show filters"
 						title="Show filters"
 					>
@@ -190,11 +214,16 @@ const ProjectMapPage = observer(() => {
 			{/* Floating sidebar - animated */}
 			{!store.state.filtersMinimized && (
 				<div
-					className="absolute top-4 left-4 w-[calc(100vw-2rem)] sm:w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300 overflow-hidden"
+					ref={sidebarRef}
+					className="absolute top-4 left-4 w-[calc(100vw-2rem)] sm:w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300 overflow-hidden leaflet-control"
 					onClick={(e) => e.stopPropagation()}
 					onMouseDown={(e) => e.stopPropagation()}
 					onMouseMove={(e) => e.stopPropagation()}
 					onMouseUp={(e) => e.stopPropagation()}
+					onDragStart={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
 					onDoubleClick={(e) => {
 						e.stopPropagation();
 						e.preventDefault();
