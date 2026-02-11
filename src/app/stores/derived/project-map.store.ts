@@ -54,6 +54,13 @@ const DEFAULT_FILTERS: ProjectMapFilters = {
 	onlyInactive: false,
 };
 
+const DEFAULT_MAP_DISPLAY = {
+	visualizationMode: "markers" as const,
+	visibleLayerTypes: ["dbcaregion"],
+	showLabels: true,
+	showColors: true,
+};
+
 /**
  * ProjectMapStore
  *
@@ -163,13 +170,20 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			if (stored) {
 				const parsed = JSON.parse(stored);
 				if (parsed.saveSearch) {
-					this.restoreFromStorage(parsed);
+					// Provide defaults for display settings (backward compatibility)
+					const stateToRestore = {
+						...DEFAULT_MAP_DISPLAY,
+						...parsed,
+					};
+					this.restoreFromStorage(stateToRestore);
 				}
 			}
 		} catch (error) {
 			logger.error("Failed to load project map state from localStorage", {
 				error: error instanceof Error ? error.message : String(error),
 			});
+			// Clear corrupted data
+			localStorage.removeItem(STORAGE_KEY);
 		}
 	}
 
@@ -227,6 +241,12 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	resetFilters() {
 		this.state.filters = { ...DEFAULT_FILTERS };
 		this.setSearchTerm("");
+		// Reset display settings to defaults
+		this.state.visualizationMode = DEFAULT_MAP_DISPLAY.visualizationMode;
+		this.state.visibleLayerTypes = [...DEFAULT_MAP_DISPLAY.visibleLayerTypes];
+		this.state.showLabels = DEFAULT_MAP_DISPLAY.showLabels;
+		this.state.showColors = DEFAULT_MAP_DISPLAY.showColors;
+		this.saveToLocalStorage();
 	}
 
 	/**
@@ -297,6 +317,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	showLayer = (layerType: string): void => {
 		if (!this.state.visibleLayerTypes.includes(layerType)) {
 			this.state.visibleLayerTypes.push(layerType);
+			this.saveToLocalStorage();
 		}
 	};
 
@@ -307,6 +328,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		const index = this.state.visibleLayerTypes.indexOf(layerType);
 		if (index > -1) {
 			this.state.visibleLayerTypes.splice(index, 1);
+			this.saveToLocalStorage();
 		}
 	};
 
@@ -320,6 +342,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		} else {
 			this.state.visibleLayerTypes.push(layerType);
 		}
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -333,6 +356,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			"ibra",
 			"imcra",
 		];
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -340,6 +364,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	hideAllLayers = (): void => {
 		this.state.visibleLayerTypes = [];
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -347,6 +372,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	toggleLabels = (): void => {
 		this.state.showLabels = !this.state.showLabels;
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -354,6 +380,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	toggleColors = (): void => {
 		this.state.showColors = !this.state.showColors;
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -410,6 +437,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	toggleVisualizationMode = (): void => {
 		this.state.visualizationMode =
 			this.state.visualizationMode === "markers" ? "heatmap" : "markers";
+		this.saveToLocalStorage();
 	};
 
 	/**
@@ -417,6 +445,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	setVisualizationMode = (mode: "markers" | "heatmap"): void => {
 		this.state.visualizationMode = mode;
+		this.saveToLocalStorage();
 	};
 
 	/**

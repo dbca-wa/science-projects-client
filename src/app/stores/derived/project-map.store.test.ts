@@ -147,6 +147,23 @@ describe("ProjectMapStore", () => {
 			expect(store.state.filters.onlyActive).toBe(false);
 			expect(store.state.filters.onlyInactive).toBe(false);
 		});
+
+		it("should reset display settings to defaults", () => {
+			// Change display settings
+			store.setVisualizationMode("heatmap");
+			store.showAllLayers();
+			store.toggleLabels(); // Set to false
+			store.toggleColors(); // Set to false
+
+			// Reset filters
+			store.resetFilters();
+
+			// Verify display settings are reset
+			expect(store.state.visualizationMode).toBe("markers");
+			expect(store.state.visibleLayerTypes).toEqual(["dbcaregion"]);
+			expect(store.state.showLabels).toBe(true);
+			expect(store.state.showColors).toBe(true);
+		});
 	});
 
 	describe("hasActiveFilters", () => {
@@ -528,6 +545,241 @@ describe("ProjectMapStore", () => {
 			expect(store.state.saveSearch).toBe(false);
 			store.toggleSaveSearch();
 			expect(store.state.saveSearch).toBe(true);
+		});
+	});
+
+	describe("Display Settings Persistence", () => {
+		describe("Visualization Mode", () => {
+			it("should persist visualization mode to localStorage", () => {
+				store.setVisualizationMode("heatmap");
+				const stored = localStorage.getItem("projectMapState");
+				expect(stored).toBeTruthy();
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visualizationMode).toBe("heatmap");
+			});
+
+			it("should restore visualization mode from localStorage", () => {
+				store.setVisualizationMode("heatmap");
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.visualizationMode).toBe("heatmap");
+			});
+
+			it("should persist when toggling visualization mode", () => {
+				store.toggleVisualizationMode(); // markers -> heatmap
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visualizationMode).toBe("heatmap");
+			});
+		});
+
+		describe("Layer Visibility", () => {
+			it("should persist layer visibility when toggling", () => {
+				store.toggleLayerType("nrm");
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visibleLayerTypes).toContain("nrm");
+			});
+
+			it("should persist when showing a layer", () => {
+				store.showLayer("ibra");
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visibleLayerTypes).toContain("ibra");
+			});
+
+			it("should persist when hiding a layer", () => {
+				store.hideLayer("dbcaregion");
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visibleLayerTypes).not.toContain("dbcaregion");
+			});
+
+			it("should persist when showing all layers", () => {
+				store.showAllLayers();
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visibleLayerTypes).toEqual([
+					"dbcaregion",
+					"dbcadistrict",
+					"nrm",
+					"ibra",
+					"imcra",
+				]);
+			});
+
+			it("should persist when hiding all layers", () => {
+				store.hideAllLayers();
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visibleLayerTypes).toEqual([]);
+			});
+
+			it("should restore layer visibility from localStorage", () => {
+				store.showAllLayers();
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.visibleLayerTypes).toEqual([
+					"dbcaregion",
+					"dbcadistrict",
+					"nrm",
+					"ibra",
+					"imcra",
+				]);
+			});
+		});
+
+		describe("Display Options", () => {
+			it("should persist showLabels when toggling", () => {
+				store.toggleLabels();
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.showLabels).toBe(false);
+			});
+
+			it("should persist showColors when toggling", () => {
+				store.toggleColors();
+				const stored = localStorage.getItem("projectMapState");
+				const parsed = JSON.parse(stored!);
+				expect(parsed.showColors).toBe(false);
+			});
+
+			it("should restore showLabels from localStorage", () => {
+				store.toggleLabels(); // Set to false
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.showLabels).toBe(false);
+			});
+
+			it("should restore showColors from localStorage", () => {
+				store.toggleColors(); // Set to false
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.showColors).toBe(false);
+			});
+		});
+
+		describe("SaveSearch Toggle", () => {
+			it("should not persist display settings when saveSearch is false", () => {
+				store.setSaveSearch(false);
+				store.setVisualizationMode("heatmap");
+				const stored = localStorage.getItem("projectMapState");
+				expect(stored).toBeFalsy();
+			});
+
+			it("should persist display settings when saveSearch is true", () => {
+				store.setSaveSearch(true);
+				store.setVisualizationMode("heatmap");
+				const stored = localStorage.getItem("projectMapState");
+				expect(stored).toBeTruthy();
+				const parsed = JSON.parse(stored!);
+				expect(parsed.visualizationMode).toBe("heatmap");
+			});
+
+			it("should clear localStorage when saveSearch is disabled", () => {
+				store.setVisualizationMode("heatmap");
+				expect(localStorage.getItem("projectMapState")).toBeTruthy();
+				store.setSaveSearch(false);
+				expect(localStorage.getItem("projectMapState")).toBeFalsy();
+			});
+		});
+
+		describe("Backward Compatibility", () => {
+			it("should apply defaults for missing visualization mode", () => {
+				// Simulate old localStorage without visualizationMode
+				const oldState = {
+					searchTerm: "test",
+					filters: {
+						selectedBusinessAreas: [],
+						user: null,
+						status: "",
+						kind: "",
+						year: 0,
+						onlyActive: false,
+						onlyInactive: false,
+					},
+					saveSearch: true,
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(oldState));
+
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.visualizationMode).toBe("markers");
+				expect(newStore.state.searchTerm).toBe("test");
+			});
+
+			it("should apply defaults for missing layer visibility", () => {
+				const oldState = {
+					searchTerm: "test",
+					filters: {
+						selectedBusinessAreas: [],
+						user: null,
+						status: "",
+						kind: "",
+						year: 0,
+						onlyActive: false,
+						onlyInactive: false,
+					},
+					saveSearch: true,
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(oldState));
+
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.visibleLayerTypes).toEqual(["dbcaregion"]);
+			});
+
+			it("should apply defaults for missing display options", () => {
+				const oldState = {
+					searchTerm: "test",
+					filters: {
+						selectedBusinessAreas: [],
+						user: null,
+						status: "",
+						kind: "",
+						year: 0,
+						onlyActive: false,
+						onlyInactive: false,
+					},
+					saveSearch: true,
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(oldState));
+
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.showLabels).toBe(true);
+				expect(newStore.state.showColors).toBe(true);
+			});
+
+			it("should handle partial new fields", () => {
+				const partialState = {
+					searchTerm: "test",
+					filters: {
+						selectedBusinessAreas: [],
+						user: null,
+						status: "",
+						kind: "",
+						year: 0,
+						onlyActive: false,
+						onlyInactive: false,
+					},
+					saveSearch: true,
+					visualizationMode: "heatmap",
+					// Missing: visibleLayerTypes, showLabels, showColors
+				};
+				localStorage.setItem("projectMapState", JSON.stringify(partialState));
+
+				const newStore = new ProjectMapStore();
+				expect(newStore.state.visualizationMode).toBe("heatmap");
+				expect(newStore.state.visibleLayerTypes).toEqual(["dbcaregion"]);
+				expect(newStore.state.showLabels).toBe(true);
+				expect(newStore.state.showColors).toBe(true);
+			});
+
+			it("should handle invalid JSON gracefully", () => {
+				localStorage.setItem("projectMapState", "invalid json{");
+				const newStore = new ProjectMapStore();
+				// Should use defaults
+				expect(newStore.state.visualizationMode).toBe("markers");
+				expect(newStore.state.visibleLayerTypes).toEqual(["dbcaregion"]);
+				expect(newStore.state.showLabels).toBe(true);
+				expect(newStore.state.showColors).toBe(true);
+				// Should clear corrupted data
+				expect(localStorage.getItem("projectMapState")).toBeFalsy();
+			});
 		});
 	});
 

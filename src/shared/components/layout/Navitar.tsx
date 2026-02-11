@@ -9,10 +9,10 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/shared/components/ui/popover";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import { IoCaretDown } from "react-icons/io5";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
@@ -50,25 +50,27 @@ export const Navitar = observer(({ shouldShowName = false }: NavitarProps) => {
 		: "U";
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<button className="flex items-center gap-1 cursor-pointer select-none">
-					{shouldShowName && displayName && (
-						<span className="mx-3 text-sm font-medium text-white/90">
-							{displayName}
-						</span>
-					)}
-					<Avatar className="h-8 w-8">
-						<AvatarImage src={avatarSrc} alt={displayName} />
-						<AvatarFallback>{userInitial}</AvatarFallback>
-					</Avatar>
-					<IoCaretDown size={13} className="ml-1 text-white/90" />
-				</button>
-			</PopoverTrigger>
+		<div className="relative">
+			<DropdownMenu open={open} onOpenChange={setOpen}>
+				<DropdownMenuTrigger asChild>
+					<button className="flex items-center gap-1 cursor-pointer select-none">
+						{shouldShowName && displayName && (
+							<span className="mx-3 text-sm font-medium text-white/90">
+								{displayName}
+							</span>
+						)}
+						<Avatar className="h-8 w-8">
+							<AvatarImage src={avatarSrc} alt={displayName} />
+							<AvatarFallback>{userInitial}</AvatarFallback>
+						</Avatar>
+						<IoCaretDown size={13} className="ml-1 text-white/90" />
+					</button>
+				</DropdownMenuTrigger>
 
-			<PopoverContent className="!z-[99999] !p-0 w-80" align="end">
-				<NavitarContent onClose={() => setOpen(false)} />
-			</PopoverContent>
-		</Popover>
+				<DropdownMenuContent className="!z-[99999] !p-0 w-80" align="end">
+					<NavitarContent onClose={() => setOpen(false)} />
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 });

@@ -12,7 +12,8 @@ import L from "leaflet";
 /**
  * ZoomControls component
  *
- * Zoom controls positioned in the bottom-right corner where Leaflet attribution used to be.
+ * Zoom controls positioned in the top-left corner, to the right of the MapStats badge.
+ * Positioned with left offset to account for MapStats width.
  */
 const ZoomControls = observer(() => {
 	const map = useMap();
@@ -40,7 +41,10 @@ const ZoomControls = observer(() => {
 	return (
 		<div
 			ref={containerRef}
-			className="absolute bottom-4 right-4 z-30 flex flex-col gap-1 leaflet-control"
+			className="absolute top-4 z-30 flex flex-col gap-1 leaflet-control"
+			style={{
+				left: "calc(1rem + max(8rem, min(calc(100vw - 8rem), 12rem)) + 0.5rem)",
+			}}
 			onMouseDown={(e) => e.stopPropagation()}
 			onMouseMove={(e) => e.stopPropagation()}
 			onMouseUp={(e) => e.stopPropagation()}
@@ -192,16 +196,20 @@ const MapControlButtons = observer(() => {
 /**
  * MapControls component
  *
- * Floating action buttons positioned in the top-right corner of the map.
+ * Floating action buttons positioned in the corners of the map.
  * Provides map interaction controls and layer management.
- * Zoom controls are positioned in the bottom-right corner.
+ *
+ * Layout:
+ * - Top-left: Zoom in, Zoom out (next to MapStats badge)
+ * - Top-right: Reset view, Fullscreen toggle, Heatmap toggle, Layer controls
  *
  * Features:
  * - Map fullscreen toggle (not browser fullscreen)
  * - Reset view button (fit all markers)
+ * - Zoom in/out buttons
  * - Layer controls via LayerPopover
- * - Zoom in/out buttons (bottom-right corner)
  * - Proper ARIA labels and keyboard support
+ * - Leaflet event prevention to avoid map pan on button clicks
  *
  * Note: This component must be rendered inside a MapContainer to access the map instance.
  */
@@ -209,7 +217,7 @@ export const MapControls = observer(() => {
 	return (
 		<>
 			<MapControlButtons />
-			<ZoomControls />
+			{/* <ZoomControls /> */}
 		</>
 	);
 });
