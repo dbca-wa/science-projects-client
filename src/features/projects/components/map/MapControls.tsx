@@ -1,12 +1,13 @@
 import { observer } from "mobx-react-lite";
 import { ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw } from "lucide-react";
 import { useMap } from "react-leaflet";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { LayerPopover } from "./LayerPopover";
 import { HeatmapToggle } from "./HeatmapToggle";
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
+import L from "leaflet";
 
 /**
  * ZoomControls component
@@ -15,6 +16,14 @@ import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
  */
 const ZoomControls = observer(() => {
 	const map = useMap();
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (containerRef.current) {
+			L.DomEvent.disableClickPropagation(containerRef.current);
+			L.DomEvent.disableScrollPropagation(containerRef.current);
+		}
+	}, []);
 
 	const handleZoomIn = (e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -30,10 +39,15 @@ const ZoomControls = observer(() => {
 
 	return (
 		<div
-			className="absolute bottom-4 right-4 z-30 flex flex-col gap-1"
+			ref={containerRef}
+			className="absolute bottom-4 right-4 z-30 flex flex-col gap-1 leaflet-control"
 			onMouseDown={(e) => e.stopPropagation()}
 			onMouseMove={(e) => e.stopPropagation()}
 			onMouseUp={(e) => e.stopPropagation()}
+			onDragStart={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
 			onDoubleClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
@@ -73,6 +87,14 @@ const MapControlButtons = observer(() => {
 	const map = useMap();
 	const store = useProjectMapStore();
 	const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (containerRef.current) {
+			L.DomEvent.disableClickPropagation(containerRef.current);
+			L.DomEvent.disableScrollPropagation(containerRef.current);
+		}
+	}, []);
 
 	// Listen for fullscreen changes
 	useEffect(() => {
@@ -106,10 +128,15 @@ const MapControlButtons = observer(() => {
 
 	return (
 		<div
-			className="absolute top-4 right-4 z-30 flex flex-col gap-2"
+			ref={containerRef}
+			className="absolute top-4 right-4 z-30 flex flex-col gap-2 leaflet-control"
 			onMouseDown={(e) => e.stopPropagation()}
 			onMouseMove={(e) => e.stopPropagation()}
 			onMouseUp={(e) => e.stopPropagation()}
+			onDragStart={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
 			onDoubleClick={(e) => {
 				e.stopPropagation();
 				e.preventDefault();
