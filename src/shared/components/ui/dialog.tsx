@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
@@ -67,16 +68,37 @@ function Dialog({
 		};
 	}, []);
 
-	// Handle escape key
+	// Handle escape key and body scroll lock
 	React.useEffect(() => {
+		if (!open) return;
+
+		// Lock body scroll when dialog is open
+		const originalOverflow = document.body.style.overflow;
+		const originalPaddingRight = document.body.style.paddingRight;
+
+		// Calculate scrollbar width to prevent layout shift
+		const scrollbarWidth =
+			window.innerWidth - document.documentElement.clientWidth;
+
+		document.body.style.overflow = "hidden";
+		if (scrollbarWidth > 0) {
+			document.body.style.paddingRight = `${scrollbarWidth}px`;
+		}
+
 		const handleEscape = (e: KeyboardEvent) => {
-			if (e.key === "Escape" && open) {
+			if (e.key === "Escape") {
 				onOpenChange(false);
 			}
 		};
 
 		document.addEventListener("keydown", handleEscape);
-		return () => document.removeEventListener("keydown", handleEscape);
+
+		return () => {
+			document.removeEventListener("keydown", handleEscape);
+			// Restore original styles
+			document.body.style.overflow = originalOverflow;
+			document.body.style.paddingRight = originalPaddingRight;
+		};
 	}, [open, onOpenChange]);
 
 	if (!isVisible) return null;
@@ -119,7 +141,16 @@ function DialogTrigger({
 }
 
 function DialogPortal({ children }: { children: React.ReactNode }) {
-	return <>{children}</>;
+	const [mounted, setMounted] = React.useState(false);
+
+	React.useEffect(() => {
+		setMounted(true);
+		return () => setMounted(false);
+	}, []);
+
+	if (!mounted) return null;
+
+	return ReactDOM.createPortal(children, document.body);
 }
 
 function DialogClose(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -170,7 +201,7 @@ function DialogOverlay() {
 			ref={overlayRef}
 			onClick={handleOverlayClick}
 			className={cn(
-				"fixed inset-0 z-50 bg-black/50",
+				"fixed inset-0 z-50 bg-black/50 overflow-hidden",
 				shouldAnimate && "transition-opacity duration-200",
 				shouldAnimate && isOpening && "opacity-0",
 				shouldAnimate && isClosing && "opacity-0",
@@ -209,12 +240,12 @@ function DialogContent({
 	return (
 		<DialogPortal data-slot="dialog-portal">
 			<DialogOverlay />
-			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none overflow-y-auto">
 				<div
 					ref={contentRef}
 					data-slot="dialog-content"
 					className={cn(
-						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg pointer-events-auto",
+						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg pointer-events-auto my-8",
 						shouldAnimate && "transition-all duration-200",
 						shouldAnimate && isOpening && "opacity-0 scale-95",
 						shouldAnimate && isClosing && "opacity-0 scale-95",

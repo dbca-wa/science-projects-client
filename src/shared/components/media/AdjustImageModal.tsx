@@ -329,7 +329,7 @@ export const AdjustImageModal = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="overflow-hidden">
+			<DialogContent className="overflow-hidden sm:max-w-4xl lg:max-w-6xl">
 				<DialogHeader>
 					<DialogTitle>Adjust Image</DialogTitle>
 					<DialogDescription>
