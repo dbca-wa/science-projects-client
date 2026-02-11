@@ -7,7 +7,7 @@ import { Input } from "@/shared/components/ui/input";
 import { FaLock, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { logger } from "@/shared/services/logger.service";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 import type { LoginFormData } from "../types";
 
 /**
@@ -37,8 +37,8 @@ export const LoginForm = () => {
 	const onSubmit = (data: LoginFormData) => {
 		logger.info("Login form submitted", { username: data.username });
 
-		// Sanitize form data before submission
-		const sanitizedData = sanitizeFormData(data, []);
+		// Sanitise form data before submission
+		const sanitisedData = sanitiseFormData(data, []);
 
 		// The useLogin hook handles:
 		// - API call

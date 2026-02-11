@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
@@ -62,7 +62,22 @@ const ProjectMapPage = observer(() => {
   // Get filtered projects and statistics from single API call
   const { data: mapData, isLoading, error } = useProjectsForMap(store.apiParams);
 
-  if (error) {
+  // Delay error display to avoid flash on initial load
+  const [shouldShowError, setShouldShowError] = useState(false);
+  
+  useEffect(() => {
+    if (error && !isLoading) {
+      // Only show error if it persists for 300ms
+      const timer = setTimeout(() => {
+        setShouldShowError(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldShowError(false);
+    }
+  }, [error, isLoading]);
+
+  if (shouldShowError) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center space-y-4 max-w-md">
@@ -136,12 +151,22 @@ const ProjectMapPage = observer(() => {
       
       {/* Minimized filter button - top right corner, positioned to not conflict with map controls */}
       {store.state.filtersMinimized && (
-        <div className="absolute top-4 left-4 z-40">
+        <div 
+          className="absolute top-4 left-4 z-40"
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseMove={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           <Button
             variant="outline"
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               store.toggleFiltersMinimized();
             }}
             className="h-10 w-10 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all animate-in fade-in slide-in-from-right-2 duration-300"
@@ -155,7 +180,17 @@ const ProjectMapPage = observer(() => {
       
       {/* Floating sidebar - animated */}
       {!store.state.filtersMinimized && (
-        <div className="absolute top-4 left-4 w-[calc(100vw-2rem)] sm:w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300 overflow-hidden">
+        <div 
+          className="absolute top-4 left-4 w-[calc(100vw-2rem)] sm:w-96 max-h-[calc(100vh-2rem)] bg-background border border-border rounded-lg shadow-lg flex flex-col z-40 animate-in fade-in slide-in-from-left-2 duration-300 overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseMove={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           {/* Sidebar header */}
           <div className="p-3 sm:p-4 border-b border-border flex items-center justify-between flex-shrink-0">
             <h2 className="text-base sm:text-lg font-semibold">Project Map</h2>
@@ -164,6 +199,7 @@ const ProjectMapPage = observer(() => {
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 store.toggleFiltersMinimized();
               }}
               className="h-8 w-8 p-0"

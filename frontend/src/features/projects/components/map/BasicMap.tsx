@@ -14,6 +14,7 @@ export function BasicMap() {
         center={[-25.2744, 122.2402]}
         zoom={6}
         style={{ height: "100%", width: "100%" }}
+        doubleClickZoom={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

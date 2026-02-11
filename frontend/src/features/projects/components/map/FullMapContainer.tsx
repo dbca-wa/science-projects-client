@@ -30,19 +30,29 @@ const MAP_CONFIG = {
 /**
  * MapClickHandler component
  * 
- * Handles map click events to clear marker selection
- */
-/**
- * MapClickHandler component
- * 
- * Handles map click events to clear marker selection
+ * Handles map click events to clear marker selection and custom double-click zoom
  */
 const MapClickHandler = () => {
   const store = useProjectMapStore();
   
-  useMapEvents({
+  const map = useMapEvents({
     click: () => {
       store.clearMarkerSelection();
+    },
+    dblclick: (e) => {
+      // Check if the double-click originated from a button or control element
+      const target = e.originalEvent.target as HTMLElement;
+      
+      // Check if click is on a button, control, or their children
+      const isOnControl = target.closest('button') || 
+                         target.closest('.leaflet-control') ||
+                         target.closest('[role="dialog"]') || // Popovers
+                         target.closest('[data-radix-popper-content-wrapper]'); // Radix popovers
+      
+      // Only zoom if NOT on a control
+      if (!isOnControl) {
+        map.zoomIn();
+      }
     },
   });
   
@@ -192,6 +202,7 @@ export const FullMapContainer = observer(({
         ref={mapRef}
         zoomControl={false} // Disable default zoom controls since we have custom ones
         attributionControl={false} // Disable attribution control
+        doubleClickZoom={false} // Disable double-click zoom to prevent button clicks from zooming
       >
         <MapClickHandler />
         <TileLayer

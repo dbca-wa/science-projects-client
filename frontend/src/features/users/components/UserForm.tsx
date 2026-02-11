@@ -24,7 +24,7 @@ import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
 import { userCreateSchema, type UserCreateFormData } from "../schemas/userCreate.schema";
 import { userEditSchema, type UserEditFormData } from "../schemas/userEdit.schema";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
 interface UserFormProps {
@@ -145,10 +145,10 @@ const CreateForm = ({ createMutation, isSubmitting, onSuccess, onCancel, navigat
   
   const onSubmit = async (data: UserCreateFormData) => {
     try {
-      // Sanitize form data before submission
-      const sanitizedData = sanitizeFormData(data, ["about", "expertise"]);
+      // Sanitise form data before submission
+      const sanitisedData = sanitiseFormData(data, ["about", "expertise"]);
       
-      const newUser = await createMutation.mutateAsync(sanitizedData);
+      const newUser = await createMutation.mutateAsync(sanitisedData);
       if (onSuccess) {
         onSuccess(newUser);
       } else {
@@ -306,12 +306,12 @@ const EditForm = ({ user, userId, updateMutation, isSubmitting, onSuccess, onCan
   
   const onSubmit = async (data: UserEditFormData) => {
     try {
-      // Sanitize form data before submission
-      const sanitizedData = sanitizeFormData(data, ["about", "expertise"]);
+      // Sanitise form data before submission
+      const sanitisedData = sanitiseFormData(data, ["about", "expertise"]);
       
       const updatedUser = await updateMutation.mutateAsync({
         id: userId,
-        data: sanitizedData,
+        data: sanitisedData,
       });
       if (onSuccess) {
         onSuccess(updatedUser);

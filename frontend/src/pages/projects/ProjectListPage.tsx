@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
@@ -56,6 +56,21 @@ const ProjectListPage = observer(() => {
 		only_inactive: projectSearchStore.state.filters.onlyInactive,
 	});
 
+	// Delay error display to avoid flash on initial load
+	const [shouldShowError, setShouldShowError] = useState(false);
+	
+	useEffect(() => {
+		if (error && !isLoading) {
+			// Only show error if it persists for 300ms
+			const timer = setTimeout(() => {
+				setShouldShowError(true);
+			}, 300);
+			return () => clearTimeout(timer);
+		} else {
+			setShouldShowError(false);
+		}
+	}, [error, isLoading]);
+
 	// Update pagination in store when data changes
 	useEffect(() => {
 		if (data) {
@@ -101,8 +116,8 @@ const ProjectListPage = observer(() => {
 		projectSearchStore.toggleSaveSearch();
 	};
 
-	// Error state
-	if (error) {
+	// Error state - only show if error persists
+	if (shouldShowError) {
 		return (
 			<ErrorState
 				message="Failed to load projects. Please try again."

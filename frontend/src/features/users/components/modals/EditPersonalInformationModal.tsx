@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updatePersonalInformation } from "../../services/user.service";
 import { authKeys } from "@/features/auth/hooks/useAuth";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import {
   Dialog,
@@ -88,9 +88,9 @@ export const EditPersonalInformationModal = observer(
     });
 
     const handleSubmit = (data: PersonalInfoFormData) => {
-      // Sanitize form data before submission
-      const sanitizedData = sanitizeFormData(data, []);
-      updateMutation.mutate(sanitizedData);
+      // Sanitise form data before submission
+      const sanitisedData = sanitiseFormData(data, []);
+      updateMutation.mutate(sanitisedData);
     };
 
     const handleClose = () => {
