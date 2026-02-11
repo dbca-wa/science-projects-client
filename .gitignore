@@ -1,22 +1,46 @@
-node_modules
-dist
-.old
-.docs
-.backup
-.vscode
-README.md
-# Environment files (but keep .env.example)
+docs/AdjustmentDuringRefactor.md
+
+# Large raw GeoJSON data files (keep raw data local only)
+public/data/raw/*.geojson
+
+# Environment variables
 .env
 .env.local
-.env.*.local
-*.unlighthouse/*
-*.DS_Store
-.vscode
-**/.vite.config.ts.timestamp*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Test coverage and results
+coverage
+*.lcov
+.nyc_output
+test-results/
+playwright-report/
+
+# Vitest
+.vitest/
+
+# Test snapshots (if using snapshot testing)
+**/__snapshots__/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-from_github
-to_be_implemented
-.guide
-.docs
-backend
-docs/AdjustmentDuringRefactor.md
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
