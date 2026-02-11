@@ -119,6 +119,7 @@ export const LayerPopover = observer(() => {
 	// Handle show all layers
 	const handleShowAllLayers = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		store.showAllLayers();
 		mapAnnouncements.allLayersToggle('show');
 	};
@@ -126,6 +127,7 @@ export const LayerPopover = observer(() => {
 	// Handle hide all layers
 	const handleHideAllLayers = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		store.hideAllLayers();
 		mapAnnouncements.allLayersToggle('hide');
 	};
@@ -141,6 +143,13 @@ export const LayerPopover = observer(() => {
 					<Button
 						variant="outline"
 						size="sm"
+						onMouseDown={(e) => e.stopPropagation()}
+						onMouseMove={(e) => e.stopPropagation()}
+						onMouseUp={(e) => e.stopPropagation()}
+						onDoubleClick={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+						}}
 						className="flex items-center gap-2 h-8 px-3 w-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
 						aria-label="Layer controls - toggle map layer visibility and display options"
 					>
@@ -156,6 +165,13 @@ export const LayerPopover = observer(() => {
 					<div 
 						onKeyDown={handleKeyDown}
 						onClick={(e: React.MouseEvent) => e.stopPropagation()}
+						onMouseDown={(e: React.MouseEvent) => e.stopPropagation()}
+						onMouseMove={(e: React.MouseEvent) => e.stopPropagation()}
+						onMouseUp={(e: React.MouseEvent) => e.stopPropagation()}
+						onDoubleClick={(e: React.MouseEvent) => {
+							e.stopPropagation();
+							e.preventDefault();
+						}}
 					>
 						<div className="space-y-4">
 						{/* Header */}
@@ -168,6 +184,11 @@ export const LayerPopover = observer(() => {
 									variant="ghost"
 									size="sm"
 									onClick={handleShowAllLayers}
+									onMouseDown={(e) => e.stopPropagation()}
+									onDoubleClick={(e) => {
+										e.stopPropagation();
+										e.preventDefault();
+									}}
 									disabled={allLayersVisible}
 									className="text-xs px-2 py-1 h-auto"
 								>
@@ -177,6 +198,11 @@ export const LayerPopover = observer(() => {
 									variant="ghost"
 									size="sm"
 									onClick={handleHideAllLayers}
+									onMouseDown={(e) => e.stopPropagation()}
+									onDoubleClick={(e) => {
+										e.stopPropagation();
+										e.preventDefault();
+									}}
 									disabled={noLayersVisible}
 									className="text-xs px-2 py-1 h-auto"
 								>

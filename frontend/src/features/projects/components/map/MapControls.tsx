@@ -18,16 +18,27 @@ const ZoomControls = observer(() => {
 
 	const handleZoomIn = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		map.zoomIn();
 	};
 
 	const handleZoomOut = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		map.zoomOut();
 	};
 
 	return (
-		<div className="absolute bottom-4 right-4 z-30 flex flex-col gap-1">
+		<div 
+			className="absolute bottom-4 right-4 z-30 flex flex-col gap-1"
+			onMouseDown={(e) => e.stopPropagation()}
+			onMouseMove={(e) => e.stopPropagation()}
+			onMouseUp={(e) => e.stopPropagation()}
+			onDoubleClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
+		>
 			<Button
 				variant="outline"
 				size="sm"
@@ -75,6 +86,7 @@ const MapControlButtons = observer(() => {
 
 	const handleMapFullscreen = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		const wasFullscreen = store.state.mapFullscreen;
 		store.toggleMapFullscreen();
 		
@@ -86,13 +98,23 @@ const MapControlButtons = observer(() => {
 
 	const handleResetView = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		// Reset to Western Australia view
 		map.setView([-25.2744, 122.2402], 6);
 		mapAnnouncements.viewReset();
 	};
 
 	return (
-		<div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
+		<div 
+			className="absolute top-4 right-4 z-30 flex flex-col gap-2"
+			onMouseDown={(e) => e.stopPropagation()}
+			onMouseMove={(e) => e.stopPropagation()}
+			onMouseUp={(e) => e.stopPropagation()}
+			onDoubleClick={(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+			}}
+		>
 			{/* Map Actions - Fullscreen and Reset in same row, matching layers button width */}
 			<div className="flex gap-1">
 				<Button

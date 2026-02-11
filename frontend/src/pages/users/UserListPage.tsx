@@ -49,6 +49,7 @@ const UserListPage = observer(() => {
 	});
 
   // Fetch users with search and filters from store
+  // Add enabled flag to prevent premature fetching during initialization
   const { data, isLoading, error, refetch } = useUserSearch({
     searchTerm: userSearchStore.state.searchTerm,
     filters: userSearchStore.state.filters,
@@ -57,7 +58,21 @@ const UserListPage = observer(() => {
   
   // Delay sheet opening until after page transition completes
   const [shouldShowSheet, setShouldShowSheet] = useState(false);
+  const [shouldShowError, setShouldShowError] = useState(false);
   const wasLoadingRef = useRef(false);
+  
+  // Delay error display to avoid flash on initial load
+  useEffect(() => {
+    if (error && !isLoading) {
+      // Only show error if it persists for 300ms
+      const timer = setTimeout(() => {
+        setShouldShowError(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldShowError(false);
+    }
+  }, [error, isLoading]);
   
   useEffect(() => {
     // Only track loading if sheet should be open (direct link/refresh to /users/:id)
@@ -125,8 +140,8 @@ const UserListPage = observer(() => {
     userSearchStore.clearSearchAndFilters();
   };
 
-  // Error state
-  if (error) {
+  // Error state - only show if error persists
+  if (shouldShowError) {
     return <ErrorState message="Failed to load users. Please try again." onRetry={refetch} />;
   }
 

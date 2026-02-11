@@ -13,7 +13,7 @@ import { staffUserCreateSchema, type StaffUserCreateFormData } from "../schemas/
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
 import { apiClient } from "@/shared/services/api/client.service";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
 interface StaffUserFormProps {
@@ -150,10 +150,10 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
     }
 
     try {
-      // Sanitize form data before submission
-      const sanitizedData = sanitizeFormData(data, []);
+      // Sanitise form data before submission
+      const sanitisedData = sanitiseFormData(data, []);
       
-      const newUser = await createMutation.mutateAsync(sanitizedData);
+      const newUser = await createMutation.mutateAsync(sanitisedData);
       if (onSuccess) {
         onSuccess(newUser);
       } else {

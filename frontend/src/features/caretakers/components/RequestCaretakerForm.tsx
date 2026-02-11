@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { sanitizeFormData } from "@/shared/utils";
+import { sanitiseFormData } from "@/shared/utils";
 import {
 	Form,
 	FormControl,
@@ -159,10 +159,10 @@ export const RequestCaretakerForm = ({
 	const handleConfirm = () => {
 		const data = form.getValues();
 		
-		// Sanitize form data before submission
-		const sanitizedData = sanitizeFormData(data, ["notes"]);
+		// Sanitise form data before submission
+		const sanitisedData = sanitiseFormData(data, ["notes"]);
 
-		console.log("Submitting caretaker request with data:", sanitizedData);
+		console.log("Submitting caretaker request with data:", sanitisedData);
 		console.log("Approve as admin:", approveAsAdmin);
 
 		requestCaretakerMutation.mutate(
