@@ -1,7 +1,6 @@
 docs/AdjustmentDuringRefactor.md
 
-# Large GeoJSON data files
-public/data/optimized/*.geojson
+# Large raw GeoJSON data files (keep raw data local only)
 public/data/raw/*.geojson
 
 # Environment variables
