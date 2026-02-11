@@ -67,7 +67,7 @@ export const GEOJSON_PROPERTY_NAMES: Record<GeoJSONLayerType, string> = {
 	dbcaRegions: "DRG_REGION_NAME",
 	dbcaDistricts: "DDT_DISTRICT_NAME",
 	nrm: "NRG_REGION_NAME",
-	ibra: "IWA_REG_NAME_6",
+	ibra: "IWA_SUB_NAME_7", // Use sub-region name for more granular labels
 	imcra: "MESO_NAME",
 };
 
