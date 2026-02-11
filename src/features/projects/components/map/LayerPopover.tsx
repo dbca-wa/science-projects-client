@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef } from "react";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/shared/components/ui/popover";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Switch } from "@/shared/components/ui/switch";
@@ -150,8 +150,8 @@ export const LayerPopover = observer(() => {
 
 	return (
 		<div ref={popoverRef}>
-			<Popover>
-				<PopoverTrigger asChild>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
 					<Button
 						variant="outline"
 						size="sm"
@@ -168,8 +168,8 @@ export const LayerPopover = observer(() => {
 						<Layers className="h-4 w-4" />
 						<span className="text-xs font-medium">Layers</span>
 					</Button>
-				</PopoverTrigger>
-				<PopoverContent
+				</DropdownMenuTrigger>
+				<DropdownMenuContent
 					className="w-72 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
 					align="end"
 					sideOffset={8}
@@ -345,8 +345,8 @@ export const LayerPopover = observer(() => {
 							</div>
 						</div>
 					</div>
-				</PopoverContent>
-			</Popover>
+				</DropdownMenuContent>
+			</DropdownMenu>
 		</div>
 	);
 });

@@ -112,14 +112,14 @@ describe("MapControls", () => {
 		expect(fullscreenButton).toHaveClass("flex-1", "h-8", "p-0");
 		expect(resetButton).toHaveClass("flex-1", "h-8", "p-0");
 
-		// Check bottom-right zoom controls
-		const bottomControls = document.querySelector(".absolute.bottom-4.right-4");
-		expect(bottomControls).toBeInTheDocument();
-
-		const zoomInButton = bottomControls?.querySelector(
-			'button[title="Zoom in"]'
+		// Check top-left zoom controls (positioned next to MapStats)
+		const zoomControls = document.querySelector(
+			".absolute.top-4.z-30.flex.gap-1"
 		);
-		const zoomOutButton = bottomControls?.querySelector(
+		expect(zoomControls).toBeInTheDocument();
+
+		const zoomInButton = zoomControls?.querySelector('button[title="Zoom in"]');
+		const zoomOutButton = zoomControls?.querySelector(
 			'button[title="Zoom out"]'
 		);
 
@@ -148,14 +148,14 @@ describe("MapControls", () => {
 		);
 		expect(resetButton).toHaveAttribute("aria-label", "Reset map view");
 
-		// Check bottom-right zoom controls
-		const bottomControls = document.querySelector(".absolute.bottom-4.right-4");
-		expect(bottomControls).toBeInTheDocument();
-
-		const zoomInButton = bottomControls?.querySelector(
-			'button[title="Zoom in"]'
+		// Check top-left zoom controls (positioned next to MapStats)
+		const zoomControls = document.querySelector(
+			".absolute.top-4.z-30.flex.gap-1"
 		);
-		const zoomOutButton = bottomControls?.querySelector(
+		expect(zoomControls).toBeInTheDocument();
+
+		const zoomInButton = zoomControls?.querySelector('button[title="Zoom in"]');
+		const zoomOutButton = zoomControls?.querySelector(
 			'button[title="Zoom out"]'
 		);
 
