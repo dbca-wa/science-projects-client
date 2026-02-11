@@ -247,7 +247,7 @@ export const AdjustImageModal = ({
 			if (previewUrls.profile) URL.revokeObjectURL(previewUrls.profile);
 			if (previewUrls.projectCard) URL.revokeObjectURL(previewUrls.projectCard);
 		};
-	}, []);
+	}, [previewUrls]);
 
 	const handleApplyCrop = async () => {
 		if (!completedCrop || !imgRef.current) return;
