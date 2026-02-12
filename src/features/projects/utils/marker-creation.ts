@@ -110,7 +110,7 @@ export const createProjectMarker = (
 	const color = getMarkerColor(count, isSelected);
 	const densityLabel = getMarkerDensityLabel(count);
 
-	// Create accessible label with sanitized plain text
+	// Create accessible label with sanitised plain text
 	const plainTextTitle =
 		count === 1 ? extractTextFromHTML(projects[0].title) : "";
 	const ariaLabel =
@@ -229,7 +229,7 @@ export const createSizedMarker = (
 	const densityLabel = getMarkerDensityLabel(count);
 	const sizeConfig = getMarkerSize(count);
 
-	// Create accessible label with sanitized plain text
+	// Create accessible label with sanitised plain text
 	const plainTextTitle =
 		count === 1 ? extractTextFromHTML(projects[0].title) : "";
 	const ariaLabel =

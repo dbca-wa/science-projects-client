@@ -168,12 +168,12 @@ export const RequestCaretakerForm = ({
 		requestCaretakerMutation.mutate(
 			{
 				user_id: userId,
-				caretaker_id: sanitizedData.caretakerUserId!,
-				reason: sanitizedData.reason,
-				end_date: sanitizedData.endDate
-					? sanitizedData.endDate.toISOString().split("T")[0]
+				caretaker_id: sanitisedData.caretakerUserId!,
+				reason: sanitisedData.reason,
+				end_date: sanitisedData.endDate
+					? sanitisedData.endDate.toISOString().split("T")[0]
 					: undefined,
-				notes: sanitizedData.notes || undefined,
+				notes: sanitisedData.notes || undefined,
 				approve_immediately: approveAsAdmin, // Send flag to backend
 			},
 			{

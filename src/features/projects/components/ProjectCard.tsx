@@ -59,7 +59,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 	const imageUrl = getImageUrl(project.image);
 	const hasImage = !!imageUrl;
 
-	// Sanitize title to remove HTML tags (including bold)
+	// Sanitise title to remove HTML tags (including bold)
 	const plainTextTitle = sanitizeInput(project.title);
 
 	return (
