@@ -20,7 +20,7 @@ export function OverviewTab({
 	details: _details,
 	members: _members,
 }: OverviewTabProps) {
-	// Sanitize title to remove HTML tags (including bold)
+	// Sanitise title to remove HTML tags (including bold)
 	const plainTextTitle = sanitizeInput(project.title);
 
 	return (
