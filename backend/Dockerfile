@@ -51,7 +51,8 @@ RUN poetry install --only=main --no-root
 # NOTE: Docker security scanner may warn about SECRET_KEY and IT_ASSETS_ACCESS_TOKEN
 # These are DUMMY values only used during build for collectstatic - NOT real secrets
 # Real secrets are injected at runtime via Rancher environment variables
-ENV SECRET_KEY="dummy-build-key" \
+ENV ENVIRONMENT="production" \
+    SECRET_KEY="dummy-build-key" \
     DATABASE_URL="sqlite:///dummy.db" \
     EXTERNAL_PASS="dummy" \
     LIBRARY_API_URL="http://dummy" \
