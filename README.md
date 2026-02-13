@@ -269,6 +269,5 @@ Unauthorised copying, distribution, modification, or use of this software is str
 ## Support
 
 For issues and questions:
-- Check [Troubleshooting](docs/operations/troubleshooting.md)
 - Review [Documentation](docs/)
 - Create an issue on GitHub
