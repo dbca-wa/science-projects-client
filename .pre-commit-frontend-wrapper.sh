@@ -25,7 +25,7 @@ export CHANGED_FILES="$FRONTEND_FILES"
 # Run each hook manually in order
 echo "→ Running Prettier (formatting)..."
 if command -v bun &> /dev/null && [ -n "$FRONTEND_FILES" ]; then
-    echo "$FRONTEND_FILES" | xargs -r bunx prettier --write || true
+    echo "$FRONTEND_FILES" | xargs bunx prettier --write || true
 fi
 
 echo "→ Running ESLint (linting - warnings only)..."

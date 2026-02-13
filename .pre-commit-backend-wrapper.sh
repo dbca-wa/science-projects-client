@@ -25,17 +25,26 @@ export CHANGED_FILES="$BACKEND_FILES"
 # Run each hook manually in order
 echo "→ Running Black (formatting)..."
 if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
-    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run black --line-length=88 2>&1 | grep -v "reformatted\|unchanged" || true
+    PY_FILES=$(echo "$BACKEND_FILES" | grep "\.py$" || true)
+    if [ -n "$PY_FILES" ]; then
+        echo "$PY_FILES" | xargs poetry run black --line-length=88 2>&1 | grep -v "reformatted\|unchanged" || true
+    fi
 fi
 
 echo "→ Running isort (import sorting)..."
 if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
-    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run isort --profile=black --line-length=88 2>&1 | grep -v "Skipped\|Fixing" || true
+    PY_FILES=$(echo "$BACKEND_FILES" | grep "\.py$" || true)
+    if [ -n "$PY_FILES" ]; then
+        echo "$PY_FILES" | xargs poetry run isort --profile=black --line-length=88 2>&1 | grep -v "Skipped\|Fixing" || true
+    fi
 fi
 
 echo "→ Running autoflake (unused imports)..."
 if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
-    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run autoflake --in-place --remove-all-unused-imports --remove-unused-variables --remove-duplicate-keys --ignore-init-module-imports 2>&1 | grep -v "^$" || true
+    PY_FILES=$(echo "$BACKEND_FILES" | grep "\.py$" || true)
+    if [ -n "$PY_FILES" ]; then
+        echo "$PY_FILES" | xargs poetry run autoflake --in-place --remove-all-unused-imports --remove-unused-variables --remove-duplicate-keys --ignore-init-module-imports 2>&1 | grep -v "^$" || true
+    fi
 fi
 
 echo "→ Running flake8 (linting - warnings only)..."
