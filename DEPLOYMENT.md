@@ -39,7 +39,7 @@ feature branch → develop → main → tagged release
 - `ghcr.io/dbca-wa/science-projects-backend:latest`
 
 **Configuration**:
-- `VITE_API_BASE_URL`: UAT backend URL
+- `VITE_PRODUCTION_BACKEND_API_URL`: UAT backend URL
 - `imagePullPolicy: Always` (pulls latest on restart)
 
 ### Production
@@ -58,7 +58,7 @@ feature branch → develop → main → tagged release
 - `ghcr.io/dbca-wa/science-projects-backend:stable`
 
 **Configuration**:
-- `VITE_API_BASE_URL`: Production backend URL
+- `VITE_PRODUCTION_BACKEND_API_URL`: Production backend URL
 - `imagePullPolicy: IfNotPresent` (uses specific version)
 
 ## Deploying to UAT
@@ -337,8 +337,8 @@ curl https://app.example.com
 
 Required secrets for CI/CD workflows:
 
-- `UAT_API_URL` - Backend API URL for UAT (e.g., `https://api-uat.example.com`)
-- `PROD_API_URL` - Backend API URL for production (e.g., `https://api.example.com`)
+- `UAT_BACKEND_API_URL` - Backend Django API URL for UAT (for example, `https://spms-api-uat.dbca.wa.gov.au/api/v1/`)
+- `PROD_BACKEND_API_URL` - Backend Django API URL for production (for example, `https://spms-api.dbca.wa.gov.au/api/v1/`)
 - `GITHUB_TOKEN` - Automatically provided by GitHub Actions
 
 To add/update secrets:

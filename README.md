@@ -367,7 +367,7 @@ Images are automatically built and pushed to GitHub Container Registry:
 ### Environment Variables
 
 **Frontend** (baked at build time):
-- `VITE_API_BASE_URL` - Backend API URL
+- `VITE_PRODUCTION_BACKEND_API_URL` - Backend Django API URL (for example, something like `https://spms-api.dbca.wa.gov.au/api/v1/`)
 
 **Backend** (runtime configuration):
 - `DATABASE_URL` - PostgreSQL connection string

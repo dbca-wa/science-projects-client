@@ -46,7 +46,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:test
           build-args: |
-            VITE_API_BASE_URL=${{ secrets.UAT_API_URL }}
+            VITE_PRODUCTION_BACKEND_API_URL=${{ secrets.UAT_BACKEND_API_URL }}
             VITE_VERSION=uat-${{ github.sha }}
           cache-from: type=gha,scope=frontend-uat
           cache-to: type=gha,mode=max,scope=frontend-uat
