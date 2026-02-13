@@ -1,0 +1,65 @@
+files/
+*.tif
+*.sql
+*.git
+README.md
+.unlighthouse/
+.git/
+.github/
+.github
+.gitignore
+.gitattributes
+.dockerignore
+Dockerfile
+docker-compose.yaml
+docker-compose.yml
+*.pgdump
+spms_media_data
+
+*.env
+*.production
+*.staging
+publish-ghcr.yaml
+render.yaml
+venv
+deployment.yaml
+extracted_table_data
+*.csv
+*.dump
+*.sql
+*.env
+extract_data.py
+build.sh
+
+# Documentation (exclude from Docker builds)
+docs/
+*.md
+!README.md
+
+# Development files
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+test_results/
+coverage.json
+
+# Development scripts
+setup-dev.sh
+run_tests.sh
+
+# Pre-commit
+.pre-commit-config.yaml
+.pre-commit-*-wrapper.sh
+.pre-commit-cache/
+
+
+# Environment files (but keep .env.example)
+.env
+.env.local
+.env.*.local
+*.production
+*.staging
