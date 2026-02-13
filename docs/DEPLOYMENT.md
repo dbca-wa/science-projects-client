@@ -488,7 +488,3 @@ For deployment issues:
 - **GitHub Issues**: https://github.com/dbca-wa/science-projects/issues
 - **Microsoft Teams**: Science Projects channel
 - **Documentation**: See README.md and this file
-
----
-
-**Last Updated**: February 13, 2026

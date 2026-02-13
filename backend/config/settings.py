@@ -349,12 +349,18 @@ else:
 # Initialize Sentry only if SENTRY_URL is provided (optional)
 SENTRY_URL = env("SENTRY_URL", default=None)
 if ENVIRONMENT != "development" and SENTRY_URL:
-    sentry_sdk.init(
-        environment=ENVIRONMENT,
-        dsn=SENTRY_URL,
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-    )
+    try:
+        sentry_sdk.init(
+            environment=ENVIRONMENT,
+            dsn=SENTRY_URL,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+        )
+    except Exception as e:
+        # Log warning but don't crash if Sentry DSN is invalid
+        # This allows the application to start even with misconfigured Sentry
+        import warnings
+        warnings.warn(f"Failed to initialize Sentry: {e}. Continuing without Sentry.")
 
 
 class ColoredFormatter(logging.Formatter):
