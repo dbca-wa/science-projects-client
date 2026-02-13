@@ -26,7 +26,7 @@ patches:
   - path: deployment_hpa_patch.yaml
   - path: service_patch.yaml
 images:
-  - name: ghcr.io/dbca-wa/science-projects-service
+  - name: ghcr.io/dbca-wa/science-projects-backend
     newTag: 3.4.12
-  - name: ghcr.io/dbca-wa/science-projects-client
+  - name: ghcr.io/dbca-wa/science-projects-frontend
     newTag: 3.4.12
