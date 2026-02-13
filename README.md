@@ -1,7 +1,7 @@
 # Science Projects Management System
 
 [![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
-![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-50%25-orange)
+![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-66%25-orange)
 ![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
 [![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
 [![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects/issues)
@@ -385,6 +385,13 @@ Images are automatically built and pushed to GitHub Container Registry:
 2. Make your changes
 3. Ensure tests pass and coverage meets thresholds
 4. Create a pull request to `develop`
+
+See [Branching Strategy](docs/BRANCHING_STRATEGY.md) for detailed workflow documentation.
+
+## Documentation
+
+- **[Branching Strategy](docs/BRANCHING_STRATEGY.md)** - Git workflow, branch management, and CI/CD processes
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Deployment procedures for UAT and production environments
 
 ## License
 
