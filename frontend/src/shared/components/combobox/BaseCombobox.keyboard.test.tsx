@@ -16,9 +16,9 @@ const mockItems: MockItem[] = [
 ];
 
 describe("BaseCombobox - Keyboard Navigation", () => {
-	let mockSearchFn: ReturnType<typeof vi.fn>;
-	let mockOnChange: ReturnType<typeof vi.fn>;
-	let mockOnCreateNew: ReturnType<typeof vi.fn>;
+	let mockSearchFn: (searchTerm: string) => Promise<MockItem[]>;
+	let mockOnChange: (value: MockItem | null) => void;
+	let mockOnCreateNew: (term: string) => Promise<MockItem>;
 
 	beforeEach(() => {
 		mockSearchFn = vi.fn().mockImplementation(async (term: string) => {
@@ -27,12 +27,12 @@ describe("BaseCombobox - Keyboard Navigation", () => {
 				return [];
 			}
 			return mockItems;
-		});
-		mockOnChange = vi.fn();
+		}) as (searchTerm: string) => Promise<MockItem[]>;
+		mockOnChange = vi.fn() as (value: MockItem | null) => void;
 		mockOnCreateNew = vi.fn().mockImplementation(async (term: string) => ({
 			id: 999,
 			name: term,
-		}));
+		})) as (term: string) => Promise<MockItem>;
 	});
 
 	afterEach(() => {
