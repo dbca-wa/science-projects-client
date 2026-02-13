@@ -1,198 +1,161 @@
-# Science Projects Frontend
+# Science Projects Management System
 
-[![Frontend Tests](https://github.com/dbca-wa/science-projects/actions/workflows/frontend-tests.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/frontend-tests.yml)
-[![codecov](https://codecov.io/gh/dbca-wa/science-projects/branch/main/graph/badge.svg)](https://codecov.io/gh/dbca-wa/science-projects)
+A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
 
-Modern React frontend for the Science Projects Management System, built with TypeScript, Vite, TanStack Query, and MobX.
+## Test Coverage
 
-## Tech Stack
+[![Frontend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/frontend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
+[![Backend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/backend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
 
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **TanStack Query** - Server state management
-- **MobX** - Client state management
-- **React Router** - Routing
-- **Tailwind CSS v4** - Styling
-- **shadcn/ui** - Component library
-- **Vitest** - Testing framework
-- **Bun** - Package manager
+- **Frontend**: Minimum 50% coverage (Vitest)
+- **Backend**: Minimum 80% coverage (pytest with 4-way sharding)
+
+### Running Tests Locally
+
+**Frontend**:
+```bash
+cd frontend
+bun install
+bun run test              # Run tests once
+bun run test:watch        # Watch mode
+bun run test:coverage     # With coverage report
+```
+
+**Backend**:
+```bash
+cd backend
+poetry install
+poetry run pytest                    # Run all tests
+poetry run pytest --cov=. --cov-report=html  # With coverage
+```
+
+## Repository Structure
+
+This is a monorepo containing both frontend and backend applications:
+
+```
+science-projects/
+├── frontend/          # React/TypeScript frontend
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── README.md
+├── backend/           # Django/Python backend
+│   ├── config/
+│   ├── [apps]/
+│   ├── pyproject.toml
+│   └── README.md
+├── docker-compose.dev.yml
+└── README.md
+```
+
+## Technical Architecture
+
+### Frontend
+- **React 19** with TypeScript
+- **Vite** for build tooling
+- **TanStack Query** for server state management
+- **MobX** for client state management
+- **Tailwind CSS v4** + shadcn/ui for styling
+- **Bun** as package manager
+
+### Backend
+- **Django** REST framework
+- **Python 3.13**
+- **PostgreSQL** database
+- **Poetry** for dependency management
+- **pytest** for testing with 4-way sharding
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) v1.0+
-- Node.js v18+ (for compatibility)
+- **Frontend**: [Bun](https://bun.sh/) v1.0+
+- **Backend**: Python 3.13+, [Poetry](https://python-poetry.org/)
+- **Database**: PostgreSQL 17
 
-### Installation
+### Local Development (Docker Compose)
+
+The easiest way to run the full stack locally:
 
 ```bash
-# Install dependencies
+# Start all services (frontend, backend, database)
+docker-compose -f docker-compose.dev.yml up
+
+# Frontend will be available at: http://localhost:3000
+# Backend will be available at: http://localhost:8000
+# Database will be available at: localhost:54320
+```
+
+### Local Development (Manual)
+
+**Frontend**:
+```bash
+cd frontend
 bun install
-
-# Copy environment variables
 cp .env.example .env
-
-# Start development server
 bun run dev
 ```
 
-The app will be available at `http://127.0.0.1:3000`
-
-## Development
-
-### Available Scripts
-
+**Backend**:
 ```bash
-# Development
-bun run dev              # Start dev server
-
-# Building
-bun run build            # Build for production
-bun run preview          # Preview production build
-
-# Testing
-bun test                 # Run tests once
-bun test:watch           # Run tests in watch mode
-bun test:ui              # Run tests with UI
-bun test:coverage        # Run tests with coverage
-bun test:coverage:open   # Run tests with coverage and open report
-
-# Linting
-bun run lint             # Run ESLint
+cd backend
+poetry install
+cp .env.example .env
+poetry run python manage.py migrate
+poetry run python manage.py createsuperuser
+poetry run python manage.py runserver
 ```
 
-### Project Structure
+## Documentation
 
-```
-frontend/
-├── src/
-│   ├── app/              # App-level config (stores, router)
-│   ├── features/         # Feature modules
-│   │   ├── auth/
-│   │   ├── users/
-│   │   └── dashboard/
-│   ├── pages/            # Route pages
-│   ├── shared/           # Shared code
-│   │   ├── components/   # Reusable components
-│   │   ├── hooks/        # Reusable hooks
-│   │   ├── services/     # API services
-│   │   ├── types/        # Shared types
-│   │   └── utils/        # Utility functions
-│   └── test/             # Test setup and factories
-├── coverage/             # Test coverage reports (gitignored)
-└── dist/                 # Production build (gitignored)
-```
-
-## Testing
-
-This project uses Vitest for testing with a focus on:
-
-- **Unit tests** for utilities and pure functions
-- **Integration tests** for components and hooks
-- **Property-based tests** for complex logic
-
-### Running Tests
-
-```bash
-# Run all tests
-bun test
-
-# Run tests in watch mode (TDD)
-bun test:watch
-
-# Run tests with coverage
-bun test:coverage
-
-# Open coverage report in browser
-bun test:coverage:open
-```
-
-### Coverage Thresholds
-
-Current thresholds (will increase as testing matures):
-
-- Lines: 50%
-- Functions: 50%
-- Branches: 50%
-- Statements: 50%
-
-### Writing Tests
-
-Tests are co-located with source files:
-
-```
-src/shared/utils/
-├── user.utils.ts
-└── user.utils.test.ts
-```
-
-Example test:
-
-```typescript
-import { describe, it, expect } from "vitest";
-import { getUserDisplayName } from "./user.utils";
-
-describe("getUserDisplayName", () => {
-	it("should return full name when display names are valid", () => {
-		const user = { display_first_name: "John", display_last_name: "Doe" };
-		expect(getUserDisplayName(user)).toBe("John Doe");
-	});
-});
-```
-
-## Architecture
-
-### State Management
-
-- **TanStack Query**: Server state (API calls, caching)
-- **MobX**: Client state (UI, auth status, preferences)
-
-### Routing
-
-React Router with data mode for type-safe routing and data loading.
-
-### Styling
-
-Tailwind CSS v4 with shadcn/ui components. No CSS-in-JS or styled-components.
-
-### API Client
-
-Axios-based client with:
-
-- Automatic CSRF token handling
-- Request/response interceptors
-- Error handling
-- Type-safe endpoints
-
-## Environment Variables
-
-```bash
-# API Configuration
-VITE_API_BASE_URL=http://localhost:8000/api/v1/
-
-# Feature Flags (optional)
-VITE_ENABLE_DEVTOOLS=true
-```
-
-## Building for Production
-
-```bash
-# Build
-bun run build
-
-# Preview build locally
-bun run preview
-```
-
-The build output will be in the `dist/` directory.
+- **[Frontend Documentation](frontend/README.md)** - React app setup, architecture, and development
+- **[Backend Documentation](backend/README.md)** - Django API, models, and deployment
 
 ## CI/CD
 
 GitHub Actions automatically:
 
-- Runs tests on push/PR
-- Generates coverage reports
-- Comments coverage on PRs
-- Uploads coverage to Codecov
+- **On Pull Requests**:
+  - Runs frontend tests with coverage
+  - Runs backend tests with coverage (4-way sharding)
+  - Enforces coverage thresholds
+  - Comments coverage reports on PRs
+
+- **On Tagged Releases**:
+  - Builds frontend Docker images (test and production)
+  - Builds backend Docker image
+  - Pushes images to GitHub Container Registry
+  - Updates coverage badges
+
+## Deployment
+
+### Docker Images
+
+Images are automatically built and pushed to GitHub Container Registry on tagged releases:
+
+- `ghcr.io/dbca-wa/science-projects-frontend:latest` (production)
+- `ghcr.io/dbca-wa/science-projects-frontend:test` (test environment)
+- `ghcr.io/dbca-wa/science-projects-backend:latest`
+
+### Environment Variables
+
+**Frontend** (baked at build time):
+- `VITE_API_BASE_URL` - Backend API URL
+
+**Backend** (runtime configuration):
+- `DATABASE_URL` - PostgreSQL connection string
+- `SECRET_KEY` - Django secret key
+- `DEBUG` - Debug mode (False in production)
+- See `backend/.env.example` for full list
+
+## Contributing
+
+1. Create a feature branch from `develop`
+2. Make your changes
+3. Ensure tests pass and coverage meets thresholds
+4. Create a pull request to `develop`
+
+## License
+
+Copyright © 2024-2026 Department of Biodiversity, Conservation and Attractions, Western Australia
