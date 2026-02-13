@@ -19,12 +19,12 @@ const mockItems: MockItem[] = [
 ];
 
 describe("BaseCombobox - Accessibility", () => {
-	let mockSearchFn: ReturnType<typeof vi.fn>;
-	let mockOnChange: ReturnType<typeof vi.fn>;
+	let mockSearchFn: (searchTerm: string) => Promise<MockItem[]>;
+	let mockOnChange: (value: MockItem | null) => void;
 
 	beforeEach(() => {
-		mockSearchFn = vi.fn(async () => mockItems);
-		mockOnChange = vi.fn();
+		mockSearchFn = vi.fn(async () => mockItems) as (searchTerm: string) => Promise<MockItem[]>;
+		mockOnChange = vi.fn() as (value: MockItem | null) => void;
 	});
 
 	afterEach(() => {
