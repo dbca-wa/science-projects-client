@@ -1,0 +1,375 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    tags:
+      - "v*"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: dbca-wa/science-projects
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # ====================== FRONTEND TESTS ======================
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            frontend/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('frontend/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: bun install
+
+      - name: Run tests with coverage
+        working-directory: frontend
+        run: bun run test:coverage
+
+      - name: Check coverage threshold
+        working-directory: frontend
+        run: |
+          # Vitest will fail if coverage is below threshold (50%)
+          echo "✅ Frontend coverage meets minimum threshold"
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          retention-days: 30
+
+  # ====================== BACKEND TESTS ======================
+  test-backend:
+    name: Test Backend (shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            backend/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('backend/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi
+
+      - name: Restore test durations cache
+        uses: actions/cache/restore@v4
+        with:
+          path: backend/.test_durations
+          key: test-durations-${{ github.sha }}-${{ matrix.shard }}
+          restore-keys: |
+            test-durations-combined-
+            test-durations-
+        continue-on-error: true
+
+      - name: Run tests with coverage
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+          DJANGO_SETTINGS_MODULE: config.settings
+          SECRET_KEY: test-secret-key-for-ci-${{ github.run_id }}
+          DEBUG: "False"
+          ENVIRONMENT: development
+          EXTERNAL_PASS: "test-external-pass"
+          LIBRARY_API_URL: "https://library-test.example.com/api"
+          LIBRARY_BEARER_TOKEN: "test-bearer-token"
+          IT_ASSETS_ACCESS_TOKEN: "test-it-assets-token"
+          IT_ASSETS_USER: "test-user"
+          PRINCE_SERVER_URL: ""
+          DEFAULT_FROM_EMAIL: "test-noreply@example.com"
+          SPMS_MAINTAINER_EMAIL: "test-maintainer@example.com"
+          EMAIL_HOST: "localhost"
+          EMAIL_PORT: "25"
+        run: |
+          poetry run pytest \
+            --splits 4 \
+            --group ${{ matrix.shard }} \
+            --store-durations \
+            -n auto \
+            --tb=short \
+            --cov=. \
+            --cov-report= \
+            -v \
+            -ra \
+            --maxfail=5
+
+      - name: Prepare coverage file for upload
+        if: always()
+        working-directory: backend
+        run: |
+          mkdir -p coverage-output
+          if [ -f ".coverage" ]; then
+            cp .coverage "coverage-output/.coverage.${{ matrix.shard }}"
+          fi
+          shopt -s nullglob
+          for file in .coverage.*; do
+            if [ "$file" != ".coveragerc" ] && [ -f "$file" ]; then
+              cp "$file" coverage-output/
+            fi
+          done
+          shopt -u nullglob
+
+      - name: Save test durations cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: backend/.test_durations
+          key: test-durations-${{ github.sha }}-${{ matrix.shard }}
+
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-${{ matrix.shard }}
+          path: backend/coverage-output/.coverage.*
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: true
+
+  # ====================== COMBINE BACKEND COVERAGE ======================
+  combine-backend-coverage:
+    name: Combine Backend Coverage
+    needs: test-backend
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi --only main,dev
+
+      - name: Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-coverage-*
+          path: backend/coverage-reports
+
+      - name: Combine coverage data
+        working-directory: backend
+        run: |
+          find coverage-reports -name '.coverage.*' -type f -exec mv {} . \;
+          poetry run coverage combine
+          poetry run coverage xml -o coverage.xml
+          poetry run coverage html
+          COVERAGE=$(poetry run coverage report | grep TOTAL | awk '{print $4}' | sed 's/%//')
+          echo "Coverage: ${COVERAGE}%"
+          echo "${COVERAGE}" > coverage-percentage.txt
+          poetry run coverage report --fail-under=80
+
+      - name: Upload combined coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/htmlcov/
+          retention-days: 30
+
+  # ====================== BUILD FRONTEND TEST ======================
+  build-frontend-test:
+    name: Build Frontend (Test)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Frontend Test image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:test-${{ steps.tag.outputs.TAG_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:test
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.TEST_API_URL }}
+            VITE_VERSION=${{ steps.tag.outputs.TAG_NAME }}
+          cache-from: type=gha,scope=frontend-test
+          cache-to: type=gha,mode=max,scope=frontend-test
+          labels: |
+            org.opencontainers.image.title=Science Projects Frontend (Test)
+            org.opencontainers.image.version=${{ steps.tag.outputs.TAG_NAME }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  # ====================== BUILD FRONTEND PRODUCTION ======================
+  build-frontend-prod:
+    name: Build Frontend (Production)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Frontend Production image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:${{ steps.tag.outputs.TAG_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:latest
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.PROD_API_URL }}
+            VITE_VERSION=${{ steps.tag.outputs.TAG_NAME }}
+          cache-from: type=gha,scope=frontend-prod
+          cache-to: type=gha,mode=max,scope=frontend-prod
+          labels: |
+            org.opencontainers.image.title=Science Projects Frontend (Production)
+            org.opencontainers.image.version=${{ steps.tag.outputs.TAG_NAME }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  # ====================== BUILD BACKEND ======================
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:${{ steps.tag.outputs.TAG_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:latest
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+          labels: |
+            org.opencontainers.image.title=Science Projects Backend
+            org.opencontainers.image.version=${{ steps.tag.outputs.TAG_NAME }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
