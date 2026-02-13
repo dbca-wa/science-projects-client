@@ -1,9 +1,11 @@
 # Science Projects Management System (SPMS) Backend
 
-[![Tests](https://github.com/dbca-wa/science-projects-service/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects-service/actions/workflows/test.yml)
-![Coverage](https://img.shields.io/badge/coverage-83.65%25-green)
-[![CodeQL](https://github.com/dbca-wa/science-projects-service/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects-service/actions/workflows/github-code-scanning/codeql)
-[![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects-service/issues)
+[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/ci.yml)
+[![Backend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/backend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
+[![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
+[![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects/issues)
+
+> **Note**: This is the backend component of the Science Projects monorepo. See the [root README](../README.md) for the complete system overview.
 
 ## What is SPMS?
 
@@ -107,7 +109,7 @@ React-based single-page application providing:
 - Real-time updates and notifications
 - Map-based project visualisation
 
-Repository: https://github.com/dbca-wa/science-projects-client
+See: [Frontend README](../frontend/README.md)
 
 ### Infrastructure
 - Kubernetes deployment using Kustomize

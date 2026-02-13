@@ -33,8 +33,8 @@ External Services:
 
 ### Container Images
 
-**Backend**: `ghcr.io/dbca-wa/science-projects-service`
-**Frontend**: `ghcr.io/dbca-wa/science-projects-client`
+**Backend**: `ghcr.io/dbca-wa/science-projects-backend`
+**Frontend**: `ghcr.io/dbca-wa/science-projects-frontend`
 
 ## Kustomize Structure
 

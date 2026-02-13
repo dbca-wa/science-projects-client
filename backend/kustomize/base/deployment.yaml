@@ -9,7 +9,7 @@ spec:
     spec:
       containers:
         - name: spms-backend
-          image: ghcr.io/dbca-wa/science-projects-service
+          image: ghcr.io/dbca-wa/science-projects-backend
           imagePullPolicy: Always
           env:
             - name: TZ
@@ -33,7 +33,7 @@ spec:
             - mountPath: /tmp
               name: tmpfs-ram-backend
         - name: spms-frontend
-          image: ghcr.io/dbca-wa/science-projects-client
+          image: ghcr.io/dbca-wa/science-projects-frontend
           imagePullPolicy: Always
           env:
             - name: TZ
