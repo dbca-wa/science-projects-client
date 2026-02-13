@@ -7,7 +7,7 @@ A comprehensive project management system for scientific research projects, deve
 [![Frontend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/frontend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
 [![Backend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/backend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
 
-- **Frontend**: Minimum 50% coverage (Vitest)
+- **Frontend**: Minimum 50% coverage (Vitest) WIP
 - **Backend**: Minimum 80% coverage (pytest with 4-way sharding)
 
 ### Running Tests Locally
@@ -57,12 +57,12 @@ science-projects/
 - **TanStack Query** for server state management
 - **MobX** for client state management
 - **Tailwind CSS v4** + shadcn/ui for styling
-- **Bun** as package manager
+- **Bun 1.3.9** as package manager
 
 ### Backend
 - **Django** REST framework
-- **Python 3.13**
-- **PostgreSQL** database
+- **Python 3.14.3**
+- **PostgreSQL 17** database
 - **Poetry** for dependency management
 - **pytest** for testing with 4-way sharding
 
@@ -70,41 +70,201 @@ science-projects/
 
 ### Prerequisites
 
-- **Frontend**: [Bun](https://bun.sh/) v1.0+
-- **Backend**: Python 3.13+, [Poetry](https://python-poetry.org/)
-- **Database**: PostgreSQL 17
+**Local Machine**:
+- **Bun**: v1.3.9+ ([install](https://bun.sh/))
+- **Python**: 3.14.3+ ([download](https://www.python.org/downloads/))
+- **Poetry**: Latest ([install](https://python-poetry.org/docs/#installation))
+- **Docker Desktop**: For containerised development (optional, [download](https://www.docker.com/products/docker-desktop/))
 
-### Local Development (Docker Compose)
+**Windows Setup**:
 
-The easiest way to run the full stack locally:
+1. **Install Python 3.14.3**:
+   - Download from [python.org](https://www.python.org/downloads/)
+   - During installation, check "Add Python to PATH"
+   - Verify: Open PowerShell and run `python --version`
+
+2. **Install Bun**:
+   ```powershell
+   # PowerShell (Run as Administrator)
+   powershell -c "irm bun.sh/install.ps1 | iex"
+   ```
+   - Verify: `bun --version`
+
+3. **Install Poetry**:
+   ```powershell
+   # PowerShell
+   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+   ```
+   - Add Poetry to PATH: `%APPDATA%\Python\Scripts`
+   - Verify: `poetry --version`
+
+4. **Install Docker Desktop** (optional):
+   - Download from [docker.com](https://www.docker.com/products/docker-desktop/)
+   - Enable WSL 2 backend for better performance
+
+**macOS/Linux Setup**:
 
 ```bash
+# Install Bun
+curl -fsSL https://bun.sh/install | bash
+
+# Install Python 3.14 (macOS with Homebrew)
+brew install python@3.14
+
+# Add Python aliases to ~/.bashrc or ~/.zshrc
+echo 'alias python="python3"' >> ~/.bashrc
+echo 'alias py="python3"' >> ~/.bashrc
+echo 'alias pip="pip3"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/python@3.14/libexec/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Install Poetry
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+**Verify Installation**:
+```bash
+bun --version      # Should show 1.3.9+
+python --version   # Should show 3.14.3+
+poetry --version   # Should show latest
+```
+
+### Local Development (Docker Compose - Recommended)
+
+The easiest way to run the full stack locally with hot-reloading:
+
+**Windows (PowerShell)**:
+```powershell
 # Start all services (frontend, backend, database)
 docker-compose -f docker-compose.dev.yml up
 
-# Frontend will be available at: http://localhost:3000
-# Backend will be available at: http://localhost:8000
-# Database will be available at: localhost:54320
+# Or run in background
+docker-compose -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Stop services
+docker-compose -f docker-compose.dev.yml down
+```
+
+**macOS/Linux (Bash/Zsh)**:
+```bash
+# Same commands work on macOS/Linux
+docker-compose -f docker-compose.dev.yml up
+```
+
+**Services**:
+- Frontend: http://127.0.0.1:3000 (Vite dev server with hot-reload)
+- Backend: http://127.0.0.1:8000 (Django dev server)
+- Database: PostgreSQL on port 54320
+
+**Run Migrations** (first time):
+
+Windows (PowerShell):
+```powershell
+docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
+```
+
+macOS/Linux:
+```bash
+docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
+```
+
+**Create Superuser** (optional):
+```bash
+docker-compose -f docker-compose.dev.yml exec backend python manage.py createsuperuser
 ```
 
 ### Local Development (Manual)
 
 **Frontend**:
+
+Windows (PowerShell):
+```powershell
+cd frontend
+bun install
+copy .env.example .env
+bun run dev
+# Available at http://127.0.0.1:3000
+```
+
+macOS/Linux:
 ```bash
 cd frontend
 bun install
 cp .env.example .env
 bun run dev
+# Available at http://127.0.0.1:3000
 ```
 
 **Backend**:
+
+Windows (PowerShell):
+```powershell
+cd backend
+
+# Setup Python environment
+poetry env use python
+poetry install
+
+# Configure environment
+copy .env.example .env
+# Edit .env with your database credentials
+
+# Run migrations
+poetry run python manage.py migrate
+
+# Create superuser (optional)
+poetry run python manage.py createsuperuser
+
+# Start dev server
+poetry run python manage.py runserver
+# Available at http://127.0.0.1:8000
+```
+
+macOS/Linux:
 ```bash
 cd backend
+
+# Setup Python environment
+poetry env use python3.14  # or: poetry env use /opt/homebrew/bin/python3.14
 poetry install
+
+# Configure environment
 cp .env.example .env
+# Edit .env with your database credentials
+
+# Run migrations
 poetry run python manage.py migrate
+
+# Create superuser (optional)
 poetry run python manage.py createsuperuser
+
+# Start dev server
 poetry run python manage.py runserver
+# Available at http://127.0.0.1:8000
+```
+
+**Database** (if not using Docker):
+
+Windows:
+- Download and install [PostgreSQL 17](https://www.postgresql.org/download/windows/)
+- Use pgAdmin or command line to create database:
+  ```sql
+  CREATE DATABASE science_projects;
+  ```
+
+macOS:
+```bash
+# Install PostgreSQL 17
+brew install postgresql@17
+
+# Start PostgreSQL
+brew services start postgresql@17
+
+# Create database
+createdb science_projects
 ```
 
 ## Documentation

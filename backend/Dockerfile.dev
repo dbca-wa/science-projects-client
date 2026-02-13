@@ -1,0 +1,56 @@
+# Development Dockerfile for local development
+FROM python:3.14-slim-bookworm
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV TZ="Australia/Perth"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    -o Acquire::Retries=4 --no-install-recommends \
+    vim wget ncdu \
+    curl ca-certificates \
+    build-essential gcc g++ \
+    && apt-get upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install --upgrade pip
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
+ENV PATH="${PATH}:/etc/poetry/bin"
+
+# Install Prince XML
+RUN DEB_FILE=prince.deb \
+    && ARCH=$(dpkg --print-architecture) \
+    && if [ "$ARCH" = "arm64" ]; then \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.1-1_debian12_arm64.deb"; \
+    else \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.1-1_debian12_amd64.deb"; \
+    fi \
+    && wget -O ${DEB_FILE} $PRINCE_URL \
+    && apt-get update \
+    && apt-get install -y -f ./${DEB_FILE} \
+    && rm -f ${DEB_FILE}
+
+ENV PATH="${PATH}:/usr/lib/prince/bin"
+
+# Set working directory
+WORKDIR /usr/src/app/backend
+
+# Copy project files
+COPY . .
+
+# Configure Poetry and install dependencies (including dev dependencies)
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-root
+
+# Delete non-commercial license of Prince
+RUN rm -f /usr/lib/prince/license/license.dat
+
+# Expose port
+EXPOSE 8000
+
+# Run Django development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
