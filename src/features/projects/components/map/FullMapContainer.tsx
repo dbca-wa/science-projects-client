@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
 	MapContainer as LeafletMap,
@@ -18,6 +18,7 @@ import { RegionLayer } from "./RegionLayer";
 import { RegionLabel } from "./RegionLabel";
 import { MapControls } from "./MapControls";
 import { MapStats } from "./MapStats";
+import { ZoomLevel } from "./ZoomLevel";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { GEOJSON_PROPERTY_NAMES } from "@/features/projects/types/map.types";
 
@@ -36,7 +37,11 @@ const MAP_CONFIG = {
  *
  * Handles map click events to clear marker selection and custom double-click zoom
  */
-const MapClickHandler = () => {
+const MapClickHandler = ({
+	onZoomChange,
+}: {
+	onZoomChange: (zoom: number) => void;
+}) => {
 	const store = useProjectMapStore();
 
 	const map = useMapEvents({
@@ -58,6 +63,9 @@ const MapClickHandler = () => {
 			if (!isOnControl) {
 				map.zoomIn();
 			}
+		},
+		zoomend: () => {
+			onZoomChange(map.getZoom());
 		},
 	});
 
@@ -107,6 +115,7 @@ export const FullMapContainer = observer(
 	}: FullMapContainerProps) => {
 		const store = useProjectMapStore();
 		const mapRef = useRef<LeafletMapType | null>(null);
+		const [currentZoom, setCurrentZoom] = useState<number>(MAP_CONFIG.zoom);
 
 		// Fetch data with reactive filters
 		const {
@@ -229,7 +238,7 @@ export const FullMapContainer = observer(
 					attributionControl={false} // Disable attribution control
 					doubleClickZoom={false} // Disable double-click zoom to prevent button clicks from zooming
 				>
-					<MapClickHandler />
+					<MapClickHandler onZoomChange={setCurrentZoom} />
 					<TileLayer
 						attribution=""
 						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -297,14 +306,21 @@ export const FullMapContainer = observer(
 					<MapControls />
 				</LeafletMap>
 
-				{/* Map statistics overlay - only show in normal (non-fullscreen) mode */}
+				{/* Map statistics - top-left corner, only show in normal (non-fullscreen) mode */}
 				{!fullscreen && (
-					<MapStats
-						projectCount={projectCount}
-						totalProjects={totalProjects}
-						projectsWithoutLocation={projectsWithoutLocation}
-					/>
+					<div className="absolute top-4 left-4 z-30">
+						<MapStats
+							projectCount={projectCount}
+							totalProjects={totalProjects}
+							projectsWithoutLocation={projectsWithoutLocation}
+						/>
+					</div>
 				)}
+
+				{/* Zoom level display - bottom-right corner, show in both modes */}
+				<div className="absolute bottom-4 right-4 z-30">
+					<ZoomLevel zoomLevel={currentZoom} />
+				</div>
 			</div>
 		);
 	}

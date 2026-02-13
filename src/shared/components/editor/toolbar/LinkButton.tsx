@@ -119,14 +119,14 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ disabled = false }) => {
 	};
 
 	const handleInsertLink = () => {
-		const sanitizedUrl = sanitizeUrl(linkUrl);
+		const sanitisedUrl = sanitizeUrl(linkUrl);
 
-		if (!sanitizedUrl) {
+		if (!sanitisedUrl) {
 			toast.error("Invalid URL. Please enter a valid URL.");
 			return;
 		}
 
-		editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizedUrl);
+		editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitisedUrl);
 		setIsDialogOpen(false);
 		setLinkUrl("");
 	};

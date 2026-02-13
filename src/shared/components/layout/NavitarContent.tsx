@@ -91,7 +91,10 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Toggle Dark Mode */}
 				<div
-					onClick={() => uiStore.toggleTheme()}
+					onClick={() => {
+						uiStore.toggleTheme();
+						onClose();
+					}}
 					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
 				>
 					<div className="flex gap-2 items-center">

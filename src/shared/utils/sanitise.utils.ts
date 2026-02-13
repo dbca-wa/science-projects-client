@@ -10,11 +10,11 @@ function getPurify() {
 }
 
 /**
- * Sanitizes HTML content to prevent XSS attacks.
+ * Sanitises HTML content to prevent XSS attacks.
  * Removes potentially dangerous tags and attributes while preserving safe HTML.
  *
- * @param html - The HTML string to sanitize
- * @returns Sanitized HTML string safe for rendering
+ * @param html - The HTML string to sanitise
+ * @returns Sanitised HTML string safe for rendering
  *
  * @example
  * ```ts
@@ -52,10 +52,10 @@ export function sanitizeHtmlContent(html: string): string {
 }
 
 /**
- * Sanitizes plain text input by removing all HTML tags.
+ * Sanitises plain text input by removing all HTML tags.
  * Use this for inputs that should never contain HTML.
  *
- * @param input - The text input to sanitize
+ * @param input - The text input to sanitise
  * @returns Plain text with all HTML removed
  *
  * @example
@@ -74,12 +74,12 @@ export function sanitizeInput(input: string): string {
 }
 
 /**
- * Sanitizes a URL to prevent javascript: and data: protocol attacks.
+ * Sanitises a URL to prevent javascript: and data: protocol attacks.
  * Only allows http:, https:, and mailto: protocols.
  * Automatically adds https:// if no protocol is specified.
  *
- * @param url - The URL to sanitize
- * @returns Sanitized URL or empty string if invalid
+ * @param url - The URL to sanitise
+ * @returns Sanitised URL or empty string if invalid
  *
  * @example
  * ```ts
@@ -98,12 +98,12 @@ export function sanitizeInput(input: string): string {
  */
 export function sanitizeUrl(url: string): string {
 	const purify = getPurify();
-	const sanitized = purify.sanitize(url, {
+	const sanitised = purify.sanitize(url, {
 		ALLOWED_TAGS: [],
 		ALLOWED_ATTR: [],
 	});
 
-	const trimmed = sanitized.trim();
+	const trimmed = sanitised.trim();
 	if (!trimmed) {
 		return "";
 	}
@@ -151,7 +151,7 @@ export function sanitizeUrl(url: string): string {
 }
 
 /**
- * Sanitizes HTML content for rich text editors.
+ * Sanitises HTML content for rich text editors.
  * More permissive than sanitizeHtml, allows additional formatting tags.
  *
  * Security Features:
@@ -163,8 +163,8 @@ export function sanitizeUrl(url: string): string {
  * This function is specifically designed for Lexical editor plugins
  * to prevent XSS attacks whilst maintaining rich text capabilities.
  *
- * @param html - The HTML string to sanitize
- * @returns Sanitized HTML string safe for rendering
+ * @param html - The HTML string to sanitise
+ * @returns Sanitised HTML string safe for rendering
  *
  * @example
  * ```ts
