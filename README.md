@@ -8,415 +8,264 @@
 
 A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
 
-<!-- Test change for CI/CD workflow verification -->
+## Quick Start
 
-## Test Coverage
-
-- **Frontend**: Minimum 50% coverage (Vitest with 2-way sharding)
-- **Backend**: Minimum 80% coverage (pytest with 4-way sharding)
-
-### Running Tests Locally
-
-**Frontend**:
 ```bash
-cd frontend
-bun install
-bun run test              # Run tests once
-bun run test:watch        # Watch mode
-bun run test:coverage     # With coverage report
-```
+# Clone and start with Docker (recommended)
+git clone https://github.com/dbca-wa/science-projects.git
+cd science-projects
+docker-compose -f docker-compose.dev.yml up
 
-**Backend**:
-```bash
-cd backend
-poetry install
-poetry run pytest                    # Run all tests
-poetry run pytest --cov=. --cov-report=html  # With coverage
+# Frontend: http://127.0.0.1:3000
+# Backend: http://127.0.0.1:8000
 ```
 
 ## Repository Structure
 
-This is a monorepo containing both frontend and backend applications:
-
 ```
 science-projects/
-├── frontend/          # React/TypeScript frontend
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── README.md
-├── backend/           # Django/Python backend
-│   ├── config/
-│   ├── [apps]/
-│   ├── pyproject.toml
-│   └── README.md
-├── docker-compose.dev.yml
-└── README.md
+├── frontend/              # React 19 + TypeScript + Tailwind + shadcn/ui
+├── backend/               # Django + DRF + PostgreSQL
+├── documentation/         # Comprehensive docs
+├── kustomize/            # Kubernetes configs
+└── docker-compose.dev.yml
 ```
 
-## Technical Architecture
+## Tech Stack
 
-### Frontend
-- **React 19** with TypeScript
-- **Vite** for build tooling
-- **TanStack Query** for server state management
-- **MobX** for client state management
-- **Tailwind CSS v4** + shadcn/ui for styling
-- **Bun 1.3.9** as package manager
+**Frontend**: React 19, TypeScript, Vite, TanStack Query, MobX, Tailwind CSS v4, Bun  
+**Backend**: Django, DRF, Python 3.14, PostgreSQL 17, Poetry, pytest  
+**DevOps**: GitHub Actions, Docker, Kubernetes, Kustomize
 
-### Backend
-- **Django** REST framework
-- **Python 3.14.3**
-- **PostgreSQL 17** database
-- **Poetry** for dependency management
-- **pytest** for testing with 4-way sharding
-
-## Getting Started
+## Development
 
 ### Prerequisites
 
-**Local Machine**:
-- **Bun**: v1.3.9+ ([install](https://bun.sh/))
-- **Python**: 3.14.3+ ([download](https://www.python.org/downloads/))
-- **Poetry**: Latest ([install](https://python-poetry.org/docs/#installation))
-- **Docker Desktop**: For containerised development (optional, [download](https://www.docker.com/products/docker-desktop/))
+- **Bun** 1.3.9+ - [install](https://bun.sh/)
+- **Python** 3.14.3+ - [download](https://www.python.org/downloads/)
+- **Poetry** - [install](https://python-poetry.org/docs/#installation)
+- **Docker Desktop** (optional) - [download](https://www.docker.com/products/docker-desktop/)
 
-**Windows Setup**:
-
-1. **Install Python 3.14.3**:
-   - Download from [python.org](https://www.python.org/downloads/)
-   - During installation, check "Add Python to PATH"
-   - Verify: Open PowerShell and run `python --version`
-
-2. **Install Bun**:
-   ```powershell
-   # PowerShell (Run as Administrator)
-   powershell -c "irm bun.sh/install.ps1 | iex"
-   ```
-   - Verify: `bun --version`
-
-3. **Install Poetry**:
-   ```powershell
-   # PowerShell
-   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
-   ```
-   - Add Poetry to PATH: `%APPDATA%\Python\Scripts`
-   - Verify: `poetry --version`
-
-4. **Install Docker Desktop** (optional):
-   - Download from [docker.com](https://www.docker.com/products/docker-desktop/)
-   - Enable WSL 2 backend for better performance
-
-**macOS/Linux Setup**:
+### Docker Compose (Recommended)
 
 ```bash
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
-
-# Install Python 3.14 (macOS with Homebrew)
-brew install python@3.14
-
-# Add Python aliases to ~/.bashrc or ~/.zshrc
-echo 'alias python="python3"' >> ~/.bashrc
-echo 'alias py="python3"' >> ~/.bashrc
-echo 'alias pip="pip3"' >> ~/.bashrc
-echo 'export PATH="/opt/homebrew/opt/python@3.14/libexec/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-
-# Install Poetry
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-**Verify Installation**:
-```bash
-bun --version      # Should show 1.3.9+
-python --version   # Should show 3.14.3+
-poetry --version   # Should show latest
-```
-
-### Local Development (Docker Compose - Recommended)
-
-The easiest way to run the full stack locally with hot-reloading:
-
-**Windows (PowerShell)**:
-```powershell
-# Start all services (frontend, backend, database)
+# Start all services
 docker-compose -f docker-compose.dev.yml up
 
-# Or run in background
-docker-compose -f docker-compose.dev.yml up -d
-
-# View logs
-docker-compose -f docker-compose.dev.yml logs -f
-
-# Stop services
-docker-compose -f docker-compose.dev.yml down
-```
-
-**macOS/Linux (Bash/Zsh)**:
-```bash
-# Same commands work on macOS/Linux
-docker-compose -f docker-compose.dev.yml up
-```
-
-**Services**:
-- Frontend: http://127.0.0.1:3000 (Vite dev server with hot-reload)
-- Backend: http://127.0.0.1:8000 (Django dev server)
-- Database: PostgreSQL on port 54320
-
-**Run Migrations** (first time):
-
-Windows (PowerShell):
-```powershell
+# Run migrations (first time)
 docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
-```
 
-macOS/Linux:
-```bash
-docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
-```
-
-**Create Superuser** (optional):
-```bash
+# Create superuser (optional)
 docker-compose -f docker-compose.dev.yml exec backend python manage.py createsuperuser
 ```
 
-### Local Development (Manual)
+### Manual Setup
 
 **Frontend**:
-
-Windows (PowerShell):
-```powershell
-cd frontend
-bun install
-copy .env.example .env
-bun run dev
-# Available at http://127.0.0.1:3000
-```
-
-macOS/Linux:
 ```bash
 cd frontend
 bun install
 cp .env.example .env
-bun run dev
-# Available at http://127.0.0.1:3000
+bun run dev  # http://127.0.0.1:3000
 ```
 
 **Backend**:
-
-Windows (PowerShell):
-```powershell
-cd backend
-
-# Setup Python environment
-poetry env use python
-poetry install
-
-# Configure environment
-copy .env.example .env
-# Edit .env with your database credentials
-
-# Run migrations
-poetry run python manage.py migrate
-
-# Create superuser (optional)
-poetry run python manage.py createsuperuser
-
-# Start dev server
-poetry run python manage.py runserver
-# Available at http://127.0.0.1:8000
-```
-
-macOS/Linux:
 ```bash
 cd backend
-
-# Setup Python environment
-poetry env use python3.14  # or: poetry env use /opt/homebrew/bin/python3.14
 poetry install
-
-# Configure environment
 cp .env.example .env
-# Edit .env with your database credentials
-
-# Run migrations
 poetry run python manage.py migrate
-
-# Create superuser (optional)
-poetry run python manage.py createsuperuser
-
-# Start dev server
-poetry run python manage.py runserver
-# Available at http://127.0.0.1:8000
+poetry run python manage.py runserver  # http://127.0.0.1:8000
 ```
 
-**Database** (if not using Docker):
+### Testing
 
-Windows:
-- Download and install [PostgreSQL 17](https://www.postgresql.org/download/windows/)
-- Use pgAdmin or command line to create database:
-  ```sql
-  CREATE DATABASE science_projects;
-  ```
-
-macOS:
 ```bash
-# Install PostgreSQL 17
-brew install postgresql@17
+# Frontend
+cd frontend
+bun run test              # Run once
+bun run test:watch        # Watch mode
+bun run test:coverage     # With coverage
 
-# Start PostgreSQL
-brew services start postgresql@17
-
-# Create database
-createdb science_projects
+# Backend
+cd backend
+poetry run pytest                    # All tests
+poetry run pytest --cov              # With coverage
 ```
 
-## Documentation
+## Branching & Deployment
 
-- **[Frontend Documentation](frontend/README.md)** - React app setup, architecture, and development
-- **[Backend Documentation](backend/README.md)** - Django API, models, and deployment
+### Branch Strategy
 
-## CI/CD
+```
+feature/* → develop (UAT) → main (production) → v* tags
+```
 
-GitHub Actions automatically:
+- **develop**: Auto-deploys to UAT on push
+- **main**: Production-ready code (merge from develop)
+- **v* tags**: Triggers production deployment
 
-- **On Pull Requests** (test.yml):
-  - Runs frontend tests with coverage (2-way sharding)
-  - Runs backend tests with coverage (4-way sharding)
-  - Enforces coverage thresholds (50% frontend, 80% backend)
-  - Updates coverage badges on merge to main
+### Workflow
 
-- **On Push to Develop** (deploy-uat.yml):
-  - Builds frontend Docker image with UAT config
-  - Builds backend Docker image
-  - Pushes images tagged as `latest` and `test`
-  - UAT environment auto-deploys from `latest` tag
-
-- **On Tagged Releases** (deploy-prod.yml):
-  - Builds frontend Docker image with production config
-  - Builds backend Docker image
-  - Pushes images tagged with version and `stable`
-  - Automatically updates Kustomize configurations with new version
-  - Production deployment requires manual kubectl apply
-
-## Deployment
-
-### Deployment Environments
-
-**UAT (User Acceptance Testing)**:
-- **Trigger**: Push to `develop` branch
-- **Images**: `latest` and `test` tags
-- **Deployment**: Manual via Rancher UI (click "Redeploy" to pull latest image)
-- **Kustomize**: `kustomize/overlays/test/`
-- **Purpose**: Testing before production
-
-**Production**:
-- **Trigger**: Tagged release (e.g., `v1.2.3`)
-- **Images**: Version tag (e.g., `v1.2.3`) and `stable`
-- **Deployment**: Manual via Rancher UI or by infrastructure team
-- **Kustomize**: `kustomize/overlays/prod/`
-- **Purpose**: Live user-facing application
-
-### Deploying to UAT
-
-1. Merge your PR to `develop` branch
-2. Push to GitHub: `git push origin develop`
-3. GitHub Actions builds and pushes images with `latest` and `test` tags
-4. Go to Rancher UI → UAT namespace → Select deployment → Click "Redeploy"
-5. Rancher pulls the latest image and restarts the pods
-
-### Deploying to Production
-
-1. Ensure `develop` is tested and stable in UAT
-2. Merge `develop` to `main`
-3. Create and push a version tag:
-   ```bash
-   git tag v1.2.3
-   git push origin v1.2.3
-   ```
-4. GitHub Actions builds and pushes versioned images
-5. Kustomize configurations are automatically updated with the new version
-6. Infrastructure team deploys to production using updated Kustomize configs
-   - Or manually via Rancher UI: Select deployment → Update image tag to `v1.2.3` → Redeploy
-
-### Rollback Procedures
-
-**UAT Rollback**:
-1. Revert the problematic commit on `develop`
-2. Push to GitHub
-3. New `latest` image builds automatically
-4. Go to Rancher UI → UAT namespace → Click "Redeploy" to pull reverted version
-
-**Production Rollback**:
-1. Identify the previous working version (e.g., `v1.2.2`)
-2. Via Rancher UI: Update image tag to `v1.2.2` and redeploy
-3. Or infrastructure team can use Kustomize to deploy previous version
-
-### Docker Images
-
-Images are automatically built and pushed to GitHub Container Registry:
-
-**Frontend**:
-- `ghcr.io/dbca-wa/science-projects-frontend:latest` (UAT)
-- `ghcr.io/dbca-wa/science-projects-frontend:test` (UAT)
-- `ghcr.io/dbca-wa/science-projects-frontend:v1.2.3` (Production)
-- `ghcr.io/dbca-wa/science-projects-frontend:stable` (Production)
-
-**Backend**:
-- `ghcr.io/dbca-wa/science-projects-backend:latest` (UAT)
-- `ghcr.io/dbca-wa/science-projects-backend:v1.2.3` (Production)
-- `ghcr.io/dbca-wa/science-projects-backend:stable` (Production)
-
-### Environment Variables
-
-**Frontend** (baked at build time):
-- `VITE_PRODUCTION_BACKEND_API_URL` - Backend Django API URL (for example, something like `https://spms-api.dbca.wa.gov.au/api/v1/`)
-
-**Backend** (runtime configuration):
-- `DATABASE_URL` - PostgreSQL connection string
-- `SECRET_KEY` - Django secret key
-- `DEBUG` - Debug mode (False in production)
-- See `backend/.env.example` for full list
-
-## Contributing
-
-1. Create a feature branch from `develop`
-2. Make your changes
-3. Ensure tests pass and coverage meets thresholds
-4. Pre-commit hooks will run automatically (install with `pre-commit install`)
-5. Create a pull request to `develop`
-
-See [Branching Strategy](docs/BRANCHING_STRATEGY.md) for detailed workflow documentation.
-
-### Pre-commit Hooks
-
-This project uses pre-commit hooks to ensure code quality. Hooks run automatically on commit and check only the files you've changed.
-
-**Installation:**
 ```bash
-# Install pre-commit (if not already installed)
-brew install pre-commit  # macOS
-# or
-pip install pre-commit   # Linux/Windows
+# 1. Create feature branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/my-feature
 
-# Install hooks
+# 2. Make changes and commit
+git add .
+git commit -m "feat: add new feature"
+git push origin feature/my-feature
+
+# 3. Create PR to develop
+# Tests run automatically on PR
+
+# 4. After merge to develop
+# UAT auto-deploys within 5 minutes
+
+# 5. When ready for production
+git checkout main
+git merge develop --no-ff
+git push origin main
+
+# 6. Create version tag
+git tag v1.0.0
+git push origin v1.0.0
+# Production images build automatically
+```
+
+### Deployment
+
+**UAT** (automatic):
+- Trigger: Push to `develop`
+- URL: https://scienceprojects-test.dbca.wa.gov.au
+- Images: `latest`, `test` tags
+
+**Production** (manual):
+- Trigger: Version tag (e.g., `v1.0.0`)
+- URL: https://scienceprojects.dbca.wa.gov.au
+- Images: `v1.0.0`, `stable` tags
+- Deploy: Update Kubernetes via Rancher UI or kubectl
+
+**Rollback**:
+```bash
+# UAT: Revert commit on develop and push
+git revert <commit-hash>
+git push origin develop
+
+# Production: Update image tag to previous version
+kubectl set image deployment/spms-deployment-prod \
+  frontend=ghcr.io/dbca-wa/science-projects-frontend:v1.0.0 \
+  backend=ghcr.io/dbca-wa/science-projects-backend:v1.0.0 \
+  -n spms-prod
+```
+
+## Pre-commit Hooks
+
+Hooks run automatically on commit and check only changed files.
+
+**Install**:
+```bash
 pre-commit install
 ```
 
-**What gets checked:**
-- General: Trailing whitespace, large files, merge conflicts
-- Frontend: Prettier, ESLint, TypeScript, security patterns
-- Backend: Black, isort, flake8, bandit, Django checks
+**What's checked**:
+- **General**: Trailing whitespace, large files, merge conflicts
+- **Frontend**: Prettier (auto-fix), ESLint, TypeScript, security
+- **Backend**: Black (auto-fix), isort (auto-fix), flake8, bandit
 
-See [Pre-commit Hooks Guide](docs/PRE_COMMIT_HOOKS.md) for detailed documentation.
+**Bypass** (emergency only):
+```bash
+git commit --no-verify -m "emergency fix"
+```
+
+## CI/CD Workflows
+
+**test.yml** (on PRs):
+- Frontend tests (2-way sharding)
+- Backend tests (4-way sharding)
+- Coverage badges (auto-update on main)
+- Path-based execution (only test changed code)
+
+**deploy-uat.yml** (on push to develop):
+- Build and push `latest`/`test` images
+- Auto-deploy to UAT
+
+**deploy-prod.yml** (on version tags):
+- Build and push versioned/`stable` images
+- Auto-update Kustomize configs
 
 ## Documentation
 
-- **[Branching Strategy](docs/BRANCHING_STRATEGY.md)** - Git workflow, branch management, and CI/CD processes
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Deployment procedures for UAT and production environments
-- **[Pre-commit Hooks](docs/PRE_COMMIT_HOOKS.md)** - Code quality checks and pre-commit hook setup
+- **[Complete Documentation](documentation/)** - Comprehensive docs for all aspects
+  - [Frontend](documentation/frontend/) - Architecture, development, testing
+  - [Backend](documentation/backend/) - API, deployment, operations
+- **[Frontend README](frontend/README.md)** - Quick start
+- **[Backend README](backend/README.md)** - Quick start
+
+## Common Tasks
+
+**Run migrations**:
+```bash
+# Docker
+docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
+
+# Manual
+cd backend && poetry run python manage.py migrate
+```
+
+**Create superuser**:
+```bash
+# Docker
+docker-compose -f docker-compose.dev.yml exec backend python manage.py createsuperuser
+
+# Manual
+cd backend && poetry run python manage.py createsuperuser
+```
+
+**View logs**:
+```bash
+# Docker
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Kubernetes (UAT)
+kubectl logs -f deployment/spms-deployment-test -n spms-test
+
+# Kubernetes (Production)
+kubectl logs -f deployment/spms-deployment-prod -n spms-prod
+```
+
+**Update dependencies**:
+```bash
+# Frontend
+cd frontend && bun update
+
+# Backend
+cd backend && poetry update
+```
+
+## Troubleshooting
+
+**Tests failing on CI but passing locally**:
+- Check Node/Bun/Python versions match CI
+- Use UTC for dates in tests
+- Ensure import paths match file names exactly
+
+**UAT not updating after deploy**:
+- Check Rancher UI → UAT namespace → Click "Redeploy"
+- Verify `imagePullPolicy: Always` in deployment
+
+**Docker build failing**:
+- Clean Docker cache: `docker system prune -a`
+- Check Dockerfile syntax
+- Verify all build args are provided
+
+**Pre-commit hooks failing**:
+- Run manually: `pre-commit run --all-files`
+- Fix TypeScript errors: `cd frontend && bun run type-check`
+- Fix Python formatting: `cd backend && black .`
 
 ## License
 
-Copyright © 2024-2026 Department of Biodiversity, Conservation and Attractions, Western Australia
+Copyright © 2023-2026 Department of Biodiversity, Conservation and Attractions, Western Australia
