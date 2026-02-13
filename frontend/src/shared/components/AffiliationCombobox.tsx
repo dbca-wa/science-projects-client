@@ -9,7 +9,6 @@ import { BaseCombobox } from "@/shared/components/combobox";
 import { apiClient } from "@/shared/services/api/client.service";
 import { toTitleCase } from "@/shared/utils";
 import type { IAffiliation } from "@/shared/types/org.types";
-import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 interface AffiliationComboboxProps {
 	// Single-select mode
@@ -36,6 +35,7 @@ interface AffiliationComboboxProps {
 
 export interface AffiliationComboboxRef {
 	focusInput: () => void;
+	clearSelection: () => void;
 }
 
 /**
@@ -205,28 +205,28 @@ const MultiSelectAffiliationCombobox = forwardRef<
 		const [_isCreating, _setIsCreating] = useState(false);
 
 		// Debounce search term (300ms)
-		const _debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+		// const _debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
 		// Search affiliations based on debounced search term
 		// TODO: Implement search for multi-select mode
 		// This will be refactored in separate spec
 
-		const _handleSelectAffiliation = (_affiliation: IAffiliation) => {
-			// TODO: Implement for multi-select mode
-			// This will be refactored in separate spec
-		};
+		// const _handleSelectAffiliation = (_affiliation: IAffiliation) => {
+		// 	// TODO: Implement for multi-select mode
+		// 	// This will be refactored in separate spec
+		// };
 
 		const handleRemoveAffiliation = (affiliation: IAffiliation) => {
 			if (!isEditable) return;
 			onChangeMultiple?.(values.filter((a) => a.id !== affiliation.id));
 		};
 
-		const _handleCreateAffiliation = async () => {
-			// TODO: Implement for multi-select mode
-			// This will be refactored in separate spec
-		};
+		// const _handleCreateAffiliation = async () => {
+		// 	// TODO: Implement for multi-select mode
+		// 	// This will be refactored in separate spec
+		// };
 
-		const _showCreateOption = false; // TODO: Implement for multi-select mode
+		// const _showCreateOption = false; // TODO: Implement for multi-select mode
 
 		return (
 			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
