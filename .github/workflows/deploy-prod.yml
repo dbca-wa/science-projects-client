@@ -18,6 +18,11 @@ jobs:
   build-frontend-prod:
     name: Build Frontend (Production)
     runs-on: ubuntu-latest
+    
+    env:
+      VITE_PRODUCTION_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
+      VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.wa.gov.au/api/v1/"
+      VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles.dbca.wa.gov.au/"
 
     steps:
       - name: Checkout code
@@ -47,7 +52,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:${{ steps.version.outputs.VERSION }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:stable
           build-args: |
-            VITE_PRODUCTION_BACKEND_API_URL=${{ secrets.PROD_BACKEND_API_URL }}
+            VITE_PRODUCTION_BACKEND_API_URL=${{ env.VITE_PRODUCTION_BACKEND_API_URL }}
             VITE_VERSION=${{ steps.version.outputs.VERSION }}
           cache-from: type=gha,scope=frontend-prod
           cache-to: type=gha,mode=max,scope=frontend-prod

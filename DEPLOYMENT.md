@@ -333,19 +333,24 @@ curl https://api.example.com/health
 curl https://app.example.com
 ```
 
-## GitHub Secrets
+## GitHub Configuration
 
-Required secrets for CI/CD workflows:
+The workflows use hardcoded URLs (not secrets) for the frontend build:
 
-- `UAT_BACKEND_API_URL` - Backend Django API URL for UAT (for example, `https://spms-api-uat.dbca.wa.gov.au/api/v1/`)
-- `PROD_BACKEND_API_URL` - Backend Django API URL for production (for example, `https://spms-api.dbca.wa.gov.au/api/v1/`)
-- `GITHUB_TOKEN` - Automatically provided by GitHub Actions
+**UAT/Test Environment:**
+- Base URL: `https://scienceprojects-test.dbca.wa.gov.au/`
+- Backend API: `https://scienceprojects-test.dbca.wa.gov.au/api/v1/`
+- Profiles: `https://science-profiles-test.dbca.wa.gov.au/`
 
-To add/update secrets:
-1. Go to repository Settings → Secrets and variables → Actions
-2. Click "New repository secret"
-3. Add name and value
-4. Click "Add secret"
+**Production Environment:**
+- Base URL: `https://scienceprojects.dbca.wa.gov.au/`
+- Backend API: `https://scienceprojects.dbca.wa.gov.au/api/v1/`
+- Profiles: `https://science-profiles.dbca.wa.gov.au/`
+
+**Required secrets:**
+- `GITHUB_TOKEN` - Automatically provided by GitHub Actions (for pushing Docker images)
+
+**Note**: URLs are hardcoded in workflow files (not secrets) because they are public-facing and not sensitive.
 
 ## Best Practices
 
