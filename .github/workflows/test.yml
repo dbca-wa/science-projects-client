@@ -108,10 +108,32 @@ jobs:
       - name: Combine coverage
         working-directory: frontend
         run: |
-          # TODO: Implement coverage combination for Vitest
-          # For now, just use the first shard's coverage
+          # Create coverage directory if it doesn't exist
+          mkdir -p coverage
+          
+          # Copy coverage files from both shards
+          echo "=== Copying coverage files from shards ==="
+          find coverage-reports -type f -name "*.json" -o -name "*.html" -o -name "*.lcov" | while read file; do
+            echo "Found: $file"
+          done
+          
+          # For now, use shard 1's coverage as the combined result
+          # TODO: Implement proper coverage merging when Vitest supports it
           if [ -d "coverage-reports/frontend-coverage-1" ]; then
-            cp -r coverage-reports/frontend-coverage-1/* coverage/ || true
+            echo "Copying shard 1 coverage as combined coverage"
+            cp -r coverage-reports/frontend-coverage-1/* coverage/ 2>/dev/null || true
+          fi
+          
+          # If shard 1 doesn't exist, try shard 2
+          if [ ! -f "coverage/coverage-summary.json" ] && [ -d "coverage-reports/frontend-coverage-2" ]; then
+            echo "Copying shard 2 coverage as combined coverage"
+            cp -r coverage-reports/frontend-coverage-2/* coverage/ 2>/dev/null || true
+          fi
+          
+          # Verify coverage directory has files
+          if [ -d "coverage" ]; then
+            echo "=== Coverage directory contents ==="
+            ls -la coverage/
           fi
 
       - name: Generate coverage report
@@ -119,11 +141,12 @@ jobs:
         run: |
           # Generate text report and extract percentage
           if [ -f "coverage/coverage-summary.json" ]; then
-            COVERAGE=$(cat coverage/coverage-summary.json | grep -o '"lines":{"total":[0-9]*,"covered":[0-9]*,"skipped":[0-9]*,"pct":[0-9.]*' | grep -o 'pct":[0-9.]*' | cut -d':' -f2)
+            COVERAGE=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')
             echo "Frontend coverage: ${COVERAGE}%"
             echo "${COVERAGE}" > coverage-percentage.txt
           else
-            echo "50" > coverage-percentage.txt
+            echo "⚠️  Warning: No coverage-summary.json found, defaulting to 0%"
+            echo "0" > coverage-percentage.txt
           fi
 
       - name: Check coverage threshold
