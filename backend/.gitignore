@@ -215,3 +215,17 @@ cython_debug/
 
 # Licenses
 license.dat
+
+# Media directories (user uploads, should never be in Git)
+media/
+uploads/
+dumped_media/
+
+# Generated static files
+staticfiles/
+
+# Coverage files (generated)
+coverage.json
+
+# Large binary files
+*.pdf

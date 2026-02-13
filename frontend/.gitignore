@@ -44,3 +44,12 @@ playwright-report/
 *.njsproj
 *.sln
 *.sw?
+
+# Coverage files (generated)
+coverage.json
+
+# Build artifacts
+dist/
+
+# Raw data files (source files)
+public/data/raw/

@@ -57,3 +57,25 @@ docker-compose.override.yml
 # Backup files
 *.bak
 *.backup
+
+# Media directories (should never be in Git)
+dumped_media/
+media/
+uploads/
+
+# Build artifacts (generated files)
+staticfiles/
+
+# Raw data (source files, not generated)
+public/data/raw/
+
+# Large binary files
+*.pdf
+*.zip
+*.tar.gz
+*.sql
+*.dump
+
+# Coverage files (generated)
+coverage.json
+**/coverage.json
