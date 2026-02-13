@@ -384,14 +384,38 @@ Images are automatically built and pushed to GitHub Container Registry:
 1. Create a feature branch from `develop`
 2. Make your changes
 3. Ensure tests pass and coverage meets thresholds
-4. Create a pull request to `develop`
+4. Pre-commit hooks will run automatically (install with `pre-commit install`)
+5. Create a pull request to `develop`
 
 See [Branching Strategy](docs/BRANCHING_STRATEGY.md) for detailed workflow documentation.
+
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality. Hooks run automatically on commit and check only the files you've changed.
+
+**Installation:**
+```bash
+# Install pre-commit (if not already installed)
+brew install pre-commit  # macOS
+# or
+pip install pre-commit   # Linux/Windows
+
+# Install hooks
+pre-commit install
+```
+
+**What gets checked:**
+- General: Trailing whitespace, large files, merge conflicts
+- Frontend: Prettier, ESLint, TypeScript, security patterns
+- Backend: Black, isort, flake8, bandit, Django checks
+
+See [Pre-commit Hooks Guide](docs/PRE_COMMIT_HOOKS.md) for detailed documentation.
 
 ## Documentation
 
 - **[Branching Strategy](docs/BRANCHING_STRATEGY.md)** - Git workflow, branch management, and CI/CD processes
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Deployment procedures for UAT and production environments
+- **[Pre-commit Hooks](docs/PRE_COMMIT_HOOKS.md)** - Code quality checks and pre-commit hook setup
 
 ## License
 
