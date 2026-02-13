@@ -120,7 +120,6 @@ const ProjectMapPage = observer(() => {
 		);
 	}
 
-	const projects = mapData?.projects || [];
 	const totalProjects = mapData?.total_projects || 0;
 	const projectsWithoutLocation = mapData?.projects_without_location || 0;
 
