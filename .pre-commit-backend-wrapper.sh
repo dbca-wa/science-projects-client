@@ -12,7 +12,10 @@ if [ -z "$CHANGED_FILES" ]; then
 fi
 
 echo "Running backend pre-commit checks on changed files..."
+
+# Change to backend directory and set PRE_COMMIT_SOURCE_DIR
 cd backend
+export PRE_COMMIT_SOURCE_DIR="$(pwd)"
 
 # Convert absolute paths to relative paths within backend/
 BACKEND_FILES=$(echo "$CHANGED_FILES" | sed 's|^backend/||')

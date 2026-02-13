@@ -12,7 +12,10 @@ if [ -z "$CHANGED_FILES" ]; then
 fi
 
 echo "Running frontend pre-commit checks on changed files..."
+
+# Change to frontend directory and set PRE_COMMIT_SOURCE_DIR
 cd frontend
+export PRE_COMMIT_SOURCE_DIR="$(pwd)"
 
 # Convert absolute paths to relative paths within frontend/
 FRONTEND_FILES=$(echo "$CHANGED_FILES" | sed 's|^frontend/||')
