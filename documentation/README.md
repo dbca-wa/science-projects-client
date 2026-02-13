@@ -6,11 +6,13 @@ Welcome to the SPMS monorepo documentation. This documentation covers the entire
 
 ## Quick Reference
 
-For quick access to common workflows, see the `docs/` folder:
+For quick access to common workflows, see the [root README](../README.md):
 
-- **[Deployment Guide](../docs/DEPLOYMENT.md)** - How to deploy to UAT and production
-- **[Branching Strategy](../docs/BRANCHING_STRATEGY.md)** - Git workflow and CI/CD processes
-- **[Pre-commit Hooks](../docs/PRE_COMMIT_HOOKS.md)** - Code quality checks and setup
+- **[Deployment](../README.md#branching--deployment)** - How to deploy to UAT and production
+- **[Branching Strategy](../README.md#branch-strategy)** - Git workflow and CI/CD processes
+- **[Pre-commit Hooks](../README.md#pre-commit-hooks)** - Code quality checks and setup
+- **[Common Tasks](../README.md#common-tasks)** - Migrations, superuser, logs, dependencies
+- **[Troubleshooting](../README.md#troubleshooting)** - Common issues and solutions
 
 ## Comprehensive Documentation
 
@@ -57,10 +59,6 @@ science-projects/
 ├── documentation/        # Comprehensive documentation
 │   ├── frontend/         # Frontend architecture and guides
 │   └── backend/          # Backend architecture and guides
-├── docs/                 # Quick reference guides
-│   ├── DEPLOYMENT.md     # Deployment quick reference
-│   ├── BRANCHING_STRATEGY.md  # Git workflow
-│   └── PRE_COMMIT_HOOKS.md    # Pre-commit hooks guide
 ├── kustomize/            # Kubernetes configurations
 └── .github/workflows/    # CI/CD workflows
 ```
@@ -109,11 +107,11 @@ poetry run pytest apps/users/tests/  # Specific app
 
 ### Deployment
 
-See [Deployment Guide](../docs/DEPLOYMENT.md) for complete deployment procedures.
+See the [root README deployment section](../README.md#branching--deployment) for complete deployment procedures.
 
 ### Pre-commit Hooks
 
-See [Pre-commit Hooks Guide](../docs/PRE_COMMIT_HOOKS.md) for setup and usage.
+See the [root README pre-commit section](../README.md#pre-commit-hooks) for setup and usage.
 
 ## Key Architectural Decisions
 
@@ -137,7 +135,7 @@ See [Pre-commit Hooks Guide](../docs/PRE_COMMIT_HOOKS.md) for setup and usage.
 
 ### CI/CD
 
-See [Branching Strategy](../docs/BRANCHING_STRATEGY.md) for complete CI/CD workflow documentation.
+See the [root README CI/CD section](../README.md#cicd-workflows) for complete CI/CD workflow documentation.
 
 ## Documentation Standards
 
@@ -202,8 +200,6 @@ See [Branching Strategy](../docs/BRANCHING_STRATEGY.md) for complete CI/CD workf
 
 ## Related Documentation
 
-- **[Deployment Guide](../docs/DEPLOYMENT.md)** - Deployment procedures
-- **[Branching Strategy](../docs/BRANCHING_STRATEGY.md)** - Git workflow and CI/CD
-- **[Pre-commit Hooks](../docs/PRE_COMMIT_HOOKS.md)** - Code quality checks
+- **[Root README](../README.md)** - Quick start, deployment, branching, troubleshooting
 - **[Frontend README](../frontend/README.md)** - Frontend quick start
 - **[Backend README](../backend/README.md)** - Backend quick start
