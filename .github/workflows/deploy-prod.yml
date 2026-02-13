@@ -1,0 +1,147 @@
+name: Deploy Production
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: dbca-wa/science-projects
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # ====================== BUILD FRONTEND PRODUCTION ======================
+  build-frontend-prod:
+    name: Build Frontend (Production)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Frontend Production image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:stable
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.PROD_API_URL }}
+            VITE_VERSION=${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha,scope=frontend-prod
+          cache-to: type=gha,mode=max,scope=frontend-prod
+          labels: |
+            org.opencontainers.image.title=Science Projects Frontend (Production)
+            org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  # ====================== BUILD BACKEND ======================
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:stable
+          cache-from: type=gha,scope=backend-prod
+          cache-to: type=gha,mode=max,scope=backend-prod
+          labels: |
+            org.opencontainers.image.title=Science Projects Backend (Production)
+            org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  # ====================== UPDATE KUSTOMIZE ======================
+  update-kustomize:
+    name: Update Kustomize Configurations
+    needs: [build-frontend-prod, build-backend]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Update production kustomization
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          if [ -f "kustomize/overlays/prod/kustomization.yaml" ]; then
+            sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/prod/kustomization.yaml
+            echo "Updated production kustomization to ${VERSION}"
+          else
+            echo "Warning: kustomize/overlays/prod/kustomization.yaml not found"
+          fi
+
+      - name: Update test kustomization
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          if [ -f "kustomize/overlays/test/kustomization.yaml" ]; then
+            sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/test/kustomization.yaml
+            echo "Updated test kustomization to ${VERSION}"
+          else
+            echo "Warning: kustomize/overlays/test/kustomization.yaml not found"
+          fi
+
+      - name: Commit and push kustomize updates
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add kustomize/overlays/prod/kustomization.yaml || true
+          git add kustomize/overlays/test/kustomization.yaml || true
+          git commit -m "chore: update kustomize to ${VERSION} [skip ci]" || exit 0
+          git push
