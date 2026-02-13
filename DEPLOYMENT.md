@@ -6,21 +6,26 @@ This guide covers deploying the Science Projects Management System to UAT and Pr
 
 The deployment process uses three separate GitHub Actions workflows:
 
-- **test.yml** - Runs on pull requests (testing only)
-- **deploy-uat.yml** - Runs on push to `develop` (auto-deploy to UAT)
+- **test.yml** - Runs on pull requests to main (testing only)
+- **deploy-uat.yml** - Runs on push to `main` (auto-deploy to UAT)
 - **deploy-prod.yml** - Runs on version tags (manual deploy to production)
 
 ## Branch Strategy
 
 ```
-feature branch → develop → main → tagged release
-                    ↓              ↓
-                   UAT         Production
+feature branch → main → tagged release
+                  ↓           ↓
+                 UAT      Production
 ```
 
-- **develop**: UAT environment (auto-deploy)
-- **main**: Protected branch (requires PR from develop)
+- **main**: Protected branch (requires PR approval), auto-deploys to UAT
 - **tags (v*)**: Production releases (manual deploy)
+
+**Why this approach?**
+- Tests run once per feature (on PR to main)
+- UAT gets automatic deployments from main
+- Production gets controlled deployments via tags
+- Saves GitHub Actions minutes (no redundant test runs)
 
 ## Deployment Environments
 
@@ -69,25 +74,23 @@ feature branch → develop → main → tagged release
 
 ### Automatic Deployment
 
-1. **Merge your PR to develop**:
+1. **Create a PR to main**:
    ```bash
-   # After PR approval
-   git checkout develop
-   git pull origin develop
+   git checkout -b feature/my-feature
+   # Make changes
+   git commit -m "feat: add new feature"
+   git push origin feature/my-feature
+   # Create PR to main on GitHub
    ```
 
-2. **Push to GitHub**:
-   ```bash
-   git push origin develop
-   ```
-
-3. **GitHub Actions automatically**:
-   - Builds frontend with UAT configuration
-   - Builds backend
-   - Pushes images tagged as `latest` and `test`
+2. **After PR approval and merge**:
+   - GitHub Actions automatically builds and deploys to UAT
+   - Frontend built with UAT configuration
+   - Backend built
+   - Images pushed tagged as `latest` and `test`
    - UAT Kubernetes pulls new images within 5 minutes
 
-4. **Verify deployment**:
+3. **Verify deployment**:
    - Check GitHub Actions: https://github.com/dbca-wa/science-projects/actions
    - Check UAT application: https://scienceprojects-test.dbca.wa.gov.au
    - Check Kubernetes pods (via Rancher at rancher-uat.dbca.wa.gov.au):
