@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spms-deployment
+  labels:
+    app: spms-test
+spec:
+  selector:
+    matchLabels:
+      app: spms-test
+  template:
+    metadata:
+      labels:
+        app: spms-test
+    spec:
+      initContainers:
+        - name: chown-files
+          image: busybox
+          command:
+            - /bin/chown
+            - -R
+            - '10001:10001'
+            - /usr/src/app/backend/files
+          volumeMounts:
+            - mountPath: /usr/src/app/backend/files
+              name: spms-media-test
+      containers:
+        - name: spms-backend
+          envFrom:
+            - secretRef:
+                name: spms-env-test
+          volumeMounts:
+            - name: spms-media-test
+              mountPath: /usr/src/app/backend/files
+            - name: prince2-license-test
+              mountPath: /usr/lib/prince/license
+              readOnly: true
+      volumes:
+        - name: spms-media-test
+          persistentVolumeClaim:
+            claimName: spms-media-data-test
+        - name: prince2-license-test
+          configMap:
+            defaultMode: 420
+            name: prince2-license-test

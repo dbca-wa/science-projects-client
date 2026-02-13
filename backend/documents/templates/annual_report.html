@@ -1,0 +1,1186 @@
+{% load custom_filters %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <link rel="stylesheet" href="{{rte_css_path}}"> {% endcomment %}
+    <link rel="stylesheet" href="{{prince_css_path}}">
+    <style>
+        /* LEFT PAGE LOGO - floats left */
+        .header-logo-left {
+            flow: static(header-logo-left);
+            width: 200px;
+            height: auto;
+            display: block;
+            padding-left: 4px;
+            padding-right: 4px;
+            float: left; /* Floats left for left pages */
+        }
+
+        /* RIGHT PAGE LOGO - floats right */
+        .header-logo-right {
+            flow: static(header-logo-right);
+            width: 200px;
+            height: auto;
+            display: block;
+            padding-left: 4px;
+            padding-right: 4px;
+            float: right; /* Floats right for right pages */
+        }
+
+        @page {
+            {% comment %} orphans: 3; {% endcomment %}
+            {% comment %} widows: 3; {% endcomment %}
+            size: A4;
+        }
+        {% comment %} content: string(doctitle);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-size: 10pt; {% endcomment %}
+
+        {% comment %} PRINCE, DIR MESS, COVERPAGE  {% endcomment %}
+        @page prince, dm, coverpage {
+            @bottom-right {
+                content: normal
+            }
+            @bottom-left {
+                content: normal
+            }
+            @top-right {
+                content: normal
+            }
+            @top-left {
+                content: normal
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+            border-top: none;
+            border-bottom: none;
+            margin-top: 0cm;
+            padding-top: 1cm;
+        }
+
+        {% comment %} CATCH ALL FOR ALL NON-NAMED PAGES AFTER PREAMBLE {% endcomment %}
+        @page main_pages {
+            @bottom-left {
+                content: " ";
+            }
+            @bottom-right {
+                content: " ";
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+
+            margin-top: max(0cm, 1.4cm);
+            margin-bottom: 1.4cm;
+            border-bottom: 0.25pt solid #666;
+            border-top: 0.25pt solid #666;
+
+        }
+
+        @page main_pages:left {
+            @bottom-left {
+                content: counter(page, decimal);
+                padding: 0;
+                padding-bottom: 20px;
+
+            }
+            @bottom-right {
+                content: string(ch_title);
+                padding: 0;
+                padding-bottom: 20px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+        }
+
+        @page main_pages:right {
+            @bottom-right {
+                content: counter(page, decimal);
+                padding: 0;
+                padding-bottom: 20px;
+            }
+
+            @bottom-left {
+                padding: 0;
+                padding-bottom: 20px;
+                content: string(ch_title);
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+
+            @top-left {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 0cm;
+                z-index: 2;
+                content: "Annual Report {{financial_year_string}}";
+            }
+
+        }
+
+
+        {% comment %} TOC PAGES {% endcomment %}
+        @page toc_pages {
+            @bottom-right {
+                content: normal
+            }
+            @bottom-left {
+                content: normal
+            }
+            @top-right {
+                content: normal
+            }
+            @top-left {
+                content: normal
+            }
+            padding-top: 1cm;
+            margin-bottom: 1.4cm;
+            padding-bottom: 20px;
+            border-bottom: 0.25pt solid #666;
+
+        }
+
+        @page toc_pages:left {
+            @bottom-left {
+                content: counter(page, lower-roman);
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @bottom-right {
+                content: "Table of Contents";
+                font-weight: bold;
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+            border-top: none;
+            margin-top: 0cm;
+            padding-top: 1.4cm;
+
+        }
+
+        @page toc_pages:right {
+            @bottom-right {
+                content: counter(page, lower-roman);
+                padding: 0;
+                padding-bottom: 20px;
+            }
+
+            @bottom-left {
+                content: "Table of Contents";
+                font-weight: bold;
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+            border-top: none;
+            margin-top: 0cm;
+            padding-top: 1.4cm;
+        }
+
+
+        {% comment %} SDS {% endcomment %}
+        @page sds {
+            @bottom-left {
+                content: " ";
+            }
+            @bottom-right {
+                content: " ";
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+            margin-bottom: 1.4cm;
+            border-bottom: 0.25pt solid #666;
+
+        }
+
+        @page sds:left {
+            @bottom-left {
+                content: counter(page, decimal);
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @bottom-right {
+                content: "Service Delivery Structure";
+                font-weight: bold;
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+        }
+
+        @page sds:right {
+            @bottom-right {
+                content: counter(page, decimal);
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @bottom-left {
+                content: "Service Delivery Structure";
+                font-weight: bold;
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+        }
+
+        @page ba_pages,
+        sr_pages,
+        publications
+        {
+            @bottom-left {
+                content: " ";
+            }
+            @bottom-right {
+                content: " ";
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+
+            margin-top: 1.4cm;
+            padding-top: 0.3cm;
+            margin-bottom: 1.4cm;
+            border-bottom: 0.25pt solid #666;
+            border-top: 0.25pt solid #666;
+        }
+
+        @page external_partnerships,
+        student_projects_summary,
+        research_projects_summary
+         {
+            @bottom-left {
+                content: " ";
+            }
+            @bottom-right {
+                content: " ";
+            }
+            @top-left {
+                content: " ";
+            }
+            @top-right {
+                content: " ";
+            }
+
+            margin-top: max(0cm, 1.4cm);
+            margin-bottom: 1.4cm;
+        }
+
+
+
+        @page ba_pages:left,
+        external_partnerships:left,
+        student_projects_summary:left,
+        sr_pages:left,
+        publications:left,
+        research_projects_summary:left {
+            @bottom-left {
+                content: counter(page, decimal);
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+            @bottom-right {
+                content: string(ch_title);
+                font-size: 12px;
+                font-weight: bold;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+
+            @top-right {
+                font-weight: bold;
+                font-size: 14px;
+                z-index: 2;
+                content: "Annual Report {{financial_year_string}}";
+                padding-top: 0.2cm !important;
+                padding-bottom: 0cm !important;
+            }
+            @top-left {
+                content: flow(header-logo-left);
+                padding-top: 0cm !important;
+                padding-bottom: 0cm !important;
+            }
+        }
+
+        @page ba_pages:right,
+        external_partnerships:right,
+        student_projects_summary:right,
+        sr_pages:right,
+        publications:right,
+        research_projects_summary:right {
+            @bottom-right {
+                content: counter(page, decimal);
+                font-size: 12px;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+
+            @bottom-left {
+                content: string(ch_title);
+                font-size: 12px;
+                font-weight: bold;
+                padding: 0;
+                padding-bottom: 20px;
+            }
+
+            @top-left {
+                font-weight: bold;
+                font-size: 14px;
+                z-index: 2;
+                content: "Annual Report {{financial_year_string}}";
+                padding-top: 0.2cm !important;
+                padding-bottom: 0cm !important;
+            }
+            @top-right {
+                content: flow(header-logo-right);
+                padding-top: 0cm !important;
+                padding-bottom: 0cm !important;
+            }
+        }
+
+        @page ba_pages:first-of-group,
+        external_partnerships:first-of-group,
+        student_projects_summary:first-of-group,
+        sr_pages:first-of-group,
+        publications:first-of-group,
+        research_projects_summary:first-of-group
+        {
+            @top-right {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 0cm;
+                z-index: 2;
+                color: orange;
+                content: " ";
+                background-image: none;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                height: 0%;
+                width: 0%;
+            }
+            @top-left {
+                font-weight: bold;
+                font-size: 14px;
+                margin-top: 0cm;
+                z-index: 2;
+                color: orange;
+                content: " ";
+                background-image: none;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                height: 0%;
+                width: 0%;
+            }
+        }
+
+        @page research_projects_summary, student_projects_summary {
+            border-bottom: none !important;
+            border-top: none !important;
+        }
+
+        .track-page-number {
+            position: absolute;
+            top: 0;
+            left: 0;
+            counter-increment: page;
+            visibility: hidden;
+        }
+    </style>
+</head>
+{% comment %} <div class="top-left-image"><img src="{{ dbca_image_path }}" alt="Top Left Image"></div> {% endcomment %}
+
+<script>
+    // Function to get subheadings between given heading indices
+    // NOTE: Prince does not have access to all js dom traversal functions
+    // nor does it have full access to all css classes utilised in browsers
+    function findSubheadingsFollowing(headings, startIndex) {
+        const subheadings = [];
+        const currentHeading = headings[startIndex];
+        const nextHeading = headings[startIndex+1];
+
+        // Flag to determine if we are within the range of interest
+        let withinRange = false;
+
+        // Iterate over all elements in the document
+        Array.from(document.querySelectorAll('*')).forEach(element => {
+            // Check if the element is the next heading
+            if (element === nextHeading) {
+                withinRange = false; // Reached the end of the range
+            }
+
+            // If we are within the range and the element is an h2 with class "subheading", add it to subheadings
+            if (withinRange && element.tagName === "H2" && element.classList.contains("subheading")) {
+                subheadings.push(element);
+            }
+
+            // Check if the element is the current heading
+            if (element === currentHeading) {
+                withinRange = true; // Start of the range
+            }
+        });
+
+
+        return subheadings;
+    }
+
+    // Function to generate the table of contents
+    function generateTableOfContents(elementType) {
+        // Get the toc container
+        const tocList = document.getElementById("toc");
+
+        // Find all headings of specified type
+        const headings = document.querySelectorAll(elementType);
+        // const subheadings = document.querySelectorAll('.subheading');
+
+        // Loop through each heading
+        for (let i = 0; i < headings.length; i++) {
+            const heading = headings[i];
+
+            // Create a list item for the heading
+            const listItem = document.createElement("li");
+            listItem.classList.add("toc_list_item");
+
+            const contentContainer = document.createElement("div");
+            contentContainer.classList.add("toc_li_content_container");
+            const textContainer = document.createElement("div");
+            textContainer.classList.add("toc_text_container");
+            const pageNumberContainer = document.createElement("div");
+            pageNumberContainer.classList.add("toc_page_number_container");
+
+
+
+            // Create an anchor element with href pointing to the heading
+            const titledAnchor = document.createElement("a");
+            titledAnchor.href = "#" + heading.id;
+            titledAnchor.classList.add("toc_anchor_title")
+            // titledAnchor.textContent = heading.textContent;
+            titledAnchor.innerHTML = removeInlineStyles(heading.innerHTML);
+
+            const pagedAnchor = document.createElement("a");
+            pagedAnchor.classList.add("toc_page_number")
+            pagedAnchor.href = "#" + heading.id;
+
+            // Append the anchor to the list item
+            textContainer.appendChild(titledAnchor);
+            contentContainer.appendChild(textContainer);
+            pageNumberContainer.appendChild(pagedAnchor);
+            contentContainer.appendChild(pageNumberContainer);
+            listItem.appendChild(contentContainer);
+
+            // Append the list item to the table of contents list
+            tocList.appendChild(listItem);
+
+            const subheadings = findSubheadingsFollowing(headings, i)
+
+            // If subheadings exist, create subitems for them
+            if (subheadings.length > 0) {
+                const subList = document.createElement("ul");
+
+                // Loop through subheadings
+                for (let j = 0; j < subheadings.length; j++) {
+                    const subheading = subheadings[j];
+                    const subItem = document.createElement("li");
+                    subItem.classList.add("toc_sub_list_item");
+
+                    const subcontentContainer = document.createElement("div");
+                    subcontentContainer.classList.add("toc_li_content_container");
+                    const subTextContainer = document.createElement("div");
+                    subTextContainer.classList.add("toc_text_container");
+                    const subPageContainer = document.createElement("div");
+                    subPageContainer.classList.add("toc_page_number_container");
+
+
+
+                    // Create an anchor element with href pointing to the heading
+                    const subTitledAnchor = document.createElement("a");
+                    subTitledAnchor.href = "#" + subheading.id;
+                    subTitledAnchor.classList.add("toc_anchor_subtitle")
+                    // subTitledAnchor.textContent = subheading.textContent;
+                    subTitledAnchor.innerHTML = removeInlineStyles(subheading.innerHTML);
+
+                    const subPageAnchor = document.createElement("a");
+                    subPageAnchor.classList.add("toc_page_number")
+                    subPageAnchor.href = "#" + subheading.id;
+
+                    // Append the anchor to the list item
+                    subTextContainer.appendChild(subTitledAnchor);
+                    subcontentContainer.appendChild(subTextContainer);
+                    subPageContainer.appendChild(subPageAnchor);
+                    subcontentContainer.appendChild(subPageContainer);
+
+
+                    subItem.appendChild(subcontentContainer);
+                    subList.appendChild(subItem);
+                }
+
+                // Append the sublist to the current list item
+                const sublistContainer = document.createElement("li");
+                sublistContainer.classList.add("toc_sublist_container");
+                sublistContainer.appendChild(subList);
+
+                tocList.appendChild(sublistContainer);
+            } else {
+                continue;
+            }
+        }
+    }
+
+    // Function to remove inline styles from HTML
+    {% comment %} function removeInlineStyles(htmlContent) {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = htmlContent;
+
+        const elements = tempDiv.querySelectorAll("*");
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].removeAttribute("style");  // Remove inline styles
+            elements[i].removeAttribute("class");  // Remove classes
+        }
+
+        return tempDiv.innerHTML;
+    } {% endcomment %}
+    function removeInlineStyles(htmlContent) {
+        if (!htmlContent) return "";
+
+        // Remove all HTML tags using regex
+        return htmlContent
+            .replace(/<[^>]*>/g, '') // Remove all HTML tags
+            .replace(/&nbsp;/g, ' ') // Convert &nbsp; to regular spaces
+            .replace(/&amp;/g, '&')  // Convert &amp; to &
+            .replace(/&lt;/g, '<')   // Convert &lt; to <
+            .replace(/&gt;/g, '>')   // Convert &gt; to >
+            .replace(/&quot;/g, '"') // Convert &quot; to "
+            .trim(); // Remove leading/trailing whitespace
+    }
+
+    function adjustBaFirstPage() {
+        var page = document.querySelector('.ba_pages');
+        if (page) {
+            page.classList.add('first-page');
+        }
+        var pagetwo = document.querySelector('.ba_pages.left');
+        if (pagetwo) {
+            pagetwo.classList.add('first-page');
+        }
+    }
+
+
+    function generateResearchSummaryPageNumbers() {
+        // Establish dictionary for storing id links to jump to
+        var pageNumbers = {};
+        // Get all elements with class of track-page-number
+        const pageNumberTrackers = Array.from(document.querySelectorAll('.track-page-number'));
+        // Iterate over these and set the dictionary
+        pageNumberTrackers.forEach(el => {
+            // Find the sibling h2
+            const siblingH2 = el.previousElementSibling;
+            let projectTitle;
+            let pageNumberHref;
+            if (siblingH2 !== null && siblingH2.tagName === "H2")
+            {
+                projectTitle = siblingH2.textContent.trim();
+                pageNumberHref = siblingH2.id
+            } else {
+                projectTItle = "NO"
+                pageNumberHref = "ha"
+            }
+            pageNumbers[projectTitle] = pageNumberHref;
+        })
+
+
+        // Get the tables
+        const tableBodies = Array.from(document.querySelectorAll('.ba_table_body'));
+        // Loop through each table
+        tableBodies.forEach(el => {
+
+            const rows = Array.from(el.querySelectorAll('tr'));
+            rows.forEach(row => {
+                const titleCell = row.querySelector('.project_title_td');
+                const projectTitle = titleCell.textContent.trim();
+                // Establish the cell for page numbers (its a td with the class page_td)
+                const pageCell = row.querySelector('.page_td');
+                const pageNumberHref = pageNumbers[projectTitle];
+
+                // Create and set the content for the pageCell
+                const textContainer = document.createElement("div");
+                textContainer.classList.add("table_page_number_text_container");
+
+                const pagedAnchor = document.createElement("a");
+                pagedAnchor.classList.add("table_page_number")
+                pagedAnchor.href = '#' + pageNumberHref;
+
+                textContainer.appendChild(pagedAnchor);
+                pageCell.appendChild(textContainer);
+            })
+
+        })
+
+        const studentTableBodies = Array.from(document.querySelectorAll('.student_table_body'));
+            // Loop through each table
+            studentTableBodies.forEach(el => {
+
+                const rows = Array.from(el.querySelectorAll('tr'));
+                rows.forEach(row => {
+                    const titleCell = row.querySelector('.student_project_title_td');
+                    const projectTitle = titleCell.textContent.trim();
+                    // Establish the cell for page numbers (its a td with the class page_td)
+                    const pageCell = row.querySelector('.page_td');
+                    const pageNumberHref = pageNumbers[projectTitle];
+
+                    // Create and set the content for the pageCell
+                    const textContainer = document.createElement("div");
+                    textContainer.classList.add("table_page_number_text_container");
+
+                    const pagedAnchor = document.createElement("a");
+                    pagedAnchor.classList.add("table_page_number")
+                    pagedAnchor.href = '#' + pageNumberHref;
+
+                    textContainer.appendChild(pagedAnchor);
+                    pageCell.appendChild(textContainer);
+                })
+
+            })
+    }
+
+    function runLoad() {
+        generateTableOfContents('h1');
+        adjustBaFirstPage();
+        generateResearchSummaryPageNumbers();
+    }
+</script>
+
+
+<body class="page_body" onload="runLoad()">
+    <img class="header-logo-left" src="{{dbca_image_path}}" alt="Header Logo Left" />
+    <img class="header-logo-right" src="{{dbca_image_path}}" alt="Header Logo Right" />
+
+    {% comment %} PRINCE BLOCK {% endcomment %}
+    {% comment %} <div class="prince_page">
+        <div class="prince_blocker">
+            <p>Generated {{time_generated}}</p>
+            <p>Template populated in {{population_time}} seconds</p>
+            <p>Site URL: {{site_url}}</p>
+            <p>Image URL: {{dbca_image_path}}</p>
+            <p>Image URL 2: {{dbca_cropped_image_path}}</p>
+        </div>
+    </div> {% endcomment %}
+
+    {% comment %} COVER {% endcomment %}
+    <div class="coverpage_page">
+        <div class="section_container">
+            <div class="cover_title_container">
+                <p class="cover_dept_text_1">Department of </p>
+                <p class="cover_dept_text_2">Biodiversity, Conservation and Attractions</p>
+                <p class="cover_dept_text_3">Biodiversity and Conservation Science<br/>Annual Report</p>
+                <p class="cover_year_text">{{financial_year_string}}</p>
+            </div>
+            <div class="cover_logo_container">
+                <img class="cover_logo" alt="DBCA BCS Image"
+                src="{{dbca_image_path}}"/>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} DM {% endcomment %}
+    <div class="dm_page">
+        <div class="section_container">
+            <div class="directors_message_section_title_container">
+                <p class="directors_message_section_title">Executive Director's Message</p>
+            </div>
+            <div class="directors_message_container">
+                {{ directors_message_data | safe }}
+            </div>
+            <div class="directors_message_sign_off_container">
+                {{ directors_message_sign_off|newline_to_br|safe }}
+            </div>
+        </div>
+    </div>
+
+    {% comment %} TOC PAGINATION {% endcomment %}
+    <div class="toc_pages">
+        {% comment %} TABLE OF CONTENTS {% endcomment %}
+        <div class="section_container">
+            <div class="toc_title_container">
+                <p class="toc_section_title">Contents</p>
+            </div>
+            <div class="toc_data_container">
+                <ol id="toc">
+                    {% comment %} <li class="toc_list_item">Test</li> {% endcomment %}
+                </ol>
+                {% comment %} TOC HERE {% endcomment %}
+            </div>
+        </div>
+
+    </div>
+
+    {% comment %} MAIN PAGINATION {% endcomment %}
+    <div class="main_pages">
+
+    {% comment %} SDS CHAPTER {% endcomment %}
+        <div class="section_container sds">
+
+            <div class="chapter_container">
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Service Delivery Structure Chapter Image"
+                            src="{{sds_data.chapter_image}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="sdschaptertext" class="chapter_title_text">Service Delivery Structure</h1>
+                    </div>
+                </div>
+                <div class="section_content_container">
+                    {% comment %} SDS CHART {% endcomment %}
+                    <div class="sds_chart_image_container">
+                        <img class="sds_chart_image" alt="BCS SDS Chart Image"
+                        src="{{server_url}}{{sds_data.chart}}"/>
+                    </div>
+                    {% comment %} SDS INTRO {% endcomment %}
+                    {% with preprocessed_intro=sds_data.intro|safe|remove_empty_p %}
+                        {% if preprocessed_intro and sds_data.intro != None %}
+                            <div class="sds_intro_container">
+                                {{ sds_data.intro | safe }}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                </div>
+            </div>
+
+        </div>
+
+
+        {% comment %} BA & THEIR REPORTS {% endcomment %}
+        <div class="section_container ba">
+            {% for ba_item in sorted_ba_data_and_pr_dict %}
+                <div class="ba_chapter_container ba_pages">
+
+                    <div class="ba_chapter_title_container ">
+                        <div class="chapter_image_container">
+                            <img
+                                class="chapter_image"
+                                alt="{{ba_item.ba_name}} Image"
+                                src="{{server_url}}{{ba_item.ba_image.file}}"
+                            />
+                        </div>
+                        <div class="chapter_title_text_container">
+                            <h1 id="{{ba_item.ba_name}}" class="chapter_title_text">{{ba_item.ba_name}}</h1>
+                        </div>
+                    </div>
+
+                    <div class="section_content_container">
+                        <div class="ba_lead_text_container">
+                            <span>
+                                <p class="ba_leader_text">Program Leader: {{ba_item.ba_leader}}</p>
+                                <div class="ba_introduction_text_container">
+                                    {{ ba_item.ba_introduction|safe }}
+                                </div>
+                            </span>
+                        </div>
+                        {% for report in ba_item.progress_reports %}
+                            <div class="progress_report_container">
+                                <div class="progress_report_top_container">
+                                    <div class="progress_report_top_container_main_section">
+                                        <div class="pr_img_container_lhs">
+                                            {% if report.document.project.image.file %}
+                                                <img class="pr_image" alt="{{ report.document.project.title }} Image" src="{{ server_url }}{{ report.document.project.image.file }}">
+                                            {% else %}
+                                                <div class="pr_image_placeholder"></div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="pr_data_rhs">
+                                            <div class="pr_title_container">
+                                                <h2 id="{{ report.document.project.title | safe | extract_text_content }}" class="subheading">
+                                                    {{report.document.project.title | extract_text_content | safe  }}
+                                                </h2>
+                                                <div class="track-page-number"></div>
+                                            </div>
+                                            <div class="project_tag_container">
+                                                <p class="project_tag_text">{% if report.document.project.kind == "science" %}SP{% elif report.document.project.kind == "student" %}STP{% elif report.document.project.kind == "core_function" %}CF{% elif report.document.project.kind == "external" %}EXT{% endif %}-{{report.document.project.year}}-{{report.document.project.number}}</p>
+                                            </div>
+                                            <div class="pr_member_container">
+                                                <p class="pr_member_string">{% for item in report.team_members|dictsort:"position" %}{% if item.role == "supervising" or item.role == "research" or item.role == "technical" %}{% if not forloop.first %}, {% endif %}{{ item.user.display_first_name|slice:":1" }} {{ item.user.display_last_name }}{% endif %}{% endfor %}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% comment %} <div class="pr_top_filler"> {% endcomment %}
+                                        {% comment %} <p class="small_text">spacer</p>
+                                        <p class="small_text">spacer</p> {% endcomment %}
+                                    {% comment %} </div> {% endcomment %}
+                                </div>
+                            </div>
+                            <div class="progress_report_bottom_container">
+                                <div class="pr_subsection">
+                                    <div class="pr_subsection_content_container">
+                                        <div class="pr_subsection_title">
+                                            <h3>Context</h3>
+                                        </div>
+                                        <div class="orphanage_widow">
+                                            {{report.context | safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pr_subsection">
+                                    <div class="pr_subsection_content_container">
+                                        <div class="pr_subsection_title">
+                                            <h3>Aims</h3>
+                                        </div>
+                                        <div class="orphanage_widow">
+                                            {{report.aims | safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pr_subsection">
+                                    <div class="pr_subsection_content_container">
+                                        <div class="pr_subsection_title">
+                                            <h3>Progress</h3>
+                                        </div>
+                                        <div class="orphanage_widow">
+                                            {{report.progress | safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pr_subsection">
+                                    <div class="pr_subsection_content_container">
+                                        <div class="pr_subsection_title">
+                                            <h3>Management Implications</h3>
+                                        </div>
+                                        <div class="orphanage_widow">
+                                            {{report.implications | safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pr_subsection pr_last_section">
+                                    <div class="pr_subsection_content_container">
+                                        <div class="pr_subsection_title">
+                                            <h3>Future Directions</h3>
+                                        </div>
+                                        <div class="orphanage_widow">
+                                            {{report.future | safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% comment %} EXTERNAL PARTNERSHIPS CHAPTER{% endcomment %}
+        <div class="section_container external_partnerships">
+            <div class="chapter_container">
+
+
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Service Delivery Structure Chapter Image"
+                            src="{{sds_data.chapter_image}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="externalpartnerships" class="chapter_title_text">External Partnerships</h1>
+                    </div>
+                </div>
+
+                <div class="section_content_container">
+                    <div class="ext_table_section_container">
+                        <div class="ext_table_container">
+                            <table class="ext_table">
+                                <thead class="table_head">
+                                    <tr class="ext_table_tr">
+                                        <th class="ext_project_title_td ext_table_th">Project Title</th>
+                                        <th class="partners_td ext_table_th">Partners</th>
+                                        <th class="funding_td ext_table_th">External Funding</th>
+                                        <th class="dept_involvement_td ext_table_th">Departmental Involvement</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table_body">
+                                    {% for project in sorted_external_project_data %}
+                                        <tr class="ext_table_tr">
+                                            <td class="ext_project_title_td ext_table_td">{{project.title | extract_text_content | safe}}</td>
+                                            <td class="partners_td ext_table_td">{% if project.partners %}
+                                                {{ project.partners }}
+                                            {% else %}
+                                                <div class="no_data_table_placeholder">No partners set</div>
+                                            {% endif %}</td>
+                                            <td class="funding_td ext_table_td">{% if project.funding %}
+                                                {{ project.funding }}
+                                            {% else %}
+                                                <div class="no_data_table_placeholder">No funding set</div>
+                                            {% endif %}</td>
+                                            <td class="dept_involvement_td ext_table_td">{% with members=project.team_members|is_staff_filter %}{% for member in members %}{% if not forloop.first %}, {% endif %}{{ member.user.display_first_name|slice:":1" }} {{ member.user.display_last_name }}{% endfor %}{% endwith %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {% comment %} STUDENT PROJECTS CHAPTER (TABLE) {% endcomment %}
+        <div class="section_container student_projects_summary">
+            <div class="chapter_container">
+
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Student Projects Image"
+                            src="{{generic_chapter_image_path}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="studentprojects" class="chapter_title_text">Student Projects</h1>
+                    </div>
+                </div>
+                <div class="section_content_container">
+                        <div class="sr_table_section_container">
+                            <div class="sr_table_container">
+                                <table class="sr_table">
+                                    <thead class="table_head">
+                                        <tr class="sr_table_tr">
+                                            <th class="student_project_title_td sr_table_th">Project Title</th>
+
+                                            <th class="student_td sr_table_th">Student</th>
+                                            <th class="duration_td sr_table_th">Duration</th>
+                                            <th class="academic_td sr_table_th">Academic/s</th>
+                                            <th class="dbca_officer_td sr_table_th">DBCA Officer/s</th>
+                                            <th class="page_td sr_table_th">Page</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table_body student_table_body">
+                                        {% for report in sorted_student_report_array %}
+                                            <tr class="sr_table_tr">
+                                                <td class="student_project_title_td sr_table_td">{{report.document.project.title | extract_text_content | safe}}</td>
+                                                <td class="student_td sr_table_td">{% with students=report.team_members|filter_by_role:"student" %}{% for student in students %}{% if not forloop.first %}, {% endif %}{{ student.user.display_first_name }} {{ student.user.display_last_name }} ({{report.document.project.student_level|get_student_level_text}}){% endfor %}{% endwith %}</td>
+                                                <td class="duration_td sr_table_td">{{report.document.project.start_date|year_only}} - {{report.document.project.end_date|year_only}}</td>
+                                                {% comment %} Abbrev. and add organisation {% endcomment %}
+                                                {% spaceless %}<td class="academic_td sr_table_td">{% with sorted_academics=report.team_members|filter_by_role:"academicsuper"|sort_by_affiliation_and_name %}{% with grouped_academics=sorted_academics|group_by_affiliation %}{% for affiliation, academics in grouped_academics %}{% for academic in academics %}{{ academic.user|abbreviated_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if affiliation %} ({{ affiliation }}){% if not forloop.last %}, {% endif %}{% else %}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}{% endwith %}{% endwith %}</td>{% endspaceless %}
+                                                <td class="dbca_officer_td sr_table_td">{% with scientists=report.team_members|get_scientists %}{% for scientist in scientists %}{% if not forloop.first %}, {% endif %}{{ scientist.user.display_first_name|slice:":1" }} {{ scientist.user.display_last_name }}{% endfor %}{% endwith %}</td>
+                                                <td class="page_td sr_table_td"></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} STUDENT REPORTS CHAPTER {% endcomment %}
+        <div class="section_container sr_pages">
+            <div class="ba_chapter_container">
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Student Project Reports"
+                            src="{{generic_chapter_image_path}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="studentreports" class="chapter_title_text">Student Project Reports</h1>
+                    </div>
+                </div>
+                <div class="section_content_container">
+                    {% for report in sorted_student_report_array %}
+                        <div class="progress_report_container">
+                            <div class="progress_report_top_container">
+                                <div class ="progress_report_top_container_main_section">
+                                    <div class="pr_img_container_lhs">
+                                        {% if report.document.project.image.file %}
+                                            <img class="pr_image" alt="{{ report.document.project.title }} Image" src="{{ server_url }}{{ report.document.project.image.file }}">
+                                        {% else %}
+                                            <div class="pr_image_placeholder"></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="pr_data_rhs">
+                                    <div class="pr_title_container">
+                                        <h2 id="{{ report.document.project.title | safe | extract_text_content }}" class="subheading">
+                                            {{report.document.project.title | extract_text_content | safe }}
+                                        </h2>
+                                        <div class="track-page-number"></div>
+                                    </div>
+                                        {% comment %} <div class="project_tag_container">
+                                            <p class="project_text_section_title">Tag:</p>
+                                            <p class="project_tag_text">{% if report.document.project.kind == "science" %}SP{% elif report.document.project.kind == "student" %}STP{% elif report.document.project.kind == "core_function" %}CF{% elif report.document.project.kind == "external" %}EXT{% endif %}-{{report.document.project.year}}-{{report.document.project.number}}</p>
+                                        </div> {% endcomment %}
+                                        <div class="student_pr_member_container">
+                                            <p class="project_text_section_title">Student:</p>
+                                            <p class="pr_member_string">{% with students=report.team_members|filter_by_role:"student" %}{% for student in students %}{% if not forloop.first %}, {% endif %}{{ student.user.display_first_name }} {{ student.user.display_last_name }}{% endfor %}{% endwith %}</p>
+                                        </div>
+                                        <div class="student_pr_member_container">
+                                            <p class="project_text_section_title">Academic(s):</p>
+                                            <p class="pr_member_string">{% with academics=report.team_members|filter_by_role:"academicsuper" %}{% for academic in academics %}{% if not forloop.first %}, {% endif %}{{ academic.user|abbreviated_name }}{% endfor %}{% endwith %}</p>
+                                        </div>
+                                        <div class="student_pr_member_container">
+                                            <p class="project_text_section_title">Scientist(s):</p>
+                                            <p class="pr_member_string">
+                                                {% with scientists=report.team_members|get_scientists %}
+                                                    {% for scientist in scientists %}{% if not forloop.first %}, {% endif %}{{ scientist.user.display_first_name|slice:":1" }} {{ scientist.user.display_last_name }}{% endfor %}
+                                                {% endwith %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %} <div class="pr_top_filler"> {% endcomment %}
+                                    {% comment %} <p class="small_text">spacer</p>
+                                    <p class="small_text">spacer</p> {% endcomment %}
+                                {% comment %} </div> {% endcomment %}
+                            </div>
+
+                                <div class="progress_report_bottom_container">
+                                    <div class="pr_subsection">
+                                        <div class="pr_subsection_content_container">
+                                            <div class="pr_subsection_title">
+                                                <h3>Progress Report</h3>
+                                            </div>
+                                            <div class="orphanage_widow">
+                                                {{report.progress_report | safe}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% comment %} PUBLICATIONS CHAPTER {% endcomment %}
+        <div class="section_container publications">
+            <div class="chapter_container">
+
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Publications Image"
+                            src="{{generic_chapter_image_path}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="publications" class="chapter_title_text">Publications and Reports</h1>
+                    </div>
+                </div>
+                <div class="section_content_container publications_div">
+                    {{publications_data | safe}}
+                </div>
+            </div>
+        </div>
+
+
+        {% comment %} SUMMARY OF RESEARCH PROJECTS CHAPTER {% endcomment %}
+        <div class="section_container research_projects_summary">
+            <div class="chapter_container">
+                <div class="chapter_title_container">
+                    <div class="generic_chapter_image_container">
+                        <img
+                            class="generic_chapter_image"
+                            alt="Research Projects Image"
+                            src="{{generic_chapter_image_path}}"
+                        />
+                    </div>
+                    <div class="chapter_title_text_container">
+                        <h1 id="researchprojsummary" class="chapter_title_text">Summary of Research Projects</h1>
+                    </div>
+                </div>
+
+                <div class="section_content_container">
+                    {% for ba_item in sorted_ba_data_and_pr_dict %}
+                        <div class="ba_table_section_container">
+                            <h3 class="ba_table_title">{{ba_item.ba_name}}</h3>
+
+                            <div class="ba_table_container">
+                                <table class="ba_table">
+                                    <thead class="ba_table_head">
+                                        <tr class="ba_table_tr">
+                                            <th class="project_title_td ba_table_th">Project Title</th>
+                                            <th class="dbca_region_td ba_table_th">DBCA Region</th>
+                                            <th class="imcraibra_td ba_table_th">IBRA/IMCRA</th>
+                                            <th class="nrm_td ba_table_th">NRM Region</th>
+                                            <th class="page_td ba_table_th">Page</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="ba_table_body">
+                                    {% for report in ba_item.progress_reports %}
+                                        <tr class="ba_table_tr">
+                                            <td class="project_title_td ba_table_td">{{report.document.project.title | extract_text_content | safe}}</td>
+
+                                            <td class="dbca_region_td ba_table_td">
+                                                {% with filtered_areas=report.project_areas.data.areas|filter_by_area:"dbcaregion" %}
+                                                    {% for area in filtered_areas %}
+                                                        {{ area.name }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </td>
+                                            <td class="imcraibra_td ba_table_td">
+                                                {% with filtered_areas=report.project_areas.data.areas|filter_by_area:"imcra, ibra" %}
+                                                    {% for area in filtered_areas %}
+                                                        {{ area.name }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </td>
+                                            <td class="nrm_td ba_table_td">
+                                                {% with filtered_areas=report.project_areas.data.areas|filter_by_area:"nrm" %}
+                                                    {% for area in filtered_areas %}
+                                                        {{ area.name }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </td>
+                                            <td class="page_td ba_table_td"></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

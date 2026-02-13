@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spms-deployment
+  labels:
+    app: spms-prod
+spec:
+  selector:
+    matchLabels:
+      app: spms-prod
+  template:
+    metadata:
+      labels:
+        app: spms-prod
+    spec:
+      initContainers:
+        - name: chown-files
+          image: busybox
+          command:
+            - /bin/chown
+            - -R
+            - '10001:10001'
+            - /usr/src/app/backend/files
+          volumeMounts:
+            - mountPath: /usr/src/app/backend/files
+              name: spms-media-prod
+      containers:
+        - name: spms-backend
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: spms-env-prod
+          volumeMounts:
+            - mountPath: /usr/src/app/backend/files
+              name: spms-media-prod
+        - name: spms-frontend
+          imagePullPolicy: IfNotPresent
+      volumes:
+        - name: spms-media-prod
+          persistentVolumeClaim:
+            claimName: spms-media-data-prod
