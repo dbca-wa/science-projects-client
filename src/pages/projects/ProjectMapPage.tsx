@@ -124,6 +124,10 @@ const ProjectMapPage = observer(() => {
 	const totalProjects = mapData?.total_projects || 0;
 	const projectsWithoutLocation = mapData?.projects_without_location || 0;
 
+	// Calculate projects with location data (for display on map)
+	// The API returns all projects, but we only show those with location on the map
+	const projectsWithLocation = totalProjects - projectsWithoutLocation;
+
 	// Normal mode: filter bar on top, map below
 	if (!store.state.mapFullscreen) {
 		return (
@@ -134,7 +138,7 @@ const ProjectMapPage = observer(() => {
 
 					{/* Filter bar - always visible in normal mode */}
 					<MapFilters
-						projectCount={projects.length}
+						projectCount={projectsWithLocation}
 						totalProjects={totalProjects}
 						projectsWithoutLocation={projectsWithoutLocation}
 					/>
@@ -152,7 +156,7 @@ const ProjectMapPage = observer(() => {
 					) : (
 						<MapErrorBoundary>
 							<FullMapContainer
-								projectCount={projects.length}
+								projectCount={projectsWithLocation}
 								totalProjects={totalProjects}
 								projectsWithoutLocation={projectsWithoutLocation}
 							/>
@@ -251,7 +255,7 @@ const ProjectMapPage = observer(() => {
 					{/* Sidebar content - scrollable */}
 					<div className="flex-1 overflow-y-auto">
 						<MapFilters
-							projectCount={projects.length}
+							projectCount={projectsWithLocation}
 							totalProjects={totalProjects}
 							projectsWithoutLocation={projectsWithoutLocation}
 						/>

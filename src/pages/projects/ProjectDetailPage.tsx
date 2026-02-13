@@ -126,7 +126,7 @@ export default function ProjectDetailPage({
 
 	const { project, documents, details, members } = data;
 
-	// Manual breadcrumbs with project title (sanitized to remove HTML)
+	// Manual breadcrumbs with project title (sanitised to remove HTML)
 	const manualBreadcrumbs = [
 		{ title: "Projects", link: "/projects" },
 		{ title: sanitizeInput(project?.title || "Project") },

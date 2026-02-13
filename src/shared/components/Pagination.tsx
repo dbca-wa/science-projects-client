@@ -102,7 +102,7 @@ export const Pagination = memo<PaginationProps>(
 								aria-current={isActive ? "page" : undefined}
 								className={`min-w-[2.5rem] ${
 									isActive
-										? "bg-blue-500 text-white hover:bg-blue-600 border-blue-500"
+										? "bg-blue-500 text-white hover:bg-blue-600 hover:text-white border-blue-500"
 										: ""
 								}`}
 							>
