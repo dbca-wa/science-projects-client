@@ -6,26 +6,36 @@ This guide covers deploying the Science Projects Management System to UAT and Pr
 
 The deployment process uses three separate GitHub Actions workflows:
 
-- **test.yml** - Runs on pull requests to main (testing only)
-- **deploy-uat.yml** - Runs on push to `main` (auto-deploy to UAT)
+- **test.yml** - Runs on pull requests to `main` or `develop` (testing)
+- **deploy-uat.yml** - Runs on push to `develop` (auto-deploy to UAT)
 - **deploy-prod.yml** - Runs on version tags (manual deploy to production)
 
 ## Branch Strategy
 
 ```
-feature branch → main → tagged release
-                  ↓           ↓
-                 UAT      Production
+feature → develop (UAT) → main (Production) → tagged release
+           ↓                                        ↓
+          UAT                                  Production
 ```
 
-- **main**: Protected branch (requires PR approval), auto-deploys to UAT
-- **tags (v*)**: Production releases (manual deploy)
+- **develop**: UAT environment (auto-deploy on merge)
+- **main**: Production-ready code (protected, requires PR from develop)
+- **tags (v*)**: Production releases (triggers production deployment)
+
+**Workflow:**
+1. Create feature branch from `develop`
+2. Create PR to `develop` → tests run
+3. Merge to `develop` → UAT auto-deploys
+4. Test in UAT
+5. Create PR from `develop` to `main` → tests run again
+6. Merge to `main` → production-ready (no auto-deploy)
+7. Create version tag → production deployment triggered
 
 **Why this approach?**
-- Tests run once per feature (on PR to main)
-- UAT gets automatic deployments from main
-- Production gets controlled deployments via tags
-- Saves GitHub Actions minutes (no redundant test runs)
+- Clear separation: develop = UAT, main = production
+- Main always reflects production state
+- UAT for testing before production
+- Production deployments are explicit (via tags)
 
 ## Deployment Environments
 
@@ -74,23 +84,30 @@ feature branch → main → tagged release
 
 ### Automatic Deployment
 
-1. **Create a PR to main**:
+1. **Create feature branch from develop**:
    ```bash
+   git checkout develop
+   git pull origin develop
    git checkout -b feature/my-feature
    # Make changes
    git commit -m "feat: add new feature"
    git push origin feature/my-feature
-   # Create PR to main on GitHub
    ```
 
-2. **After PR approval and merge**:
-   - GitHub Actions automatically builds and deploys to UAT
-   - Frontend built with UAT configuration
-   - Backend built
-   - Images pushed tagged as `latest` and `test`
-   - UAT Kubernetes pulls new images within 5 minutes
+2. **Create PR to develop**:
+   - Go to GitHub and create PR from `feature/my-feature` to `develop`
+   - Tests will run automatically
+   - Get PR approved
 
-3. **Verify deployment**:
+3. **Merge to develop**:
+   - Merge the PR
+   - GitHub Actions automatically:
+     - Builds frontend with UAT configuration
+     - Builds backend
+     - Pushes images tagged as `latest` and `test`
+     - UAT Kubernetes pulls new images within 5 minutes
+
+4. **Verify deployment**:
    - Check GitHub Actions: https://github.com/dbca-wa/science-projects/actions
    - Check UAT application: https://scienceprojects-test.dbca.wa.gov.au
    - Check Kubernetes pods (via Rancher at rancher-uat.dbca.wa.gov.au):
@@ -124,37 +141,53 @@ kubectl rollout status deployment/spms-deployment-test -n spms-test
 - All tests pass on `develop` branch
 - Team approval for production release
 
-### Step 1: Merge to Main
+### Step 1: Create PR from Develop to Main
 
 ```bash
-# Ensure develop is up to date
+# Ensure develop is up to date and tested in UAT
 git checkout develop
 git pull origin develop
 
-# Merge to main
-git checkout main
-git pull origin main
-git merge develop
-
-# Push to main
-git push origin main
+# Create PR from develop to main on GitHub
+# This triggers tests one more time before production
 ```
+
+**On GitHub:**
+1. Go to Pull Requests
+2. Click "New Pull Request"
+3. Base: `main`, Compare: `develop`
+4. Create PR and get approval
+5. Merge to main
 
 ### Step 2: Create Version Tag
 
+After merging to main, create a version tag to trigger production deployment.
+
 Use semantic versioning (MAJOR.MINOR.PATCH):
 
-- **MAJOR**: Breaking changes
-- **MINOR**: New features (backward compatible)
-- **PATCH**: Bug fixes
+- **MAJOR**: Breaking changes (v2.0.0)
+- **MINOR**: New features, backward compatible (v1.2.0)
+- **PATCH**: Bug fixes (v1.2.3)
 
 ```bash
-# Create tag
-git tag v1.2.3
+# Checkout main and pull latest
+git checkout main
+git pull origin main
 
-# Push tag to trigger deployment
+# Create annotated tag with message
+git tag -a v1.2.3 -m "Release v1.2.3: Add new feature X"
+
+# Push tag to trigger production deployment
 git push origin v1.2.3
 ```
+
+**Alternative: Create release on GitHub**
+1. Go to Releases on GitHub
+2. Click "Draft a new release"
+3. Click "Choose a tag" → type `v1.2.3` → "Create new tag"
+4. Fill in release title and description
+5. Click "Publish release"
+6. This automatically pushes the tag and triggers deployment
 
 ### Step 3: Wait for Build
 
