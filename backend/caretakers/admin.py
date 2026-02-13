@@ -1,5 +1,4 @@
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.core.management import call_command
 
 from .models import Caretaker
@@ -8,7 +7,7 @@ from .models import Caretaker
 def migrate_caretaker_data_action(modeladmin, request, queryset):
     """
     Admin action to run the one-time caretaker data migration.
-    
+
     This migrates data from adminoptions_caretaker to caretakers_caretaker.
     Safe to run multiple times (idempotent).
     """

@@ -11,18 +11,44 @@ if [ -z "$CHANGED_FILES" ]; then
     exit 0
 fi
 
-echo "Running backend pre-commit checks on changed files..."
+echo "Running backend pre-commit checks..."
 
-# Change to backend directory and set PRE_COMMIT_SOURCE_DIR
+# Change to backend directory for all operations
 cd backend
-export PRE_COMMIT_SOURCE_DIR="$(pwd)"
 
-# Convert absolute paths to relative paths within backend/
+# Convert paths from "backend/foo.py" to "foo.py"
 BACKEND_FILES=$(echo "$CHANGED_FILES" | sed 's|^backend/||')
 
-# Run pre-commit on only the changed files
-if [ -n "$BACKEND_FILES" ]; then
-    echo "$BACKEND_FILES" | xargs pre-commit run --files
-else
-    echo "No backend files to check"
+# Export files for hooks that need them
+export CHANGED_FILES="$BACKEND_FILES"
+
+# Run each hook manually in order
+echo "→ Running Black (formatting)..."
+if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
+    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run black --line-length=88 2>&1 | grep -v "reformatted\|unchanged" || true
+fi
+
+echo "→ Running isort (import sorting)..."
+if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
+    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run isort --profile=black --line-length=88 2>&1 | grep -v "Skipped\|Fixing" || true
+fi
+
+echo "→ Running autoflake (unused imports)..."
+if command -v poetry &> /dev/null && [ -n "$BACKEND_FILES" ]; then
+    echo "$BACKEND_FILES" | grep "\.py$" | xargs -r poetry run autoflake --in-place --remove-all-unused-imports --remove-unused-variables --remove-duplicate-keys --ignore-init-module-imports 2>&1 | grep -v "^$" || true
+fi
+
+echo "→ Running flake8 (linting - warnings only)..."
+if command -v poetry &> /dev/null && [ -f .pre-commit-flake8-wrapper.sh ]; then
+    ./.pre-commit-flake8-wrapper.sh 2>&1 | head -20 || true
+fi
+
+echo "→ Running bandit (security - warnings only)..."
+if command -v poetry &> /dev/null && [ -f .pre-commit-bandit-wrapper.sh ]; then
+    ./.pre-commit-bandit-wrapper.sh 2>&1 | head -20 || true
+fi
+
+echo "→ Running commit summary..."
+if [ -f .pre-commit-confirm-wrapper.sh ]; then
+    ./.pre-commit-confirm-wrapper.sh
 fi

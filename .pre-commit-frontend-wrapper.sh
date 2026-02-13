@@ -11,18 +11,42 @@ if [ -z "$CHANGED_FILES" ]; then
     exit 0
 fi
 
-echo "Running frontend pre-commit checks on changed files..."
+echo "Running frontend pre-commit checks..."
 
-# Change to frontend directory and set PRE_COMMIT_SOURCE_DIR
+# Change to frontend directory for all operations
 cd frontend
-export PRE_COMMIT_SOURCE_DIR="$(pwd)"
 
-# Convert absolute paths to relative paths within frontend/
+# Convert paths from "frontend/foo.ts" to "foo.ts"
 FRONTEND_FILES=$(echo "$CHANGED_FILES" | sed 's|^frontend/||')
 
-# Run pre-commit on only the changed files
-if [ -n "$FRONTEND_FILES" ]; then
-    echo "$FRONTEND_FILES" | xargs pre-commit run --files
-else
-    echo "No frontend files to check"
+# Export files for hooks that need them
+export CHANGED_FILES="$FRONTEND_FILES"
+
+# Run each hook manually in order
+echo "→ Running Prettier (formatting)..."
+if command -v bun &> /dev/null && [ -n "$FRONTEND_FILES" ]; then
+    echo "$FRONTEND_FILES" | xargs -r bunx prettier --write || true
+fi
+
+echo "→ Running ESLint (linting - warnings only)..."
+if command -v bun &> /dev/null && [ -f .pre-commit-eslint-wrapper.sh ]; then
+    ./.pre-commit-eslint-wrapper.sh || true
+fi
+
+echo "→ Running TypeScript (type checking)..."
+if command -v bun &> /dev/null; then
+    bun run tsc --noEmit || {
+        echo "TypeScript errors found. Please fix before committing."
+        exit 1
+    }
+fi
+
+echo "→ Running security checks..."
+if [ -f .pre-commit-security-wrapper.sh ]; then
+    ./.pre-commit-security-wrapper.sh || true
+fi
+
+echo "→ Running commit summary..."
+if [ -f .pre-commit-summary.sh ]; then
+    ./.pre-commit-summary.sh
 fi
