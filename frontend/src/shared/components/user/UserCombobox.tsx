@@ -69,6 +69,7 @@ export interface UserComboboxProps {
 
 export interface UserComboboxRef {
 	focusInput: () => void;
+	clearSelection: () => void;
 }
 
 export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
@@ -101,6 +102,11 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 				ignoreArray: excludeUserIds,
 			});
 			return result.users.slice(0, 10);
+		};
+
+		// Handle clear selection
+		const handleClearSelection = () => {
+			onValueChange(null);
 		};
 
 		return (
