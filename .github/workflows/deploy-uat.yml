@@ -117,7 +117,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend
-          file: ./Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:latest
