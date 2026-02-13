@@ -29,8 +29,10 @@ feature branch → develop → main → tagged release
 **Purpose**: Testing before production release
 
 **Infrastructure**:
-- Azure Rancher Kubernetes
-- Namespace: `uat` or `test`
+- Azure Rancher Kubernetes (rancher-uat.dbca.wa.gov.au)
+- Cluster: `az-aks-oim03`
+- Namespace: `spms-test`
+- Deployment: `spms-deployment-test`
 - Auto-deployment enabled
 
 **Image Tags**:
@@ -47,8 +49,10 @@ feature branch → develop → main → tagged release
 **Purpose**: Live user-facing application
 
 **Infrastructure**:
-- Azure Rancher Kubernetes
-- Namespace: `production` or `prod`
+- Azure Rancher Kubernetes (rancher.dbca.wa.gov.au)
+- Cluster: TBD (contact DevOps)
+- Namespace: `spms-prod` (TBD)
+- Deployment: `spms-deployment-prod` (TBD)
 - Manual deployment required
 
 **Image Tags**:
@@ -85,12 +89,12 @@ feature branch → develop → main → tagged release
 
 4. **Verify deployment**:
    - Check GitHub Actions: https://github.com/dbca-wa/science-projects/actions
-   - Check UAT application: https://uat.example.com
-   - Check Kubernetes pods:
+   - Check UAT application: https://scienceprojects-test.dbca.wa.gov.au
+   - Check Kubernetes pods (via Rancher at rancher-uat.dbca.wa.gov.au):
      ```bash
-     kubectl get pods -n uat
-     kubectl logs -f deployment/frontend -n uat
-     kubectl logs -f deployment/backend -n uat
+     # Access cluster: az-aks-oim03
+     kubectl get pods -n spms-test
+     kubectl logs -f deployment/spms-deployment-test -n spms-test
      ```
 
 ### Manual UAT Deployment (if needed)
@@ -98,13 +102,15 @@ feature branch → develop → main → tagged release
 If auto-deployment fails or you need to force a deployment:
 
 ```bash
+# Access via Rancher: rancher-uat.dbca.wa.gov.au
+# Cluster: az-aks-oim03
+# Namespace: spms-test
+
 # Force Kubernetes to pull latest images
-kubectl rollout restart deployment/frontend -n uat
-kubectl rollout restart deployment/backend -n uat
+kubectl rollout restart deployment/spms-deployment-test -n spms-test
 
 # Check rollout status
-kubectl rollout status deployment/frontend -n uat
-kubectl rollout status deployment/backend -n uat
+kubectl rollout status deployment/spms-deployment-test -n spms-test
 ```
 
 ## Deploying to Production
@@ -166,50 +172,44 @@ Monitor progress: https://github.com/dbca-wa/science-projects/actions
 kubectl apply -k kustomize/overlays/prod/
 
 # Check rollout status
-kubectl rollout status deployment/spms-deployment-prod -n production
+kubectl rollout status deployment/spms-deployment-prod -n spms-prod
 ```
 
 **Option B: Using kubectl**
 
 ```bash
-# Update frontend
-kubectl set image deployment/frontend \
+# Update deployment with new image versions
+kubectl set image deployment/spms-deployment-prod \
   frontend=ghcr.io/dbca-wa/science-projects-frontend:v1.2.3 \
-  -n production
-
-# Update backend
-kubectl set image deployment/backend \
   backend=ghcr.io/dbca-wa/science-projects-backend:v1.2.3 \
-  -n production
+  -n spms-prod
 
 # Check rollout status
-kubectl rollout status deployment/frontend -n production
-kubectl rollout status deployment/backend -n production
+kubectl rollout status deployment/spms-deployment-prod -n spms-prod
 ```
 
 **Option C: Using Rancher UI**
 
-1. Navigate to Rancher dashboard
-2. Select `production` namespace
-3. Find `frontend` deployment
+1. Navigate to Rancher dashboard (rancher.dbca.wa.gov.au)
+2. Select cluster and `spms-prod` namespace
+3. Find `spms-deployment-prod` deployment
 4. Click "Edit" → "Upgrade"
-5. Change image tag to `v1.2.3`
-6. Click "Save"
-7. Repeat for `backend` deployment
+5. Update frontend image tag to `v1.2.3`
+6. Update backend image tag to `v1.2.3`
+7. Click "Save"
 
 ### Step 5: Verify Deployment
 
 ```bash
 # Check pods are running
-kubectl get pods -n production
+kubectl get pods -n spms-prod
 
-# Check pod logs
-kubectl logs -f deployment/frontend -n production
-kubectl logs -f deployment/backend -n production
+# Check deployment logs
+kubectl logs -f deployment/spms-deployment-prod -n spms-prod
 
-# Check application health
-curl https://api.example.com/health
-curl https://app.example.com
+# Check application is accessible
+curl https://scienceprojects.dbca.wa.gov.au
+curl https://scienceprojects.dbca.wa.gov.au/api/v1/
 ```
 
 ## Rollback Procedures
@@ -246,21 +246,17 @@ If production deployment breaks:
 2. **Rollback using kubectl**:
    ```bash
    # Rollback to previous version (e.g., v1.2.2)
-   kubectl set image deployment/frontend \
+   kubectl set image deployment/spms-deployment-prod \
      frontend=ghcr.io/dbca-wa/science-projects-frontend:v1.2.2 \
-     -n production
-
-   kubectl set image deployment/backend \
      backend=ghcr.io/dbca-wa/science-projects-backend:v1.2.2 \
-     -n production
+     -n spms-prod
    ```
 
-3. **Or use Rancher UI** to select previous version
+3. **Or use Rancher UI** (rancher.dbca.wa.gov.au) to select previous version
 
 4. **Verify rollback**:
    ```bash
-   kubectl rollout status deployment/frontend -n production
-   kubectl rollout status deployment/backend -n production
+   kubectl rollout status deployment/spms-deployment-prod -n spms-prod
    ```
 
 5. **No need to rebuild images** - Previous versions are immutable and available in registry
@@ -297,20 +293,20 @@ kubectl describe pod <pod-name> -n <namespace>
 
 **Check logs**:
 ```bash
-# Frontend logs
-kubectl logs -f deployment/frontend -n <namespace>
+# UAT logs
+kubectl logs -f deployment/spms-deployment-test -n spms-test
 
-# Backend logs
-kubectl logs -f deployment/backend -n <namespace>
+# Production logs
+kubectl logs -f deployment/spms-deployment-prod -n spms-prod
 
 # Previous pod logs (if pod restarted)
-kubectl logs deployment/frontend -n <namespace> --previous
+kubectl logs deployment/spms-deployment-test -n spms-test --previous
 ```
 
 **Common issues**:
 - Configuration errors: Check environment variables
 - Database connection: Verify DATABASE_URL
-- API connection: Verify VITE_API_BASE_URL
+- API connection: Verify VITE_PRODUCTION_BACKEND_API_URL
 
 ## Monitoring
 
@@ -321,27 +317,30 @@ Monitor workflow runs:
 
 ### Kubernetes
 
-Check deployment status:
+Check deployment status via Rancher (rancher-uat.dbca.wa.gov.au or rancher.dbca.wa.gov.au):
 ```bash
-# List all deployments
-kubectl get deployments -n <namespace>
+# UAT - Cluster: az-aks-oim03
+kubectl get deployments -n spms-test
+kubectl get pods -n spms-test
+kubectl get events -n spms-test --sort-by='.lastTimestamp'
 
-# Check pod status
-kubectl get pods -n <namespace>
-
-# Check events
-kubectl get events -n <namespace> --sort-by='.lastTimestamp'
+# Production (TBD - contact DevOps for cluster details)
+kubectl get deployments -n spms-prod
+kubectl get pods -n spms-prod
+kubectl get events -n spms-prod --sort-by='.lastTimestamp'
 ```
 
 ### Application Health
 
 Check application endpoints:
 ```bash
-# Backend health check
-curl https://api.example.com/health
+# UAT
+curl https://scienceprojects-test.dbca.wa.gov.au
+curl https://scienceprojects-test.dbca.wa.gov.au/api/v1/
 
-# Frontend (should return HTML)
-curl https://app.example.com
+# Production
+curl https://scienceprojects.dbca.wa.gov.au
+curl https://scienceprojects.dbca.wa.gov.au/api/v1/
 ```
 
 ## GitHub Configuration
@@ -389,7 +388,7 @@ kustomize/
 - Both overlays reference `ghcr.io/dbca-wa/science-projects-frontend` and `ghcr.io/dbca-wa/science-projects-backend`
 - Image tags are automatically updated by GitHub Actions on tagged releases
 - The `update-kustomize` job updates both `prod` and `test` overlays with the new version
-- Commits are made using the credentials of whoever triggered the workflow (the person who pushed the tag)
+- Commits are made using `github-actions[bot]` credentials
 
 **Deployment:**
 ```bash
