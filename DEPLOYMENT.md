@@ -153,12 +153,23 @@ GitHub Actions automatically:
 - Builds frontend with production configuration
 - Builds backend
 - Pushes images tagged with version and `stable`
+- Updates Kustomize configurations in `kustomize/overlays/prod/` and `kustomize/overlays/test/`
 
 Monitor progress: https://github.com/dbca-wa/science-projects/actions
 
 ### Step 4: Deploy to Kubernetes
 
-**Option A: Using kubectl**
+**Option A: Using Kustomize (Recommended)**
+
+```bash
+# Deploy to production using Kustomize
+kubectl apply -k kustomize/overlays/prod/
+
+# Check rollout status
+kubectl rollout status deployment/spms-deployment-prod -n production
+```
+
+**Option B: Using kubectl**
 
 ```bash
 # Update frontend
@@ -176,7 +187,7 @@ kubectl rollout status deployment/frontend -n production
 kubectl rollout status deployment/backend -n production
 ```
 
-**Option B: Using Rancher UI**
+**Option C: Using Rancher UI**
 
 1. Navigate to Rancher dashboard
 2. Select `production` namespace
@@ -351,6 +362,43 @@ The workflows use hardcoded URLs (not secrets) for the frontend build:
 - `GITHUB_TOKEN` - Automatically provided by GitHub Actions (for pushing Docker images)
 
 **Note**: URLs are hardcoded in workflow files (not secrets) because they are public-facing and not sensitive.
+
+## Kustomize Configuration
+
+The repository includes Kustomize configurations for deploying to Kubernetes:
+
+**Structure:**
+```
+kustomize/
+├── base/                    # Base configuration (shared)
+│   ├── deployment.yaml      # Deployment with frontend + backend containers
+│   ├── service.yaml         # Service configuration
+│   └── kustomization.yaml   # Base kustomization
+└── overlays/
+    ├── prod/                # Production overlay
+    │   ├── kustomization.yaml
+    │   ├── ingress.yaml
+    │   └── ...
+    └── test/                # Test/UAT overlay
+        ├── kustomization.yaml
+        ├── ingress.yaml
+        └── ...
+```
+
+**Image Configuration:**
+- Both overlays reference `ghcr.io/dbca-wa/science-projects-frontend` and `ghcr.io/dbca-wa/science-projects-backend`
+- Image tags are automatically updated by GitHub Actions on tagged releases
+- The `update-kustomize` job updates both `prod` and `test` overlays with the new version
+- Commits are made using the credentials of whoever triggered the workflow (the person who pushed the tag)
+
+**Deployment:**
+```bash
+# Deploy to test/UAT
+kubectl apply -k kustomize/overlays/test/
+
+# Deploy to production
+kubectl apply -k kustomize/overlays/prod/
+```
 
 ## Best Practices
 

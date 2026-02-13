@@ -295,8 +295,8 @@ GitHub Actions automatically:
   - Builds frontend Docker image with production config
   - Builds backend Docker image
   - Pushes images tagged with version and `stable`
+  - Automatically updates Kustomize configurations with new version
   - Production deployment requires manual kubectl apply
-  - Kustomize configurations updated manually (automation TODO)
 
 ## Deployment
 
@@ -306,12 +306,14 @@ GitHub Actions automatically:
 - **Trigger**: Push to `develop` branch
 - **Images**: `latest` and `test` tags
 - **Deployment**: Manual via Rancher UI (click "Redeploy" to pull latest image)
+- **Kustomize**: `kustomize/overlays/test/`
 - **Purpose**: Testing before production
 
 **Production**:
 - **Trigger**: Tagged release (e.g., `v1.2.3`)
 - **Images**: Version tag (e.g., `v1.2.3`) and `stable`
 - **Deployment**: Manual via Rancher UI or by infrastructure team
+- **Kustomize**: `kustomize/overlays/prod/`
 - **Purpose**: Live user-facing application
 
 ### Deploying to UAT
