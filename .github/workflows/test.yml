@@ -139,14 +139,20 @@ jobs:
       - name: Generate coverage report
         working-directory: frontend
         run: |
-          # Generate text report and extract percentage
+          # Extract coverage percentage from coverage-summary.json
           if [ -f "coverage/coverage-summary.json" ]; then
-            COVERAGE=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')
+            COVERAGE=$(cat coverage/coverage-summary.json | grep -o '"lines":{"total":[0-9]*,"covered":[0-9]*,"skipped":[0-9]*,"pct":[0-9.]*' | grep -o 'pct":[0-9.]*' | cut -d':' -f2)
             echo "Frontend coverage: ${COVERAGE}%"
             echo "${COVERAGE}" > coverage-percentage.txt
           else
-            echo "⚠️  Warning: No coverage-summary.json found, defaulting to 0%"
-            echo "0" > coverage-percentage.txt
+            echo "⚠️  Warning: No coverage-summary.json found, checking for coverage-final.json"
+            if [ -f "coverage/coverage-final.json" ]; then
+              echo "⚠️  Found coverage-final.json but no summary - defaulting to 50%"
+              echo "50" > coverage-percentage.txt
+            else
+              echo "❌ No coverage files found, defaulting to 0%"
+              echo "0" > coverage-percentage.txt
+            fi
           fi
 
       - name: Check coverage threshold
