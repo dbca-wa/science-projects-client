@@ -45,8 +45,6 @@ describe("MapControls", () => {
 	it("should render all control buttons", () => {
 		render(<MapControlsWrapper />);
 
-		expect(screen.getByLabelText("Zoom in")).toBeInTheDocument();
-		expect(screen.getByLabelText("Zoom out")).toBeInTheDocument();
 		expect(screen.getByLabelText("Enter map fullscreen")).toBeInTheDocument();
 		expect(screen.getByLabelText("Reset map view")).toBeInTheDocument();
 		expect(screen.getByTestId("layer-popover")).toBeInTheDocument();
@@ -55,8 +53,6 @@ describe("MapControls", () => {
 	it("should have proper button titles", () => {
 		render(<MapControlsWrapper />);
 
-		expect(screen.getByTitle("Zoom in")).toBeInTheDocument();
-		expect(screen.getByTitle("Zoom out")).toBeInTheDocument();
 		expect(screen.getByTitle("Enter map fullscreen")).toBeInTheDocument();
 		expect(
 			screen.getByTitle("Reset to Western Australia view")
@@ -111,21 +107,6 @@ describe("MapControls", () => {
 		// Check that top buttons have proper styling (flex-1 h-8 for matching layers button width)
 		expect(fullscreenButton).toHaveClass("flex-1", "h-8", "p-0");
 		expect(resetButton).toHaveClass("flex-1", "h-8", "p-0");
-
-		// Check top-left zoom controls (positioned next to MapStats)
-		const zoomControls = document.querySelector(
-			".absolute.top-4.z-30.flex.gap-1"
-		);
-		expect(zoomControls).toBeInTheDocument();
-
-		const zoomInButton = zoomControls?.querySelector('button[title="Zoom in"]');
-		const zoomOutButton = zoomControls?.querySelector(
-			'button[title="Zoom out"]'
-		);
-
-		// Check that zoom buttons have proper styling (h-8 w-8 for square buttons)
-		expect(zoomInButton).toHaveClass("h-8", "w-8", "p-0");
-		expect(zoomOutButton).toHaveClass("h-8", "w-8", "p-0");
 	});
 
 	it("should have proper accessibility attributes", () => {
@@ -147,19 +128,5 @@ describe("MapControls", () => {
 			"Enter map fullscreen"
 		);
 		expect(resetButton).toHaveAttribute("aria-label", "Reset map view");
-
-		// Check top-left zoom controls (positioned next to MapStats)
-		const zoomControls = document.querySelector(
-			".absolute.top-4.z-30.flex.gap-1"
-		);
-		expect(zoomControls).toBeInTheDocument();
-
-		const zoomInButton = zoomControls?.querySelector('button[title="Zoom in"]');
-		const zoomOutButton = zoomControls?.querySelector(
-			'button[title="Zoom out"]'
-		);
-
-		expect(zoomInButton).toHaveAttribute("aria-label", "Zoom in");
-		expect(zoomOutButton).toHaveAttribute("aria-label", "Zoom out");
 	});
 });

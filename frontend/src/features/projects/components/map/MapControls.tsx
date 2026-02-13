@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw } from "lucide-react";
+import { Maximize, Minimize, RotateCcw } from "lucide-react";
 import { useMap } from "react-leaflet";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
@@ -15,71 +15,71 @@ import L from "leaflet";
  * Zoom controls positioned in the top-left corner, to the right of the MapStats badge.
  * Positioned with left offset to account for MapStats width.
  */
-const ZoomControls = observer(() => {
-	const map = useMap();
-	const containerRef = useRef<HTMLDivElement>(null);
+// const ZoomControls = observer(() => {
+// 	const map = useMap();
+// 	const containerRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		if (containerRef.current) {
-			L.DomEvent.disableClickPropagation(containerRef.current);
-			L.DomEvent.disableScrollPropagation(containerRef.current);
-		}
-	}, []);
+// 	useEffect(() => {
+// 		if (containerRef.current) {
+// 			L.DomEvent.disableClickPropagation(containerRef.current);
+// 			L.DomEvent.disableScrollPropagation(containerRef.current);
+// 		}
+// 	}, []);
 
-	const handleZoomIn = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		e.preventDefault();
-		map.zoomIn();
-	};
+// 	const handleZoomIn = (e: React.MouseEvent) => {
+// 		e.stopPropagation();
+// 		e.preventDefault();
+// 		map.zoomIn();
+// 	};
 
-	const handleZoomOut = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		e.preventDefault();
-		map.zoomOut();
-	};
+// 	const handleZoomOut = (e: React.MouseEvent) => {
+// 		e.stopPropagation();
+// 		e.preventDefault();
+// 		map.zoomOut();
+// 	};
 
-	return (
-		<div
-			ref={containerRef}
-			className="absolute top-4 z-30 flex flex-col gap-1 leaflet-control"
-			style={{
-				left: "calc(1rem + max(8rem, min(calc(100vw - 8rem), 12rem)) + 0.5rem)",
-			}}
-			onMouseDown={(e) => e.stopPropagation()}
-			onMouseMove={(e) => e.stopPropagation()}
-			onMouseUp={(e) => e.stopPropagation()}
-			onDragStart={(e) => {
-				e.stopPropagation();
-				e.preventDefault();
-			}}
-			onDoubleClick={(e) => {
-				e.stopPropagation();
-				e.preventDefault();
-			}}
-		>
-			<Button
-				variant="outline"
-				size="sm"
-				onClick={handleZoomIn}
-				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-				aria-label="Zoom in"
-				title="Zoom in"
-			>
-				<ZoomIn className="h-4 w-4" />
-			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				onClick={handleZoomOut}
-				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-				aria-label="Zoom out"
-				title="Zoom out"
-			>
-				<ZoomOut className="h-4 w-4" />
-			</Button>
-		</div>
-	);
-});
+// 	return (
+// 		<div
+// 			ref={containerRef}
+// 			className="absolute top-4 z-30 flex flex-col gap-1 leaflet-control"
+// 			style={{
+// 				left: "calc(1rem + max(8rem, min(calc(100vw - 8rem), 12rem)) + 0.5rem)",
+// 			}}
+// 			onMouseDown={(e) => e.stopPropagation()}
+// 			onMouseMove={(e) => e.stopPropagation()}
+// 			onMouseUp={(e) => e.stopPropagation()}
+// 			onDragStart={(e) => {
+// 				e.stopPropagation();
+// 				e.preventDefault();
+// 			}}
+// 			onDoubleClick={(e) => {
+// 				e.stopPropagation();
+// 				e.preventDefault();
+// 			}}
+// 		>
+// 			<Button
+// 				variant="outline"
+// 				size="sm"
+// 				onClick={handleZoomIn}
+// 				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+// 				aria-label="Zoom in"
+// 				title="Zoom in"
+// 			>
+// 				<ZoomIn className="h-4 w-4" />
+// 			</Button>
+// 			<Button
+// 				variant="outline"
+// 				size="sm"
+// 				onClick={handleZoomOut}
+// 				className="h-8 w-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+// 				aria-label="Zoom out"
+// 				title="Zoom out"
+// 			>
+// 				<ZoomOut className="h-4 w-4" />
+// 			</Button>
+// 		</div>
+// 	);
+// });
 
 /**
  * MapControlButtons component
