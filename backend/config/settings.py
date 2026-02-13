@@ -346,10 +346,12 @@ else:
 # endregion ========================================================================================
 
 # region Logs and Tracking =======================================================================
-if ENVIRONMENT != "development":
+# Initialize Sentry only if SENTRY_URL is provided (optional)
+SENTRY_URL = env("SENTRY_URL", default=None)
+if ENVIRONMENT != "development" and SENTRY_URL:
     sentry_sdk.init(
         environment=ENVIRONMENT,
-        dsn=env("SENTRY_URL"),
+        dsn=SENTRY_URL,
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
     )
