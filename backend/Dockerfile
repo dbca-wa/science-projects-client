@@ -62,7 +62,6 @@ ENV ENVIRONMENT="production" \
     IT_ASSETS_URL="http://dummy" \
     DEFAULT_FROM_EMAIL="dummy@dummy.local" \
     SPMS_MAINTAINER_EMAIL="dummy@dummy.local" \
-    SENTRY_URL="https://dummy@dummy.ingest.sentry.io/dummy" \
     MAIN_DOMAIN="dummy.local" \
     MAINTAINER_EMAIL="dummy@dummy.local" \
     DEBUG="False"
