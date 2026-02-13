@@ -99,49 +99,51 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-  # ====================== UPDATE KUSTOMIZE ======================
-  update-kustomize:
-    name: Update Kustomize Configurations
-    needs: [build-frontend-prod, build-backend]
-    runs-on: ubuntu-latest
-    if: always()
+  # ====================== UPDATE KUSTOMIZE (TODO: Enable after investigation) ======================
+  # update-kustomize:
+  #   name: Update Kustomize Configurations
+  #   needs: [build-frontend-prod, build-backend]
+  #   runs-on: ubuntu-latest
+  #   if: always()
+  #
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #
+  #     - name: Extract version
+  #       id: version
+  #       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+  #
+  #     - name: Update production kustomization
+  #       run: |
+  #         VERSION=${{ steps.version.outputs.VERSION }}
+  #         if [ -f "kustomize/overlays/prod/kustomization.yaml" ]; then
+  #           sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/prod/kustomization.yaml
+  #           echo "Updated production kustomization to ${VERSION}"
+  #         else
+  #           echo "Warning: kustomize/overlays/prod/kustomization.yaml not found"
+  #         fi
+  #
+  #     - name: Update test kustomization
+  #       run: |
+  #         VERSION=${{ steps.version.outputs.VERSION }}
+  #         if [ -f "kustomize/overlays/test/kustomization.yaml" ]; then
+  #           sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/test/kustomization.yaml
+  #           echo "Updated test kustomization to ${VERSION}"
+  #         else
+  #           echo "Warning: kustomize/overlays/test/kustomization.yaml not found"
+  #         fi
+  #
+  #     - name: Commit and push kustomize updates
+  #       run: |
+  #         VERSION=${{ steps.version.outputs.VERSION }}
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
+  #         git add kustomize/overlays/prod/kustomization.yaml || true
+  #         git add kustomize/overlays/test/kustomization.yaml || true
+  #         git commit -m "chore: update kustomize to ${VERSION} [skip ci]" || exit 0
+  #         git push
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract version
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Update production kustomization
-        run: |
-          VERSION=${{ steps.version.outputs.VERSION }}
-          if [ -f "kustomize/overlays/prod/kustomization.yaml" ]; then
-            sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/prod/kustomization.yaml
-            echo "Updated production kustomization to ${VERSION}"
-          else
-            echo "Warning: kustomize/overlays/prod/kustomization.yaml not found"
-          fi
-
-      - name: Update test kustomization
-        run: |
-          VERSION=${{ steps.version.outputs.VERSION }}
-          if [ -f "kustomize/overlays/test/kustomization.yaml" ]; then
-            sed -i "s|newTag:.*|newTag: ${VERSION}|g" kustomize/overlays/test/kustomization.yaml
-            echo "Updated test kustomization to ${VERSION}"
-          else
-            echo "Warning: kustomize/overlays/test/kustomization.yaml not found"
-          fi
-
-      - name: Commit and push kustomize updates
-        run: |
-          VERSION=${{ steps.version.outputs.VERSION }}
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add kustomize/overlays/prod/kustomization.yaml || true
-          git add kustomize/overlays/test/kustomization.yaml || true
-          git commit -m "chore: update kustomize to ${VERSION} [skip ci]" || exit 0
-          git push
