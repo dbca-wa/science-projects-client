@@ -147,48 +147,48 @@ See: [Frontend README](../frontend/README.md)
 
 ## Documentation
 
-**[Complete Documentation →](docs/)**
+**[Complete Documentation →](../documentation/backend/)**
 
 ### Quick Links
 
 **Getting Started**:
-- [Getting Started](docs/development/getting-started.md) - Quick setup (< 30 minutes)
-- [Local Setup](docs/development/local-setup.md) - Detailed setup
-- [Testing](docs/development/testing.md) - Run your first tests
+- [Getting Started](../documentation/backend/development/getting-started.md) - Quick setup (< 30 minutes)
+- [Local Setup](../documentation/backend/development/local-setup.md) - Detailed setup
+- [Testing](../documentation/backend/development/testing.md) - Run your first tests
 
 **Development**:
-- [Feature Development](docs/development/feature-development.md) - Development workflow
-- [Code Style](docs/development/code-style.md) - Coding standards
-- [Pre-commit](docs/development/pre-commit.md) - Code quality checks
+- [Feature Development](../documentation/backend/development/feature-development.md) - Development workflow
+- [Code Style](../documentation/backend/development/code-style.md) - Coding standards
+- [Pre-commit](../documentation/backend/development/pre-commit.md) - Code quality checks
 
 **Architecture**:
-- [Overview](docs/architecture/overview.md) - Application structure
-- [ADRs](docs/architecture/) - Architectural decisions
-- [API Design](docs/architecture/api-design.md) - REST API principles
+- [Overview](../documentation/backend/architecture/overview.md) - Application structure
+- [ADRs](../documentation/backend/architecture/) - Architectural decisions
+- [API Design](../documentation/backend/architecture/api-design.md) - REST API principles
 
 **Deployment**:
-- [CI/CD](docs/deployment/ci-cd.md) - Continuous integration
-- [Kubernetes](docs/deployment/kubernetes-setup.md) - Deployment setup
-- [Monitoring](docs/deployment/monitoring-setup.md) - Observability
+- [CI/CD](../documentation/backend/deployment/ci-cd.md) - Continuous integration
+- [Kubernetes](../documentation/backend/deployment/kubernetes-setup.md) - Deployment setup
+- [Monitoring](../documentation/backend/deployment/monitoring-setup.md) - Observability
 
 **Operations**:
-- [Troubleshooting](docs/operations/troubleshooting.md) - Common issues
-- [Error Tracking](docs/operations/error-tracking.md) - Monitoring errors
-- [Disaster Recovery](docs/operations/disaster-recovery.md) - Recovery procedures
+- [Troubleshooting](../documentation/backend/operations/troubleshooting.md) - Common issues
+- [Error Tracking](../documentation/backend/operations/error-tracking.md) - Monitoring errors
+- [Disaster Recovery](../documentation/backend/operations/disaster-recovery.md) - Recovery procedures
 
 **Security**:
-- [Security Overview](docs/security/) - Security tools and processes
-- [Review Process](docs/security/security-review-process.md) - PR security checklist
+- [Security Overview](../documentation/backend/security/) - Security tools and processes
+- [Review Process](../documentation/backend/security/security-review-process.md) - PR security checklist
 
 ## Contributing
 
 1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make changes following our [Code Style](docs/development/code-style.md)
+2. Make changes following our [Code Style](../documentation/backend/development/code-style.md)
 3. Write tests (maintain >80% coverage)
 4. Run pre-commit hooks: `pre-commit run --all-files`
 5. Push and create a pull request
 
-See [Feature Development](docs/development/feature-development.md) for the complete workflow.
+See [Feature Development](../documentation/backend/development/feature-development.md) for the complete workflow.
 
 ## Testing
 
@@ -271,5 +271,5 @@ Unauthorised copying, distribution, modification, or use of this software is str
 ## Support
 
 For issues and questions:
-- Review [Documentation](docs/)
+- Review [Documentation](../documentation/backend/)
 - Create an issue on GitHub
