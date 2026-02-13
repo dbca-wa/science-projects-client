@@ -104,10 +104,10 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 			return result.users.slice(0, 10);
 		};
 
-		// Handle clear selection
-		const handleClearSelection = () => {
-			onValueChange(null);
-		};
+		// Handle clear selection (exposed via ref)
+		// const handleClearSelection = () => {
+		// 	onValueChange(null);
+		// };
 
 		return (
 			<BaseCombobox<IUserData>
