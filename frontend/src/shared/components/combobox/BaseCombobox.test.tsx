@@ -21,13 +21,13 @@ describe("BaseCombobox", () => {
 	let mockOnCreateNew: ReturnType<typeof vi.fn>;
 
 	beforeEach(() => {
-		mockSearchFn = vi.fn().mockImplementation(async (term: string) => {
+		mockSearchFn = vi.fn<[string], Promise<MockItem[]>>().mockImplementation(async (term: string) => {
 			return mockItems.filter((item) =>
 				item.name.toLowerCase().includes(term.toLowerCase())
 			);
 		});
-		mockOnChange = vi.fn();
-		mockOnCreateNew = vi.fn().mockImplementation(async (term: string) => ({
+		mockOnChange = vi.fn<[MockItem | null], void>();
+		mockOnCreateNew = vi.fn<[string], Promise<MockItem>>().mockImplementation(async (term: string) => ({
 			id: 999,
 			name: term,
 		}));
