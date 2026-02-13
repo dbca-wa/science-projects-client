@@ -10,12 +10,40 @@ See [Frontend README](../../frontend/README.md) for setup and getting started.
 
 ## Documentation Structure
 
-This section contains comprehensive frontend documentation covering:
+This section contains comprehensive frontend documentation organised into four main areas:
 
-- **Architecture** - Application structure and design patterns
-- **Development** - Development workflow and coding standards
-- **Testing** - Testing strategy and best practices
-- **Components** - Component organisation and patterns
+### [Architecture](./architecture/README.md)
+
+Architectural decisions and design patterns:
+- [ADRs](./architecture/README.md#architectural-decision-records-adrs) - Architectural Decision Records
+- [Overview](./architecture/overview.md) - System architecture overview
+- [State Management](./architecture/state-management.md) - MobX and TanStack Query patterns
+- [Component Organisation](./architecture/component-organisation.md) - Feature-based structure
+
+### [Development](./development/README.md)
+
+Development workflow and standards:
+- [Getting Started](./development/getting-started.md) - Setup and installation
+- [Code Style](./development/code-style.md) - TypeScript standards and ESLint
+- [Testing Guide](./development/testing-guide.md) - Testing philosophy and implementation
+- [Feature Development](./development/feature-development.md) - Feature development workflow
+- [Pre-commit Hooks](./development/pre-commit.md) - Pre-commit checks
+
+### [Performance](./performance/README.md)
+
+Performance optimisation strategies:
+- [Code Splitting](./performance/code-splitting.md) - Manual chunks and route-based splitting
+- [Bundle Optimisation](./performance/bundle-optimisation.md) - Bundle analysis and tree shaking
+- [Memoisation](./performance/memoisation.md) - React and MobX memoisation patterns
+- [Memory Management](./performance/memory-management.md) - Store lifecycle and cleanup
+
+### [Deployment](./deployment/README.md)
+
+Build and deployment configuration:
+- [Build Configuration](./deployment/build-configuration.md) - Vite production build settings
+- [CI/CD](./deployment/ci-cd.md) - GitHub Actions workflows
+- [Environment Variables](./deployment/environment-variables.md) - Configuration management
+- [Docker](./deployment/docker.md) - Docker configuration
 
 ## Technology Stack
 
