@@ -8,6 +8,8 @@
 
 A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
 
+<!-- Test change for CI/CD workflow verification -->
+
 ## Test Coverage
 
 - **Frontend**: Minimum 50% coverage (Vitest with 2-way sharding)
