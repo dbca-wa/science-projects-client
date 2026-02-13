@@ -1,13 +1,18 @@
 # Science Projects Management System
 
+[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
+![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-50%25-orange)
+![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
+[![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
+[![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects/issues)
+
 A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
+
+<!-- Test change for CI/CD workflow verification -->
 
 ## Test Coverage
 
-[![Frontend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/frontend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
-[![Backend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/backend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
-
-- **Frontend**: Minimum 50% coverage (Vitest) WIP
+- **Frontend**: Minimum 50% coverage (Vitest with 2-way sharding)
 - **Backend**: Minimum 80% coverage (pytest with 4-way sharding)
 
 ### Running Tests Locally
@@ -276,32 +281,97 @@ createdb science_projects
 
 GitHub Actions automatically:
 
-- **On Pull Requests**:
-  - Runs frontend tests with coverage
+- **On Pull Requests** (test.yml):
+  - Runs frontend tests with coverage (2-way sharding)
   - Runs backend tests with coverage (4-way sharding)
-  - Enforces coverage thresholds
-  - Comments coverage reports on PRs
+  - Enforces coverage thresholds (50% frontend, 80% backend)
+  - Updates coverage badges on merge to main
 
-- **On Tagged Releases**:
-  - Builds frontend Docker images (test and production)
+- **On Push to Develop** (deploy-uat.yml):
+  - Builds frontend Docker image with UAT config
   - Builds backend Docker image
-  - Pushes images to GitHub Container Registry
-  - Updates coverage badges
+  - Pushes images tagged as `latest` and `test`
+  - UAT environment auto-deploys from `latest` tag
+
+- **On Tagged Releases** (deploy-prod.yml):
+  - Builds frontend Docker image with production config
+  - Builds backend Docker image
+  - Pushes images tagged with version and `stable`
+  - Automatically updates Kustomize configurations with new version
+  - Production deployment requires manual kubectl apply
 
 ## Deployment
 
+### Deployment Environments
+
+**UAT (User Acceptance Testing)**:
+- **Trigger**: Push to `develop` branch
+- **Images**: `latest` and `test` tags
+- **Deployment**: Manual via Rancher UI (click "Redeploy" to pull latest image)
+- **Kustomize**: `kustomize/overlays/test/`
+- **Purpose**: Testing before production
+
+**Production**:
+- **Trigger**: Tagged release (e.g., `v1.2.3`)
+- **Images**: Version tag (e.g., `v1.2.3`) and `stable`
+- **Deployment**: Manual via Rancher UI or by infrastructure team
+- **Kustomize**: `kustomize/overlays/prod/`
+- **Purpose**: Live user-facing application
+
+### Deploying to UAT
+
+1. Merge your PR to `develop` branch
+2. Push to GitHub: `git push origin develop`
+3. GitHub Actions builds and pushes images with `latest` and `test` tags
+4. Go to Rancher UI → UAT namespace → Select deployment → Click "Redeploy"
+5. Rancher pulls the latest image and restarts the pods
+
+### Deploying to Production
+
+1. Ensure `develop` is tested and stable in UAT
+2. Merge `develop` to `main`
+3. Create and push a version tag:
+   ```bash
+   git tag v1.2.3
+   git push origin v1.2.3
+   ```
+4. GitHub Actions builds and pushes versioned images
+5. Kustomize configurations are automatically updated with the new version
+6. Infrastructure team deploys to production using updated Kustomize configs
+   - Or manually via Rancher UI: Select deployment → Update image tag to `v1.2.3` → Redeploy
+
+### Rollback Procedures
+
+**UAT Rollback**:
+1. Revert the problematic commit on `develop`
+2. Push to GitHub
+3. New `latest` image builds automatically
+4. Go to Rancher UI → UAT namespace → Click "Redeploy" to pull reverted version
+
+**Production Rollback**:
+1. Identify the previous working version (e.g., `v1.2.2`)
+2. Via Rancher UI: Update image tag to `v1.2.2` and redeploy
+3. Or infrastructure team can use Kustomize to deploy previous version
+
 ### Docker Images
 
-Images are automatically built and pushed to GitHub Container Registry on tagged releases:
+Images are automatically built and pushed to GitHub Container Registry:
 
-- `ghcr.io/dbca-wa/science-projects-frontend:latest` (production)
-- `ghcr.io/dbca-wa/science-projects-frontend:test` (test environment)
-- `ghcr.io/dbca-wa/science-projects-backend:latest`
+**Frontend**:
+- `ghcr.io/dbca-wa/science-projects-frontend:latest` (UAT)
+- `ghcr.io/dbca-wa/science-projects-frontend:test` (UAT)
+- `ghcr.io/dbca-wa/science-projects-frontend:v1.2.3` (Production)
+- `ghcr.io/dbca-wa/science-projects-frontend:stable` (Production)
+
+**Backend**:
+- `ghcr.io/dbca-wa/science-projects-backend:latest` (UAT)
+- `ghcr.io/dbca-wa/science-projects-backend:v1.2.3` (Production)
+- `ghcr.io/dbca-wa/science-projects-backend:stable` (Production)
 
 ### Environment Variables
 
 **Frontend** (baked at build time):
-- `VITE_API_BASE_URL` - Backend API URL
+- `VITE_PRODUCTION_BACKEND_API_URL` - Backend Django API URL (for example, something like `https://spms-api.dbca.wa.gov.au/api/v1/`)
 
 **Backend** (runtime configuration):
 - `DATABASE_URL` - PostgreSQL connection string
