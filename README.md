@@ -197,7 +197,7 @@ git commit --no-verify -m "emergency fix"
 - Coverage badges (auto-update on main)
 - Path-based execution (only test changed code)
 
-**deploy-uat.yml** (on push to staging):
+**deploy-staging.yml** (on push to staging):
 
 - Build and push `latest`/`test` images
 - Auto-deploy to staging

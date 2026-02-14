@@ -31,10 +31,10 @@ jobs:
           filters: |
             frontend:
               - 'frontend/**'
-              - '.github/workflows/deploy-uat.yml'
+              - '.github/workflows/deploy-staging.yml'
             backend:
               - 'backend/**'
-              - '.github/workflows/deploy-uat.yml'
+              - '.github/workflows/deploy-staging.yml'
 
   # ====================== BUILD FRONTEND TEST ======================
   build-frontend-test:
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
-    
+
     env:
       VITE_PRODUCTION_BASE_URL: "https://scienceprojects-test.dbca.wa.gov.au/"
       VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"

@@ -32,6 +32,7 @@ The frontend container serves the Vite-built application using Bun's built-in HT
 See the actual Dockerfile: [`frontend/Dockerfile`](../../../frontend/Dockerfile)
 
 **Key features**:
+
 - Multi-stage build (build stage + production stage)
 - Build stage uses `oven/bun:1.3.9-alpine` for dependencies and Vite build
 - Production stage uses `oven/bun:1.3.9-slim` for minimal runtime
@@ -43,6 +44,7 @@ See the actual Dockerfile: [`frontend/Dockerfile`](../../../frontend/Dockerfile)
 **Location**: `frontend/server.js`
 
 The frontend uses a custom Bun server (not nginx) to serve static files. Key features:
+
 - Serves static files from `dist/` directory
 - SPA routing support (fallback to index.html)
 - Runs on port 3000
@@ -53,6 +55,7 @@ The frontend uses a custom Bun server (not nginx) to serve static files. Key fea
 **Output**: `dist/` directory with optimised static assets
 
 **Build features**:
+
 - TypeScript compilation with type checking
 - Vite bundling and optimisation
 - Tree shaking and code splitting
@@ -347,7 +350,7 @@ services:
             - db
 
     db:
-        image: postgres:15-alpine
+        image: 7-alpine
         ports:
             - "5432:5432"
         environment:
@@ -550,6 +553,7 @@ Understanding Docker image sizes helps optimise builds and deployment times. The
 **Why is the backend nearly 3x larger?**
 
 The backend image is larger due to:
+
 1. Python runtime and standard library (~108MB base)
 2. Django and Django REST Framework ecosystem (~233MB)
 3. System dependencies for PDF generation (PrinceXML ~28MB)
@@ -557,6 +561,7 @@ The backend image is larger due to:
 5. Additional runtime tools (~50MB)
 
 The frontend image is smaller because:
+
 1. Bun runtime is more compact (~50MB)
 2. Static assets are pre-built and optimised
 3. No database client libraries needed
@@ -577,12 +582,14 @@ Total:                    ~296MB
 ```
 
 **Key components:**
+
 - Bun runtime (JavaScript/TypeScript execution)
 - Built Vite bundle (optimised, tree-shaken)
 - Static assets (images, fonts, CSS)
 - Server.js (HTTP server)
 
 **Why it's small:**
+
 - Pre-built static assets (no build tools in production)
 - Bun is more compact than Node.js
 - No database drivers or system libraries
@@ -612,6 +619,7 @@ Total:                    ~880MB
 ```
 
 **Key components:**
+
 - Python 3.14 runtime and standard library
 - Django and Django REST Framework
 - PostgreSQL client libraries (psycopg2)
@@ -620,6 +628,7 @@ Total:                    ~880MB
 - Application code and static files
 
 **Why it's larger:**
+
 - Python ecosystem is heavier than JavaScript
 - Database drivers require system libraries (psycopg2)
 - PDF generation requires PrinceXML (~28MB)
@@ -632,6 +641,7 @@ Total:                    ~880MB
 **Initial backend image**: ~940MB
 
 **Optimisations applied:**
+
 1. Removed unnecessary development tools (vim, wget, ncdu): -60MB
 2. Multi-stage build to exclude build tools: Already implemented
 3. Cleaned apt cache: Already implemented
@@ -643,23 +653,27 @@ Total:                    ~880MB
 #### Frontend
 
 **Current optimisations:**
+
 - ✅ Multi-stage build
 - ✅ Bun slim base image
 - ✅ Static asset optimisation via Vite
 - ✅ Tree shaking and code splitting
 
 **Potential improvements:**
+
 - Use `oven/bun:1.3.9-distroless` (could save ~20MB)
 - Further optimise static assets (image compression)
 - Remove unused dependencies
 
 **Trade-offs:**
+
 - Distroless images are harder to debug (no shell)
 - Aggressive asset optimisation may impact quality
 
 #### Backend
 
 **Current optimisations:**
+
 - ✅ Multi-stage build
 - ✅ Python 3.14 slim base image
 - ✅ Removed development tools (vim, wget, ncdu)
@@ -667,12 +681,14 @@ Total:                    ~880MB
 - ✅ Code obfuscation (compiled bytecode, source removed)
 
 **Potential improvements:**
+
 - Use `python:3.14-alpine` (could save ~50MB)
 - Remove PrinceXML if PDF generation not needed (saves ~28MB)
 - Optimise static files collection (currently ~393MB)
 - Use PostgreSQL connection pooler instead of client libraries
 
 **Trade-offs:**
+
 - Alpine requires compiling many Python packages (slower builds, potential compatibility issues)
 - Removing PrinceXML breaks PDF generation feature
 - Connection pooler adds infrastructure complexity
@@ -681,11 +697,13 @@ Total:                    ~880MB
 ### Build Time Comparison
 
 **Frontend build:**
+
 - Build time: ~60-90 seconds
 - Stages: 2 (build + production)
 - Caching: Excellent (node_modules cached)
 
 **Backend build:**
+
 - Build time: ~120-180 seconds
 - Stages: 2 (builder + production)
 - Caching: Good (Poetry dependencies cached)
@@ -693,11 +711,13 @@ Total:                    ~880MB
 ### Deployment Impact
 
 **Frontend:**
+
 - Pull time: ~30-60 seconds (296MB)
 - Startup time: ~2-5 seconds
 - Memory usage: ~50-100MB
 
 **Backend:**
+
 - Pull time: ~90-180 seconds (880MB)
 - Startup time: ~5-10 seconds
 - Memory usage: ~200-400MB (depends on workers)
@@ -705,6 +725,7 @@ Total:                    ~880MB
 ### Best Practices
 
 **For both images:**
+
 1. Use multi-stage builds to exclude build tools
 2. Use slim/alpine base images where possible
 3. Clean package manager caches
@@ -712,12 +733,14 @@ Total:                    ~880MB
 5. Use .dockerignore to exclude unnecessary files
 
 **For frontend:**
+
 1. Optimise static assets during build
 2. Use tree shaking and code splitting
 3. Compress images and fonts
 4. Use CDN for large static assets
 
 **For backend:**
+
 1. Use Poetry for dependency management
 2. Collect static files at build time
 3. Remove development dependencies
@@ -726,17 +749,20 @@ Total:                    ~880MB
 ### Monitoring Image Sizes
 
 **Check image size:**
+
 ```bash
 docker images | grep spms
 ```
 
 **Analyse image layers:**
+
 ```bash
 docker history spms-frontend:latest
 docker history spms-backend:latest
 ```
 
 **Detailed layer analysis:**
+
 ```bash
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
   wagoodman/dive:latest spms-backend:latest
@@ -745,6 +771,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 ### Summary
 
 The backend image is larger than the frontend primarily due to:
+
 1. Python ecosystem is heavier than JavaScript/Bun
 2. Database client libraries and system dependencies (psycopg2)
 3. PDF generation tools (PrinceXML 16.1, ~28MB)
