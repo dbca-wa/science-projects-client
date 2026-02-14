@@ -100,10 +100,10 @@ poetry run pytest --cov              # With coverage
 ### Branch Strategy
 
 ```
-feature/* → staging (UAT) → main (production) → v* tags
+feature/* → staging (Staging) → main (production) → v* tags
 ```
 
-- **staging**: Auto-deploys to UAT on push
+- **staging**: Auto-deploys to Staging on push
 - **main**: Production-ready code (merge from staging)
 - **v\* tags**: Triggers production deployment
 
@@ -124,7 +124,7 @@ git push origin feature/my-feature
 # Tests run automatically on PR
 
 # 4. After merge to staging
-# UAT auto-deploys within 5 minutes
+# Staging auto-deploys within 5 minutes
 
 # 5. When ready for production
 git checkout main
@@ -139,7 +139,7 @@ git push origin v1.0.0
 
 ### Deployment
 
-**UAT** (automatic):
+**Staging** (automatic):
 
 - Trigger: Push to `staging`
 - URL: https://scienceprojects-test.dbca.wa.gov.au
@@ -155,7 +155,7 @@ git push origin v1.0.0
 **Rollback**:
 
 ```bash
-# UAT: Revert commit on staging and push
+# Staging: Revert commit on staging and push
 git revert <commit-hash>
 git push origin staging
 

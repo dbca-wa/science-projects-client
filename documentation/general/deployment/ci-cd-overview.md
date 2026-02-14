@@ -45,21 +45,21 @@ Workflows automatically detect which components have changed:
 
 ```
 feature/* → staging → main
-            (UAT)     (Production)
+            (Staging)  (Production)
 ```
 
 **Branch purposes:**
 
 - `feature/*` - Feature development branches
-- `staging` - Integration branch, deploys to UAT
+- `staging` - Integration branch, deploys to Staging
 - `main` - Production branch, deploys to production
 
 ### Deployment Triggers
 
-**UAT deployment:**
+**Staging deployment:**
 
 - Trigger: Push to `staging` branch
-- Environment: UAT
+- Environment: Staging
 - Approval: Automatic
 
 **Production deployment:**
