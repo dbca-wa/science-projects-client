@@ -350,7 +350,7 @@ services:
             - db
 
     db:
-        image: 7-alpine
+        image: postgres:17-alpine
         ports:
             - "5432:5432"
         environment:
