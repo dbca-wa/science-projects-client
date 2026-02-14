@@ -80,7 +80,7 @@ get activeUsers() {
 
 - [Architecture Guide](../architecture/README.md) - Architectural decisions and patterns
 - [Development Guide](../development/README.md) - Development workflow and standards
-- [Deployment Guide](../deployment/README.md) - Build and deployment configuration
+- [Deployment Guide](../../general/deployment/README.md) - Build and deployment configuration
 
 ## External Resources
 

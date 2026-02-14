@@ -4,6 +4,12 @@ import {
 	MAX_IMAGE_SIZE_MB,
 	MAX_IMAGE_DIMENSION,
 } from "@/shared/constants/image.constants";
+import {
+	getWorkerConfig,
+	logWorkerMetrics,
+	type WorkerMetrics,
+} from "./worker.utils";
+import { getCompressionWorkerUrl } from "./compression-worker";
 
 /**
  * Error types for image compression
@@ -29,6 +35,15 @@ export interface CompressImageOptions {
 	maxSizeMB?: number;
 	maxDimension?: number;
 	useWebWorker?: boolean;
+	onProgress?: (progress: number) => void;
+}
+
+/**
+ * Result of image compression including metrics
+ */
+export interface CompressionResult {
+	file: File;
+	metrics: WorkerMetrics;
 }
 
 /**
@@ -87,21 +102,23 @@ export const needsCompression = (
 };
 
 /**
- * Compress an image file
+ * Compress an image file with Web Worker support
  *
  * This is the main compression function that should be used throughout the application.
- * It validates the file type, compresses if needed, and returns the processed file.
+ * It validates the file type, compresses if needed using Web Workers (when available),
+ * and returns the processed file with performance metrics.
  *
  * @param file - The image file to compress
  * @param options - Compression options (uses defaults from constants)
- * @returns Promise resolving to the compressed (or original) file
+ * @returns Promise resolving to compression result with file and metrics
  * @throws ImageCompressionError if validation or compression fails
  *
  * @example
  * ```typescript
  * try {
- *   const compressed = await compressImage(file);
- *   // Upload compressed file
+ *   const result = await compressImage(file);
+ *   // Upload result.file
+ *   console.log('Compression metrics:', result.metrics);
  * } catch (error) {
  *   if (error instanceof ImageCompressionError) {
  *     toast.error(error.message);
@@ -112,12 +129,16 @@ export const needsCompression = (
 export const compressImage = async (
 	file: File,
 	options: CompressImageOptions = {}
-): Promise<File> => {
+): Promise<CompressionResult> => {
+	const startTime = performance.now();
+	const originalSize = file.size;
+
 	const {
 		acceptedTypes = ACCEPTED_IMAGE_TYPES,
 		maxSizeMB = MAX_IMAGE_SIZE_MB,
 		maxDimension = MAX_IMAGE_DIMENSION,
-		useWebWorker = false, // Disabled to avoid CSP issues with CDN worker loading
+		useWebWorker = getWorkerConfig().useWebWorker, // Auto-detect Web Worker support
+		onProgress,
 	} = options;
 
 	// Validate file type
@@ -128,31 +149,75 @@ export const compressImage = async (
 		console.log(
 			`File size ${(file.size / (1024 * 1024)).toFixed(2)}MB is within limit, skipping compression`
 		);
-		return file;
+		return {
+			file,
+			metrics: {
+				workerCreated: false,
+				compressionTime: 0,
+				originalSize,
+				compressedSize: originalSize,
+				compressionRatio: 1,
+			},
+		};
 	}
 
 	// Compress the file
 	console.log(
-		`File size ${(file.size / (1024 * 1024)).toFixed(2)}MB exceeds limit, compressing...`
+		`File size ${(file.size / (1024 * 1024)).toFixed(2)}MB exceeds limit, compressing...`,
+		{ useWebWorker }
 	);
 
 	try {
+		// Get local worker URL if using Web Workers
+		// This prevents the library from loading from CDN, which would violate CSP
+		const workerUrl = useWebWorker ? getCompressionWorkerUrl() : undefined;
+
+		// If worker URL creation failed, fall back to main thread
+		const actualUseWebWorker = useWebWorker && workerUrl !== null;
+
+		if (useWebWorker && !actualUseWebWorker) {
+			console.warn(
+				"Worker URL creation failed, falling back to main thread compression"
+			);
+		}
+
 		const compressionOptions = {
 			maxSizeMB,
-			useWebWorker,
+			useWebWorker: actualUseWebWorker,
 			maxWidthOrHeight: maxDimension,
+			onProgress,
+			// Pass local worker URL to prevent CDN loading (CSP compliance)
+			...(workerUrl && { libURL: workerUrl }),
 		};
 
 		const compressedBlob = await imageCompression(file, compressionOptions);
 		const compressedFile = blobToFile(compressedBlob, file.name);
+		const compressionTime = performance.now() - startTime;
+
+		const metrics: WorkerMetrics = {
+			workerCreated: actualUseWebWorker,
+			compressionTime,
+			originalSize,
+			compressedSize: compressedFile.size,
+			compressionRatio: compressedFile.size / originalSize,
+		};
+
+		logWorkerMetrics(metrics);
 
 		console.log(
 			`Compressed to ${(compressedFile.size / (1024 * 1024)).toFixed(2)}MB`
 		);
 
-		return compressedFile;
+		return { file: compressedFile, metrics };
 	} catch (error) {
 		console.error("Error during image compression:", error);
+
+		// If Web Worker failed, try fallback to main thread
+		if (useWebWorker && getWorkerConfig().fallbackToMainThread) {
+			console.warn("Retrying compression on main thread...");
+			return compressImage(file, { ...options, useWebWorker: false });
+		}
+
 		throw new ImageCompressionError(
 			"Failed to compress image. Please try a different file.",
 			"COMPRESSION_FAILED"
@@ -247,16 +312,16 @@ export const handleImageFileCompression = async ({
 		}
 
 		// Compress the image
-		const compressedFile = await compressImage(file, options);
+		const result = await compressImage(file, options);
 
 		// Success - update state
-		setSelectedFile(compressedFile);
-		setSelectedImageUrl(URL.createObjectURL(compressedFile));
+		setSelectedFile(result.file);
+		setSelectedImageUrl(URL.createObjectURL(result.file));
 		clearProgressInterval();
 		setUploadProgress(100);
 		setIsUploading(false);
 
-		return compressedFile;
+		return result.file;
 	} catch (error) {
 		console.error("Error in handleImageFileCompression:", error);
 		clearProgressInterval();

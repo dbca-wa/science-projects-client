@@ -1,79 +1,23 @@
-# Operations Documentation
+# Backend Operations Documentation
 
-## Overview
+> **Note**: All operations documentation has been consolidated in [General Operations](../../general/operations/).
 
-This directory contains operational documentation for the Science Projects Management System backend. These guides cover monitoring, error tracking, disaster recovery, and day-to-day operational procedures.
+## Redirect
 
-## Documentation
+This directory previously contained backend-specific operations documentation. All operational procedures now apply to both frontend and backend and have been moved to the general operations section.
 
-### Change Management
+**Please visit**: [General Operations Documentation](../../general/operations/)
 
-**File**: `change-management.md`
+## Available Documentation
 
-Guide to the DBCA Request For Change (RFC) process via Freshservice:
-- When to submit an RFC
-- Step-by-step RFC submission process
-- Required planning documentation (impact, implementation, rollback, test plans)
-- Example RFC for production deployment
-- Post-RFC procedures and tips
-
-**When to use**: Before any production deployment or infrastructure change.
-
-### Error Tracking
-
-**File**: `error-tracking.md`
-
-Comprehensive guide to Sentry error tracking and the Seer GitHub integration:
-- Sentry configuration and setup
-- Error capture (automatic and manual)
-- User and request context
-- Error grouping and fingerprinting
-- Performance monitoring and transaction tracing
-- Release tracking and correlation
-- Alerts and notifications
-- Error triage and resolution workflow
-- Integration with Azure Application Insights and Rancher
-
-**When to use**: When investigating errors, setting up monitoring, or understanding error tracking capabilities.
-
-### Disaster Recovery
-
-**File**: `disaster-recovery.md`
-
-Procedures for disaster recovery and data restoration:
-- Backup strategy (managed by OIM Infrastructure team)
-- Recovery process and ticket submission
-- Maintainer responsibilities during recovery
-- Post-recovery verification procedures
-
-**When to use**: When data loss occurs or disaster recovery is needed.
-
-### Troubleshooting
-
-**File**: `troubleshooting.md`
-
-Common issues and their solutions:
-- Database connection issues
-- Cache failures
-- File upload problems
-- External API errors
-- Deployment issues
-
-**When to use**: When encountering common operational issues.
-
-## Quick Links
-
-- **Change Management**: [change-management.md](change-management.md)
-- **Freshservice Portal**: https://dbca.freshservice.com/support/home
-- **System ID**: S033 (Science Project Management System)
-- **Error Tracking**: [error-tracking.md](error-tracking.md)
-- **Sentry Dashboard**: Access through GitHub organisation
-- **Azure Rancher (Production)**: https://rancher.dbca.wa.gov.au
-- **Azure Rancher (Staging)**: https://rancher-uat.dbca.wa.gov.au
+- **[Change Management](../../general/operations/change-management.md)** - RFC process and deployment procedures (frontend and backend)
+- **[Error Tracking](../../general/operations/error-tracking.md)** - Sentry integration for frontend and backend
+- **[Disaster Recovery](../../general/operations/disaster-recovery.md)** - Recovery procedures for the entire system
+- **[Monitoring](../../general/operations/monitoring.md)** - Monitoring strategy for frontend and backend
 
 ## Related Documentation
 
-- **Architecture**: `../architecture/` - Architectural decisions and patterns
-- **Deployment**: `../deployment/` - Deployment procedures and configuration
-- **Development**: `../development/` - Development setup and guidelines
-- **Security**: `../security/` - Security tools and procedures
+- [General Operations](../../general/operations/) - All operational procedures
+- [General Deployment](../../general/deployment/) - Deployment guides
+- [General Security](../../general/security/) - Security tools and processes
+- [Backend Architecture](../architecture/) - Backend architectural decisions

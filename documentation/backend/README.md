@@ -43,20 +43,20 @@ Architectural decisions, design patterns, and system structure.
 
 ### Deployment
 
-**Location**: `deployment/`
+**Location**: `../general/deployment/`
 
-Deployment guides, CI/CD workflows, and infrastructure documentation.
+Deployment guides, CI/CD workflows, and infrastructure documentation are shared across the monorepo.
 
 - Kubernetes setup and configuration
 - CI/CD pipelines
 - Monitoring and logging
 - Version management
 
-**[Browse Deployment Docs →](deployment/)**
+**[Browse Deployment Docs →](../general/deployment/)**
 
 ### Security
 
-**Location**: `security/`
+**Location**: `../general/security/`
 
 Security tools, review processes, and vulnerability management.
 
@@ -65,19 +65,19 @@ Security tools, review processes, and vulnerability management.
 - Vulnerability triage and remediation
 - Security baseline and compliance
 
-**[Browse Security Docs →](security/)**
+**[Browse Security Docs →](../general/security/)**
 
 ### Operations
 
-**Location**: `operations/`
+**Location**: `../general/operations/`
 
-Operational procedures, monitoring, and troubleshooting.
+Operational procedures, monitoring, and troubleshooting for the entire system.
 
-- Error tracking and monitoring
+- Change management and deployment procedures
+- Error tracking with Sentry (frontend and backend)
 - Disaster recovery procedures
-- Troubleshooting common issues
 
-**[Browse Operations Docs →](operations/)**
+**[Browse Operations Docs →](../../general/operations/)**
 
 ## Common Workflows
 
@@ -95,15 +95,15 @@ Operational procedures, monitoring, and troubleshooting.
 
 ### Deploying
 
-1. [CI/CD](deployment/ci-cd.md)
-2. [Kubernetes Setup](deployment/kubernetes-setup.md)
-3. [Monitoring](deployment/monitoring-setup.md)
+1. [CI/CD Overview](../general/deployment/ci-cd-overview.md)
+2. [Kubernetes Overview](../general/deployment/kubernetes-overview.md)
+3. [Monitoring](../general/operations/monitoring.md)
 
 ### Operations
 
-1. [Change Management](operations/change-management.md)
-2. [Disaster Recovery](operations/disaster-recovery.md)
-3. [Error Tracking](operations/error-tracking.md)
+1. [Change Management](../general/operations/change-management.md)
+2. [Disaster Recovery](../general/operations/disaster-recovery.md)
+3. [Error Tracking](../general/operations/error-tracking.md)
 
 ## External Resources
 
@@ -133,7 +133,7 @@ Documentation is code. When you update the application, update the docs too.
 
 ## Getting Help
 
-1. Check [Troubleshooting](operations/troubleshooting.md) for common issues
+1. Check [Operations Documentation](../general/operations/) for common issues
 2. Search this documentation
 3. Ask the team in Microsoft Teams
 4. Create an issue if documentation is missing or unclear

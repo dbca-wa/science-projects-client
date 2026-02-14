@@ -150,7 +150,7 @@ export const ImageUpload = ({
 
 		try {
 			// Compress the image automatically
-			const compressedFile = await compressImage(file, {
+			const result = await compressImage(file, {
 				acceptedTypes,
 				maxSizeMB: maxSize / (1024 * 1024), // Convert bytes to MB
 			});
@@ -162,14 +162,14 @@ export const ImageUpload = ({
 
 			// Show success message for large compressions
 			if (fileSizeMB > 5) {
-				const compressedSizeMB = compressedFile.size / (1024 * 1024);
+				const compressedSizeMB = result.file.size / (1024 * 1024);
 				toast.success(
 					`Image compressed from ${fileSizeMB.toFixed(1)}MB to ${compressedSizeMB.toFixed(1)}MB`
 				);
 			}
 
-			setOriginalFileName(compressedFile.name);
-			onChange(compressedFile);
+			setOriginalFileName(result.file.name);
+			onChange(result.file);
 		} catch (error) {
 			// Dismiss loading toast
 			if (loadingToast) {

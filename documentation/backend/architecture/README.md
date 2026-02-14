@@ -38,6 +38,6 @@ Use the [ADR-TEMPLATE.md](ADR-TEMPLATE.md) when documenting new architectural de
 ## Related Documentation
 
 - **Development**: `../development/` - Development guides and workflows
-- **Deployment**: `../deployment/` - Deployment and infrastructure
-- **Operations**: `../operations/` - Operational procedures
-- **Security**: `../security/` - Security documentation
+- **Deployment**: `../../general/deployment/` - Deployment and infrastructure
+- **Operations**: `../../general/operations/` - Operational procedures
+- **Security**: `../../general/security/` - Security documentation

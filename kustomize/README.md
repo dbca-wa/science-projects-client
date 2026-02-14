@@ -17,7 +17,7 @@ kustomize/
     │   ├── ingress.yaml
     │   ├── deployment_patch.yaml
     │   └── ...
-    └── test/                # Test/UAT overlay
+    └── test/                # Staging/test overlay
         ├── kustomization.yaml
         ├── ingress.yaml
         ├── deployment_patch.yaml
@@ -52,7 +52,7 @@ ENVIRONMENT=production
 Review the built resource output using `kustomize`:
 
 ```bash
-# Review test/UAT configuration
+# Review staging/test configuration
 kustomize build kustomize/overlays/test/ | less
 
 # Review production configuration
@@ -64,10 +64,10 @@ kustomize build kustomize/overlays/prod/ | less
 Run `kubectl` with the `-k` flag to generate resources for a given overlay:
 
 ```bash
-# Dry run (test/UAT)
+# Dry run (staging/test)
 kubectl apply -k kustomize/overlays/test/ --namespace spms --dry-run=client
 
-# Apply (test/UAT)
+# Apply (staging/test)
 kubectl apply -k kustomize/overlays/test/ --namespace spms
 
 # Apply (production)

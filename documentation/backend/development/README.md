@@ -58,6 +58,6 @@ poetry run pre-commit run --all-files
 ## Related Documentation
 
 - **Architecture**: `../architecture/` - Application structure and design decisions
-- **Deployment**: `../deployment/` - CI/CD and deployment guides
-- **Operations**: `../operations/` - Troubleshooting and operational procedures
-- **Security**: `../security/` - Security guidelines and review process
+- **Deployment**: `../../general/deployment/` - CI/CD and deployment guides
+- **Operations**: `../../general/operations/` - Troubleshooting and operational procedures
+- **Security**: `../../general/security/` - Security guidelines and review process

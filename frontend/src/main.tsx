@@ -1,3 +1,7 @@
+// Sentry - Initialize FIRST before any other code
+import { initSentry } from "./app/sentry";
+initSentry();
+
 // Providers
 import { RouterProvider } from "react-router";
 import "./shared/styles/main.css";
@@ -15,6 +19,7 @@ import {
 	getAllBranches,
 	getAllBusinessAreas,
 } from "./shared/services/org.service";
+import { logger } from "./shared/services/logger.service";
 
 // Components
 import ErrorBoundary from "./shared/components/errors/ErrorBoundary";
@@ -32,20 +37,26 @@ const initialiseApp = async () => {
 	// Only prefetch data if user is authenticated
 	// This prevents 403 errors on app load when not logged in
 	if (rootStore.authStore.isAuthenticated) {
-		// Prefetch branches and business areas for instant availability
-		// Wait for both to complete before rendering to prevent race conditions
-		await Promise.all([
-			queryClient.prefetchQuery({
-				queryKey: ["branches"],
-				queryFn: getAllBranches,
-				staleTime: 10 * 60_000,
-			}),
-			queryClient.prefetchQuery({
-				queryKey: ["businessAreas"],
-				queryFn: getAllBusinessAreas,
-				staleTime: 30 * 60_000,
-			}),
-		]);
+		try {
+			// Prefetch branches and business areas for instant availability
+			// Wait for both to complete before rendering to prevent race conditions
+			await Promise.all([
+				queryClient.prefetchQuery({
+					queryKey: ["branches"],
+					queryFn: getAllBranches,
+					staleTime: 10 * 60_000,
+				}),
+				queryClient.prefetchQuery({
+					queryKey: ["businessAreas"],
+					queryFn: getAllBusinessAreas,
+					staleTime: 30 * 60_000,
+				}),
+			]);
+		} catch (error) {
+			// Prefetch errors are non-critical - log and continue
+			// The queries will be retried when components mount
+			logger.error("Prefetch failed", { error });
+		}
 	}
 
 	createRoot(document.getElementById("root")!).render(

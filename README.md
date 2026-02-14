@@ -62,6 +62,7 @@ docker-compose -f docker-compose.dev.yml exec backend python manage.py createsup
 ### Manual Setup
 
 **Frontend**:
+
 ```bash
 cd frontend
 bun install
@@ -70,6 +71,7 @@ bun run dev  # http://127.0.0.1:3000
 ```
 
 **Backend**:
+
 ```bash
 cd backend
 poetry install
@@ -98,12 +100,12 @@ poetry run pytest --cov              # With coverage
 ### Branch Strategy
 
 ```
-feature/* → develop (UAT) → main (production) → v* tags
+feature/* → develop (Staging) → main (production) → v* tags
 ```
 
-- **develop**: Auto-deploys to UAT on push
+- **develop**: Auto-deploys to staging on push
 - **main**: Production-ready code (merge from develop)
-- **v* tags**: Triggers production deployment
+- **v\* tags**: Triggers production deployment
 
 ### Workflow
 
@@ -122,7 +124,7 @@ git push origin feature/my-feature
 # Tests run automatically on PR
 
 # 4. After merge to develop
-# UAT auto-deploys within 5 minutes
+# Staging auto-deploys within 5 minutes
 
 # 5. When ready for production
 git checkout main
@@ -137,20 +139,23 @@ git push origin v1.0.0
 
 ### Deployment
 
-**UAT** (automatic):
+**Staging** (automatic):
+
 - Trigger: Push to `develop`
 - URL: https://scienceprojects-test.dbca.wa.gov.au
 - Images: `latest`, `test` tags
 
 **Production** (manual):
+
 - Trigger: Version tag (e.g., `v1.0.0`)
 - URL: https://scienceprojects.dbca.wa.gov.au
 - Images: `v1.0.0`, `stable` tags
 - Deploy: Update Kubernetes via Rancher UI or kubectl
 
 **Rollback**:
+
 ```bash
-# UAT: Revert commit on develop and push
+# Staging: Revert commit on develop and push
 git revert <commit-hash>
 git push origin develop
 
@@ -166,16 +171,19 @@ kubectl set image deployment/spms-deployment-prod \
 Hooks run automatically on commit and check only changed files.
 
 **Install**:
+
 ```bash
 pre-commit install
 ```
 
 **What's checked**:
+
 - **General**: Trailing whitespace, large files, merge conflicts
 - **Frontend**: Prettier (auto-fix), ESLint, TypeScript, security
 - **Backend**: Black (auto-fix), isort (auto-fix), flake8, bandit
 
 **Bypass** (emergency only):
+
 ```bash
 git commit --no-verify -m "emergency fix"
 ```
@@ -183,30 +191,34 @@ git commit --no-verify -m "emergency fix"
 ## CI/CD Workflows
 
 **test.yml** (on PRs):
+
 - Frontend tests (2-way sharding)
 - Backend tests (4-way sharding)
 - Coverage badges (auto-update on main)
 - Path-based execution (only test changed code)
 
 **deploy-uat.yml** (on push to develop):
+
 - Build and push `latest`/`test` images
-- Auto-deploy to UAT
+- Auto-deploy to staging
 
 **deploy-prod.yml** (on version tags):
+
 - Build and push versioned/`stable` images
 - Auto-update Kustomize configs
 
 ## Documentation
 
 - **[Complete Documentation](documentation/)** - Comprehensive docs for all aspects
-  - [Frontend](documentation/frontend/) - Architecture, development, testing
-  - [Backend](documentation/backend/) - API, deployment, operations
+    - [Frontend](documentation/frontend/) - Architecture, development, testing
+    - [Backend](documentation/backend/) - API, deployment, operations
 - **[Frontend README](frontend/README.md)** - Quick start
 - **[Backend README](backend/README.md)** - Quick start
 
 ## Common Tasks
 
 **Run migrations**:
+
 ```bash
 # Docker
 docker-compose -f docker-compose.dev.yml exec backend python manage.py migrate
@@ -216,6 +228,7 @@ cd backend && poetry run python manage.py migrate
 ```
 
 **Create superuser**:
+
 ```bash
 # Docker
 docker-compose -f docker-compose.dev.yml exec backend python manage.py createsuperuser
@@ -225,11 +238,12 @@ cd backend && poetry run python manage.py createsuperuser
 ```
 
 **View logs**:
+
 ```bash
 # Docker
 docker-compose -f docker-compose.dev.yml logs -f
 
-# Kubernetes (UAT)
+# Kubernetes (Staging)
 kubectl logs -f deployment/spms-deployment-test -n spms-test
 
 # Kubernetes (Production)
@@ -237,6 +251,7 @@ kubectl logs -f deployment/spms-deployment-prod -n spms-prod
 ```
 
 **Update dependencies**:
+
 ```bash
 # Frontend
 cd frontend && bun update
@@ -248,20 +263,24 @@ cd backend && poetry update
 ## Troubleshooting
 
 **Tests failing on CI but passing locally**:
+
 - Check Node/Bun/Python versions match CI
 - Use UTC for dates in tests
 - Ensure import paths match file names exactly
 
-**UAT not updating after deploy**:
-- Check Rancher UI → UAT namespace → Click "Redeploy"
+**Staging not updating after deploy**:
+
+- Check Rancher UI → Staging namespace → Click "Redeploy"
 - Verify `imagePullPolicy: Always` in deployment
 
 **Docker build failing**:
+
 - Clean Docker cache: `docker system prune -a`
 - Check Dockerfile syntax
 - Verify all build args are provided
 
 **Pre-commit hooks failing**:
+
 - Run manually: `pre-commit run --all-files`
 - Fix TypeScript errors: `cd frontend && bun run type-check`
 - Fix Python formatting: `cd backend && black .`

@@ -54,13 +54,25 @@ unique_together = (("field1", "field2"),)
 
 ### Monitoring Index Usage
 
-Use Django Debug Toolbar in development:
+Use Django's query logging in development:
 
 ```python
 # settings.py (development only)
 if DEBUG:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    LOGGING = {
+        'version': 1,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            },
+        },
+    }
 ```
 
 ## Query Optimisation Patterns
@@ -157,14 +169,25 @@ Project.objects.bulk_update(projects, ["status"], batch_size=100)
 
 ## Database Performance Monitoring
 
-### Django Debug Toolbar
+### Query Logging
 
 ```python
 # settings.py (development only)
 if DEBUG:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
-    INTERNAL_IPS = ["127.0.0.1"]
+    LOGGING = {
+        'version': 1,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            },
+        },
+    }
 ```
 
 **What to monitor:**
@@ -364,10 +387,10 @@ Queries are automatically tracked via Application Insights:
 - Query frequency
 - Slow query alerts
 
-See `backend/docs/deployment/monitoring-setup.md` for configuration.
+See `../../general/operations/monitoring.md` for configuration.
 
 ## Resources
 
 - Django Query Optimisation: https://docs.djangoproject.com/en/stable/topics/db/optimization/
 - PostgreSQL Performance Tips: https://wiki.postgresql.org/wiki/Performance_Optimization
-- Django Debug Toolbar: https://django-debug-toolbar.readthedocs.io/
+- Django Logging: https://docs.djangoproject.com/en/stable/topics/logging/

@@ -22,11 +22,15 @@ COPY . .
 # Set default values for environment variables (overridden by GitHub Actions)
 ARG VITE_PRODUCTION_BACKEND_API_URL=http://127.0.0.1:8000/api/v1/
 ARG VITE_VERSION=0.0.1
+ARG VITE_SENTRY_ENVIRONMENT=development
+ARG VITE_SENTRY_DSN=
 ARG BUILD_SCRIPT=build
 
 # Set environment variables for Vite build
 ENV VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL
 ENV VITE_VERSION=$VITE_VERSION
+ENV VITE_SENTRY_ENVIRONMENT=$VITE_SENTRY_ENVIRONMENT
+ENV VITE_SENTRY_DSN=$VITE_SENTRY_DSN
 
 # Build the application with TypeScript type checking enabled
 # Uses 'build' script which runs: tsc -b && vite build

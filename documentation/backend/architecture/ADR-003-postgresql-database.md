@@ -176,7 +176,6 @@ DATABASES = {
 - Indexes on foreign keys and frequently queried fields
 - Connection pooling via pgBouncer
 - Query performance monitoring via Azure insights
-- Regular VACUUM and ANALYZE operations (automated)
 
 ### Migration Strategy
 

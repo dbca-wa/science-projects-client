@@ -33,7 +33,7 @@ Use the [ADR Template](./ADR-TEMPLATE.md) when creating new architectural decisi
 
 - [Development Guide](../development/README.md) - Development workflow and standards
 - [Performance Guide](../performance/README.md) - Performance optimisation strategies
-- [Deployment Guide](../deployment/README.md) - Build and deployment configuration
+- [Deployment Guide](../../general/deployment/README.md) - Build and deployment configuration
 - [Backend Architecture](../../backend/architecture/README.md) - Backend architectural decisions
 
 ## External Resources

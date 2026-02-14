@@ -1,44 +1,37 @@
-files/
-*.tif
-*.sql
-*.git
-README.md
-.unlighthouse/
+# Git and version control
 .git/
 .github/
-.github
 .gitignore
 .gitattributes
+
+# Docker files
 .dockerignore
 Dockerfile
+Dockerfile.dev
 docker-compose.yaml
 docker-compose.yml
-*.pgdump
-spms_media_data
 
-*.env
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.example
 *.production
 *.staging
-publish-ghcr.yaml
-render.yaml
-venv
-deployment.yaml
-extracted_table_data
-*.csv
-*.dump
-*.sql
-*.env
-extract_data.py
-build.sh
 
-# Documentation (exclude from Docker builds)
+# Documentation
 docs/
 *.md
-!README.md
+README.md
 
 # Development files
 .vscode/
 .idea/
+.pre-commit-config.yaml
+.pre-commit-*-wrapper.sh
+.pre-commit-cache/
+
+# Python development
 *.pyc
 __pycache__/
 .pytest_cache/
@@ -46,20 +39,38 @@ __pycache__/
 htmlcov/
 test_results/
 coverage.json
+conftest.py
+conftest.pyc
+**/tests/
+**/test_*.py
+**/*_test.py
 
 # Development scripts
 setup-dev.sh
 run_tests.sh
+build.sh
+extract_data.py
 
-# Pre-commit
-.pre-commit-config.yaml
-.pre-commit-*-wrapper.sh
-.pre-commit-cache/
+# Data files
+files/
+*.tif
+*.sql
+*.pgdump
+*.csv
+*.dump
+spms_media_data
+extracted_table_data
 
+# Deployment configs
+publish-ghcr.yaml
+render.yaml
+deployment.yaml
 
-# Environment files (but keep .env.example)
-.env
-.env.local
-.env.*.local
-*.production
-*.staging
+# Virtual environments
+venv/
+.venv/
+
+# Other
+.unlighthouse/
+*.txt
+!requirements.txt

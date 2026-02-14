@@ -2,7 +2,7 @@
 
 Purpose: Complete workflow for developing features in the SPMS backend.
 
-Related Documentation: [Getting Started](getting-started.md), [Testing Guide](testing-guide.md), [Code Style](code-style.md), [CI/CD](../deployment/ci-cd.md)
+Related Documentation: [Getting Started](getting-started.md), [Testing Guide](testing-guide.md), [Code Style](code-style.md), [CI/CD](../../general/deployment/ci-cd-overview.md)
 
 ## Overview
 
@@ -21,7 +21,7 @@ This guide walks through the complete process of developing a feature, from plan
 - Only updated via releases
 - Protected branch
 - Requires pull request approval
-- Production deployments require RFC (see [Change Management](../operations/change-management.md))
+- Production deployments require RFC (see [Change Management](../../general/operations/change-management.md))
 
 ### Feature Branch Workflow
 
@@ -638,6 +638,6 @@ git branch -d feature/project-tags
 
 - [Testing Guide](testing-guide.md) - Testing guidelines
 - [Code Style](code-style.md) - Coding standards
-- [CI/CD](../deployment/ci-cd.md) - Deployment pipeline
-- [Change Management](../operations/change-management.md) - RFC process for production
-- [Troubleshooting](../operations/troubleshooting.md) - Common issues
+- [CI/CD](../../general/deployment/ci-cd-overview.md) - Deployment pipeline
+- [Change Management](../../general/operations/change-management.md) - RFC process for production
+- [Troubleshooting](../../general/operations/) - Common issues

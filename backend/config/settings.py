@@ -33,30 +33,31 @@ LIBRARY_API_URL = env("LIBRARY_API_URL")
 LIBRARY_BEARER_TOKEN = env("LIBRARY_BEARER_TOKEN")
 IT_ASSETS_ACCESS_TOKEN = env("IT_ASSETS_ACCESS_TOKEN")
 IT_ASSETS_USER = env("IT_ASSETS_USER")
+
+# IT Assets URL configuration
 IT_ASSETS_URLS = {
-    "production": "https://itassets.dbca.wa.gov.au/api/v3/departmentuser/",
-    "staging": "https://itassets-uat.dbca.wa.gov.au/api/v3/departmentuser/",
     "development": "https://itassets-uat.dbca.wa.gov.au/api/v3/departmentuser/",
+    "staging": "https://itassets-uat.dbca.wa.gov.au/api/v3/departmentuser/",
+    "production": "https://itassets.dbca.wa.gov.au/api/v3/departmentuser/",
 }
-IT_ASSETS_URL = IT_ASSETS_URLS[ENVIRONMENT]
+IT_ASSETS_URL = IT_ASSETS_URLS.get(ENVIRONMENT)
 
 # Domain configuration
 DOMAINS = {
-    "production": {
-        "main": "scienceprojects.dbca.wa.gov.au",
-        "profiles": "science-profiles.dbca.wa.gov.au",
+    "development": {
+        "main": "127.0.0.1:8000",
+        "profiles": "127.0.0.1:8000",
     },
     "staging": {
         "main": "scienceprojects-test.dbca.wa.gov.au",
         "profiles": "science-profiles-test.dbca.wa.gov.au",
     },
-    "development": {
-        "main": "127.0.0.1:3000",
-        "profiles": "127.0.0.1:3000/staff",
+    "production": {
+        "main": "scienceprojects.dbca.wa.gov.au",
+        "profiles": "science-profiles.dbca.wa.gov.au",
     },
 }
-
-CURRENT_DOMAINS = DOMAINS[ENVIRONMENT]
+CURRENT_DOMAINS = DOMAINS.get(ENVIRONMENT)
 
 # Site URL configuration
 if DEBUG:
@@ -65,7 +66,6 @@ if DEBUG:
 else:
     SITE_URL = f"https://{CURRENT_DOMAINS['main']}"
     INSTANCE_URL = SITE_URL
-
 
 SITE_URL_HTTP = SITE_URL if DEBUG else f"https://{CURRENT_DOMAINS['main']}"
 
@@ -161,7 +161,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # region CORS, CSRF and Hosts =========================================================
 
-# Get unique domains
+# Allowed hosts configuration
 if DEBUG:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost", "127.0.0.1:3000", "127.0.0.1:8000"]
 else:
@@ -246,9 +246,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
 ]
 
-# Add Django Debug Toolbar in development (but not in tests)
-if DEBUG and not os.environ.get("PYTEST_RUNNING"):
-    THIRD_PARTY_APPS.append("debug_toolbar")
 
 CUSTOM_APPS = [
     "quotes.apps.QuotesConfig",
@@ -281,9 +278,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Add Django Debug Toolbar middleware in development (but not in tests)
-if DEBUG and not TESTING:
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -360,6 +354,7 @@ if ENVIRONMENT != "development" and SENTRY_URL:
         # Log warning but don't crash if Sentry DSN is invalid
         # This allows the application to start even with misconfigured Sentry
         import warnings
+
         warnings.warn(f"Failed to initialize Sentry: {e}. Continuing without Sentry.")
 
 
@@ -450,30 +445,6 @@ if DEBUG:
     INTERNAL_IPS = [
         "127.0.0.1",
         "localhost",
-    ]
-
-    # Debug Toolbar configuration
-    DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
-        "SHOW_COLLAPSED": True,
-        "SHOW_TEMPLATE_CONTEXT": True,
-    }
-
-    # Panels to display
-    DEBUG_TOOLBAR_PANELS = [
-        "debug_toolbar.panels.history.HistoryPanel",
-        "debug_toolbar.panels.versions.VersionsPanel",
-        "debug_toolbar.panels.timer.TimerPanel",
-        "debug_toolbar.panels.settings.SettingsPanel",
-        "debug_toolbar.panels.headers.HeadersPanel",
-        "debug_toolbar.panels.request.RequestPanel",
-        "debug_toolbar.panels.sql.SQLPanel",
-        "debug_toolbar.panels.staticfiles.StaticFilesPanel",
-        "debug_toolbar.panels.templates.TemplatesPanel",
-        "debug_toolbar.panels.cache.CachePanel",
-        "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.redirects.RedirectsPanel",
-        "debug_toolbar.panels.profiling.ProfilingPanel",
     ]
 
 # endregion ========================================================================================

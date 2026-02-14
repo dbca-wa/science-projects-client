@@ -104,7 +104,6 @@ ENV TZ="Australia/Perth"
 # Install only runtime dependencies
 RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install -y \
     -o Acquire::Retries=4 --no-install-recommends \
-    vim wget ncdu \
     curl ca-certificates \
     gdebi \
     && apt-get upgrade -y \
@@ -151,8 +150,8 @@ RUN echo '# Custom .bashrc modifications\n' \
     'PS1="\n\n\[$(tput sgr0)\]\[\033[38;5;105m\]\d\[$(tput sgr0)\], \[$(tput sgr0)\]\[\033[38;5;15m\]\D{%H:%M:%S}\[$(tput sgr0)\]\n\[$(tput sgr0)\]\[\033[38;5;76m\]\w\[$(tput sgr0)\]\n\[$(tput sgr0)\]\[\033[38;5;10m\]--------------------------------\[$(tput sgr0)\]\n\[$(tput sgr0)\]\[\033[38;5;14m\]>\[$(tput sgr0)\]"\n' \
     'alias home="cd ~"\n' \
     'alias settz="export TZ=$TZ"\n' \
-    'alias edit="home && vim .bashrc"\n' \
-    'alias migrate="python manage.py migrate"\n' \ 
+    'alias edit="home && vi .bashrc"\n' \
+    'alias migrate="python manage.py migrate"\n' \
     'settz\n' >> /home/spmsuser/.bashrc
 
 # Copy obfuscated application from builder stage

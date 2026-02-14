@@ -179,6 +179,27 @@ Axios-based client with:
 - Error handling
 - Type-safe endpoints
 
+### Image Compression
+
+Client-side image compression using Web Workers for non-blocking compression:
+
+- **Library**: `browser-image-compression`
+- **Worker implementation**: Local blob URLs (CSP compliant)
+- **Location**: `src/shared/utils/compression-worker.ts`
+- **Max size**: 1MB (configurable)
+- **Automatic fallback**: Falls back to main thread if workers unavailable
+
+**CSP Compliance:**
+
+The image compression implementation uses local worker blob URLs instead of external CDN loading to comply with strict Content Security Policy:
+
+- Worker code is bundled at build time using Vite's `?raw` import
+- Blob URL is created from bundled code at runtime
+- No external CDN requests (security maintained)
+- CSP allows `blob:` sources for scripts and workers
+
+See [ADR-008: Web Workers and CSP](../documentation/frontend/architecture/ADR-008-web-workers-csp.md) for details.
+
 ## Environment Variables
 
 ```bash

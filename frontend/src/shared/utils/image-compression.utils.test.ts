@@ -18,7 +18,13 @@ vi.mock("browser-image-compression", () => ({
 	default: vi.fn(),
 }));
 
+// Mock compression-worker
+vi.mock("./compression-worker", () => ({
+	getCompressionWorkerUrl: vi.fn(),
+}));
+
 import imageCompression from "browser-image-compression";
+import { getCompressionWorkerUrl } from "./compression-worker";
 import {
 	compressImage,
 	ImageCompressionError,
@@ -30,6 +36,8 @@ import {
 const mockImageCompression = imageCompression as unknown as ReturnType<
 	typeof vi.fn
 >;
+const mockGetCompressionWorkerUrl =
+	getCompressionWorkerUrl as unknown as ReturnType<typeof vi.fn>;
 
 describe("blobToFile", () => {
 	it("should create valid File objects", () => {
@@ -214,7 +222,8 @@ describe("compressImage", () => {
 
 			const result = await compressImage(smallFile);
 
-			expect(result).toBe(smallFile); // Same reference
+			expect(result.file).toBe(smallFile); // Same reference
+			expect(result.metrics.compressionTime).toBe(0);
 			expect(mockImageCompression).not.toHaveBeenCalled();
 		});
 
@@ -231,7 +240,9 @@ describe("compressImage", () => {
 
 			const result = await compressImage(file);
 
-			expect(result).toBe(file);
+			expect(result.file).toBe(file);
+			expect(result.metrics.compressionTime).toBe(0);
+			expect(result.metrics.workerCreated).toBe(false);
 			expect(mockImageCompression).not.toHaveBeenCalled();
 		});
 	});
@@ -252,8 +263,8 @@ describe("compressImage", () => {
 					maxWidthOrHeight: 1920,
 				})
 			);
-			expect(result).toBeInstanceOf(File);
-			expect(result.name).toBe(largeFile.name);
+			expect(result.file).toBeInstanceOf(File);
+			expect(result.file.name).toBe(largeFile.name);
 		});
 
 		it("should preserve original filename", async () => {
@@ -263,7 +274,7 @@ describe("compressImage", () => {
 
 			const result = await compressImage(largeFile);
 
-			expect(result.name).toBe(largeFile.name);
+			expect(result.file.name).toBe(largeFile.name);
 		});
 
 		it("should return smaller file after compression", async () => {
@@ -273,7 +284,7 @@ describe("compressImage", () => {
 
 			const result = await compressImage(largeFile);
 
-			expect(result.size).toBeLessThan(largeFile.size);
+			expect(result.file.size).toBeLessThan(largeFile.size);
 		});
 
 		it("should throw COMPRESSION_FAILED when compression fails", async () => {
@@ -369,7 +380,8 @@ describe("compressImage", () => {
 
 			const result = await compressImage(emptyFile);
 
-			expect(result).toBe(emptyFile);
+			expect(result.file).toBe(emptyFile);
+			expect(result.metrics.compressionTime).toBe(0);
 			expect(mockImageCompression).not.toHaveBeenCalled();
 		});
 
@@ -386,7 +398,7 @@ describe("compressImage", () => {
 
 			const result = await compressImage(largeFile);
 
-			expect(result.name).toBe(largeFile.name);
+			expect(result.file.name).toBe(largeFile.name);
 		});
 
 		it("should handle files with very long names", async () => {
@@ -402,7 +414,7 @@ describe("compressImage", () => {
 
 			const result = await compressImage(largeFile);
 
-			expect(result.name).toBe(largeFile.name);
+			expect(result.file.name).toBe(largeFile.name);
 		});
 
 		it("should handle extremely large files", async () => {
@@ -413,7 +425,8 @@ describe("compressImage", () => {
 			const result = await compressImage(hugeFile);
 
 			expect(mockImageCompression).toHaveBeenCalled();
-			expect(result).toBeInstanceOf(File);
+			expect(result.file).toBeInstanceOf(File);
+			expect(result.metrics).toBeDefined();
 		});
 	});
 
@@ -423,7 +436,7 @@ describe("compressImage", () => {
 
 			const result = await compressImage(file);
 
-			expect(result).toBe(file);
+			expect(result.file).toBe(file);
 		});
 
 		it.each(ACCEPTED_IMAGE_TYPES)(
@@ -436,8 +449,143 @@ describe("compressImage", () => {
 				const result = await compressImage(largeFile);
 
 				expect(mockImageCompression).toHaveBeenCalled();
-				expect(result).toBeInstanceOf(File);
+				expect(result.file).toBeInstanceOf(File);
+				expect(result.metrics).toBeDefined();
+				expect(result.metrics.compressionTime).toBeGreaterThan(0);
 			}
 		);
+	});
+});
+
+describe("worker URL integration", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		// Default: worker URL creation succeeds
+		mockGetCompressionWorkerUrl.mockReturnValue(
+			"blob:http://localhost:3000/test-worker"
+		);
+	});
+
+	it("should pass workerUrl to library when using Web Workers", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		await compressImage(largeFile, { useWebWorker: true });
+
+		expect(mockGetCompressionWorkerUrl).toHaveBeenCalled();
+		expect(mockImageCompression).toHaveBeenCalledWith(
+			largeFile,
+			expect.objectContaining({
+				useWebWorker: true,
+				libURL: "blob:http://localhost:3000/test-worker",
+			})
+		);
+	});
+
+	it("should not call getCompressionWorkerUrl when useWebWorker is false", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		await compressImage(largeFile, { useWebWorker: false });
+
+		expect(mockGetCompressionWorkerUrl).not.toHaveBeenCalled();
+		expect(mockImageCompression).toHaveBeenCalledWith(
+			largeFile,
+			expect.objectContaining({
+				useWebWorker: false,
+			})
+		);
+	});
+
+	it("should fall back to main thread if worker URL creation fails", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		// Mock worker URL creation failure
+		mockGetCompressionWorkerUrl.mockReturnValue(null);
+
+		await compressImage(largeFile, { useWebWorker: true });
+
+		expect(mockGetCompressionWorkerUrl).toHaveBeenCalled();
+		expect(mockImageCompression).toHaveBeenCalledWith(
+			largeFile,
+			expect.objectContaining({
+				useWebWorker: false, // Falls back to main thread
+			})
+		);
+	});
+
+	it("should not include libURL when worker URL creation fails", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		// Mock worker URL creation failure
+		mockGetCompressionWorkerUrl.mockReturnValue(null);
+
+		await compressImage(largeFile, { useWebWorker: true });
+
+		expect(mockImageCompression).toHaveBeenCalledWith(
+			largeFile,
+			expect.not.objectContaining({
+				libURL: expect.anything(),
+			})
+		);
+	});
+
+	it("should return metrics with workerCreated: true when worker URL succeeds", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		const result = await compressImage(largeFile, { useWebWorker: true });
+
+		expect(result.metrics.workerCreated).toBe(true);
+	});
+
+	it("should return metrics with workerCreated: false when worker URL fails", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		// Mock worker URL creation failure
+		mockGetCompressionWorkerUrl.mockReturnValue(null);
+
+		const result = await compressImage(largeFile, { useWebWorker: true });
+
+		expect(result.metrics.workerCreated).toBe(false);
+	});
+
+	it("should handle worker URL with special characters", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		const specialWorkerUrl =
+			"blob:http://localhost:3000/abc-123-def-456-ghi-789";
+		mockGetCompressionWorkerUrl.mockReturnValue(specialWorkerUrl);
+
+		await compressImage(largeFile, { useWebWorker: true });
+
+		expect(mockImageCompression).toHaveBeenCalledWith(
+			largeFile,
+			expect.objectContaining({
+				libURL: specialWorkerUrl,
+			})
+		);
+	});
+
+	it("should not include libURL when useWebWorker is false", async () => {
+		const largeFile = createOversizedFile(2);
+		const compressedBlob = new Blob(["compressed"], { type: "image/jpeg" });
+		mockImageCompression.mockResolvedValue(compressedBlob);
+
+		await compressImage(largeFile, { useWebWorker: false });
+
+		const callArgs = mockImageCompression.mock.calls[0][1];
+		expect(callArgs).not.toHaveProperty("libURL");
 	});
 });

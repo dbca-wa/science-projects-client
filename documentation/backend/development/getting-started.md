@@ -144,7 +144,7 @@ Now that you're set up, here's what to do next:
 
 1. **[Feature Development](feature-development.md)** - Step-by-step guide for adding features
 2. **[Pre-commit](pre-commit.md)** - Understand code quality checks
-3. **[CI/CD](../deployment/ci-cd.md)** - Learn about our deployment pipeline
+3. **[CI/CD](../../general/deployment/ci-cd-overview.md)** - Learn about our deployment pipeline
 
 ### Explore the Application
 
@@ -225,4 +225,4 @@ Need more details? See [Local Setup](local-setup.md) for:
 
 ## Troubleshooting
 
-For more issues and solutions, see [Troubleshooting](../operations/troubleshooting.md).
+For more issues and solutions, see [General Operations Documentation](../../general/operations/).

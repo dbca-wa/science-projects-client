@@ -4,17 +4,49 @@
 
 Welcome to the SPMS monorepo documentation. This documentation covers the entire system including frontend and backend architecture, development guides, and operational procedures.
 
+## Documentation Structure
+
+```
+documentation/
+├── general/                    # Monorepo-wide (both frontend & backend)
+│   ├── operations/            # Change management, error tracking, disaster recovery, monitoring
+│   ├── deployment/            # CI/CD, Docker, Kubernetes, Kustomize, environment strategy
+│   └── security/              # Security tools, review process (applies to both)
+│
+├── frontend/                   # Frontend-specific
+│   ├── architecture/          # ADRs, state management, component organisation
+│   ├── development/           # Getting started, testing, code style
+│   └── performance/           # Code splitting, bundle optimisation, memoisation
+│
+└── backend/                    # Backend-specific
+    ├── architecture/          # ADRs, API design, database design
+    ├── development/           # Getting started, testing, feature development
+    └── operations/            # Redirects to general/operations/
+```
+
 ## Quick Reference
 
 For quick access to common workflows, see the [root README](../README.md):
 
-- **[Deployment](../README.md#branching--deployment)** - How to deploy to UAT and production
+- **[Deployment](../README.md#branching--deployment)** - How to deploy to staging and production
 - **[Branching Strategy](../README.md#branch-strategy)** - Git workflow and CI/CD processes
 - **[Pre-commit Hooks](../README.md#pre-commit-hooks)** - Code quality checks and setup
 - **[Common Tasks](../README.md#common-tasks)** - Migrations, superuser, logs, dependencies
 - **[Troubleshooting](../README.md#troubleshooting)** - Common issues and solutions
 
 ## Comprehensive Documentation
+
+### General Documentation
+
+**Location**: `general/`
+
+Monorepo-wide documentation covering operations, deployment, security, and cross-cutting concerns.
+
+- [Operations](general/operations/) - Change management, error tracking, disaster recovery, monitoring
+- [Deployment](general/deployment/) - CI/CD, Docker, Kubernetes (includes Kustomize), environment strategy, version management
+- [Security](general/security/) - Security tools, review process (applies to both frontend and backend)
+
+**[Browse General Docs →](general/)**
 
 ### Frontend Documentation
 
@@ -26,6 +58,7 @@ React application with Tailwind CSS, shadcn/ui, MobX, and TanStack Query.
 - Development workflow and standards
 - Testing strategy and best practices
 - Component organisation
+- Performance optimisation
 
 **[Browse Frontend Docs →](frontend/)**
 
@@ -38,9 +71,6 @@ Django REST API with PostgreSQL, Redis, and comprehensive testing.
 - [Getting Started](backend/development/getting-started.md) - Setup in under 30 minutes
 - [Architecture](backend/architecture/) - ADRs and design patterns
 - [Development](backend/development/) - Development workflow and standards
-- [Deployment](backend/deployment/) - Kubernetes and CI/CD
-- [Security](backend/security/) - Security tools and processes
-- [Operations](backend/operations/) - Monitoring and troubleshooting
 
 **[Browse Backend Docs →](backend/)**
 

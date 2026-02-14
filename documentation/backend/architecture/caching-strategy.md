@@ -268,7 +268,6 @@ If Redis is unavailable:
 ### Monitoring Tools
 
 **Development**:
-- Django Debug Toolbar shows cache hits/misses
 - Redis CLI: `redis-cli INFO stats`
 
 **Production**:

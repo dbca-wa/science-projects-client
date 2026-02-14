@@ -65,13 +65,11 @@ export class ApiClientService {
 
 					switch (status) {
 						case 401:
-							logger.warn("Unauthorised access - triggering logout");
-							await this.handleUnauthorised();
-							break;
 						case 403:
-							logger.error("Access forbidden", {
-								data: error.response.data,
-							});
+							logger.warn(
+								`Unauthorised access (${status}) - triggering logout`
+							);
+							await this.handleUnauthorised();
 							break;
 						case 404:
 							logger.error("Resource not found", {

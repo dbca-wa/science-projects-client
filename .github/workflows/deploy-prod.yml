@@ -47,6 +47,7 @@ jobs:
       VITE_PRODUCTION_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
       VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.wa.gov.au/api/v1/"
       VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles.dbca.wa.gov.au/"
+      VITE_SENTRY_ENVIRONMENT: "production"
 
     steps:
       - name: Checkout code
@@ -78,6 +79,8 @@ jobs:
           build-args: |
             VITE_PRODUCTION_BACKEND_API_URL=${{ env.VITE_PRODUCTION_BACKEND_API_URL }}
             VITE_VERSION=${{ steps.version.outputs.VERSION }}
+            VITE_SENTRY_ENVIRONMENT=production
+            VITE_SENTRY_DSN=https://8dd0517876955893e7c6c13dda43ae8b@o4506736817405952.ingest.us.sentry.io/4507297807663104
           cache-from: type=gha,scope=frontend-prod
           cache-to: type=gha,mode=max,scope=frontend-prod
           labels: |

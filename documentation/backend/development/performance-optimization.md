@@ -432,8 +432,8 @@ Before deploying code, verify:
 - [select_related() Documentation](https://docs.djangoproject.com/en/5.0/ref/models/querysets/#select-related)
 - [prefetch_related() Documentation](https://docs.djangoproject.com/en/5.0/ref/models/querysets/#prefetch-related)
 - Related Documentation:
-  - `backend/docs/development/database-optimization.md` - Database indexing and migration best practices
-  - `backend/docs/architecture/caching-strategy.md` - Application-level caching with Redis
+  - `database-optimisation.md` - Database indexing and migration best practices
+  - `../architecture/caching-strategy.md` - Application-level caching with Redis
 
 ---
 

@@ -18,8 +18,10 @@ The Science Projects Management System (SPMS) backend requires application-level
 - Infrastructure alerting and scaling
 - Azure Application Insights configuration and management
 
+> **Infrastructure Management**: Infrastructure monitoring and configuration is handled by OIM (Office of Information Management). For infrastructure changes, submit requests via the [change management process](../../general/operations/change-management.md).
+
 The development team needs tools to:
-- Review application logs in UAT and Production environments
+- Review application logs in staging and production environments
 - Track errors and exceptions in real-time
 - Monitor endpoint performance and identify bottlenecks
 - Analyse API usage patterns
@@ -32,13 +34,18 @@ The development team needs tools to:
 We will use a two-tier approach for application logging and monitoring:
 
 **Primary Tools** (Development Team):
-1. **Rancher** - Log review for UAT and Production environments
+1. **Rancher** - Log review for staging and production environments
 2. **Sentry** - Error tracking, performance monitoring, and endpoint analysis
 
-**Infrastructure Tools** (Infrastructure Team):
-- Azure Application Insights - Configured and managed by infrastructure team
+**Infrastructure Tools** (Infrastructure Team - OIM):
+- Azure Application Insights - Configured and managed by OIM
 - Azure Monitor - Resource monitoring and alerting
 - Kubernetes metrics - Cluster health and resource utilisation
+
+> **Infrastructure Management**: Infrastructure monitoring is configured and managed by OIM (Office of Information Management). For infrastructure monitoring changes:
+> 1. Review the [change management process](../../general/operations/change-management.md)
+> 2. Submit an RFC (Request for Change) with monitoring requirements
+> 3. OIM will implement approved changes
 
 This division allows the development team to focus on application-level concerns whilst the infrastructure team handles platform-level monitoring.
 
@@ -47,7 +54,7 @@ This division allows the development team to focus on application-level concerns
 ### Positive Consequences
 
 - **Clear Separation of Concerns**: Development team focuses on application issues, infrastructure team handles platform concerns
-- **Efficient Log Access**: Rancher provides direct access to application logs in UAT and Production
+- **Efficient Log Access**: Rancher provides direct access to application logs in staging and production
 - **Real-Time Error Tracking**: Sentry immediately notifies of errors and exceptions
 - **Performance Insights**: Sentry tracks endpoint performance and identifies slow operations
 - **API Usage Analysis**: Sentry provides visibility into most-hit endpoints and usage patterns
@@ -111,11 +118,11 @@ This division allows the development team to focus on application-level concerns
 
 ### Rancher Log Access
 
-**Purpose**: Review application logs in UAT and Production environments.
+**Purpose**: Review application logs in staging and production environments.
 
 **Access**:
-- UAT environment: Rancher UAT cluster
-- Production environment: Rancher Production cluster
+- Staging environment: Rancher staging cluster
+- Production environment: Rancher production cluster
 
 **Common Use Cases**:
 - Reviewing application startup logs
@@ -125,7 +132,7 @@ This division allows the development team to focus on application-level concerns
 - Analysing request/response patterns
 
 **Log Review Workflow**:
-1. Access Rancher for appropriate environment (UAT/Production)
+1. Access Rancher for appropriate environment (staging/production)
 2. Navigate to application pods
 3. View real-time logs or download log history
 4. Search for specific errors, warnings, or patterns
@@ -238,7 +245,7 @@ except Exception as e:
 
 ### Infrastructure Team Coordination
 
-**When to Involve Infrastructure Team**:
+**When to Involve OIM Infrastructure Team**:
 - Application errors related to resource constraints (OOM, CPU throttling)
 - Database connection pool exhaustion
 - Network connectivity issues
@@ -247,9 +254,9 @@ except Exception as e:
 
 **Communication Pattern**:
 1. Development team identifies application-level issue
-2. If resource-related, provide Sentry/Rancher evidence to infrastructure team
-3. Infrastructure team reviews Application Insights and Azure Monitor
-4. Teams collaborate on resolution
+2. If resource-related, provide Sentry/Rancher evidence to OIM via change management
+3. OIM reviews Application Insights and Azure Monitor
+4. Teams collaborate on resolution via change management process
 5. Development team verifies fix in Sentry/Rancher
 
 ### Alerting Strategy
@@ -260,16 +267,16 @@ except Exception as e:
 - Performance degradation >2 seconds p95 (daily digest)
 - High-volume endpoint issues (daily digest)
 
-**Infrastructure Alerts** (Infrastructure Team):
-- CPU usage >80% (managed by infrastructure team)
-- Memory usage >80% (managed by infrastructure team)
-- Pod crashes (managed by infrastructure team)
-- Database resource constraints (managed by infrastructure team)
+**Infrastructure Alerts** (OIM Infrastructure Team):
+- CPU usage >80% (managed by OIM)
+- Memory usage >80% (managed by OIM)
+- Pod crashes (managed by OIM)
+- Database resource constraints (managed by OIM)
 
 ### Log Retention
 
 **Rancher Logs**:
-- Retention managed by infrastructure team
+- Retention managed by OIM
 - Typically 7-30 days depending on environment
 
 **Sentry**:
@@ -286,17 +293,17 @@ except Exception as e:
 
 **Rancher**:
 - No direct cost to development team
-- Managed by infrastructure team
+- Managed by OIM
 
 ### Migration Strategy
 
-**Current State**: Application Insights configured by infrastructure team, Sentry integrated for error tracking.
+**Current State**: Application Insights configured by OIM (Office of Information Management), Sentry integrated for error tracking.
 
 **Ongoing Maintenance**:
 1. Ensure Sentry SDK stays up-to-date
 2. Review and adjust performance sampling rates
 3. Configure alerts for new critical endpoints
-4. Coordinate with infrastructure team on resource issues
+4. Coordinate with OIM via change management for infrastructure monitoring changes
 
 ### Rollback Plan
 

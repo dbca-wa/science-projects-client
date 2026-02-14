@@ -74,7 +74,7 @@ frontend/src/
 
 - [Architecture Guide](../architecture/README.md) - Architectural decisions and patterns
 - [Performance Guide](../performance/README.md) - Performance optimisation strategies
-- [Deployment Guide](../deployment/README.md) - Build and deployment configuration
+- [Deployment Guide](../../general/deployment/README.md) - Build and deployment configuration
 
 ## External Resources
 
