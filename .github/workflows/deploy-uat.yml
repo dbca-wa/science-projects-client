@@ -2,7 +2,7 @@ name: Deploy UAT
 
 on:
   push:
-    branches: [develop]
+    branches: [staging]
 
 env:
   REGISTRY: ghcr.io

@@ -65,12 +65,12 @@ The Science Projects Management System uses automated version management to keep
 
 **Step 1: Prepare Release**
 ```powershell
-# Ensure develop is stable and tested
-git checkout develop
-git pull origin develop
+# Ensure staging is stable and tested
+git checkout staging
+git pull origin staging
 
-# Merge develop to main via pull request
-# (Create PR on GitHub: develop → main)
+# Merge staging to main via pull request
+# (Create PR on GitHub: staging → main)
 # After PR approval and merge:
 
 # Switch to main and pull latest
@@ -417,7 +417,7 @@ kubectl logs -f deployment/spms-deployment-prod -n spms-production
 ```
 Test Suite and Coverage (test.yml)
   ↓
-  Runs on: PR, push to main/develop
+  Runs on: PR, push to main/staging
   ↓
   Tests pass → Merge to main
   ↓

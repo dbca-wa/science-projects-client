@@ -100,19 +100,19 @@ poetry run pytest --cov              # With coverage
 ### Branch Strategy
 
 ```
-feature/* → develop (Staging) → main (production) → v* tags
+feature/* → staging (UAT) → main (production) → v* tags
 ```
 
-- **develop**: Auto-deploys to staging on push
-- **main**: Production-ready code (merge from develop)
+- **staging**: Auto-deploys to UAT on push
+- **main**: Production-ready code (merge from staging)
 - **v\* tags**: Triggers production deployment
 
 ### Workflow
 
 ```bash
-# 1. Create feature branch from develop
-git checkout develop
-git pull origin develop
+# 1. Create feature branch from staging
+git checkout staging
+git pull origin staging
 git checkout -b feature/my-feature
 
 # 2. Make changes and commit
@@ -120,15 +120,15 @@ git add .
 git commit -m "feat: add new feature"
 git push origin feature/my-feature
 
-# 3. Create PR to develop
+# 3. Create PR to staging
 # Tests run automatically on PR
 
-# 4. After merge to develop
-# Staging auto-deploys within 5 minutes
+# 4. After merge to staging
+# UAT auto-deploys within 5 minutes
 
 # 5. When ready for production
 git checkout main
-git merge develop --no-ff
+git merge staging --no-ff
 git push origin main
 
 # 6. Create version tag
@@ -139,9 +139,9 @@ git push origin v1.0.0
 
 ### Deployment
 
-**Staging** (automatic):
+**UAT** (automatic):
 
-- Trigger: Push to `develop`
+- Trigger: Push to `staging`
 - URL: https://scienceprojects-test.dbca.wa.gov.au
 - Images: `latest`, `test` tags
 
@@ -155,9 +155,9 @@ git push origin v1.0.0
 **Rollback**:
 
 ```bash
-# Staging: Revert commit on develop and push
+# UAT: Revert commit on staging and push
 git revert <commit-hash>
-git push origin develop
+git push origin staging
 
 # Production: Update image tag to previous version
 kubectl set image deployment/spms-deployment-prod \
@@ -197,7 +197,7 @@ git commit --no-verify -m "emergency fix"
 - Coverage badges (auto-update on main)
 - Path-based execution (only test changed code)
 
-**deploy-uat.yml** (on push to develop):
+**deploy-uat.yml** (on push to staging):
 
 - Build and push `latest`/`test` images
 - Auto-deploy to staging

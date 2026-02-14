@@ -42,20 +42,20 @@ Workflows automatically detect which components have changed:
 ### Development Workflow
 
 ```
-feature/* → develop → main
-            (Staging) (Production)
+feature/* → staging → main
+            (UAT)     (Production)
 ```
 
 **Branch purposes:**
 - `feature/*` - Feature development branches
-- `develop` - Integration branch, deploys to staging
+- `staging` - Integration branch, deploys to UAT
 - `main` - Production branch, deploys to production
 
 ### Deployment Triggers
 
-**Staging deployment:**
-- Trigger: Push to `develop` branch
-- Environment: Staging
+**UAT deployment:**
+- Trigger: Push to `staging` branch
+- Environment: UAT
 - Approval: Automatic
 
 **Production deployment:**
@@ -70,8 +70,8 @@ feature/* → develop → main
 **File**: `.github/workflows/test.yml`
 
 **Triggers:**
-- Pull requests to `develop` or `main`
-- Push to `develop` or `main`
+- Pull requests to `staging` or `main`
+- Push to `staging` or `main`
 
 **Jobs:**
 
@@ -96,9 +96,9 @@ name: Test
 
 on:
   pull_request:
-    branches: [develop, main]
+    branches: [staging, main]
   push:
-    branches: [develop, main]
+    branches: [staging, main]
 
 jobs:
   detect-changes:
@@ -150,7 +150,7 @@ jobs:
 **File**: `.github/workflows/deploy-uat.yml`
 
 **Triggers:**
-- Push to `develop` branch
+- Push to `staging` branch
 
 **Jobs:**
 
@@ -179,7 +179,7 @@ name: Deploy to Staging
 
 on:
   push:
-    branches: [develop]
+    branches: [staging]
 
 jobs:
   build-frontend:
@@ -396,7 +396,7 @@ Backend secrets are injected at runtime (when container starts) via Kubernetes S
 **Conditions:**
 - All tests pass
 - No merge conflicts
-- Branch is `develop`
+- Branch is `staging`
 
 ### Production Deployment
 
@@ -679,14 +679,14 @@ poetry run pytest \
 
 ### Pull Request Workflow
 
-1. **Create feature branch** from `develop`
+1. **Create feature branch** from `staging`
 2. **Make changes** and commit regularly
 3. **Push to GitHub** and create PR
 4. **Wait for CI** to pass all tests
 5. **Request review** from team member
 6. **Address feedback** and update PR
-7. **Merge to develop** when approved
-8. **Verify staging deployment** succeeds
+7. **Merge to staging** when approved
+8. **Verify UAT deployment** succeeds
 9. **Create PR to main** for production
 10. **Approve and deploy** to production
 
