@@ -409,7 +409,7 @@ jobs:
             elif [ "$COVERAGE" -ge 50 ]; then COLOR="orange"
             fi
             
-            sed -i "s|frontend--coverage-[0-9]*%-[a-z]*|frontend--coverage-${COVERAGE}%-${COLOR}|g" README.md
+            sed -i "s|frontend--coverage-[0-9]*%25-[a-z]*|frontend--coverage-${COVERAGE}%25-${COLOR}|g" README.md
             echo "Updated frontend badge: ${COVERAGE}% (${COLOR})"
           fi
 
@@ -424,7 +424,7 @@ jobs:
             elif [ "$COVERAGE" -ge 50 ]; then COLOR="orange"
             fi
             
-            sed -i "s|backend--coverage-[0-9]*%-[a-z]*|backend--coverage-${COVERAGE}%-${COLOR}|g" README.md
+            sed -i "s|backend--coverage-[0-9]*%25-[a-z]*|backend--coverage-${COVERAGE}%25-${COLOR}|g" README.md
             echo "Updated backend badge: ${COVERAGE}% (${COLOR})"
           fi
 
