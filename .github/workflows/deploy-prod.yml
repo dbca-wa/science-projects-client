@@ -19,22 +19,19 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      frontend: ${{ steps.filter.outputs.frontend }}
-      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.override.outputs.frontend }}
+      backend: ${{ steps.override.outputs.backend }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check for changes since last tag
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          base: ${{ github.event.before }}
-          filters: |
-            frontend:
-              - 'frontend/**'
-            backend:
-              - 'backend/**'
+      # For tagged releases, always build both frontend and backend
+      - name: Set build flags for release
+        id: override
+        run: |
+          echo "frontend=true" >> $GITHUB_OUTPUT
+          echo "backend=true" >> $GITHUB_OUTPUT
+          echo "✅ Tagged release detected - building both frontend and backend"
 
   # ====================== BUILD FRONTEND PRODUCTION ======================
   build-frontend-prod:
