@@ -4,6 +4,8 @@ Tests for medias serializers
 
 from unittest.mock import Mock, patch
 
+import pytest
+
 from medias.serializers import (
     AECPDFCreateSerializer,
     AECPDFSerializer,
@@ -40,6 +42,7 @@ from medias.serializers import (
 class TestProjectDocumentPDFSerializers:
     """Tests for ProjectDocumentPDF serializers"""
 
+    @pytest.mark.integration
     def test_project_document_pdf_serializer(self, project_document_pdf, db):
         """Test ProjectDocumentPDFSerializer"""
         serializer = ProjectDocumentPDFSerializer(project_document_pdf)
@@ -50,6 +53,7 @@ class TestProjectDocumentPDFSerializers:
         assert data["document"] == project_document_pdf.document.id
         assert data["project"] == project_document_pdf.project.id
 
+    @pytest.mark.unit
     def test_project_document_pdf_creation_serializer(
         self, project, project_document, mock_file, db
     ):
@@ -66,6 +70,7 @@ class TestProjectDocumentPDFSerializers:
 class TestAECPDFSerializers:
     """Tests for AECEndorsementPDF serializers"""
 
+    @pytest.mark.unit
     def test_aec_pdf_serializer(self, aec_endorsement_pdf, db):
         """Test AECPDFSerializer"""
         serializer = AECPDFSerializer(aec_endorsement_pdf)
@@ -74,6 +79,7 @@ class TestAECPDFSerializers:
         assert data["id"] == aec_endorsement_pdf.id
         assert "file" in data
 
+    @pytest.mark.unit
     def test_aec_pdf_create_serializer(self, endorsement, user, mock_file, db):
         """Test AECPDFCreateSerializer"""
         data = {
@@ -92,6 +98,7 @@ class TestAECPDFSerializers:
 class TestMethodologyImageSerializers:
     """Tests for ProjectPlanMethodologyPhoto serializers"""
 
+    @pytest.mark.unit
     def test_tiny_methodology_image_serializer(self, methodology_photo, db):
         """Test TinyMethodologyImageSerializer"""
         serializer = TinyMethodologyImageSerializer(methodology_photo)
@@ -103,6 +110,7 @@ class TestMethodologyImageSerializers:
         assert data["uploader"]["id"] == methodology_photo.uploader.id
         assert data["uploader"]["username"] == methodology_photo.uploader.username
 
+    @pytest.mark.integration
     def test_tiny_methodology_image_serializer_no_project_plan(self, db):
         """Test TinyMethodologyImageSerializer with no project_plan - COVERS LINE 58-59"""
         from medias.models import ProjectPlanMethodologyPhoto
@@ -122,6 +130,7 @@ class TestMethodologyImageSerializers:
         result = serializer.get_uploader(photo)
         assert result is None  # Should return None when uploader is None
 
+    @pytest.mark.unit
     def test_methodology_image_create_serializer(
         self, project_plan, user, mock_image, db
     ):
@@ -134,6 +143,7 @@ class TestMethodologyImageSerializers:
         serializer = MethodologyImageCreateSerializer(data=data)
         assert serializer.is_valid()
 
+    @pytest.mark.unit
     def test_methodology_image_serializer(self, methodology_photo, db):
         """Test MethodologyImageSerializer"""
         serializer = MethodologyImageSerializer(methodology_photo)
@@ -148,6 +158,7 @@ class TestMethodologyImageSerializers:
 class TestAnnualReportMediaSerializers:
     """Tests for AnnualReportMedia serializers"""
 
+    @pytest.mark.unit
     def test_tiny_annual_report_media_serializer(self, annual_report_media, db):
         """Test TinyAnnualReportMediaSerializer"""
         serializer = TinyAnnualReportMediaSerializer(annual_report_media)
@@ -159,6 +170,7 @@ class TestAnnualReportMediaSerializers:
         assert data["report"]["id"] == annual_report_media.report.id
         assert data["report"]["year"] == annual_report_media.report.year
 
+    @pytest.mark.unit
     def test_tiny_annual_report_media_serializer_no_report(self, db):
         """Test TinyAnnualReportMediaSerializer with no report - COVERS LINE 146"""
         from medias.models import AnnualReportMedia
@@ -173,6 +185,7 @@ class TestAnnualReportMediaSerializers:
         result = serializer.get_report(media)
         assert result is None  # Should return None when report is None
 
+    @pytest.mark.unit
     def test_annual_report_media_serializer(self, annual_report_media, db):
         """Test AnnualReportMediaSerializer"""
         serializer = AnnualReportMediaSerializer(annual_report_media)
@@ -183,6 +196,7 @@ class TestAnnualReportMediaSerializers:
         assert "file" in data
         assert data["report"]["id"] == annual_report_media.report.id
 
+    @pytest.mark.unit
     def test_annual_report_media_serializer_no_report(self, db):
         """Test AnnualReportMediaSerializer with no report - COVERS LINE 163"""
         from medias.models import AnnualReportMedia
@@ -197,6 +211,7 @@ class TestAnnualReportMediaSerializers:
         result = serializer.get_report(media)
         assert result is None  # Should return None when report is None
 
+    @pytest.mark.integration
     def test_annual_report_media_creation_serializer(
         self, annual_report, user, mock_image, db
     ):
@@ -216,6 +231,7 @@ class TestAnnualReportMediaSerializers:
 class TestAnnualReportPDFSerializers:
     """Tests for AnnualReportPDF serializers"""
 
+    @pytest.mark.unit
     def test_tiny_annual_report_pdf_serializer(self, annual_report_pdf, db):
         """Test TinyAnnualReportPDFSerializer"""
         serializer = TinyAnnualReportPDFSerializer(annual_report_pdf)
@@ -226,6 +242,7 @@ class TestAnnualReportPDFSerializers:
         assert data["report"]["id"] == annual_report_pdf.report.id
         assert data["report"]["year"] == annual_report_pdf.report.year
 
+    @pytest.mark.unit
     def test_tiny_annual_report_pdf_serializer_no_report(self, db):
         """Test TinyAnnualReportPDFSerializer with no report - COVERS LINE 190"""
         from medias.models import AnnualReportPDF
@@ -239,6 +256,7 @@ class TestAnnualReportPDFSerializers:
         result = serializer.get_report(pdf)
         assert result is None  # Should return None when report is None
 
+    @pytest.mark.unit
     def test_tiny_legacy_annual_report_pdf_serializer(
         self, legacy_annual_report_pdf, db
     ):
@@ -252,6 +270,7 @@ class TestAnnualReportPDFSerializers:
         assert data["report"]["id"] == 0  # Always returns 0 for legacy
         assert data["report"]["year"] == legacy_annual_report_pdf.year
 
+    @pytest.mark.unit
     def test_annual_report_pdf_create_serializer(
         self, annual_report, user, mock_file, db
     ):
@@ -268,6 +287,7 @@ class TestAnnualReportPDFSerializers:
         assert pdf.id is not None
         assert pdf.report == annual_report
 
+    @pytest.mark.unit
     def test_legacy_annual_report_pdf_create_serializer(self, user, mock_file, db):
         """Test LegacyAnnualReportPDFCreateSerializer"""
         data = {
@@ -282,6 +302,7 @@ class TestAnnualReportPDFSerializers:
         assert pdf.id is not None
         assert pdf.year == 2015
 
+    @pytest.mark.unit
     def test_annual_report_pdf_serializer(self, annual_report_pdf, db):
         """Test AnnualReportPDFSerializer"""
         serializer = AnnualReportPDFSerializer(annual_report_pdf)
@@ -292,6 +313,7 @@ class TestAnnualReportPDFSerializers:
         assert data["report"]["id"] == annual_report_pdf.report.id
         assert data["report"]["year"] == annual_report_pdf.report.year
 
+    @pytest.mark.unit
     def test_annual_report_pdf_serializer_no_report(self, db):
         """Test AnnualReportPDFSerializer with no report - COVERS LINE 250"""
         from medias.models import AnnualReportPDF
@@ -306,6 +328,7 @@ class TestAnnualReportPDFSerializers:
         assert result is None  # Should return None when report is None
 
     @patch("builtins.open", side_effect=FileNotFoundError)
+    @pytest.mark.unit
     def test_annual_report_pdf_serializer_file_not_found(
         self, mock_open, annual_report_pdf, db
     ):
@@ -314,6 +337,7 @@ class TestAnnualReportPDFSerializers:
         result = serializer.get_pdf_data(annual_report_pdf)
         assert result is None  # Should return None when file not found
 
+    @pytest.mark.integration
     def test_annual_report_pdf_serializer_no_file(self, annual_report, user, db):
         """Test AnnualReportPDFSerializer with no file"""
         from medias.models import AnnualReportPDF
@@ -328,6 +352,7 @@ class TestAnnualReportPDFSerializers:
         result = serializer.get_pdf_data(pdf)
         assert result is None  # Should return None when no file
 
+    @pytest.mark.unit
     def test_legacy_annual_report_pdf_serializer(self, legacy_annual_report_pdf, db):
         """Test LegacyAnnualReportPDFSerializer"""
         serializer = LegacyAnnualReportPDFSerializer(legacy_annual_report_pdf)
@@ -337,6 +362,7 @@ class TestAnnualReportPDFSerializers:
         assert "file" in data
         assert data["year"] == legacy_annual_report_pdf.year
 
+    @pytest.mark.integration
     def test_legacy_annual_report_pdf_serializer_no_file(self, user, db):
         """Test LegacyAnnualReportPDFSerializer with no file - COVERS LINE 277"""
         from medias.models import LegacyAnnualReportPDF
@@ -355,6 +381,7 @@ class TestAnnualReportPDFSerializers:
 class TestBusinessAreaPhotoSerializers:
     """Tests for BusinessAreaPhoto serializers"""
 
+    @pytest.mark.integration
     def test_tiny_business_area_photo_serializer(self, business_area_photo, db):
         """Test TinyBusinessAreaPhotoSerializer"""
         serializer = TinyBusinessAreaPhotoSerializer(business_area_photo)
@@ -364,6 +391,7 @@ class TestBusinessAreaPhotoSerializers:
         assert "business_area" in data
         assert data["uploader"]["id"] == business_area_photo.uploader.id
 
+    @pytest.mark.integration
     def test_tiny_business_area_photo_serializer_no_uploader(
         self, business_area, mock_image, db
     ):
@@ -380,6 +408,7 @@ class TestBusinessAreaPhotoSerializers:
         data = serializer.data
         assert data["uploader"] is None
 
+    @pytest.mark.integration
     def test_business_area_photo_serializer(self, business_area_photo, db):
         """Test BusinessAreaPhotoSerializer"""
         serializer = BusinessAreaPhotoSerializer(business_area_photo)
@@ -389,6 +418,7 @@ class TestBusinessAreaPhotoSerializers:
         assert "business_area" in data
         assert data["uploader"]["id"] == business_area_photo.uploader.id
 
+    @pytest.mark.unit
     def test_business_area_photo_create_serializer(
         self, business_area, user, mock_image, db
     ):
@@ -405,6 +435,7 @@ class TestBusinessAreaPhotoSerializers:
 class TestProjectPhotoSerializers:
     """Tests for ProjectPhoto serializers"""
 
+    @pytest.mark.integration
     def test_tiny_project_photo_serializer(self, project_photo, db):
         """Test TinyProjectPhotoSerializer"""
         serializer = TinyProjectPhotoSerializer(project_photo)
@@ -416,6 +447,7 @@ class TestProjectPhotoSerializers:
         assert data["project"]["title"] == project_photo.project.title
         assert data["uploader"]["id"] == project_photo.uploader.id
 
+    @pytest.mark.integration
     def test_tiny_project_photo_serializer_no_project(self, db):
         """Test TinyProjectPhotoSerializer with no project - COVERS LINE 357"""
         from medias.models import ProjectPhoto
@@ -433,6 +465,7 @@ class TestProjectPhotoSerializers:
         result = serializer.get_uploader(photo)
         assert result is None  # Should return None when uploader is None
 
+    @pytest.mark.integration
     def test_project_photo_serializer(self, project_photo, db):
         """Test ProjectPhotoSerializer"""
         serializer = ProjectPhotoSerializer(project_photo)
@@ -442,6 +475,7 @@ class TestProjectPhotoSerializers:
         assert "file" in data
         assert data["project"]["id"] == project_photo.project.id
 
+    @pytest.mark.integration
     def test_project_photo_serializer_no_project(self, db):
         """Test ProjectPhotoSerializer with no project - COVERS LINE 366"""
         from medias.models import ProjectPhoto
@@ -459,6 +493,7 @@ class TestProjectPhotoSerializers:
         result = serializer.get_uploader(photo)
         assert result is None  # Should return None when uploader is None
 
+    @pytest.mark.unit
     def test_project_photo_create_serializer(self, project, user, mock_image, db):
         """Test ProjectPhotoCreateSerializer"""
         data = {
@@ -473,6 +508,7 @@ class TestProjectPhotoSerializers:
 class TestAgencyPhotoSerializers:
     """Tests for AgencyImage serializers"""
 
+    @pytest.mark.integration
     def test_tiny_agency_photo_serializer(self, agency_image, db):
         """Test TinyAgencyPhotoSerializer"""
         serializer = TinyAgencyPhotoSerializer(agency_image)
@@ -483,6 +519,7 @@ class TestAgencyPhotoSerializers:
         assert data["agency"]["id"] == agency_image.agency.id
         assert data["agency"]["name"] == agency_image.agency.name
 
+    @pytest.mark.integration
     def test_agency_photo_serializer(self, agency_image, db):
         """Test AgencyPhotoSerializer"""
         serializer = AgencyPhotoSerializer(agency_image)
@@ -492,6 +529,7 @@ class TestAgencyPhotoSerializers:
         assert "file" in data
         assert data["agency"]["id"] == agency_image.agency.id
 
+    @pytest.mark.unit
     def test_agency_photo_create_serializer(self, agency, mock_image, db):
         """Test AgencyPhotoCreateSerializer"""
         data = {
@@ -505,6 +543,7 @@ class TestAgencyPhotoSerializers:
 class TestUserAvatarSerializers:
     """Tests for UserAvatar serializers"""
 
+    @pytest.mark.integration
     def test_tiny_user_avatar_serializer(self, user_avatar, db):
         """Test TinyUserAvatarSerializer"""
         serializer = TinyUserAvatarSerializer(user_avatar)
@@ -515,6 +554,7 @@ class TestUserAvatarSerializers:
         assert data["user"]["id"] == user_avatar.user.id
         assert data["user"]["username"] == user_avatar.user.username
 
+    @pytest.mark.integration
     def test_tiny_user_avatar_serializer_no_user(self, db):
         """Test TinyUserAvatarSerializer with no user - COVERS LINES 523-525"""
         from medias.models import UserAvatar
@@ -528,6 +568,7 @@ class TestUserAvatarSerializers:
         result = serializer.get_user(avatar)
         assert result is None  # Should return None when user is None
 
+    @pytest.mark.integration
     def test_user_avatar_serializer(self, user_avatar, db):
         """Test UserAvatarSerializer"""
         serializer = UserAvatarSerializer(user_avatar)
@@ -537,6 +578,7 @@ class TestUserAvatarSerializers:
         assert "file" in data
         assert data["user"]["id"] == user_avatar.user.id
 
+    @pytest.mark.unit
     def test_user_avatar_create_serializer(self, user, mock_image, db):
         """Test UserAvatarCreateSerializer"""
         data = {
@@ -546,6 +588,7 @@ class TestUserAvatarSerializers:
         serializer = UserAvatarCreateSerializer(data=data)
         assert serializer.is_valid()
 
+    @pytest.mark.integration
     def test_staff_profile_avatar_serializer(self, user_avatar, db):
         """Test StaffProfileAvatarSerializer"""
         serializer = StaffProfileAvatarSerializer(user_avatar)

@@ -2,6 +2,7 @@
 Tests for communications admin
 """
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 
 from communications.admin import ChatRoomAdmin, ChatRoomForm
@@ -13,6 +14,7 @@ from communications.models import ChatRoom, Comment, DirectMessage, Reaction
 class TestUserFilterWidget:
     """Tests for UserFilterWidget"""
 
+    @pytest.mark.integration
     def test_label_from_instance(self, user, db):
         """Test label generation from user instance"""
         # Arrange
@@ -25,6 +27,7 @@ class TestUserFilterWidget:
         assert user.first_name in label
         assert user.last_name in label
 
+    @pytest.mark.unit
     def test_format_value_none(self, db):
         """Test format_value with None"""
         # Arrange
@@ -36,6 +39,7 @@ class TestUserFilterWidget:
         # Assert
         assert result == []
 
+    @pytest.mark.unit
     def test_format_value_string(self, db):
         """Test format_value with string"""
         # Arrange
@@ -47,6 +51,7 @@ class TestUserFilterWidget:
         # Assert
         assert result == ["1", "2", "3"]
 
+    @pytest.mark.unit
     def test_format_value_int(self, db):
         """Test format_value with integer"""
         # Arrange
@@ -58,6 +63,7 @@ class TestUserFilterWidget:
         # Assert
         assert result == ["5"]
 
+    @pytest.mark.unit
     def test_format_value_list(self, db):
         """Test format_value with list"""
         # Arrange
@@ -73,6 +79,7 @@ class TestUserFilterWidget:
 class TestChatRoomForm:
     """Tests for ChatRoomForm"""
 
+    @pytest.mark.unit
     def test_form_fields(self, db):
         """Test form has correct fields"""
         # Act
@@ -81,6 +88,7 @@ class TestChatRoomForm:
         # Assert
         assert "users" in form.fields
 
+    @pytest.mark.integration
     def test_form_with_instance(self, chat_room, user, other_user, db):
         """Test form initialization with existing instance"""
         # Act
@@ -91,6 +99,7 @@ class TestChatRoomForm:
         assert user.id in form.initial["users"]
         assert other_user.id in form.initial["users"]
 
+    @pytest.mark.integration
     def test_form_users_queryset_ordered(self, db):
         """Test users queryset is ordered by first_name"""
         # Act
@@ -101,6 +110,7 @@ class TestChatRoomForm:
         # Check that queryset has ordering
         assert queryset.ordered
 
+    @pytest.mark.integration
     def test_form_widget_type(self, db):
         """Test users field uses UserFilterWidget"""
         # Act
@@ -113,6 +123,7 @@ class TestChatRoomForm:
 class TestChatRoomAdmin:
     """Tests for ChatRoomAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -124,6 +135,7 @@ class TestChatRoomAdmin:
         assert "created_at" in admin.list_display
         assert "updated_at" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -132,6 +144,7 @@ class TestChatRoomAdmin:
         # Assert
         assert "created_at" in admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -140,6 +153,7 @@ class TestChatRoomAdmin:
         # Assert
         assert "users__username" in admin.search_fields
 
+    @pytest.mark.unit
     def test_form_class(self, db):
         """Test admin uses ChatRoomForm"""
         # Arrange
@@ -148,6 +162,7 @@ class TestChatRoomAdmin:
         # Assert
         assert admin.form == ChatRoomForm
 
+    @pytest.mark.unit
     def test_admin_registered(self, db):
         """Test ChatRoom is registered in admin"""
         # Arrange
@@ -163,6 +178,7 @@ class TestChatRoomAdmin:
 class TestCommentAdmin:
     """Tests for CommentAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -176,6 +192,7 @@ class TestCommentAdmin:
         assert "is_public" in admin.list_display
         assert "is_removed" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -185,6 +202,7 @@ class TestCommentAdmin:
         assert "is_public" in admin.list_filter
         assert "is_removed" in admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -195,6 +213,7 @@ class TestCommentAdmin:
         assert "user__username" in admin.search_fields
         assert "document__project" in admin.search_fields
 
+    @pytest.mark.unit
     def test_document_truncated_short(self, comment, db):
         """Test document_truncated with short document string"""
         # Arrange
@@ -211,6 +230,7 @@ class TestCommentAdmin:
         else:
             assert "..." not in result
 
+    @pytest.mark.integration
     def test_document_truncated_long(self, user, project_document, db):
         """Test document_truncated with long document string"""
         # Arrange
@@ -231,6 +251,7 @@ class TestCommentAdmin:
             assert "..." in result
             assert len(result) <= 53  # 50 chars + '...'
 
+    @pytest.mark.unit
     def test_document_truncated_short_description(self, db):
         """Test document_truncated has short_description"""
         # Arrange
@@ -244,6 +265,7 @@ class TestCommentAdmin:
 class TestDirectMessageAdmin:
     """Tests for DirectMessageAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -255,6 +277,7 @@ class TestDirectMessageAdmin:
         assert "text" in admin.list_display
         assert "ip_address" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -263,6 +286,7 @@ class TestDirectMessageAdmin:
         # Assert
         assert "is_public" in admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -273,6 +297,7 @@ class TestDirectMessageAdmin:
         assert "user__username" in admin.search_fields
         assert "ip_address" in admin.search_fields
 
+    @pytest.mark.unit
     def test_admin_registered(self, db):
         """Test DirectMessage is registered in admin"""
         # Arrange
@@ -288,6 +313,7 @@ class TestDirectMessageAdmin:
 class TestReactionAdmin:
     """Tests for ReactionAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -300,6 +326,7 @@ class TestReactionAdmin:
         assert "created_at" in admin.list_display
         assert "updated_at" in admin.list_display
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -311,6 +338,7 @@ class TestReactionAdmin:
         assert "direct_message__text" in admin.search_fields
         assert "user__username" in admin.search_fields
 
+    @pytest.mark.unit
     def test_admin_registered(self, db):
         """Test Reaction is registered in admin"""
         # Arrange

@@ -21,6 +21,7 @@ User = get_user_model()
 class TestProjectService:
     """Tests for ProjectService"""
 
+    @pytest.mark.integration
     def test_list_projects_no_filters(self, user, project, db):
         """Test listing projects without filters"""
         # Act
@@ -30,6 +31,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_search_term(self, user, project, db):
         """Test listing projects with search term filter"""
         # Arrange
@@ -42,6 +44,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_status_filter(self, user, project, db):
         """Test listing projects with status filter"""
         # Arrange
@@ -54,6 +57,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_year_filter(self, user, project, db):
         """Test listing projects with year filter"""
         # Arrange
@@ -66,6 +70,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_business_area_filter(self, user, project, db):
         """Test listing projects with business area filter"""
         # Arrange
@@ -78,6 +83,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_project_tag_search(self, user, project, db):
         """Test listing projects with project tag search"""
         # Arrange
@@ -94,6 +100,7 @@ class TestProjectService:
         assert projects.count() >= 1
         assert project in projects
 
+    @pytest.mark.integration
     def test_get_project_success(self, project, db):
         """Test getting a project by ID"""
         # Act
@@ -103,12 +110,14 @@ class TestProjectService:
         assert result.pk == project.pk
         assert result.title == project.title
 
+    @pytest.mark.integration
     def test_get_project_not_found(self, db):
         """Test getting non-existent project raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Project 99999 not found"):
             ProjectService.get_project(99999)
 
+    @pytest.mark.integration
     def test_create_project(self, user, business_area, db):
         """Test creating a project"""
         # Arrange
@@ -131,6 +140,7 @@ class TestProjectService:
         assert project.status == "new"
         assert project.year == 2023
 
+    @pytest.mark.integration
     def test_update_project(self, project, user, db):
         """Test updating a project"""
         # Arrange
@@ -147,6 +157,7 @@ class TestProjectService:
         assert updated.title == "Updated Title"
         assert updated.description == "Updated Description"
 
+    @pytest.mark.integration
     def test_delete_project(self, project, user, db):
         """Test deleting a project"""
         # Arrange
@@ -158,6 +169,7 @@ class TestProjectService:
         # Assert
         assert not Project.objects.filter(pk=project_id).exists()
 
+    @pytest.mark.integration
     def test_suspend_project(self, project, user, db):
         """Test suspending a project"""
         # Act
@@ -166,6 +178,7 @@ class TestProjectService:
         # Assert
         assert suspended.status == Project.StatusChoices.SUSPENDED
 
+    @pytest.mark.integration
     def test_get_project_years(self, project, db):
         """Test getting list of project years"""
         # Act
@@ -174,6 +187,7 @@ class TestProjectService:
         # Assert
         assert project.year in years
 
+    @pytest.mark.integration
     def test_toggle_user_profile_visibility_hide(self, project, user, db):
         """Test hiding project from user profile"""
         # Arrange
@@ -185,6 +199,7 @@ class TestProjectService:
         # Assert
         assert user.pk in updated.hidden_from_staff_profiles
 
+    @pytest.mark.integration
     def test_toggle_user_profile_visibility_show(self, project, user, db):
         """Test showing project on user profile"""
         # Arrange
@@ -201,6 +216,7 @@ class TestProjectService:
 class TestMemberService:
     """Tests for MemberService"""
 
+    @pytest.mark.integration
     def test_list_members_no_filters(self, project_with_members, db):
         """Test listing all members"""
         # Act
@@ -209,6 +225,7 @@ class TestMemberService:
         # Assert
         assert members.count() >= 4  # 1 lead + 3 members
 
+    @pytest.mark.integration
     def test_list_members_by_project(self, project_with_members, db):
         """Test listing members for a specific project"""
         # Act
@@ -220,6 +237,7 @@ class TestMemberService:
         for member in members:
             assert member.project == project_with_members
 
+    @pytest.mark.integration
     def test_list_members_by_user(self, project_with_lead, project_lead, db):
         """Test listing projects for a specific user"""
         # Act
@@ -230,6 +248,7 @@ class TestMemberService:
         for member in members:
             assert member.user == project_lead
 
+    @pytest.mark.integration
     def test_get_member_success(self, project_with_lead, project_lead, db):
         """Test getting a specific member"""
         # Act
@@ -240,12 +259,14 @@ class TestMemberService:
         assert member.user == project_lead
         assert member.is_leader is True
 
+    @pytest.mark.integration
     def test_get_member_not_found(self, project, user, db):
         """Test getting non-existent member raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound):
             MemberService.get_member(project.pk, user.pk)
 
+    @pytest.mark.integration
     def test_get_project_leader(self, project_with_lead, project_lead, db):
         """Test getting project leader"""
         # Act
@@ -256,6 +277,7 @@ class TestMemberService:
         assert leader.is_leader is True
         assert leader.project == project_with_lead
 
+    @pytest.mark.integration
     def test_get_project_leader_not_found(self, business_area, db):
         """Test getting leader when none exists raises NotFound"""
         # Arrange - Create project without any members
@@ -269,6 +291,7 @@ class TestMemberService:
         with pytest.raises(NotFound):
             MemberService.get_project_leader(project.pk)
 
+    @pytest.mark.integration
     def test_get_project_leader_multiple_leaders(
         self, project_with_lead, user_factory, db
     ):
@@ -288,6 +311,7 @@ class TestMemberService:
         assert leader.is_leader is True
         assert leader.project == project_with_lead
 
+    @pytest.mark.integration
     def test_add_member(self, project, user, superuser, db):
         """Test adding a member to a project"""
         # Arrange
@@ -306,6 +330,7 @@ class TestMemberService:
         assert member.role == "supervising"
         assert member.is_leader is False
 
+    @pytest.mark.integration
     def test_add_member_with_all_fields(self, project, user, superuser, db):
         """Test adding member with all optional fields"""
         # Arrange
@@ -328,6 +353,7 @@ class TestMemberService:
         assert member.short_code == "ABC"
         assert member.comments == "Test comments"
 
+    @pytest.mark.integration
     def test_add_member_without_role_raises_error(self, project, user, superuser, db):
         """Test adding member without role raises ValidationError"""
         # Arrange
@@ -339,6 +365,7 @@ class TestMemberService:
         with pytest.raises(ValidationError, match="Role is required"):
             MemberService.add_member(project.pk, user.pk, data, superuser)
 
+    @pytest.mark.integration
     def test_add_duplicate_member_raises_error(
         self, project_with_lead, project_lead, superuser, db
     ):
@@ -354,6 +381,7 @@ class TestMemberService:
                 project_with_lead.pk, project_lead.pk, data, superuser
             )
 
+    @pytest.mark.integration
     def test_update_member(self, project_with_lead, project_lead, superuser, db):
         """Test updating a member"""
         # Arrange
@@ -371,6 +399,7 @@ class TestMemberService:
         assert updated.role == "research"
         assert updated.time_allocation == 75
 
+    @pytest.mark.integration
     def test_update_member_with_none_values(
         self, project_with_lead, project_lead, superuser, db
     ):
@@ -393,6 +422,7 @@ class TestMemberService:
         assert updated.role == original_role  # Unchanged
         assert updated.time_allocation == 80  # Changed
 
+    @pytest.mark.integration
     def test_remove_member(self, project_with_lead, project_lead, superuser, db):
         """Test removing a member from a project"""
         # Act
@@ -403,6 +433,7 @@ class TestMemberService:
             project=project_with_lead, user=project_lead
         ).exists()
 
+    @pytest.mark.integration
     def test_promote_to_leader(self, project_with_members, user_factory, superuser, db):
         """Test promoting a member to leader"""
         # Arrange
@@ -424,6 +455,7 @@ class TestMemberService:
         ).exclude(user=new_leader)
         assert old_leaders.count() == 0
 
+    @pytest.mark.integration
     def test_get_members_for_project(self, project_with_members, db):
         """Test getting all members for a project"""
         # Act
@@ -434,6 +466,7 @@ class TestMemberService:
         for member in members:
             assert member.project == project_with_members
 
+    @pytest.mark.integration
     def test_get_user_projects(self, project_with_lead, project_lead, db):
         """Test getting all projects for a user"""
         # Act
@@ -447,12 +480,14 @@ class TestMemberService:
 class TestDetailsService:
     """Tests for DetailsService"""
 
+    @pytest.mark.integration
     def test_get_project_details_not_found(self, project, db):
         """Test getting non-existent details raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound):
             DetailsService.get_project_details(project.pk)
 
+    @pytest.mark.integration
     def test_create_project_details(self, project, user, db):
         """Test creating project details"""
         # Arrange
@@ -470,6 +505,7 @@ class TestDetailsService:
         assert details.project == project
         assert details.creator == user
 
+    @pytest.mark.integration
     def test_get_project_details_success(self, project, user, db):
         """Test getting project details"""
         # Arrange
@@ -484,6 +520,7 @@ class TestDetailsService:
         assert result.pk == details.pk
         assert result.project == project
 
+    @pytest.mark.integration
     def test_update_project_details(self, project, user, db):
         """Test updating project details"""
         # Arrange
@@ -500,6 +537,7 @@ class TestDetailsService:
         assert updated.pk == details.pk
         assert updated.modifier == user
 
+    @pytest.mark.integration
     def test_get_student_details_none(self, project, db):
         """Test getting student details when none exist"""
         # Act
@@ -508,6 +546,7 @@ class TestDetailsService:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_create_student_details(self, project, user, db):
         """Test creating student details"""
         # Arrange
@@ -524,6 +563,7 @@ class TestDetailsService:
         assert details.project == project
         assert details.level == "undergraduate"
 
+    @pytest.mark.integration
     def test_get_external_details_none(self, project, db):
         """Test getting external details when none exist"""
         # Act
@@ -532,6 +572,7 @@ class TestDetailsService:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_create_external_details(self, project, user, db):
         """Test creating external details"""
         # Arrange
@@ -548,6 +589,7 @@ class TestDetailsService:
         assert details.project == project
         assert "Test Collaborator" in details.collaboration_with
 
+    @pytest.mark.integration
     def test_get_all_details(self, project, user, db):
         """Test getting all details for a project"""
         # Arrange
@@ -567,6 +609,7 @@ class TestDetailsService:
 class TestExportService:
     """Tests for ExportService"""
 
+    @pytest.mark.unit
     def test_strip_html_tags(self):
         """Test stripping HTML tags from string"""
         # Arrange
@@ -578,6 +621,7 @@ class TestExportService:
         # Assert
         assert result == "Test content"
 
+    @pytest.mark.unit
     def test_strip_html_tags_empty(self):
         """Test stripping HTML tags from empty string"""
         # Act
@@ -586,6 +630,7 @@ class TestExportService:
         # Assert
         assert result == ""
 
+    @pytest.mark.unit
     def test_strip_html_tags_none(self):
         """Test stripping HTML tags from None"""
         # Act
@@ -594,6 +639,7 @@ class TestExportService:
         # Assert
         assert result == ""
 
+    @pytest.mark.integration
     def test_export_all_projects_csv(self, project_with_members, user, db):
         """Test exporting all projects to CSV"""
         # Act
@@ -610,6 +656,7 @@ class TestExportService:
         assert "Title" in content
 
     @patch("projects.services.export_service.Project.objects")
+    @pytest.mark.integration
     def test_export_all_projects_csv_error(self, mock_projects, user, db):
         """Test export error handling"""
         # Arrange
@@ -622,6 +669,7 @@ class TestExportService:
         assert response.status_code == 500
         assert "Error generating CSV" in response.content.decode("utf-8")
 
+    @pytest.mark.integration
     def test_export_all_projects_csv_with_business_area_leader(
         self, project_with_members, user, business_area, db
     ):
@@ -640,6 +688,7 @@ class TestExportService:
         content = response.content.decode("utf-8")
         assert str(user) in content
 
+    @pytest.mark.integration
     def test_export_all_projects_csv_with_team_members(
         self, project_with_members, user, db
     ):
@@ -659,6 +708,7 @@ class TestExportService:
                 )
 
     @patch("projects.services.export_service.AnnualReport")
+    @pytest.mark.integration
     def test_export_annual_report_projects_csv_no_reports(
         self, mock_annual_report, user, db
     ):
@@ -675,6 +725,7 @@ class TestExportService:
 
     @patch("projects.services.export_service.Project.objects")
     @patch("projects.services.export_service.AnnualReport")
+    @pytest.mark.integration
     def test_export_annual_report_projects_csv_error(
         self, mock_annual_report, mock_projects, user, db
     ):
@@ -693,6 +744,7 @@ class TestExportService:
 class TestAreaService:
     """Tests for AreaService"""
 
+    @pytest.mark.integration
     def test_get_project_area_success(self, project_with_area, db):
         """Test getting project area by project ID"""
         # Act
@@ -702,6 +754,7 @@ class TestAreaService:
         assert result.project == project_with_area
         assert result.areas == [1, 2, 3]
 
+    @pytest.mark.integration
     def test_get_project_area_not_found(self, business_area, db):
         """Test getting non-existent project area raises NotFound"""
         # Arrange - Create project without area
@@ -718,6 +771,7 @@ class TestAreaService:
         ):
             AreaService.get_project_area(project_without_area.pk)
 
+    @pytest.mark.integration
     def test_get_area_by_pk_success(self, project_with_area, db):
         """Test getting project area by primary key"""
         # Arrange
@@ -730,12 +784,14 @@ class TestAreaService:
         assert result.pk == area.pk
         assert result.project == project_with_area
 
+    @pytest.mark.unit
     def test_get_area_by_pk_not_found(self, db):
         """Test getting non-existent area by pk raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Project area 99999 not found"):
             AreaService.get_area_by_pk(99999)
 
+    @pytest.mark.integration
     def test_create_project_area(self, project, user, db):
         """Test creating project area"""
         # Arrange
@@ -751,6 +807,7 @@ class TestAreaService:
         assert area.project == project
         assert area.areas == [1, 2, 3]
 
+    @pytest.mark.integration
     def test_create_project_area_empty_list(self, project, user, db):
         """Test creating project area with empty area list"""
         # Arrange
@@ -765,6 +822,7 @@ class TestAreaService:
         assert area.project == project
         assert area.areas == []
 
+    @pytest.mark.integration
     def test_create_project_area_none_list(self, project, user, db):
         """Test creating project area with None area list"""
         # Arrange
@@ -779,6 +837,7 @@ class TestAreaService:
         assert area.project == project
         assert area.areas == []
 
+    @pytest.mark.integration
     def test_update_project_area(self, project_with_area, user, db):
         """Test updating project area by project ID"""
         # Arrange
@@ -793,6 +852,7 @@ class TestAreaService:
         assert updated.project == project_with_area
         assert updated.areas == [4, 5, 6]
 
+    @pytest.mark.integration
     def test_update_project_area_empty_list(self, project_with_area, user, db):
         """Test updating project area with empty list"""
         # Act
@@ -802,6 +862,7 @@ class TestAreaService:
         assert updated.project == project_with_area
         assert updated.areas == []
 
+    @pytest.mark.integration
     def test_update_project_area_none_list(self, project_with_area, user, db):
         """Test updating project area with None"""
         # Act
@@ -811,6 +872,7 @@ class TestAreaService:
         assert updated.project == project_with_area
         assert updated.areas == []
 
+    @pytest.mark.integration
     def test_update_project_area_not_found(self, user, db):
         """Test updating non-existent project area raises NotFound"""
         # Arrange
@@ -824,6 +886,7 @@ class TestAreaService:
         with pytest.raises(NotFound):
             AreaService.update_project_area(project_without_area.pk, [1, 2], user)
 
+    @pytest.mark.integration
     def test_update_area_by_pk(self, project_with_area, user, db):
         """Test updating project area by primary key"""
         # Arrange
@@ -837,6 +900,7 @@ class TestAreaService:
         assert updated.pk == area.pk
         assert updated.areas == [7, 8, 9]
 
+    @pytest.mark.integration
     def test_update_area_by_pk_empty_list(self, project_with_area, user, db):
         """Test updating area by pk with empty list"""
         # Arrange
@@ -849,6 +913,7 @@ class TestAreaService:
         assert updated.pk == area.pk
         assert updated.areas == []
 
+    @pytest.mark.integration
     def test_update_area_by_pk_none_list(self, project_with_area, user, db):
         """Test updating area by pk with None"""
         # Arrange
@@ -861,12 +926,14 @@ class TestAreaService:
         assert updated.pk == area.pk
         assert updated.areas == []
 
+    @pytest.mark.integration
     def test_update_area_by_pk_not_found(self, user, db):
         """Test updating non-existent area by pk raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound):
             AreaService.update_area_by_pk(99999, [1, 2], user)
 
+    @pytest.mark.integration
     def test_delete_project_area(self, project_with_area, user, db):
         """Test deleting project area"""
         # Arrange
@@ -879,12 +946,14 @@ class TestAreaService:
         # Assert
         assert not ProjectArea.objects.filter(pk=area_pk).exists()
 
+    @pytest.mark.integration
     def test_delete_project_area_not_found(self, user, db):
         """Test deleting non-existent area raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound):
             AreaService.delete_project_area(99999, user)
 
+    @pytest.mark.integration
     def test_list_all_areas(self, project_with_area, db):
         """Test listing all project areas"""
         # Act
@@ -894,6 +963,7 @@ class TestAreaService:
         assert areas.count() >= 1
         assert ProjectArea.objects.get(project=project_with_area) in areas
 
+    @pytest.mark.unit
     def test_list_all_areas_empty(self, db):
         """Test listing all areas when none exist"""
         # Arrange
@@ -912,6 +982,7 @@ class TestAreaService:
 class TestExportServiceAdditional:
     """Additional tests for ExportService to cover remaining lines"""
 
+    @pytest.mark.integration
     def test_export_annual_report_projects_csv_success(
         self, project_with_members, user, db
     ):
@@ -948,6 +1019,7 @@ class TestExportServiceAdditional:
         assert "Report Type" in content
         assert "Progress" in content
 
+    @pytest.mark.integration
     def test_export_annual_report_with_student_report(
         self, project_with_members, user, db
     ):
@@ -978,6 +1050,7 @@ class TestExportServiceAdditional:
         content = response.content.decode("utf-8")
         assert "Student" in content
 
+    @pytest.mark.integration
     def test_export_annual_report_with_both_reports(
         self, project_with_members, user, db
     ):
@@ -1029,6 +1102,7 @@ class TestExportServiceAdditional:
 class TestProjectServiceAdditional:
     """Additional tests for ProjectService to cover remaining lines"""
 
+    @pytest.mark.integration
     def test_list_projects_with_selected_user_filter(
         self, user, project_with_lead, project_lead, db
     ):
@@ -1043,6 +1117,7 @@ class TestProjectServiceAdditional:
         assert projects.count() >= 1
         assert project_with_lead in projects
 
+    @pytest.mark.integration
     def test_list_projects_with_multiple_business_areas(
         self, user, project, business_area, db
     ):
@@ -1056,6 +1131,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 1
 
+    @pytest.mark.integration
     def test_list_projects_with_unknown_status(self, user, project, db):
         """Test listing projects with unknown status filter"""
         # Arrange
@@ -1070,6 +1146,7 @@ class TestProjectServiceAdditional:
         # Should exclude projects with valid statuses
         assert projects.count() >= 0
 
+    @pytest.mark.integration
     def test_list_projects_with_kind_filter(self, user, project, db):
         """Test listing projects with kind filter"""
         # Arrange
@@ -1081,6 +1158,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 1
 
+    @pytest.mark.integration
     def test_list_projects_only_active(self, user, project, db):
         """Test listing only active projects"""
         # Arrange
@@ -1094,6 +1172,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 1
 
+    @pytest.mark.integration
     def test_list_projects_only_inactive(self, user, project, db):
         """Test listing only inactive projects"""
         # Arrange
@@ -1107,6 +1186,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 1
 
+    @pytest.mark.integration
     def test_parse_search_term_with_year_only(self, user, project, db):
         """Test parsing project tag with year only (CF-2023)"""
         # Arrange
@@ -1121,6 +1201,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 1
 
+    @pytest.mark.integration
     def test_parse_search_term_with_prefix_only(self, user, db):
         """Test parsing project tag with prefix only (CF)"""
         # Arrange
@@ -1140,6 +1221,7 @@ class TestProjectServiceAdditional:
         # Should filter by kind=core_function
         assert all(p.kind == "core_function" for p in projects)
 
+    @pytest.mark.integration
     def test_parse_search_term_invalid_year(self, user, db):
         """Test parsing project tag with invalid year"""
         # Arrange
@@ -1152,6 +1234,7 @@ class TestProjectServiceAdditional:
         # Should still filter by kind
         assert projects.count() >= 0
 
+    @pytest.mark.integration
     def test_parse_search_term_invalid_number(self, user, db):
         """Test parsing project tag with invalid number"""
         # Arrange
@@ -1164,6 +1247,7 @@ class TestProjectServiceAdditional:
         # Should still filter by kind and year
         assert projects.count() >= 0
 
+    @pytest.mark.integration
     def test_parse_search_term_empty_parts(self, user, db):
         """Test parsing project tag with empty parts"""
         # Arrange
@@ -1175,6 +1259,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert projects.count() >= 0
 
+    @pytest.mark.integration
     def test_parse_search_term_invalid_prefix(self, user, db):
         """Test parsing project tag with invalid prefix"""
         # Arrange
@@ -1187,6 +1272,7 @@ class TestProjectServiceAdditional:
         # Should return no results for invalid prefix
         assert projects.count() == 0
 
+    @pytest.mark.integration
     def test_parse_search_term_empty(self, user, db):
         """Test parsing empty search term"""
         # Arrange
@@ -1199,6 +1285,7 @@ class TestProjectServiceAdditional:
         # Should return all projects
         assert projects.count() >= 0
 
+    @pytest.mark.unit
     def test_determine_db_kind_stp(self):
         """Test determining database kind for STP prefix"""
         # Act
@@ -1207,6 +1294,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert result == "student"
 
+    @pytest.mark.unit
     def test_determine_db_kind_ext(self):
         """Test determining database kind for EXT prefix"""
         # Act
@@ -1215,6 +1303,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert result == "external"
 
+    @pytest.mark.unit
     def test_determine_db_kind_invalid(self):
         """Test determining database kind for invalid prefix"""
         # Act
@@ -1223,6 +1312,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_handle_project_image_string(self):
         """Test handling project image when it's already a string"""
         # Act
@@ -1231,6 +1321,7 @@ class TestProjectServiceAdditional:
         # Assert
         assert result == "/path/to/image.jpg"
 
+    @pytest.mark.integration
     def test_handle_project_image_none(self):
         """Test handling project image when it's None"""
         # Act
@@ -1240,6 +1331,7 @@ class TestProjectServiceAdditional:
         assert result is None
 
     @patch("projects.services.project_service.default_storage")
+    @pytest.mark.integration
     def test_handle_project_image_existing_file(self, mock_storage, db):
         """Test handling project image when file already exists with same size"""
         # Arrange
@@ -1261,6 +1353,7 @@ class TestProjectServiceAdditional:
                 assert result == "projects/test.jpg"
 
     @patch("projects.services.project_service.default_storage")
+    @pytest.mark.integration
     def test_handle_project_image_new_file(self, mock_storage, db):
         """Test handling new project image upload"""
         # Arrange
@@ -1285,6 +1378,7 @@ class TestProjectServiceAdditional:
 class TestDetailsServiceAdditional:
     """Additional tests for DetailsService to cover remaining lines"""
 
+    @pytest.mark.integration
     def test_get_detail_by_project_alias(self, project, user, db):
         """Test get_detail_by_project alias method"""
         # Arrange
@@ -1299,6 +1393,7 @@ class TestDetailsServiceAdditional:
         assert result.pk == details.pk
         assert result.project == project
 
+    @pytest.mark.integration
     def test_update_student_details(self, project, user, db):
         """Test updating student details"""
         # Arrange
@@ -1314,6 +1409,7 @@ class TestDetailsServiceAdditional:
         assert updated.pk == details.pk
         assert updated.level == "postgraduate"
 
+    @pytest.mark.integration
     def test_update_student_details_not_found(self, project, user, db):
         """Test updating non-existent student details raises NotFound"""
         # Arrange
@@ -1325,6 +1421,7 @@ class TestDetailsServiceAdditional:
         ):
             DetailsService.update_student_details(project.pk, data, user)
 
+    @pytest.mark.integration
     def test_update_external_details(self, project, user, db):
         """Test updating external details"""
         # Arrange
@@ -1340,6 +1437,7 @@ class TestDetailsServiceAdditional:
         assert updated.pk == details.pk
         assert "Updated" in updated.collaboration_with
 
+    @pytest.mark.integration
     def test_update_external_details_not_found(self, project, user, db):
         """Test updating non-existent external details raises NotFound"""
         # Arrange
@@ -1351,6 +1449,7 @@ class TestDetailsServiceAdditional:
         ):
             DetailsService.update_external_details(project.pk, data, user)
 
+    @pytest.mark.integration
     def test_list_all_project_details(self, project, user, db):
         """Test listing all project details"""
         # Arrange
@@ -1362,6 +1461,7 @@ class TestDetailsServiceAdditional:
         # Assert
         assert all_details.count() >= 1
 
+    @pytest.mark.integration
     def test_list_all_student_details(self, project, user, db):
         """Test listing all student details"""
         # Arrange
@@ -1375,6 +1475,7 @@ class TestDetailsServiceAdditional:
         # Assert
         assert all_details.count() >= 1
 
+    @pytest.mark.integration
     def test_list_all_external_details(self, project, user, db):
         """Test listing all external details"""
         # Arrange
@@ -1388,6 +1489,7 @@ class TestDetailsServiceAdditional:
         # Assert
         assert all_details.count() >= 1
 
+    @pytest.mark.integration
     def test_create_project_details_with_all_fields(
         self, project, user, user_factory, db
     ):
@@ -1417,6 +1519,7 @@ class TestDetailsServiceAdditional:
         assert details.site_custodian == site_custodian
         assert details.service == service
 
+    @pytest.mark.integration
     def test_create_project_details_with_model_instances(self, project, user, db):
         """Test creating project details with model instances instead of IDs"""
         # Arrange

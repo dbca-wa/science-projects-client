@@ -22,6 +22,8 @@ def clear_cache():
 
 
 @pytest.mark.django_db
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserCacheInvalidation:
     """Test cache invalidation for user profile updates"""
 

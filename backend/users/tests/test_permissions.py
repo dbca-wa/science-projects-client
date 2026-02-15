@@ -4,6 +4,8 @@ Tests for user permissions
 
 from unittest.mock import Mock
 
+import pytest
+
 from users.permissions.user_permissions import (
     CanExportData,
     CanManageEducationEntry,
@@ -15,10 +17,12 @@ from users.permissions.user_permissions import (
 )
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanManageUser:
     """Tests for CanManageUser permission"""
 
-    def test_superuser_can_manage_any_user(self, user, superuser, db):
+    def test_superuser_can_manage_any_user(self, user, superuser):
         """Test superuser can manage any user"""
         # Arrange
         request = Mock(user=superuser)
@@ -30,7 +34,7 @@ class TestCanManageUser:
         # Assert
         assert result is True
 
-    def test_user_can_manage_themselves(self, user, db):
+    def test_user_can_manage_themselves(self, user):
         """Test user can manage their own account"""
         # Arrange
         request = Mock(user=user)
@@ -42,7 +46,7 @@ class TestCanManageUser:
         # Assert
         assert result is True
 
-    def test_user_cannot_manage_other_user(self, user, user_factory, db):
+    def test_user_cannot_manage_other_user(self, user, user_factory):
         """Test user cannot manage another user"""
         # Arrange
         other_user = user_factory(username="otheruser")
@@ -55,7 +59,7 @@ class TestCanManageUser:
         # Assert
         assert result is False
 
-    def test_staff_cannot_manage_other_user(self, staff_user, user, db):
+    def test_staff_cannot_manage_other_user(self, staff_user, user):
         """Test staff user cannot manage another user"""
         # Arrange
         request = Mock(user=staff_user)
@@ -68,10 +72,12 @@ class TestCanManageUser:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanManageProfile:
     """Tests for CanManageProfile permission"""
 
-    def test_superuser_can_manage_any_profile(self, user_profile, superuser, db):
+    def test_superuser_can_manage_any_profile(self, user_profile, superuser):
         """Test superuser can manage any profile"""
         # Arrange
         request = Mock(user=superuser)
@@ -83,7 +89,7 @@ class TestCanManageProfile:
         # Assert
         assert result is True
 
-    def test_user_can_manage_own_profile(self, user, user_profile, db):
+    def test_user_can_manage_own_profile(self, user, user_profile):
         """Test user can manage their own profile"""
         # Arrange
         request = Mock(user=user)
@@ -95,7 +101,7 @@ class TestCanManageProfile:
         # Assert
         assert result is True
 
-    def test_user_cannot_manage_other_profile(self, user, user_factory, db):
+    def test_user_cannot_manage_other_profile(self, user, user_factory):
         """Test user cannot manage another user's profile"""
         # Arrange
         from users.models import UserProfile
@@ -115,10 +121,12 @@ class TestCanManageProfile:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanViewProfile:
     """Tests for CanViewProfile permission"""
 
-    def test_superuser_can_view_any_profile(self, user_profile, superuser, db):
+    def test_superuser_can_view_any_profile(self, user_profile, superuser):
         """Test superuser can view any profile"""
         # Arrange
         request = Mock(user=superuser)
@@ -130,7 +138,7 @@ class TestCanViewProfile:
         # Assert
         assert result is True
 
-    def test_user_can_view_own_profile(self, user, user_profile, db):
+    def test_user_can_view_own_profile(self, user, user_profile):
         """Test user can view their own profile"""
         # Arrange
         request = Mock(user=user)
@@ -142,7 +150,7 @@ class TestCanViewProfile:
         # Assert
         assert result is True
 
-    def test_public_profile_visible_to_all(self, user, user_factory, db):
+    def test_public_profile_visible_to_all(self, user, user_factory):
         """Test public profile is visible to all users"""
         # Arrange
         from users.models import PublicStaffProfile
@@ -168,7 +176,7 @@ class TestCanViewProfile:
         # Assert
         assert result is True
 
-    def test_private_profile_not_visible_to_others(self, user, user_factory, db):
+    def test_private_profile_not_visible_to_others(self, user, user_factory):
         """Test private profile is not visible to other users"""
         # Arrange
         from users.models import UserProfile
@@ -192,7 +200,7 @@ class TestCanViewProfile:
         # Assert
         assert result is False
 
-    def test_profile_without_public_attribute_not_visible(self, user, user_factory, db):
+    def test_profile_without_public_attribute_not_visible(self, user, user_factory):
         """Test profile without public attribute is not visible to others"""
         # Arrange
         from users.models import UserProfile
@@ -214,10 +222,12 @@ class TestCanViewProfile:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanManageStaffProfile:
     """Tests for CanManageStaffProfile permission"""
 
-    def test_superuser_can_manage_any_staff_profile(self, staff_profile, superuser, db):
+    def test_superuser_can_manage_any_staff_profile(self, staff_profile, superuser):
         """Test superuser can manage any staff profile"""
         # Arrange
         request = Mock(user=superuser)
@@ -229,7 +239,7 @@ class TestCanManageStaffProfile:
         # Assert
         assert result is True
 
-    def test_user_can_manage_own_staff_profile(self, user, staff_profile, db):
+    def test_user_can_manage_own_staff_profile(self, user, staff_profile):
         """Test user can manage their own staff profile"""
         # Arrange
         request = Mock(user=user)
@@ -241,7 +251,7 @@ class TestCanManageStaffProfile:
         # Assert
         assert result is True
 
-    def test_user_cannot_manage_other_staff_profile(self, user, user_factory, db):
+    def test_user_cannot_manage_other_staff_profile(self, user, user_factory):
         """Test user cannot manage another user's staff profile"""
         # Arrange
         from users.models import PublicStaffProfile
@@ -261,10 +271,12 @@ class TestCanManageStaffProfile:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanExportData:
     """Tests for CanExportData permission"""
 
-    def test_superuser_can_export_data(self, superuser, db):
+    def test_superuser_can_export_data(self, superuser):
         """Test superuser can export data"""
         # Arrange
         request = Mock(user=superuser)
@@ -276,7 +288,7 @@ class TestCanExportData:
         # Assert
         assert result is True
 
-    def test_regular_user_cannot_export_data(self, user, db):
+    def test_regular_user_cannot_export_data(self, user):
         """Test regular user cannot export data"""
         # Arrange
         request = Mock(user=user)
@@ -288,7 +300,7 @@ class TestCanExportData:
         # Assert
         assert result is False
 
-    def test_staff_user_cannot_export_data(self, staff_user, db):
+    def test_staff_user_cannot_export_data(self, staff_user):
         """Test staff user cannot export data"""
         # Arrange
         request = Mock(user=staff_user)
@@ -301,6 +313,8 @@ class TestCanExportData:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanManageEmploymentEntry:
     """Tests for CanManageEmploymentEntry permission"""
 
@@ -318,7 +332,7 @@ class TestCanManageEmploymentEntry:
         # Assert
         assert result is True
 
-    def test_user_can_manage_own_employment_entry(self, user, employment_entry, db):
+    def test_user_can_manage_own_employment_entry(self, user, employment_entry):
         """Test user can manage their own employment entry"""
         # Arrange
         request = Mock(user=user)
@@ -330,7 +344,7 @@ class TestCanManageEmploymentEntry:
         # Assert
         assert result is True
 
-    def test_user_cannot_manage_other_employment_entry(self, user, user_factory, db):
+    def test_user_cannot_manage_other_employment_entry(self, user, user_factory):
         """Test user cannot manage another user's employment entry"""
         # Arrange
         from users.models import EmploymentEntry, PublicStaffProfile
@@ -355,6 +369,8 @@ class TestCanManageEmploymentEntry:
         assert result is False
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCanManageEducationEntry:
     """Tests for CanManageEducationEntry permission"""
 
@@ -372,7 +388,7 @@ class TestCanManageEducationEntry:
         # Assert
         assert result is True
 
-    def test_user_can_manage_own_education_entry(self, user, education_entry, db):
+    def test_user_can_manage_own_education_entry(self, user, education_entry):
         """Test user can manage their own education entry"""
         # Arrange
         request = Mock(user=user)
@@ -384,7 +400,7 @@ class TestCanManageEducationEntry:
         # Assert
         assert result is True
 
-    def test_user_cannot_manage_other_education_entry(self, user, user_factory, db):
+    def test_user_cannot_manage_other_education_entry(self, user, user_factory):
         """Test user cannot manage another user's education entry"""
         # Arrange
         from users.models import EducationEntry, PublicStaffProfile

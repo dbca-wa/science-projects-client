@@ -4,6 +4,7 @@ Tests for agencies signals
 
 from unittest.mock import patch
 
+import pytest
 from django.conf import settings
 
 from agencies.models import Affiliation
@@ -14,6 +15,7 @@ from projects.models import ExternalProjectDetails, StudentProjectDetails
 class TestUpdateProjectAffiliationsOnNameChange:
     """Tests for update_project_affiliations_on_name_change signal"""
 
+    @pytest.mark.unit
     def test_new_affiliation_creation_no_signal(self, db):
         """Test signal does not trigger for new affiliation creation"""
         # Arrange & Act
@@ -24,6 +26,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert affiliation.name == "New Affiliation"
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_unchanged_no_update(self, mock_logger, db):
         """Test signal does not update projects when name unchanged"""
         # Arrange
@@ -40,6 +43,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         mock_logger.info.assert_not_called()
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_updates_student_project(self, mock_logger, db):
         """Test signal updates StudentProjectDetails when affiliation name changes"""
         # Arrange
@@ -62,6 +66,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert "1 student project(s)" in mock_logger.info.call_args[0][0]
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_updates_external_project(self, mock_logger, db):
         """Test signal updates ExternalProjectDetails when affiliation name changes"""
         # Arrange
@@ -84,6 +89,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert "1 external project(s)" in mock_logger.info.call_args[0][0]
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_updates_multiple_projects(self, mock_logger, db):
         """Test signal updates multiple projects when affiliation name changes"""
         # Arrange
@@ -120,6 +126,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert "1 external project(s)" in mock_logger.info.call_args[0][0]
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_with_semicolon_delimited_field(
         self, mock_logger, db
     ):
@@ -141,6 +148,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         mock_logger.info.assert_called_once()
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_only_updates_exact_match(self, mock_logger, db):
         """Test signal only updates exact matches in semicolon-delimited fields"""
         # Arrange
@@ -160,6 +168,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert student_project.organisation == "Test Org; New Test; Testing"
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_with_empty_organisation(self, mock_logger, db):
         """Test signal handles empty organisation field gracefully"""
         # Arrange
@@ -180,6 +189,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         mock_logger.info.assert_not_called()
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_with_none_organisation(self, mock_logger, db):
         """Test signal handles None organisation field gracefully"""
         # Arrange
@@ -200,6 +210,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         mock_logger.info.assert_not_called()
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_case_sensitive(self, mock_logger, db):
         """Test signal is case-sensitive when matching affiliation names"""
         # Arrange
@@ -219,6 +230,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert student_project.organisation == "test org; New Org; TEST ORG"
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.unit
     def test_affiliation_does_not_exist_exception_handled(self, mock_logger, db):
         """Test signal handles DoesNotExist exception gracefully"""
         # Arrange
@@ -234,6 +246,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         mock_logger.error.assert_not_called()
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.unit
     def test_general_exception_logged(self, mock_logger, db):
         """Test signal logs general exceptions"""
         # Arrange
@@ -253,6 +266,7 @@ class TestUpdateProjectAffiliationsOnNameChange:
         assert "Test error" in mock_logger.error.call_args[0][0]
 
     @patch.object(settings, "LOGGER")
+    @pytest.mark.integration
     def test_affiliation_name_change_with_whitespace_handling(self, mock_logger, db):
         """Test signal handles whitespace in semicolon-delimited fields"""
         # Arrange

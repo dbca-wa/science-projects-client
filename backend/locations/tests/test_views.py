@@ -19,6 +19,7 @@ def api_client():
 class TestAreasView:
     """Tests for Areas list/create view"""
 
+    @pytest.mark.integration
     def test_list_areas(self, api_client, user, dbca_district, dbca_region, db):
         """Test listing all areas"""
         api_client.force_authenticate(user=user)
@@ -33,6 +34,7 @@ class TestAreasView:
         assert dbca_district.name in area_names
         assert dbca_region.name in area_names
 
+    @pytest.mark.integration
     def test_list_areas_empty(self, api_client, user, db):
         """Test listing areas when none exist"""
         api_client.force_authenticate(user=user)
@@ -42,6 +44,7 @@ class TestAreasView:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == []
 
+    @pytest.mark.integration
     def test_create_area_valid_data(self, api_client, user, db):
         """Test creating area with valid data"""
         api_client.force_authenticate(user=user)
@@ -60,6 +63,7 @@ class TestAreasView:
         # Verify area was created in database
         assert Area.objects.filter(name="New District").exists()
 
+    @pytest.mark.integration
     def test_create_area_invalid_data(self, api_client, user, db):
         """Test creating area with invalid data"""
         api_client.force_authenticate(user=user)
@@ -74,6 +78,7 @@ class TestAreasView:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "name" in response.data
 
+    @pytest.mark.integration
     def test_create_area_missing_fields(self, api_client, user, db):
         """Test creating area with missing required fields"""
         api_client.force_authenticate(user=user)
@@ -91,6 +96,7 @@ class TestAreasView:
 class TestAreaDetailView:
     """Tests for AreaDetail get/update/delete view"""
 
+    @pytest.mark.integration
     def test_get_area_detail(self, api_client, user, dbca_district, db):
         """Test getting area detail"""
         api_client.force_authenticate(user=user)
@@ -102,6 +108,7 @@ class TestAreaDetailView:
         assert response.data["name"] == dbca_district.name
         assert response.data["area_type"] == dbca_district.area_type
 
+    @pytest.mark.integration
     def test_get_area_detail_unauthenticated(self, api_client, dbca_district, db):
         """Test getting area detail without authentication"""
         response = api_client.get(locations_urls.detail(dbca_district.id))
@@ -112,6 +119,7 @@ class TestAreaDetailView:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_area_detail_not_found(self, api_client, user, db):
         """Test getting non-existent area"""
         api_client.force_authenticate(user=user)
@@ -120,6 +128,7 @@ class TestAreaDetailView:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_area(self, api_client, user, dbca_district, db):
         """Test updating area"""
         api_client.force_authenticate(user=user)
@@ -139,6 +148,7 @@ class TestAreaDetailView:
         dbca_district.refresh_from_db()
         assert dbca_district.name == "Updated District Name"
 
+    @pytest.mark.integration
     def test_update_area_invalid_data(self, api_client, user, dbca_district, db):
         """Test updating area with invalid data"""
         api_client.force_authenticate(user=user)
@@ -153,6 +163,7 @@ class TestAreaDetailView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_update_area_unauthenticated(self, api_client, dbca_district, db):
         """Test updating area without authentication"""
         data = {"name": "New Name"}
@@ -166,6 +177,7 @@ class TestAreaDetailView:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_delete_area(self, api_client, user, dbca_district, db):
         """Test deleting area"""
         api_client.force_authenticate(user=user)
@@ -178,6 +190,7 @@ class TestAreaDetailView:
         # Verify area was deleted from database
         assert not Area.objects.filter(id=area_id).exists()
 
+    @pytest.mark.integration
     def test_delete_area_unauthenticated(self, api_client, dbca_district, db):
         """Test deleting area without authentication"""
         response = api_client.delete(locations_urls.detail(dbca_district.id))
@@ -191,6 +204,7 @@ class TestAreaDetailView:
 class TestDBCADistrictsView:
     """Tests for DBCADistricts view"""
 
+    @pytest.mark.integration
     def test_list_dbca_districts(
         self, api_client, user, dbca_district, dbca_region, db
     ):
@@ -204,6 +218,7 @@ class TestDBCADistrictsView:
         assert response.data[0]["name"] == dbca_district.name
         assert response.data[0]["area_type"] == "dbcadistrict"
 
+    @pytest.mark.integration
     def test_list_dbca_districts_unauthenticated(self, api_client, db):
         """Test listing DBCA districts without authentication"""
         response = api_client.get(locations_urls.path("dbcadistricts"))
@@ -217,6 +232,7 @@ class TestDBCADistrictsView:
 class TestDBCARegionsView:
     """Tests for DBCARegions view"""
 
+    @pytest.mark.integration
     def test_list_dbca_regions(self, api_client, user, dbca_district, dbca_region, db):
         """Test listing only DBCA regions"""
         api_client.force_authenticate(user=user)
@@ -228,6 +244,7 @@ class TestDBCARegionsView:
         assert response.data[0]["name"] == dbca_region.name
         assert response.data[0]["area_type"] == "dbcaregion"
 
+    @pytest.mark.integration
     def test_list_dbca_regions_unauthenticated(self, api_client, db):
         """Test listing DBCA regions without authentication"""
         response = api_client.get(locations_urls.path("dbcaregions"))
@@ -241,6 +258,7 @@ class TestDBCARegionsView:
 class TestImcrasView:
     """Tests for Imcras view"""
 
+    @pytest.mark.integration
     def test_list_imcras(self, api_client, user, db):
         """Test listing IMCRA areas"""
         api_client.force_authenticate(user=user)
@@ -258,6 +276,7 @@ class TestImcrasView:
         assert response.data[0]["name"] == imcra.name
         assert response.data[0]["area_type"] == "imcra"
 
+    @pytest.mark.integration
     def test_list_imcras_unauthenticated(self, api_client, db):
         """Test listing IMCRA areas without authentication"""
         response = api_client.get(locations_urls.path("imcra"))
@@ -271,6 +290,7 @@ class TestImcrasView:
 class TestIbrasView:
     """Tests for Ibras view"""
 
+    @pytest.mark.integration
     def test_list_ibras(self, api_client, user, ibra_region, db):
         """Test listing IBRA areas"""
         api_client.force_authenticate(user=user)
@@ -282,6 +302,7 @@ class TestIbrasView:
         assert response.data[0]["name"] == ibra_region.name
         assert response.data[0]["area_type"] == "ibra"
 
+    @pytest.mark.integration
     def test_list_ibras_unauthenticated(self, api_client, db):
         """Test listing IBRA areas without authentication"""
         response = api_client.get(locations_urls.path("ibra"))
@@ -295,6 +316,7 @@ class TestIbrasView:
 class TestNrmsView:
     """Tests for Nrms view"""
 
+    @pytest.mark.integration
     def test_list_nrms(self, api_client, user, db):
         """Test listing NRM areas"""
         api_client.force_authenticate(user=user)
@@ -312,6 +334,7 @@ class TestNrmsView:
         assert response.data[0]["name"] == nrm.name
         assert response.data[0]["area_type"] == "nrm"
 
+    @pytest.mark.integration
     def test_list_nrms_unauthenticated(self, api_client, db):
         """Test listing NRM areas without authentication"""
         response = api_client.get(locations_urls.path("nrm"))

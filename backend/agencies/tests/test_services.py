@@ -19,6 +19,7 @@ from agencies.services.agency_service import AgencyService
 class TestAffiliationService:
     """Tests for affiliation service operations"""
 
+    @pytest.mark.unit
     def test_list_affiliations(self, affiliation, db):
         """Test listing affiliations"""
         # Act
@@ -28,6 +29,7 @@ class TestAffiliationService:
         assert affiliations.count() == 1
         assert affiliation in affiliations
 
+    @pytest.mark.unit
     def test_list_affiliations_with_search(self, db):
         """Test listing affiliations with search"""
         # Arrange
@@ -41,6 +43,7 @@ class TestAffiliationService:
         assert affiliations.count() == 1
         assert affiliations.first().name == "Test Affiliation"
 
+    @pytest.mark.unit
     def test_list_affiliations_with_search_no_results(self, db):
         """Test listing affiliations with search that returns no results"""
         # Arrange
@@ -52,6 +55,7 @@ class TestAffiliationService:
         # Assert
         assert affiliations.count() == 0
 
+    @pytest.mark.unit
     def test_list_affiliations_case_insensitive_search(self, db):
         """Test listing affiliations with case-insensitive search"""
         # Arrange
@@ -64,6 +68,7 @@ class TestAffiliationService:
         assert affiliations.count() == 1
         assert affiliations.first().name == "Test Affiliation"
 
+    @pytest.mark.unit
     def test_get_affiliation(self, affiliation, db):
         """Test getting affiliation by ID"""
         # Act
@@ -72,12 +77,14 @@ class TestAffiliationService:
         # Assert
         assert result == affiliation
 
+    @pytest.mark.unit
     def test_get_affiliation_not_found(self, db):
         """Test getting non-existent affiliation raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Affiliation 999 not found"):
             AgencyService.get_affiliation(999)
 
+    @pytest.mark.integration
     def test_create_affiliation(self, user, db):
         """Test creating affiliation"""
         # Arrange
@@ -90,6 +97,7 @@ class TestAffiliationService:
         assert affiliation.id is not None
         assert affiliation.name == "New Affiliation"
 
+    @pytest.mark.integration
     def test_update_affiliation(self, affiliation, user, db):
         """Test updating affiliation"""
         # Arrange
@@ -101,6 +109,7 @@ class TestAffiliationService:
         # Assert
         assert updated.name == "Updated Affiliation"
 
+    @pytest.mark.integration
     def test_delete_affiliation_basic(self, affiliation, user, db):
         """Test deleting affiliation without project references"""
         # Arrange
@@ -115,6 +124,7 @@ class TestAffiliationService:
         assert result["external_projects_updated"] == 0
         assert result["student_projects_updated"] == 0
 
+    @pytest.mark.integration
     def test_delete_affiliation_with_external_projects(self, affiliation, user, db):
         """Test deleting affiliation cleans external project references"""
         from common.tests.factories import ProjectFactory
@@ -138,6 +148,7 @@ class TestAffiliationService:
         assert result["external_projects_updated"] == 1
         assert result["student_projects_updated"] == 0
 
+    @pytest.mark.integration
     def test_delete_affiliation_with_student_projects(self, affiliation, user, db):
         """Test deleting affiliation cleans student project references"""
         from common.tests.factories import ProjectFactory
@@ -161,6 +172,7 @@ class TestAffiliationService:
         assert result["external_projects_updated"] == 0
         assert result["student_projects_updated"] == 1
 
+    @pytest.mark.integration
     def test_delete_affiliation_with_both_project_types(self, affiliation, user, db):
         """Test deleting affiliation cleans both external and student projects"""
         from common.tests.factories import ProjectFactory
@@ -191,6 +203,7 @@ class TestAffiliationService:
         assert result["external_projects_updated"] == 1
         assert result["student_projects_updated"] == 1
 
+    @pytest.mark.integration
     def test_clean_orphaned_affiliations_no_orphans(self, affiliation, user, db):
         """Test cleaning orphaned affiliations when none exist"""
         from common.tests.factories import ProjectFactory
@@ -211,6 +224,7 @@ class TestAffiliationService:
         assert result["deleted_count"] == 0
         assert result["message"] == "No orphaned affiliations found"
 
+    @pytest.mark.integration
     def test_clean_orphaned_affiliations_with_orphans(self, user, db):
         """Test cleaning orphaned affiliations removes unused ones"""
         # Arrange - Create orphaned affiliations
@@ -227,6 +241,7 @@ class TestAffiliationService:
         assert "Orphan 1" in result["deleted_names"]
         assert "Orphan 2" in result["deleted_names"]
 
+    @pytest.mark.integration
     def test_clean_orphaned_affiliations_with_user_work_reference(
         self, affiliation, user, db
     ):
@@ -251,6 +266,7 @@ class TestAffiliationService:
 class TestAgencyService:
     """Tests for agency service operations"""
 
+    @pytest.mark.integration
     def test_list_agencies(self, agency, db):
         """Test listing agencies"""
         # Act
@@ -260,6 +276,7 @@ class TestAgencyService:
         assert agencies.count() == 1
         assert agency in agencies
 
+    @pytest.mark.integration
     def test_get_agency(self, agency, db):
         """Test getting agency by ID"""
         # Act
@@ -268,12 +285,14 @@ class TestAgencyService:
         # Assert
         assert result == agency
 
+    @pytest.mark.integration
     def test_get_agency_not_found(self, db):
         """Test getting non-existent agency raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Agency 999 not found"):
             AgencyService.get_agency(999)
 
+    @pytest.mark.integration
     def test_create_agency(self, user, db):
         """Test creating agency"""
         # Arrange
@@ -291,6 +310,7 @@ class TestAgencyService:
         assert agency.name == "New Agency"
         assert agency.is_active is True
 
+    @pytest.mark.integration
     def test_update_agency(self, agency, user, db):
         """Test updating agency"""
         # Arrange
@@ -302,6 +322,7 @@ class TestAgencyService:
         # Assert
         assert updated.name == "Updated Agency"
 
+    @pytest.mark.integration
     def test_delete_agency(self, agency, user, db):
         """Test deleting agency"""
         # Arrange
@@ -317,6 +338,7 @@ class TestAgencyService:
 class TestBranchService:
     """Tests for branch service operations"""
 
+    @pytest.mark.unit
     def test_list_branches(self, branch, db):
         """Test listing branches"""
         # Act
@@ -326,6 +348,7 @@ class TestBranchService:
         assert len(branches) == 1
         assert branch in branches
 
+    @pytest.mark.unit
     def test_list_branches_with_search(self, branch, db):
         """Test listing branches with search"""
         # Act
@@ -335,6 +358,7 @@ class TestBranchService:
         assert len(branches) == 1
         assert branch in branches
 
+    @pytest.mark.unit
     def test_list_branches_with_search_no_results(self, branch, db):
         """Test listing branches with search that returns no results"""
         # Act
@@ -343,6 +367,7 @@ class TestBranchService:
         # Assert
         assert len(branches) == 0
 
+    @pytest.mark.unit
     def test_list_branches_case_insensitive_search(self, branch, db):
         """Test listing branches with case-insensitive search"""
         # Act
@@ -352,6 +377,7 @@ class TestBranchService:
         assert len(branches) == 1
         assert branch in branches
 
+    @pytest.mark.unit
     def test_get_branch(self, branch, db):
         """Test getting branch by ID"""
         # Act
@@ -360,12 +386,14 @@ class TestBranchService:
         # Assert
         assert result == branch
 
+    @pytest.mark.unit
     def test_get_branch_not_found(self, db):
         """Test getting non-existent branch raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Branch 999 not found"):
             AgencyService.get_branch(999)
 
+    @pytest.mark.integration
     def test_create_branch(self, agency, user, db):
         """Test creating branch"""
         # Arrange
@@ -383,6 +411,7 @@ class TestBranchService:
         assert branch.name == "New Branch"
         assert branch.agency == agency
 
+    @pytest.mark.integration
     def test_update_branch(self, branch, user, db):
         """Test updating branch"""
         # Arrange
@@ -394,6 +423,7 @@ class TestBranchService:
         # Assert
         assert updated.name == "Updated Branch"
 
+    @pytest.mark.integration
     def test_delete_branch(self, branch, user, db):
         """Test deleting branch"""
         # Arrange
@@ -405,6 +435,7 @@ class TestBranchService:
         # Assert
         assert not Branch.objects.filter(id=branch_id).exists()
 
+    @pytest.mark.unit
     def test_list_branches_caching_cache_miss(self, branch, db, settings):
         """Test that list_branches caches results on cache miss"""
         from django.core.cache import cache
@@ -431,6 +462,7 @@ class TestBranchService:
         assert len(cached) == 1
         assert branch in cached
 
+    @pytest.mark.unit
     def test_list_branches_caching_cache_hit(self, branch, db, settings):
         """Test that list_branches returns cached results without database query"""
         from django.core.cache import cache
@@ -463,6 +495,7 @@ class TestBranchService:
         ]
         assert len(branch_queries) == 0, "Cache hit should not query Branch table"
 
+    @pytest.mark.unit
     def test_list_branches_search_bypasses_cache(self, branch, db, settings):
         """Test that search queries bypass cache"""
         from django.core.cache import cache
@@ -487,6 +520,7 @@ class TestBranchService:
         cached = cache.get("agency:all:branches")
         assert cached is None
 
+    @pytest.mark.integration
     def test_create_branch_invalidates_cache(self, agency, user, db, settings):
         """Test that creating a branch invalidates the cache"""
         from django.core.cache import cache
@@ -514,6 +548,7 @@ class TestBranchService:
         cached = cache.get("agency:all:branches")
         assert cached is None
 
+    @pytest.mark.integration
     def test_update_branch_invalidates_cache(self, branch, user, db, settings):
         """Test that updating a branch invalidates the cache"""
         from django.core.cache import cache
@@ -537,6 +572,7 @@ class TestBranchService:
         cached = cache.get("agency:all:branches")
         assert cached is None
 
+    @pytest.mark.integration
     def test_delete_branch_invalidates_cache(self, agency, user, db, settings):
         """Test that deleting a branch invalidates the cache"""
         from django.core.cache import cache
@@ -569,6 +605,7 @@ class TestBranchService:
 class TestBusinessAreaService:
     """Tests for business area service operations"""
 
+    @pytest.mark.integration
     def test_list_business_areas(self, business_area, db):
         """Test listing business areas"""
         # Act
@@ -578,6 +615,7 @@ class TestBusinessAreaService:
         assert business_areas.count() == 1
         assert business_area in business_areas
 
+    @pytest.mark.integration
     def test_list_business_areas_with_filters(self, business_area, division, db):
         """Test listing business areas with filters"""
         # Act
@@ -587,6 +625,7 @@ class TestBusinessAreaService:
         assert business_areas.count() == 1
         assert business_area in business_areas
 
+    @pytest.mark.integration
     def test_get_business_area(self, business_area, db):
         """Test getting business area by ID"""
         # Act
@@ -595,12 +634,14 @@ class TestBusinessAreaService:
         # Assert
         assert result == business_area
 
+    @pytest.mark.integration
     def test_get_business_area_not_found(self, db):
         """Test getting non-existent business area raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Business area 999 not found"):
             AgencyService.get_business_area(999)
 
+    @pytest.mark.integration
     def test_create_business_area(self, agency, division, user, db):
         """Test creating business area"""
         # Arrange
@@ -623,6 +664,7 @@ class TestBusinessAreaService:
         assert ba.name == "New Business Area"
         assert ba.agency == agency
 
+    @pytest.mark.integration
     def test_update_business_area(self, business_area, user, db):
         """Test updating business area"""
         # Arrange
@@ -634,6 +676,7 @@ class TestBusinessAreaService:
         # Assert
         assert updated.name == "Updated Business Area"
 
+    @pytest.mark.integration
     def test_delete_business_area(self, business_area, user, db):
         """Test deleting business area"""
         # Arrange
@@ -645,6 +688,7 @@ class TestBusinessAreaService:
         # Assert
         assert not BusinessArea.objects.filter(id=ba_id).exists()
 
+    @pytest.mark.integration
     def test_set_business_area_active(self, business_area, db):
         """Test toggling business area active status"""
         # Arrange
@@ -656,6 +700,7 @@ class TestBusinessAreaService:
         # Assert
         assert updated.is_active != original_status
 
+    @pytest.mark.integration
     def test_set_business_area_active_toggle_twice(self, business_area, db):
         """Test toggling business area active status twice returns to original"""
         # Arrange
@@ -668,6 +713,7 @@ class TestBusinessAreaService:
         # Assert
         assert final.is_active == original_status
 
+    @pytest.mark.integration
     def test_list_business_areas_includes_related_data(self, business_area, db):
         """Test listing business areas includes related data"""
         # Act
@@ -678,6 +724,7 @@ class TestBusinessAreaService:
             assert ba.division is not None
             assert ba.division.name is not None
 
+    @pytest.mark.integration
     def test_get_business_area_includes_related_data(self, business_area, db):
         """Test getting business area includes related data"""
         # Act
@@ -692,6 +739,7 @@ class TestBusinessAreaService:
 class TestDivisionService:
     """Tests for division service operations"""
 
+    @pytest.mark.unit
     def test_list_divisions(self, division, db):
         """Test listing divisions"""
         # Act
@@ -701,6 +749,7 @@ class TestDivisionService:
         assert divisions.count() == 1
         assert division in divisions
 
+    @pytest.mark.unit
     def test_get_division(self, division, db):
         """Test getting division by ID"""
         # Act
@@ -709,12 +758,14 @@ class TestDivisionService:
         # Assert
         assert result == division
 
+    @pytest.mark.unit
     def test_get_division_not_found(self, db):
         """Test getting non-existent division raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Division 999 not found"):
             AgencyService.get_division(999)
 
+    @pytest.mark.integration
     def test_create_division(self, user, db):
         """Test creating division"""
         # Arrange
@@ -731,6 +782,7 @@ class TestDivisionService:
         assert division.id is not None
         assert division.name == "New Division"
 
+    @pytest.mark.integration
     def test_update_division(self, division, user, db):
         """Test updating division"""
         # Arrange
@@ -742,6 +794,7 @@ class TestDivisionService:
         # Assert
         assert updated.name == "Updated Division"
 
+    @pytest.mark.integration
     def test_delete_division(self, division, user, db):
         """Test deleting division"""
         # Arrange
@@ -757,6 +810,7 @@ class TestDivisionService:
 class TestDepartmentalServiceService:
     """Tests for departmental service operations"""
 
+    @pytest.mark.unit
     def test_list_departmental_services(self, departmental_service, db):
         """Test listing departmental services"""
         # Act
@@ -766,6 +820,7 @@ class TestDepartmentalServiceService:
         assert services.count() == 1
         assert departmental_service in services
 
+    @pytest.mark.unit
     def test_get_departmental_service(self, departmental_service, db):
         """Test getting departmental service by ID"""
         # Act
@@ -774,12 +829,14 @@ class TestDepartmentalServiceService:
         # Assert
         assert result == departmental_service
 
+    @pytest.mark.unit
     def test_get_departmental_service_not_found(self, db):
         """Test getting non-existent service raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Departmental service 999 not found"):
             AgencyService.get_departmental_service(999)
 
+    @pytest.mark.integration
     def test_create_departmental_service(self, user, db):
         """Test creating departmental service"""
         # Arrange
@@ -795,6 +852,7 @@ class TestDepartmentalServiceService:
         assert service.id is not None
         assert service.name == "New Service"
 
+    @pytest.mark.integration
     def test_update_departmental_service(self, departmental_service, user, db):
         """Test updating departmental service"""
         # Arrange
@@ -808,6 +866,7 @@ class TestDepartmentalServiceService:
         # Assert
         assert updated.name == "Updated Service"
 
+    @pytest.mark.integration
     def test_delete_departmental_service(self, departmental_service, user, db):
         """Test deleting departmental service"""
         # Arrange

@@ -3,6 +3,7 @@ Tests for adminoptions views - Part 2
 (AdminTaskDetail)
 """
 
+import pytest
 from rest_framework import status
 
 from adminoptions.models import AdminTask
@@ -16,6 +17,7 @@ from common.tests.test_helpers import adminoptions_urls
 class TestAdminTaskDetail:
     """Tests for AdminTaskDetail view"""
 
+    @pytest.mark.integration
     def test_get_admin_task_detail(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -32,6 +34,7 @@ class TestAdminTaskDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == admin_task_delete_project.id
 
+    @pytest.mark.integration
     def test_put_admin_task_detail(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -53,6 +56,7 @@ class TestAdminTaskDetail:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["notes"] == "Updated notes"
 
+    @pytest.mark.integration
     def test_delete_admin_task(self, api_client, user, admin_task_delete_project, db):
         """Test deleting admin task"""
         # Arrange
@@ -67,6 +71,7 @@ class TestAdminTaskDetail:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not AdminTask.objects.filter(id=admin_task_delete_project.id).exists()
 
+    @pytest.mark.integration
     def test_get_admin_task_detail_not_found(self, api_client, user, db):
         """Test getting non-existent admin task"""
         # Arrange

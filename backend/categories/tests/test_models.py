@@ -2,12 +2,15 @@
 Tests for categories models
 """
 
+import pytest
+
 from categories.models import ProjectCategory
 
 
 class TestProjectCategoryModel:
     """Tests for ProjectCategory model"""
 
+    @pytest.mark.unit
     def test_create_category_valid_data(self, db):
         """Test creating category with valid data"""
         # Arrange & Act
@@ -21,6 +24,7 @@ class TestProjectCategoryModel:
         assert category.name == "Biodiversity"
         assert category.kind == ProjectCategory.CategoryKindChoices.SCIENCE
 
+    @pytest.mark.integration
     def test_category_str_method(self, project_category, db):
         """Test ProjectCategory __str__ method"""
         # Act
@@ -29,6 +33,7 @@ class TestProjectCategoryModel:
         # Assert
         assert result == "Biodiversity"
 
+    @pytest.mark.unit
     def test_category_kind_choices_science(self, db):
         """Test creating category with science kind"""
         # Arrange & Act
@@ -40,6 +45,7 @@ class TestProjectCategoryModel:
         # Assert
         assert category.kind == "science"
 
+    @pytest.mark.unit
     def test_category_kind_choices_student(self, db):
         """Test creating category with student kind"""
         # Arrange & Act
@@ -51,6 +57,7 @@ class TestProjectCategoryModel:
         # Assert
         assert category.kind == "student"
 
+    @pytest.mark.unit
     def test_category_kind_choices_external(self, db):
         """Test creating category with external kind"""
         # Arrange & Act
@@ -62,6 +69,7 @@ class TestProjectCategoryModel:
         # Assert
         assert category.kind == "external"
 
+    @pytest.mark.unit
     def test_category_kind_choices_core_function(self, db):
         """Test creating category with core function kind"""
         # Arrange & Act
@@ -73,6 +81,7 @@ class TestProjectCategoryModel:
         # Assert
         assert category.kind == "core_function"
 
+    @pytest.mark.unit
     def test_category_verbose_name(self, db):
         """Test model verbose name"""
         # Act
@@ -81,6 +90,7 @@ class TestProjectCategoryModel:
         # Assert
         assert verbose_name == "Project Category"
 
+    @pytest.mark.unit
     def test_category_verbose_name_plural(self, db):
         """Test model verbose name plural"""
         # Act
@@ -89,6 +99,7 @@ class TestProjectCategoryModel:
         # Assert
         assert verbose_name_plural == "Project Categories"
 
+    @pytest.mark.unit
     def test_category_name_max_length(self, db):
         """Test category name max length"""
         # Act
@@ -97,6 +108,7 @@ class TestProjectCategoryModel:
         # Assert
         assert max_length == 50
 
+    @pytest.mark.unit
     def test_category_kind_max_length(self, db):
         """Test category kind max length"""
         # Act
@@ -105,6 +117,7 @@ class TestProjectCategoryModel:
         # Assert
         assert max_length == 15
 
+    @pytest.mark.integration
     def test_category_inherits_common_model(self, project_category, db):
         """Test category inherits CommonModel fields"""
         # Assert - CommonModel provides created_at and updated_at
@@ -113,6 +126,7 @@ class TestProjectCategoryModel:
         assert project_category.created_at is not None
         assert project_category.updated_at is not None
 
+    @pytest.mark.integration
     def test_category_update(self, project_category, db):
         """Test updating category"""
         # Arrange
@@ -127,6 +141,7 @@ class TestProjectCategoryModel:
         assert project_category.name == "Updated Biodiversity"
         assert project_category.name != original_name
 
+    @pytest.mark.integration
     def test_category_delete(self, project_category, db):
         """Test deleting category"""
         # Arrange
@@ -138,6 +153,7 @@ class TestProjectCategoryModel:
         # Assert
         assert not ProjectCategory.objects.filter(id=category_id).exists()
 
+    @pytest.mark.unit
     def test_multiple_categories_same_kind(self, db):
         """Test creating multiple categories with same kind"""
         # Arrange & Act

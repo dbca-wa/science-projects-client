@@ -19,6 +19,7 @@ def api_client():
 class TestQuotesView:
     """Tests for Quotes list/create view"""
 
+    @pytest.mark.integration
     def test_list_quotes(self, api_client, quote, quote2, db):
         """Test listing all quotes"""
         response = api_client.get(quotes_urls.list())
@@ -34,6 +35,7 @@ class TestQuotesView:
             assert quote.text in quote_texts
             assert quote2.text in quote_texts
 
+    @pytest.mark.integration
     def test_list_quotes_empty(self, api_client, db):
         """Test listing quotes when none exist"""
         response = api_client.get(quotes_urls.list())
@@ -44,6 +46,7 @@ class TestQuotesView:
         if response.status_code == status.HTTP_200_OK:
             assert response.data == []
 
+    @pytest.mark.integration
     def test_create_quote_authenticated(self, api_client, user, db):
         """Test creating quote as authenticated user"""
         api_client.force_authenticate(user=user)
@@ -62,6 +65,7 @@ class TestQuotesView:
         # Verify quote was created in database
         assert Quote.objects.filter(text="New quote text").exists()
 
+    @pytest.mark.integration
     def test_create_quote_unauthenticated(self, api_client, db):
         """Test creating quote without authentication"""
         data = {
@@ -77,6 +81,7 @@ class TestQuotesView:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_quote_invalid_data(self, api_client, user, db):
         """Test creating quote with invalid data"""
         api_client.force_authenticate(user=user)
@@ -91,6 +96,7 @@ class TestQuotesView:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "text" in response.data
 
+    @pytest.mark.integration
     def test_create_quote_missing_fields(self, api_client, user, db):
         """Test creating quote with missing required fields"""
         api_client.force_authenticate(user=user)
@@ -108,6 +114,7 @@ class TestQuotesView:
 class TestQuoteDetailView:
     """Tests for QuoteDetail get/update/delete view"""
 
+    @pytest.mark.integration
     def test_get_quote_detail(self, api_client, quote, db):
         """Test getting quote detail"""
         response = api_client.get(quotes_urls.detail(quote.id))
@@ -120,6 +127,7 @@ class TestQuoteDetailView:
             assert response.data["text"] == quote.text
             assert response.data["author"] == quote.author
 
+    @pytest.mark.integration
     def test_get_quote_detail_not_found(self, api_client, db):
         """Test getting non-existent quote"""
         response = api_client.get(quotes_urls.detail(99999))
@@ -130,6 +138,7 @@ class TestQuoteDetailView:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_quote_authenticated(self, api_client, user, quote, db):
         """Test updating quote as authenticated user"""
         api_client.force_authenticate(user=user)
@@ -147,6 +156,7 @@ class TestQuoteDetailView:
         quote.refresh_from_db()
         assert quote.text == "Updated quote text"
 
+    @pytest.mark.integration
     def test_update_quote_unauthenticated(self, api_client, quote, db):
         """Test updating quote without authentication"""
         data = {"text": "Updated text"}
@@ -159,6 +169,7 @@ class TestQuoteDetailView:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_quote_invalid_data(self, api_client, user, quote, db):
         """Test updating quote with invalid data"""
         api_client.force_authenticate(user=user)
@@ -171,6 +182,7 @@ class TestQuoteDetailView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_quote_authenticated(self, api_client, user, quote, db):
         """Test deleting quote as authenticated user"""
         api_client.force_authenticate(user=user)
@@ -183,6 +195,7 @@ class TestQuoteDetailView:
         # Verify quote was deleted from database
         assert not Quote.objects.filter(id=quote_id).exists()
 
+    @pytest.mark.integration
     def test_delete_quote_unauthenticated(self, api_client, quote, db):
         """Test deleting quote without authentication"""
         response = api_client.delete(quotes_urls.detail(quote.id))
@@ -197,6 +210,7 @@ class TestQuoteDetailView:
 class TestQuoteRandomView:
     """Tests for QuoteRandom view"""
 
+    @pytest.mark.integration
     def test_get_random_quote(self, api_client, quote, quote2, db):
         """Test getting random quote"""
         response = api_client.get(quotes_urls.path("random"))
@@ -212,6 +226,7 @@ class TestQuoteRandomView:
             # Should be one of the existing quotes
             assert response.data["id"] in [quote.id, quote2.id]
 
+    @pytest.mark.integration
     def test_get_random_quote_empty(self, api_client, db):
         """Test getting random quote when none exist"""
         response = api_client.get(quotes_urls.path("random"))

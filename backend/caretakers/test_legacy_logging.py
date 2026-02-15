@@ -4,6 +4,7 @@ Tests for legacy endpoint logging.
 
 from unittest.mock import patch
 
+import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
@@ -21,6 +22,7 @@ class LegacyEndpointLoggingTest(TestCase):
         self.client.force_login(self.user)
 
     @patch("caretakers.urls_compat.logger")
+    @pytest.mark.integration
     def test_legacy_list_endpoint_logs_warning(self, mock_logger):
         """Test that calling legacy list endpoint logs a warning"""
         self.client.get("/api/v1/adminoptions/caretakers/")
@@ -37,6 +39,7 @@ class LegacyEndpointLoggingTest(TestCase):
         self.assertIn("Please update to use /api/v1/caretakers/", call_args)
 
     @patch("caretakers.urls_compat.logger")
+    @pytest.mark.integration
     def test_legacy_check_endpoint_logs_warning(self, mock_logger):
         """Test that calling legacy check endpoint logs a warning"""
         self.client.get("/api/v1/adminoptions/caretakers/checkcaretaker")
@@ -51,6 +54,7 @@ class LegacyEndpointLoggingTest(TestCase):
         self.assertIn("GET", call_args)
 
     @patch("caretakers.urls_compat.logger")
+    @pytest.mark.integration
     def test_legacy_requests_endpoint_logs_warning(self, mock_logger):
         """Test that calling legacy requests endpoint logs a warning"""
         self.client.get("/api/v1/adminoptions/caretakers/requests?user=1")
@@ -64,6 +68,7 @@ class LegacyEndpointLoggingTest(TestCase):
         self.assertIn("/api/v1/adminoptions/caretakers/requests", call_args)
 
     @patch("caretakers.urls_compat.logger")
+    @pytest.mark.integration
     def test_new_endpoint_does_not_log_warning(self, mock_logger):
         """Test that calling new endpoint does NOT log a warning"""
         self.client.get("/api/v1/caretakers/")

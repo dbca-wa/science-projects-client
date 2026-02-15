@@ -6,6 +6,7 @@ Tests the serializers in the caretakers app.
 
 from datetime import timedelta
 
+import pytest
 from django.test import TestCase
 from django.utils import timezone
 
@@ -38,6 +39,7 @@ class CaretakerSerializerTest(TestCase):
             notes="Test notes",
         )
 
+    @pytest.mark.unit
     def test_serializer_contains_expected_fields(self):
         """Test serializer contains all expected fields"""
         serializer = CaretakerSerializer(self.caretaker)
@@ -55,6 +57,7 @@ class CaretakerSerializerTest(TestCase):
         }
         self.assertEqual(set(data.keys()), expected_fields)
 
+    @pytest.mark.unit
     def test_serializer_uses_id_not_pk(self):
         """Test serializer uses 'id' field not 'pk'"""
         serializer = CaretakerSerializer(self.caretaker)
@@ -64,6 +67,7 @@ class CaretakerSerializerTest(TestCase):
         self.assertNotIn("pk", data)
         self.assertEqual(data["id"], self.caretaker.pk)
 
+    @pytest.mark.integration
     def test_serializer_includes_nested_user_data(self):
         """Test serializer includes nested user objects"""
         serializer = CaretakerSerializer(self.caretaker)
@@ -79,6 +83,7 @@ class CaretakerSerializerTest(TestCase):
         self.assertEqual(data["caretaker"]["id"], self.user2.pk)
         self.assertEqual(data["caretaker"]["email"], "user2@example.com")
 
+    @pytest.mark.unit
     def test_serializer_handles_null_end_date(self):
         """Test serializer handles null end_date"""
         serializer = CaretakerSerializer(self.caretaker)
@@ -86,6 +91,7 @@ class CaretakerSerializerTest(TestCase):
 
         self.assertIsNone(data["end_date"])
 
+    @pytest.mark.integration
     def test_serializer_handles_end_date(self):
         """Test serializer handles end_date when present"""
         # Create unique users for this test to avoid duplicate constraint
@@ -115,6 +121,7 @@ class CaretakerSerializerTest(TestCase):
 
         self.assertIsNotNone(data["end_date"])
 
+    @pytest.mark.integration
     def test_serializer_many_true(self):
         """Test serializer works with many=True"""
         # Create another caretaker
@@ -146,6 +153,7 @@ class CaretakerCreateSerializerTest(TestCase):
             email="user2@example.com",
         )
 
+    @pytest.mark.integration
     def test_create_serializer_valid_data(self):
         """Test create serializer with valid data"""
         data = {
@@ -162,6 +170,7 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertEqual(caretaker.caretaker, self.user2)
         self.assertEqual(caretaker.reason, "Going on leave")
 
+    @pytest.mark.integration
     def test_create_serializer_with_end_date(self):
         """Test create serializer with end_date"""
         end_date = timezone.now() + timedelta(days=30)
@@ -178,6 +187,7 @@ class CaretakerCreateSerializerTest(TestCase):
         caretaker = serializer.save()
         self.assertIsNotNone(caretaker.end_date)
 
+    @pytest.mark.integration
     def test_create_serializer_with_notes(self):
         """Test create serializer with notes"""
         data = {
@@ -193,6 +203,7 @@ class CaretakerCreateSerializerTest(TestCase):
         caretaker = serializer.save()
         self.assertEqual(caretaker.notes, "Additional notes")
 
+    @pytest.mark.integration
     def test_create_serializer_prevents_self_caretaking(self):
         """Test create serializer prevents user from being their own caretaker"""
         data = {
@@ -205,6 +216,7 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("non_field_errors", serializer.errors)
 
+    @pytest.mark.integration
     def test_create_serializer_prevents_duplicate(self):
         """Test create serializer prevents duplicate caretaker relationships"""
         # Create first caretaker
@@ -225,6 +237,7 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("non_field_errors", serializer.errors)
 
+    @pytest.mark.integration
     def test_create_serializer_requires_user(self):
         """Test create serializer requires user field"""
         data = {
@@ -236,6 +249,7 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("user", serializer.errors)
 
+    @pytest.mark.integration
     def test_create_serializer_requires_caretaker(self):
         """Test create serializer requires caretaker field"""
         data = {
@@ -247,6 +261,7 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("caretaker", serializer.errors)
 
+    @pytest.mark.integration
     def test_create_serializer_reason_optional(self):
         """Test create serializer allows optional reason field"""
         data = {
@@ -261,6 +276,7 @@ class CaretakerCreateSerializerTest(TestCase):
         caretaker = serializer.save()
         self.assertIsNone(caretaker.reason)
 
+    @pytest.mark.integration
     def test_create_serializer_allows_multiple_caretakers_per_user(self):
         """Test create serializer allows multiple caretakers for same user"""
         user3 = User.objects.create_user(
@@ -288,6 +304,7 @@ class CaretakerCreateSerializerTest(TestCase):
         serializer.save()
         self.assertEqual(Caretaker.objects.filter(user=self.user1).count(), 2)
 
+    @pytest.mark.integration
     def test_create_serializer_allows_user_to_caretake_multiple(self):
         """Test create serializer allows user to caretake for multiple users"""
         user3 = User.objects.create_user(

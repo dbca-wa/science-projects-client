@@ -2,6 +2,7 @@
 Tests for users serializers
 """
 
+import pytest
 from django.contrib.auth import get_user_model
 
 from users.models import KeywordTag
@@ -37,10 +38,12 @@ from users.serializers import (  # Base serializers; Profile serializers; Staff 
 User = get_user_model()
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserSerializer:
     """Tests for UserSerializer"""
 
-    def test_serialize_user(self, user, db):
+    def test_serialize_user(self, user):
         """Test serializing user"""
         # Act
         serializer = UserSerializer(user)
@@ -52,10 +55,12 @@ class TestUserSerializer:
         assert "password" not in serializer.data
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestTinyUserSerializer:
     """Tests for TinyUserSerializer"""
 
-    def test_serialize_user_basic(self, user, db):
+    def test_serialize_user_basic(self, user):
         """Test serializing user with basic fields"""
         # Act
         serializer = TinyUserSerializer(user)
@@ -69,7 +74,7 @@ class TestTinyUserSerializer:
             == f"{user.display_first_name} {user.display_last_name}"
         )
 
-    def test_serialize_user_with_avatar(self, user, mock_image, db):
+    def test_serialize_user_with_avatar(self, user, mock_image):
         """Test serializing user with avatar"""
         # Arrange
         from medias.models import UserAvatar
@@ -85,7 +90,7 @@ class TestTinyUserSerializer:
         # Assert
         assert serializer.data["image"] is not None
 
-    def test_serialize_user_without_avatar(self, user, db):
+    def test_serialize_user_without_avatar(self, user):
         """Test serializing user without avatar"""
         # Act
         serializer = TinyUserSerializer(user)
@@ -93,7 +98,7 @@ class TestTinyUserSerializer:
         # Assert
         assert serializer.data["image"] is None
 
-    def test_serialize_user_with_work(self, user, user_work, db):
+    def test_serialize_user_with_work(self, user, user_work):
         """Test serializing user with work details"""
         # Act
         serializer = TinyUserSerializer(user)
@@ -102,7 +107,7 @@ class TestTinyUserSerializer:
         assert serializer.data["business_area"] is not None
         assert serializer.data["business_area"]["id"] == user_work.business_area.id
 
-    def test_serialize_user_without_work(self, user, db):
+    def test_serialize_user_without_work(self, user):
         """Test serializing user without work details"""
         # Act
         serializer = TinyUserSerializer(user)
@@ -112,10 +117,12 @@ class TestTinyUserSerializer:
         assert serializer.data["business_area"] is None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestPrivateTinyUserSerializer:
     """Tests for PrivateTinyUserSerializer"""
 
-    def test_serialize_user_excludes_sensitive_fields(self, user, db):
+    def test_serialize_user_excludes_sensitive_fields(self, user):
         """Test serializing user excludes sensitive fields"""
         # Act
         serializer = PrivateTinyUserSerializer(user)
@@ -127,10 +134,12 @@ class TestPrivateTinyUserSerializer:
         assert "id" not in serializer.data
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestMiniUserSerializer:
     """Tests for MiniUserSerializer"""
 
-    def test_serialize_user_with_caretakers(self, user, db):
+    def test_serialize_user_with_caretakers(self, user):
         """Test serializing user with caretakers"""
         # Arrange
         from caretakers.models import Caretaker
@@ -151,10 +160,12 @@ class TestMiniUserSerializer:
         assert serializer.data["caretakers"][0]["name"] == "Care Taker"
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestBasicUserSerializer:
     """Tests for BasicUserSerializer"""
 
-    def test_serialize_user_with_work(self, user, user_work, db):
+    def test_serialize_user_with_work(self, user, user_work):
         """Test serializing user with work info"""
         # Act
         serializer = BasicUserSerializer(user)
@@ -163,7 +174,7 @@ class TestBasicUserSerializer:
         assert serializer.data["work"] is not None
         assert serializer.data["work"]["id"] == user_work.id
 
-    def test_serialize_user_without_work(self, user, db):
+    def test_serialize_user_without_work(self, user):
         """Test serializing user without work info"""
         # Act
         serializer = BasicUserSerializer(user)
@@ -172,10 +183,12 @@ class TestBasicUserSerializer:
         assert serializer.data["work"] is None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileEmailListSerializer:
     """Tests for StaffProfileEmailListSerializer"""
 
-    def test_serialize_user_for_email_list(self, user, db):
+    def test_serialize_user_for_email_list(self, user):
         """Test serializing user for email list"""
         # Act
         serializer = StaffProfileEmailListSerializer(user)
@@ -189,10 +202,12 @@ class TestStaffProfileEmailListSerializer:
         assert "is_active" in serializer.data
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestTinyUserWorkSerializer:
     """Tests for TinyUserWorkSerializer"""
 
-    def test_serialize_user_work(self, user_work, db):
+    def test_serialize_user_work(self, user_work):
         """Test serializing user work"""
         # Act
         serializer = TinyUserWorkSerializer(user_work)
@@ -202,10 +217,12 @@ class TestTinyUserWorkSerializer:
         assert serializer.data["business_area"]["id"] == user_work.business_area.id
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserWorkSerializer:
     """Tests for UserWorkSerializer"""
 
-    def test_serialize_user_work_full(self, user_work, db):
+    def test_serialize_user_work_full(self, user_work):
         """Test serializing full user work"""
         # Act
         serializer = UserWorkSerializer(user_work)
@@ -215,10 +232,12 @@ class TestUserWorkSerializer:
         assert serializer.data["role"] == user_work.role
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestTinyUserProfileSerializer:
     """Tests for TinyUserProfileSerializer"""
 
-    def test_serialize_user_profile(self, user_profile, db):
+    def test_serialize_user_profile(self, user_profile):
         """Test serializing user profile"""
         # Act
         serializer = TinyUserProfileSerializer(user_profile)
@@ -229,10 +248,12 @@ class TestTinyUserProfileSerializer:
         assert serializer.data["title"] == user_profile.title
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserProfileSerializer:
     """Tests for UserProfileSerializer"""
 
-    def test_serialize_user_profile_full(self, user_profile, db):
+    def test_serialize_user_profile_full(self, user_profile):
         """Test serializing full user profile"""
         # Act
         serializer = UserProfileSerializer(user_profile)
@@ -243,10 +264,12 @@ class TestUserProfileSerializer:
         assert serializer.data["middle_initials"] == user_profile.middle_initials
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestProfilePageSerializer:
     """Tests for ProfilePageSerializer"""
 
-    def test_serialize_profile_page(self, user_profile, db):
+    def test_serialize_profile_page(self, user_profile):
         """Test serializing profile page"""
         # Act
         serializer = ProfilePageSerializer(user_profile)
@@ -256,7 +279,7 @@ class TestProfilePageSerializer:
         assert serializer.data["user"]["id"] == user_profile.user.id
         assert serializer.data["title"] == user_profile.title
 
-    def test_serialize_profile_page_with_work(self, user_profile, user_work, db):
+    def test_serialize_profile_page_with_work(self, user_profile, user_work):
         """Test serializing profile page with work"""
         # Act
         serializer = ProfilePageSerializer(user_profile)
@@ -265,7 +288,7 @@ class TestProfilePageSerializer:
         assert serializer.data["work"] is not None
         assert serializer.data["work"]["id"] == user_work.id
 
-    def test_serialize_profile_page_without_work(self, user_profile, db):
+    def test_serialize_profile_page_without_work(self, user_profile):
         """Test serializing profile page without work"""
         # Act
         serializer = ProfilePageSerializer(user_profile)
@@ -274,10 +297,12 @@ class TestProfilePageSerializer:
         assert serializer.data["work"] is None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestKeywordTagSerializer:
     """Tests for KeywordTagSerializer"""
 
-    def test_serialize_keyword_tag(self, db):
+    def test_serialize_keyword_tag(self):
         """Test serializing keyword tag"""
         # Arrange
         tag = KeywordTag.objects.create(name="Python")
@@ -290,10 +315,12 @@ class TestKeywordTagSerializer:
         assert serializer.data["name"] == "Python"
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestTinyStaffProfileSerializer:
     """Tests for TinyStaffProfileSerializer"""
 
-    def test_serialize_staff_profile(self, staff_profile, db):
+    def test_serialize_staff_profile(self, staff_profile):
         """Test serializing staff profile"""
         # Act
         serializer = TinyStaffProfileSerializer(staff_profile)
@@ -303,9 +330,7 @@ class TestTinyStaffProfileSerializer:
         assert serializer.data["user"]["id"] == staff_profile.user.id
         assert serializer.data["about"] == staff_profile.about
 
-    def test_serialize_staff_profile_with_business_area(
-        self, staff_profile, user_work, db
-    ):
+    def test_serialize_staff_profile_with_business_area(self, staff_profile, user_work):
         """Test serializing staff profile with business area"""
         # Act
         serializer = TinyStaffProfileSerializer(staff_profile)
@@ -315,10 +340,12 @@ class TestTinyStaffProfileSerializer:
         assert serializer.data["business_area"]["id"] == user_work.business_area.id
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileCreationSerializer:
     """Tests for StaffProfileCreationSerializer"""
 
-    def test_serialize_staff_profile_creation(self, staff_profile, db):
+    def test_serialize_staff_profile_creation(self, staff_profile):
         """Test serializing staff profile for creation"""
         # Act
         serializer = StaffProfileCreationSerializer(staff_profile)
@@ -328,10 +355,12 @@ class TestStaffProfileCreationSerializer:
         assert serializer.data["user"] == staff_profile.user.id
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileHeroSerializer:
     """Tests for StaffProfileHeroSerializer"""
 
-    def test_serialize_staff_profile_hero(self, staff_profile, db):
+    def test_serialize_staff_profile_hero(self, staff_profile):
         """Test serializing staff profile hero section"""
         # Act
         serializer = StaffProfileHeroSerializer(staff_profile)
@@ -341,7 +370,7 @@ class TestStaffProfileHeroSerializer:
         assert serializer.data["user"]["id"] == staff_profile.user.id
         assert serializer.data["about"] == staff_profile.about
 
-    def test_serialize_staff_profile_hero_with_public_email(self, staff_profile, db):
+    def test_serialize_staff_profile_hero_with_public_email(self, staff_profile):
         """Test serializing staff profile hero with public email"""
         # Act
         serializer = StaffProfileHeroSerializer(staff_profile)
@@ -350,7 +379,7 @@ class TestStaffProfileHeroSerializer:
         # When public_email_on is True, it should show public_email
         assert serializer.data["user"]["email"] == staff_profile.public_email
 
-    def test_serialize_staff_profile_hero_without_public_email(self, staff_profile, db):
+    def test_serialize_staff_profile_hero_without_public_email(self, staff_profile):
         """Test serializing staff profile hero without public email"""
         # Arrange
         staff_profile.public_email_on = False
@@ -363,7 +392,7 @@ class TestStaffProfileHeroSerializer:
         assert serializer.data["user"]["email"] is None
 
     def test_serialize_staff_profile_hero_with_custom_title(
-        self, staff_profile, user_work, db
+        self, staff_profile, user_work
     ):
         """Test serializing staff profile hero with custom title"""
         # Act
@@ -374,7 +403,7 @@ class TestStaffProfileHeroSerializer:
         assert serializer.data["work"] is not None
 
     def test_serialize_staff_profile_hero_without_custom_title(
-        self, staff_profile, user_work, db
+        self, staff_profile, user_work
     ):
         """Test serializing staff profile hero without custom title"""
         # Arrange
@@ -389,10 +418,12 @@ class TestStaffProfileHeroSerializer:
         assert serializer.data["work"] is not None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileOverviewSerializer:
     """Tests for StaffProfileOverviewSerializer"""
 
-    def test_serialize_staff_profile_overview(self, staff_profile, db):
+    def test_serialize_staff_profile_overview(self, staff_profile):
         """Test serializing staff profile overview"""
         # Arrange
         tag1 = KeywordTag.objects.create(name="Python")
@@ -408,11 +439,13 @@ class TestStaffProfileOverviewSerializer:
         assert len(serializer.data["keywords"]) == 2
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileCVSerializer:
     """Tests for StaffProfileCVSerializer"""
 
     def test_serialize_staff_profile_cv(
-        self, staff_profile, employment_entry, education_entry, db
+        self, staff_profile, employment_entry, education_entry
     ):
         """Test serializing staff profile CV"""
         # Act
@@ -424,11 +457,13 @@ class TestStaffProfileCVSerializer:
         assert len(serializer.data["education_entries"]) == 1
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileSerializer:
     """Tests for StaffProfileSerializer"""
 
     def test_serialize_staff_profile_full(
-        self, staff_profile, employment_entry, education_entry, db
+        self, staff_profile, employment_entry, education_entry
     ):
         """Test serializing full staff profile"""
         # Arrange
@@ -446,7 +481,7 @@ class TestStaffProfileSerializer:
         assert len(serializer.data["employment_entries"]) == 1
         assert len(serializer.data["education_entries"]) == 1
 
-    def test_serialize_staff_profile_with_public_email(self, staff_profile, db):
+    def test_serialize_staff_profile_with_public_email(self, staff_profile):
         """Test serializing staff profile with public email"""
         # Act
         serializer = StaffProfileSerializer(staff_profile)
@@ -455,7 +490,7 @@ class TestStaffProfileSerializer:
         # When public_email_on is True and public_email exists, show public_email
         assert serializer.data["user"]["email"] == staff_profile.public_email
 
-    def test_serialize_staff_profile_without_public_email(self, staff_profile, db):
+    def test_serialize_staff_profile_without_public_email(self, staff_profile):
         """Test serializing staff profile without public email"""
         # Arrange
         staff_profile.public_email_on = False
@@ -469,10 +504,12 @@ class TestStaffProfileSerializer:
         assert serializer.data["user"]["email"] == staff_profile.user.email
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEmploymentEntrySerializer:
     """Tests for EmploymentEntrySerializer"""
 
-    def test_serialize_employment_entry(self, employment_entry, db):
+    def test_serialize_employment_entry(self, employment_entry):
         """Test serializing employment entry"""
         # Act
         serializer = EmploymentEntrySerializer(employment_entry)
@@ -483,10 +520,12 @@ class TestEmploymentEntrySerializer:
         assert serializer.data["employer"] == employment_entry.employer
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEmploymentEntryCreationSerializer:
     """Tests for EmploymentEntryCreationSerializer"""
 
-    def test_serialize_employment_entry_creation(self, employment_entry, db):
+    def test_serialize_employment_entry_creation(self, employment_entry):
         """Test serializing employment entry for creation"""
         # Act
         serializer = EmploymentEntryCreationSerializer(employment_entry)
@@ -496,10 +535,12 @@ class TestEmploymentEntryCreationSerializer:
         assert serializer.data["position_title"] == employment_entry.position_title
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEducationEntrySerializer:
     """Tests for EducationEntrySerializer"""
 
-    def test_serialize_education_entry(self, education_entry, db):
+    def test_serialize_education_entry(self, education_entry):
         """Test serializing education entry"""
         # Act
         serializer = EducationEntrySerializer(education_entry)
@@ -512,10 +553,12 @@ class TestEducationEntrySerializer:
         assert serializer.data["institution"] == education_entry.institution
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEducationEntryCreationSerializer:
     """Tests for EducationEntryCreationSerializer"""
 
-    def test_serialize_education_entry_creation(self, education_entry, db):
+    def test_serialize_education_entry_creation(self, education_entry):
         """Test serializing education entry for creation"""
         # Act
         serializer = EducationEntryCreationSerializer(education_entry)
@@ -527,8 +570,9 @@ class TestEducationEntryCreationSerializer:
         )
 
 
+@pytest.mark.unit
 class TestUpdatePISerializer:
-    """Tests for UpdatePISerializer"""
+    """Tests for UpdatePISerializer - validation only"""
 
     def test_serialize_update_pi(self, user, db):
         """Test serializing personal information update"""
@@ -552,8 +596,9 @@ class TestUpdatePISerializer:
         assert serializer.validated_data["display_last_name"] == "Name"
 
 
+@pytest.mark.unit
 class TestUpdateProfileSerializer:
-    """Tests for UpdateProfileSerializer"""
+    """Tests for UpdateProfileSerializer - validation only"""
 
     def test_serialize_update_profile(self, user_profile, db):
         """Test serializing profile update"""
@@ -576,8 +621,9 @@ class TestUpdateProfileSerializer:
         assert serializer.validated_data["expertise"] == "Updated expertise"
 
 
+@pytest.mark.unit
 class TestUpdateMembershipSerializer:
-    """Tests for UpdateMembershipSerializer"""
+    """Tests for UpdateMembershipSerializer - validation only"""
 
     def test_serialize_update_membership(self, user_work, db):
         """Test serializing membership update"""
@@ -594,10 +640,12 @@ class TestUpdateMembershipSerializer:
         assert serializer.validated_data["role"] == "Updated Role"
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserWorkAffiliationUpdateSerializer:
     """Tests for UserWorkAffiliationUpdateSerializer"""
 
-    def test_serialize_affiliation_update(self, user_work, db):
+    def test_serialize_affiliation_update(self, user_work):
         """Test serializing affiliation update"""
         # Arrange
         from agencies.models import Affiliation

@@ -20,6 +20,7 @@ class TestCanManageCaretaker:
     """Tests for CanManageCaretaker permission"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_superuser_can_manage_any_caretaker(self):
         """Test superuser can manage any caretaker relationship"""
         # Arrange
@@ -41,6 +42,7 @@ class TestCanManageCaretaker:
         assert result is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_can_manage_own_relationship(self):
         """Test caretaker can manage their own relationships"""
         # Arrange
@@ -61,6 +63,7 @@ class TestCanManageCaretaker:
         assert result is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_user_can_manage_own_caretaker_relationship(self):
         """Test user being caretaken can manage their relationships"""
         # Arrange
@@ -81,6 +84,7 @@ class TestCanManageCaretaker:
         assert result is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_other_user_cannot_manage_caretaker(self):
         """Test other users cannot manage caretaker relationships"""
         # Arrange
@@ -102,6 +106,7 @@ class TestCanManageCaretaker:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_regular_user_cannot_manage_others_relationship(self):
         """Test regular user cannot manage other users' relationships"""
         # Arrange
@@ -123,6 +128,7 @@ class TestCanManageCaretaker:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_staff_user_without_superuser_cannot_manage(self):
         """Test staff user without superuser cannot manage relationships"""
         # Arrange
@@ -148,6 +154,7 @@ class TestCanRespondToCaretakerRequest:
     """Tests for CanRespondToCaretakerRequest permission"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_superuser_can_respond_to_any_request(self):
         """Test superuser can respond to any caretaker request"""
         # Arrange
@@ -167,6 +174,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is True
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_requested_caretaker_can_respond(self):
         """Test requested caretaker can respond to request"""
         # Arrange
@@ -186,6 +194,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_non_requested_user_cannot_respond(self):
         """Test non-requested user cannot respond to request"""
         # Arrange
@@ -205,6 +214,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_user_not_in_secondary_users_cannot_respond(self):
         """Test user not in secondary_users list cannot respond"""
         # Arrange
@@ -225,6 +235,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_empty_secondary_users_denies_access(self):
         """Test empty secondary_users list denies access"""
         # Arrange
@@ -244,6 +255,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_missing_secondary_users_attribute_denies_access(self):
         """Test missing secondary_users attribute denies access"""
         # Arrange
@@ -262,6 +274,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_staff_user_without_superuser_cannot_respond(self):
         """Test staff user without superuser cannot respond"""
         # Arrange
@@ -281,6 +294,7 @@ class TestCanRespondToCaretakerRequest:
         assert result is False
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_multiple_users_in_secondary_users(self):
         """Test permission works with multiple users in secondary_users"""
         # Arrange

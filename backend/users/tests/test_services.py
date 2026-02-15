@@ -17,10 +17,12 @@ from users.services.user_service import UserService
 User = get_user_model()
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserService:
     """Tests for UserService"""
 
-    def test_authenticate_user_success(self, db):
+    def test_authenticate_user_success(self):
         """Test successful user authentication"""
         # Arrange
         User.objects.create_user(username="testuser", password="testpass123")
@@ -32,7 +34,7 @@ class TestUserService:
         assert authenticated is not None
         assert authenticated.username == "testuser"
 
-    def test_authenticate_user_invalid_credentials(self, db):
+    def test_authenticate_user_invalid_credentials(self):
         """Test authentication with invalid credentials"""
         # Arrange
         User.objects.create_user(username="testuser", password="testpass123")
@@ -43,14 +45,14 @@ class TestUserService:
         # Assert
         assert authenticated is None
 
-    def test_authenticate_user_missing_credentials(self, db):
+    def test_authenticate_user_missing_credentials(self):
         """Test authentication with missing credentials"""
         # Act & Assert
         with pytest.raises(ValidationError, match="Username and password are required"):
             UserService.authenticate_user("", "password")
 
     @patch("users.services.user_service.login")
-    def test_login_user(self, mock_login, user, db):
+    def test_login_user(self, mock_login, user):
         """Test logging in user"""
         # Arrange
         request = Mock()
@@ -62,7 +64,7 @@ class TestUserService:
         mock_login.assert_called_once_with(request, user)
 
     @patch("users.services.user_service.logout")
-    def test_logout_user_with_url(self, mock_logout, user, db):
+    def test_logout_user_with_url(self, mock_logout, user):
         """Test logging out user with logout URL"""
         # Arrange
         request = Mock(user=user)
@@ -76,7 +78,7 @@ class TestUserService:
         assert result == {"logoutUrl": "https://example.com/logout"}
 
     @patch("users.services.user_service.logout")
-    def test_logout_user_without_url(self, mock_logout, user, db):
+    def test_logout_user_without_url(self, mock_logout, user):
         """Test logging out user without logout URL"""
         # Arrange
         request = Mock(user=user)
@@ -89,7 +91,7 @@ class TestUserService:
         mock_logout.assert_called_once_with(request)
         assert result == {}
 
-    def test_change_password_success(self, db):
+    def test_change_password_success(self):
         """Test successful password change"""
         # Arrange
         user = User.objects.create_user(username="testuser", password="oldpass123")
@@ -101,7 +103,7 @@ class TestUserService:
         user.refresh_from_db()
         assert user.check_password("newpass123")
 
-    def test_change_password_incorrect_old(self, db):
+    def test_change_password_incorrect_old(self):
         """Test password change with incorrect old password"""
         # Arrange
         user = User.objects.create_user(username="testuser", password="oldpass123")
@@ -110,7 +112,7 @@ class TestUserService:
         with pytest.raises(ValidationError, match="Incorrect old password"):
             UserService.change_password(user, "wrongpass", "newpass123")
 
-    def test_list_users_no_filters(self, user, db):
+    def test_list_users_no_filters(self, user):
         """Test listing users without filters"""
         # Act
         users = UserService.list_users()
@@ -119,7 +121,7 @@ class TestUserService:
         assert users.count() >= 1
         assert user in users
 
-    def test_list_users_with_search(self, user, db):
+    def test_list_users_with_search(self, user):
         """Test listing users with search term"""
         # Act
         users = UserService.list_users(filters={"search": "Test"})
@@ -128,7 +130,7 @@ class TestUserService:
         assert users.count() >= 1
         assert user in users
 
-    def test_list_users_with_filters(self, user, staff_user, db):
+    def test_list_users_with_filters(self, user, staff_user):
         """Test listing users with filters"""
         # Act
         staff_users = UserService.list_users(filters={"is_staff": True})
@@ -137,7 +139,7 @@ class TestUserService:
         assert staff_user in staff_users
         assert user not in staff_users
 
-    def test_get_user_success(self, user, db):
+    def test_get_user_success(self, user):
         """Test getting user by ID"""
         # Act
         retrieved = UserService.get_user(user.id)
@@ -146,13 +148,13 @@ class TestUserService:
         assert retrieved.id == user.id
         assert retrieved.username == user.username
 
-    def test_get_user_not_found(self, db):
+    def test_get_user_not_found(self):
         """Test getting non-existent user"""
         # Act & Assert
         with pytest.raises(NotFound, match="User 99999 not found"):
             UserService.get_user(99999)
 
-    def test_create_user(self, db):
+    def test_create_user(self):
         """Test creating user"""
         # Arrange
         data = {
@@ -173,7 +175,7 @@ class TestUserService:
         assert user.first_name == "New"
         assert user.check_password("testpass123")
 
-    def test_update_user(self, user, db):
+    def test_update_user(self, user):
         """Test updating user"""
         # Arrange
         data = {"first_name": "Updated", "last_name": "Name"}
@@ -185,7 +187,7 @@ class TestUserService:
         assert updated.first_name == "Updated"
         assert updated.last_name == "Name"
 
-    def test_update_user_password(self, user, db):
+    def test_update_user_password(self, user):
         """Test updating user password"""
         # Arrange
         data = {"password": "newpass123"}
@@ -196,7 +198,7 @@ class TestUserService:
         # Assert
         assert updated.check_password("newpass123")
 
-    def test_delete_user(self, user, db):
+    def test_delete_user(self, user):
         """Test deleting user"""
         # Arrange
         user_id = user.id
@@ -207,7 +209,7 @@ class TestUserService:
         # Assert
         assert not User.objects.filter(id=user_id).exists()
 
-    def test_toggle_active(self, user, db):
+    def test_toggle_active(self, user):
         """Test toggling user active status"""
         # Arrange
         original_status = user.is_active
@@ -218,7 +220,7 @@ class TestUserService:
         # Assert
         assert updated.is_active != original_status
 
-    def test_switch_admin(self, user, db):
+    def test_switch_admin(self, user):
         """Test toggling user admin status"""
         # Arrange
         original_status = user.is_superuser
@@ -229,7 +231,7 @@ class TestUserService:
         # Assert
         assert updated.is_superuser != original_status
 
-    def test_check_email_exists_true(self, user, db):
+    def test_check_email_exists_true(self, user):
         """Test checking existing email"""
         # Act
         exists = UserService.check_email_exists(user.email)
@@ -237,7 +239,7 @@ class TestUserService:
         # Assert
         assert exists is True
 
-    def test_check_email_exists_false(self, db):
+    def test_check_email_exists_false(self):
         """Test checking non-existent email"""
         # Act
         exists = UserService.check_email_exists("nonexistent@example.com")
@@ -245,7 +247,7 @@ class TestUserService:
         # Assert
         assert exists is False
 
-    def test_check_username_exists_true(self, user, db):
+    def test_check_username_exists_true(self, user):
         """Test checking existing username"""
         # Act
         exists = UserService.check_username_exists(user.username)
@@ -253,7 +255,7 @@ class TestUserService:
         # Assert
         assert exists is True
 
-    def test_check_username_exists_false(self, db):
+    def test_check_username_exists_false(self):
         """Test checking non-existent username"""
         # Act
         exists = UserService.check_username_exists("nonexistent")
@@ -272,7 +274,7 @@ class TestUserService:
         assert users.count() >= 1
         assert user in users
 
-    def test_list_users_with_is_active_filter(self, user_factory, db):
+    def test_list_users_with_is_active_filter(self, user_factory):
         """Test listing users with is_active filter"""
         # Arrange
         active_user = user_factory(is_active=True)
@@ -285,7 +287,7 @@ class TestUserService:
         assert active_user in users
         assert inactive_user not in users
 
-    def test_list_users_with_is_staff_filter(self, user_factory, db):
+    def test_list_users_with_is_staff_filter(self, user_factory):
         """Test listing users with is_staff filter"""
         # Arrange
         staff_user = user_factory(is_staff=True)
@@ -298,7 +300,7 @@ class TestUserService:
         assert staff_user in users
         assert regular_user not in users
 
-    def test_list_users_with_is_superuser_filter(self, user_factory, db):
+    def test_list_users_with_is_superuser_filter(self, user_factory):
         """Test listing users with is_superuser filter"""
         # Arrange
         superuser = user_factory(is_superuser=True)
@@ -312,10 +314,12 @@ class TestUserService:
         assert regular_user not in users
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestProfileService:
     """Tests for ProfileService"""
 
-    def test_list_staff_profiles_no_filters(self, staff_profile, db):
+    def test_list_staff_profiles_no_filters(self, staff_profile):
         """Test listing staff profiles without filters"""
         # Act
         profiles = ProfileService.list_staff_profiles()
@@ -324,7 +328,7 @@ class TestProfileService:
         assert profiles.count() >= 1
         assert staff_profile in profiles
 
-    def test_list_staff_profiles_with_search(self, staff_profile, db):
+    def test_list_staff_profiles_with_search(self, staff_profile):
         """Test listing staff profiles with search"""
         # Act
         profiles = ProfileService.list_staff_profiles(search="Test")
@@ -333,7 +337,7 @@ class TestProfileService:
         assert profiles.count() >= 1
         assert staff_profile in profiles
 
-    def test_list_staff_profiles_with_filters(self, staff_profile, db):
+    def test_list_staff_profiles_with_filters(self, staff_profile):
         """Test listing staff profiles with filters"""
         # Arrange
         staff_profile.is_hidden = False
@@ -345,7 +349,7 @@ class TestProfileService:
         # Assert
         assert staff_profile in profiles
 
-    def test_get_staff_profile_success(self, staff_profile, db):
+    def test_get_staff_profile_success(self, staff_profile):
         """Test getting staff profile by ID"""
         # Act
         retrieved = ProfileService.get_staff_profile(staff_profile.id)
@@ -353,13 +357,13 @@ class TestProfileService:
         # Assert
         assert retrieved.id == staff_profile.id
 
-    def test_get_staff_profile_not_found(self, db):
+    def test_get_staff_profile_not_found(self):
         """Test getting non-existent staff profile"""
         # Act & Assert
         with pytest.raises(NotFound, match="Profile 99999 not found"):
             ProfileService.get_staff_profile(99999)
 
-    def test_get_staff_profile_by_user_success(self, staff_profile, user, db):
+    def test_get_staff_profile_by_user_success(self, staff_profile, user):
         """Test getting staff profile by user ID"""
         # Act
         retrieved = ProfileService.get_staff_profile_by_user(user.id)
@@ -367,7 +371,7 @@ class TestProfileService:
         # Assert
         assert retrieved.id == staff_profile.id
 
-    def test_get_staff_profile_by_user_not_found(self, db):
+    def test_get_staff_profile_by_user_not_found(self):
         """Test getting staff profile for user without profile"""
         # Arrange
         user = User.objects.create_user(username="noprofile")
@@ -378,7 +382,7 @@ class TestProfileService:
         # Assert
         assert result is None
 
-    def test_create_staff_profile(self, user, db):
+    def test_create_staff_profile(self, user):
         """Test creating staff profile"""
         # Arrange
         data = {
@@ -396,7 +400,7 @@ class TestProfileService:
         assert profile.about == "Test about"
         assert profile.is_hidden is False
 
-    def test_create_staff_profile_duplicate(self, staff_profile, user, db):
+    def test_create_staff_profile_duplicate(self, staff_profile, user):
         """Test creating duplicate staff profile"""
         # Arrange
         data = {"about": "Test"}
@@ -405,7 +409,7 @@ class TestProfileService:
         with pytest.raises(ValidationError, match="Profile already exists"):
             ProfileService.create_staff_profile(user.id, data)
 
-    def test_update_staff_profile(self, staff_profile, db):
+    def test_update_staff_profile(self, staff_profile):
         """Test updating staff profile"""
         # Arrange
         data = {"about": "Updated about"}
@@ -416,7 +420,7 @@ class TestProfileService:
         # Assert
         assert updated.about == "Updated about"
 
-    def test_delete_staff_profile(self, staff_profile, db):
+    def test_delete_staff_profile(self, staff_profile):
         """Test deleting staff profile"""
         # Arrange
         profile_id = staff_profile.id
@@ -427,7 +431,7 @@ class TestProfileService:
         # Assert
         assert not PublicStaffProfile.objects.filter(id=profile_id).exists()
 
-    def test_toggle_visibility(self, staff_profile, db):
+    def test_toggle_visibility(self, staff_profile):
         """Test toggling profile visibility"""
         # Arrange
         original_status = staff_profile.is_hidden
@@ -438,7 +442,7 @@ class TestProfileService:
         # Assert
         assert updated.is_hidden != original_status
 
-    def test_get_active_staff_emails(self, staff_profile, db):
+    def test_get_active_staff_emails(self, staff_profile):
         """Test getting active staff emails"""
         # Arrange
         staff_profile.is_hidden = False
@@ -451,7 +455,7 @@ class TestProfileService:
         assert profiles.count() >= 1
         assert staff_profile in profiles
 
-    def test_check_staff_profile_exists_true(self, staff_profile, user, db):
+    def test_check_staff_profile_exists_true(self, staff_profile, user):
         """Test checking existing staff profile"""
         # Act
         result = ProfileService.check_staff_profile_exists(user.id)
@@ -460,7 +464,7 @@ class TestProfileService:
         assert result["exists"] is True
         assert result["profile"] == staff_profile
 
-    def test_check_staff_profile_exists_false(self, db):
+    def test_check_staff_profile_exists_false(self):
         """Test checking non-existent staff profile"""
         # Arrange
         user = User.objects.create_user(username="noprofile")
@@ -472,7 +476,7 @@ class TestProfileService:
         assert result["exists"] is False
         assert result["profile"] is None
 
-    def test_get_user_profile_success(self, user_profile, db):
+    def test_get_user_profile_success(self, user_profile):
         """Test getting user profile by ID"""
         # Act
         retrieved = ProfileService.get_user_profile(user_profile.id)
@@ -480,13 +484,13 @@ class TestProfileService:
         # Assert
         assert retrieved.id == user_profile.id
 
-    def test_get_user_profile_not_found(self, db):
+    def test_get_user_profile_not_found(self):
         """Test getting non-existent user profile"""
         # Act & Assert
         with pytest.raises(NotFound, match="User profile 99999 not found"):
             ProfileService.get_user_profile(99999)
 
-    def test_update_user_profile(self, user_profile, db):
+    def test_update_user_profile(self, user_profile):
         """Test updating user profile"""
         # Arrange
         data = {"title": "prof"}
@@ -497,7 +501,7 @@ class TestProfileService:
         # Assert
         assert updated.title == "prof"
 
-    def test_update_personal_information(self, user, db):
+    def test_update_personal_information(self, user):
         """Test updating user personal information"""
         # Arrange
         data = {"first_name": "Updated"}
@@ -508,7 +512,7 @@ class TestProfileService:
         # Assert
         assert updated.first_name == "Updated"
 
-    def test_update_personal_information_not_found(self, db):
+    def test_update_personal_information_not_found(self):
         """Test updating personal information for non-existent user"""
         # Arrange
         data = {"first_name": "Updated"}
@@ -530,7 +534,7 @@ class TestProfileService:
         assert profiles.count() >= 1
         assert staff_profile in profiles
 
-    def test_list_user_profiles_with_user_filter(self, user_profile, user, db):
+    def test_list_user_profiles_with_user_filter(self, user_profile, user):
         """Test listing user profiles filtered by user"""
         # Act
         profiles = ProfileService.list_user_profiles(filters={"user": user.id})
@@ -540,10 +544,12 @@ class TestProfileService:
         assert user_profile in profiles
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEntryService:
     """Tests for EmploymentService and EducationService"""
 
-    def test_list_employment(self, employment_entry, staff_profile, db):
+    def test_list_employment(self, employment_entry, staff_profile):
         """Test listing employment entries"""
         # Act
         entries = EmploymentService.list_employment(staff_profile.id)
@@ -552,7 +558,7 @@ class TestEntryService:
         assert entries.count() >= 1
         assert employment_entry in entries
 
-    def test_get_employment_success(self, employment_entry, db):
+    def test_get_employment_success(self, employment_entry):
         """Test getting employment entry by ID"""
         # Act
         retrieved = EmploymentService.get_employment(employment_entry.id)
@@ -560,13 +566,13 @@ class TestEntryService:
         # Assert
         assert retrieved.id == employment_entry.id
 
-    def test_get_employment_not_found(self, db):
+    def test_get_employment_not_found(self):
         """Test getting non-existent employment entry"""
         # Act & Assert
         with pytest.raises(NotFound, match="Employment entry 99999 not found"):
             EmploymentService.get_employment(99999)
 
-    def test_create_employment(self, staff_profile, db):
+    def test_create_employment(self, staff_profile):
         """Test creating employment entry"""
         # Arrange
         data = {
@@ -585,7 +591,7 @@ class TestEntryService:
         assert entry.position_title == "Test Position"
         assert entry.start_year == 2020
 
-    def test_update_employment(self, employment_entry, db):
+    def test_update_employment(self, employment_entry):
         """Test updating employment entry"""
         # Arrange
         data = {"position_title": "Updated Position"}
@@ -596,7 +602,7 @@ class TestEntryService:
         # Assert
         assert updated.position_title == "Updated Position"
 
-    def test_delete_employment(self, employment_entry, db):
+    def test_delete_employment(self, employment_entry):
         """Test deleting employment entry"""
         # Arrange
         entry_id = employment_entry.id
@@ -607,7 +613,7 @@ class TestEntryService:
         # Assert
         assert not EmploymentEntry.objects.filter(id=entry_id).exists()
 
-    def test_list_education(self, education_entry, staff_profile, db):
+    def test_list_education(self, education_entry, staff_profile):
         """Test listing education entries"""
         # Act
         entries = EducationService.list_education(staff_profile.id)
@@ -616,7 +622,7 @@ class TestEntryService:
         assert entries.count() >= 1
         assert education_entry in entries
 
-    def test_get_education_success(self, education_entry, db):
+    def test_get_education_success(self, education_entry):
         """Test getting education entry by ID"""
         # Act
         retrieved = EducationService.get_education(education_entry.id)
@@ -624,13 +630,13 @@ class TestEntryService:
         # Assert
         assert retrieved.id == education_entry.id
 
-    def test_get_education_not_found(self, db):
+    def test_get_education_not_found(self):
         """Test getting non-existent education entry"""
         # Act & Assert
         with pytest.raises(NotFound, match="Education entry 99999 not found"):
             EducationService.get_education(99999)
 
-    def test_create_education(self, staff_profile, db):
+    def test_create_education(self, staff_profile):
         """Test creating education entry"""
         # Arrange
         data = {
@@ -648,7 +654,7 @@ class TestEntryService:
         assert entry.qualification_name == "Test Degree"
         assert entry.end_year == 2019
 
-    def test_update_education(self, education_entry, db):
+    def test_update_education(self, education_entry):
         """Test updating education entry"""
         # Arrange
         data = {"qualification_name": "Updated Degree"}
@@ -659,7 +665,7 @@ class TestEntryService:
         # Assert
         assert updated.qualification_name == "Updated Degree"
 
-    def test_delete_education(self, education_entry, db):
+    def test_delete_education(self, education_entry):
         """Test deleting education entry"""
         # Arrange
         entry_id = education_entry.id
@@ -670,7 +676,7 @@ class TestEntryService:
         # Assert
         assert not EducationEntry.objects.filter(id=entry_id).exists()
 
-    def test_create_employment_without_optional_fields(self, staff_profile, db):
+    def test_create_employment_without_optional_fields(self, staff_profile):
         """Test creating employment entry without optional fields"""
         # Arrange
         data = {
@@ -688,7 +694,7 @@ class TestEntryService:
         assert entry.end_year is None
         assert entry.section == ""
 
-    def test_create_education_without_optional_fields(self, staff_profile, db):
+    def test_create_education_without_optional_fields(self, staff_profile):
         """Test creating education entry without optional fields"""
         # Arrange
         data = {
@@ -705,7 +711,7 @@ class TestEntryService:
         assert entry.qualification_name == "Test Degree"
         assert entry.location == ""
 
-    def test_list_employment_ordering(self, staff_profile, db):
+    def test_list_employment_ordering(self, staff_profile):
         """Test employment entries are ordered by start_year and end_year descending"""
         # Arrange
         EmploymentEntry.objects.create(
@@ -740,7 +746,7 @@ class TestEntryService:
         assert entries[1].position_title == "Position 3"  # 2020-2021
         assert entries[2].position_title == "Position 1"  # 2015-2018
 
-    def test_list_education_ordering(self, staff_profile, db):
+    def test_list_education_ordering(self, staff_profile):
         """Test education entries are ordered by end_year descending"""
         # Arrange
         EducationEntry.objects.create(
@@ -772,7 +778,7 @@ class TestEntryService:
         assert entries[1].qualification_name == "Degree 3"  # 2018
         assert entries[2].qualification_name == "Degree 1"  # 2015
 
-    def test_list_employment_empty(self, staff_profile, db):
+    def test_list_employment_empty(self, staff_profile):
         """Test listing employment entries when none exist"""
         # Act
         entries = EmploymentService.list_employment(staff_profile.id)
@@ -780,7 +786,7 @@ class TestEntryService:
         # Assert
         assert entries.count() == 0
 
-    def test_list_education_empty(self, staff_profile, db):
+    def test_list_education_empty(self, staff_profile):
         """Test listing education entries when none exist"""
         # Act
         entries = EducationService.list_education(staff_profile.id)
@@ -788,7 +794,7 @@ class TestEntryService:
         # Assert
         assert entries.count() == 0
 
-    def test_update_employment_multiple_fields(self, employment_entry, db):
+    def test_update_employment_multiple_fields(self, employment_entry):
         """Test updating multiple fields in employment entry"""
         # Arrange
         data = {
@@ -805,7 +811,7 @@ class TestEntryService:
         assert updated.employer == "Updated Org"
         assert updated.section == "Updated Section"
 
-    def test_update_education_multiple_fields(self, education_entry, db):
+    def test_update_education_multiple_fields(self, education_entry):
         """Test updating multiple fields in education entry"""
         # Arrange
         data = {
@@ -823,10 +829,12 @@ class TestEntryService:
         assert updated.location == "Updated City"
 
 
+@pytest.mark.slow
+@pytest.mark.django_db
 class TestExportService:
     """Tests for ExportService"""
 
-    def test_generate_staff_csv(self, staff_profile, db):
+    def test_generate_staff_csv(self, staff_profile):
         """Test generating staff CSV export"""
         # Arrange
         staff_profile.is_hidden = False

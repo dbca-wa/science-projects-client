@@ -22,6 +22,7 @@ from medias.models import (
 class TestProjectDocumentPDF:
     """Tests for ProjectDocumentPDF model"""
 
+    @pytest.mark.integration
     def test_create_project_document_pdf(
         self, project, project_document, mock_file, db
     ):
@@ -37,6 +38,7 @@ class TestProjectDocumentPDF:
         assert pdf.project == project
         assert pdf.size > 0  # Size auto-calculated from file
 
+    @pytest.mark.integration
     def test_project_document_pdf_str(self, project_document_pdf, db):
         """Test __str__ method"""
         result = str(project_document_pdf)
@@ -44,6 +46,7 @@ class TestProjectDocumentPDF:
         assert project_document_pdf.document.kind in result
         assert project_document_pdf.project.title in result
 
+    @pytest.mark.integration
     def test_project_document_pdf_size_auto_calculation(
         self, project, project_document, mock_file, db
     ):
@@ -62,6 +65,7 @@ class TestProjectDocumentPDF:
 class TestAnnualReportMedia:
     """Tests for AnnualReportMedia model"""
 
+    @pytest.mark.integration
     def test_create_annual_report_media(self, annual_report, user, mock_image, db):
         """Test creating annual report media"""
         media = AnnualReportMedia.objects.create(
@@ -77,12 +81,14 @@ class TestAnnualReportMedia:
         assert media.uploader == user
         assert media.size > 0
 
+    @pytest.mark.unit
     def test_annual_report_media_str(self, annual_report_media, db):
         """Test __str__ method"""
         result = str(annual_report_media)
         assert str(annual_report_media.report.year) in result
         assert "Annual Report Media" in result
 
+    @pytest.mark.integration
     def test_annual_report_media_unique_constraint(
         self, annual_report, user, mock_image, db
     ):
@@ -106,6 +112,7 @@ class TestAnnualReportMedia:
                 uploader=user,
             )
 
+    @pytest.mark.integration
     def test_annual_report_media_size_auto_calculation(
         self, annual_report, user, mock_image, db
     ):
@@ -125,6 +132,7 @@ class TestAnnualReportMedia:
 class TestAnnualReportPDF:
     """Tests for AnnualReportPDF model"""
 
+    @pytest.mark.integration
     def test_create_annual_report_pdf(self, annual_report, user, mock_file, db):
         """Test creating annual report PDF"""
         pdf = AnnualReportPDF.objects.create(
@@ -138,12 +146,14 @@ class TestAnnualReportPDF:
         assert pdf.creator == user
         assert pdf.size > 0
 
+    @pytest.mark.unit
     def test_annual_report_pdf_str(self, annual_report_pdf, db):
         """Test __str__ method"""
         result = str(annual_report_pdf)
         assert str(annual_report_pdf.report.year) in result
         assert "Annual Report PDF" in result
 
+    @pytest.mark.integration
     def test_annual_report_pdf_size_auto_calculation(
         self, annual_report, user, mock_file, db
     ):
@@ -162,6 +172,7 @@ class TestAnnualReportPDF:
 class TestLegacyAnnualReportPDF:
     """Tests for LegacyAnnualReportPDF model"""
 
+    @pytest.mark.integration
     def test_create_legacy_annual_report_pdf(self, user, mock_file, db):
         """Test creating legacy annual report PDF"""
         pdf = LegacyAnnualReportPDF.objects.create(
@@ -175,12 +186,14 @@ class TestLegacyAnnualReportPDF:
         assert pdf.creator == user
         assert pdf.size > 0
 
+    @pytest.mark.unit
     def test_legacy_annual_report_pdf_str(self, legacy_annual_report_pdf, db):
         """Test __str__ method"""
         result = str(legacy_annual_report_pdf)
         assert str(legacy_annual_report_pdf.year) in result
         assert "Annual Report PDF" in result
 
+    @pytest.mark.integration
     def test_legacy_annual_report_pdf_year_validation(self, user, mock_file, db):
         """Test year validation (2005-2019)"""
         # Valid year
@@ -209,6 +222,7 @@ class TestLegacyAnnualReportPDF:
             )
             pdf.full_clean()
 
+    @pytest.mark.integration
     def test_legacy_annual_report_pdf_size_auto_calculation(self, user, mock_file, db):
         """Test size field is auto-calculated on save"""
         pdf = LegacyAnnualReportPDF(
@@ -225,6 +239,7 @@ class TestLegacyAnnualReportPDF:
 class TestAECEndorsementPDF:
     """Tests for AECEndorsementPDF model"""
 
+    @pytest.mark.integration
     def test_create_aec_endorsement_pdf(self, endorsement, user, mock_file, db):
         """Test creating AEC endorsement PDF"""
         pdf = AECEndorsementPDF.objects.create(
@@ -238,11 +253,13 @@ class TestAECEndorsementPDF:
         assert pdf.creator == user
         assert pdf.size > 0
 
+    @pytest.mark.unit
     def test_aec_endorsement_pdf_str(self, aec_endorsement_pdf, db):
         """Test __str__ method"""
         result = str(aec_endorsement_pdf)
         assert "AEC PDF" in result
 
+    @pytest.mark.integration
     def test_aec_endorsement_pdf_size_auto_calculation(
         self, endorsement, user, mock_file, db
     ):
@@ -261,6 +278,7 @@ class TestAECEndorsementPDF:
 class TestProjectPhoto:
     """Tests for ProjectPhoto model"""
 
+    @pytest.mark.integration
     def test_create_project_photo(self, project, user, mock_image, db):
         """Test creating project photo"""
         photo = ProjectPhoto.objects.create(
@@ -274,11 +292,13 @@ class TestProjectPhoto:
         assert photo.uploader == user
         assert photo.size > 0
 
+    @pytest.mark.integration
     def test_project_photo_str(self, project_photo, db):
         """Test __str__ method"""
         result = str(project_photo)
         assert "Project Photo File" in result
 
+    @pytest.mark.integration
     def test_project_photo_size_auto_calculation(self, project, user, mock_image, db):
         """Test size field is auto-calculated on save"""
         photo = ProjectPhoto(
@@ -295,6 +315,7 @@ class TestProjectPhoto:
 class TestProjectPlanMethodologyPhoto:
     """Tests for ProjectPlanMethodologyPhoto model"""
 
+    @pytest.mark.integration
     def test_create_methodology_photo(self, project_plan, user, mock_image, db):
         """Test creating methodology photo"""
         photo = ProjectPlanMethodologyPhoto.objects.create(
@@ -308,11 +329,13 @@ class TestProjectPlanMethodologyPhoto:
         assert photo.uploader == user
         assert photo.size > 0
 
+    @pytest.mark.unit
     def test_methodology_photo_str(self, methodology_photo, db):
         """Test __str__ method"""
         result = str(methodology_photo)
         assert "Methodology Image File" in result
 
+    @pytest.mark.integration
     def test_methodology_photo_size_auto_calculation(
         self, project_plan, user, mock_image, db
     ):
@@ -331,6 +354,7 @@ class TestProjectPlanMethodologyPhoto:
 class TestBusinessAreaPhoto:
     """Tests for BusinessAreaPhoto model"""
 
+    @pytest.mark.integration
     def test_create_business_area_photo(self, business_area, user, mock_image, db):
         """Test creating business area photo"""
         photo = BusinessAreaPhoto.objects.create(
@@ -344,11 +368,13 @@ class TestBusinessAreaPhoto:
         assert photo.uploader == user
         assert photo.size > 0
 
+    @pytest.mark.integration
     def test_business_area_photo_str(self, business_area_photo, db):
         """Test __str__ method"""
         result = str(business_area_photo)
         assert "Business Area Photo File" in result
 
+    @pytest.mark.integration
     def test_business_area_photo_size_auto_calculation(
         self, business_area, user, mock_image, db
     ):
@@ -367,6 +393,7 @@ class TestBusinessAreaPhoto:
 class TestAgencyImage:
     """Tests for AgencyImage model"""
 
+    @pytest.mark.integration
     def test_create_agency_image(self, agency, mock_image, db):
         """Test creating agency image"""
         image = AgencyImage.objects.create(
@@ -378,11 +405,13 @@ class TestAgencyImage:
         assert image.agency == agency
         assert image.size > 0
 
+    @pytest.mark.integration
     def test_agency_image_str(self, agency_image, db):
         """Test __str__ method"""
         result = str(agency_image)
         assert "Agency Photo File" in result
 
+    @pytest.mark.integration
     def test_agency_image_size_auto_calculation(self, agency, mock_image, db):
         """Test size field is auto-calculated on save"""
         image = AgencyImage(
@@ -398,6 +427,7 @@ class TestAgencyImage:
 class TestUserAvatar:
     """Tests for UserAvatar model"""
 
+    @pytest.mark.integration
     def test_create_user_avatar(self, user, mock_image, db):
         """Test creating user avatar"""
         avatar = UserAvatar.objects.create(
@@ -409,12 +439,14 @@ class TestUserAvatar:
         assert avatar.user == user
         assert avatar.size > 0
 
+    @pytest.mark.integration
     def test_user_avatar_str(self, user_avatar, db):
         """Test __str__ method"""
         result = str(user_avatar)
         assert str(user_avatar.user) in result
         assert user_avatar.file.name in result
 
+    @pytest.mark.integration
     def test_user_avatar_size_auto_calculation(self, user, mock_image, db):
         """Test size field is auto-calculated on save"""
         avatar = UserAvatar(

@@ -7,6 +7,7 @@ with the new caretakers.models.Caretaker model.
 
 from datetime import timedelta
 
+import pytest
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -39,6 +40,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             last_name="User",
         )
 
+    @pytest.mark.integration
     def test_approve_caretaker_task_creates_caretaker(self):
         """Test that approving a caretaker AdminTask creates a Caretaker object"""
         # Create a pending caretaker request
@@ -87,6 +89,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         task.refresh_from_db()
         self.assertEqual(task.status, AdminTask.TaskStatus.FULFILLED)
 
+    @pytest.mark.integration
     def test_reject_caretaker_task_does_not_create_caretaker(self):
         """Test that rejecting a caretaker AdminTask does not create a Caretaker object"""
         # Create a pending caretaker request
@@ -113,6 +116,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         task.refresh_from_db()
         self.assertEqual(task.status, AdminTask.TaskStatus.REJECTED)
 
+    @pytest.mark.integration
     def test_cancel_caretaker_task_does_not_create_caretaker(self):
         """Test that cancelling a caretaker AdminTask does not create a Caretaker object"""
         # Create a pending caretaker request
@@ -139,6 +143,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         task.refresh_from_db()
         self.assertEqual(task.status, AdminTask.TaskStatus.CANCELLED)
 
+    @pytest.mark.integration
     def test_caretaker_with_null_end_date(self):
         """Test creating a caretaker with no end date (permanent caretaker)"""
         # Create a pending caretaker request with no end date
@@ -171,6 +176,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         caretaker = Caretaker.objects.first()
         self.assertIsNone(caretaker.end_date)
 
+    @pytest.mark.integration
     def test_multiple_caretakers_for_same_user(self):
         """Test that a user can have multiple caretakers"""
         # Create another caretaker user
@@ -199,6 +205,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         caretakers = Caretaker.objects.filter(user=self.user_needing_caretaker)
         self.assertEqual(caretakers.count(), 2)
 
+    @pytest.mark.integration
     def test_user_can_be_caretaker_for_multiple_users(self):
         """Test that a user can be caretaker for multiple users"""
         # Create another user needing a caretaker
@@ -237,6 +244,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             }
         }
     )
+    @pytest.mark.unit
     def test_caretaker_cache_clearing_on_save(self):
         """Test that cache is cleared when caretaker is saved"""
         from django.core.cache import cache
@@ -278,6 +286,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             }
         }
     )
+    @pytest.mark.unit
     def test_caretaker_cache_clearing_on_delete(self):
         """Test that cache is cleared when caretaker is deleted"""
         from django.core.cache import cache
@@ -310,6 +319,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertIsNone(cache.get(f"caretakers_{self.caretaker_user.pk}"))
         self.assertIsNone(cache.get(f"caretaking_{self.caretaker_user.pk}"))
 
+    @pytest.mark.integration
     def test_user_model_get_caretakers_method(self):
         """Test that User.get_caretakers() works with new Caretaker model"""
         # Create a caretaker relationship
@@ -326,6 +336,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertEqual(caretakers.count(), 1)
         self.assertEqual(caretakers.first().caretaker, self.caretaker_user)
 
+    @pytest.mark.integration
     def test_user_model_get_caretaking_for_method(self):
         """Test that User.get_caretaking_for() works with new Caretaker model"""
         # Create a caretaker relationship
@@ -342,6 +353,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertEqual(caretaking_for.count(), 1)
         self.assertEqual(caretaking_for.first().user, self.user_needing_caretaker)
 
+    @pytest.mark.integration
     def test_expired_caretaker_not_returned_by_get_caretakers(self):
         """Test that expired caretakers are not returned by get_caretakers()"""
         # Create an expired caretaker relationship
@@ -361,6 +373,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         all_caretakers = self.user_needing_caretaker.get_all_caretakers()
         self.assertEqual(all_caretakers.count(), 1)
 
+    @pytest.mark.integration
     def test_related_name_caretakers_plural(self):
         """Test that the new related_name 'caretakers' (plural) works correctly"""
         # Create a caretaker relationship
@@ -375,6 +388,7 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertEqual(caretakers.count(), 1)
         self.assertEqual(caretakers.first().caretaker, self.caretaker_user)
 
+    @pytest.mark.integration
     def test_related_name_caretaking_for(self):
         """Test that the new related_name 'caretaking_for' works correctly"""
         # Create a caretaker relationship

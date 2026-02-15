@@ -2,6 +2,8 @@
 Tests for communications serializers
 """
 
+import pytest
+
 from communications.serializers import (
     ChatRoomSerializer,
     CommentSerializer,
@@ -19,6 +21,7 @@ from communications.serializers import (
 class TestTinyDirectMessageSerializer:
     """Tests for TinyDirectMessageSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_direct_message(self, direct_message, db):
         """Test serializing a direct message"""
         # Act
@@ -31,6 +34,7 @@ class TestTinyDirectMessageSerializer:
         assert data["chat_room"] == direct_message.chat_room.id
         assert "user" in data
 
+    @pytest.mark.integration
     def test_user_field_read_only(self, direct_message, db):
         """Test user field is read-only"""
         # Arrange
@@ -42,6 +46,7 @@ class TestTinyDirectMessageSerializer:
         # Assert
         assert fields["user"].read_only is True
 
+    @pytest.mark.unit
     def test_fields_included(self, direct_message, db):
         """Test correct fields are included"""
         # Act
@@ -55,6 +60,7 @@ class TestTinyDirectMessageSerializer:
 class TestTinyReactionSerializer:
     """Tests for TinyReactionSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_reaction_on_message(self, reaction_on_message, db):
         """Test serializing a reaction on a direct message"""
         # Act
@@ -67,6 +73,7 @@ class TestTinyReactionSerializer:
         assert data["reaction"] == reaction_on_message.reaction
         assert "direct_message" in data
 
+    @pytest.mark.unit
     def test_serialize_reaction_on_comment(self, reaction_on_comment, db):
         """Test serializing a reaction on a comment"""
         # Act
@@ -79,6 +86,7 @@ class TestTinyReactionSerializer:
         assert data["comment"] == reaction_on_comment.comment.id
         assert data["reaction"] == reaction_on_comment.reaction
 
+    @pytest.mark.unit
     def test_fields_included(self, reaction_on_comment, db):
         """Test correct fields are included"""
         # Act
@@ -98,6 +106,7 @@ class TestTinyReactionSerializer:
 class TestTinyCommentSerializer:
     """Tests for TinyCommentSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_comment(self, comment, db):
         """Test serializing a comment"""
         # Act
@@ -113,6 +122,7 @@ class TestTinyCommentSerializer:
         assert "updated_at" in data
         assert "reactions" in data
 
+    @pytest.mark.integration
     def test_user_field_read_only(self, comment, db):
         """Test user field is read-only"""
         # Arrange
@@ -124,6 +134,7 @@ class TestTinyCommentSerializer:
         # Assert
         assert fields["user"].read_only is True
 
+    @pytest.mark.unit
     def test_reactions_field_many(self, comment, reaction_on_comment, db):
         """Test reactions field handles multiple reactions"""
         # Act
@@ -134,6 +145,7 @@ class TestTinyCommentSerializer:
         assert isinstance(data["reactions"], list)
         assert len(data["reactions"]) == 1
 
+    @pytest.mark.unit
     def test_fields_included(self, comment, db):
         """Test correct fields are included"""
         # Act
@@ -155,6 +167,7 @@ class TestTinyCommentSerializer:
 class TestTinyCommentCreateSerializer:
     """Tests for TinyCommentCreateSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_comment(self, comment, db):
         """Test serializing a comment for creation"""
         # Act
@@ -169,6 +182,7 @@ class TestTinyCommentCreateSerializer:
         assert "created_at" in data
         assert "updated_at" in data
 
+    @pytest.mark.integration
     def test_deserialize_comment(self, user, project_document, db):
         """Test deserializing comment data"""
         # Arrange
@@ -188,6 +202,7 @@ class TestTinyCommentCreateSerializer:
         assert comment.user == user
         assert comment.document == project_document
 
+    @pytest.mark.unit
     def test_fields_included(self, comment, db):
         """Test correct fields are included"""
         # Act
@@ -208,6 +223,7 @@ class TestTinyCommentCreateSerializer:
 class TestCommentSerializer:
     """Tests for CommentSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_comment(self, comment, db):
         """Test serializing a comment with all fields"""
         # Act
@@ -225,6 +241,7 @@ class TestCommentSerializer:
         assert "is_public" in data
         assert "is_removed" in data
 
+    @pytest.mark.integration
     def test_user_field_read_only(self, comment, db):
         """Test user field is read-only"""
         # Arrange
@@ -236,6 +253,7 @@ class TestCommentSerializer:
         # Assert
         assert fields["user"].read_only is True
 
+    @pytest.mark.unit
     def test_document_field_read_only(self, comment, db):
         """Test document field is read-only"""
         # Arrange
@@ -247,6 +265,7 @@ class TestCommentSerializer:
         # Assert
         assert fields["document"].read_only is True
 
+    @pytest.mark.unit
     def test_all_fields_included(self, comment, db):
         """Test all model fields are included"""
         # Act
@@ -269,6 +288,7 @@ class TestCommentSerializer:
 class TestTinyChatRoomSerializer:
     """Tests for TinyChatRoomSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_chat_room(self, chat_room, db):
         """Test serializing a chat room"""
         # Act
@@ -280,6 +300,7 @@ class TestTinyChatRoomSerializer:
         assert "users" in data
         assert isinstance(data["users"], list)
 
+    @pytest.mark.integration
     def test_users_field_read_only(self, chat_room, db):
         """Test users field is read-only"""
         # Arrange
@@ -291,6 +312,7 @@ class TestTinyChatRoomSerializer:
         # Assert
         assert fields["users"].read_only is True
 
+    @pytest.mark.integration
     def test_users_field_many(self, chat_room, user, other_user, db):
         """Test users field handles multiple users"""
         # Act
@@ -300,6 +322,7 @@ class TestTinyChatRoomSerializer:
         # Assert
         assert len(data["users"]) == 2
 
+    @pytest.mark.unit
     def test_fields_included(self, chat_room, db):
         """Test correct fields are included"""
         # Act
@@ -313,6 +336,7 @@ class TestTinyChatRoomSerializer:
 class TestDirectMessageSerializer:
     """Tests for DirectMessageSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_direct_message(self, direct_message, db):
         """Test serializing a direct message with all fields"""
         # Act
@@ -329,6 +353,7 @@ class TestDirectMessageSerializer:
         assert "is_public" in data
         assert "is_removed" in data
 
+    @pytest.mark.integration
     def test_user_field_read_only(self, direct_message, db):
         """Test user field is read-only"""
         # Arrange
@@ -340,6 +365,7 @@ class TestDirectMessageSerializer:
         # Assert
         assert fields["user"].read_only is True
 
+    @pytest.mark.unit
     def test_chat_room_field_read_only(self, direct_message, db):
         """Test chat_room field is read-only"""
         # Arrange
@@ -351,6 +377,7 @@ class TestDirectMessageSerializer:
         # Assert
         assert fields["chat_room"].read_only is True
 
+    @pytest.mark.unit
     def test_reactions_field_read_only(self, direct_message, db):
         """Test reactions field is read-only"""
         # Arrange
@@ -362,6 +389,7 @@ class TestDirectMessageSerializer:
         # Assert
         assert fields["reactions"].read_only is True
 
+    @pytest.mark.unit
     def test_all_fields_included(self, direct_message, db):
         """Test all model fields are included"""
         # Act
@@ -384,6 +412,7 @@ class TestDirectMessageSerializer:
 class TestChatRoomSerializer:
     """Tests for ChatRoomSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_chat_room(self, chat_room, db):
         """Test serializing a chat room with all fields"""
         # Act
@@ -397,6 +426,7 @@ class TestChatRoomSerializer:
         assert "created_at" in data
         assert "updated_at" in data
 
+    @pytest.mark.integration
     def test_users_field_read_only(self, chat_room, db):
         """Test users field is read-only"""
         # Arrange
@@ -408,6 +438,7 @@ class TestChatRoomSerializer:
         # Assert
         assert fields["users"].read_only is True
 
+    @pytest.mark.unit
     def test_messages_field_read_only(self, chat_room, db):
         """Test messages field is read-only"""
         # Arrange
@@ -419,6 +450,7 @@ class TestChatRoomSerializer:
         # Assert
         assert fields["messages"].read_only is True
 
+    @pytest.mark.unit
     def test_messages_field_many(self, chat_room, direct_message, db):
         """Test messages field handles multiple messages"""
         # Act
@@ -429,6 +461,7 @@ class TestChatRoomSerializer:
         assert isinstance(data["messages"], list)
         assert len(data["messages"]) == 1
 
+    @pytest.mark.unit
     def test_all_fields_included(self, chat_room, db):
         """Test all model fields are included"""
         # Act
@@ -446,6 +479,7 @@ class TestChatRoomSerializer:
 class TestReactionSerializer:
     """Tests for ReactionSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_reaction_on_comment(self, reaction_on_comment, db):
         """Test serializing a reaction on a comment"""
         # Act
@@ -458,6 +492,7 @@ class TestReactionSerializer:
         assert "comment" in data
         assert data["reaction"] == reaction_on_comment.reaction
 
+    @pytest.mark.unit
     def test_serialize_reaction_on_message(self, reaction_on_message, db):
         """Test serializing a reaction on a direct message"""
         # Act
@@ -470,6 +505,7 @@ class TestReactionSerializer:
         assert "direct_message" in data
         assert data["reaction"] == reaction_on_message.reaction
 
+    @pytest.mark.integration
     def test_user_field_read_only(self, reaction_on_comment, db):
         """Test user field is read-only"""
         # Arrange
@@ -481,6 +517,7 @@ class TestReactionSerializer:
         # Assert
         assert fields["user"].read_only is True
 
+    @pytest.mark.unit
     def test_all_fields_included(self, reaction_on_comment, db):
         """Test all model fields are included"""
         # Act
@@ -500,6 +537,7 @@ class TestReactionSerializer:
 class TestReactionCreateSerializer:
     """Tests for ReactionCreateSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_reaction(self, reaction_on_comment, db):
         """Test serializing a reaction for creation"""
         # Act
@@ -512,6 +550,7 @@ class TestReactionCreateSerializer:
         assert data["comment"] == reaction_on_comment.comment.id
         assert data["reaction"] == reaction_on_comment.reaction
 
+    @pytest.mark.integration
     def test_deserialize_reaction_on_comment(self, user, comment, db):
         """Test deserializing reaction data for comment"""
         # Arrange
@@ -531,6 +570,7 @@ class TestReactionCreateSerializer:
         assert reaction.comment == comment
         assert reaction.reaction == "thumbup"
 
+    @pytest.mark.integration
     def test_deserialize_reaction_on_message(self, user, direct_message, db):
         """Test deserializing reaction data for direct message"""
         # Arrange
@@ -550,6 +590,7 @@ class TestReactionCreateSerializer:
         assert reaction.direct_message == direct_message
         assert reaction.reaction == "heart"
 
+    @pytest.mark.unit
     def test_fields_included(self, reaction_on_comment, db):
         """Test correct fields are included"""
         # Act

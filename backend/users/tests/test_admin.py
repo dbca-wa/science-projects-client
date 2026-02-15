@@ -31,10 +31,13 @@ from users.models import KeywordTag, PublicStaffProfile, User, UserProfile, User
 # ============================================================================
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestDeleteUnusedTags:
     """Tests for delete_unused_tags admin action"""
 
-    def test_requires_single_selection(self, db):
+    @pytest.mark.unit
+    def test_requires_single_selection(self):
         """Test action requires single selection"""
         # Arrange
         tag1 = KeywordTag.objects.create(name="Tag 1")
@@ -50,7 +53,8 @@ class TestDeleteUnusedTags:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
-    def test_deletes_unused_tags(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_deletes_unused_tags(self, staff_profile):
         """Test action deletes tags not associated with any profile"""
         # Arrange
         used_tag = KeywordTag.objects.create(name="Used Tag")
@@ -70,7 +74,8 @@ class TestDeleteUnusedTags:
         assert KeywordTag.objects.filter(pk=used_tag.pk).exists()
         assert not KeywordTag.objects.filter(pk=unused_tag.pk).exists()
 
-    def test_reports_deletion_count(self, db):
+    @pytest.mark.unit
+    def test_reports_deletion_count(self):
         """Test action reports number of deleted tags"""
         # Arrange
         tag1 = KeywordTag.objects.create(name="Unused 1")
@@ -96,10 +101,18 @@ class TestDeleteUnusedTags:
 # ============================================================================
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCopyAboutExpertiseToStaffProfile:
     """Tests for copy_about_expertise_to_staff_profile admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -113,7 +126,8 @@ class TestCopyAboutExpertiseToStaffProfile:
             # Assert
             mock_print.assert_called_once_with("Please select only one")
 
-    def test_copies_profile_data_to_staff_profile(self, staff_user, db):
+    @pytest.mark.integration
+    def test_copies_profile_data_to_staff_profile(self, staff_user):
         """Test action copies about and expertise to staff profile"""
         # Arrange
         from users.models import UserProfile
@@ -139,10 +153,18 @@ class TestCopyAboutExpertiseToStaffProfile:
             copy_about_expertise_to_staff_profile(admin, request, selected)
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestHideAllStaffProfiles:
     """Tests for hide_all_staff_profiles admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -156,7 +178,8 @@ class TestHideAllStaffProfiles:
             # Assert
             mock_print.assert_called_once_with("Please select only one")
 
-    def test_hides_all_staff_profiles(self, staff_user, db):
+    @pytest.mark.integration
+    def test_hides_all_staff_profiles(self, staff_user):
         """Test action hides all staff profiles"""
         # Arrange
         staff_profile = PublicStaffProfile.objects.create(
@@ -175,10 +198,18 @@ class TestHideAllStaffProfiles:
         assert staff_profile.is_hidden is True
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCreateStaffProfiles:
     """Tests for create_staff_profiles admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -192,7 +223,8 @@ class TestCreateStaffProfiles:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
-    def test_creates_staff_profiles_for_users_without(self, staff_user, db):
+    @pytest.mark.integration
+    def test_creates_staff_profiles_for_users_without(self, staff_user):
         """Test action creates staff profiles for users without them"""
         # Arrange
         # Ensure user has no staff profile
@@ -209,10 +241,18 @@ class TestCreateStaffProfiles:
         assert PublicStaffProfile.objects.filter(user=staff_user).exists()
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUpdateDisplayNames:
     """Tests for update_display_names admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -226,7 +266,8 @@ class TestUpdateDisplayNames:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
-    def test_updates_display_names_from_first_last(self, user_factory, db):
+    @pytest.mark.integration
+    def test_updates_display_names_from_first_last(self, user_factory):
         """Test action updates display names from first and last names"""
         # Arrange
         user = user_factory(
@@ -248,7 +289,8 @@ class TestUpdateDisplayNames:
         assert user.display_first_name == "John"
         assert user.display_last_name == "Doe"
 
-    def test_skips_users_with_display_names(self, user_factory, db):
+    @pytest.mark.integration
+    def test_skips_users_with_display_names(self, user_factory):
         """Test action skips users who already have display names"""
         # Arrange
         user = user_factory(
@@ -272,10 +314,13 @@ class TestUpdateDisplayNames:
         assert user.display_last_name == "D"
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestExportSelectedUsersToCSV:
     """Tests for export_selected_users_to_csv admin action"""
 
-    def test_exports_users_to_csv(self, user_factory, db):
+    @pytest.mark.integration
+    def test_exports_users_to_csv(self, user_factory):
         """Test action exports selected users to CSV"""
         # Arrange
         user1 = user_factory(username="user1", email="user1@example.com")
@@ -304,10 +349,13 @@ class TestExportSelectedUsersToCSV:
 # ============================================================================
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestSetItAssetsId:
     """Tests for set_it_assets_id admin action"""
 
-    def test_requires_single_selection(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_requires_single_selection(self, staff_profile):
         """Test action requires single selection"""
         # Arrange
         admin = StaffProfileAdmin(PublicStaffProfile, AdminSite())
@@ -322,7 +370,8 @@ class TestSetItAssetsId:
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
     @patch("users.admin.requests.get")
-    def test_sets_it_asset_id_from_api(self, mock_get, staff_profile, db):
+    @pytest.mark.integration
+    def test_sets_it_asset_id_from_api(self, mock_get, staff_profile):
         """Test action sets IT asset ID from API response"""
         # Arrange
         mock_response = Mock()
@@ -351,7 +400,8 @@ class TestSetItAssetsId:
         assert staff_profile.it_asset_id == 12345
 
     @patch("users.admin.requests.get")
-    def test_handles_api_failure(self, mock_get, staff_profile, db):
+    @pytest.mark.unit
+    def test_handles_api_failure(self, mock_get, staff_profile):
         """Test action handles API failure gracefully"""
         # Arrange
         mock_response = Mock()
@@ -380,10 +430,18 @@ class TestSetItAssetsId:
 # ============================================================================
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestGenerateActiveStaffCSV:
     """Tests for generate_active_staff_csv admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -398,7 +456,8 @@ class TestGenerateActiveStaffCSV:
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
     @patch("users.admin.requests.get")
-    def test_generates_csv_from_it_assets_api(self, mock_get, staff_user, db):
+    @pytest.mark.integration
+    def test_generates_csv_from_it_assets_api(self, mock_get, staff_user):
         """Test action generates CSV from IT Assets API data"""
         # Arrange
         PublicStaffProfile.objects.create(user=staff_user, is_hidden=False)
@@ -446,7 +505,8 @@ class TestGenerateActiveStaffCSV:
         assert staff_user.email in content
 
     @patch("users.admin.requests.get")
-    def test_handles_api_failure_gracefully(self, mock_get, staff_user, db):
+    @pytest.mark.integration
+    def test_handles_api_failure_gracefully(self, mock_get, staff_user):
         """Test action handles IT Assets API failure"""
         # Arrange
         mock_response = Mock()
@@ -473,10 +533,18 @@ class TestGenerateActiveStaffCSV:
         assert "Failed to fetch IT Assets data" in args[1]
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestExportCurrentActiveProjectLeads:
     """Tests for export_current_active_project_leads admin action"""
 
-    def test_requires_single_selection(self, user, db):
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
+    def test_requires_single_selection(self, user):
         """Test action requires single selection"""
         # Arrange
         admin = CustomUserAdmin(User, AdminSite())
@@ -490,7 +558,8 @@ class TestExportCurrentActiveProjectLeads:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
-    def test_exports_active_project_leads(self, user_factory, db):
+    @pytest.mark.integration
+    def test_exports_active_project_leads(self, user_factory):
         """Test action exports active project leads to text file"""
         # Arrange
         from projects.models import Project, ProjectMember
@@ -539,7 +608,8 @@ class TestExportCurrentActiveProjectLeads:
         assert "external@example.com" in content
         assert "Test Project" in content
 
-    def test_separates_dbca_and_external_leads(self, user_factory, db):
+    @pytest.mark.integration
+    def test_separates_dbca_and_external_leads(self, user_factory):
         """Test action separates DBCA and non-DBCA project leads"""
         # Arrange
         from projects.models import Project, ProjectMember
@@ -583,27 +653,34 @@ class TestExportCurrentActiveProjectLeads:
 # ============================================================================
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestKeywordTagAdmin:
     """Tests for KeywordTagAdmin configuration"""
 
-    def test_list_display(self, db):
+    @pytest.mark.unit
+    def test_list_display(self):
         """Test list_display configuration"""
         admin = KeywordTagAdmin(KeywordTag, AdminSite())
 
         assert "pk" in admin.list_display
         assert "name" in admin.list_display
 
-    def test_actions_configured(self, db):
+    @pytest.mark.unit
+    def test_actions_configured(self):
         """Test admin actions are configured"""
         admin = KeywordTagAdmin(KeywordTag, AdminSite())
 
         assert delete_unused_tags in admin.actions
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestCustomUserAdmin:
     """Tests for CustomUserAdmin configuration"""
 
-    def test_list_display(self, db):
+    @pytest.mark.unit
+    def test_list_display(self):
         """Test list_display configuration"""
         admin = CustomUserAdmin(User, AdminSite())
 
@@ -616,7 +693,8 @@ class TestCustomUserAdmin:
         assert "is_staff" in admin.list_display
         assert "is_superuser" in admin.list_display
 
-    def test_fieldsets_configured(self, db):
+    @pytest.mark.unit
+    def test_fieldsets_configured(self):
         """Test fieldsets are properly configured"""
         admin = CustomUserAdmin(User, AdminSite())
 
@@ -628,7 +706,8 @@ class TestCustomUserAdmin:
         # Important Dates section
         assert admin.fieldsets[2][0] == "Important Dates"
 
-    def test_actions_configured(self, db):
+    @pytest.mark.unit
+    def test_actions_configured(self):
         """Test admin actions are configured"""
         admin = CustomUserAdmin(User, AdminSite())
 
@@ -640,10 +719,13 @@ class TestCustomUserAdmin:
         # create_redirect_files was removed - function no longer exists
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileAdmin:
     """Tests for StaffProfileAdmin configuration"""
 
-    def test_list_display(self, db):
+    @pytest.mark.unit
+    def test_list_display(self):
         """Test list_display configuration"""
         admin = StaffProfileAdmin(PublicStaffProfile, AdminSite())
 
@@ -652,13 +734,15 @@ class TestStaffProfileAdmin:
         assert "about" in admin.list_display
         assert "expertise" in admin.list_display
 
-    def test_ordering(self, db):
+    @pytest.mark.unit
+    def test_ordering(self):
         """Test ordering configuration"""
         admin = StaffProfileAdmin(PublicStaffProfile, AdminSite())
 
         assert admin.ordering == ["user"]
 
-    def test_search_fields(self, db):
+    @pytest.mark.unit
+    def test_search_fields(self):
         """Test search fields configuration"""
         admin = StaffProfileAdmin(PublicStaffProfile, AdminSite())
 
@@ -668,7 +752,8 @@ class TestStaffProfileAdmin:
         assert "user__last_name" in admin.search_fields
         assert "user__username" in admin.search_fields
 
-    def test_actions_configured(self, db):
+    @pytest.mark.unit
+    def test_actions_configured(self):
         """Test admin actions are configured"""
         admin = StaffProfileAdmin(PublicStaffProfile, AdminSite())
 
@@ -679,10 +764,13 @@ class TestStaffProfileAdmin:
         assert set_it_assets_id in admin.actions
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserProfileAdmin:
     """Tests for UserProfileAdmin configuration"""
 
-    def test_list_display(self, db):
+    @pytest.mark.unit
+    def test_list_display(self):
         """Test list_display configuration"""
         admin = UserProfileAdmin(UserProfile, AdminSite())
 
@@ -691,13 +779,15 @@ class TestUserProfileAdmin:
         assert "middle_initials" in admin.list_display
         assert "image" in admin.list_display
 
-    def test_ordering(self, db):
+    @pytest.mark.unit
+    def test_ordering(self):
         """Test ordering configuration"""
         admin = UserProfileAdmin(UserProfile, AdminSite())
 
         assert admin.ordering == ["user"]
 
-    def test_search_fields(self, db):
+    @pytest.mark.unit
+    def test_search_fields(self):
         """Test search fields configuration"""
         admin = UserProfileAdmin(UserProfile, AdminSite())
 
@@ -708,10 +798,13 @@ class TestUserProfileAdmin:
         assert "user__username" in admin.search_fields
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserWorkAdmin:
     """Tests for UserWorkAdmin configuration"""
 
-    def test_list_display(self, db):
+    @pytest.mark.unit
+    def test_list_display(self):
         """Test list_display configuration"""
         admin = UserWorkAdmin(UserWork, AdminSite())
 
@@ -720,7 +813,8 @@ class TestUserWorkAdmin:
         assert "branch" in admin.list_display
         assert "business_area" in admin.list_display
 
-    def test_list_filter(self, db):
+    @pytest.mark.unit
+    def test_list_filter(self):
         """Test list_filter configuration"""
         admin = UserWorkAdmin(UserWork, AdminSite())
 
@@ -728,7 +822,8 @@ class TestUserWorkAdmin:
         assert "branch" in admin.list_filter
         assert "business_area" in admin.list_filter
 
-    def test_search_fields(self, db):
+    @pytest.mark.unit
+    def test_search_fields(self):
         """Test search fields configuration"""
         admin = UserWorkAdmin(UserWork, AdminSite())
 

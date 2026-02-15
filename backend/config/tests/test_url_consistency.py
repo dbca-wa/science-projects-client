@@ -2,6 +2,7 @@
 Test URL consistency - verify no trailing slashes and APPEND_SLASH is False
 """
 
+import pytest
 from django.conf import settings
 from django.test import TestCase
 from django.urls import get_resolver
@@ -10,6 +11,7 @@ from django.urls import get_resolver
 class URLConsistencyTestCase(TestCase):
     """Test that all URLs follow the no-trailing-slash convention"""
 
+    @pytest.mark.unit
     def test_append_slash_is_false(self):
         """Verify APPEND_SLASH setting is False"""
         self.assertFalse(
@@ -17,6 +19,7 @@ class URLConsistencyTestCase(TestCase):
             "APPEND_SLASH should be False to prevent redirect issues with PUT/PATCH/DELETE",
         )
 
+    @pytest.mark.unit
     def test_no_trailing_slashes_in_url_patterns(self):
         """Verify no URL patterns end with trailing slash (except include() prefixes and admin)"""
         resolver = get_resolver()
@@ -91,6 +94,7 @@ class URLConsistencyTestCase(TestCase):
             ),
         )
 
+    @pytest.mark.unit
     def test_critical_endpoints_no_trailing_slash(self):
         """Test that critical endpoints don't have trailing slashes"""
         from django.urls import NoReverseMatch, reverse

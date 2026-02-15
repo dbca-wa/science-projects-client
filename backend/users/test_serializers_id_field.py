@@ -6,6 +6,7 @@ Tests verify that:
 2. 'id' value matches the model's pk value
 """
 
+import pytest
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -31,6 +32,7 @@ class UserSerializerIdFieldTestCase(TestCase):
             display_last_name="User",
         )
 
+    @pytest.mark.integration
     def test_mini_user_serializer_has_id_not_pk(self):
         """MiniUserSerializer should have 'id' field, not 'pk'"""
         serializer = MiniUserSerializer(self.user)
@@ -40,6 +42,7 @@ class UserSerializerIdFieldTestCase(TestCase):
         self.assertNotIn("pk", data, "Serializer should not have 'pk' field")
         self.assertEqual(data["id"], self.user.pk, "'id' value should match model's pk")
 
+    @pytest.mark.integration
     def test_basic_user_serializer_has_id_not_pk(self):
         """BasicUserSerializer should have 'id' field, not 'pk'"""
         serializer = BasicUserSerializer(self.user)
@@ -49,6 +52,7 @@ class UserSerializerIdFieldTestCase(TestCase):
         self.assertNotIn("pk", data, "Serializer should not have 'pk' field")
         self.assertEqual(data["id"], self.user.pk, "'id' value should match model's pk")
 
+    @pytest.mark.integration
     def test_tiny_user_serializer_has_id_not_pk(self):
         """TinyUserSerializer should have 'id' field, not 'pk'"""
         serializer = TinyUserSerializer(self.user)
@@ -58,6 +62,7 @@ class UserSerializerIdFieldTestCase(TestCase):
         self.assertNotIn("pk", data, "Serializer should not have 'pk' field")
         self.assertEqual(data["id"], self.user.pk, "'id' value should match model's pk")
 
+    @pytest.mark.integration
     def test_multiple_users_have_correct_ids(self):
         """Test that multiple users have correct 'id' values"""
         user2 = User.objects.create_user(
