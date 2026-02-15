@@ -456,6 +456,184 @@ docker-compose -f docker-compose.dev.yml logs -f frontend
 - `ghcr.io/dbca-wa/science-projects-frontend` - Frontend images
 - `ghcr.io/dbca-wa/science-projects-backend` - Backend images
 
+### Image Tagging Strategy
+
+The project uses different tagging strategies for staging and production environments to support proper testing and deployment workflows.
+
+#### Staging/UAT Images
+
+**Purpose**: Testing and User Acceptance Testing (UAT) environment
+
+**Tags:**
+- Frontend: `test`
+- Backend: `test`
+
+**Characteristics:**
+- **Mutable tags**: `test` tag is overwritten on each staging deployment
+- **Environment-specific**: Frontend image has `VITE_SENTRY_ENVIRONMENT=test` baked in
+- **Always pull**: Kubernetes configured with `imagePullPolicy: Always` to get latest `test` image
+
+**Build triggers:**
+- Push to `staging` branch
+- Only builds changed components (frontend or backend)
+
+**Example:**
+```bash
+# Frontend test image
+ghcr.io/dbca-wa/science-projects-frontend:test
+
+# Backend test image
+ghcr.io/dbca-wa/science-projects-backend:test
+```
+
+**Deployment:**
+```yaml
+# Kubernetes deployment uses test tag
+image: ghcr.io/dbca-wa/science-projects-frontend:test
+imagePullPolicy: Always  # Always pulls latest test image
+```
+
+#### Production Images
+
+**Purpose**: Production environment
+
+**Tags:**
+- Frontend: `v1.0.0` (version) + `stable` (alias)
+- Backend: `v1.0.0` (version) + `stable` (alias)
+
+**Characteristics:**
+- **Immutable version tags**: `v1.0.0` never changes once created
+- **Mutable stable tag**: `stable` always points to latest production release
+- **Environment-specific**: Frontend image has `VITE_SENTRY_ENVIRONMENT=production` baked in
+- **Specific version**: Kubernetes uses specific version tag (e.g., `v1.0.0`)
+
+**Build triggers:**
+- Push tags matching `v*` (e.g., `v1.0.0`)
+- Release published events
+- Always builds both frontend and backend
+
+**Example:**
+```bash
+# Frontend production images
+ghcr.io/dbca-wa/science-projects-frontend:v1.0.0  # Immutable
+ghcr.io/dbca-wa/science-projects-frontend:stable  # Alias to latest
+
+# Backend production images
+ghcr.io/dbca-wa/science-projects-backend:v1.0.0   # Immutable
+ghcr.io/dbca-wa/science-projects-backend:stable   # Alias to latest
+```
+
+**Deployment:**
+```yaml
+# Kubernetes deployment uses specific version
+image: ghcr.io/dbca-wa/science-projects-frontend:v1.0.0
+imagePullPolicy: IfNotPresent  # Uses cached image if available
+```
+
+#### Why Different Frontend Images?
+
+**Frontend images are environment-specific** because Vite bakes environment variables into the JavaScript bundle at build time:
+
+```typescript
+// frontend/vite.config.ts
+// These values are replaced at build time by Vite
+const apiUrl = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL;
+const sentryEnv = import.meta.env.VITE_SENTRY_ENVIRONMENT;
+```
+
+**Result:**
+- `test` image contains:
+  - `VITE_PRODUCTION_BACKEND_API_URL=https://scienceprojects-test.dbca.wa.gov.au/api/v1/`
+  - `VITE_SENTRY_ENVIRONMENT=test`
+- `v1.0.0` image contains:
+  - `VITE_PRODUCTION_BACKEND_API_URL=https://scienceprojects.dbca.wa.gov.au/api/v1/`
+  - `VITE_SENTRY_ENVIRONMENT=production`
+
+**Cannot use same frontend image for both environments** because the environment variables are compiled into the JavaScript code.
+
+#### Why Same Backend Image Works?
+
+**Backend images are environment-agnostic** because Django reads environment variables at runtime:
+
+```python
+# backend/config/settings.py
+# These values are read at runtime from environment
+API_URL = os.environ.get('API_URL')
+SENTRY_ENVIRONMENT = os.environ.get('SENTRY_ENVIRONMENT')
+```
+
+**Result:**
+- Same backend image can be used in any environment
+- Configuration injected via Kubernetes Secrets at runtime
+- No need for environment-specific builds
+
+**However**, we still use separate `test` and versioned tags for:
+- Clear separation between staging and production
+- Ability to test specific versions before production
+- Consistent tagging strategy across frontend and backend
+
+#### Tag Lifecycle
+
+**Staging workflow:**
+```
+1. Push to staging branch
+2. Detect changes (frontend/backend)
+3. Run tests
+4. Build changed components
+5. Tag as `test`
+6. Push to GHCR (overwrites previous `test` tag)
+7. Kubernetes pulls new `test` image automatically
+```
+
+**Production workflow:**
+```
+1. Create version tag (e.g., v1.0.0)
+2. Detect changes (always builds both)
+3. Run tests
+4. Build both components
+5. Tag as `v1.0.0` and `stable`
+6. Push to GHCR
+7. Update Kustomize configs with new version
+8. Manual deployment to production
+```
+
+#### Best Practices
+
+**For staging:**
+- Use `test` tag for all staging deployments
+- Configure `imagePullPolicy: Always` to get latest images
+- Test thoroughly before promoting to production
+
+**For production:**
+- Always use specific version tags (e.g., `v1.0.0`)
+- Never use `latest` or mutable tags in production
+- Use `stable` tag only for reference, not deployment
+- Keep version tags immutable (never overwrite)
+
+**For rollbacks:**
+```bash
+# Rollback to previous version
+kubectl set image deployment/spms-frontend \
+  frontend=ghcr.io/dbca-wa/science-projects-frontend:v0.9.0 \
+  -n spms-prod
+```
+
+#### Tag Naming Conventions
+
+**Version tags:**
+- Format: `vMAJOR.MINOR.PATCH` (e.g., `v1.0.0`)
+- Follow semantic versioning
+- Immutable once created
+
+**Environment tags:**
+- `test` - Staging/UAT environment
+- `stable` - Alias to latest production release
+
+**Never use:**
+- `latest` - Ambiguous and error-prone
+- `dev` - Use `test` instead
+- `prod` - Use specific versions instead
+
 ### Authentication
 
 **Docker login:**

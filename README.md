@@ -190,22 +190,58 @@ git commit --no-verify -m "emergency fix"
 
 ## CI/CD Workflows
 
-**test.yml** (on PRs):
+### Workflow Structure
 
-- Frontend tests (2-way sharding)
-- Backend tests (4-way sharding)
-- Coverage badges (auto-update on main)
+The CI/CD pipeline uses a modular approach with reusable workflows:
+
+**test.yml** (reusable workflow):
+- Called by deploy-staging.yml and deploy-prod.yml
+- Frontend tests (2-way sharding, ~2 min)
+- Backend tests (4-way sharding, ~10 min)
+- Coverage combining and validation
 - Path-based execution (only test changed code)
 
 **deploy-staging.yml** (on push to staging):
-
-- Build and push `latest`/`test` images
-- Auto-deploy to staging
+- Detects changes (frontend/backend)
+- Runs tests via test.yml (test gating)
+- Builds and pushes `test` images (only if tests pass)
+- Total time: ~12 minutes
 
 **deploy-prod.yml** (on version tags):
+- Always tests and builds both frontend and backend
+- Runs tests via test.yml (test gating)
+- Builds and pushes versioned + `stable` images
+- Updates coverage badges in README
+- Updates Kustomize configs automatically
 
-- Build and push versioned/`stable` images
-- Auto-update Kustomize configs
+**sync-staging.yml** (on push to main):
+- Syncs staging branch with main
+- Uses `[skip ci]` to prevent unnecessary builds
+
+### Image Tagging Strategy
+
+**Staging** (test environment):
+- Frontend: `test` tag with `VITE_SENTRY_ENVIRONMENT=test`
+- Backend: `test` tag
+- Note: Frontend test and production images are different builds (Vite bakes environment variables)
+
+**Production** (tagged releases):
+- Frontend: `v1.0.0` + `stable` tags with `VITE_SENTRY_ENVIRONMENT=production`
+- Backend: `v1.0.0` + `stable` tags
+- `stable` tag always points to latest production release
+
+### Skipping CI
+
+Add `[skip ci]` to commit message to skip workflows:
+
+```bash
+git commit -m "docs: update README [skip ci]"
+```
+
+Use cases:
+- Documentation-only changes
+- README updates
+- Non-code changes that don't require testing/building
 
 ## Documentation
 

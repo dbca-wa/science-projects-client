@@ -70,86 +70,118 @@ feature/* → staging → main
 
 ## GitHub Actions Workflows
 
-### Test Workflow
+### Workflow Architecture
+
+The CI/CD pipeline uses a **modular, reusable workflow approach** following the DRY (Don't Repeat Yourself) principle:
+
+```
+test.yml (reusable)
+    ↓
+    Called by:
+    ├── deploy-staging.yml
+    ├── deploy-prod.yml
+    └── Pull Requests
+```
+
+This architecture ensures:
+- Tests are defined once, used everywhere
+- Consistent test execution across environments
+- Easier maintenance and updates
+- Test gating prevents broken deployments
+
+### Test Workflow (Reusable)
 
 **File**: `.github/workflows/test.yml`
 
 **Triggers:**
 
 - Pull requests to `staging` or `main`
-- Push to `staging` or `main`
+- Release events
+- **Workflow call** from deploy-staging.yml and deploy-prod.yml
 
 **Jobs:**
 
-1. **Frontend Tests**
-    - Runs when frontend files change
-    - Installs dependencies with bun
-    - Runs unit tests with Vitest
-    - Runs page tests with Vitest + Testing Library
-    - Generates coverage report
-    - Coverage badge automatically updated on `main` branch
+1. **Detect Changes**
+    - Determines which components changed (frontend/backend)
+    - For releases: Always tests both components
+    - Outputs used by subsequent jobs to skip unchanged components
 
-2. **Backend Tests**
+2. **Frontend Tests** (2-way sharding)
+    - Runs when frontend files change
+    - Installs dependencies with Bun
+    - Runs tests in 2 parallel shards (~2 minutes total)
+    - Uploads coverage artifacts from each shard
+
+3. **Combine Frontend Coverage**
+    - Combines coverage from both shards
+    - Generates coverage report
+    - Validates minimum coverage threshold (40%)
+    - Uploads combined coverage percentage artifact
+
+4. **Backend Tests** (4-way sharding)
     - Runs when backend files change
     - Sets up Python with Poetry
-    - Runs Django tests with pytest
-    - Generates coverage report
-    - Coverage badge automatically updated on `main` branch
+    - Runs tests in 4 parallel shards (~10 minutes total)
+    - Uses test duration caching for optimal distribution
+    - Uploads coverage artifacts from each shard
 
-**Example:**
+5. **Combine Backend Coverage**
+    - Combines coverage from all 4 shards
+    - Generates coverage report
+    - Validates minimum coverage threshold (80%)
+    - Uploads combined coverage percentage artifact
+
+**Key features:**
+
+- **Path-based execution**: Only tests changed code
+- **Parallel sharding**: Faster test execution
+- **Coverage combining**: Accurate coverage from sharded tests
+- **Reusable**: Called by other workflows via `workflow_call`
+
+**Example structure:**
 
 ```yaml
 name: Test
 
 on:
     pull_request:
-        branches: [staging, main]
-    push:
-        branches: [staging, main]
+        branches: [main, staging]
+    release:
+        types: [published]
+    workflow_call:  # Allows other workflows to call this
+
+permissions:
+    contents: read
+    packages: read
 
 jobs:
     detect-changes:
-        runs-on: ubuntu-latest
-        outputs:
-            frontend: ${{ steps.changes.outputs.frontend }}
-            backend: ${{ steps.changes.outputs.backend }}
-        steps:
-            - uses: actions/checkout@v4
-            - uses: dorny/paths-filter@v2
-              id: changes
-              with:
-                  filters: |
-                      frontend:
-                        - 'frontend/**'
-                      backend:
-                        - 'backend/**'
+        # Detects frontend/backend changes
+        # For releases: Always returns true for both
 
     test-frontend:
         needs: detect-changes
         if: needs.detect-changes.outputs.frontend == 'true'
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: oven-sh/setup-bun@v1
-            - run: bun install
-              working-directory: frontend
-            - run: bun run test:coverage
-              working-directory: frontend
+        strategy:
+            matrix:
+                shard: [1, 2]
+        # Runs frontend tests with sharding
+
+    combine-frontend-coverage:
+        needs: test-frontend
+        # Combines coverage from shards
 
     test-backend:
         needs: detect-changes
         if: needs.detect-changes.outputs.backend == 'true'
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-python@v4
-              with:
-                  python-version: "3.11"
-            - run: pip install poetry
-            - run: poetry install
-              working-directory: backend
-            - run: poetry run pytest --cov --cov-report=xml
-              working-directory: backend
+        strategy:
+            matrix:
+                shard: [1, 2, 3, 4]
+        # Runs backend tests with sharding
+
+    combine-backend-coverage:
+        needs: test-backend
+        # Combines coverage from shards
 ```
 
 ### Staging Deployment Workflow
@@ -159,73 +191,86 @@ jobs:
 **Triggers:**
 
 - Push to `staging` branch
+- Skipped if commit message contains `[skip ci]`
 
 **Jobs:**
 
-1. **Build Frontend**
-    - Runs when frontend files change
+1. **Detect Changes**
+    - Runs first (~10 seconds)
+    - Determines which components changed (frontend/backend)
+    - Outputs used by build jobs to skip unchanged components
+
+2. **Run Tests**
+    - Calls `test.yml` workflow (reusable)
+    - Runs all tests for changed components
+    - **Test gating**: Builds only proceed if tests pass
+    - Total time: ~12 minutes (frontend ~2 min, backend ~10 min)
+
+3. **Build Frontend Test** (conditional)
+    - Runs only if frontend changed AND tests passed
     - Builds production bundle with Vite
+    - Environment: `VITE_SENTRY_ENVIRONMENT=test`
     - Creates Docker image
-    - Pushes to Azure Container Registry
-    - Tags with `staging-<commit-sha>`
+    - Pushes to GitHub Container Registry
+    - Tags: `test` (for staging/UAT environment)
 
-2. **Build Backend**
-    - Runs when backend files change
+4. **Build Backend Test** (conditional)
+    - Runs only if backend changed AND tests passed
     - Creates Docker image
-    - Pushes to Azure Container Registry
-    - Tags with `staging-<commit-sha>`
+    - Pushes to GitHub Container Registry
+    - Tags: `test` (for staging/UAT environment)
 
-3. **Deploy to AKS**
-    - Updates Kubernetes manifests
-    - Applies Kustomize overlays for staging
-    - Deploys to AKS test namespace
-    - Runs smoke tests
+**Key features:**
 
-**Example:**
+- **Test gating**: Builds wait for tests to pass
+- **Conditional builds**: Only builds changed components
+- **Skip CI support**: Add `[skip ci]` to commit message to skip workflow
+- **Environment-specific builds**: Frontend test image has `VITE_SENTRY_ENVIRONMENT=test` baked in
+
+**Example structure:**
 
 ```yaml
-name: Deploy to Staging
+name: Deploy Staging
 
 on:
     push:
         branches: [staging]
 
 jobs:
-    build-frontend:
-        if: contains(github.event.head_commit.modified, 'frontend/')
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: oven-sh/setup-bun@v1
-            - run: bun install
-              working-directory: frontend
-            - run: bun run build
-              working-directory: frontend
-              env:
-                  VITE_API_URL: ${{ secrets.TEST_API_URL }}
-                  VITE_ENVIRONMENT: staging
-            - uses: azure/docker-login@v1
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-            - run: |
-                  docker build -t ghcr.io/dbca-wa/science-projects-frontend:staging-${{ github.sha }} frontend
-                  docker push ghcr.io/dbca-wa/science-projects-frontend:staging-${{ github.sha }}
+    detect-changes:
+        if: "!contains(github.event.head_commit.message, '[skip ci]')"
+        # Detects frontend/backend changes
 
-    deploy-aks:
-        needs: [build-frontend, build-backend]
-        runs-on: ubuntu-latest
-        steps:
-            - uses: azure/k8s-set-context@v3
-              with:
-                  method: kubeconfig
-                  kubeconfig: ${{ secrets.KUBE_CONFIG }}
-            - run: |
-                  kubectl set image deployment/spms-frontend \
-                    spms-frontend=ghcr.io/dbca-wa/science-projects-frontend:staging-${{ github.sha }} \
-                    -n spms-test
+    run-tests:
+        needs: detect-changes
+        if: "!contains(github.event.head_commit.message, '[skip ci]')"
+        uses: ./.github/workflows/test.yml  # Calls reusable workflow
+
+    build-frontend-test:
+        needs: [detect-changes, run-tests]
+        if: |
+            !contains(github.event.head_commit.message, '[skip ci]') &&
+            success() &&
+            needs.detect-changes.outputs.frontend == 'true'
+        # Builds frontend with test environment variables
+        # Tags: test
+
+    build-backend-test:
+        needs: [detect-changes, run-tests]
+        if: |
+            !contains(github.event.head_commit.message, '[skip ci]') &&
+            success() &&
+            needs.detect-changes.outputs.backend == 'true'
+        # Builds backend
+        # Tags: test
 ```
+
+**Image tagging:**
+
+- Frontend: `ghcr.io/dbca-wa/science-projects-frontend:test`
+- Backend: `ghcr.io/dbca-wa/science-projects-backend:test`
+
+**Note**: Frontend test and production images are **different builds** because Vite bakes environment variables into the JavaScript bundle at build time.
 
 ### Production Deployment Workflow
 
@@ -233,82 +278,314 @@ jobs:
 
 **Triggers:**
 
-- Push to `main` branch
+- Push tags matching `v*` (e.g., `v1.0.0`)
+- Release published events
 
 **Jobs:**
 
-1. **Build Frontend**
-    - Runs when frontend files change
+1. **Detect Changes**
+    - Runs first (~10 seconds)
+    - For tagged releases: **Always builds both frontend and backend**
+    - Ensures complete production deployment
+
+2. **Run Tests**
+    - Calls `test.yml` workflow (reusable)
+    - Runs all tests for both components
+    - **Test gating**: Builds only proceed if tests pass
+
+3. **Build Frontend Production**
     - Builds production bundle with Vite
+    - Environment: `VITE_SENTRY_ENVIRONMENT=production`
     - Creates Docker image
-    - Pushes to Azure Container Registry
-    - Tags with `prod-<version>` and `latest`
+    - Pushes to GitHub Container Registry
+    - Tags: `v1.0.0` (version) + `stable` (alias to latest production)
 
-2. **Build Backend**
-    - Runs when backend files change
+4. **Build Backend Production**
     - Creates Docker image
-    - Pushes to Azure Container Registry
-    - Tags with `prod-<version>` and `latest`
+    - Pushes to GitHub Container Registry
+    - Tags: `v1.0.0` (version) + `stable` (alias to latest production)
 
-3. **Deploy to AKS** (requires approval)
-    - Updates Kubernetes manifests
-    - Applies Kustomize overlays for production
-    - Deploys to AKS production namespace
-    - Runs smoke tests
+5. **Update Coverage Badges**
+    - Downloads coverage percentages from test artifacts
+    - Validates coverage values (numeric check)
+    - Updates README.md badges with new coverage percentages
+    - Commits with `[skip ci]` to prevent recursive workflow
 
-**Example:**
+6. **Update Kustomize**
+    - Updates Kustomize image tags to new version
+    - Updates both `prod` and `test` overlays
+    - Commits with `[skip ci]` to prevent recursive workflow
+
+**Key features:**
+
+- **Always builds both components**: Tagged releases deploy complete system
+- **Test gating**: Builds wait for tests to pass
+- **Coverage badge updates**: Automatic README updates on production releases
+- **Kustomize automation**: Image tags updated automatically
+- **Environment-specific builds**: Frontend production image has `VITE_SENTRY_ENVIRONMENT=production` baked in
+
+**Example structure:**
 
 ```yaml
-name: Deploy to Production
+name: Deploy Production
+
+on:
+    push:
+        tags:
+            - "v*"
+    release:
+        types: [published]
+
+jobs:
+    detect-changes:
+        # Always returns true for both frontend and backend
+
+    run-tests:
+        needs: detect-changes
+        uses: ./.github/workflows/test.yml  # Calls reusable workflow
+
+    build-frontend-prod:
+        needs: [run-tests, detect-changes]
+        if: success() && needs.detect-changes.outputs.frontend == 'true'
+        # Builds frontend with production environment variables
+        # Tags: v1.0.0, stable
+
+    build-backend-prod:
+        needs: [run-tests, detect-changes]
+        if: success() && needs.detect-changes.outputs.backend == 'true'
+        # Builds backend
+        # Tags: v1.0.0, stable
+
+    update-coverage-badges:
+        needs: run-tests
+        if: success()
+        # Downloads coverage artifacts
+        # Validates coverage values
+        # Updates README.md badges
+        # Commits with [skip ci]
+
+    update-kustomize:
+        needs: [detect-changes, build-frontend-prod, build-backend-prod]
+        if: |
+            always() &&
+            (needs.build-frontend-prod.result == 'success' ||
+             needs.build-backend-prod.result == 'success')
+        # Updates kustomize image tags
+        # Commits with [skip ci]
+```
+
+**Image tagging:**
+
+- Frontend:
+  - `ghcr.io/dbca-wa/science-projects-frontend:v1.0.0`
+  - `ghcr.io/dbca-wa/science-projects-frontend:stable`
+- Backend:
+  - `ghcr.io/dbca-wa/science-projects-backend:v1.0.0`
+  - `ghcr.io/dbca-wa/science-projects-backend:stable`
+
+**Stable tag**: The `stable` tag always points to the latest production release, providing a consistent reference for deployments.
+
+### Sync Staging Workflow
+
+**File**: `.github/workflows/sync-staging.yml`
+
+**Triggers:**
+
+- Push to `main` branch
+
+**Purpose:**
+
+Automatically syncs the `staging` branch with `main` after production releases, ensuring staging stays up-to-date with production code.
+
+**Jobs:**
+
+1. **Sync Staging Branch**
+    - Fetches latest `main` and `staging` branches
+    - Resets `staging` to match `main`
+    - Creates empty commit with `[skip ci]` message
+    - Force pushes to `staging`
+
+**Key features:**
+
+- **Skip CI**: Uses `[skip ci]` to prevent unnecessary builds
+- **Force sync**: Ensures staging exactly matches main
+- **Automatic**: No manual intervention required
+
+**Example structure:**
+
+```yaml
+name: Sync Staging with Main
 
 on:
     push:
         branches: [main]
 
 jobs:
-    build-frontend:
-        if: contains(github.event.head_commit.modified, 'frontend/')
+    sync-staging:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - uses: oven-sh/setup-bun@v1
-            - run: bun install
-              working-directory: frontend
-            - run: bun run build
-              working-directory: frontend
-              env:
-                  VITE_API_URL: ${{ secrets.PROD_API_URL }}
-                  VITE_ENVIRONMENT: production
-            - uses: azure/docker-login@v1
               with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
+                  fetch-depth: 0
             - run: |
-                  VERSION=$(cat frontend/package.json | jq -r .version)
-                  docker build -t ghcr.io/dbca-wa/science-projects-frontend:prod-$VERSION frontend
-                  docker tag ghcr.io/dbca-wa/science-projects-frontend:prod-$VERSION \
-                    ghcr.io/dbca-wa/science-projects-frontend:latest
-                  docker push ghcr.io/dbca-wa/science-projects-frontend:prod-$VERSION
-                  docker push ghcr.io/dbca-wa/science-projects-frontend:latest
-
-    deploy-aks:
-        needs: [build-frontend, build-backend]
-        runs-on: ubuntu-latest
-        environment:
-            name: production
-            url: https://scienceprojects.dbca.wa.gov.au
-        steps:
-            - uses: azure/k8s-set-context@v3
-              with:
-                  method: kubeconfig
-                  kubeconfig: ${{ secrets.KUBE_CONFIG }}
-            - run: |
-                  VERSION=$(cat frontend/package.json | jq -r .version)
-                  kubectl set image deployment/spms-frontend \
-                    spms-frontend=ghcr.io/dbca-wa/science-projects-frontend:prod-$VERSION \
-                    -n spms-prod
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git fetch origin main
+                  git fetch origin staging
+                  git checkout staging
+                  git reset --hard origin/main
+                  git commit --allow-empty -m "chore: sync staging with main [skip ci]"
+                  git push origin staging --force
 ```
+
+**Why `[skip ci]`?**
+
+After a production release, `main` and `staging` are identical. Running tests and builds again would waste CI minutes without providing value.
+
+## Test Gating
+
+### What is Test Gating?
+
+**Test gating** ensures that Docker images are only built and pushed if all tests pass. This prevents deploying broken code to staging or production.
+
+### How It Works
+
+**Workflow dependency chain:**
+
+```
+detect-changes → run-tests → build-frontend
+                           → build-backend
+```
+
+**Build jobs wait for tests:**
+
+```yaml
+build-frontend-test:
+    needs: [detect-changes, run-tests]  # Waits for tests
+    if: |
+        !contains(github.event.head_commit.message, '[skip ci]') &&
+        success() &&  # Only runs if tests passed
+        needs.detect-changes.outputs.frontend == 'true'
+```
+
+### Benefits
+
+- **Prevents broken deployments**: No images built if tests fail
+- **Saves CI minutes**: Skips expensive builds when tests fail early
+- **Clear feedback**: Developers know immediately if tests fail
+- **Consistent quality**: All deployed code has passed tests
+
+### Workflow Execution Time
+
+**Staging deployment** (typical):
+- Detect changes: ~10 seconds
+- Run tests: ~12 minutes (frontend ~2 min, backend ~10 min in parallel)
+- Build images: ~5 minutes (only changed components)
+- **Total**: ~17 minutes
+
+**Production deployment** (typical):
+- Detect changes: ~10 seconds
+- Run tests: ~12 minutes (both components)
+- Build images: ~8 minutes (both components)
+- Update badges: ~30 seconds
+- Update Kustomize: ~30 seconds
+- **Total**: ~21 minutes
+
+**Note**: Builds wait for ALL tests to complete because `test.yml` runs as a single atomic workflow when called via `workflow_call`. This is a GitHub Actions limitation but ensures test integrity.
+
+## Image Tagging Strategy
+
+### Staging Images
+
+**Purpose**: Testing and UAT environment
+
+**Tags:**
+- Frontend: `test`
+- Backend: `test`
+
+**Environment variables:**
+- Frontend: `VITE_SENTRY_ENVIRONMENT=test` (baked into build)
+- Backend: Environment-agnostic (configured at runtime)
+
+**Deployment:**
+- Kubernetes pulls `test` tag with `imagePullPolicy: Always`
+- Updates automatically when new `test` image is pushed
+
+### Production Images
+
+**Purpose**: Production environment
+
+**Tags:**
+- Frontend: `v1.0.0` (version) + `stable` (alias)
+- Backend: `v1.0.0` (version) + `stable` (alias)
+
+**Environment variables:**
+- Frontend: `VITE_SENTRY_ENVIRONMENT=production` (baked into build)
+- Backend: Environment-agnostic (configured at runtime)
+
+**Deployment:**
+- Kubernetes uses specific version tag (e.g., `v1.0.0`)
+- `stable` tag provides consistent reference to latest production
+
+### Why Different Frontend Images?
+
+**Frontend images are environment-specific** because Vite bakes environment variables into the JavaScript bundle at build time:
+
+```typescript
+// These values are replaced at build time
+const apiUrl = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL;
+const sentryEnv = import.meta.env.VITE_SENTRY_ENVIRONMENT;
+```
+
+**Result:**
+- `test` image has test API URLs and `VITE_SENTRY_ENVIRONMENT=test`
+- `v1.0.0` image has production API URLs and `VITE_SENTRY_ENVIRONMENT=production`
+- Cannot use same image for both environments
+
+**Backend images are environment-agnostic** because Django reads environment variables at runtime:
+
+```python
+# These values are read at runtime from environment
+API_URL = os.environ.get('API_URL')
+SENTRY_ENVIRONMENT = os.environ.get('SENTRY_ENVIRONMENT')
+```
+
+**Result:**
+- Same backend image can be used in any environment
+- Configuration injected via Kubernetes Secrets at runtime
+
+## Skipping CI
+
+### When to Skip CI
+
+Add `[skip ci]` to commit messages to skip workflows:
+
+```bash
+git commit -m "docs: update README [skip ci]"
+```
+
+**Use cases:**
+- Documentation-only changes
+- README updates
+- Comment changes
+- Non-code changes that don't require testing/building
+
+### How It Works
+
+Workflows check for `[skip ci]` in commit message:
+
+```yaml
+jobs:
+    detect-changes:
+        if: "!contains(github.event.head_commit.message, '[skip ci]')"
+```
+
+**Workflows that respect `[skip ci]`:**
+- `deploy-staging.yml` - Skips all jobs
+- `deploy-prod.yml` - Does NOT skip (production always builds)
+- `test.yml` - Skips when called by deploy-staging.yml
+
+**Note**: Pull request workflows do NOT respect `[skip ci]` to ensure all PRs are tested.
 
 ## Testing Strategy in CI/CD
 
