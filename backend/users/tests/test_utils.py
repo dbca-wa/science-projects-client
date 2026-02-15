@@ -22,10 +22,12 @@ from users.utils.validators import (
 )
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserFilters:
     """Tests for user filtering utilities"""
 
-    def test_apply_user_filters_is_active(self, user, db):
+    def test_apply_user_filters_is_active(self, user):
         """Test filtering users by is_active"""
         # Arrange
         queryset = User.objects.all()
@@ -38,7 +40,7 @@ class TestUserFilters:
         assert user in result
         assert result.filter(is_active=True).count() == result.count()
 
-    def test_apply_user_filters_is_staff(self, staff_user, db):
+    def test_apply_user_filters_is_staff(self, staff_user):
         """Test filtering users by is_staff"""
         # Arrange
         queryset = User.objects.all()
@@ -51,7 +53,7 @@ class TestUserFilters:
         assert staff_user in result
         assert result.filter(is_staff=True).count() == result.count()
 
-    def test_apply_user_filters_is_superuser(self, superuser, db):
+    def test_apply_user_filters_is_superuser(self, superuser):
         """Test filtering users by is_superuser"""
         # Arrange
         queryset = User.objects.all()
@@ -64,7 +66,7 @@ class TestUserFilters:
         assert superuser in result
         assert result.filter(is_superuser=True).count() == result.count()
 
-    def test_apply_user_filters_business_area(self, user, user_work, business_area, db):
+    def test_apply_user_filters_business_area(self, user, user_work, business_area):
         """Test filtering users by business area"""
         # Arrange
         queryset = User.objects.all()
@@ -76,7 +78,7 @@ class TestUserFilters:
         # Assert
         assert user in result
 
-    def test_apply_user_filters_multiple(self, user, db):
+    def test_apply_user_filters_multiple(self, user):
         """Test applying multiple filters"""
         # Arrange
         queryset = User.objects.all()
@@ -92,7 +94,7 @@ class TestUserFilters:
         assert user in result
         assert result.filter(is_active=True, is_staff=False).count() == result.count()
 
-    def test_apply_user_filters_empty(self, user, db):
+    def test_apply_user_filters_empty(self, user):
         """Test applying no filters"""
         # Arrange
         queryset = User.objects.all()
@@ -118,7 +120,7 @@ class TestUserFilters:
         # Assert
         assert staff_profile in result
 
-    def test_apply_profile_filters_user(self, staff_profile, db):
+    def test_apply_profile_filters_user(self, staff_profile):
         """Test filtering profiles by user"""
         # Arrange
         queryset = PublicStaffProfile.objects.all()
@@ -132,10 +134,12 @@ class TestUserFilters:
         assert result.count() == 1
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserHelpers:
     """Tests for user helper utilities"""
 
-    def test_search_users_by_username(self, user, db):
+    def test_search_users_by_username(self, user):
         """Test searching users by username"""
         # Arrange
         queryset = User.objects.all()
@@ -147,7 +151,7 @@ class TestUserHelpers:
         # Assert
         assert user in result
 
-    def test_search_users_by_email(self, user, db):
+    def test_search_users_by_email(self, user):
         """Test searching users by email"""
         # Arrange
         queryset = User.objects.all()
@@ -159,7 +163,7 @@ class TestUserHelpers:
         # Assert
         assert user in result
 
-    def test_search_users_by_first_name(self, user, db):
+    def test_search_users_by_first_name(self, user):
         """Test searching users by first name"""
         # Arrange
         queryset = User.objects.all()
@@ -171,7 +175,7 @@ class TestUserHelpers:
         # Assert
         assert user in result
 
-    def test_search_users_by_last_name(self, user, db):
+    def test_search_users_by_last_name(self, user):
         """Test searching users by last name"""
         # Arrange
         queryset = User.objects.all()
@@ -183,7 +187,7 @@ class TestUserHelpers:
         # Assert
         assert user in result
 
-    def test_search_users_by_full_name(self, user, db):
+    def test_search_users_by_full_name(self, user):
         """Test searching users by full name"""
         # Arrange
         queryset = User.objects.all()
@@ -195,7 +199,7 @@ class TestUserHelpers:
         # Assert
         assert user in result
 
-    def test_search_users_empty_term(self, user, db):
+    def test_search_users_empty_term(self, user):
         """Test searching with empty term"""
         # Arrange
         queryset = User.objects.all()
@@ -207,7 +211,7 @@ class TestUserHelpers:
         # Assert
         assert result.count() == queryset.count()
 
-    def test_search_users_short_term(self, user, db):
+    def test_search_users_short_term(self, user):
         """Test searching with term less than 2 characters"""
         # Arrange
         queryset = User.objects.all()
@@ -219,7 +223,7 @@ class TestUserHelpers:
         # Assert
         assert result.count() == queryset.count()
 
-    def test_search_profiles_by_user_name(self, staff_profile, db):
+    def test_search_profiles_by_user_name(self, staff_profile):
         """Test searching profiles by user name"""
         # Arrange
         queryset = PublicStaffProfile.objects.all()
@@ -231,7 +235,7 @@ class TestUserHelpers:
         # Assert
         assert staff_profile in result
 
-    def test_search_profiles_by_email(self, staff_profile, db):
+    def test_search_profiles_by_email(self, staff_profile):
         """Test searching profiles by email"""
         # Arrange
         queryset = PublicStaffProfile.objects.all()
@@ -243,7 +247,7 @@ class TestUserHelpers:
         # Assert
         assert staff_profile in result
 
-    def test_search_profiles_by_about(self, staff_profile, db):
+    def test_search_profiles_by_about(self, staff_profile):
         """Test searching profiles by about text"""
         # Arrange
         staff_profile.about = "Expert in Python development"
@@ -257,7 +261,7 @@ class TestUserHelpers:
         # Assert
         assert staff_profile in result
 
-    def test_search_profiles_by_expertise(self, staff_profile, db):
+    def test_search_profiles_by_expertise(self, staff_profile):
         """Test searching profiles by expertise"""
         # Arrange
         staff_profile.expertise = "Django, REST APIs"
@@ -271,7 +275,7 @@ class TestUserHelpers:
         # Assert
         assert staff_profile in result
 
-    def test_search_profiles_empty_term(self, staff_profile, db):
+    def test_search_profiles_empty_term(self, staff_profile):
         """Test searching profiles with empty term"""
         # Arrange
         queryset = PublicStaffProfile.objects.all()
@@ -283,7 +287,7 @@ class TestUserHelpers:
         # Assert
         assert result.count() == queryset.count()
 
-    def test_format_user_name(self, user, db):
+    def test_format_user_name(self, user):
         """Test formatting user name"""
         # Act
         result = format_user_name(user)
@@ -291,7 +295,7 @@ class TestUserHelpers:
         # Assert
         assert result == f"{user.display_first_name} {user.display_last_name}"
 
-    def test_get_user_avatar_url_no_avatar(self, user, db):
+    def test_get_user_avatar_url_no_avatar(self, user):
         """Test getting avatar URL when user has no avatar"""
         # Act
         result = get_user_avatar_url(user)
@@ -299,7 +303,7 @@ class TestUserHelpers:
         # Assert
         assert result is None
 
-    def test_get_user_business_area_with_work(self, user, user_work, business_area, db):
+    def test_get_user_business_area_with_work(self, user, user_work, business_area):
         """Test getting user business area when work exists"""
         # Act
         result = get_user_business_area(user)
@@ -307,7 +311,7 @@ class TestUserHelpers:
         # Assert
         assert result == business_area
 
-    def test_get_user_business_area_no_work(self, user_factory, db):
+    def test_get_user_business_area_no_work(self, user_factory):
         """Test getting user business area when no work"""
         # Arrange
         user = user_factory()
@@ -319,10 +323,12 @@ class TestUserHelpers:
         assert result is None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserValidators:
     """Tests for user validation utilities"""
 
-    def test_validate_email_unique_new_email(self, db):
+    def test_validate_email_unique_new_email(self):
         """Test validating unique email for new user"""
         # Arrange
         email = "newemail@example.com"
@@ -330,7 +336,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_email_unique(email)
 
-    def test_validate_email_unique_existing_email(self, user, db):
+    def test_validate_email_unique_existing_email(self, user):
         """Test validating email that already exists"""
         # Arrange
         email = user.email
@@ -339,7 +345,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="Email already exists"):
             validate_email_unique(email)
 
-    def test_validate_email_unique_exclude_user(self, user, db):
+    def test_validate_email_unique_exclude_user(self, user):
         """Test validating email excluding specific user"""
         # Arrange
         email = user.email
@@ -347,7 +353,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_email_unique(email, exclude_user_id=user.id)
 
-    def test_validate_username_unique_new_username(self, db):
+    def test_validate_username_unique_new_username(self):
         """Test validating unique username for new user"""
         # Arrange
         username = "newusername"
@@ -355,7 +361,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_username_unique(username)
 
-    def test_validate_username_unique_existing_username(self, user, db):
+    def test_validate_username_unique_existing_username(self, user):
         """Test validating username that already exists"""
         # Arrange
         username = user.username
@@ -364,7 +370,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="Username already exists"):
             validate_username_unique(username)
 
-    def test_validate_username_unique_exclude_user(self, user, db):
+    def test_validate_username_unique_exclude_user(self, user):
         """Test validating username excluding specific user"""
         # Arrange
         username = user.username
@@ -372,7 +378,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_username_unique(username, exclude_user_id=user.id)
 
-    def test_validate_profile_data_valid(self, db):
+    def test_validate_profile_data_valid(self):
         """Test validating valid profile data"""
         # Arrange
         data = {
@@ -383,7 +389,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_profile_data(data)
 
-    def test_validate_profile_data_about_too_long(self, db):
+    def test_validate_profile_data_about_too_long(self):
         """Test validating profile with about section too long"""
         # Arrange
         data = {
@@ -394,7 +400,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="About section too long"):
             validate_profile_data(data)
 
-    def test_validate_profile_data_expertise_too_long(self, db):
+    def test_validate_profile_data_expertise_too_long(self):
         """Test validating profile with expertise section too long"""
         # Arrange
         data = {
@@ -405,7 +411,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="Expertise section too long"):
             validate_profile_data(data)
 
-    def test_validate_password_strength_valid(self, db):
+    def test_validate_password_strength_valid(self):
         """Test validating strong password"""
         # Arrange
         password = "StrongPass123"
@@ -413,7 +419,7 @@ class TestUserValidators:
         # Act & Assert - should not raise
         validate_password_strength(password)
 
-    def test_validate_password_strength_too_short(self, db):
+    def test_validate_password_strength_too_short(self):
         """Test validating password that is too short"""
         # Arrange
         password = "Short1"
@@ -422,7 +428,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="at least 8 characters"):
             validate_password_strength(password)
 
-    def test_validate_password_strength_no_digit(self, db):
+    def test_validate_password_strength_no_digit(self):
         """Test validating password without digit"""
         # Arrange
         password = "NoDigitPass"
@@ -431,7 +437,7 @@ class TestUserValidators:
         with pytest.raises(ValidationError, match="at least one digit"):
             validate_password_strength(password)
 
-    def test_validate_password_strength_no_uppercase(self, db):
+    def test_validate_password_strength_no_uppercase(self):
         """Test validating password without uppercase"""
         # Arrange
         password = "nouppercase123"

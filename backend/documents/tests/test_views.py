@@ -20,6 +20,7 @@ from documents.models import ProgressReport, ProjectDocument
 class TestConceptPlansBasic:
     """Tests for concept plan list and create endpoints (basic version)"""
 
+    @pytest.mark.integration
     def test_list_concept_plans_authenticated(
         self, api_client, user, project_document, db
     ):
@@ -34,6 +35,8 @@ class TestConceptPlansBasic:
         assert response.status_code == status.HTTP_200_OK
         assert "concept_plans" in response.data
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_list_concept_plans_unauthenticated(self, api_client, db):
         """Test listing concept plans without authentication"""
         # Act
@@ -49,6 +52,7 @@ class TestConceptPlansBasic:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.create_concept_plan"
     )
+    @pytest.mark.integration
     def test_create_concept_plan(
         self, mock_create, api_client, user, project_with_lead, db
     ):
@@ -81,6 +85,7 @@ class TestConceptPlansBasic:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_create_concept_plan_invalid_data(self, api_client, user, db):
         """Test creating concept plan with invalid data"""
         # Arrange
@@ -99,6 +104,7 @@ class TestConceptPlansBasic:
 class TestConceptPlanDetailBasic:
     """Tests for concept plan detail endpoints (basic version)"""
 
+    @pytest.mark.integration
     def test_get_concept_plan(self, api_client, user, project_document, db):
         """Test getting a concept plan by ID"""
         # Arrange
@@ -114,6 +120,7 @@ class TestConceptPlanDetailBasic:
         # In real implementation, we'd need proper test data
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_400_BAD_REQUEST]
 
+    @pytest.mark.integration
     def test_get_concept_plan_unauthenticated(self, api_client, project_document, db):
         """Test getting concept plan without authentication"""
         # Act
@@ -128,6 +135,7 @@ class TestConceptPlanDetailBasic:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_concept_plan(self, api_client, user, project_document, db):
         """Test updating a concept plan"""
         # Arrange
@@ -153,6 +161,7 @@ class TestConceptPlanDetailBasic:
         ]
 
     @patch("documents.services.document_service.DocumentService.delete_document")
+    @pytest.mark.integration
     def test_delete_concept_plan(
         self, mock_delete, api_client, user, project_document, db
     ):
@@ -185,6 +194,7 @@ class TestRequestApproval:
 
     @patch("documents.services.approval_service.ApprovalService.request_approval")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_request_approval_success(
         self, mock_get, mock_request, api_client, user, project_document, db
     ):
@@ -207,6 +217,7 @@ class TestRequestApproval:
             assert "id" in response.data
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_request_approval_unauthenticated(
         self, mock_get, api_client, project_document, db
     ):
@@ -228,6 +239,7 @@ class TestRequestApproval:
 
     @patch("documents.services.approval_service.ApprovalService.request_approval")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_request_approval_service_error(
         self, mock_get, mock_request, api_client, user, project_document, db
     ):
@@ -257,6 +269,7 @@ class TestApproveStageOne:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_one")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_one_success(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -278,6 +291,7 @@ class TestApproveStageOne:
             assert "id" in response.data
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_one_unauthenticated(
         self, mock_get, api_client, project_document, db
     ):
@@ -299,6 +313,7 @@ class TestApproveStageOne:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_one")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_one_permission_denied(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -327,6 +342,7 @@ class TestApproveStageTwo:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_two")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_two_success(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -347,6 +363,7 @@ class TestApproveStageTwo:
             assert "id" in response.data
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_two_unauthenticated(
         self, mock_get, api_client, project_document, db
     ):
@@ -368,6 +385,7 @@ class TestApproveStageTwo:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_two")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_two_stage_one_incomplete(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -396,6 +414,7 @@ class TestApproveStageThree:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_three")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_three_success(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -416,6 +435,7 @@ class TestApproveStageThree:
             assert "id" in response.data
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_three_unauthenticated(
         self, mock_get, api_client, project_document, db
     ):
@@ -437,6 +457,7 @@ class TestApproveStageThree:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_three")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_approve_stage_three_permission_denied(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -465,6 +486,7 @@ class TestSendBack:
 
     @patch("documents.services.approval_service.ApprovalService.send_back")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_send_back_success(
         self, mock_get, mock_send_back, api_client, user, project_document, db
     ):
@@ -493,6 +515,7 @@ class TestSendBack:
 
     @patch("documents.services.approval_service.ApprovalService.send_back")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_send_back_no_reason(
         self, mock_get, mock_send_back, api_client, user, project_document, db
     ):
@@ -516,6 +539,7 @@ class TestSendBack:
             mock_send_back.assert_called_once_with(project_document, user, "")
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_send_back_unauthenticated(
         self, mock_get, api_client, project_document, db
     ):
@@ -537,6 +561,7 @@ class TestSendBack:
 
     @patch("documents.services.approval_service.ApprovalService.send_back")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_send_back_permission_denied(
         self, mock_get, mock_send_back, api_client, user, project_document, db
     ):
@@ -569,6 +594,7 @@ class TestRecallDocument:
 
     @patch("documents.services.approval_service.ApprovalService.recall")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_recall_success(
         self, mock_get, mock_recall, api_client, user, project_document, db
     ):
@@ -597,6 +623,7 @@ class TestRecallDocument:
 
     @patch("documents.services.approval_service.ApprovalService.recall")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_recall_no_reason(
         self, mock_get, mock_recall, api_client, user, project_document, db
     ):
@@ -620,6 +647,7 @@ class TestRecallDocument:
             mock_recall.assert_called_once_with(project_document, user, "")
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_recall_unauthenticated(self, mock_get, api_client, project_document, db):
         """Test recalling without authentication"""
         # Arrange
@@ -639,6 +667,7 @@ class TestRecallDocument:
 
     @patch("documents.services.approval_service.ApprovalService.recall")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_recall_permission_denied(
         self, mock_get, mock_recall, api_client, user, project_document, db
     ):
@@ -671,6 +700,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_success(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -698,6 +728,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_multiple_documents(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -723,6 +754,7 @@ class TestBatchApprove:
         # Verify get_document was called twice
         assert mock_get.call_count == 2
 
+    @pytest.mark.integration
     def test_batch_approve_missing_document_ids(self, api_client, user, db):
         """Test batch approve with missing document_ids"""
         # Arrange
@@ -738,6 +770,7 @@ class TestBatchApprove:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_batch_approve_missing_stage(self, api_client, user, project_document, db):
         """Test batch approve with missing stage"""
         # Arrange
@@ -753,6 +786,7 @@ class TestBatchApprove:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_batch_approve_empty_document_ids(self, api_client, user, db):
         """Test batch approve with empty document_ids list"""
         # Arrange
@@ -768,6 +802,7 @@ class TestBatchApprove:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_batch_approve_unauthenticated(self, api_client, project_document, db):
         """Test batch approve without authentication"""
         # Arrange
@@ -785,6 +820,7 @@ class TestBatchApprove:
         ]
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_document_not_found(self, mock_get, api_client, user, db):
         """Test batch approve when document doesn't exist"""
         # Arrange
@@ -805,6 +841,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_stage_1(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -830,6 +867,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_stage_2(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -854,6 +892,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_stage_3(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -878,6 +917,7 @@ class TestBatchApprove:
 
     @patch("documents.services.approval_service.ApprovalService.batch_approve")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_batch_approve_partial_failure(
         self, mock_get, mock_batch, api_client, user, project_document, db
     ):
@@ -917,6 +957,7 @@ class TestDownloadProjectDocument:
     """Tests for download project document endpoint"""
 
     @patch("documents.services.pdf_service.PDFService.generate_document_pdf")
+    @pytest.mark.integration
     def test_download_document_generates_pdf(
         self, mock_generate, api_client, user, project_document, db
     ):
@@ -937,6 +978,7 @@ class TestDownloadProjectDocument:
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_download_document_with_existing_pdf(
         self, mock_get_doc, api_client, user, project_document, db
     ):
@@ -964,6 +1006,7 @@ class TestDownloadProjectDocument:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_download_document_not_found(self, api_client, user, db):
         """Test downloading non-existent document - covers line 29"""
         # Arrange
@@ -975,6 +1018,7 @@ class TestDownloadProjectDocument:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_download_document_unauthenticated(self, api_client, project_document, db):
         """Test downloading document without authentication"""
         # Act
@@ -996,6 +1040,7 @@ class TestBeginProjectDocGeneration:
     @patch("documents.services.pdf_service.PDFService.generate_document_pdf")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @pytest.mark.integration
     def test_begin_pdf_generation(
         self,
         mock_complete,
@@ -1027,6 +1072,7 @@ class TestBeginProjectDocGeneration:
     @patch("documents.services.pdf_service.PDFService.generate_document_pdf")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @pytest.mark.integration
     def test_begin_pdf_generation_with_exception(
         self,
         mock_complete,
@@ -1051,6 +1097,7 @@ class TestBeginProjectDocGeneration:
         # Verify cleanup was called
         mock_complete.assert_called_once()
 
+    @pytest.mark.integration
     def test_begin_pdf_generation_not_found(self, api_client, user, db):
         """Test starting PDF generation for non-existent document - covers line 54"""
         # Arrange
@@ -1064,6 +1111,7 @@ class TestBeginProjectDocGeneration:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_begin_pdf_generation_unauthenticated(
         self, api_client, project_document, db
     ):
@@ -1085,6 +1133,7 @@ class TestCancelProjectDocGeneration:
     """Tests for cancel PDF generation endpoint"""
 
     @patch("documents.services.pdf_service.PDFService.cancel_pdf_generation")
+    @pytest.mark.integration
     def test_cancel_pdf_generation(
         self, mock_cancel, api_client, user, project_document, db
     ):
@@ -1102,6 +1151,7 @@ class TestCancelProjectDocGeneration:
         if response.status_code == status.HTTP_200_OK:
             mock_cancel.assert_called_once()
 
+    @pytest.mark.integration
     def test_cancel_pdf_generation_not_found(self, api_client, user, db):
         """Test cancelling PDF generation for non-existent document - covers line 84"""
         # Arrange
@@ -1113,6 +1163,7 @@ class TestCancelProjectDocGeneration:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_cancel_pdf_generation_unauthenticated(
         self, api_client, project_document, db
     ):
@@ -1139,6 +1190,7 @@ class TestDownloadAnnualReport:
     """Tests for download annual report endpoint"""
 
     @patch("documents.services.pdf_service.PDFService.generate_annual_report_pdf")
+    @pytest.mark.integration
     def test_download_annual_report(
         self, mock_generate, api_client, user, annual_report, db
     ):
@@ -1161,6 +1213,7 @@ class TestDownloadAnnualReport:
             status.HTTP_404_NOT_FOUND,
         ]
 
+    @pytest.mark.integration
     def test_download_annual_report_with_existing_pdf(
         self, api_client, user, annual_report, db
     ):
@@ -1189,6 +1242,7 @@ class TestDownloadAnnualReport:
             # Assert
             assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_download_annual_report_not_found(self, api_client, user, db):
         """Test downloading non-existent annual report - covers lines 98-100"""
         # Arrange
@@ -1200,6 +1254,7 @@ class TestDownloadAnnualReport:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_download_annual_report_unauthenticated(
         self, api_client, annual_report, db
     ):
@@ -1223,6 +1278,7 @@ class TestBeginAnnualReportDocGeneration:
     @patch("documents.services.pdf_service.PDFService.generate_annual_report_pdf")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @pytest.mark.integration
     def test_begin_annual_report_generation(
         self,
         mock_complete,
@@ -1258,6 +1314,7 @@ class TestBeginAnnualReportDocGeneration:
     @patch("documents.services.pdf_service.PDFService.generate_annual_report_pdf")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @pytest.mark.integration
     def test_begin_annual_report_generation_with_exception(
         self,
         mock_complete,
@@ -1286,6 +1343,7 @@ class TestBeginAnnualReportDocGeneration:
         # This is the critical assertion - mark_pdf_generation_complete should be called in the except block
         mock_complete.assert_called_once_with(annual_report)
 
+    @pytest.mark.integration
     def test_begin_annual_report_generation_not_found(self, api_client, user, db):
         """Test starting annual report generation for non-existent report - covers lines 127-130"""
         # Arrange
@@ -1299,6 +1357,7 @@ class TestBeginAnnualReportDocGeneration:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_begin_annual_report_generation_unauthenticated(
         self, api_client, annual_report, db
     ):
@@ -1320,6 +1379,7 @@ class TestCancelReportDocGeneration:
     """Tests for cancel annual report PDF generation endpoint"""
 
     @patch("documents.services.pdf_service.PDFService.cancel_pdf_generation")
+    @pytest.mark.integration
     def test_cancel_report_generation(
         self, mock_cancel, api_client, user, annual_report, db
     ):
@@ -1337,6 +1397,7 @@ class TestCancelReportDocGeneration:
         if response.status_code == status.HTTP_200_OK:
             mock_cancel.assert_called_once()
 
+    @pytest.mark.integration
     def test_cancel_report_generation_not_found(self, api_client, user, db):
         """Test cancelling PDF generation for non-existent report - covers lines 160-163"""
         # Arrange
@@ -1350,6 +1411,7 @@ class TestCancelReportDocGeneration:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_cancel_report_generation_unauthenticated(
         self, api_client, annual_report, db
     ):
@@ -1376,6 +1438,7 @@ class TestNewCycleOpen:
     """Tests for new cycle open endpoint"""
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_new_cycle_open_superuser(
         self,
         mock_send_email,
@@ -1402,6 +1465,7 @@ class TestNewCycleOpen:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_new_cycle_open_non_superuser(self, api_client, user, db):
         """Test opening new cycle as non-superuser"""
         # Arrange
@@ -1421,6 +1485,7 @@ class TestNewCycleOpen:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_new_cycle_open_unauthenticated(self, api_client, db):
         """Test opening new cycle without authentication"""
         # Act
@@ -1435,6 +1500,7 @@ class TestNewCycleOpen:
         ]
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_new_cycle_open_with_emails(
         self,
         mock_send_email,
@@ -1462,6 +1528,7 @@ class TestNewCycleOpen:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_new_cycle_open_no_annual_report(self, api_client, superuser, db):
         """Test opening new cycle when no annual report exists"""
         # Arrange
@@ -1486,6 +1553,7 @@ class TestSendBumpEmails:
     """Tests for send bump emails endpoint"""
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_admin(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
     ):
@@ -1513,6 +1581,7 @@ class TestSendBumpEmails:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_400_BAD_REQUEST]
 
+    @pytest.mark.integration
     def test_send_bump_emails_non_admin(self, api_client, user, db):
         """Test sending bump emails as non-admin"""
         # Arrange
@@ -1527,6 +1596,7 @@ class TestSendBumpEmails:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_send_bump_emails_no_documents(self, api_client, admin_user, db):
         """Test sending bump emails with no documents"""
         # Arrange
@@ -1542,6 +1612,7 @@ class TestSendBumpEmails:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_send_bump_emails_unauthenticated(self, api_client, db):
         """Test sending bump emails without authentication"""
         # Act
@@ -1556,6 +1627,7 @@ class TestSendBumpEmails:
         ]
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_multiple_documents(
         self,
         mock_send_email,
@@ -1599,6 +1671,7 @@ class TestSendBumpEmails:
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_400_BAD_REQUEST]
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_inactive_user(
         self,
         mock_send_email,
@@ -1635,6 +1708,7 @@ class TestSendBumpEmails:
         assert "errors" in response.data or "error" in response.data
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_user_not_found(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
     ):
@@ -1663,6 +1737,7 @@ class TestSendBumpEmails:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_email_error(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
     ):
@@ -1692,6 +1767,7 @@ class TestSendBumpEmails:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_bump_emails_different_document_kinds(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
     ):
@@ -1736,6 +1812,7 @@ class TestUserPublications:
     """Tests for user publications endpoint"""
 
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_authenticated(
         self, mock_get, api_client, user, staff_profile, db
     ):
@@ -1760,6 +1837,7 @@ class TestUserPublications:
         assert "customPublications" in response.data
 
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_unauthenticated(
         self, mock_get, api_client, staff_profile, db
     ):
@@ -1780,6 +1858,7 @@ class TestUserPublications:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_get_user_publications_no_employee_id(self, api_client, user, db):
         """Test getting user publications with no employee ID"""
         # Arrange
@@ -1793,6 +1872,7 @@ class TestUserPublications:
         assert response.data["libraryData"]["isError"] is True
 
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_api_error(
         self, mock_get, api_client, user, staff_profile, db
     ):
@@ -1829,6 +1909,7 @@ class TestUserPublications:
         }
     )
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_cached(
         self, mock_get, api_client, user, staff_profile, db
     ):
@@ -1863,6 +1944,7 @@ class TestUserPublications:
         assert not mock_get.called  # Should not call API when cached
 
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_with_custom_publications(
         self, mock_get, api_client, user, staff_profile, db
     ):
@@ -1896,6 +1978,7 @@ class TestUserPublications:
         assert len(response.data["customPublications"]) == 1
 
     @patch("documents.views.notifications.requests.get")
+    @pytest.mark.integration
     def test_get_user_publications_no_staff_profile(
         self, mock_get, api_client, user, db
     ):
@@ -1918,6 +2001,7 @@ class TestUserPublications:
         assert response.data["staffProfilePk"] == 0
 
     @patch("documents.views.notifications.settings")
+    @pytest.mark.integration
     def test_get_user_publications_missing_api_url(
         self, mock_settings, api_client, user, staff_profile, db
     ):
@@ -1936,6 +2020,7 @@ class TestUserPublications:
         assert response.data["libraryData"]["isError"] is True
 
     @patch("documents.views.notifications.settings")
+    @pytest.mark.integration
     def test_get_user_publications_missing_token(
         self, mock_settings, api_client, user, staff_profile, db
     ):
@@ -1959,6 +2044,7 @@ class TestSendMentionNotification:
     """Tests for send mention notification endpoint"""
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
     ):
@@ -1991,6 +2077,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
         assert "message" in response.data
 
+    @pytest.mark.integration
     def test_send_mention_notification_no_mentioned_users(
         self, api_client, user, project_document, project_with_lead, db
     ):
@@ -2017,6 +2104,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["recipients"] == 0
 
+    @pytest.mark.integration
     def test_send_mention_notification_document_not_found(self, api_client, user, db):
         """Test sending mention notification when document not found"""
         # Arrange
@@ -2040,6 +2128,7 @@ class TestSendMentionNotification:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_send_mention_notification_unauthenticated(self, api_client, db):
         """Test sending mention notification without authentication"""
         # Act
@@ -2054,6 +2143,7 @@ class TestSendMentionNotification:
         ]
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification_with_html_content(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
     ):
@@ -2086,6 +2176,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification_inactive_user(
         self,
         mock_send_email,
@@ -2127,6 +2218,7 @@ class TestSendMentionNotification:
         assert response.data["recipients"] == 0  # Inactive user not included
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification_non_dbca_email(
         self,
         mock_send_email,
@@ -2168,6 +2260,7 @@ class TestSendMentionNotification:
         assert response.data["recipients"] == 0  # Non-DBCA email not included
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification_user_not_found(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
     ):
@@ -2201,6 +2294,7 @@ class TestSendMentionNotification:
         assert response.data["recipients"] == 0  # User not found, skipped
 
     @patch("documents.views.notifications.send_email_with_embedded_image")
+    @pytest.mark.integration
     def test_send_mention_notification_email_error(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
     ):
@@ -2244,6 +2338,7 @@ class TestSendMentionNotification:
 class TestProjectDocsPendingMyActionAllStages:
     """Tests for documents pending action endpoint"""
 
+    @pytest.mark.integration
     def test_get_pending_documents_authenticated(
         self, api_client, user_with_work, project_with_lead, project_document, db
     ):
@@ -2264,6 +2359,8 @@ class TestProjectDocsPendingMyActionAllStages:
         assert "ba" in response.data
         assert "directorate" in response.data
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_get_pending_documents_unauthenticated(self, api_client, db):
         """Test getting pending documents without authentication"""
         # Act
@@ -2277,6 +2374,7 @@ class TestProjectDocsPendingMyActionAllStages:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_pending_documents_as_project_lead(
         self, api_client, user_with_work, project_with_lead, db
     ):
@@ -2301,6 +2399,7 @@ class TestProjectDocsPendingMyActionAllStages:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["lead"]) >= 0  # May or may not have documents
 
+    @pytest.mark.integration
     def test_get_pending_documents_as_ba_leader(
         self, api_client, user_with_work, project_with_ba_lead, db
     ):
@@ -2326,6 +2425,7 @@ class TestProjectDocsPendingMyActionAllStages:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["ba"]) >= 0  # May or may not have documents
 
+    @pytest.mark.integration
     def test_get_pending_documents_as_directorate(
         self, api_client, user_with_work, project_with_lead, db
     ):
@@ -2355,6 +2455,7 @@ class TestProjectDocsPendingMyActionAllStages:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data["directorate"]) >= 0  # May or may not have documents
 
+    @pytest.mark.integration
     def test_get_pending_documents_no_user_work(self, api_client, db):
         """Test getting pending documents when user has no work relationship"""
         # Arrange
@@ -2378,6 +2479,7 @@ class TestProjectDocsPendingMyActionAllStages:
 class TestGetPreviousReportsData:
     """Tests for get previous reports data endpoint"""
 
+    @pytest.mark.integration
     def test_get_previous_progress_report_data(
         self,
         api_client,
@@ -2430,6 +2532,7 @@ class TestGetPreviousReportsData:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == "<p>Old context</p>"
 
+    @pytest.mark.integration
     def test_get_previous_student_report_data(
         self,
         api_client,
@@ -2484,6 +2587,7 @@ class TestGetPreviousReportsData:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == "<p>Old progress</p>"
 
+    @pytest.mark.integration
     def test_get_previous_reports_data_invalid_kind(
         self, api_client, user, project_with_lead, db
     ):
@@ -2505,6 +2609,7 @@ class TestGetPreviousReportsData:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_previous_reports_data_insufficient_documents(
         self, api_client, user, project_with_lead, progress_report_with_details, db
     ):
@@ -2527,6 +2632,7 @@ class TestGetPreviousReportsData:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_previous_reports_data_invalid_section(
         self,
         api_client,
@@ -2578,6 +2684,7 @@ class TestGetPreviousReportsData:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_previous_reports_data_unauthenticated(self, api_client, db):
         """Test getting previous reports data without authentication"""
         # Act
@@ -2598,6 +2705,7 @@ class TestReopenProject:
     @patch(
         "documents.services.notification_service.NotificationService.notify_project_reopened"
     )
+    @pytest.mark.integration
     def test_reopen_project_with_closure_document(
         self, mock_notify, api_client, user, project_with_lead, db
     ):
@@ -2626,6 +2734,7 @@ class TestReopenProject:
     @patch(
         "documents.services.notification_service.NotificationService.notify_project_reopened"
     )
+    @pytest.mark.integration
     def test_reopen_project_without_closure_document(
         self, mock_notify, api_client, user, db
     ):
@@ -2645,6 +2754,7 @@ class TestReopenProject:
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_notify.assert_called_once()
 
+    @pytest.mark.integration
     def test_reopen_project_unauthenticated(self, api_client, project_with_lead, db):
         """Test reopening project without authentication"""
         # Act
@@ -2662,6 +2772,7 @@ class TestReopenProject:
 class TestBatchApproveOld:
     """Tests for batch approve old reports endpoint"""
 
+    @pytest.mark.integration
     def test_batch_approve_old_as_superuser(
         self,
         api_client,
@@ -2709,6 +2820,7 @@ class TestBatchApproveOld:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_batch_approve_old_as_non_superuser(self, api_client, user, db):
         """Test batch approving old reports as non-superuser"""
         # Arrange
@@ -2721,6 +2833,7 @@ class TestBatchApproveOld:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_batch_approve_old_no_reports(self, api_client, superuser, db):
         """Test batch approving when no annual reports exist"""
         # Arrange
@@ -2733,6 +2846,7 @@ class TestBatchApproveOld:
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_batch_approve_old_unauthenticated(self, api_client, db):
         """Test batch approving without authentication"""
         # Act
@@ -2748,6 +2862,7 @@ class TestBatchApproveOld:
 class TestFinalDocApproval:
     """Tests for final document approval endpoint"""
 
+    @pytest.mark.integration
     def test_final_approval_grant(self, api_client, user, project_document, db):
         """Test granting final approval"""
         # Arrange
@@ -2766,6 +2881,7 @@ class TestFinalDocApproval:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_final_approval_recall(self, api_client, user, project_document, db):
         """Test recalling final approval"""
         # Arrange
@@ -2789,6 +2905,7 @@ class TestFinalDocApproval:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_final_approval_invalid_data(self, api_client, user, project_document, db):
         """Test final approval with invalid data"""
         # Arrange
@@ -2808,6 +2925,7 @@ class TestFinalDocApproval:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_final_approval_document_not_found(self, api_client, user, db):
         """Test final approval when document doesn't exist"""
         # Arrange
@@ -2826,6 +2944,7 @@ class TestFinalDocApproval:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_final_approval_unauthenticated(self, api_client, db):
         """Test final approval without authentication"""
         # Act
@@ -2848,6 +2967,7 @@ class TestFinalDocApproval:
 class TestProjectPlans:
     """Tests for project plan list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_project_plans_authenticated(self, api_client, user, db):
         """Test listing project plans as authenticated user"""
         # Arrange
@@ -2859,6 +2979,7 @@ class TestProjectPlans:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_list_project_plans_unauthenticated(self, api_client, db):
         """Test listing project plans without authentication"""
         # Act
@@ -2870,6 +2991,7 @@ class TestProjectPlans:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_project_plan_valid_data(
         self, api_client, user, project_with_lead, db
     ):
@@ -2923,6 +3045,7 @@ class TestProjectPlans:
             # Assert
             assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_create_project_plan_invalid_data(self, api_client, user, db):
         """Test creating project plan with invalid data"""
         # Arrange
@@ -2942,6 +3065,7 @@ class TestProjectPlans:
 class TestProjectPlanDetail:
     """Tests for project plan detail endpoints"""
 
+    @pytest.mark.integration
     def test_get_project_plan(self, api_client, user, db):
         """Test getting a project plan by ID"""
         # Arrange
@@ -2965,6 +3089,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_get_project_plan_not_found(self, api_client, user, db):
         """Test getting non-existent project plan"""
         # Arrange
@@ -2976,6 +3101,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_project_plan_unauthenticated(self, api_client, db):
         """Test getting project plan without authentication"""
         # Act
@@ -2987,6 +3113,7 @@ class TestProjectPlanDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_project_plan_basic_fields(self, api_client, user, db):
         """Test updating project plan basic fields"""
         # Arrange
@@ -3016,6 +3143,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_with_endorsement_specimens(self, api_client, user, db):
         """Test updating project plan with specimens endorsement"""
         # Arrange
@@ -3048,6 +3176,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_with_endorsement_data_management(
         self, api_client, user, db
     ):
@@ -3082,6 +3211,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_with_animals_endorsement(self, api_client, user, db):
         """Test updating project plan with animals endorsement"""
         # Arrange
@@ -3115,6 +3245,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_with_plants_endorsement(self, api_client, user, db):
         """Test updating project plan with plants endorsement (no_specimens field)"""
         # Arrange
@@ -3148,6 +3279,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_auto_clear_animal_endorsement(
         self, api_client, user, db
     ):
@@ -3182,6 +3314,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_auto_clear_plant_endorsement(
         self, api_client, user, db
     ):
@@ -3216,6 +3349,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_plan_invalid_data(self, api_client, user, db):
         """Test updating project plan with invalid data - covers lines 124-125"""
         # Arrange
@@ -3255,6 +3389,7 @@ class TestProjectPlanDetail:
             # Assert
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_update_project_plan_not_found(self, api_client, user, db):
         """Test updating non-existent project plan"""
         # Arrange
@@ -3272,6 +3407,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_delete_project_plan(self, api_client, user, db):
         """Test deleting a project plan"""
         # Arrange
@@ -3296,6 +3432,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    @pytest.mark.integration
     def test_delete_project_plan_not_found(self, api_client, user, db):
         """Test deleting non-existent project plan"""
         # Arrange
@@ -3307,6 +3444,7 @@ class TestProjectPlanDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_delete_project_plan_unauthenticated(self, api_client, db):
         """Test deleting project plan without authentication"""
         # Act
@@ -3318,6 +3456,7 @@ class TestProjectPlanDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_project_plan_without_endorsement(self, api_client, user, db):
         """Test updating project plan when no endorsement exists"""
         # Arrange
@@ -3363,6 +3502,7 @@ class TestProjectPlanDetail:
 class TestEndorsements:
     """Tests for endorsement list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_endorsements_authenticated(self, api_client, user, db):
         """Test listing endorsements as authenticated user"""
         # Arrange
@@ -3389,6 +3529,7 @@ class TestEndorsements:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) >= 1
 
+    @pytest.mark.integration
     def test_list_endorsements_unauthenticated(self, api_client, db):
         """Test listing endorsements without authentication"""
         # Act
@@ -3400,6 +3541,7 @@ class TestEndorsements:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_endorsement_valid_data(self, api_client, user, db):
         """Test creating endorsement with valid data"""
         # Arrange
@@ -3432,6 +3574,7 @@ class TestEndorsements:
         # Response uses TinyEndorsementSerializer which has nested project_plan
         assert "project_plan" in response.data
 
+    @pytest.mark.integration
     def test_create_endorsement_invalid_data_error_logging(self, api_client, user, db):
         """Test creating endorsement with invalid data to cover error logging"""
         # Arrange
@@ -3456,6 +3599,7 @@ class TestEndorsements:
 class TestEndorsementDetail:
     """Tests for endorsement detail endpoints"""
 
+    @pytest.mark.integration
     def test_get_endorsement(self, api_client, user, db):
         """Test getting endorsement by ID"""
         # Arrange
@@ -3484,6 +3628,7 @@ class TestEndorsementDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == endorsement.id
 
+    @pytest.mark.integration
     def test_get_endorsement_not_found(self, api_client, user, db):
         """Test getting non-existent endorsement - covers line 71"""
         # Arrange
@@ -3497,6 +3642,7 @@ class TestEndorsementDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_endorsement_unauthenticated(self, api_client, db):
         """Test getting endorsement without authentication"""
         # Act
@@ -3510,6 +3656,7 @@ class TestEndorsementDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_endorsement_valid_data(self, api_client, user, db):
         """Test updating endorsement with valid data"""
         # Arrange
@@ -3544,6 +3691,7 @@ class TestEndorsementDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_endorsement_invalid_data(self, api_client, user, db):
         """Test updating endorsement with invalid data - covers lines 95-96"""
         # Arrange
@@ -3585,6 +3733,7 @@ class TestEndorsementDetail:
             # Assert
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_update_endorsement_not_found(self, api_client, user, db):
         """Test updating non-existent endorsement - covers line 86"""
         # Arrange
@@ -3608,6 +3757,7 @@ class TestEndorsementDetail:
 class TestEndorsementsPendingMyAction:
     """Tests for endorsements pending action endpoint"""
 
+    @pytest.mark.integration
     def test_get_pending_endorsements_as_aec(self, api_client, user, db):
         """Test getting pending endorsements as AEC user"""
         # Arrange
@@ -3639,6 +3789,7 @@ class TestEndorsementsPendingMyAction:
         assert response.status_code == status.HTTP_200_OK
         assert "aec" in response.data
 
+    @pytest.mark.integration
     def test_get_pending_endorsements_as_superuser(self, api_client, superuser, db):
         """Test getting pending endorsements as superuser"""
         # Arrange
@@ -3668,6 +3819,7 @@ class TestEndorsementsPendingMyAction:
         assert response.status_code == status.HTTP_200_OK
         assert "aec" in response.data
 
+    @pytest.mark.integration
     def test_get_pending_endorsements_as_regular_user(self, api_client, user, db):
         """Test getting pending endorsements as regular user"""
         # Arrange
@@ -3687,6 +3839,7 @@ class TestEndorsementsPendingMyAction:
 class TestSeekEndorsement:
     """Tests for seek endorsement endpoint"""
 
+    @pytest.mark.integration
     def test_seek_endorsement_without_pdf(self, api_client, user, db):
         """Test seeking endorsement without PDF file"""
         # Arrange
@@ -3721,6 +3874,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_seek_endorsement_with_new_pdf(self, api_client, user, db):
         """Test seeking endorsement with new PDF file - covers lines 182-197"""
         # Arrange
@@ -3763,6 +3917,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_seek_endorsement_with_existing_pdf(self, api_client, user, mock_file, db):
         """Test seeking endorsement with existing PDF file - covers lines 175-178"""
         # Arrange
@@ -3794,7 +3949,7 @@ class TestSeekEndorsement:
         )
 
         # Create new PDF file using fixture (need to create a new one)
-        pdf_content = b"%PDF-1.4\n%\xE2\xE3\xCF\xD3\n1 0 obj\n<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj\n<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000015 00000 n\n0000000068 00000 n\n0000000127 00000 n\ntrailer\n<</Size 4/Root 1 0 R>>\nstartxref\n225\n%%EOF"
+        pdf_content = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj\n<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000015 00000 n\n0000000068 00000 n\n0000000127 00000 n\ntrailer\n<</Size 4/Root 1 0 R>>\nstartxref\n225\n%%EOF"
         new_pdf_file = SimpleUploadedFile(
             "new.pdf", pdf_content, content_type="application/pdf"
         )
@@ -3814,6 +3969,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_seek_endorsement_invalid_data(self, api_client, user, db):
         """Test seeking endorsement with invalid data - covers lines 167-168"""
         # Arrange
@@ -3857,6 +4013,7 @@ class TestSeekEndorsement:
             # Assert
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_seek_endorsement_project_plan_not_found(self, api_client, user, db):
         """Test seeking endorsement when project plan doesn't exist - covers line 149"""
         # Arrange
@@ -3876,6 +4033,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_seek_endorsement_no_endorsement(self, api_client, user, db):
         """Test seeking endorsement when endorsement doesn't exist - covers line 154"""
         # Arrange
@@ -3905,6 +4063,7 @@ class TestSeekEndorsement:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_seek_endorsement_pdf_validation_error(self, api_client, user, db):
         """Test seeking endorsement with PDF validation error to cover lines 188-216"""
         # Arrange
@@ -3957,6 +4116,7 @@ class TestSeekEndorsement:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             assert "creator" in response.data
 
+    @pytest.mark.integration
     def test_seek_endorsement_with_pdf_upload(self, api_client, user, db):
         """Test seeking endorsement with PDF file upload (happy path)
 
@@ -4007,6 +4167,7 @@ class TestSeekEndorsement:
 class TestDeleteAECEndorsement:
     """Tests for delete AEC endorsement endpoint"""
 
+    @pytest.mark.integration
     def test_delete_aec_endorsement_with_pdf(self, api_client, user, mock_file, db):
         """Test deleting AEC endorsement with PDF - covers lines 237-238"""
         # Arrange
@@ -4045,6 +4206,7 @@ class TestDeleteAECEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_aec_endorsement_without_pdf(self, api_client, user, db):
         """Test deleting AEC endorsement without PDF"""
         # Arrange
@@ -4075,6 +4237,7 @@ class TestDeleteAECEndorsement:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_aec_endorsement_project_plan_not_found(self, api_client, user, db):
         """Test deleting AEC endorsement when project plan doesn't exist - covers line 208"""
         # Arrange
@@ -4088,6 +4251,7 @@ class TestDeleteAECEndorsement:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_delete_aec_endorsement_no_endorsement(self, api_client, user, db):
         """Test deleting AEC endorsement when endorsement doesn't exist - covers line 213"""
         # Arrange
@@ -4113,6 +4277,7 @@ class TestDeleteAECEndorsement:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_delete_aec_endorsement_invalid_data(self, api_client, user, db):
         """Test deleting AEC endorsement with invalid serializer - covers lines 226-227"""
         # Arrange
@@ -4160,6 +4325,7 @@ class TestDeleteAECEndorsement:
 class TestCustomPublications:
     """Tests for custom publication list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_custom_publications_authenticated(
         self, api_client, user, staff_profile, db
     ):
@@ -4183,6 +4349,7 @@ class TestCustomPublications:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) >= 1
 
+    @pytest.mark.integration
     def test_list_custom_publications_unauthenticated(self, api_client, db):
         """Test listing custom publications without authentication"""
         # Act
@@ -4196,6 +4363,7 @@ class TestCustomPublications:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_custom_publication_valid_data(
         self, api_client, user, staff_profile, db
     ):
@@ -4219,6 +4387,7 @@ class TestCustomPublications:
         assert response.data["title"] == "New Publication"
         assert response.data["year"] == 2024
 
+    @pytest.mark.integration
     def test_create_custom_publication_invalid_data(self, api_client, user, db):
         """Test creating custom publication with invalid data - covers lines 35-38"""
         # Arrange
@@ -4238,6 +4407,7 @@ class TestCustomPublications:
 class TestCustomPublicationDetail:
     """Tests for custom publication detail endpoints"""
 
+    @pytest.mark.integration
     def test_get_custom_publication(self, api_client, user, staff_profile, db):
         """Test getting custom publication by ID"""
         # Arrange
@@ -4259,6 +4429,7 @@ class TestCustomPublicationDetail:
         assert response.data["id"] == pub.id
         assert response.data["title"] == "Test Publication"
 
+    @pytest.mark.integration
     def test_get_custom_publication_not_found(self, api_client, user, db):
         """Test getting non-existent custom publication - covers line 54"""
         # Arrange
@@ -4270,6 +4441,7 @@ class TestCustomPublicationDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_custom_publication_valid_data(
         self, api_client, user, staff_profile, db
     ):
@@ -4300,6 +4472,7 @@ class TestCustomPublicationDetail:
         assert response.data["title"] == "Updated Title"
         assert response.data["year"] == 2024
 
+    @pytest.mark.integration
     def test_update_custom_publication_not_found(self, api_client, user, db):
         """Test updating non-existent custom publication - covers line 67"""
         # Arrange
@@ -4318,6 +4491,7 @@ class TestCustomPublicationDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_custom_publication_invalid_data(
         self, api_client, user, staff_profile, db
     ):
@@ -4346,6 +4520,7 @@ class TestCustomPublicationDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_custom_publication(self, api_client, user, staff_profile, db):
         """Test deleting custom publication"""
         # Arrange
@@ -4366,6 +4541,7 @@ class TestCustomPublicationDetail:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not CustomPublication.objects.filter(id=pub.id).exists()
 
+    @pytest.mark.integration
     def test_delete_custom_publication_not_found(self, api_client, user, db):
         """Test deleting non-existent custom publication - covers line 92"""
         # Arrange
@@ -4386,6 +4562,7 @@ class TestCustomPublicationDetail:
 class TestProgressReports:
     """Tests for progress report list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_progress_reports_authenticated(
         self, api_client, user, progress_report, db
     ):
@@ -4400,6 +4577,7 @@ class TestProgressReports:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_list_progress_reports_unauthenticated(self, api_client, db):
         """Test listing progress reports without authentication"""
         # Act
@@ -4411,6 +4589,7 @@ class TestProgressReports:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_progress_report_valid_data(
         self, api_client, user, project_document, annual_report, db
     ):
@@ -4435,6 +4614,7 @@ class TestProgressReports:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_create_progress_report_invalid_data(self, api_client, user, db):
         """Test creating progress report with invalid data - covers lines 45-47"""
         # Arrange
@@ -4454,6 +4634,7 @@ class TestProgressReports:
 class TestProgressReportDetail:
     """Tests for progress report detail endpoints"""
 
+    @pytest.mark.integration
     def test_get_progress_report(self, api_client, user, progress_report, db):
         """Test getting progress report by ID"""
         # Arrange
@@ -4468,6 +4649,7 @@ class TestProgressReportDetail:
         assert response.status_code == status.HTTP_200_OK
         assert "id" in response.data
 
+    @pytest.mark.integration
     def test_get_progress_report_not_found(self, api_client, user, db):
         """Test getting non-existent progress report - covers line 67"""
         # Arrange
@@ -4479,6 +4661,7 @@ class TestProgressReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_progress_report_unauthenticated(self, api_client, progress_report, db):
         """Test getting progress report without authentication"""
         # Act
@@ -4492,6 +4675,7 @@ class TestProgressReportDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_progress_report_valid_data(
         self, api_client, user, progress_report, db
     ):
@@ -4516,6 +4700,7 @@ class TestProgressReportDetail:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_update_progress_report_not_found(self, api_client, user, db):
         """Test updating non-existent progress report - covers line 79"""
         # Arrange
@@ -4533,6 +4718,7 @@ class TestProgressReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_progress_report_invalid_data(
         self, api_client, user, progress_report, db
     ):
@@ -4554,6 +4740,7 @@ class TestProgressReportDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_progress_report(self, api_client, user, progress_report, db):
         """Test deleting progress report"""
         # Arrange
@@ -4568,6 +4755,7 @@ class TestProgressReportDetail:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ProgressReport.objects.filter(id=progress_report.id).exists()
 
+    @pytest.mark.integration
     def test_delete_progress_report_not_found(self, api_client, user, db):
         """Test deleting non-existent progress report - covers line 109"""
         # Arrange
@@ -4583,6 +4771,7 @@ class TestProgressReportDetail:
 class TestUpdateProgressReport:
     """Tests for update progress report section endpoint"""
 
+    @pytest.mark.integration
     def test_update_progress_report_section(
         self, api_client, user, progress_report, db
     ):
@@ -4608,6 +4797,7 @@ class TestUpdateProgressReport:
             status.HTTP_404_NOT_FOUND,
         ]
 
+    @pytest.mark.integration
     def test_update_progress_report_section_not_found(self, api_client, user, db):
         """Test updating section of non-existent progress report - covers lines 130-133"""
         # Arrange
@@ -4627,6 +4817,7 @@ class TestUpdateProgressReport:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_progress_report_section_invalid_data(
         self, api_client, user, progress_report, db
     ):
@@ -4657,6 +4848,7 @@ class TestUpdateProgressReport:
 class TestProgressReportByYear:
     """Tests for progress report by year endpoint"""
 
+    @pytest.mark.integration
     def test_get_progress_report_by_year(self, api_client, user, progress_report, db):
         """Test getting progress report by project and year"""
         # Arrange
@@ -4674,6 +4866,7 @@ class TestProgressReportByYear:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+    @pytest.mark.integration
     def test_get_progress_report_by_year_not_found(
         self, api_client, user, project_with_lead, db
     ):
@@ -4689,6 +4882,7 @@ class TestProgressReportByYear:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_progress_report_by_year_unauthenticated(
         self, api_client, progress_report, db
     ):
@@ -4717,6 +4911,7 @@ class TestProgressReportByYear:
 class TestStudentReports:
     """Tests for student report list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_student_reports_authenticated(
         self, api_client, user, student_report, db
     ):
@@ -4731,6 +4926,7 @@ class TestStudentReports:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_list_student_reports_unauthenticated(self, api_client, db):
         """Test listing student reports without authentication"""
         # Act
@@ -4742,6 +4938,7 @@ class TestStudentReports:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_student_report_valid(self, api_client, user, student_report, db):
         """Test creating student report with valid data"""
         # Arrange
@@ -4766,6 +4963,7 @@ class TestStudentReports:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_create_student_report_invalid(self, api_client, user, db):
         """Test creating student report with invalid data"""
         # Arrange
@@ -4788,6 +4986,7 @@ class TestStudentReports:
 class TestStudentReportDetail:
     """Tests for student report detail endpoint"""
 
+    @pytest.mark.integration
     def test_get_student_report(self, api_client, user, student_report, db):
         """Test getting student report by ID"""
         # Arrange
@@ -4802,6 +5001,7 @@ class TestStudentReportDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == student_report.id
 
+    @pytest.mark.integration
     def test_get_student_report_not_found(self, api_client, user, db):
         """Test getting non-existent student report"""
         # Arrange
@@ -4813,6 +5013,7 @@ class TestStudentReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_student_report_unauthenticated(self, api_client, student_report, db):
         """Test getting student report without authentication"""
         # Act
@@ -4826,6 +5027,7 @@ class TestStudentReportDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_student_report_valid(self, api_client, user, student_report, db):
         """Test updating student report with valid data"""
         # Arrange
@@ -4845,6 +5047,7 @@ class TestStudentReportDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_student_report_not_found(self, api_client, user, db):
         """Test updating non-existent student report"""
         # Arrange
@@ -4862,6 +5065,7 @@ class TestStudentReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_student_report_invalid(self, api_client, user, student_report, db):
         """Test updating student report with invalid data"""
         # Arrange
@@ -4881,6 +5085,7 @@ class TestStudentReportDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_student_report(self, api_client, user, student_report, db):
         """Test deleting student report"""
         # Arrange
@@ -4894,6 +5099,7 @@ class TestStudentReportDetail:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    @pytest.mark.integration
     def test_delete_student_report_not_found(self, api_client, user, db):
         """Test deleting non-existent student report"""
         # Arrange
@@ -4909,6 +5115,7 @@ class TestStudentReportDetail:
 class TestUpdateStudentReport:
     """Tests for student report update endpoint"""
 
+    @pytest.mark.integration
     def test_update_student_report_content_valid(
         self, api_client, user, student_report, db
     ):
@@ -4929,6 +5136,7 @@ class TestUpdateStudentReport:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_student_report_content_not_found(self, api_client, user, db):
         """Test updating non-existent student report content"""
         # Arrange
@@ -4947,6 +5155,7 @@ class TestUpdateStudentReport:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_student_report_content_invalid(
         self, api_client, user, student_report, db
     ):
@@ -4976,6 +5185,7 @@ class TestUpdateStudentReport:
 class TestStudentReportByYear:
     """Tests for student report by year endpoint"""
 
+    @pytest.mark.integration
     def test_get_student_report_by_year(self, api_client, user, student_report, db):
         """Test getting student report by project and year"""
         # Arrange
@@ -4991,6 +5201,7 @@ class TestStudentReportByYear:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+    @pytest.mark.integration
     def test_get_student_report_by_year_not_found(
         self, api_client, user, project_with_lead, db
     ):
@@ -5006,6 +5217,7 @@ class TestStudentReportByYear:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_student_report_by_year_unauthenticated(
         self, api_client, student_report, db
     ):
@@ -5032,6 +5244,7 @@ class TestStudentReportByYear:
 class TestProjectClosures:
     """Tests for project closure list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_project_closures_authenticated(
         self, api_client, user, project_closure, db
     ):
@@ -5046,6 +5259,7 @@ class TestProjectClosures:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_list_project_closures_unauthenticated(self, api_client, db):
         """Test listing project closures without authentication"""
         # Act
@@ -5057,6 +5271,7 @@ class TestProjectClosures:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_project_closure_valid(self, api_client, user, project_closure, db):
         """Test creating project closure with valid data"""
         # Arrange
@@ -5079,6 +5294,7 @@ class TestProjectClosures:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_create_project_closure_invalid(self, api_client, user, db):
         """Test creating project closure with invalid data"""
         # Arrange
@@ -5100,6 +5316,7 @@ class TestProjectClosures:
 class TestProjectClosureDetail:
     """Tests for project closure detail endpoint"""
 
+    @pytest.mark.integration
     def test_get_project_closure(self, api_client, user, project_closure, db):
         """Test getting project closure by ID"""
         # Arrange
@@ -5114,6 +5331,7 @@ class TestProjectClosureDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == project_closure.id
 
+    @pytest.mark.integration
     def test_get_project_closure_not_found(self, api_client, user, db):
         """Test getting non-existent project closure"""
         # Arrange
@@ -5125,6 +5343,7 @@ class TestProjectClosureDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_project_closure_unauthenticated(self, api_client, project_closure, db):
         """Test getting project closure without authentication"""
         # Act
@@ -5138,6 +5357,7 @@ class TestProjectClosureDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_update_project_closure_valid(self, api_client, user, project_closure, db):
         """Test updating project closure with valid data"""
         # Arrange
@@ -5157,6 +5377,7 @@ class TestProjectClosureDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_closure_not_found(self, api_client, user, db):
         """Test updating non-existent project closure"""
         # Arrange
@@ -5174,6 +5395,7 @@ class TestProjectClosureDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_project_closure_invalid(
         self, api_client, user, project_closure, db
     ):
@@ -5200,6 +5422,7 @@ class TestProjectClosureDetail:
             status.HTTP_400_BAD_REQUEST,
         ]
 
+    @pytest.mark.integration
     def test_delete_project_closure(self, api_client, user, project_closure, db):
         """Test deleting project closure"""
         # Arrange
@@ -5213,6 +5436,7 @@ class TestProjectClosureDetail:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    @pytest.mark.integration
     def test_delete_project_closure_not_found(self, api_client, user, db):
         """Test deleting non-existent project closure"""
         # Arrange
@@ -5233,6 +5457,7 @@ class TestProjectClosureDetail:
 class TestReports:
     """Tests for annual report list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_reports_authenticated(self, api_client, user, annual_report, db):
         """Test listing annual reports as authenticated user"""
         # Arrange
@@ -5245,6 +5470,7 @@ class TestReports:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_list_reports_unauthenticated(self, api_client, db):
         """Test listing annual reports without authentication"""
         # Act
@@ -5256,6 +5482,7 @@ class TestReports:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_create_report_valid(self, api_client, user, db):
         """Test creating annual report with valid data"""
         # Arrange
@@ -5275,6 +5502,7 @@ class TestReports:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_create_report_invalid(self, api_client, user, db):
         """Test creating annual report with invalid data"""
         # Arrange
@@ -5292,6 +5520,7 @@ class TestReports:
 class TestReportDetail:
     """Tests for annual report detail endpoint"""
 
+    @pytest.mark.integration
     def test_get_report(self, api_client, user, annual_report, db):
         """Test getting annual report by ID"""
         # Arrange
@@ -5304,6 +5533,7 @@ class TestReportDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == annual_report.id
 
+    @pytest.mark.integration
     def test_get_report_not_found(self, api_client, user, db):
         """Test getting non-existent annual report"""
         # Arrange
@@ -5315,6 +5545,7 @@ class TestReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_report_valid(self, api_client, user, annual_report, db):
         """Test updating annual report with valid data"""
         # Arrange
@@ -5334,6 +5565,7 @@ class TestReportDetail:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["is_published"] is True
 
+    @pytest.mark.integration
     def test_update_report_not_found(self, api_client, user, db):
         """Test updating non-existent annual report"""
         # Arrange
@@ -5351,6 +5583,7 @@ class TestReportDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_report_invalid(self, api_client, user, annual_report, db):
         """Test updating annual report with invalid data"""
         # Arrange
@@ -5368,6 +5601,7 @@ class TestReportDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_report(self, api_client, user, annual_report, db):
         """Test deleting annual report"""
         # Arrange
@@ -5379,6 +5613,7 @@ class TestReportDetail:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    @pytest.mark.integration
     def test_delete_report_not_found(self, api_client, user, db):
         """Test deleting non-existent annual report"""
         # Arrange
@@ -5394,6 +5629,7 @@ class TestReportDetail:
 class TestGetLatestReportYear:
     """Tests for get latest report year endpoint"""
 
+    @pytest.mark.integration
     def test_get_latest_report_year(self, api_client, user, annual_report, db):
         """Test getting latest report year"""
         # Arrange
@@ -5406,6 +5642,7 @@ class TestGetLatestReportYear:
         assert response.status_code == status.HTTP_200_OK
         assert "year" in response.data
 
+    @pytest.mark.integration
     def test_get_latest_report_year_no_reports(self, api_client, user, db):
         """Test getting latest report year when no reports exist"""
         # Arrange
@@ -5421,6 +5658,7 @@ class TestGetLatestReportYear:
 class TestGetAvailableReportYears:
     """Tests for get available report years endpoints"""
 
+    @pytest.mark.integration
     def test_get_available_years_for_student_report(
         self, api_client, user, annual_report, project_with_lead, db
     ):
@@ -5439,6 +5677,7 @@ class TestGetAvailableReportYears:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_get_available_years_for_progress_report(
         self, api_client, user, annual_report, project_with_lead, db
     ):
@@ -5461,6 +5700,7 @@ class TestGetAvailableReportYears:
 class TestGetReportsWithPDFs:
     """Tests for get reports with/without PDFs endpoints"""
 
+    @pytest.mark.integration
     def test_get_reports_without_pdfs(self, api_client, user, annual_report, db):
         """Test getting reports without PDFs"""
         # Arrange
@@ -5472,6 +5712,7 @@ class TestGetReportsWithPDFs:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_get_reports_with_pdfs(self, api_client, user, db):
         """Test getting reports with PDFs"""
         # Arrange
@@ -5484,6 +5725,7 @@ class TestGetReportsWithPDFs:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_get_legacy_pdfs(self, api_client, user, db):
         """Test getting legacy PDFs"""
         # Arrange
@@ -5500,6 +5742,7 @@ class TestGetReportsWithPDFs:
 class TestGetCompletedReports:
     """Tests for get completed reports endpoint"""
 
+    @pytest.mark.integration
     def test_get_completed_reports(self, api_client, user, db):
         """Test getting completed (published) reports"""
         # Arrange
@@ -5515,6 +5758,7 @@ class TestGetCompletedReports:
 class TestLatestYearsReports:
     """Tests for latest year's reports endpoints"""
 
+    @pytest.mark.integration
     def test_get_latest_years_progress_reports(
         self, api_client, user, annual_report, db
     ):
@@ -5528,6 +5772,7 @@ class TestLatestYearsReports:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+    @pytest.mark.integration
     def test_get_latest_years_student_reports(
         self, api_client, user, annual_report, db
     ):
@@ -5541,6 +5786,7 @@ class TestLatestYearsReports:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+    @pytest.mark.integration
     def test_get_latest_years_inactive_reports(
         self, api_client, user, annual_report, db
     ):
@@ -5554,6 +5800,7 @@ class TestLatestYearsReports:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+    @pytest.mark.integration
     def test_get_full_latest_report(self, api_client, user, annual_report, db):
         """Test getting full latest report"""
         # Arrange
@@ -5575,6 +5822,7 @@ class TestLatestYearsReports:
 class TestConceptPlans:
     """Tests for ConceptPlans view (list/create)"""
 
+    @pytest.mark.integration
     def test_list_concept_plans_authenticated(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5591,6 +5839,8 @@ class TestConceptPlans:
         assert len(response.data["concept_plans"]) == 1
         assert response.data["concept_plans"][0]["id"] == concept_plan_with_details.id
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_list_concept_plans_unauthenticated(self, api_client, db):
         """Test listing concept plans without authentication"""
         # Act
@@ -5602,6 +5852,7 @@ class TestConceptPlans:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_list_concept_plans_empty(self, api_client, project_lead, db):
         """Test listing concept plans when none exist"""
         # Arrange
@@ -5618,6 +5869,7 @@ class TestConceptPlans:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.create_concept_plan"
     )
+    @pytest.mark.integration
     def test_create_concept_plan_valid(
         self, mock_create, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5643,6 +5895,7 @@ class TestConceptPlans:
         assert "id" in response.data
         mock_create.assert_called_once()
 
+    @pytest.mark.integration
     def test_create_concept_plan_invalid_data(self, api_client, project_lead, db):
         """Test creating concept plan with invalid data"""
         # Arrange
@@ -5663,6 +5916,7 @@ class TestConceptPlans:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.create_concept_plan"
     )
+    @pytest.mark.integration
     def test_create_concept_plan_no_details(
         self, mock_create, api_client, project_lead, concept_plan, db
     ):
@@ -5693,6 +5947,7 @@ class TestConceptPlans:
 class TestConceptPlanDetail:
     """Tests for ConceptPlanDetail view (get/update/delete)"""
 
+    @pytest.mark.integration
     def test_get_concept_plan_authenticated(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5710,6 +5965,7 @@ class TestConceptPlanDetail:
         assert response.data["id"] == concept_plan_with_details.id
         assert response.data["background"] == concept_plan_with_details.background
 
+    @pytest.mark.integration
     def test_get_concept_plan_unauthenticated(
         self, api_client, concept_plan_with_details, db
     ):
@@ -5725,6 +5981,7 @@ class TestConceptPlanDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_concept_plan_not_found(self, api_client, project_lead, db):
         """Test getting non-existent concept plan"""
         # Arrange
@@ -5739,6 +5996,7 @@ class TestConceptPlanDetail:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.get_concept_plan_data"
     )
+    @pytest.mark.integration
     def test_get_concept_plan_no_details(
         self, mock_get_data, api_client, project_lead, concept_plan, db
     ):
@@ -5757,6 +6015,7 @@ class TestConceptPlanDetail:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.update_concept_plan"
     )
+    @pytest.mark.integration
     def test_update_concept_plan_valid(
         self, mock_update, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5781,6 +6040,7 @@ class TestConceptPlanDetail:
         assert response.status_code == status.HTTP_200_OK
         mock_update.assert_called_once()
 
+    @pytest.mark.integration
     def test_update_concept_plan_invalid_data(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5810,6 +6070,7 @@ class TestConceptPlanDetail:
     @patch(
         "documents.services.concept_plan_service.ConceptPlanService.get_concept_plan_data"
     )
+    @pytest.mark.integration
     def test_update_concept_plan_no_details(
         self, mock_get_data, mock_update, api_client, project_lead, concept_plan, db
     ):
@@ -5835,6 +6096,7 @@ class TestConceptPlanDetail:
         assert "error" in response.data
 
     @patch("documents.services.document_service.DocumentService.delete_document")
+    @pytest.mark.integration
     def test_delete_concept_plan_authenticated(
         self, mock_delete, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5853,6 +6115,7 @@ class TestConceptPlanDetail:
             concept_plan_with_details.document.id, project_lead
         )
 
+    @pytest.mark.integration
     def test_delete_concept_plan_unauthenticated(
         self, api_client, concept_plan_with_details, db
     ):
@@ -5872,6 +6135,7 @@ class TestConceptPlanDetail:
 class TestGetConceptPlanData:
     """Tests for GetConceptPlanData view (PDF generation data)"""
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_authenticated(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -5897,6 +6161,7 @@ class TestGetConceptPlanData:
         assert "aims" in response.data
         assert response.data["concept_plan_data_id"] == concept_plan_with_details.id
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_unauthenticated(
         self, api_client, concept_plan_with_details, db
     ):
@@ -5914,6 +6179,7 @@ class TestGetConceptPlanData:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_not_found(self, api_client, project_lead, db):
         """Test getting data for non-existent concept plan"""
         # Arrange
@@ -5927,6 +6193,7 @@ class TestGetConceptPlanData:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_with_team(
         self, api_client, project_lead, concept_plan_with_details, user_factory, db
     ):
@@ -5959,6 +6226,7 @@ class TestGetConceptPlanData:
         # Leader should be first
         assert "Project Lead" in response.data["project_team"][0]
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_with_image(
         self, api_client, project_lead, concept_plan_with_details, mock_image, db
     ):
@@ -5986,6 +6254,7 @@ class TestGetConceptPlanData:
         assert "project_image" in response.data
         assert response.data["project_image"] is not None
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_without_image(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -6005,6 +6274,7 @@ class TestGetConceptPlanData:
         assert "project_image" in response.data
         assert response.data["project_image"] is None
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_approval_statuses(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -6031,6 +6301,7 @@ class TestGetConceptPlanData:
         assert response.data["business_area_lead_approval_granted"] is True
         assert response.data["directorate_approval_granted"] is False
 
+    @pytest.mark.integration
     def test_get_concept_plan_data_formatted_tables(
         self, api_client, project_lead, concept_plan_with_details, db
     ):
@@ -6067,6 +6338,7 @@ class TestGetConceptPlanData:
 class TestProjectDocuments:
     """Tests for project documents list and create endpoints"""
 
+    @pytest.mark.integration
     def test_list_documents_authenticated(self, api_client, user, project_document, db):
         """Test listing documents as authenticated user"""
         # Arrange
@@ -6081,6 +6353,7 @@ class TestProjectDocuments:
         assert "total_results" in response.data
         assert "total_pages" in response.data
 
+    @pytest.mark.integration
     def test_list_documents_unauthenticated(self, api_client, db):
         """Test listing documents without authentication"""
         # Act
@@ -6092,6 +6365,7 @@ class TestProjectDocuments:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_list_documents_with_pagination(
         self, api_client, user, project_with_lead, db
     ):
@@ -6114,6 +6388,7 @@ class TestProjectDocuments:
         assert "documents" in response.data
         assert response.data["total_results"] >= 5
 
+    @pytest.mark.integration
     def test_list_documents_with_kind_filter(
         self, api_client, user, project_with_lead, db
     ):
@@ -6132,6 +6407,7 @@ class TestProjectDocuments:
         assert response.status_code == status.HTTP_200_OK
         assert "documents" in response.data
 
+    @pytest.mark.integration
     def test_list_documents_with_status_filter(
         self, api_client, user, project_with_lead, db
     ):
@@ -6150,6 +6426,7 @@ class TestProjectDocuments:
         assert response.status_code == status.HTTP_200_OK
         assert "documents" in response.data
 
+    @pytest.mark.integration
     def test_list_documents_with_search_term(
         self, api_client, user, project_with_lead, db
     ):
@@ -6169,6 +6446,7 @@ class TestProjectDocuments:
         assert response.status_code == status.HTTP_200_OK
         assert "documents" in response.data
 
+    @pytest.mark.integration
     def test_create_document_valid(self, api_client, user, project_with_lead, db):
         """Test creating a document with valid data"""
         # Arrange
@@ -6188,6 +6466,7 @@ class TestProjectDocuments:
         assert "id" in response.data
         assert response.data["kind"] == "concept"
 
+    @pytest.mark.integration
     def test_create_document_invalid_data(self, api_client, user, db):
         """Test creating document with invalid data"""
         # Arrange
@@ -6202,6 +6481,7 @@ class TestProjectDocuments:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_create_document_unauthenticated(self, api_client, project_with_lead, db):
         """Test creating document without authentication"""
         # Arrange
@@ -6225,6 +6505,7 @@ class TestProjectDocuments:
 class TestProjectDocumentDetail:
     """Tests for project document detail endpoints"""
 
+    @pytest.mark.integration
     def test_get_document_authenticated(self, api_client, user, project_document, db):
         """Test getting a document by ID"""
         # Arrange
@@ -6239,6 +6520,7 @@ class TestProjectDocumentDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == project_document.id
 
+    @pytest.mark.integration
     def test_get_document_unauthenticated(self, api_client, project_document, db):
         """Test getting document without authentication"""
         # Act
@@ -6252,6 +6534,7 @@ class TestProjectDocumentDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_document_not_found(self, api_client, user, db):
         """Test getting non-existent document"""
         # Arrange
@@ -6263,6 +6546,7 @@ class TestProjectDocumentDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_document_valid(self, api_client, user, project_document, db):
         """Test updating document with valid data"""
         # Arrange
@@ -6282,6 +6566,7 @@ class TestProjectDocumentDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["status"] == "inapproval"
 
+    @pytest.mark.integration
     def test_update_document_invalid_data(self, api_client, user, project_document, db):
         """Test updating document with invalid data"""
         # Arrange
@@ -6300,6 +6585,7 @@ class TestProjectDocumentDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_update_document_unauthenticated(self, api_client, project_document, db):
         """Test updating document without authentication"""
         # Arrange
@@ -6320,6 +6606,7 @@ class TestProjectDocumentDetail:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_delete_document_authenticated(
         self, api_client, user, project_document, db
     ):
@@ -6338,6 +6625,7 @@ class TestProjectDocumentDetail:
         # Verify document was deleted
         assert not ProjectDocument.objects.filter(id=document_id).exists()
 
+    @pytest.mark.integration
     def test_delete_document_unauthenticated(self, api_client, project_document, db):
         """Test deleting document without authentication"""
         # Act
@@ -6355,6 +6643,7 @@ class TestProjectDocumentDetail:
 class TestProjectDocsPendingMyAction:
     """Tests for documents pending user action endpoint"""
 
+    @pytest.mark.integration
     def test_get_pending_documents_authenticated(
         self, api_client, project_lead, project_with_lead, db
     ):
@@ -6382,6 +6671,8 @@ class TestProjectDocsPendingMyAction:
         assert "ba" in response.data
         assert "directorate" in response.data
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_get_pending_documents_unauthenticated(self, api_client, db):
         """Test getting pending documents without authentication"""
         # Act
@@ -6395,6 +6686,7 @@ class TestProjectDocsPendingMyAction:
             status.HTTP_403_FORBIDDEN,
         ]
 
+    @pytest.mark.integration
     def test_get_pending_documents_with_stage_filter(
         self, api_client, project_lead, project_with_lead, db
     ):
@@ -6420,6 +6712,7 @@ class TestProjectDocsPendingMyAction:
         assert response.status_code == status.HTTP_200_OK
         assert "lead" in response.data
 
+    @pytest.mark.integration
     def test_get_pending_documents_without_stage_filter(
         self, api_client, project_lead, project_with_lead, db
     ):
@@ -6444,6 +6737,7 @@ class TestProjectDocsPendingMyAction:
         assert "all" in response.data
         assert "lead" in response.data
 
+    @pytest.mark.integration
     def test_get_pending_documents_stage_2(
         self, api_client, ba_lead, project_with_ba_lead, db
     ):
@@ -6468,6 +6762,7 @@ class TestProjectDocsPendingMyAction:
         assert response.status_code == status.HTTP_200_OK
         assert "ba" in response.data
 
+    @pytest.mark.integration
     def test_get_pending_documents_no_pending(self, api_client, user, db):
         """Test getting pending documents when none are pending"""
         # Arrange
@@ -6497,6 +6792,7 @@ class TestProjectDocsPendingMyActionUnused:
     coverage completeness only.
     """
 
+    @pytest.mark.integration
     def test_unused_view_get_with_stage(
         self, api_client, project_lead, project_with_lead, db
     ):
@@ -6523,6 +6819,7 @@ class TestProjectDocsPendingMyActionUnused:
         assert "documents" in response.data
         assert "count" in response.data
 
+    @pytest.mark.integration
     def test_unused_view_get_without_stage(
         self, api_client, project_lead, project_with_lead, db
     ):
@@ -6560,6 +6857,7 @@ class TestDocApproval:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_one")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_approval_stage_one(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -6582,6 +6880,7 @@ class TestDocApproval:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_two")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_approval_stage_two(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -6603,6 +6902,7 @@ class TestDocApproval:
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_three")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_approval_stage_three(
         self, mock_get, mock_approve, api_client, user, project_document, db
     ):
@@ -6622,6 +6922,7 @@ class TestDocApproval:
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_approve.assert_called_once_with(project_document, user)
 
+    @pytest.mark.integration
     def test_doc_approval_missing_stage(self, api_client, user, project_document, db):
         """Test approval with missing stage parameter"""
         # Arrange
@@ -6637,6 +6938,7 @@ class TestDocApproval:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_approval_missing_document_pk(self, api_client, user, db):
         """Test approval with missing documentPk parameter"""
         # Arrange
@@ -6652,6 +6954,7 @@ class TestDocApproval:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_approval_invalid_stage(self, api_client, user, project_document, db):
         """Test approval with invalid stage number"""
         # Arrange
@@ -6667,6 +6970,7 @@ class TestDocApproval:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_approval_stage_not_integer(
         self, api_client, user, project_document, db
     ):
@@ -6684,6 +6988,7 @@ class TestDocApproval:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_approval_unauthenticated(self, api_client, project_document, db):
         """Test approval without authentication"""
         # Arrange
@@ -6706,6 +7011,7 @@ class TestDocRecall:
 
     @patch("documents.services.approval_service.ApprovalService.recall")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_recall_with_reason(
         self, mock_get, mock_recall, api_client, user, project_document, db
     ):
@@ -6734,6 +7040,7 @@ class TestDocRecall:
 
     @patch("documents.services.approval_service.ApprovalService.recall")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_recall_without_reason(
         self, mock_get, mock_recall, api_client, user, project_document, db
     ):
@@ -6753,6 +7060,7 @@ class TestDocRecall:
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_recall.assert_called_once_with(project_document, user, "")
 
+    @pytest.mark.integration
     def test_doc_recall_missing_stage(self, api_client, user, project_document, db):
         """Test recall with missing stage parameter"""
         # Arrange
@@ -6768,6 +7076,7 @@ class TestDocRecall:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_recall_missing_document_pk(self, api_client, user, db):
         """Test recall with missing documentPk parameter"""
         # Arrange
@@ -6783,6 +7092,7 @@ class TestDocRecall:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_recall_unauthenticated(self, api_client, project_document, db):
         """Test recall without authentication"""
         # Arrange
@@ -6805,6 +7115,7 @@ class TestDocSendBack:
 
     @patch("documents.services.approval_service.ApprovalService.send_back")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_send_back_with_reason(
         self, mock_get, mock_send_back, api_client, user, project_document, db
     ):
@@ -6833,6 +7144,7 @@ class TestDocSendBack:
 
     @patch("documents.services.approval_service.ApprovalService.send_back")
     @patch("documents.services.document_service.DocumentService.get_document")
+    @pytest.mark.integration
     def test_doc_send_back_without_reason(
         self, mock_get, mock_send_back, api_client, user, project_document, db
     ):
@@ -6852,6 +7164,7 @@ class TestDocSendBack:
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_send_back.assert_called_once_with(project_document, user, "")
 
+    @pytest.mark.integration
     def test_doc_send_back_missing_stage(self, api_client, user, project_document, db):
         """Test send back with missing stage parameter"""
         # Arrange
@@ -6867,6 +7180,7 @@ class TestDocSendBack:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_send_back_missing_document_pk(self, api_client, user, db):
         """Test send back with missing documentPk parameter"""
         # Arrange
@@ -6882,6 +7196,7 @@ class TestDocSendBack:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_doc_send_back_unauthenticated(self, api_client, project_document, db):
         """Test send back without authentication"""
         # Arrange

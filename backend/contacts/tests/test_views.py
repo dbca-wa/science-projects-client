@@ -22,6 +22,7 @@ def api_client():
 class TestAddressViews:
     """Tests for Address views"""
 
+    @pytest.mark.integration
     def test_list_addresses_authenticated(
         self, api_client, user, address_for_agency, db
     ):
@@ -37,6 +38,7 @@ class TestAddressViews:
         assert len(response.data) == 1
         assert response.data[0]["id"] == address_for_agency.id
 
+    @pytest.mark.integration
     def test_list_addresses_unauthenticated(self, api_client, db):
         """Test listing addresses without authentication"""
         # Act
@@ -45,6 +47,7 @@ class TestAddressViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_address_valid_data(self, api_client, user, agency, db):
         """Test creating address with valid data"""
         # Arrange
@@ -67,6 +70,7 @@ class TestAddressViews:
         assert response.data["street"] == "789 New St"
         assert Address.objects.filter(street="789 New St").exists()
 
+    @pytest.mark.integration
     def test_create_address_invalid_data(self, api_client, user, db):
         """Test creating address with invalid data"""
         # Arrange
@@ -82,6 +86,7 @@ class TestAddressViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_address_detail(self, api_client, user, address_for_agency, db):
         """Test getting address detail"""
         # Arrange
@@ -97,6 +102,7 @@ class TestAddressViews:
         assert response.data["id"] == address_for_agency.id
         assert response.data["street"] == "123 Test St"
 
+    @pytest.mark.integration
     def test_get_address_not_found(self, api_client, user, db):
         """Test getting non-existent address"""
         # Arrange
@@ -108,6 +114,7 @@ class TestAddressViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_address(self, api_client, user, address_for_agency, db):
         """Test updating address"""
         # Arrange
@@ -127,6 +134,7 @@ class TestAddressViews:
         address_for_agency.refresh_from_db()
         assert address_for_agency.street == "Updated Street"
 
+    @pytest.mark.integration
     def test_delete_address(self, api_client, user, address_for_agency, db):
         """Test deleting address"""
         # Arrange
@@ -144,6 +152,7 @@ class TestAddressViews:
 class TestAgencyContactViews:
     """Tests for AgencyContact views"""
 
+    @pytest.mark.integration
     def test_list_agency_contacts_authenticated(
         self, api_client, user, agency_contact, db
     ):
@@ -159,6 +168,7 @@ class TestAgencyContactViews:
         assert len(response.data) == 1
         assert response.data[0]["id"] == agency_contact.id
 
+    @pytest.mark.integration
     def test_list_agency_contacts_unauthenticated(self, api_client, db):
         """Test listing agency contacts without authentication"""
         # Act
@@ -167,6 +177,7 @@ class TestAgencyContactViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_agency_contact_valid_data(
         self, api_client, user, agency, address_for_agency, db
     ):
@@ -188,6 +199,7 @@ class TestAgencyContactViews:
         assert response.data["email"] == "newagency@example.com"
         assert AgencyContact.objects.filter(email="newagency@example.com").exists()
 
+    @pytest.mark.integration
     def test_create_agency_contact_invalid_data(self, api_client, user, db):
         """Test creating agency contact with invalid data"""
         # Arrange
@@ -203,6 +215,7 @@ class TestAgencyContactViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_agency_contact_detail(self, api_client, user, agency_contact, db):
         """Test getting agency contact detail"""
         # Arrange
@@ -216,6 +229,7 @@ class TestAgencyContactViews:
         assert response.data["id"] == agency_contact.id
         assert response.data["email"] == "agency@example.com"
 
+    @pytest.mark.integration
     def test_get_agency_contact_not_found(self, api_client, user, db):
         """Test getting non-existent agency contact"""
         # Arrange
@@ -227,6 +241,7 @@ class TestAgencyContactViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_agency_contact(self, api_client, user, agency_contact, db):
         """Test updating agency contact"""
         # Arrange
@@ -244,6 +259,7 @@ class TestAgencyContactViews:
         agency_contact.refresh_from_db()
         assert agency_contact.email == "updated@example.com"
 
+    @pytest.mark.integration
     def test_delete_agency_contact(self, api_client, user, agency_contact, db):
         """Test deleting agency contact"""
         # Arrange
@@ -261,6 +277,7 @@ class TestAgencyContactViews:
 class TestBranchContactViews:
     """Tests for BranchContact views"""
 
+    @pytest.mark.integration
     def test_list_branch_contacts_authenticated(
         self, api_client, user, branch_contact, db
     ):
@@ -276,6 +293,7 @@ class TestBranchContactViews:
         assert len(response.data) == 1
         assert response.data[0]["id"] == branch_contact.id
 
+    @pytest.mark.integration
     def test_list_branch_contacts_unauthenticated(self, api_client, db):
         """Test listing branch contacts without authentication"""
         # Act
@@ -284,6 +302,7 @@ class TestBranchContactViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_branch_contact_valid_data(
         self, api_client, user, branch, address_for_branch, db
     ):
@@ -305,6 +324,7 @@ class TestBranchContactViews:
         assert response.data["email"] == "newbranch@example.com"
         assert BranchContact.objects.filter(email="newbranch@example.com").exists()
 
+    @pytest.mark.integration
     def test_create_branch_contact_invalid_data(self, api_client, user, db):
         """Test creating branch contact with invalid data"""
         # Arrange
@@ -320,6 +340,7 @@ class TestBranchContactViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_branch_contact_detail(self, api_client, user, branch_contact, db):
         """Test getting branch contact detail"""
         # Arrange
@@ -333,6 +354,7 @@ class TestBranchContactViews:
         assert response.data["id"] == branch_contact.id
         assert response.data["email"] == "branch@example.com"
 
+    @pytest.mark.integration
     def test_get_branch_contact_not_found(self, api_client, user, db):
         """Test getting non-existent branch contact"""
         # Arrange
@@ -344,6 +366,7 @@ class TestBranchContactViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_branch_contact(self, api_client, user, branch_contact, db):
         """Test updating branch contact"""
         # Arrange
@@ -361,6 +384,7 @@ class TestBranchContactViews:
         branch_contact.refresh_from_db()
         assert branch_contact.email == "updatedbranch@example.com"
 
+    @pytest.mark.integration
     def test_delete_branch_contact(self, api_client, user, branch_contact, db):
         """Test deleting branch contact"""
         # Arrange
@@ -378,6 +402,7 @@ class TestBranchContactViews:
 class TestUserContactViews:
     """Tests for UserContact views"""
 
+    @pytest.mark.integration
     def test_list_user_contacts_authenticated(self, api_client, user, user_contact, db):
         """Test listing user contacts as authenticated user"""
         # Arrange
@@ -391,6 +416,7 @@ class TestUserContactViews:
         assert len(response.data) == 1
         assert response.data[0]["id"] == user_contact.id
 
+    @pytest.mark.integration
     def test_list_user_contacts_unauthenticated(self, api_client, db):
         """Test listing user contacts without authentication"""
         # Act
@@ -399,6 +425,7 @@ class TestUserContactViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_user_contact_valid_data(self, api_client, user, user_factory, db):
         """Test creating user contact with valid data"""
         # Arrange
@@ -418,6 +445,7 @@ class TestUserContactViews:
         assert response.data["email"] == "newcontact@example.com"
         assert UserContact.objects.filter(email="newcontact@example.com").exists()
 
+    @pytest.mark.integration
     def test_create_user_contact_invalid_data(self, api_client, user, db):
         """Test creating user contact with invalid data"""
         # Arrange
@@ -433,6 +461,7 @@ class TestUserContactViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_user_contact_detail(self, api_client, user, user_contact, db):
         """Test getting user contact detail"""
         # Arrange
@@ -446,6 +475,7 @@ class TestUserContactViews:
         assert response.data["id"] == user_contact.id
         assert response.data["email"] == "user@example.com"
 
+    @pytest.mark.integration
     def test_get_user_contact_not_found(self, api_client, user, db):
         """Test getting non-existent user contact"""
         # Arrange
@@ -457,6 +487,7 @@ class TestUserContactViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_user_contact(self, api_client, user, user_contact, db):
         """Test updating user contact"""
         # Arrange
@@ -474,6 +505,7 @@ class TestUserContactViews:
         user_contact.refresh_from_db()
         assert user_contact.email == "updateduser@example.com"
 
+    @pytest.mark.integration
     def test_delete_user_contact(self, api_client, user, user_contact, db):
         """Test deleting user contact"""
         # Arrange
@@ -491,6 +523,7 @@ class TestUserContactViews:
 class TestUserContactDetailPermissions:
     """Tests for UserContactDetail permissions"""
 
+    @pytest.mark.integration
     def test_get_user_contact_detail_unauthenticated(
         self, api_client, user_contact, db
     ):
@@ -503,6 +536,7 @@ class TestUserContactDetailPermissions:
         # This test documents the current behavior
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_update_user_contact_unauthenticated(self, api_client, user_contact, db):
         """Test updating user contact without authentication"""
         # Arrange
@@ -518,6 +552,7 @@ class TestUserContactDetailPermissions:
         # This test documents the current behavior (should be 401)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_user_contact_unauthenticated(self, api_client, user_contact, db):
         """Test deleting user contact without authentication"""
         # Act

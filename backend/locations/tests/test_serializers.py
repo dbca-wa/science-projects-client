@@ -2,6 +2,8 @@
 Tests for locations serializers
 """
 
+import pytest
+
 from locations.models import Area
 from locations.serializers import AreaSerializer, TinyAreaSerializer
 
@@ -9,6 +11,7 @@ from locations.serializers import AreaSerializer, TinyAreaSerializer
 class TestTinyAreaSerializer:
     """Tests for TinyAreaSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_area(self, dbca_district, db):
         """Test serializing area to JSON"""
         serializer = TinyAreaSerializer(dbca_district)
@@ -21,6 +24,7 @@ class TestTinyAreaSerializer:
         assert data["name"] == dbca_district.name
         assert data["area_type"] == dbca_district.area_type
 
+    @pytest.mark.unit
     def test_serialize_area_fields_only(self, dbca_district, db):
         """Test TinyAreaSerializer only includes specified fields"""
         serializer = TinyAreaSerializer(dbca_district)
@@ -32,6 +36,7 @@ class TestTinyAreaSerializer:
         assert "created_at" not in data
         assert "updated_at" not in data
 
+    @pytest.mark.unit
     def test_serialize_multiple_areas(self, dbca_district, dbca_region, db):
         """Test serializing multiple areas"""
         areas = [dbca_district, dbca_region]
@@ -42,6 +47,7 @@ class TestTinyAreaSerializer:
         assert data[0]["name"] == dbca_district.name
         assert data[1]["name"] == dbca_region.name
 
+    @pytest.mark.unit
     def test_serialize_dbca_region(self, dbca_region, db):
         """Test serializing DBCA region area"""
         serializer = TinyAreaSerializer(dbca_region)
@@ -49,6 +55,7 @@ class TestTinyAreaSerializer:
 
         assert data["area_type"] == "dbcaregion"
 
+    @pytest.mark.unit
     def test_serialize_ibra_region(self, ibra_region, db):
         """Test serializing IBRA region area"""
         serializer = TinyAreaSerializer(ibra_region)
@@ -60,6 +67,7 @@ class TestTinyAreaSerializer:
 class TestAreaSerializer:
     """Tests for AreaSerializer"""
 
+    @pytest.mark.unit
     def test_serialize_area_all_fields(self, dbca_district, db):
         """Test serializing area includes all fields"""
         serializer = AreaSerializer(dbca_district)
@@ -71,6 +79,7 @@ class TestAreaSerializer:
         assert "created_at" in data
         assert "updated_at" in data
 
+    @pytest.mark.unit
     def test_serialize_area_values(self, dbca_district, db):
         """Test serialized area has correct values"""
         serializer = AreaSerializer(dbca_district)
@@ -80,6 +89,7 @@ class TestAreaSerializer:
         assert data["name"] == dbca_district.name
         assert data["area_type"] == dbca_district.area_type
 
+    @pytest.mark.unit
     def test_deserialize_valid_data(self, db):
         """Test deserializing valid JSON to area"""
         data = {
@@ -93,6 +103,7 @@ class TestAreaSerializer:
         assert area.name == "Perth District"
         assert area.area_type == "dbcadistrict"
 
+    @pytest.mark.unit
     def test_deserialize_missing_name(self, db):
         """Test deserializing with missing name fails validation"""
         data = {
@@ -103,6 +114,7 @@ class TestAreaSerializer:
         assert not serializer.is_valid()
         assert "name" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_missing_area_type(self, db):
         """Test deserializing with missing area_type fails validation"""
         data = {
@@ -113,6 +125,7 @@ class TestAreaSerializer:
         assert not serializer.is_valid()
         assert "area_type" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_invalid_area_type(self, db):
         """Test deserializing with invalid area_type fails validation"""
         data = {
@@ -124,6 +137,7 @@ class TestAreaSerializer:
         assert not serializer.is_valid()
         assert "area_type" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_empty_name(self, db):
         """Test deserializing with empty name fails validation"""
         data = {
@@ -135,6 +149,7 @@ class TestAreaSerializer:
         assert not serializer.is_valid()
         assert "name" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_name_too_long(self, db):
         """Test deserializing with name exceeding max_length fails"""
         data = {
@@ -146,6 +161,7 @@ class TestAreaSerializer:
         assert not serializer.is_valid()
         assert "name" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_name_max_length(self, db):
         """Test deserializing with name at max_length succeeds"""
         data = {
@@ -158,6 +174,7 @@ class TestAreaSerializer:
         area = serializer.save()
         assert len(area.name) == 150
 
+    @pytest.mark.unit
     def test_deserialize_all_area_types(self, db):
         """Test deserializing all valid area types"""
         area_types = [
@@ -179,6 +196,7 @@ class TestAreaSerializer:
             area = serializer.save()
             assert area.area_type == area_type
 
+    @pytest.mark.unit
     def test_update_area_name(self, dbca_district, db):
         """Test updating area name via serializer"""
         data = {
@@ -191,6 +209,7 @@ class TestAreaSerializer:
         assert area.name == "Updated District Name"
         assert area.area_type == dbca_district.area_type  # Unchanged
 
+    @pytest.mark.unit
     def test_update_area_type(self, dbca_district, db):
         """Test updating area type via serializer"""
         data = {
@@ -203,6 +222,7 @@ class TestAreaSerializer:
         assert area.area_type == "dbcaregion"
         assert area.name == dbca_district.name  # Unchanged
 
+    @pytest.mark.unit
     def test_update_area_full(self, dbca_district, db):
         """Test full update of area via serializer"""
         data = {
@@ -216,6 +236,7 @@ class TestAreaSerializer:
         assert area.name == "Completely New Name"
         assert area.area_type == "ibra"
 
+    @pytest.mark.unit
     def test_serialize_multiple_areas(
         self, dbca_district, dbca_region, ibra_region, db
     ):
@@ -229,6 +250,7 @@ class TestAreaSerializer:
         assert data[1]["name"] == dbca_region.name
         assert data[2]["name"] == ibra_region.name
 
+    @pytest.mark.unit
     def test_deserialize_with_extra_fields(self, db):
         """Test deserializing with extra fields ignores them"""
         data = {
@@ -243,6 +265,7 @@ class TestAreaSerializer:
         assert area.name == "Test Area"
         assert not hasattr(area, "extra_field")
 
+    @pytest.mark.unit
     def test_serialize_area_with_special_characters(self, db):
         """Test serializing area with special characters in name"""
         area = Area.objects.create(
@@ -255,6 +278,7 @@ class TestAreaSerializer:
 
         assert data["name"] == "Perth & Peel District (South-West)"
 
+    @pytest.mark.unit
     def test_deserialize_area_with_special_characters(self, db):
         """Test deserializing area with special characters in name"""
         data = {
@@ -267,6 +291,7 @@ class TestAreaSerializer:
         area = serializer.save()
         assert area.name == "Perth & Peel District (South-West)"
 
+    @pytest.mark.unit
     def test_serialize_preserves_timestamps(self, dbca_district, db):
         """Test serialization preserves created_at and updated_at"""
         serializer = AreaSerializer(dbca_district)
@@ -277,6 +302,7 @@ class TestAreaSerializer:
         assert data["created_at"] is not None
         assert data["updated_at"] is not None
 
+    @pytest.mark.unit
     def test_deserialize_ignores_id(self, db):
         """Test deserializing with id field ignores it for new objects"""
         data = {

@@ -16,6 +16,7 @@ from medias.models import AnnualReportPDF, ProjectPhoto
 class TestFileValidationOnUpdate:
     """Test that file validation runs when files are updated"""
 
+    @pytest.mark.integration
     def test_validation_runs_on_image_update(self, project, user, mock_image, db):
         """Test validation runs when image file is changed on existing instance"""
         # Create initial photo
@@ -43,6 +44,7 @@ class TestFileValidationOnUpdate:
             assert mock_validate.called
             assert mock_validate.call_count == 1
 
+    @pytest.mark.integration
     def test_validation_runs_on_pdf_update(self, annual_report, user, mock_file, db):
         """Test validation runs when PDF file is changed on existing instance"""
         # Create initial PDF
@@ -70,6 +72,7 @@ class TestFileValidationOnUpdate:
             assert mock_validate.called
             assert mock_validate.call_count == 1
 
+    @pytest.mark.integration
     def test_validation_skipped_when_file_unchanged(
         self, project, user, mock_image, db
     ):
@@ -90,6 +93,7 @@ class TestFileValidationOnUpdate:
             # Verify validation was NOT called (performance optimisation)
             assert not mock_validate.called
 
+    @pytest.mark.integration
     def test_validation_runs_on_creation(self, project, user, mock_image, db):
         """Test validation runs on new instance creation"""
         # Mock the validation function
@@ -105,6 +109,7 @@ class TestFileValidationOnUpdate:
             assert mock_validate.called
             assert mock_validate.call_count == 1
 
+    @pytest.mark.integration
     def test_file_change_detection_with_same_file(self, project, user, mock_image, db):
         """Test that re-assigning the same file doesn't trigger validation"""
         # Create photo
@@ -129,6 +134,7 @@ class TestFileValidationOnUpdate:
 class TestFileSizeLimits:
     """Test file size limit enforcement"""
 
+    @pytest.mark.integration
     def test_image_size_limit_enforced(self, project, user, db):
         """Test image upload rejection when > 3 MB"""
         # Create a mock image larger than 3 MB
@@ -153,6 +159,7 @@ class TestFileSizeLimits:
                     uploader=user,
                 )
 
+    @pytest.mark.integration
     def test_project_pdf_size_limit_enforced(self, project, project_document, db):
         """Test project PDF upload rejection when > 10 MB"""
         from medias.models import ProjectDocumentPDF
@@ -179,6 +186,7 @@ class TestFileSizeLimits:
                     project=project,
                 )
 
+    @pytest.mark.integration
     def test_annual_report_pdf_size_limit_enforced(self, annual_report, user, db):
         """Test annual report PDF upload rejection when > 100 MB"""
         # Create a mock PDF larger than 100 MB
@@ -203,6 +211,7 @@ class TestFileSizeLimits:
                     creator=user,
                 )
 
+    @pytest.mark.integration
     def test_valid_files_within_limits_accepted(self, project, user, db):
         """Test valid files within size limits are accepted"""
         # Create a small image with valid JPEG magic bytes
@@ -233,6 +242,7 @@ class TestFileSizeLimits:
 class TestFilenameSanitisation:
     """Test filename sanitisation during validation"""
 
+    @pytest.mark.integration
     def test_unsafe_filename_sanitised(self, project, user, db):
         """Test unsafe filename is sanitised during validation"""
         # Create image with unsafe filename
@@ -257,6 +267,7 @@ class TestFilenameSanitisation:
             assert "passwd" not in photo.file.name
             assert "etc" not in photo.file.name
 
+    @pytest.mark.integration
     def test_file_content_preserved_after_sanitisation(self, project, user, db):
         """Test file content is preserved after filename sanitisation"""
         original_content = b"test image content that should be preserved"
@@ -286,6 +297,7 @@ class TestFilenameSanitisation:
 class TestUpdateSecurityFix:
     """Integration test for the security fix"""
 
+    @pytest.mark.integration
     def test_security_fix_prevents_malicious_update(
         self, project, user, mock_image, db
     ):

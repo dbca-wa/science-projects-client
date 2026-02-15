@@ -20,10 +20,13 @@ from users.models import (
 )
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserModel:
     """Tests for User model"""
 
-    def test_user_creation(self, db):
+    @pytest.mark.integration
+    def test_user_creation(self):
         """Test creating a user"""
         # Arrange & Act
         user = User.objects.create(
@@ -39,7 +42,8 @@ class TestUserModel:
         assert user.first_name == "Test"
         assert user.last_name == "User"
 
-    def test_user_str_representation(self, user, db):
+    @pytest.mark.integration
+    def test_user_str_representation(self, user):
         """Test user string representation"""
         # Act
         result = str(user)
@@ -49,7 +53,8 @@ class TestUserModel:
         assert "User" in result
         assert "testuser" in result
 
-    def test_user_save_auto_populates_display_names(self, db):
+    @pytest.mark.integration
+    def test_user_save_auto_populates_display_names(self):
         """Test that save() auto-populates display names"""
         # Arrange
         user = User(
@@ -65,7 +70,8 @@ class TestUserModel:
         assert user.display_first_name == "John"
         assert user.display_last_name == "Doe"
 
-    def test_user_save_preserves_existing_display_names(self, db):
+    @pytest.mark.integration
+    def test_user_save_preserves_existing_display_names(self):
         """Test that save() preserves existing display names"""
         # Arrange
         user = User(
@@ -83,7 +89,8 @@ class TestUserModel:
         assert user.display_first_name == "Jöhn"
         assert user.display_last_name == "Döe"
 
-    def test_get_formatted_name_with_initials(self, user, user_profile, db):
+    @pytest.mark.integration
+    def test_get_formatted_name_with_initials(self, user, user_profile):
         """Test formatted name with middle initials"""
         # Arrange
         user_profile.middle_initials = "A B"
@@ -98,7 +105,8 @@ class TestUserModel:
         assert "A." in result
         assert "B." in result
 
-    def test_get_formatted_name_without_initials(self, user, user_profile, db):
+    @pytest.mark.integration
+    def test_get_formatted_name_without_initials(self, user, user_profile):
         """Test formatted name without middle initials"""
         # Arrange
         user_profile.middle_initials = None
@@ -111,7 +119,8 @@ class TestUserModel:
         assert "User" in result
         assert "T." in result
 
-    def test_get_image_with_avatar(self, user, mock_image, db):
+    @pytest.mark.integration
+    def test_get_image_with_avatar(self, user, mock_image):
         """Test getting user image when avatar exists"""
         # Arrange
         from medias.models import UserAvatar
@@ -128,7 +137,8 @@ class TestUserModel:
         assert result is not None
         assert "file" in result
 
-    def test_get_image_without_avatar(self, user, db):
+    @pytest.mark.integration
+    def test_get_image_without_avatar(self, user):
         """Test getting user image when no avatar exists"""
         # Act
         result = user.get_image()
@@ -136,7 +146,8 @@ class TestUserModel:
         # Assert
         assert result is None
 
-    def test_get_caretakers(self, user, user_factory, db):
+    @pytest.mark.integration
+    def test_get_caretakers(self, user, user_factory):
         """Test getting active caretakers"""
         # Arrange
         from caretakers.models import Caretaker
@@ -156,7 +167,8 @@ class TestUserModel:
         # Assert
         assert caretakers.count() == 1
 
-    def test_get_caretakers_excludes_expired(self, user, user_factory, db):
+    @pytest.mark.integration
+    def test_get_caretakers_excludes_expired(self, user, user_factory):
         """Test that get_caretakers excludes expired caretakers"""
         # Arrange
         from caretakers.models import Caretaker
@@ -176,7 +188,8 @@ class TestUserModel:
         # Assert
         assert caretakers.count() == 0
 
-    def test_get_all_caretakers(self, user, user_factory, db):
+    @pytest.mark.integration
+    def test_get_all_caretakers(self, user, user_factory):
         """Test getting all caretakers including expired"""
         # Arrange
         from caretakers.models import Caretaker
@@ -196,7 +209,8 @@ class TestUserModel:
         # Assert
         assert caretakers.count() == 1
 
-    def test_get_caretaking_for(self, user, user_factory, db):
+    @pytest.mark.integration
+    def test_get_caretaking_for(self, user, user_factory):
         """Test getting users this user is caretaking for"""
         # Arrange
         from caretakers.models import Caretaker
@@ -216,7 +230,8 @@ class TestUserModel:
         # Assert
         assert caretaking.count() == 1
 
-    def test_get_caretaker_data(self, user, db):
+    @pytest.mark.integration
+    def test_get_caretaker_data(self, user):
         """Test getting caretaker data"""
         # Act
         data = user.get_caretaker_data()
@@ -229,7 +244,8 @@ class TestUserModel:
         assert data["is_superuser"] == user.is_superuser
         assert data["email"] == user.email
 
-    def test_get_caretaker_data_prevents_recursion(self, user, db):
+    @pytest.mark.integration
+    def test_get_caretaker_data_prevents_recursion(self, user):
         """Test that get_caretaker_data prevents infinite recursion"""
         # Act
         data = user.get_caretaker_data(current_path=[user.pk])
@@ -238,10 +254,13 @@ class TestUserModel:
         assert data is None
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserWorkModel:
     """Tests for UserWork model"""
 
-    def test_user_work_creation(self, user, business_area, db):
+    @pytest.mark.integration
+    def test_user_work_creation(self, user, business_area):
         """Test creating user work"""
         # Arrange & Act
         work = UserWork.objects.create(
@@ -255,7 +274,8 @@ class TestUserWorkModel:
         assert work.business_area == business_area
         assert work.role == "DBCA Member"
 
-    def test_user_work_str_representation(self, user_work, db):
+    @pytest.mark.integration
+    def test_user_work_str_representation(self, user_work):
         """Test user work string representation"""
         # Act
         result = str(user_work)
@@ -264,7 +284,8 @@ class TestUserWorkModel:
         assert "Work Detail" in result
         assert str(user_work.user) in result
 
-    def test_user_work_role_choices(self, db):
+    @pytest.mark.integration
+    def test_user_work_role_choices(self):
         """Test user work role choices"""
         # Act
         choices = UserWork.RoleChoices
@@ -277,10 +298,13 @@ class TestUserWorkModel:
         assert hasattr(choices, "DBCA")
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserProfileModel:
     """Tests for UserProfile model"""
 
-    def test_user_profile_creation(self, user, db):
+    @pytest.mark.integration
+    def test_user_profile_creation(self, user):
         """Test creating user profile"""
         # Arrange & Act
         profile = UserProfile.objects.create(
@@ -294,7 +318,8 @@ class TestUserProfileModel:
         assert profile.title == "dr"
         assert profile.middle_initials == "A"
 
-    def test_user_profile_str_representation(self, user_profile, db):
+    @pytest.mark.integration
+    def test_user_profile_str_representation(self, user_profile):
         """Test user profile string representation"""
         # Act
         result = str(user_profile)
@@ -303,7 +328,8 @@ class TestUserProfileModel:
         assert "Profile" in result
         assert user_profile.user.username in result
 
-    def test_user_profile_title_choices(self, db):
+    @pytest.mark.integration
+    def test_user_profile_title_choices(self):
         """Test user profile title choices"""
         # Act
         choices = UserProfile.TitleChoices
@@ -315,10 +341,13 @@ class TestUserProfileModel:
         assert hasattr(choices, "PROF")
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestKeywordTagModel:
     """Tests for KeywordTag model"""
 
-    def test_keyword_tag_creation(self, db):
+    @pytest.mark.unit
+    def test_keyword_tag_creation(self):
         """Test creating keyword tag"""
         # Arrange & Act
         tag = KeywordTag.objects.create(name="Python")
@@ -326,7 +355,8 @@ class TestKeywordTagModel:
         # Assert
         assert tag.name == "Python"
 
-    def test_keyword_tag_str_representation(self, db):
+    @pytest.mark.unit
+    def test_keyword_tag_str_representation(self):
         """Test keyword tag string representation"""
         # Arrange
         tag = KeywordTag.objects.create(name="Django")
@@ -337,7 +367,8 @@ class TestKeywordTagModel:
         # Assert
         assert result == "Django"
 
-    def test_keyword_tag_unique_name(self, db):
+    @pytest.mark.unit
+    def test_keyword_tag_unique_name(self):
         """Test keyword tag name uniqueness"""
         # Arrange
         KeywordTag.objects.create(name="Python")
@@ -347,10 +378,13 @@ class TestKeywordTagModel:
             KeywordTag.objects.create(name="Python")
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEmploymentEntryModel:
     """Tests for EmploymentEntry model"""
 
-    def test_employment_entry_creation(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_employment_entry_creation(self, staff_profile):
         """Test creating employment entry"""
         # Arrange & Act
         entry = EmploymentEntry.objects.create(
@@ -368,7 +402,8 @@ class TestEmploymentEntryModel:
         assert entry.start_year == 2020
         assert entry.end_year == 2023
 
-    def test_employment_entry_str_representation(self, employment_entry, db):
+    @pytest.mark.unit
+    def test_employment_entry_str_representation(self, employment_entry):
         """Test employment entry string representation"""
         # Act
         result = str(employment_entry)
@@ -379,10 +414,13 @@ class TestEmploymentEntryModel:
         assert str(employment_entry.start_year) in result
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestEducationEntryModel:
     """Tests for EducationEntry model"""
 
-    def test_education_entry_creation(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_education_entry_creation(self, staff_profile):
         """Test creating education entry"""
         # Arrange & Act
         entry = EducationEntry.objects.create(
@@ -399,7 +437,8 @@ class TestEducationEntryModel:
         assert entry.end_year == 2019
         assert entry.institution == "University of Test"
 
-    def test_education_entry_str_representation(self, education_entry, db):
+    @pytest.mark.unit
+    def test_education_entry_str_representation(self, education_entry):
         """Test education entry string representation"""
         # Act
         result = str(education_entry)
@@ -410,10 +449,13 @@ class TestEducationEntryModel:
         assert str(education_entry.end_year) in result
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestDOIPublicationModel:
     """Tests for DOIPublication model"""
 
-    def test_doi_publication_creation(self, user, db):
+    @pytest.mark.integration
+    def test_doi_publication_creation(self, user):
         """Test creating DOI publication"""
         # Arrange & Act
         pub = DOIPublication.objects.create(
@@ -425,7 +467,8 @@ class TestDOIPublicationModel:
         assert pub.user == user
         assert pub.doi == "10.1234/test.doi"
 
-    def test_doi_publication_str_representation(self, user, db):
+    @pytest.mark.integration
+    def test_doi_publication_str_representation(self, user):
         """Test DOI publication string representation"""
         # Arrange
         pub = DOIPublication.objects.create(
@@ -442,10 +485,13 @@ class TestDOIPublicationModel:
         assert pub.doi in result
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestPublicStaffProfileModel:
     """Tests for PublicStaffProfile model"""
 
-    def test_staff_profile_creation(self, user, db):
+    @pytest.mark.integration
+    def test_staff_profile_creation(self, user):
         """Test creating staff profile"""
         # Arrange & Act
         profile = PublicStaffProfile.objects.create(
@@ -463,7 +509,8 @@ class TestPublicStaffProfileModel:
         assert profile.public_email == "public@example.com"
         assert profile.public_email_on is True
 
-    def test_staff_profile_str_representation(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_staff_profile_str_representation(self, staff_profile):
         """Test staff profile string representation"""
         # Act
         result = str(staff_profile)
@@ -473,7 +520,8 @@ class TestPublicStaffProfileModel:
         assert staff_profile.user.first_name in result
         assert staff_profile.user.last_name in result
 
-    def test_staff_profile_title_choices(self, db):
+    @pytest.mark.unit
+    def test_staff_profile_title_choices(self):
         """Test staff profile title choices"""
         # Act
         choices = PublicStaffProfile.TitleChoices
@@ -484,7 +532,8 @@ class TestPublicStaffProfileModel:
         assert hasattr(choices, "DR")
         assert hasattr(choices, "PROF")
 
-    def test_staff_profile_keyword_tags(self, staff_profile, db):
+    @pytest.mark.unit
+    def test_staff_profile_keyword_tags(self, staff_profile):
         """Test staff profile keyword tags relationship"""
         # Arrange
         tag1 = KeywordTag.objects.create(name="Python")
@@ -499,7 +548,8 @@ class TestPublicStaffProfileModel:
         assert tag2 in staff_profile.keyword_tags.all()
 
     @patch("users.models.requests.get")
-    def test_get_it_asset_data_success(self, mock_get, staff_profile, db):
+    @pytest.mark.integration
+    def test_get_it_asset_data_success(self, mock_get, staff_profile):
         """Test getting IT asset data successfully"""
         # Arrange
         mock_response = Mock()
@@ -526,7 +576,8 @@ class TestPublicStaffProfileModel:
         assert result["division"] == "Test Division"
 
     @patch("users.models.requests.get")
-    def test_get_it_asset_data_failure(self, mock_get, staff_profile, db):
+    @pytest.mark.unit
+    def test_get_it_asset_data_failure(self, mock_get, staff_profile):
         """Test getting IT asset data when API fails"""
         # Arrange
         mock_response = Mock()
@@ -541,7 +592,8 @@ class TestPublicStaffProfileModel:
         assert result is None
 
     @patch("users.models.requests.get")
-    def test_get_it_asset_email_success(self, mock_get, staff_profile, db):
+    @pytest.mark.integration
+    def test_get_it_asset_email_success(self, mock_get, staff_profile):
         """Test getting IT asset email successfully"""
         # Arrange
         mock_response = Mock()
@@ -563,7 +615,8 @@ class TestPublicStaffProfileModel:
         assert result == "it.asset@example.com"
 
     @patch("users.models.requests.get")
-    def test_get_it_asset_email_failure(self, mock_get, staff_profile, db):
+    @pytest.mark.unit
+    def test_get_it_asset_email_failure(self, mock_get, staff_profile):
         """Test getting IT asset email when API fails"""
         # Arrange
         mock_response = Mock()

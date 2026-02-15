@@ -4,6 +4,8 @@ Tests for document permissions
 
 from unittest.mock import Mock
 
+import pytest
+
 from documents.permissions.annual_report_permissions import (
     CanEditAnnualReport,
     CanGenerateAnnualReportPDF,
@@ -27,6 +29,7 @@ from documents.permissions.document_permissions import (
 class TestCanViewDocument:
     """Tests for CanViewDocument permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_view(self, project_document, user_factory, db):
         """Test superuser can view any document"""
         superuser = user_factory(is_superuser=True)
@@ -35,6 +38,7 @@ class TestCanViewDocument:
         permission = CanViewDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_member_can_view(self, project_document, user, db):
         """Test project member can view document"""
         request = Mock(user=user)
@@ -42,6 +46,7 @@ class TestCanViewDocument:
         permission = CanViewDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_business_area_leader_can_view(self, project_with_ba_lead, ba_lead, db):
         """Test business area leader can view document"""
         from common.tests.factories import ProjectDocumentFactory
@@ -52,6 +57,7 @@ class TestCanViewDocument:
         permission = CanViewDocument()
         assert permission.has_object_permission(request, None, document)
 
+    @pytest.mark.integration
     def test_director_can_view(self, project_document, director, db):
         """Test director can view document"""
         # Set director on division
@@ -64,6 +70,7 @@ class TestCanViewDocument:
         permission = CanViewDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_member_cannot_view(self, project_document, user_factory, db):
         """Test non-member cannot view document"""
         other_user = user_factory()
@@ -72,6 +79,7 @@ class TestCanViewDocument:
         permission = CanViewDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_member_non_leader_cannot_view_when_no_division(
         self, project_document, user_factory, db
     ):
@@ -91,6 +99,7 @@ class TestCanViewDocument:
 class TestCanEditDocument:
     """Tests for CanEditDocument permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_edit(self, project_document, user_factory, db):
         """Test superuser can edit any document"""
         superuser = user_factory(is_superuser=True)
@@ -99,6 +108,7 @@ class TestCanEditDocument:
         permission = CanEditDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_member_can_edit(self, project_document, user, db):
         """Test project member can edit document"""
         request = Mock(user=user)
@@ -106,6 +116,7 @@ class TestCanEditDocument:
         permission = CanEditDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_cannot_edit_approved_document(self, project_document, user, db):
         """Test cannot edit approved document"""
         project_document.status = "approved"
@@ -116,6 +127,7 @@ class TestCanEditDocument:
         permission = CanEditDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_member_cannot_edit(self, project_document, user_factory, db):
         """Test non-member cannot edit document"""
         other_user = user_factory()
@@ -128,6 +140,7 @@ class TestCanEditDocument:
 class TestCanApproveDocument:
     """Tests for CanApproveDocument permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_approve(self, project_document, user_factory, db):
         """Test superuser can approve any document"""
         project_document.status = "inapproval"
@@ -139,6 +152,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_lead_can_approve_stage_1(
         self, project_document, user, project_member, db
     ):
@@ -155,6 +169,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_ba_leader_can_approve_stage_2(self, project_with_ba_lead, ba_lead, db):
         """Test business area leader can approve stage 2"""
         from common.tests.factories import ProjectDocumentFactory
@@ -170,6 +185,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert permission.has_object_permission(request, None, document)
 
+    @pytest.mark.integration
     def test_director_can_approve_stage_3(self, project_document, director, db):
         """Test director can approve stage 3"""
         project_document.status = "inapproval"
@@ -188,6 +204,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_cannot_approve_non_approval_status(self, project_document, user, db):
         """Test cannot approve document not in approval status"""
         project_document.status = "new"
@@ -198,6 +215,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_wrong_user_cannot_approve_stage(self, project_document, user_factory, db):
         """Test wrong user cannot approve stage"""
         project_document.status = "inapproval"
@@ -210,6 +228,7 @@ class TestCanApproveDocument:
         permission = CanApproveDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_cannot_approve_stage_3_when_no_division(
         self, project_document, user_factory, db
     ):
@@ -235,6 +254,7 @@ class TestCanApproveDocument:
 class TestCanRecallDocument:
     """Tests for CanRecallDocument permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_recall(self, project_document, user_factory, db):
         """Test superuser can recall document"""
         project_document.status = "inapproval"
@@ -246,6 +266,7 @@ class TestCanRecallDocument:
         permission = CanRecallDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_lead_can_recall(self, project_document, user, project_member, db):
         """Test project lead can recall document"""
         project_document.status = "inapproval"
@@ -259,6 +280,7 @@ class TestCanRecallDocument:
         permission = CanRecallDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_cannot_recall_non_approval_status(
         self, project_document, user, project_member, db
     ):
@@ -274,6 +296,7 @@ class TestCanRecallDocument:
         permission = CanRecallDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_lead_cannot_recall(self, project_document, user_factory, db):
         """Test non-lead cannot recall document"""
         project_document.status = "inapproval"
@@ -290,6 +313,7 @@ class TestCanRecallDocument:
 class TestCanDeleteDocument:
     """Tests for CanDeleteDocument permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_delete(self, project_document, user_factory, db):
         """Test superuser can delete any document"""
         superuser = user_factory(is_superuser=True)
@@ -298,6 +322,7 @@ class TestCanDeleteDocument:
         permission = CanDeleteDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_lead_can_delete(self, project_document, user, project_member, db):
         """Test project lead can delete document"""
         project_member.is_leader = True
@@ -308,6 +333,7 @@ class TestCanDeleteDocument:
         permission = CanDeleteDocument()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_cannot_delete_approved_document(
         self, project_document, user, project_member, db
     ):
@@ -323,6 +349,7 @@ class TestCanDeleteDocument:
         permission = CanDeleteDocument()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_lead_cannot_delete(self, project_document, user_factory, db):
         """Test non-lead cannot delete document"""
         # Create a non-lead user
@@ -336,6 +363,7 @@ class TestCanDeleteDocument:
 class TestCanGeneratePDF:
     """Tests for CanGeneratePDF permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_generate_pdf(self, project_document, user_factory, db):
         """Test superuser can generate PDF"""
         project_document.status = "approved"
@@ -347,6 +375,7 @@ class TestCanGeneratePDF:
         permission = CanGeneratePDF()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_project_member_can_generate_pdf(self, project_document, user, db):
         """Test project member can generate PDF for approved document"""
         project_document.status = "approved"
@@ -357,6 +386,7 @@ class TestCanGeneratePDF:
         permission = CanGeneratePDF()
         assert permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_ba_leader_can_generate_pdf(self, project_with_ba_lead, ba_lead, db):
         """Test business area leader can generate PDF"""
         from common.tests.factories import ProjectDocumentFactory
@@ -370,6 +400,7 @@ class TestCanGeneratePDF:
         permission = CanGeneratePDF()
         assert permission.has_object_permission(request, None, document)
 
+    @pytest.mark.integration
     def test_cannot_generate_pdf_for_non_approved(self, project_document, user, db):
         """Test cannot generate PDF for non-approved document"""
         project_document.status = "new"
@@ -380,6 +411,7 @@ class TestCanGeneratePDF:
         permission = CanGeneratePDF()
         assert not permission.has_object_permission(request, None, project_document)
 
+    @pytest.mark.integration
     def test_non_member_cannot_generate_pdf(self, project_document, user_factory, db):
         """Test non-member cannot generate PDF"""
         project_document.status = "approved"
@@ -400,6 +432,7 @@ class TestCanGeneratePDF:
 class TestCanViewAnnualReport:
     """Tests for CanViewAnnualReport permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_can_view(self, user_factory, db):
         """Test authenticated user can view annual reports"""
         user = user_factory()
@@ -410,6 +443,7 @@ class TestCanViewAnnualReport:
         permission = CanViewAnnualReport()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_unauthenticated_user_cannot_view(self, db):
         """Test unauthenticated user cannot view annual reports"""
         user = Mock()
@@ -423,6 +457,7 @@ class TestCanViewAnnualReport:
 class TestCanEditAnnualReport:
     """Tests for CanEditAnnualReport permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_edit(self, user_factory, db):
         """Test superuser can edit annual reports"""
         superuser = user_factory(is_superuser=True)
@@ -431,6 +466,7 @@ class TestCanEditAnnualReport:
         permission = CanEditAnnualReport()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_staff_can_edit(self, user_factory, db):
         """Test staff can edit annual reports"""
         staff_user = user_factory(is_staff=True)
@@ -439,6 +475,7 @@ class TestCanEditAnnualReport:
         permission = CanEditAnnualReport()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_regular_user_cannot_edit(self, user_factory, db):
         """Test regular user cannot edit annual reports"""
         user = user_factory()
@@ -451,6 +488,7 @@ class TestCanEditAnnualReport:
 class TestCanPublishAnnualReport:
     """Tests for CanPublishAnnualReport permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_publish(self, user_factory, db):
         """Test superuser can publish annual reports"""
         superuser = user_factory(is_superuser=True)
@@ -459,6 +497,7 @@ class TestCanPublishAnnualReport:
         permission = CanPublishAnnualReport()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.unit
     def test_director_can_publish(self, director, db):
         """Test director can publish annual reports"""
         from agencies.models import Division
@@ -474,6 +513,7 @@ class TestCanPublishAnnualReport:
         permission = CanPublishAnnualReport()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_regular_user_cannot_publish(self, user_factory, db):
         """Test regular user cannot publish annual reports"""
         user = user_factory()
@@ -482,6 +522,7 @@ class TestCanPublishAnnualReport:
         permission = CanPublishAnnualReport()
         assert not permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_user_without_director_of_cannot_publish(self, user_factory, db):
         """Test user without director_of attribute cannot publish"""
         user = user_factory()
@@ -498,6 +539,7 @@ class TestCanPublishAnnualReport:
 class TestCanGenerateAnnualReportPDF:
     """Tests for CanGenerateAnnualReportPDF permission"""
 
+    @pytest.mark.integration
     def test_superuser_can_generate(self, user_factory, db):
         """Test superuser can generate annual report PDFs"""
         superuser = user_factory(is_superuser=True)
@@ -506,6 +548,7 @@ class TestCanGenerateAnnualReportPDF:
         permission = CanGenerateAnnualReportPDF()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_staff_can_generate(self, user_factory, db):
         """Test staff can generate annual report PDFs"""
         staff_user = user_factory(is_staff=True)
@@ -514,6 +557,7 @@ class TestCanGenerateAnnualReportPDF:
         permission = CanGenerateAnnualReportPDF()
         assert permission.has_permission(request, None)
 
+    @pytest.mark.integration
     def test_regular_user_cannot_generate(self, user_factory, db):
         """Test regular user cannot generate annual report PDFs"""
         user = user_factory()

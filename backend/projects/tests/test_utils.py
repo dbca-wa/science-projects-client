@@ -4,6 +4,8 @@ Tests for project utilities
 
 from datetime import date
 
+import pytest
+
 from projects.models import Project
 from projects.utils.filters import (
     apply_project_filters,
@@ -17,6 +19,7 @@ from projects.utils.helpers import handle_date_parsing, parse_keywords, strip_ht
 class TestFilters:
     """Tests for project filtering utilities"""
 
+    @pytest.mark.unit
     def test_determine_db_kind_core_function(self):
         """Test determining core function kind"""
         # Act
@@ -25,6 +28,7 @@ class TestFilters:
         # Assert
         assert result == "core_function"
 
+    @pytest.mark.unit
     def test_determine_db_kind_student(self):
         """Test determining student kind"""
         # Act
@@ -33,6 +37,7 @@ class TestFilters:
         # Assert
         assert result == "student"
 
+    @pytest.mark.unit
     def test_determine_db_kind_science(self):
         """Test determining science kind"""
         # Act
@@ -41,6 +46,7 @@ class TestFilters:
         # Assert
         assert result == "science"
 
+    @pytest.mark.unit
     def test_determine_db_kind_external(self):
         """Test determining external kind"""
         # Act
@@ -49,6 +55,7 @@ class TestFilters:
         # Assert
         assert result == "external"
 
+    @pytest.mark.unit
     def test_determine_db_kind_unknown(self):
         """Test determining unknown kind returns None"""
         # Act
@@ -57,6 +64,7 @@ class TestFilters:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_is_project_tag_search_cf(self):
         """Test identifying CF project tag"""
         # Act
@@ -65,6 +73,7 @@ class TestFilters:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_is_project_tag_search_sp(self):
         """Test identifying SP project tag"""
         # Act
@@ -73,6 +82,7 @@ class TestFilters:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_is_project_tag_search_stp(self):
         """Test identifying STP project tag"""
         # Act
@@ -81,6 +91,7 @@ class TestFilters:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_is_project_tag_search_ext(self):
         """Test identifying EXT project tag"""
         # Act
@@ -89,6 +100,7 @@ class TestFilters:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_is_project_tag_search_case_insensitive(self):
         """Test project tag search is case insensitive"""
         # Act
@@ -97,6 +109,7 @@ class TestFilters:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_is_project_tag_search_not_tag(self):
         """Test non-tag search returns False"""
         # Act
@@ -105,6 +118,7 @@ class TestFilters:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_is_project_tag_search_empty(self):
         """Test empty search returns False"""
         # Act
@@ -113,6 +127,7 @@ class TestFilters:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_is_project_tag_search_none(self):
         """Test None search returns False"""
         # Act
@@ -121,6 +136,7 @@ class TestFilters:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_full_tag(self, project, db):
         """Test parsing full project tag (prefix-year-number)"""
         # Arrange
@@ -135,6 +151,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_prefix_year(self, project, db):
         """Test parsing project tag with prefix and year only"""
         # Arrange
@@ -148,6 +165,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_prefix_only(self, project, db):
         """Test parsing project tag with prefix only"""
         # Arrange
@@ -160,6 +178,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_empty(self, db):
         """Test parsing empty search returns empty queryset"""
         # Act
@@ -168,6 +187,7 @@ class TestFilters:
         # Assert
         assert result.count() == 0
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_empty_parts(self, db):
         """Test parsing search with empty parts returns empty queryset"""
         # Act
@@ -176,6 +196,7 @@ class TestFilters:
         # Assert
         assert result.count() == 0
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_invalid_prefix(self, db):
         """Test parsing invalid prefix returns empty queryset"""
         # Act
@@ -184,6 +205,7 @@ class TestFilters:
         # Assert
         assert result.count() == 0
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_invalid_year(self, project, db):
         """Test parsing with invalid year format"""
         # Arrange
@@ -199,6 +221,7 @@ class TestFilters:
         # Should still return projects with CF kind, just not filtered by year
         assert project in result
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_invalid_number(self, project, db):
         """Test parsing with invalid number format"""
         # Arrange
@@ -214,6 +237,7 @@ class TestFilters:
         # Should still return projects with CF kind and year, just not filtered by number
         assert project in result
 
+    @pytest.mark.integration
     def test_parse_project_tag_search_invalid_year_in_two_part(self, project, db):
         """Test parsing two-part tag with invalid year"""
         # Arrange
@@ -228,6 +252,7 @@ class TestFilters:
         # Should still return projects with CF kind, just not filtered by year
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_search_term(self, project, db):
         """Test applying search term filter"""
         # Arrange
@@ -242,6 +267,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_project_tag(self, project, db):
         """Test applying project tag filter"""
         # Arrange
@@ -258,6 +284,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_user(self, project_with_lead, project_lead, db):
         """Test applying user filter"""
         # Arrange
@@ -270,6 +297,7 @@ class TestFilters:
         # Assert
         assert project_with_lead in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_business_area(self, project, db):
         """Test applying business area filter"""
         # Arrange
@@ -282,6 +310,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_business_area_multiple(
         self, project, business_area, db
     ):
@@ -296,6 +325,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_status(self, project, db):
         """Test applying status filter"""
         # Arrange
@@ -310,6 +340,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_status_unknown(self, project, db):
         """Test applying unknown status filter"""
         # Arrange
@@ -325,6 +356,7 @@ class TestFilters:
         # Should exclude projects with valid statuses
         assert result.count() >= 0
 
+    @pytest.mark.integration
     def test_apply_project_filters_kind(self, project, db):
         """Test applying kind filter"""
         # Arrange
@@ -339,6 +371,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_year(self, project, db):
         """Test applying year filter"""
         # Arrange
@@ -353,6 +386,7 @@ class TestFilters:
         # Assert
         assert project in result
 
+    @pytest.mark.integration
     def test_apply_project_filters_only_active(self, project, db):
         """Test applying only active filter"""
         # Arrange
@@ -368,6 +402,7 @@ class TestFilters:
         # Should only include active projects
         assert result.count() >= 0
 
+    @pytest.mark.integration
     def test_apply_project_filters_only_inactive(self, project, db):
         """Test applying only inactive filter"""
         # Arrange
@@ -383,6 +418,7 @@ class TestFilters:
         # Should exclude active projects
         assert result.count() >= 0
 
+    @pytest.mark.integration
     def test_apply_project_filters_no_filters(self, project, db):
         """Test applying no filters returns all projects"""
         # Arrange
@@ -399,6 +435,7 @@ class TestFilters:
 class TestHelpers:
     """Tests for project helper utilities"""
 
+    @pytest.mark.unit
     def test_strip_html_tags_simple(self):
         """Test stripping simple HTML tags"""
         # Arrange
@@ -410,6 +447,7 @@ class TestHelpers:
         # Assert
         assert result == "Test content"
 
+    @pytest.mark.unit
     def test_strip_html_tags_nested(self):
         """Test stripping nested HTML tags"""
         # Arrange
@@ -421,6 +459,7 @@ class TestHelpers:
         # Assert
         assert result == "Test content"
 
+    @pytest.mark.unit
     def test_strip_html_tags_with_attributes(self):
         """Test stripping HTML tags with attributes"""
         # Arrange
@@ -432,6 +471,7 @@ class TestHelpers:
         # Assert
         assert result == "Test content"
 
+    @pytest.mark.unit
     def test_strip_html_tags_empty(self):
         """Test stripping empty HTML"""
         # Act
@@ -440,6 +480,7 @@ class TestHelpers:
         # Assert
         assert result == ""
 
+    @pytest.mark.unit
     def test_strip_html_tags_none(self):
         """Test stripping None returns empty string"""
         # Act
@@ -448,6 +489,7 @@ class TestHelpers:
         # Assert
         assert result == ""
 
+    @pytest.mark.unit
     def test_handle_date_parsing_valid(self):
         """Test parsing valid date string"""
         # Arrange
@@ -459,6 +501,7 @@ class TestHelpers:
         # Assert
         assert result == date(2023, 1, 15)
 
+    @pytest.mark.unit
     def test_handle_date_parsing_invalid_format(self):
         """Test parsing invalid date format returns None"""
         # Arrange
@@ -470,6 +513,7 @@ class TestHelpers:
         # Assert
         assert result is None
 
+    @pytest.mark.unit
     def test_handle_date_parsing_empty(self):
         """Test parsing empty string returns None"""
         # Act
@@ -478,6 +522,7 @@ class TestHelpers:
         # Assert
         assert result is None
 
+    @pytest.mark.unit
     def test_handle_date_parsing_none(self):
         """Test parsing None returns None"""
         # Act
@@ -486,6 +531,7 @@ class TestHelpers:
         # Assert
         assert result is None
 
+    @pytest.mark.unit
     def test_parse_keywords_simple(self):
         """Test parsing simple keywords"""
         # Arrange
@@ -497,6 +543,7 @@ class TestHelpers:
         # Assert
         assert result == "keyword1,keyword2"
 
+    @pytest.mark.unit
     def test_parse_keywords_single(self):
         """Test parsing single keyword"""
         # Arrange
@@ -508,6 +555,7 @@ class TestHelpers:
         # Assert
         assert result == "keyword1"
 
+    @pytest.mark.unit
     def test_parse_keywords_empty(self):
         """Test parsing empty keywords"""
         # Act
@@ -516,6 +564,7 @@ class TestHelpers:
         # Assert
         assert result == ""
 
+    @pytest.mark.unit
     def test_parse_keywords_none(self):
         """Test parsing None keywords"""
         # Act
@@ -528,6 +577,7 @@ class TestHelpers:
 class TestFiles:
     """Tests for project file handling utilities"""
 
+    @pytest.mark.integration
     def test_handle_project_image_string_path(self):
         """Test handling project image when given a string path"""
         # Arrange
@@ -541,6 +591,7 @@ class TestFiles:
         # Assert
         assert result == image_path
 
+    @pytest.mark.integration
     def test_handle_project_image_none(self):
         """Test handling project image when given None"""
         # Arrange
@@ -552,6 +603,7 @@ class TestFiles:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_handle_project_image_upload(self):
         """Test handling project image upload"""
         # Arrange
@@ -580,6 +632,7 @@ class TestFiles:
             assert result == "projects/test_image.jpg"
             mock_storage.save.assert_called_once()
 
+    @pytest.mark.integration
     def test_handle_project_image_existing_file_same_size(self):
         """Test handling project image when file exists with same size"""
         # Arrange
@@ -616,6 +669,7 @@ class TestFiles:
             # Should not call save since file exists with same size
             mock_storage.save.assert_not_called()
 
+    @pytest.mark.integration
     def test_handle_project_image_existing_file_different_size(self):
         """Test handling project image when file exists with different size"""
         # Arrange

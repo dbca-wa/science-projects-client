@@ -15,6 +15,7 @@ User = get_user_model()
 class TestChatRoomService:
     """Tests for ChatRoom service operations"""
 
+    @pytest.mark.unit
     def test_list_chat_rooms(self, chat_room, db):
         """Test listing all chat rooms"""
         # Act
@@ -24,6 +25,7 @@ class TestChatRoomService:
         assert rooms.count() == 1
         assert chat_room in rooms
 
+    @pytest.mark.unit
     def test_get_chat_room(self, chat_room, db):
         """Test getting chat room by ID"""
         # Act
@@ -32,12 +34,14 @@ class TestChatRoomService:
         # Assert
         assert room.id == chat_room.id
 
+    @pytest.mark.unit
     def test_get_chat_room_not_found(self, db):
         """Test getting non-existent chat room raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Chat room 999 not found"):
             CommunicationService.get_chat_room(999)
 
+    @pytest.mark.integration
     def test_create_chat_room(self, user, db):
         """Test creating a chat room"""
         # Arrange
@@ -50,6 +54,7 @@ class TestChatRoomService:
         assert room.id is not None
         assert ChatRoom.objects.filter(id=room.id).exists()
 
+    @pytest.mark.integration
     def test_update_chat_room(self, chat_room, user, db):
         """Test updating a chat room"""
         # Arrange
@@ -61,6 +66,7 @@ class TestChatRoomService:
         # Assert
         assert updated.id == chat_room.id
 
+    @pytest.mark.integration
     def test_delete_chat_room(self, chat_room, user, db):
         """Test deleting a chat room"""
         # Arrange
@@ -76,6 +82,7 @@ class TestChatRoomService:
 class TestDirectMessageService:
     """Tests for DirectMessage service operations"""
 
+    @pytest.mark.unit
     def test_list_direct_messages(self, direct_message, db):
         """Test listing all direct messages"""
         # Act
@@ -85,6 +92,7 @@ class TestDirectMessageService:
         assert messages.count() == 1
         assert direct_message in messages
 
+    @pytest.mark.unit
     def test_get_direct_message(self, direct_message, db):
         """Test getting direct message by ID"""
         # Act
@@ -94,12 +102,14 @@ class TestDirectMessageService:
         assert message.id == direct_message.id
         assert message.text == "Test message"
 
+    @pytest.mark.unit
     def test_get_direct_message_not_found(self, db):
         """Test getting non-existent direct message raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Direct message 999 not found"):
             CommunicationService.get_direct_message(999)
 
+    @pytest.mark.integration
     def test_create_direct_message(self, user, chat_room, db):
         """Test creating a direct message"""
         # Arrange
@@ -119,6 +129,7 @@ class TestDirectMessageService:
         assert message.user == user
         assert message.chat_room == chat_room
 
+    @pytest.mark.integration
     def test_update_direct_message(self, direct_message, user, db):
         """Test updating a direct message"""
         # Arrange
@@ -133,6 +144,7 @@ class TestDirectMessageService:
         assert updated.id == direct_message.id
         assert updated.text == "Updated message"
 
+    @pytest.mark.integration
     def test_delete_direct_message(self, direct_message, user, db):
         """Test deleting a direct message"""
         # Arrange
@@ -148,6 +160,7 @@ class TestDirectMessageService:
 class TestCommentService:
     """Tests for Comment service operations"""
 
+    @pytest.mark.unit
     def test_list_comments(self, comment, db):
         """Test listing all comments"""
         # Act
@@ -157,6 +170,7 @@ class TestCommentService:
         assert comments.count() == 1
         assert comment in comments
 
+    @pytest.mark.unit
     def test_get_comment(self, comment, db):
         """Test getting comment by ID"""
         # Act
@@ -166,12 +180,14 @@ class TestCommentService:
         assert result.id == comment.id
         assert result.text == "Test comment"
 
+    @pytest.mark.unit
     def test_get_comment_not_found(self, db):
         """Test getting non-existent comment raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Comment 999 not found"):
             CommunicationService.get_comment(999)
 
+    @pytest.mark.integration
     def test_create_comment(self, user, project_document, db):
         """Test creating a comment"""
         # Arrange
@@ -191,6 +207,7 @@ class TestCommentService:
         assert comment.user == user
         assert comment.document == project_document
 
+    @pytest.mark.integration
     def test_update_comment(self, comment, user, db):
         """Test updating a comment"""
         # Arrange
@@ -203,6 +220,7 @@ class TestCommentService:
         assert updated.id == comment.id
         assert updated.text == "Updated comment"
 
+    @pytest.mark.integration
     def test_delete_comment_by_creator(self, comment, user, db):
         """Test deleting comment by creator"""
         # Arrange
@@ -214,6 +232,7 @@ class TestCommentService:
         # Assert
         assert not Comment.objects.filter(id=comment_id).exists()
 
+    @pytest.mark.integration
     def test_delete_comment_by_superuser(self, comment, superuser, db):
         """Test deleting comment by superuser"""
         # Arrange
@@ -225,6 +244,7 @@ class TestCommentService:
         # Assert
         assert not Comment.objects.filter(id=comment_id).exists()
 
+    @pytest.mark.integration
     def test_delete_comment_permission_denied(self, comment, other_user, db):
         """Test deleting comment by non-creator raises PermissionDenied"""
         # Act & Assert
@@ -237,6 +257,7 @@ class TestCommentService:
 class TestReactionService:
     """Tests for Reaction service operations"""
 
+    @pytest.mark.unit
     def test_list_reactions(self, reaction_on_comment, db):
         """Test listing all reactions"""
         # Act
@@ -246,6 +267,7 @@ class TestReactionService:
         assert reactions.count() == 1
         assert reaction_on_comment in reactions
 
+    @pytest.mark.unit
     def test_get_reaction(self, reaction_on_comment, db):
         """Test getting reaction by ID"""
         # Act
@@ -255,12 +277,14 @@ class TestReactionService:
         assert reaction.id == reaction_on_comment.id
         assert reaction.reaction == Reaction.ReactionChoices.THUMBUP
 
+    @pytest.mark.unit
     def test_get_reaction_not_found(self, db):
         """Test getting non-existent reaction raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Reaction 999 not found"):
             CommunicationService.get_reaction(999)
 
+    @pytest.mark.integration
     def test_toggle_comment_reaction_create(self, user, comment, db):
         """Test toggling reaction creates new reaction"""
         # Act
@@ -275,6 +299,7 @@ class TestReactionService:
         assert reaction.comment == comment
         assert reaction.reaction == Reaction.ReactionChoices.THUMBUP
 
+    @pytest.mark.integration
     def test_toggle_comment_reaction_delete(self, user, comment, db):
         """Test toggling reaction deletes existing reaction"""
         # Arrange - Create initial reaction
@@ -294,6 +319,7 @@ class TestReactionService:
         assert reaction is None
         assert not Reaction.objects.filter(id=existing.id).exists()
 
+    @pytest.mark.integration
     def test_update_reaction(self, reaction_on_comment, user, db):
         """Test updating a reaction"""
         # Arrange
@@ -308,6 +334,7 @@ class TestReactionService:
         assert updated.id == reaction_on_comment.id
         assert updated.reaction == Reaction.ReactionChoices.HEART
 
+    @pytest.mark.integration
     def test_delete_reaction(self, reaction_on_comment, user, db):
         """Test deleting a reaction"""
         # Arrange
@@ -323,6 +350,7 @@ class TestReactionService:
 class TestReactionValidation:
     """Tests for Reaction model validation"""
 
+    @pytest.mark.integration
     def test_reaction_requires_comment_or_message(self, user, db):
         """Test reaction must have either comment or direct message"""
         # Arrange
@@ -335,6 +363,7 @@ class TestReactionValidation:
         with pytest.raises(Exception):  # ValidationError
             reaction.save()
 
+    @pytest.mark.integration
     def test_reaction_cannot_have_both(self, user, comment, direct_message, db):
         """Test reaction cannot have both comment and direct message"""
         # Arrange
@@ -349,6 +378,7 @@ class TestReactionValidation:
         with pytest.raises(Exception):  # ValidationError
             reaction.save()
 
+    @pytest.mark.integration
     def test_reaction_on_comment_valid(self, user, comment, db):
         """Test reaction on comment is valid"""
         # Arrange
@@ -366,6 +396,7 @@ class TestReactionValidation:
         assert reaction.comment == comment
         assert reaction.direct_message is None
 
+    @pytest.mark.integration
     def test_reaction_on_message_valid(self, user, direct_message, db):
         """Test reaction on direct message is valid"""
         # Arrange

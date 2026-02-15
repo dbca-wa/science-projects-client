@@ -26,6 +26,7 @@ from projects.models import ProjectArea, ProjectDetail, ProjectMember
 class TestProjectAreaAdmin:
     """Tests for ProjectAreaAdmin"""
 
+    @pytest.mark.integration
     def test_project_id(self, project_factory, db):
         """Test project_id method returns project ID"""
         # Arrange
@@ -39,6 +40,7 @@ class TestProjectAreaAdmin:
         # Assert
         assert result == project.id
 
+    @pytest.mark.integration
     def test_formatted_areas_with_valid_areas(self, project_factory, db):
         """Test formatted_areas with valid area IDs"""
         # Arrange
@@ -67,6 +69,7 @@ class TestProjectAreaAdmin:
         assert "Area 1" in result
         assert "Area 2" in result
 
+    @pytest.mark.integration
     def test_formatted_areas_with_nonexistent_areas(self, project_factory, db):
         """Test formatted_areas with non-existent area IDs"""
         # Arrange
@@ -82,6 +85,7 @@ class TestProjectAreaAdmin:
         # Assert
         assert result == ""  # Should return empty string for non-existent areas
 
+    @pytest.mark.integration
     def test_formatted_areas_empty(self, project_factory, db):
         """Test formatted_areas with empty areas list"""
         # Arrange
@@ -104,6 +108,7 @@ class TestProjectAreaAdmin:
 class TestConvertExtPeerToConsulted:
     """Tests for convert_ext_peer_to_consulted admin action"""
 
+    @pytest.mark.integration
     def test_requires_single_selection(self, project_member, db):
         """Test action requires single selection"""
         # Arrange
@@ -118,6 +123,7 @@ class TestConvertExtPeerToConsulted:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
+    @pytest.mark.integration
     def test_converts_external_peer_to_consulted(
         self, project_with_lead, user_factory, db
     ):
@@ -146,6 +152,9 @@ class TestConvertExtPeerToConsulted:
 class TestConvertExtCollaboratorToConsulted:
     """Tests for convert_ext_collaborator_to_consulted admin action"""
 
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_requires_single_selection(self, project_member, db):
         """Test action requires single selection"""
         # Arrange
@@ -160,6 +169,7 @@ class TestConvertExtCollaboratorToConsulted:
             # Assert
             mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
 
+    @pytest.mark.integration
     def test_converts_external_collaborator_to_consulted(
         self, project_with_lead, user_factory, db
     ):
@@ -188,6 +198,9 @@ class TestConvertExtCollaboratorToConsulted:
 class TestCleanOrphanedProjectMemberships:
     """Tests for clean_orphaned_project_memberships admin action"""
 
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_requires_single_selection(self, project_member, db):
         """Test action requires single selection"""
         # Arrange
@@ -204,6 +217,7 @@ class TestCleanOrphanedProjectMemberships:
             args = mock_message.call_args
             assert "PLEASE SELECT ONLY ONE" in args[0][1]
 
+    @pytest.mark.integration
     def test_cleans_orphaned_memberships(self, project_with_lead, user_factory, db):
         """Test action removes memberships with deleted users"""
         # Arrange
@@ -233,6 +247,7 @@ class TestCleanOrphanedProjectMemberships:
             assert not ProjectMember.objects.filter(pk=member_id).exists()
             mock_message.assert_called_once()
 
+    @pytest.mark.integration
     def test_no_orphaned_memberships(self, project_member, db):
         """Test action when no orphaned memberships exist"""
         # Arrange
@@ -253,6 +268,9 @@ class TestCleanOrphanedProjectMemberships:
 class TestReportOrphanedData:
     """Tests for report_orphaned_data admin action"""
 
+    @pytest.mark.integration
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_requires_single_selection(self, project_member, db):
         """Test action requires single selection"""
         # Arrange
@@ -272,12 +290,14 @@ class TestReportOrphanedData:
     @pytest.mark.skip(
         reason="Cannot simulate orphaned membership due to FK constraints - edge case tested manually"
     )
+    @pytest.mark.integration
     def test_reports_orphaned_memberships(self, project_with_lead, user_factory, db):
         """Test action reports orphaned memberships"""
         # Note: This test is skipped because Django's FK constraints prevent
         # creating orphaned memberships in tests. The functionality works in
         # production when users are deleted outside of Django's ORM.
 
+    @pytest.mark.integration
     def test_reports_null_project_details(self, project_with_lead, db):
         """Test action reports ProjectDetails with null users"""
         # Arrange
@@ -298,6 +318,7 @@ class TestReportOrphanedData:
             args = mock_message.call_args
             assert "ProjectDetails with null users" in args[0][1]
 
+    @pytest.mark.integration
     def test_no_orphaned_data(self, project_member, db):
         """Test action when no orphaned data exists"""
         # Arrange

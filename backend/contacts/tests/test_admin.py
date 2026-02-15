@@ -2,6 +2,7 @@
 Tests for contact admin
 """
 
+import pytest
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 
@@ -17,6 +18,7 @@ from contacts.models import Address, AgencyContact, BranchContact, UserContact
 class TestAddressAdmin:
     """Tests for AddressAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -31,6 +33,7 @@ class TestAddressAdmin:
             "branch",
         ]
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -39,6 +42,7 @@ class TestAddressAdmin:
         # Assert
         assert admin_instance.search_fields == ["street", "branch__name"]
 
+    @pytest.mark.unit
     def test_registered(self, db):
         """Test AddressAdmin is registered"""
         # Assert
@@ -48,6 +52,7 @@ class TestAddressAdmin:
 class TestUserContactAdmin:
     """Tests for UserContactAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -60,6 +65,7 @@ class TestUserContactAdmin:
             "phone",
         ]
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -71,6 +77,7 @@ class TestUserContactAdmin:
             "user_id__username",
         ]
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -79,6 +86,7 @@ class TestUserContactAdmin:
         # Assert
         assert admin_instance.ordering == ["user__first_name"]
 
+    @pytest.mark.unit
     def test_registered(self, db):
         """Test UserContactAdmin is registered"""
         # Assert
@@ -88,6 +96,7 @@ class TestUserContactAdmin:
 class TestBranchContactAdmin:
     """Tests for BranchContactAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -101,6 +110,7 @@ class TestBranchContactAdmin:
             "display_address",
         ]
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -111,6 +121,7 @@ class TestBranchContactAdmin:
             "branch__name",
         ]
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -119,6 +130,7 @@ class TestBranchContactAdmin:
         # Assert
         assert admin_instance.ordering == ["branch__name"]
 
+    @pytest.mark.unit
     def test_display_address_with_address(self, branch_contact, db):
         """Test display_address method with address"""
         # Arrange
@@ -130,6 +142,7 @@ class TestBranchContactAdmin:
         # Assert
         assert result == "456 Branch St"
 
+    @pytest.mark.unit
     def test_display_address_without_address(self, branch, db):
         """Test display_address method without address"""
         # Arrange
@@ -145,6 +158,7 @@ class TestBranchContactAdmin:
         # Assert
         assert result is None
 
+    @pytest.mark.unit
     def test_display_address_short_description(self, db):
         """Test display_address has short_description"""
         # Arrange
@@ -153,6 +167,7 @@ class TestBranchContactAdmin:
         # Assert
         assert admin_instance.display_address.short_description == "Address"
 
+    @pytest.mark.unit
     def test_registered(self, db):
         """Test BranchContactAdmin is registered"""
         # Assert
@@ -162,6 +177,7 @@ class TestBranchContactAdmin:
 class TestAgencyContactAdmin:
     """Tests for AgencyContactAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -175,6 +191,7 @@ class TestAgencyContactAdmin:
             "address",
         ]
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -185,6 +202,7 @@ class TestAgencyContactAdmin:
             "agency__name",
         ]
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -193,6 +211,7 @@ class TestAgencyContactAdmin:
         # Assert
         assert admin_instance.ordering == ["agency__name"]
 
+    @pytest.mark.unit
     def test_registered(self, db):
         """Test AgencyContactAdmin is registered"""
         # Assert

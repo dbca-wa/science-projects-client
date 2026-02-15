@@ -21,6 +21,7 @@ from medias.services.media_service import MediaService
 class TestProjectDocumentPDFService:
     """Tests for project document PDF service operations"""
 
+    @pytest.mark.integration
     def test_list_project_document_pdfs(self, project_document_pdf, db):
         """Test listing project document PDFs"""
         # Act
@@ -30,6 +31,7 @@ class TestProjectDocumentPDFService:
         assert pdfs.count() == 1
         assert project_document_pdf in pdfs
 
+    @pytest.mark.integration
     def test_get_project_document_pdf(self, project_document_pdf, db):
         """Test getting project document PDF by ID"""
         # Act
@@ -38,6 +40,7 @@ class TestProjectDocumentPDFService:
         # Assert
         assert result == project_document_pdf
 
+    @pytest.mark.integration
     def test_get_project_document_pdf_not_found(self, db):
         """Test getting non-existent PDF raises NotFound"""
         # Act & Assert
@@ -48,6 +51,7 @@ class TestProjectDocumentPDFService:
 class TestAnnualReportPDFService:
     """Tests for annual report PDF service operations"""
 
+    @pytest.mark.unit
     def test_list_annual_report_pdfs(self, annual_report_pdf, db):
         """Test listing annual report PDFs"""
         # Act
@@ -57,6 +61,7 @@ class TestAnnualReportPDFService:
         assert pdfs.count() == 1
         assert annual_report_pdf in pdfs
 
+    @pytest.mark.unit
     def test_get_annual_report_pdf(self, annual_report_pdf, db):
         """Test getting annual report PDF by ID"""
         # Act
@@ -65,12 +70,14 @@ class TestAnnualReportPDFService:
         # Assert
         assert result == annual_report_pdf
 
+    @pytest.mark.unit
     def test_get_annual_report_pdf_not_found(self, db):
         """Test getting non-existent PDF raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Annual report PDF 999 not found"):
             MediaService.get_annual_report_pdf(999)
 
+    @pytest.mark.integration
     def test_create_annual_report_pdf(self, annual_report, user, mock_file, db):
         """Test creating annual report PDF"""
         # Arrange
@@ -88,6 +95,7 @@ class TestAnnualReportPDFService:
         assert pdf.report == annual_report
         assert pdf.creator == user
 
+    @pytest.mark.integration
     def test_update_annual_report_pdf(self, annual_report_pdf, user, mock_file, db):
         """Test updating annual report PDF"""
         # Arrange
@@ -101,6 +109,7 @@ class TestAnnualReportPDFService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_delete_annual_report_pdf(self, annual_report_pdf, user, db):
         """Test deleting annual report PDF"""
         # Arrange
@@ -116,6 +125,7 @@ class TestAnnualReportPDFService:
 class TestLegacyAnnualReportPDFService:
     """Tests for legacy annual report PDF service operations"""
 
+    @pytest.mark.unit
     def test_list_legacy_annual_report_pdfs(self, legacy_annual_report_pdf, db):
         """Test listing legacy annual report PDFs"""
         # Act
@@ -125,6 +135,7 @@ class TestLegacyAnnualReportPDFService:
         assert pdfs.count() == 1
         assert legacy_annual_report_pdf in pdfs
 
+    @pytest.mark.unit
     def test_get_legacy_annual_report_pdf(self, legacy_annual_report_pdf, db):
         """Test getting legacy annual report PDF by ID"""
         # Act
@@ -133,12 +144,14 @@ class TestLegacyAnnualReportPDFService:
         # Assert
         assert result == legacy_annual_report_pdf
 
+    @pytest.mark.unit
     def test_get_legacy_annual_report_pdf_not_found(self, db):
         """Test getting non-existent PDF raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Legacy annual report PDF 999 not found"):
             MediaService.get_legacy_annual_report_pdf(999)
 
+    @pytest.mark.integration
     def test_create_legacy_annual_report_pdf(self, user, mock_file, db):
         """Test creating legacy annual report PDF"""
         # Arrange
@@ -156,6 +169,7 @@ class TestLegacyAnnualReportPDFService:
         assert pdf.year == 2010
         assert pdf.creator == user
 
+    @pytest.mark.integration
     def test_update_legacy_annual_report_pdf(self, legacy_annual_report_pdf, user, db):
         """Test updating legacy annual report PDF"""
         # Arrange
@@ -169,6 +183,7 @@ class TestLegacyAnnualReportPDFService:
         # Assert
         assert updated.year == 2016
 
+    @pytest.mark.integration
     def test_delete_legacy_annual_report_pdf(self, legacy_annual_report_pdf, user, db):
         """Test deleting legacy annual report PDF"""
         # Arrange
@@ -184,6 +199,7 @@ class TestLegacyAnnualReportPDFService:
 class TestAnnualReportMediaService:
     """Tests for annual report media service operations"""
 
+    @pytest.mark.unit
     def test_list_annual_report_media(self, annual_report_media, db):
         """Test listing annual report media"""
         # Act
@@ -193,6 +209,7 @@ class TestAnnualReportMediaService:
         assert media.count() == 1
         assert annual_report_media in media
 
+    @pytest.mark.unit
     def test_get_annual_report_media(self, annual_report_media, db):
         """Test getting annual report media by ID"""
         # Act
@@ -201,12 +218,14 @@ class TestAnnualReportMediaService:
         # Assert
         assert result == annual_report_media
 
+    @pytest.mark.unit
     def test_get_annual_report_media_not_found(self, db):
         """Test getting non-existent media raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Annual report media 999 not found"):
             MediaService.get_annual_report_media(999)
 
+    @pytest.mark.unit
     def test_get_annual_report_media_by_report_and_kind(
         self, annual_report_media, annual_report, db
     ):
@@ -219,6 +238,7 @@ class TestAnnualReportMediaService:
         # Assert
         assert result == annual_report_media
 
+    @pytest.mark.unit
     def test_get_annual_report_media_by_report_and_kind_not_found(
         self, annual_report, db
     ):
@@ -231,6 +251,7 @@ class TestAnnualReportMediaService:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_create_annual_report_media(self, annual_report, user, mock_image, db):
         """Test creating annual report media"""
         # Arrange
@@ -249,6 +270,7 @@ class TestAnnualReportMediaService:
         assert media.kind == AnnualReportMedia.MediaTypes.REAR_COVER
         assert media.report == annual_report
 
+    @pytest.mark.integration
     def test_update_annual_report_media(self, annual_report_media, user, db):
         """Test updating annual report media"""
         # Arrange
@@ -262,6 +284,7 @@ class TestAnnualReportMediaService:
         # Assert
         assert updated.kind == AnnualReportMedia.MediaTypes.SDCHART
 
+    @pytest.mark.integration
     def test_delete_annual_report_media(self, annual_report_media, user, db):
         """Test deleting annual report media"""
         # Arrange
@@ -273,6 +296,7 @@ class TestAnnualReportMediaService:
         # Assert
         assert not AnnualReportMedia.objects.filter(id=media_id).exists()
 
+    @pytest.mark.integration
     def test_delete_annual_report_media_by_report_and_kind(
         self, annual_report_media, annual_report, user, db
     ):
@@ -289,6 +313,7 @@ class TestAnnualReportMediaService:
 class TestBusinessAreaPhotoService:
     """Tests for business area photo service operations"""
 
+    @pytest.mark.integration
     def test_list_business_area_photos(self, business_area_photo, db):
         """Test listing business area photos"""
         # Act
@@ -298,6 +323,7 @@ class TestBusinessAreaPhotoService:
         assert photos.count() == 1
         assert business_area_photo in photos
 
+    @pytest.mark.integration
     def test_get_business_area_photo(self, business_area_photo, db):
         """Test getting business area photo by ID"""
         # Act
@@ -306,12 +332,14 @@ class TestBusinessAreaPhotoService:
         # Assert
         assert result == business_area_photo
 
+    @pytest.mark.integration
     def test_get_business_area_photo_not_found(self, db):
         """Test getting non-existent photo raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Business area photo 999 not found"):
             MediaService.get_business_area_photo(999)
 
+    @pytest.mark.integration
     def test_create_business_area_photo(self, business_area, user, mock_image, db):
         """Test creating business area photo"""
         # Arrange
@@ -329,6 +357,7 @@ class TestBusinessAreaPhotoService:
         assert photo.business_area == business_area
         assert photo.uploader == user
 
+    @pytest.mark.integration
     def test_update_business_area_photo_as_uploader(
         self, business_area_photo, user, mock_image, db
     ):
@@ -344,6 +373,7 @@ class TestBusinessAreaPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_business_area_photo_as_superuser(
         self, business_area_photo, superuser, mock_image, db
     ):
@@ -359,6 +389,7 @@ class TestBusinessAreaPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_business_area_photo_permission_denied(
         self, business_area_photo, db
     ):
@@ -378,6 +409,7 @@ class TestBusinessAreaPhotoService:
                 business_area_photo.id, other_user, data
             )
 
+    @pytest.mark.integration
     def test_delete_business_area_photo_as_uploader(
         self, business_area_photo, user, db
     ):
@@ -391,6 +423,7 @@ class TestBusinessAreaPhotoService:
         # Assert
         assert not BusinessAreaPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_business_area_photo_permission_denied(
         self, business_area_photo, db
     ):
@@ -411,6 +444,7 @@ class TestBusinessAreaPhotoService:
 class TestProjectPhotoService:
     """Tests for project photo service operations"""
 
+    @pytest.mark.integration
     def test_list_project_photos(self, project_photo, db):
         """Test listing project photos"""
         # Act
@@ -420,6 +454,7 @@ class TestProjectPhotoService:
         assert photos.count() == 1
         assert project_photo in photos
 
+    @pytest.mark.integration
     def test_get_project_photo(self, project_photo, db):
         """Test getting project photo by ID"""
         # Act
@@ -428,12 +463,14 @@ class TestProjectPhotoService:
         # Assert
         assert result == project_photo
 
+    @pytest.mark.integration
     def test_get_project_photo_not_found(self, db):
         """Test getting non-existent photo raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Project photo 999 not found"):
             MediaService.get_project_photo(999)
 
+    @pytest.mark.integration
     def test_create_project_photo(self, project, user, mock_image, db):
         """Test creating project photo"""
         # Arrange
@@ -451,6 +488,7 @@ class TestProjectPhotoService:
         assert photo.project == project
         assert photo.uploader == user
 
+    @pytest.mark.integration
     def test_update_project_photo_as_uploader(
         self, project_photo, user, mock_image, db
     ):
@@ -464,6 +502,7 @@ class TestProjectPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_project_photo_as_superuser(
         self, project_photo, superuser, mock_image, db
     ):
@@ -477,6 +516,7 @@ class TestProjectPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_project_photo_permission_denied(self, project_photo, db):
         """Test updating project photo without permission raises PermissionDenied"""
         # Arrange
@@ -492,6 +532,7 @@ class TestProjectPhotoService:
         with pytest.raises(PermissionDenied):
             MediaService.update_project_photo(project_photo.id, other_user, data)
 
+    @pytest.mark.integration
     def test_delete_project_photo_as_uploader(self, project_photo, user, db):
         """Test deleting project photo as uploader"""
         # Arrange
@@ -503,6 +544,7 @@ class TestProjectPhotoService:
         # Assert
         assert not ProjectPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_project_photo_permission_denied(self, project_photo, db):
         """Test deleting project photo without permission raises PermissionDenied"""
         # Arrange
@@ -521,6 +563,7 @@ class TestProjectPhotoService:
 class TestMethodologyPhotoService:
     """Tests for methodology photo service operations"""
 
+    @pytest.mark.unit
     def test_list_methodology_photos(self, methodology_photo, db):
         """Test listing methodology photos"""
         # Act
@@ -530,6 +573,7 @@ class TestMethodologyPhotoService:
         assert photos.count() == 1
         assert methodology_photo in photos
 
+    @pytest.mark.integration
     def test_get_methodology_photo_by_project_plan(
         self, methodology_photo, project_plan, db
     ):
@@ -540,6 +584,7 @@ class TestMethodologyPhotoService:
         # Assert
         assert result == methodology_photo
 
+    @pytest.mark.integration
     def test_get_methodology_photo_by_project_plan_not_found(self, db):
         """Test getting non-existent photo returns None"""
         # Act
@@ -548,6 +593,7 @@ class TestMethodologyPhotoService:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_create_methodology_photo(self, project_plan, user, mock_image, db):
         """Test creating methodology photo"""
         # Arrange
@@ -565,6 +611,7 @@ class TestMethodologyPhotoService:
         assert photo.project_plan == project_plan
         assert photo.uploader == user
 
+    @pytest.mark.integration
     def test_update_methodology_photo_as_uploader(
         self, methodology_photo, project_plan, user, mock_image, db
     ):
@@ -578,6 +625,7 @@ class TestMethodologyPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_methodology_photo_as_superuser(
         self, methodology_photo, project_plan, superuser, mock_image, db
     ):
@@ -593,6 +641,7 @@ class TestMethodologyPhotoService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_methodology_photo_not_found(self, user, db):
         """Test updating non-existent photo raises NotFound"""
         # Arrange
@@ -604,6 +653,7 @@ class TestMethodologyPhotoService:
         ):
             MediaService.update_methodology_photo(999, user, data)
 
+    @pytest.mark.integration
     def test_update_methodology_photo_permission_denied(
         self, methodology_photo, project_plan, db
     ):
@@ -621,6 +671,7 @@ class TestMethodologyPhotoService:
         with pytest.raises(PermissionDenied):
             MediaService.update_methodology_photo(project_plan.id, other_user, data)
 
+    @pytest.mark.integration
     def test_delete_methodology_photo_as_uploader(
         self, methodology_photo, project_plan, user, db
     ):
@@ -634,6 +685,7 @@ class TestMethodologyPhotoService:
         # Assert
         assert not ProjectPlanMethodologyPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_methodology_photo_not_found(self, user, db):
         """Test deleting non-existent methodology photo raises NotFound"""
         # Act & Assert
@@ -642,6 +694,7 @@ class TestMethodologyPhotoService:
         ):
             MediaService.delete_methodology_photo(999, user)
 
+    @pytest.mark.integration
     def test_delete_methodology_photo_permission_denied(
         self, methodology_photo, project_plan, db
     ):
@@ -662,6 +715,7 @@ class TestMethodologyPhotoService:
 class TestAgencyImageService:
     """Tests for agency image service operations"""
 
+    @pytest.mark.integration
     def test_list_agency_images(self, agency_image, db):
         """Test listing agency images"""
         # Act
@@ -671,6 +725,7 @@ class TestAgencyImageService:
         assert images.count() == 1
         assert agency_image in images
 
+    @pytest.mark.integration
     def test_get_agency_image(self, agency_image, db):
         """Test getting agency image by ID"""
         # Act
@@ -679,12 +734,14 @@ class TestAgencyImageService:
         # Assert
         assert result == agency_image
 
+    @pytest.mark.integration
     def test_get_agency_image_not_found(self, db):
         """Test getting non-existent image raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Agency image 999 not found"):
             MediaService.get_agency_image(999)
 
+    @pytest.mark.integration
     def test_create_agency_image(self, agency, superuser, mock_image, db):
         """Test creating agency image"""
         # Arrange
@@ -700,6 +757,7 @@ class TestAgencyImageService:
         assert image.id is not None
         assert image.agency == agency
 
+    @pytest.mark.integration
     def test_update_agency_image_as_superuser(
         self, agency_image, superuser, mock_image, db
     ):
@@ -713,6 +771,7 @@ class TestAgencyImageService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_agency_image_permission_denied(self, agency_image, user, db):
         """Test updating agency image as non-superuser raises PermissionDenied"""
         # Arrange
@@ -722,6 +781,7 @@ class TestAgencyImageService:
         with pytest.raises(PermissionDenied):
             MediaService.update_agency_image(agency_image.id, user, data)
 
+    @pytest.mark.integration
     def test_delete_agency_image_as_superuser(self, agency_image, superuser, db):
         """Test deleting agency image as superuser"""
         # Arrange
@@ -733,6 +793,7 @@ class TestAgencyImageService:
         # Assert
         assert not AgencyImage.objects.filter(id=image_id).exists()
 
+    @pytest.mark.integration
     def test_delete_agency_image_permission_denied(self, agency_image, user, db):
         """Test deleting agency image as non-superuser raises PermissionDenied"""
         # Act & Assert
@@ -743,6 +804,7 @@ class TestAgencyImageService:
 class TestUserAvatarService:
     """Tests for user avatar service operations"""
 
+    @pytest.mark.integration
     def test_list_user_avatars(self, user_avatar, db):
         """Test listing user avatars"""
         # Act
@@ -752,6 +814,7 @@ class TestUserAvatarService:
         assert avatars.count() == 1
         assert user_avatar in avatars
 
+    @pytest.mark.integration
     def test_get_user_avatar(self, user_avatar, db):
         """Test getting user avatar by ID"""
         # Act
@@ -760,12 +823,14 @@ class TestUserAvatarService:
         # Assert
         assert result == user_avatar
 
+    @pytest.mark.integration
     def test_get_user_avatar_not_found(self, db):
         """Test getting non-existent avatar raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="User avatar 999 not found"):
             MediaService.get_user_avatar(999)
 
+    @pytest.mark.integration
     def test_create_user_avatar(self, user, mock_image, db):
         """Test creating user avatar"""
         # Arrange
@@ -781,6 +846,7 @@ class TestUserAvatarService:
         assert avatar.id is not None
         assert avatar.user == user
 
+    @pytest.mark.integration
     def test_update_user_avatar_as_owner(self, user_avatar, user, mock_image, db):
         """Test updating user avatar as owner"""
         # Arrange
@@ -792,6 +858,7 @@ class TestUserAvatarService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_user_avatar_as_superuser(
         self, user_avatar, superuser, mock_image, db
     ):
@@ -805,6 +872,7 @@ class TestUserAvatarService:
         # Assert
         assert updated.file is not None
 
+    @pytest.mark.integration
     def test_update_user_avatar_permission_denied(self, user_avatar, db):
         """Test updating user avatar without permission raises PermissionDenied"""
         # Arrange
@@ -820,6 +888,7 @@ class TestUserAvatarService:
         with pytest.raises(PermissionDenied):
             MediaService.update_user_avatar(user_avatar.id, other_user, data)
 
+    @pytest.mark.integration
     def test_delete_user_avatar_as_owner(self, user_avatar, user, db):
         """Test deleting user avatar as owner"""
         # Arrange
@@ -831,6 +900,7 @@ class TestUserAvatarService:
         # Assert
         assert not UserAvatar.objects.filter(id=avatar_id).exists()
 
+    @pytest.mark.integration
     def test_delete_user_avatar_as_superuser(self, user_avatar, superuser, db):
         """Test deleting user avatar as superuser"""
         # Arrange
@@ -842,6 +912,7 @@ class TestUserAvatarService:
         # Assert
         assert not UserAvatar.objects.filter(id=avatar_id).exists()
 
+    @pytest.mark.integration
     def test_delete_user_avatar_permission_denied(self, user_avatar, db):
         """Test deleting user avatar without permission raises PermissionDenied"""
         # Arrange

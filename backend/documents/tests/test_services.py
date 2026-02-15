@@ -30,6 +30,7 @@ class TestDocumentService:
     """Test DocumentService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_optimization(self):
         """Test list_documents uses N+1 query optimization"""
         # Arrange
@@ -45,6 +46,7 @@ class TestDocumentService:
         assert "project" in str(documents.query)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_filters(self):
         """Test list_documents applies filters correctly"""
         # Arrange
@@ -60,6 +62,7 @@ class TestDocumentService:
         assert documents.first().pk == concept.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_document_success(self):
         """Test get_document retrieves document with optimization"""
         # Arrange
@@ -73,6 +76,7 @@ class TestDocumentService:
         assert result.kind == "concept"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_document_not_found(self):
         """Test get_document raises NotFound for invalid ID"""
         # Act & Assert
@@ -80,6 +84,7 @@ class TestDocumentService:
             DocumentService.get_document(99999)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_document_success(self):
         """Test create_document creates document correctly"""
         # Arrange
@@ -101,6 +106,7 @@ class TestDocumentService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_update_document_success(self):
         """Test update_document updates fields correctly"""
         # Arrange
@@ -118,6 +124,7 @@ class TestDocumentService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_delete_document_success(self):
         """Test delete_document removes document"""
         # Arrange
@@ -132,6 +139,7 @@ class TestDocumentService:
         assert not ProjectDocument.objects.filter(pk=document_pk).exists()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_documents_pending_action_stage_one(self):
         """Test get_documents_pending_action for stage 1"""
         # Arrange
@@ -155,6 +163,7 @@ class TestDocumentService:
         assert pending.first().pk == concept_plan.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_documents_pending_action_stage_two(self):
         """Test get_documents_pending_action for stage 2"""
         # Arrange
@@ -181,6 +190,7 @@ class TestDocumentService:
         assert pending.first().pk == concept_plan.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_documents_pending_action_stage_three(self):
         """Test get_documents_pending_action for stage 3"""
         # Arrange
@@ -209,6 +219,7 @@ class TestDocumentService:
         assert pending.first().pk == concept_plan.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_documents_pending_action_all_stages(self):
         """Test get_documents_pending_action with no stage (all stages)"""
         # Arrange
@@ -257,6 +268,7 @@ class TestDocumentService:
         assert doc3.document.pk in doc_ids
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_search_term_filter(self):
         """Test list_documents with searchTerm filter"""
         # Arrange
@@ -275,6 +287,7 @@ class TestDocumentService:
         assert documents.first().pk == doc1.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_status_filter(self):
         """Test list_documents with status filter"""
         # Arrange
@@ -294,6 +307,7 @@ class TestDocumentService:
         assert documents.first().pk == doc2.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_project_filter(self):
         """Test list_documents with project filter"""
         # Arrange
@@ -312,6 +326,7 @@ class TestDocumentService:
         assert documents.first().pk == doc1.document.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_documents_with_year_filter(self):
         """Test list_documents with year filter"""
         # Arrange
@@ -334,6 +349,7 @@ class TestApprovalService:
     """Test ApprovalService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_request_approval_success(self):
         """Test request_approval changes status correctly"""
         # Arrange
@@ -353,6 +369,7 @@ class TestApprovalService:
         assert concept_plan.document.status == ProjectDocument.StatusChoices.INAPPROVAL
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_request_approval_invalid_status(self):
         """Test request_approval fails for invalid status"""
         # Arrange
@@ -366,6 +383,7 @@ class TestApprovalService:
             ApprovalService.request_approval(concept_plan.document, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_one_success(self):
         """Test approve_stage_one grants approval"""
         # Arrange
@@ -396,6 +414,7 @@ class TestApprovalService:
         assert document.project_lead_approval_granted is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_one_permission_denied(self):
         """Test approve_stage_one fails for non-leader"""
         # Arrange
@@ -409,6 +428,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_one(concept_plan.document, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_two_success(self, project_with_ba_lead, ba_lead):
         """Test approve_stage_two grants approval"""
         # Arrange
@@ -436,6 +456,7 @@ class TestApprovalService:
         assert document.business_area_lead_approval_granted is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_two_requires_stage_one(self, project_with_ba_lead, ba_lead):
         """Test approve_stage_two fails without stage 1"""
         # Arrange
@@ -457,6 +478,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_two(document, ba_lead)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_send_back_resets_status(self):
         """Test send_back changes status to revising"""
         # Arrange
@@ -476,6 +498,7 @@ class TestApprovalService:
         assert concept_plan.document.status == ProjectDocument.StatusChoices.REVISING
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_recall_resets_approvals(self):
         """Test recall resets all approval flags"""
         # Arrange
@@ -500,6 +523,7 @@ class TestApprovalService:
         assert concept_plan.document.status == ProjectDocument.StatusChoices.REVISING
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_approval_stage(self):
         """Test get_approval_stage returns correct stage"""
         # Arrange
@@ -516,6 +540,7 @@ class TestApprovalService:
         assert stage == 2
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_two_permission_denied(self, project_with_ba_lead):
         """Test approve_stage_two fails for non-BA-lead"""
         # Arrange
@@ -531,6 +556,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_two(document, non_ba_lead)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_three_success(self, project_lead, ba_lead, director):
         """Test approve_stage_three grants final approval"""
         # Arrange
@@ -563,6 +589,7 @@ class TestApprovalService:
         assert document.status == ProjectDocument.StatusChoices.APPROVED
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_three_requires_stage_one(
         self, project_lead, ba_lead, director
     ):
@@ -588,6 +615,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_three(document, director)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_three_requires_stage_two(
         self, project_lead, ba_lead, director
     ):
@@ -613,6 +641,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_three(document, director)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_three_permission_denied(self, project_lead, ba_lead):
         """Test approve_stage_three fails for non-director"""
         # Arrange
@@ -637,6 +666,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_three(document, non_director)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_stage_three_no_division(self, project_lead, ba_lead):
         """Test approve_stage_three fails when business area has no division"""
         # Arrange
@@ -659,6 +689,7 @@ class TestApprovalService:
             ApprovalService.approve_stage_three(document, some_user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_batch_approve_stage_one_success(self, project_lead):
         """Test batch_approve approves multiple documents at stage 1"""
         # Arrange
@@ -692,6 +723,7 @@ class TestApprovalService:
         assert doc2.project_lead_approval_granted is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_batch_approve_stage_two_success(self, project_lead, ba_lead):
         """Test batch_approve approves multiple documents at stage 2"""
         # Arrange
@@ -729,6 +761,7 @@ class TestApprovalService:
         assert doc2.business_area_lead_approval_granted is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_batch_approve_stage_three_success(self, project_lead, ba_lead, director):
         """Test batch_approve approves multiple documents at stage 3"""
         # Arrange
@@ -774,6 +807,7 @@ class TestApprovalService:
         assert doc2.status == ProjectDocument.StatusChoices.APPROVED
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_batch_approve_with_failures(self, project_lead):
         """Test batch_approve handles failures correctly"""
         # Arrange
@@ -807,6 +841,7 @@ class TestApprovalService:
         assert "not authorized" in results["failed"][0]["error"].lower()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_batch_approve_invalid_stage(self, project_lead):
         """Test batch_approve fails for invalid stage"""
         # Arrange
@@ -822,6 +857,7 @@ class TestApprovalService:
         assert "Invalid stage" in results["failed"][0]["error"]
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_next_approver_stage_one(self, project_lead):
         """Test get_next_approver returns project lead for stage 1"""
         # Arrange
@@ -844,6 +880,7 @@ class TestApprovalService:
         assert next_approver == project_lead
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_next_approver_stage_two(self, project_lead, ba_lead):
         """Test get_next_approver returns BA lead for stage 2"""
         # Arrange
@@ -866,6 +903,7 @@ class TestApprovalService:
         assert next_approver == ba_lead
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_next_approver_stage_three(self, project_lead, ba_lead, director):
         """Test get_next_approver returns director for stage 3"""
         # Arrange
@@ -890,6 +928,7 @@ class TestApprovalService:
         assert next_approver == director
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_next_approver_no_division(self, project_lead, ba_lead):
         """Test get_next_approver returns None when no division"""
         # Arrange
@@ -912,6 +951,7 @@ class TestApprovalService:
         assert next_approver is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_next_approver_no_project_lead(self):
         """Test get_next_approver returns None when no project lead"""
         # Arrange
@@ -932,6 +972,7 @@ class TestApprovalService:
         assert next_approver is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_next_approver_approved(self):
         """Test get_next_approver returns None for approved document"""
         # Arrange
@@ -946,6 +987,7 @@ class TestApprovalService:
         assert next_approver is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_next_approver_not_in_approval(self):
         """Test get_next_approver returns None for document not in approval"""
         # Arrange
@@ -960,6 +1002,7 @@ class TestApprovalService:
         assert next_approver is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_approval_stage_not_in_approval(self):
         """Test get_approval_stage returns 0 for non-approval status"""
         # Arrange
@@ -974,6 +1017,7 @@ class TestApprovalService:
         assert stage == 0
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_approval_stage_approved(self):
         """Test get_approval_stage returns 4 for approved document"""
         # Arrange
@@ -988,6 +1032,7 @@ class TestApprovalService:
         assert stage == 4
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_approval_stage_one(self):
         """Test get_approval_stage returns 1 for stage 1"""
         # Arrange
@@ -1003,6 +1048,7 @@ class TestApprovalService:
         assert stage == 1
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_approval_stage_three(self):
         """Test get_approval_stage returns 3 for stage 3"""
         # Arrange
@@ -1026,6 +1072,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_document_pdf_success(self, mock_render, mock_subprocess):
         """Test generate_document_pdf creates PDF successfully"""
         # Arrange
@@ -1051,6 +1098,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_document_pdf_custom_template(self, mock_render, mock_subprocess):
         """Test generate_document_pdf uses custom template"""
         # Arrange
@@ -1079,6 +1127,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_document_pdf_prince_failure(self, mock_render, mock_subprocess):
         """Test generate_document_pdf handles Prince XML failure"""
         # Arrange
@@ -1095,6 +1144,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_document_pdf_timeout(self, mock_render, mock_subprocess):
         """Test generate_document_pdf handles timeout"""
         # Arrange
@@ -1113,6 +1163,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_document_pdf_template_error(self, mock_render, mock_subprocess):
         """Test generate_document_pdf handles template rendering error"""
         # Arrange
@@ -1128,6 +1179,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_annual_report_pdf_success(
         self, mock_render, mock_subprocess, annual_report
     ):
@@ -1152,6 +1204,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_annual_report_pdf_custom_template(
         self, mock_render, mock_subprocess, annual_report
     ):
@@ -1178,6 +1231,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_generate_annual_report_pdf_failure(
         self, mock_render, mock_subprocess, annual_report
     ):
@@ -1191,6 +1245,7 @@ class TestPDFService:
             PDFService.generate_annual_report_pdf(annual_report)
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_build_document_context_concept_plan(self):
         """Test _build_document_context for concept plan"""
         # Arrange
@@ -1212,6 +1267,7 @@ class TestPDFService:
         assert context["details"] == concept_plan
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_build_document_context_project_plan(self):
         """Test _build_document_context for project plan"""
         # Arrange
@@ -1234,6 +1290,7 @@ class TestPDFService:
         assert "endorsements" in context
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_build_document_context_progress_report_without_details(self):
         """Test _build_document_context for progress report without details"""
         # Arrange - Create document without progress report details
@@ -1251,6 +1308,7 @@ class TestPDFService:
         # This tests the code path for documents without details
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_build_document_context_student_report_without_details(self):
         """Test _build_document_context for student report without details"""
         # Arrange - Create document without student report details
@@ -1270,6 +1328,7 @@ class TestPDFService:
         assert context["details"] == student_report
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_build_document_context_project_closure_without_details(self):
         """Test _build_document_context for project closure without details"""
         # Arrange - Create document without project closure details
@@ -1289,6 +1348,7 @@ class TestPDFService:
         assert context["details"] == project_closure
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_build_annual_report_context(self, annual_report):
         """Test _build_annual_report_context includes reports"""
         # Arrange - just test the context structure without creating progress reports
@@ -1307,6 +1367,7 @@ class TestPDFService:
         assert hasattr(context["student_reports"], "count")
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_mark_pdf_generation_started(self):
         """Test mark_pdf_generation_started sets flag"""
         # Arrange
@@ -1324,6 +1385,7 @@ class TestPDFService:
         assert concept_plan.document.pdf_generation_in_progress is True
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_mark_pdf_generation_complete(self):
         """Test mark_pdf_generation_complete clears flag"""
         # Arrange
@@ -1341,6 +1403,7 @@ class TestPDFService:
         assert concept_plan.document.pdf_generation_in_progress is False
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_cancel_pdf_generation(self):
         """Test cancel_pdf_generation clears flag"""
         # Arrange
@@ -1360,6 +1423,7 @@ class TestPDFService:
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
+    @pytest.mark.unit
     def test_html_to_pdf_success(self, mock_render, mock_subprocess):
         """Test _html_to_pdf converts HTML to PDF"""
         # Arrange
@@ -1382,6 +1446,7 @@ class TestPDFService:
 
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
+    @pytest.mark.unit
     def test_html_to_pdf_prince_error(self, mock_subprocess):
         """Test _html_to_pdf handles Prince error"""
         # Arrange
@@ -1394,6 +1459,7 @@ class TestPDFService:
 
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
+    @pytest.mark.unit
     def test_html_to_pdf_timeout_error(self, mock_subprocess):
         """Test _html_to_pdf handles timeout"""
         # Arrange
@@ -1408,6 +1474,7 @@ class TestPDFService:
 
     @pytest.mark.django_db
     @patch("documents.services.pdf_service.subprocess.run")
+    @pytest.mark.unit
     def test_html_to_pdf_generic_error(self, mock_subprocess):
         """Test _html_to_pdf handles generic errors"""
         # Arrange
@@ -1426,6 +1493,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_document_approved(self, mock_send):
         """Test notify_document_approved sends notification"""
         # Arrange
@@ -1449,6 +1517,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_document_approved_directorate(self, mock_send):
         """Test notify_document_approved_directorate sends notification"""
         # Arrange
@@ -1473,6 +1542,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_document_recalled(self, mock_send):
         """Test notify_document_recalled sends notification with reason"""
         # Arrange
@@ -1497,6 +1567,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_document_sent_back(self, mock_send):
         """Test notify_document_sent_back sends notification with reason"""
         # Arrange
@@ -1521,6 +1592,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_document_ready(self, mock_send):
         """Test notify_document_ready sends notification to approvers"""
         # Arrange
@@ -1542,6 +1614,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_feedback_received(self, mock_send):
         """Test notify_feedback_received sends notification with feedback"""
         # Arrange
@@ -1566,6 +1639,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_notify_review_request(self, mock_send):
         """Test notify_review_request sends notification to approvers"""
         # Arrange
@@ -1587,6 +1661,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_send_bump_emails(self, mock_send):
         """Test send_bump_emails sends reminders for multiple documents"""
         # Arrange
@@ -1609,6 +1684,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.integration
     def test_notify_comment_mention(self, mock_send):
         """Test notify_comment_mention sends notification to mentioned user"""
         # Arrange
@@ -1641,6 +1717,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.integration
     def test_notify_new_cycle_open(self, mock_send):
         """Test notify_new_cycle_open sends notifications for all projects"""
         # Arrange
@@ -1672,6 +1749,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.integration
     def test_notify_project_closed(self, mock_send):
         """Test notify_project_closed sends notification to project team"""
         # Arrange
@@ -1694,6 +1772,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.integration
     def test_notify_project_reopened(self, mock_send):
         """Test notify_project_reopened sends notification to project team"""
         # Arrange
@@ -1716,6 +1795,7 @@ class TestNotificationService:
     @patch(
         "documents.services.notification_service.EmailService.send_document_notification"
     )
+    @pytest.mark.unit
     def test_send_spms_invite(self, mock_send):
         """Test send_spms_invite sends invitation email"""
         # Arrange
@@ -1742,6 +1822,7 @@ class TestNotificationService:
         assert recipients[0]["email"] == "new@example.com"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_document_recipients_with_project_team(self):
         """Test _get_document_recipients includes project team members"""
         # Arrange
@@ -1785,6 +1866,7 @@ class TestNotificationService:
         assert member_recipient["kind"] == "Team Member"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_document_recipients_with_ba_leader(self):
         """Test _get_document_recipients includes business area leader"""
         # Arrange
@@ -1808,6 +1890,7 @@ class TestNotificationService:
         assert ba_recipient["kind"] == "Business Area Leader"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_directorate_recipients(self):
         """Test _get_directorate_recipients includes director"""
         # Arrange
@@ -1831,6 +1914,7 @@ class TestNotificationService:
         assert recipients[0]["kind"] == "Director"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_directorate_recipients_no_division(self):
         """Test _get_directorate_recipients returns empty when no division"""
         # Arrange
@@ -1848,6 +1932,7 @@ class TestNotificationService:
         assert len(recipients) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_approver_recipients(self):
         """Test _get_approver_recipients includes project leaders"""
         # Arrange
@@ -1879,6 +1964,7 @@ class TestNotificationService:
         assert recipients[0]["kind"] == "Project Lead"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_project_team_recipients(self):
         """Test _get_project_team_recipients includes all team members"""
         # Arrange
@@ -1917,6 +2003,7 @@ class TestConceptPlanService:
     """Test ConceptPlanService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_concept_plan_success(self):
         """Test create_concept_plan creates document correctly"""
         # Arrange
@@ -1936,6 +2023,7 @@ class TestConceptPlanService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_concept_plan_with_details(self):
         """Test create_concept_plan with details data"""
         # Arrange
@@ -1953,6 +2041,7 @@ class TestConceptPlanService:
         assert document.project == project
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_concept_plan_success(self):
         """Test update_concept_plan updates document correctly"""
         # Arrange
@@ -1972,6 +2061,7 @@ class TestConceptPlanService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_concept_plan_wrong_kind(self):
         """Test update_concept_plan fails for non-concept document"""
         # Arrange
@@ -1986,6 +2076,7 @@ class TestConceptPlanService:
             ConceptPlanService.update_concept_plan(project_plan.document.pk, user, data)
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_concept_plan_with_details(self):
         """Test update_concept_plan with details data"""
         # Arrange
@@ -2004,6 +2095,7 @@ class TestConceptPlanService:
         assert updated.status == ProjectDocument.StatusChoices.INREVIEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_concept_plan_data_with_details(self):
         """Test get_concept_plan_data includes details"""
         # Arrange
@@ -2023,6 +2115,7 @@ class TestConceptPlanService:
         assert data["details"] == concept_plan
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_concept_plan_data_without_details(self):
         """Test get_concept_plan_data without details"""
         # Arrange
@@ -2045,6 +2138,7 @@ class TestProjectPlanService:
     """Test ProjectPlanService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_project_plan_success(self):
         """Test create_project_plan creates document correctly"""
         # Arrange
@@ -2064,6 +2158,7 @@ class TestProjectPlanService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_project_plan_with_details(self):
         """Test create_project_plan with details data"""
         # Arrange
@@ -2081,6 +2176,7 @@ class TestProjectPlanService:
         assert document.project == project
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_update_project_plan_success(self):
         """Test update_project_plan updates document correctly"""
         # Arrange
@@ -2100,6 +2196,7 @@ class TestProjectPlanService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_update_project_plan_wrong_kind(self):
         """Test update_project_plan fails for non-project-plan document"""
         # Arrange
@@ -2114,6 +2211,7 @@ class TestProjectPlanService:
             ProjectPlanService.update_project_plan(concept_plan.document.pk, user, data)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_update_project_plan_with_details(self):
         """Test update_project_plan with details data"""
         # Arrange
@@ -2132,6 +2230,7 @@ class TestProjectPlanService:
         assert updated.status == ProjectDocument.StatusChoices.INREVIEW
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_project_plan_data_with_details(self):
         """Test get_project_plan_data includes details and endorsements"""
         # Arrange
@@ -2154,6 +2253,7 @@ class TestProjectPlanService:
             assert "endorsements" in data
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_project_plan_data_without_details(self):
         """Test get_project_plan_data without details"""
         # Arrange
@@ -2179,6 +2279,7 @@ class TestClosureService:
     """Test ClosureService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_closure_success(self):
         """Test create_closure creates document correctly"""
         # Arrange
@@ -2198,6 +2299,7 @@ class TestClosureService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_closure_with_details(self):
         """Test create_closure with details data"""
         # Arrange
@@ -2215,6 +2317,7 @@ class TestClosureService:
         assert document.project == project
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_closure_success(self):
         """Test update_closure updates document correctly"""
         # Arrange
@@ -2233,6 +2336,7 @@ class TestClosureService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_closure_wrong_kind(self):
         """Test update_closure fails for non-closure document"""
         # Arrange
@@ -2247,6 +2351,7 @@ class TestClosureService:
             ClosureService.update_closure(concept_plan.document.pk, user, data)
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_closure_with_details(self):
         """Test update_closure with details data"""
         # Arrange
@@ -2267,6 +2372,7 @@ class TestClosureService:
     @patch(
         "documents.services.closure_service.NotificationService.notify_project_closed"
     )
+    @pytest.mark.integration
     def test_close_project_success(self, mock_notify):
         """Test close_project closes project correctly"""
         # Arrange
@@ -2287,6 +2393,7 @@ class TestClosureService:
         mock_notify.assert_called_once_with(project_closure.document.project, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_close_project_wrong_kind(self):
         """Test close_project fails for non-closure document"""
         # Arrange
@@ -2300,6 +2407,7 @@ class TestClosureService:
             ClosureService.close_project(concept_plan.document, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_close_project_not_approved(self):
         """Test close_project fails for non-approved closure"""
         # Arrange
@@ -2319,6 +2427,7 @@ class TestClosureService:
     @patch(
         "documents.services.closure_service.NotificationService.notify_project_reopened"
     )
+    @pytest.mark.integration
     def test_reopen_project_success(self, mock_notify):
         """Test reopen_project reopens project correctly"""
         # Arrange
@@ -2336,6 +2445,7 @@ class TestClosureService:
         mock_notify.assert_called_once_with(project, user)
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_closure_data_with_details(self):
         """Test get_closure_data includes details"""
         # Arrange
@@ -2356,6 +2466,7 @@ class TestClosureService:
         assert data["details"] == project_closure
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_closure_data_without_details(self):
         """Test get_closure_data without details"""
         # Arrange
@@ -2378,6 +2489,7 @@ class TestProgressReportService:
     """Test ProgressReportService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_progress_report_success(self):
         """Test create_progress_report creates document correctly"""
         # Arrange
@@ -2400,6 +2512,7 @@ class TestProgressReportService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_progress_report_with_details(self):
         """Test create_progress_report with details data"""
         # Arrange
@@ -2420,6 +2533,7 @@ class TestProgressReportService:
         assert document.project == project
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_progress_report_success(self):
         """Test update_progress_report updates document correctly"""
         # Arrange
@@ -2439,6 +2553,7 @@ class TestProgressReportService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_progress_report_wrong_kind(self):
         """Test update_progress_report fails for non-progress-report document"""
         # Arrange
@@ -2455,6 +2570,7 @@ class TestProgressReportService:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_progress_report_with_details(self):
         """Test update_progress_report with details data"""
         # Arrange
@@ -2473,6 +2589,7 @@ class TestProgressReportService:
         assert updated.status == ProjectDocument.StatusChoices.INREVIEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_progress_report_by_year_found(self):
         """Test get_progress_report_by_year finds report"""
         # Arrange
@@ -2491,6 +2608,7 @@ class TestProgressReportService:
         assert result is None or result.kind == "progressreport"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_progress_report_by_year_not_found(self):
         """Test get_progress_report_by_year returns None when not found"""
         # Arrange
@@ -2506,6 +2624,7 @@ class TestProgressReportService:
         assert result is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_progress_report_data_with_details(self):
         """Test get_progress_report_data includes details"""
         # Arrange
@@ -2525,6 +2644,7 @@ class TestProgressReportService:
         assert data["details"] == progress_report
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_progress_report_data_without_details(self):
         """Test get_progress_report_data without details"""
         # Arrange
@@ -2547,6 +2667,7 @@ class TestStudentReportService:
     """Test StudentReportService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_student_report_success(self):
         """Test create_student_report creates document correctly"""
         # Arrange
@@ -2567,6 +2688,7 @@ class TestStudentReportService:
         assert document.status == ProjectDocument.StatusChoices.NEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_create_student_report_with_details(self):
         """Test create_student_report with details data"""
         # Arrange
@@ -2585,6 +2707,7 @@ class TestStudentReportService:
         assert document.project == project
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_student_report_success(self):
         """Test update_student_report updates document correctly"""
         # Arrange
@@ -2604,6 +2727,7 @@ class TestStudentReportService:
         assert updated.modifier == user
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_student_report_wrong_kind(self):
         """Test update_student_report fails for non-student-report document"""
         # Arrange
@@ -2620,6 +2744,7 @@ class TestStudentReportService:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_student_report_with_details(self):
         """Test update_student_report with details data"""
         # Arrange
@@ -2638,6 +2763,7 @@ class TestStudentReportService:
         assert updated.status == ProjectDocument.StatusChoices.INREVIEW
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_student_report_by_year_found(self):
         """Test get_student_report_by_year finds report"""
         # Arrange
@@ -2656,6 +2782,7 @@ class TestStudentReportService:
         assert result is None or result.kind == "studentreport"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_student_report_by_year_not_found(self):
         """Test get_student_report_by_year returns None when not found"""
         # Arrange
@@ -2671,6 +2798,7 @@ class TestStudentReportService:
         assert result is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_student_report_data_with_details(self):
         """Test get_student_report_data includes details"""
         # Arrange
@@ -2690,6 +2818,7 @@ class TestStudentReportService:
         assert data["details"] == student_report
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_student_report_data_without_details(self):
         """Test get_student_report_data without details"""
         # Arrange
@@ -2714,6 +2843,7 @@ class TestEmailService:
     @pytest.mark.django_db
     @patch("documents.services.email_service.send_email_with_embedded_image")
     @patch("documents.services.email_service.render_to_string")
+    @pytest.mark.unit
     def test_send_template_email_success(self, mock_render, mock_send):
         """Test send_template_email sends email correctly"""
         # Arrange
@@ -2736,6 +2866,7 @@ class TestEmailService:
     @pytest.mark.django_db
     @patch("documents.services.email_service.send_email_with_embedded_image")
     @patch("documents.services.email_service.render_to_string")
+    @pytest.mark.unit
     def test_send_template_email_failure(self, mock_render, mock_send):
         """Test send_template_email raises error on failure"""
         # Arrange
@@ -2753,6 +2884,7 @@ class TestEmailService:
 
     @pytest.mark.django_db
     @patch("documents.services.email_service.EmailService.send_template_email")
+    @pytest.mark.integration
     def test_send_document_notification(self, mock_send):
         """Test send_document_notification sends to all recipients"""
         # Arrange
@@ -2775,6 +2907,7 @@ class TestEmailService:
         assert mock_send.call_count == 2
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_send_document_notification_invalid_type(self):
         """Test send_document_notification fails for invalid type"""
         # Arrange

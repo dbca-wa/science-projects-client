@@ -4,6 +4,7 @@ Tests for documents admin
 
 from unittest.mock import Mock, patch
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 
 from common.tests.factories import ProjectDocumentFactory
@@ -38,6 +39,7 @@ from documents.models import (
 class TestUserFilterWidget:
     """Tests for UserFilterWidget"""
 
+    @pytest.mark.integration
     def test_label_from_instance(self, user_factory, db):
         """Test label formatting for user"""
         user = user_factory(first_name="John", last_name="Doe")
@@ -47,6 +49,7 @@ class TestUserFilterWidget:
 
         assert label == "John Doe"
 
+    @pytest.mark.integration
     def test_format_value_none(self, db):
         """Test format_value with None"""
         widget = UserFilterWidget("users", False)
@@ -55,6 +58,7 @@ class TestUserFilterWidget:
 
         assert result == []
 
+    @pytest.mark.integration
     def test_format_value_string(self, db):
         """Test format_value with string"""
         widget = UserFilterWidget("users", False)
@@ -63,6 +67,7 @@ class TestUserFilterWidget:
 
         assert result == ["1", "2", "3"]
 
+    @pytest.mark.integration
     def test_format_value_int(self, db):
         """Test format_value with int"""
         widget = UserFilterWidget("users", False)
@@ -80,6 +85,7 @@ class TestUserFilterWidget:
 class TestProjectDocumentAdmin:
     """Tests for ProjectDocumentAdmin"""
 
+    @pytest.mark.integration
     def test_display_year(self, project_document, db):
         """Test display_year method"""
         admin = ProjectDocumentAdmin(ProjectDocument, AdminSite())
@@ -92,6 +98,7 @@ class TestProjectDocumentAdmin:
 class TestConceptPlanAdmin:
     """Tests for ConceptPlanAdmin"""
 
+    @pytest.mark.unit
     def test_doc_status(self, concept_plan_with_details, db):
         """Test doc_status method"""
         admin = ConceptPlanAdmin(ConceptPlan, AdminSite())
@@ -104,6 +111,7 @@ class TestConceptPlanAdmin:
 class TestProjectPlanAdmin:
     """Tests for ProjectPlanAdmin"""
 
+    @pytest.mark.integration
     def test_doc_status(self, project_plan_with_details, db):
         """Test doc_status method"""
         admin = ProjectPlanAdmin(ProjectPlan, AdminSite())
@@ -116,6 +124,7 @@ class TestProjectPlanAdmin:
 class TestProgressReportAdmin:
     """Tests for ProgressReportAdmin"""
 
+    @pytest.mark.unit
     def test_doc_status(self, progress_report, db):
         """Test doc_status method"""
         admin = ProgressReportAdmin(ProgressReport, AdminSite())
@@ -128,6 +137,7 @@ class TestProgressReportAdmin:
 class TestStudentReportAdmin:
     """Tests for StudentReportAdmin"""
 
+    @pytest.mark.unit
     def test_doc_status(self, student_report, db):
         """Test doc_status method"""
         admin = StudentReportAdmin(StudentReport, AdminSite())
@@ -140,6 +150,7 @@ class TestStudentReportAdmin:
 class TestProjectClosureAdmin:
     """Tests for ProjectClosureAdmin"""
 
+    @pytest.mark.integration
     def test_doc_created_data(self, project_closure, db):
         """Test doc_created_data method"""
         admin = ProjectClosureAdmin(ProjectClosure, AdminSite())
@@ -148,6 +159,7 @@ class TestProjectClosureAdmin:
 
         assert created_at == project_closure.document.created_at
 
+    @pytest.mark.integration
     def test_doc_status(self, project_closure, db):
         """Test doc_status method"""
         admin = ProjectClosureAdmin(ProjectClosure, AdminSite())
@@ -160,6 +172,7 @@ class TestProjectClosureAdmin:
 class TestEndorsementAdmin:
     """Tests for EndorsementAdmin"""
 
+    @pytest.mark.unit
     def test_display_data_management_short(self, endorsement, db):
         """Test display_data_management with short text"""
         endorsement.data_management = "Short text"
@@ -171,6 +184,7 @@ class TestEndorsementAdmin:
 
         assert result == "Short text"
 
+    @pytest.mark.unit
     def test_display_data_management_long(self, endorsement, db):
         """Test display_data_management with long text"""
         endorsement.data_management = "A" * 150
@@ -183,6 +197,7 @@ class TestEndorsementAdmin:
         assert result == "A" * 100 + "..."
         assert len(result) == 103
 
+    @pytest.mark.unit
     def test_display_data_management_none(self, endorsement, db):
         """Test display_data_management with None"""
         endorsement.data_management = None
@@ -203,6 +218,7 @@ class TestEndorsementAdmin:
 class TestDeleteUnlinkedDocs:
     """Tests for delete_unlinked_docs admin action"""
 
+    @pytest.mark.integration
     def test_delete_unlinked_docs_requires_single_selection(self, project_document, db):
         """Test action requires single selection"""
         admin = ProjectDocumentAdmin(ProjectDocument, AdminSite())
@@ -215,6 +231,7 @@ class TestDeleteUnlinkedDocs:
                 "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
             )
 
+    @pytest.mark.integration
     def test_delete_unlinked_docs_deletes_empty_docs(self, project_with_lead, db):
         """Test action deletes documents without data"""
         # Create a document without associated data (no ConceptPlan, ProjectPlan, etc.)
@@ -257,6 +274,7 @@ class TestDeleteUnlinkedDocs:
 class TestProvideFinalApprovalForDocsIfNextExist:
     """Tests for provide_final_approval_for_docs_if_next_exist admin action"""
 
+    @pytest.mark.integration
     def test_action_requires_single_selection(self, project_document, db):
         """Test action requires single selection"""
         admin = ProjectDocumentAdmin(ProjectDocument, AdminSite())
@@ -269,6 +287,7 @@ class TestProvideFinalApprovalForDocsIfNextExist:
                 "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
             )
 
+    @pytest.mark.integration
     def test_action_approves_concept_when_project_plan_exists(
         self, project_with_lead, concept_plan_with_details, db
     ):
@@ -304,6 +323,7 @@ class TestProvideFinalApprovalForDocsIfNextExist:
 class TestPopulateAimsAndContext:
     """Tests for populate_aims_and_context admin action"""
 
+    @pytest.mark.unit
     def test_action_requires_single_selection(self, progress_report, db):
         """Test action requires single selection"""
         admin = ProgressReportAdmin(ProgressReport, AdminSite())
@@ -316,6 +336,7 @@ class TestPopulateAimsAndContext:
                 "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
             )
 
+    @pytest.mark.integration
     def test_action_populates_from_previous_year(self, project_with_lead, db):
         """Test action populates aims and context from previous year"""
         # Create annual reports for different years

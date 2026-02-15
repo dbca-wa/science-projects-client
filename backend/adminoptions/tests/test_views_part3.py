@@ -3,6 +3,7 @@ Tests for adminoptions views - Part 3
 (ApproveTask, RejectTask, CancelTask, MergeUsers, AdminSetCaretaker, SetCaretaker, RespondToCaretakerRequest)
 """
 
+import pytest
 from rest_framework import status
 
 from adminoptions.models import AdminTask
@@ -17,6 +18,7 @@ from users.models import User
 class TestApproveTask:
     """Tests for ApproveTask view"""
 
+    @pytest.mark.integration
     def test_approve_delete_project_task(
         self, api_client, admin_user, admin_task_delete_project, db
     ):
@@ -36,6 +38,7 @@ class TestApproveTask:
         assert admin_task_delete_project.status == AdminTask.TaskStatus.FULFILLED
         assert not Project.objects.filter(id=project_id).exists()
 
+    @pytest.mark.integration
     def test_approve_merge_user_task(
         self, api_client, admin_user, admin_task_merge_user, db
     ):
@@ -55,6 +58,7 @@ class TestApproveTask:
         assert admin_task_merge_user.status == AdminTask.TaskStatus.FULFILLED
         assert not User.objects.filter(id=secondary_user_id).exists()
 
+    @pytest.mark.integration
     def test_approve_merge_user_task_with_project_memberships(
         self, api_client, admin_user, user, secondary_user, project, db
     ):
@@ -88,6 +92,7 @@ class TestApproveTask:
         assert ProjectMember.objects.filter(project=project, user=user).exists()
         assert not User.objects.filter(id=secondary_user.id).exists()
 
+    @pytest.mark.integration
     def test_approve_merge_user_task_with_documents(
         self, api_client, admin_user, user, secondary_user, project, db
     ):
@@ -123,6 +128,7 @@ class TestApproveTask:
         assert doc.creator == user
         assert doc.modifier == user
 
+    @pytest.mark.integration
     def test_approve_merge_user_task_with_comments(
         self, api_client, admin_user, user, secondary_user, project, db
     ):
@@ -160,6 +166,7 @@ class TestApproveTask:
         comment.refresh_from_db()
         assert comment.user == user
 
+    @pytest.mark.integration
     def test_approve_set_caretaker_task(
         self, api_client, admin_user, admin_task_set_caretaker, db
     ):
@@ -181,6 +188,7 @@ class TestApproveTask:
             caretaker_id=admin_task_set_caretaker.secondary_users[0],
         ).exists()
 
+    @pytest.mark.integration
     def test_approve_task_requires_admin(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -196,6 +204,7 @@ class TestApproveTask:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_approve_task_not_found(self, api_client, admin_user, db):
         """Test approving non-existent task"""
         # Arrange
@@ -211,6 +220,7 @@ class TestApproveTask:
 class TestRejectTask:
     """Tests for RejectTask view"""
 
+    @pytest.mark.integration
     def test_reject_delete_project_task(
         self, api_client, admin_user, admin_task_delete_project, db
     ):
@@ -231,6 +241,7 @@ class TestRejectTask:
         project.refresh_from_db()
         assert project.deletion_requested is False
 
+    @pytest.mark.integration
     def test_reject_merge_user_task(
         self, api_client, admin_user, admin_task_merge_user, db
     ):
@@ -248,6 +259,7 @@ class TestRejectTask:
         admin_task_merge_user.refresh_from_db()
         assert admin_task_merge_user.status == AdminTask.TaskStatus.REJECTED
 
+    @pytest.mark.integration
     def test_reject_set_caretaker_task(
         self, api_client, admin_user, admin_task_set_caretaker, db
     ):
@@ -265,6 +277,7 @@ class TestRejectTask:
         admin_task_set_caretaker.refresh_from_db()
         assert admin_task_set_caretaker.status == AdminTask.TaskStatus.REJECTED
 
+    @pytest.mark.integration
     def test_reject_task_requires_admin(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -284,6 +297,7 @@ class TestRejectTask:
 class TestCancelTask:
     """Tests for CancelTask view"""
 
+    @pytest.mark.integration
     def test_cancel_delete_project_task(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -304,6 +318,7 @@ class TestCancelTask:
         project.refresh_from_db()
         assert project.deletion_requested is False
 
+    @pytest.mark.integration
     def test_cancel_merge_user_task(self, api_client, user, admin_task_merge_user, db):
         """Test cancelling merge user task"""
         # Arrange
@@ -319,6 +334,7 @@ class TestCancelTask:
         admin_task_merge_user.refresh_from_db()
         assert admin_task_merge_user.status == AdminTask.TaskStatus.CANCELLED
 
+    @pytest.mark.integration
     def test_cancel_set_caretaker_task(
         self, api_client, user, admin_task_set_caretaker, db
     ):
@@ -350,6 +366,7 @@ class TestCancelTask:
 class TestMergeUsers:
     """Tests for MergeUsers view"""
 
+    @pytest.mark.integration
     def test_merge_users(self, api_client, admin_user, user, secondary_user, db):
         """Test merging users"""
         # Arrange
@@ -368,6 +385,7 @@ class TestMergeUsers:
         assert response.status_code == status.HTTP_200_OK
         assert not User.objects.filter(id=secondary_user.id).exists()
 
+    @pytest.mark.integration
     def test_merge_users_with_projects(
         self, api_client, admin_user, user, secondary_user, project, db
     ):
@@ -397,6 +415,7 @@ class TestMergeUsers:
         assert response.status_code == status.HTTP_200_OK
         assert ProjectMember.objects.filter(project=project, user=user).exists()
 
+    @pytest.mark.integration
     def test_merge_users_missing_data(self, api_client, admin_user, db):
         """Test merging users with missing data"""
         # Arrange
@@ -411,6 +430,7 @@ class TestMergeUsers:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_merge_users_primary_in_secondary(self, api_client, admin_user, user, db):
         """Test merging users with primary user in secondary list"""
         # Arrange
@@ -428,6 +448,7 @@ class TestMergeUsers:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_merge_users_requires_superuser(self, api_client, user, secondary_user, db):
         """Test merging users requires superuser permission"""
         # Arrange
@@ -456,6 +477,7 @@ class TestMergeUsers:
 class TestRespondToCaretakerRequest:
     """Tests for RespondToCaretakerRequest view"""
 
+    @pytest.mark.integration
     def test_approve_caretaker_request(self, api_client, user, secondary_user, db):
         """Test approving caretaker request"""
         # Arrange
@@ -482,6 +504,7 @@ class TestRespondToCaretakerRequest:
         assert task.status == AdminTask.TaskStatus.FULFILLED
         assert Caretaker.objects.filter(user=user, caretaker=secondary_user).exists()
 
+    @pytest.mark.integration
     def test_reject_caretaker_request(self, api_client, user, secondary_user, db):
         """Test rejecting caretaker request"""
         # Arrange
@@ -510,6 +533,7 @@ class TestRespondToCaretakerRequest:
             user=user, caretaker=secondary_user
         ).exists()
 
+    @pytest.mark.integration
     def test_respond_to_non_caretaker_task(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -528,6 +552,7 @@ class TestRespondToCaretakerRequest:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_respond_to_non_pending_task(self, api_client, user, secondary_user, db):
         """Test responding to non-pending task fails"""
         # Arrange
@@ -551,6 +576,7 @@ class TestRespondToCaretakerRequest:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_respond_unauthorized_user(self, api_client, user, secondary_user, db):
         """Test responding as unauthorized user fails"""
         # Arrange
@@ -579,6 +605,7 @@ class TestRespondToCaretakerRequest:
         # Assert
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    @pytest.mark.integration
     def test_respond_invalid_action(self, api_client, user, secondary_user, db):
         """Test responding with invalid action fails"""
         # Arrange

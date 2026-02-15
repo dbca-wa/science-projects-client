@@ -19,6 +19,7 @@ class TestCaretakerSerializer:
     """Tests for CaretakerSerializer (read-only)"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_serialize_caretaker(self):
         """Test serializing a caretaker relationship"""
         # Arrange
@@ -47,6 +48,7 @@ class TestCaretakerSerializer:
         assert "updated_at" in data
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_serialize_caretaker_with_end_date(self):
         """Test serializing caretaker with end_date"""
         # Arrange
@@ -67,6 +69,7 @@ class TestCaretakerSerializer:
         assert data["end_date"] is not None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_serialize_caretaker_without_optional_fields(self):
         """Test serializing caretaker without optional fields"""
         # Arrange
@@ -87,6 +90,7 @@ class TestCaretakerSerializer:
         assert data["notes"] is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_serialize_multiple_caretakers(self):
         """Test serializing multiple caretaker relationships"""
         # Arrange
@@ -115,6 +119,7 @@ class TestCaretakerSerializer:
         assert data[1]["reason"] == "Reason 2"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_serializer_fields(self):
         """Test serializer has correct fields"""
         # Arrange
@@ -142,6 +147,7 @@ class TestCaretakerSerializer:
         assert set(serializer.data.keys()) == expected_fields
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_id_field_read_only(self):
         """Test id field is read-only"""
         # Arrange
@@ -151,6 +157,7 @@ class TestCaretakerSerializer:
         assert serializer.fields["id"].read_only is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_user_field_read_only(self):
         """Test user field is read-only"""
         # Arrange
@@ -160,6 +167,7 @@ class TestCaretakerSerializer:
         assert serializer.fields["user"].read_only is True
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_caretaker_field_read_only(self):
         """Test caretaker field is read-only"""
         # Arrange
@@ -173,6 +181,7 @@ class TestCaretakerCreateSerializer:
     """Tests for CaretakerCreateSerializer"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_valid_data(self):
         """Test creating caretaker with valid data"""
         # Arrange
@@ -197,6 +206,7 @@ class TestCaretakerCreateSerializer:
         assert relationship.notes == "Additional notes"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_with_end_date(self):
         """Test creating caretaker with end_date"""
         # Arrange
@@ -218,6 +228,7 @@ class TestCaretakerCreateSerializer:
         assert relationship.end_date is not None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_minimal_data(self):
         """Test creating caretaker with minimal required data"""
         # Arrange
@@ -240,6 +251,7 @@ class TestCaretakerCreateSerializer:
         assert relationship.notes is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_prevents_self_caretaking(self):
         """Test validation prevents self-caretaking"""
         # Arrange
@@ -259,6 +271,7 @@ class TestCaretakerCreateSerializer:
         assert "Cannot caretake for yourself" in str(serializer.errors)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_prevents_duplicate_relationship(self):
         """Test validation prevents duplicate relationships"""
         # Arrange
@@ -289,6 +302,7 @@ class TestCaretakerCreateSerializer:
         assert "unique set" in str(serializer.errors).lower()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_allows_different_relationships(self):
         """Test validation allows different relationships"""
         # Arrange
@@ -315,6 +329,7 @@ class TestCaretakerCreateSerializer:
         assert serializer.is_valid()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_allows_reverse_relationship(self):
         """Test validation allows reverse relationships"""
         # Arrange
@@ -340,6 +355,7 @@ class TestCaretakerCreateSerializer:
         assert serializer.is_valid()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_missing_required_user_field(self):
         """Test validation fails when user field is missing"""
         # Arrange
@@ -357,6 +373,7 @@ class TestCaretakerCreateSerializer:
         assert "user" in serializer.errors
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_missing_required_caretaker_field(self):
         """Test validation fails when caretaker field is missing"""
         # Arrange
@@ -374,6 +391,7 @@ class TestCaretakerCreateSerializer:
         assert "caretaker" in serializer.errors
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_invalid_user_id(self):
         """Test validation fails with invalid user ID"""
         # Arrange
@@ -391,6 +409,7 @@ class TestCaretakerCreateSerializer:
         assert "user" in serializer.errors
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_invalid_caretaker_id(self):
         """Test validation fails with invalid caretaker ID"""
         # Arrange
@@ -408,6 +427,7 @@ class TestCaretakerCreateSerializer:
         assert "caretaker" in serializer.errors
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_serializer_fields(self):
         """Test serializer has correct fields"""
         # Arrange
@@ -418,6 +438,7 @@ class TestCaretakerCreateSerializer:
         assert set(serializer.fields.keys()) == expected_fields
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_update_caretaker(self):
         """Test updating caretaker relationship"""
         # Arrange
@@ -444,6 +465,7 @@ class TestCaretakerCreateSerializer:
         assert updated.notes == "New notes"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_partial_update_caretaker(self):
         """Test partial update of caretaker relationship"""
         # Arrange

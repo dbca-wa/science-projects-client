@@ -5,6 +5,7 @@ These tests verify that rate limiting is properly configured and working
 to protect the API from abuse.
 """
 
+import pytest
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
@@ -24,6 +25,7 @@ class RateLimitingTestCase(TestCase):
             email="test@example.com",
         )
 
+    @pytest.mark.unit
     def test_rate_limiting_configured(self):
         """Test that rate limiting is configured in settings"""
         from django.conf import settings
@@ -38,6 +40,7 @@ class RateLimitingTestCase(TestCase):
         self.assertIn("user", rates)
         self.assertIn("burst", rates)
 
+    @pytest.mark.unit
     def test_custom_throttle_classes_exist(self):
         """Test that custom throttle classes are defined"""
         from config.throttling import (
@@ -61,6 +64,7 @@ class RateLimitingTestCase(TestCase):
             },
         }
     )
+    @pytest.mark.integration
     def test_anonymous_rate_limit_enforced(self):
         """
         Test that anonymous users are rate limited.
@@ -91,6 +95,7 @@ class RateLimitingTestCase(TestCase):
             },
         }
     )
+    @pytest.mark.integration
     def test_authenticated_rate_limit_enforced(self):
         """
         Test that authenticated users are rate limited.
@@ -111,6 +116,7 @@ class RateLimitingTestCase(TestCase):
             "5/minute",
         )
 
+    @pytest.mark.unit
     def test_throttle_response_format(self):
         """
         Test that throttle configuration is correct.
@@ -128,6 +134,7 @@ class RateLimitingTestCase(TestCase):
 class CustomThrottleClassesTestCase(TestCase):
     """Test custom throttle classes"""
 
+    @pytest.mark.unit
     def test_burst_throttle_scope(self):
         """Test BurstRateThrottle has correct scope"""
         from config.throttling import BurstRateThrottle
@@ -135,6 +142,7 @@ class CustomThrottleClassesTestCase(TestCase):
         throttle = BurstRateThrottle()
         self.assertEqual(throttle.scope, "burst")
 
+    @pytest.mark.unit
     def test_login_throttle_scope(self):
         """Test LoginRateThrottle has correct scope"""
         from config.throttling import LoginRateThrottle
@@ -142,6 +150,7 @@ class CustomThrottleClassesTestCase(TestCase):
         throttle = LoginRateThrottle()
         self.assertEqual(throttle.scope, "login")
 
+    @pytest.mark.unit
     def test_password_reset_throttle_scope(self):
         """Test PasswordResetRateThrottle has correct scope"""
         from config.throttling import PasswordResetRateThrottle

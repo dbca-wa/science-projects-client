@@ -19,6 +19,7 @@ def api_client():
 class TestAffiliations:
     """Tests for Affiliations view"""
 
+    @pytest.mark.integration
     def test_list_affiliations(self, api_client, user, affiliation, db):
         """Test listing all affiliations"""
         # Arrange
@@ -32,6 +33,7 @@ class TestAffiliations:
         assert len(response.data) == 1
         assert response.data[0]["name"] == affiliation.name
 
+    @pytest.mark.integration
     def test_list_affiliations_unauthenticated(self, api_client, db):
         """Test listing affiliations without authentication"""
         # Act
@@ -41,6 +43,7 @@ class TestAffiliations:
         # DRF returns 403 (Forbidden) when no authentication is provided
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_list_affiliations_with_search(self, api_client, user, db):
         """Test listing affiliations with search term"""
         # Arrange
@@ -61,6 +64,7 @@ class TestAffiliations:
         assert response.data["total_results"] == 1
         assert response.data["affiliations"][0]["name"] == "Test Affiliation"
 
+    @pytest.mark.integration
     def test_list_affiliations_with_search_pagination(self, api_client, user, db):
         """Test listing affiliations with search and pagination"""
         # Arrange
@@ -78,6 +82,7 @@ class TestAffiliations:
         assert "affiliations" in response.data
         assert response.data["total_results"] == 15
 
+    @pytest.mark.integration
     def test_create_affiliation(self, api_client, user, db):
         """Test creating affiliation"""
         # Arrange
@@ -94,6 +99,7 @@ class TestAffiliations:
         assert response.data["name"] == "New Affiliation"
         assert Affiliation.objects.filter(name="New Affiliation").exists()
 
+    @pytest.mark.integration
     def test_create_affiliation_invalid_data(self, api_client, user, db):
         """Test creating affiliation with invalid data"""
         # Arrange
@@ -112,6 +118,7 @@ class TestAffiliations:
 class TestAffiliationDetail:
     """Tests for AffiliationDetail view"""
 
+    @pytest.mark.integration
     def test_get_affiliation(self, api_client, user, affiliation, db):
         """Test getting affiliation detail"""
         # Arrange
@@ -124,6 +131,7 @@ class TestAffiliationDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == affiliation.name
 
+    @pytest.mark.integration
     def test_get_affiliation_pk_zero(self, api_client, user, db):
         """Test getting affiliation with pk=0"""
         # Arrange
@@ -135,6 +143,7 @@ class TestAffiliationDetail:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_get_affiliation_not_found(self, api_client, user, db):
         """Test getting non-existent affiliation"""
         # Arrange
@@ -146,6 +155,7 @@ class TestAffiliationDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_affiliation(self, api_client, user, affiliation, db):
         """Test updating affiliation"""
         # Arrange
@@ -163,6 +173,7 @@ class TestAffiliationDetail:
         affiliation.refresh_from_db()
         assert affiliation.name == "Updated Affiliation"
 
+    @pytest.mark.integration
     def test_update_affiliation_invalid_data(self, api_client, user, affiliation, db):
         """Test updating affiliation with invalid data"""
         # Arrange
@@ -177,6 +188,7 @@ class TestAffiliationDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_affiliation(self, api_client, user, affiliation, db):
         """Test deleting affiliation"""
         # Arrange
@@ -195,6 +207,7 @@ class TestAffiliationDetail:
 class TestAffiliationsMerge:
     """Tests for AffiliationsMerge view"""
 
+    @pytest.mark.integration
     def test_merge_affiliations(self, api_client, user, db):
         """Test merging affiliations"""
         # Arrange
@@ -230,6 +243,7 @@ class TestAffiliationsMerge:
 class TestAffiliationsCleanOrphaned:
     """Tests for AffiliationsCleanOrphaned view"""
 
+    @pytest.mark.integration
     def test_clean_orphaned_affiliations(self, api_client, user, db):
         """Test cleaning orphaned affiliations"""
         # Arrange
@@ -249,6 +263,7 @@ class TestAffiliationsCleanOrphaned:
 class TestAgencies:
     """Tests for Agencies view"""
 
+    @pytest.mark.integration
     def test_list_agencies(self, api_client, user, agency, db):
         """Test listing all agencies"""
         # Arrange
@@ -262,6 +277,7 @@ class TestAgencies:
         assert len(response.data) == 1
         assert response.data[0]["name"] == agency.name
 
+    @pytest.mark.integration
     def test_list_agencies_unauthenticated(self, api_client, db):
         """Test listing agencies without authentication"""
         # Act
@@ -271,6 +287,7 @@ class TestAgencies:
         # DRF returns 403 (Forbidden) when no authentication is provided
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_agency(self, api_client, user, db):
         """Test creating agency"""
         # Arrange
@@ -289,6 +306,7 @@ class TestAgencies:
         assert response.data["name"] == "New Agency"
         assert Agency.objects.filter(name="New Agency").exists()
 
+    @pytest.mark.integration
     def test_create_agency_invalid_data(self, api_client, user, db):
         """Test creating agency with invalid data"""
         # Arrange
@@ -305,6 +323,7 @@ class TestAgencies:
 class TestAgencyDetail:
     """Tests for AgencyDetail view"""
 
+    @pytest.mark.integration
     def test_get_agency(self, api_client, user, agency, db):
         """Test getting agency detail"""
         # Arrange
@@ -317,6 +336,7 @@ class TestAgencyDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == agency.name
 
+    @pytest.mark.integration
     def test_get_agency_not_found(self, api_client, user, db):
         """Test getting non-existent agency"""
         # Arrange
@@ -328,6 +348,7 @@ class TestAgencyDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_agency(self, api_client, user, agency, db):
         """Test updating agency"""
         # Arrange
@@ -343,6 +364,7 @@ class TestAgencyDetail:
         agency.refresh_from_db()
         assert agency.name == "Updated Agency"
 
+    @pytest.mark.integration
     def test_update_agency_invalid_data(self, api_client, user, agency, db):
         """Test updating agency with invalid data"""
         # Arrange
@@ -355,6 +377,7 @@ class TestAgencyDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_agency(self, api_client, user, agency, db):
         """Test deleting agency"""
         # Arrange
@@ -372,6 +395,7 @@ class TestAgencyDetail:
 class TestBranches:
     """Tests for Branches view"""
 
+    @pytest.mark.integration
     def test_list_branches(self, api_client, user, branch, db):
         """Test listing all branches"""
         # Arrange
@@ -385,6 +409,7 @@ class TestBranches:
         assert len(response.data) == 1
         assert response.data[0]["name"] == branch.name
 
+    @pytest.mark.integration
     def test_list_branches_with_search(self, api_client, user, db):
         """Test listing branches with search term"""
         # Arrange
@@ -405,6 +430,7 @@ class TestBranches:
         assert response.data["total_results"] == 1
         assert response.data["branches"][0]["name"] == "Test Branch"
 
+    @pytest.mark.integration
     def test_create_branch(self, api_client, user, agency, db):
         """Test creating branch"""
         # Arrange
@@ -421,6 +447,7 @@ class TestBranches:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == "New Branch"
 
+    @pytest.mark.integration
     def test_create_branch_invalid_data(self, api_client, user, db):
         """Test creating branch with invalid data"""
         # Arrange
@@ -437,6 +464,7 @@ class TestBranches:
 class TestBranchDetail:
     """Tests for BranchDetail view"""
 
+    @pytest.mark.integration
     def test_get_branch(self, api_client, user, branch, db):
         """Test getting branch detail"""
         # Arrange
@@ -449,6 +477,7 @@ class TestBranchDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == branch.name
 
+    @pytest.mark.integration
     def test_get_branch_not_found(self, api_client, user, db):
         """Test getting non-existent branch"""
         # Arrange
@@ -460,6 +489,7 @@ class TestBranchDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_branch(self, api_client, user, branch, db):
         """Test updating branch"""
         # Arrange
@@ -477,6 +507,7 @@ class TestBranchDetail:
         branch.refresh_from_db()
         assert branch.name == "Updated Branch"
 
+    @pytest.mark.integration
     def test_update_branch_invalid_data(self, api_client, user, branch, db):
         """Test updating branch with invalid data"""
         # Arrange
@@ -491,6 +522,7 @@ class TestBranchDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_branch(self, api_client, user, branch, db):
         """Test deleting branch"""
         # Arrange
@@ -510,6 +542,7 @@ class TestBranchDetail:
 class TestBusinessAreas:
     """Tests for BusinessAreas view"""
 
+    @pytest.mark.integration
     def test_list_business_areas(self, api_client, user, business_area, db):
         """Test listing all business areas"""
         # Arrange
@@ -523,6 +556,7 @@ class TestBusinessAreas:
         assert len(response.data) == 1
         assert response.data[0]["name"] == business_area.name
 
+    @pytest.mark.integration
     def test_create_business_area(self, api_client, user, agency, db):
         """Test creating business area"""
         # Arrange
@@ -543,6 +577,7 @@ class TestBusinessAreas:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == "New Business Area"
 
+    @pytest.mark.integration
     def test_create_business_area_invalid_data(self, api_client, user, db):
         """Test creating business area with invalid data"""
         # Arrange
@@ -561,6 +596,7 @@ class TestBusinessAreas:
 class TestBusinessAreaDetail:
     """Tests for BusinessAreaDetail view"""
 
+    @pytest.mark.integration
     def test_get_business_area(self, api_client, user, business_area, db):
         """Test getting business area detail"""
         # Arrange
@@ -575,6 +611,7 @@ class TestBusinessAreaDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == business_area.name
 
+    @pytest.mark.integration
     def test_get_business_area_not_found(self, api_client, user, db):
         """Test getting non-existent business area"""
         # Arrange
@@ -586,6 +623,7 @@ class TestBusinessAreaDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_business_area(self, api_client, user, business_area, db):
         """Test updating business area"""
         # Arrange
@@ -603,6 +641,7 @@ class TestBusinessAreaDetail:
         business_area.refresh_from_db()
         assert business_area.name == "Updated Business Area"
 
+    @pytest.mark.integration
     def test_update_business_area_invalid_data(
         self, api_client, user, business_area, db
     ):
@@ -619,6 +658,7 @@ class TestBusinessAreaDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_business_area(self, api_client, user, business_area, db):
         """Test deleting business area"""
         # Arrange
@@ -640,6 +680,7 @@ class TestBusinessAreaDetail:
 class TestMyBusinessAreas:
     """Tests for MyBusinessAreas view"""
 
+    @pytest.mark.integration
     def test_get_my_business_areas(self, api_client, user, business_area, db):
         """Test getting business areas led by current user"""
         # Arrange
@@ -655,6 +696,7 @@ class TestMyBusinessAreas:
         assert len(response.data) == 1
         assert response.data[0]["name"] == business_area.name
 
+    @pytest.mark.integration
     def test_get_my_business_areas_empty(self, api_client, user, db):
         """Test getting business areas when user leads none"""
         # Arrange
@@ -671,6 +713,7 @@ class TestMyBusinessAreas:
 class TestSetBusinessAreaActive:
     """Tests for SetBusinessAreaActive view"""
 
+    @pytest.mark.integration
     def test_toggle_business_area_active(self, api_client, user, business_area, db):
         """Test toggling business area active status"""
         # Arrange
@@ -691,6 +734,7 @@ class TestSetBusinessAreaActive:
 class TestDivisions:
     """Tests for Divisions view"""
 
+    @pytest.mark.integration
     def test_list_divisions(self, api_client, user, division, db):
         """Test listing all divisions"""
         # Arrange
@@ -704,6 +748,7 @@ class TestDivisions:
         assert len(response.data) == 1
         assert response.data[0]["name"] == division.name
 
+    @pytest.mark.integration
     def test_create_division(self, api_client, user, db):
         """Test creating division"""
         # Arrange
@@ -722,6 +767,7 @@ class TestDivisions:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == "New Division"
 
+    @pytest.mark.integration
     def test_create_division_invalid_data(self, api_client, user, db):
         """Test creating division with invalid data"""
         # Arrange
@@ -738,6 +784,7 @@ class TestDivisions:
 class TestDivisionDetail:
     """Tests for DivisionDetail view"""
 
+    @pytest.mark.integration
     def test_get_division(self, api_client, user, division, db):
         """Test getting division detail"""
         # Arrange
@@ -750,6 +797,7 @@ class TestDivisionDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == division.name
 
+    @pytest.mark.integration
     def test_get_division_not_found(self, api_client, user, db):
         """Test getting non-existent division"""
         # Arrange
@@ -761,6 +809,7 @@ class TestDivisionDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_division(self, api_client, user, division, db):
         """Test updating division"""
         # Arrange
@@ -778,6 +827,7 @@ class TestDivisionDetail:
         division.refresh_from_db()
         assert division.name == "Updated Division"
 
+    @pytest.mark.integration
     def test_update_division_invalid_data(self, api_client, user, division, db):
         """Test updating division with invalid data"""
         # Arrange
@@ -792,6 +842,7 @@ class TestDivisionDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_division(self, api_client, user, division, db):
         """Test deleting division"""
         # Arrange
@@ -811,6 +862,7 @@ class TestDivisionDetail:
 class TestDivisionEmailList:
     """Tests for DivisionEmailList view"""
 
+    @pytest.mark.integration
     def test_get_division_email_list(self, api_client, user, division, db):
         """Test getting division email list"""
         # Arrange
@@ -825,6 +877,7 @@ class TestDivisionEmailList:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == division.name
 
+    @pytest.mark.integration
     def test_update_division_email_list(self, api_client, user, division, db):
         """Test updating division email list"""
         # Arrange
@@ -847,6 +900,7 @@ class TestDivisionEmailList:
         division.refresh_from_db()
         assert division.directorate_email_list.count() == 2
 
+    @pytest.mark.integration
     def test_update_division_email_list_invalid_user(
         self, api_client, user, division, db
     ):
@@ -869,6 +923,7 @@ class TestDivisionEmailList:
 class TestDepartmentalServices:
     """Tests for DepartmentalServices view"""
 
+    @pytest.mark.integration
     def test_list_services(self, api_client, user, departmental_service, db):
         """Test listing all departmental services"""
         # Arrange
@@ -882,6 +937,7 @@ class TestDepartmentalServices:
         assert len(response.data) == 1
         assert response.data[0]["name"] == departmental_service.name
 
+    @pytest.mark.integration
     def test_create_service(self, api_client, user, db):
         """Test creating departmental service"""
         # Arrange
@@ -897,6 +953,7 @@ class TestDepartmentalServices:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["name"] == "New Service"
 
+    @pytest.mark.integration
     def test_create_service_invalid_data(self, api_client, user, db):
         """Test creating departmental service with invalid data"""
         # Arrange
@@ -913,6 +970,7 @@ class TestDepartmentalServices:
 class TestDepartmentalServiceDetail:
     """Tests for DepartmentalServiceDetail view"""
 
+    @pytest.mark.integration
     def test_get_service(self, api_client, user, departmental_service, db):
         """Test getting departmental service detail"""
         # Arrange
@@ -927,6 +985,7 @@ class TestDepartmentalServiceDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["name"] == departmental_service.name
 
+    @pytest.mark.integration
     def test_get_service_not_found(self, api_client, user, db):
         """Test getting non-existent departmental service"""
         # Arrange
@@ -938,6 +997,7 @@ class TestDepartmentalServiceDetail:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_service(self, api_client, user, departmental_service, db):
         """Test updating departmental service"""
         # Arrange
@@ -955,6 +1015,7 @@ class TestDepartmentalServiceDetail:
         departmental_service.refresh_from_db()
         assert departmental_service.name == "Updated Service"
 
+    @pytest.mark.integration
     def test_update_service_invalid_data(
         self, api_client, user, departmental_service, db
     ):
@@ -971,6 +1032,7 @@ class TestDepartmentalServiceDetail:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_delete_service(self, api_client, user, departmental_service, db):
         """Test deleting departmental service"""
         # Arrange

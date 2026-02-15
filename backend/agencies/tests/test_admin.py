@@ -2,6 +2,7 @@
 Tests for agencies admin
 """
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 
@@ -28,6 +29,7 @@ User = get_user_model()
 class TestAffiliationAdmin:
     """Tests for AffiliationAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -38,6 +40,7 @@ class TestAffiliationAdmin:
         assert "created_at" in admin.list_display
         assert "updated_at" in admin.list_display
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -46,6 +49,7 @@ class TestAffiliationAdmin:
         # Act & Assert
         assert admin.ordering == ["name"]
 
+    @pytest.mark.unit
     def test_actions_configured(self, db):
         """Test admin actions are configured"""
         # Arrange
@@ -69,6 +73,7 @@ class TestAffiliationAdmin:
 class TestAgencyAdmin:
     """Tests for AgencyAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -78,6 +83,7 @@ class TestAgencyAdmin:
         assert "name" in admin.list_display
         assert "key_stakeholder" in admin.list_display
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -90,6 +96,7 @@ class TestAgencyAdmin:
 class TestBranchAdmin:
     """Tests for BranchAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -100,6 +107,7 @@ class TestBranchAdmin:
         assert "agency" in admin.list_display
         assert "manager" in admin.list_display
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -108,6 +116,7 @@ class TestBranchAdmin:
         # Act & Assert
         assert "name" in admin.search_fields
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -120,6 +129,7 @@ class TestBranchAdmin:
 class TestBusinessAreaAdmin:
     """Tests for BusinessAreaAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -131,6 +141,7 @@ class TestBusinessAreaAdmin:
         assert "focus" in admin.list_display
         assert "leader" in admin.list_display
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -141,6 +152,7 @@ class TestBusinessAreaAdmin:
         assert "focus" in admin.search_fields
         assert "leader" in admin.search_fields
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -153,6 +165,7 @@ class TestBusinessAreaAdmin:
 class TestDivisionAdmin:
     """Tests for DivisionAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -163,6 +176,7 @@ class TestDivisionAdmin:
         assert "approver" in admin.list_display
         assert "director" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -172,6 +186,7 @@ class TestDivisionAdmin:
         assert "approver" in admin.list_filter
         assert "director" in admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -180,6 +195,7 @@ class TestDivisionAdmin:
         # Act & Assert
         assert "name" in admin.search_fields
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange
@@ -192,6 +208,7 @@ class TestDivisionAdmin:
 class TestDepartmentalServiceAdmin:
     """Tests for DepartmentalServiceAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -201,6 +218,7 @@ class TestDepartmentalServiceAdmin:
         assert "name" in admin.list_display
         assert "director" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -209,6 +227,7 @@ class TestDepartmentalServiceAdmin:
         # Act & Assert
         assert "director" in admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -217,6 +236,7 @@ class TestDepartmentalServiceAdmin:
         # Act & Assert
         assert "name" in admin.search_fields
 
+    @pytest.mark.unit
     def test_ordering(self, db):
         """Test ordering configuration"""
         # Arrange

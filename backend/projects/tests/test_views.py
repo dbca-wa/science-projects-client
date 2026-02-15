@@ -2,6 +2,7 @@
 Tests for project views
 """
 
+import pytest
 from rest_framework import status
 
 from common.tests.test_helpers import projects_urls
@@ -11,6 +12,7 @@ from projects.models import Project, ProjectMember
 class TestProjects:
     """Tests for Projects view (list and create)"""
 
+    @pytest.mark.integration
     def test_list_projects_authenticated(self, api_client, user, project, db):
         """Test listing projects as authenticated user"""
         # Arrange
@@ -25,6 +27,7 @@ class TestProjects:
         assert "total_results" in response.data
         assert "total_pages" in response.data
 
+    @pytest.mark.integration
     def test_list_projects_unauthenticated(self, api_client, db):
         """Test listing projects without authentication"""
         # Act
@@ -34,6 +37,7 @@ class TestProjects:
         # DRF returns 403 for unauthenticated requests with IsAuthenticated permission
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_list_projects_with_filters(self, api_client, user, project, db):
         """Test listing projects with search filter"""
         # Arrange
@@ -52,6 +56,7 @@ class TestProjects:
 class TestProjectDetails:
     """Tests for ProjectDetails view (get, update, delete)"""
 
+    @pytest.mark.integration
     def test_get_project_authenticated(self, api_client, user, project, db):
         """Test getting project details as authenticated user"""
         # Arrange
@@ -68,6 +73,7 @@ class TestProjectDetails:
         assert "documents" in response.data
         assert "members" in response.data
 
+    @pytest.mark.integration
     def test_get_project_unauthenticated(self, api_client, project, db):
         """Test getting project without authentication"""
         # Act
@@ -77,6 +83,7 @@ class TestProjectDetails:
         # DRF returns 403 for unauthenticated requests with IsAuthenticated permission
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_get_project_not_found(self, api_client, user, db):
         """Test getting non-existent project"""
         # Arrange
@@ -88,6 +95,7 @@ class TestProjectDetails:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_project_as_leader(
         self, api_client, project_with_lead, project_lead, db
     ):
@@ -108,6 +116,7 @@ class TestProjectDetails:
         project_with_lead.refresh_from_db()
         assert project_with_lead.title == "Updated Project Title"
 
+    @pytest.mark.integration
     def test_update_project_as_non_leader(
         self, api_client, project_with_members, user_factory, db
     ):
@@ -127,6 +136,7 @@ class TestProjectDetails:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_project_as_leader(
         self, api_client, project_with_lead, project_lead, db
     ):
@@ -142,6 +152,7 @@ class TestProjectDetails:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not Project.objects.filter(pk=project_id).exists()
 
+    @pytest.mark.integration
     def test_delete_project_as_non_leader(self, api_client, project_with_members, db):
         """Test deleting project as non-leader member fails"""
         # Arrange
@@ -158,6 +169,7 @@ class TestProjectDetails:
 class TestProjectMembers:
     """Tests for ProjectMembers view (list and create)"""
 
+    @pytest.mark.integration
     def test_list_all_members(self, api_client, user, project_with_members, db):
         """Test listing all project members"""
         # Arrange
@@ -171,6 +183,7 @@ class TestProjectMembers:
         assert isinstance(response.data, list)
         assert len(response.data) >= 4  # 1 leader + 3 members
 
+    @pytest.mark.integration
     def test_add_member_to_project(
         self, api_client, user, project_with_lead, user_factory, db
     ):
@@ -196,6 +209,7 @@ class TestProjectMembers:
             project=project_with_lead, user=new_user
         ).exists()
 
+    @pytest.mark.integration
     def test_add_member_invalid_data(self, api_client, user, db):
         """Test adding member with invalid data"""
         # Arrange
@@ -217,6 +231,7 @@ class TestProjectMembers:
 class TestProjectMemberDetail:
     """Tests for ProjectMemberDetail view (get, update, delete)"""
 
+    @pytest.mark.integration
     def test_get_member(self, api_client, user, project_with_lead, project_lead, db):
         """Test getting specific project member"""
         # Arrange
@@ -231,6 +246,7 @@ class TestProjectMemberDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["user"]["id"] == project_lead.pk
 
+    @pytest.mark.integration
     def test_update_member(self, api_client, user, project_with_members, db):
         """Test updating project member"""
         # Arrange
@@ -256,6 +272,7 @@ class TestProjectMemberDetail:
         member.refresh_from_db()
         assert member.role == "technical"
 
+    @pytest.mark.integration
     def test_remove_member(self, api_client, user, project_with_members, db):
         """Test removing member from project"""
         # Arrange
@@ -278,6 +295,7 @@ class TestProjectMemberDetail:
 class TestMembersForProject:
     """Tests for MembersForProject view"""
 
+    @pytest.mark.integration
     def test_get_members_for_project(self, api_client, user, project_with_members, db):
         """Test getting all members for a specific project"""
         # Arrange
@@ -295,6 +313,7 @@ class TestMembersForProject:
 class TestProjectLeaderDetail:
     """Tests for ProjectLeaderDetail view"""
 
+    @pytest.mark.integration
     def test_get_project_leader(
         self, api_client, user, project_with_lead, project_lead, db
     ):
@@ -323,6 +342,7 @@ class TestProjectLeaderDetail:
 class TestPromoteToLeader:
     """Tests for PromoteToLeader view"""
 
+    @pytest.mark.integration
     def test_promote_member_to_leader(self, api_client, user, project_with_members, db):
         """Test promoting a member to project leader"""
         # Arrange
@@ -343,6 +363,7 @@ class TestPromoteToLeader:
         member.refresh_from_db()
         assert member.is_leader is True
 
+    @pytest.mark.integration
     def test_promote_missing_data(self, api_client, user, db):
         """Test promoting without required data"""
         # Arrange
@@ -364,6 +385,7 @@ class TestPromoteToLeader:
 class TestProjectAdditional:
     """Tests for ProjectAdditional view (project details)"""
 
+    @pytest.mark.integration
     def test_list_project_details(self, api_client, user, db):
         """Test listing all project details"""
         # Arrange
@@ -376,6 +398,7 @@ class TestProjectAdditional:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_create_project_detail(self, api_client, project, user, db):
         """Test creating project detail"""
         # Arrange
@@ -399,6 +422,7 @@ class TestProjectAdditional:
 class TestProjectAdditionalDetail:
     """Tests for ProjectAdditionalDetail view"""
 
+    @pytest.mark.integration
     def test_get_project_detail(self, api_client, user, project_with_lead, db):
         """Test getting project detail by ID"""
         # Arrange
@@ -412,6 +436,7 @@ class TestProjectAdditionalDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == detail.pk
 
+    @pytest.mark.integration
     def test_update_project_detail(self, api_client, project_with_lead, user, db):
         """Test updating project detail"""
         # Arrange
@@ -429,6 +454,7 @@ class TestProjectAdditionalDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_project_detail(self, api_client, user, project_with_lead, db):
         """Test deleting project detail"""
         # Arrange
@@ -446,6 +472,7 @@ class TestProjectAdditionalDetail:
 class TestSelectedProjectAdditionalDetail:
     """Tests for SelectedProjectAdditionalDetail view"""
 
+    @pytest.mark.integration
     def test_get_detail_by_project(self, api_client, user, project_with_lead, db):
         """Test getting project detail by project ID"""
         # Arrange
@@ -465,6 +492,7 @@ class TestSelectedProjectAdditionalDetail:
 class TestProjectsCreate:
     """Tests for Projects.post() - creating projects"""
 
+    @pytest.mark.integration
     def test_create_project_minimal_data(self, api_client, user, business_area, db):
         """Test creating project with minimal required data"""
         # Arrange
@@ -491,6 +519,7 @@ class TestProjectsCreate:
         assert response.data["title"] == "New Science Project"
         assert response.data["kind"] == "science"
 
+    @pytest.mark.integration
     def test_create_project_with_dates(self, api_client, user, business_area, db):
         """Test creating project with start and end dates"""
         # Arrange
@@ -517,6 +546,7 @@ class TestProjectsCreate:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_create_project_with_keywords(self, api_client, user, business_area, db):
         """Test creating project with keywords"""
         # Arrange
@@ -542,6 +572,7 @@ class TestProjectsCreate:
         assert response.status_code == status.HTTP_201_CREATED
         assert "keyword1" in response.data["keywords"]
 
+    @pytest.mark.integration
     def test_create_project_invalid_data(self, api_client, user, db):
         """Test creating project with invalid data"""
         # Arrange
@@ -559,6 +590,7 @@ class TestProjectsCreate:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_create_student_project(self, api_client, user, business_area, db):
         """Test creating student project with student details"""
         # Arrange
@@ -586,6 +618,7 @@ class TestProjectsCreate:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["kind"] == "student"
 
+    @pytest.mark.integration
     def test_create_external_project(self, api_client, user, business_area, db):
         """Test creating external project with external details"""
         # Arrange
@@ -622,6 +655,7 @@ class TestProjectsCreate:
 class TestUnapprovedThisFY:
     """Tests for UnapprovedThisFY view"""
 
+    @pytest.mark.integration
     def test_get_unapproved_projects(self, api_client, user, project, db):
         """Test getting unapproved projects for current fiscal year"""
         # Arrange
@@ -649,6 +683,7 @@ class TestUnapprovedThisFY:
 class TestProblematicProjects:
     """Tests for ProblematicProjects view"""
 
+    @pytest.mark.integration
     def test_get_problematic_projects(self, api_client, user, db):
         """Test getting projects with various issues"""
         # Arrange
@@ -669,6 +704,7 @@ class TestProblematicProjects:
 class TestRemedyViews:
     """Tests for remedy views"""
 
+    @pytest.mark.integration
     def test_remedy_open_closed(self, api_client, user, db):
         """Test getting open projects with approved closures"""
         # Arrange
@@ -681,6 +717,7 @@ class TestRemedyViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_remedy_memberless(self, api_client, user, db):
         """Test getting projects with no members"""
         # Arrange
@@ -693,6 +730,7 @@ class TestRemedyViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_remedy_no_leader(self, api_client, user, db):
         """Test getting projects with no leader"""
         # Arrange
@@ -705,6 +743,7 @@ class TestRemedyViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_remedy_multiple_leaders(self, api_client, user, db):
         """Test getting projects with multiple leaders"""
         # Arrange
@@ -717,6 +756,7 @@ class TestRemedyViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_remedy_external_leaders(self, api_client, user, db):
         """Test getting projects with external leaders"""
         # Arrange
@@ -736,6 +776,7 @@ class TestRemedyViews:
 class TestStudentProjectAdditional:
     """Tests for StudentProjectAdditional view"""
 
+    @pytest.mark.integration
     def test_list_student_details(self, api_client, user, db):
         """Test listing all student project details"""
         # Arrange
@@ -748,6 +789,7 @@ class TestStudentProjectAdditional:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_create_student_detail(self, api_client, user, project, db):
         """Test creating student project detail"""
         # Arrange
@@ -770,6 +812,7 @@ class TestStudentProjectAdditional:
 class TestStudentProjectAdditionalDetail:
     """Tests for StudentProjectAdditionalDetail view"""
 
+    @pytest.mark.integration
     def test_get_student_detail(self, api_client, user, project, db):
         """Test getting student project detail"""
         # Arrange
@@ -788,6 +831,7 @@ class TestStudentProjectAdditionalDetail:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_update_student_detail(self, api_client, user, project, db):
         """Test updating student project detail"""
         # Arrange
@@ -811,6 +855,7 @@ class TestStudentProjectAdditionalDetail:
             print(f"ERROR: {response.data}")
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_student_detail(self, api_client, user, project, db):
         """Test deleting student project detail"""
         # Arrange
@@ -834,6 +879,7 @@ class TestStudentProjectAdditionalDetail:
 class TestExternalProjectAdditional:
     """Tests for ExternalProjectAdditional view"""
 
+    @pytest.mark.integration
     def test_list_external_details(self, api_client, user, db):
         """Test listing all external project details"""
         # Arrange
@@ -846,6 +892,7 @@ class TestExternalProjectAdditional:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_create_external_detail(self, api_client, user, project, db):
         """Test creating external project detail"""
         # Arrange
@@ -868,6 +915,7 @@ class TestExternalProjectAdditional:
 class TestExternalProjectAdditionalDetail:
     """Tests for ExternalProjectAdditionalDetail view"""
 
+    @pytest.mark.integration
     def test_get_external_detail(self, api_client, user, project, db):
         """Test getting external project detail"""
         # Arrange
@@ -886,6 +934,7 @@ class TestExternalProjectAdditionalDetail:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_update_external_detail(self, api_client, user, project, db):
         """Test updating external project detail"""
         # Arrange
@@ -907,6 +956,7 @@ class TestExternalProjectAdditionalDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_external_detail(self, api_client, user, project, db):
         """Test deleting external project detail"""
         # Arrange
@@ -933,6 +983,7 @@ class TestExternalProjectAdditionalDetail:
 class TestProjectAreas:
     """Tests for ProjectAreas view (list and create)"""
 
+    @pytest.mark.integration
     def test_list_all_areas(self, api_client, user, db):
         """Test listing all project areas"""
         # Arrange
@@ -945,6 +996,7 @@ class TestProjectAreas:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_create_project_area(self, api_client, user, project_factory, area, db):
         """Test creating project area"""
         # Arrange
@@ -966,6 +1018,7 @@ class TestProjectAreas:
             print(f"ERROR: {response.data}")
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_create_project_area_invalid_data(self, api_client, user, db):
         """Test creating project area with invalid data"""
         # Arrange
@@ -986,6 +1039,7 @@ class TestProjectAreas:
 class TestProjectAreaDetail:
     """Tests for ProjectAreaDetail view"""
 
+    @pytest.mark.integration
     def test_get_project_area(self, api_client, user, project_area, db):
         """Test getting project area by ID"""
         # Arrange
@@ -998,6 +1052,7 @@ class TestProjectAreaDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == project_area.pk
 
+    @pytest.mark.integration
     def test_update_project_area(self, api_client, user, project_area, area, db):
         """Test updating project area"""
         # Arrange
@@ -1016,6 +1071,7 @@ class TestProjectAreaDetail:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_project_area(self, api_client, user, project_area, db):
         """Test deleting project area"""
         # Arrange
@@ -1032,6 +1088,7 @@ class TestProjectAreaDetail:
 class TestAreasForProject:
     """Tests for AreasForProject view"""
 
+    @pytest.mark.integration
     def test_get_areas_for_project(self, api_client, user, project_area, db):
         """Test getting areas for a specific project"""
         # Arrange
@@ -1051,6 +1108,7 @@ class TestAreasForProject:
 class TestDownloadAllProjectsAsCSV:
     """Tests for DownloadAllProjectsAsCSV view"""
 
+    @pytest.mark.integration
     def test_download_csv_as_admin(self, api_client, superuser, project, db):
         """Test downloading all projects CSV as admin"""
         # Arrange
@@ -1064,6 +1122,7 @@ class TestDownloadAllProjectsAsCSV:
         assert response["Content-Type"] == "text/csv"
         assert "attachment" in response["Content-Disposition"]
 
+    @pytest.mark.integration
     def test_download_csv_as_non_admin(self, api_client, user, db):
         """Test downloading CSV as non-admin fails"""
         # Arrange
@@ -1079,6 +1138,7 @@ class TestDownloadAllProjectsAsCSV:
 class TestDownloadARProjectsAsCSV:
     """Tests for DownloadARProjectsAsCSV view"""
 
+    @pytest.mark.integration
     def test_download_ar_csv_as_admin(self, api_client, superuser, project, db):
         """Test downloading annual report projects CSV as admin"""
         # Arrange
@@ -1092,6 +1152,7 @@ class TestDownloadARProjectsAsCSV:
         assert response["Content-Type"] == "text/csv"
         assert "attachment" in response["Content-Disposition"]
 
+    @pytest.mark.integration
     def test_download_ar_csv_as_non_admin(self, api_client, user, db):
         """Test downloading AR CSV as non-admin fails"""
         # Arrange
@@ -1110,6 +1171,7 @@ class TestDownloadARProjectsAsCSV:
 class TestProjectMap:
     """Tests for ProjectMap view"""
 
+    @pytest.mark.integration
     def test_get_project_map(self, api_client, user, project, db):
         """Test getting projects for map display"""
         # Arrange
@@ -1124,6 +1186,7 @@ class TestProjectMap:
         assert "total_projects" in response.data
         assert "projects_without_location" in response.data
 
+    @pytest.mark.integration
     def test_get_project_map_with_filters(self, api_client, user, project, db):
         """Test getting map with filters"""
         # Arrange
@@ -1143,6 +1206,7 @@ class TestProjectMap:
 class TestSmallProjectSearch:
     """Tests for SmallProjectSearch view"""
 
+    @pytest.mark.integration
     def test_small_search(self, api_client, user, project, db):
         """Test small project search for autocomplete"""
         # Arrange
@@ -1155,6 +1219,7 @@ class TestSmallProjectSearch:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_small_search_with_filter(self, api_client, user, project, db):
         """Test small search with search term"""
         # Arrange
@@ -1175,6 +1240,7 @@ class TestSmallProjectSearch:
 class TestMyProjects:
     """Tests for MyProjects view"""
 
+    @pytest.mark.integration
     def test_get_my_projects(
         self, api_client, user, project_with_lead, project_lead, db
     ):
@@ -1197,6 +1263,7 @@ class TestMyProjects:
 class TestProjectYears:
     """Tests for ProjectYears view"""
 
+    @pytest.mark.integration
     def test_get_project_years(self, api_client, user, project, db):
         """Test getting list of project years"""
         # Arrange
@@ -1213,6 +1280,7 @@ class TestProjectYears:
 class TestSuspendProject:
     """Tests for SuspendProject view"""
 
+    @pytest.mark.integration
     def test_suspend_project(self, api_client, user, project, db):
         """Test suspending a project"""
         # Arrange
@@ -1232,6 +1300,7 @@ class TestSuspendProject:
 class TestProjectDocs:
     """Tests for ProjectDocs view"""
 
+    @pytest.mark.integration
     def test_get_project_docs(self, api_client, user, project, db):
         """Test getting all documents for a project"""
         # Arrange
@@ -1248,6 +1317,7 @@ class TestProjectDocs:
 class TestToggleUserProfileVisibilityForProject:
     """Tests for ToggleUserProfileVisibilityForProject view"""
 
+    @pytest.mark.integration
     def test_toggle_visibility(self, api_client, user, project, db):
         """Test toggling project visibility on user profile"""
         # Arrange
@@ -1273,6 +1343,7 @@ class TestToggleUserProfileVisibilityForProject:
 class TestProjectKindGetters:
     """Tests for project kind getter views"""
 
+    @pytest.mark.integration
     def test_get_core_function_projects(self, api_client, user, project_factory, db):
         """Test getting core function projects"""
         # Arrange
@@ -1286,6 +1357,7 @@ class TestProjectKindGetters:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_get_science_projects(self, api_client, user, project_factory, db):
         """Test getting science projects"""
         # Arrange
@@ -1299,6 +1371,7 @@ class TestProjectKindGetters:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_get_student_projects(self, api_client, user, project_factory, db):
         """Test getting student projects"""
         # Arrange
@@ -1312,6 +1385,7 @@ class TestProjectKindGetters:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
+    @pytest.mark.integration
     def test_get_external_projects(self, api_client, user, project_factory, db):
         """Test getting external projects"""
         # Arrange

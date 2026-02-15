@@ -28,6 +28,7 @@ class TestCaretakerTaskService:
     """Test CaretakerTaskService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_all_caretaker_assignments_direct(
         self, caretaker_user, caretakee_user, caretaker_assignment
     ):
@@ -43,6 +44,7 @@ class TestCaretakerTaskService:
         assert assignments[0].caretaker == caretaker_user
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_all_caretaker_assignments_nested(self, db):
         """Test get_all_caretaker_assignments handles nested relationships"""
         # Arrange - Create chain: user1 -> user2 -> user3
@@ -65,6 +67,7 @@ class TestCaretakerTaskService:
         assert user3.id in user_ids
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_all_caretaker_assignments_circular_prevention(self, db):
         """Test get_all_caretaker_assignments prevents infinite loops"""
         # Arrange - Create circular relationship: user1 -> user2 -> user1
@@ -85,6 +88,7 @@ class TestCaretakerTaskService:
         assert user2.id in user_ids
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_all_caretaker_assignments_no_assignments(self, db):
         """Test get_all_caretaker_assignments with no assignments"""
         # Arrange
@@ -97,6 +101,7 @@ class TestCaretakerTaskService:
         assert len(assignments) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_directorate_documents(self, db):
         """Test get_directorate_documents returns correct documents"""
         # Arrange
@@ -143,6 +148,7 @@ class TestCaretakerTaskService:
         assert documents.first().pk == doc1.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_ba_documents(self, db):
         """Test get_ba_documents returns correct documents"""
         # Arrange
@@ -186,6 +192,7 @@ class TestCaretakerTaskService:
         assert documents.first().pk == doc1.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_lead_documents(self, db):
         """Test get_lead_documents returns correct documents"""
         # Arrange
@@ -226,6 +233,7 @@ class TestCaretakerTaskService:
         assert documents.first().pk == doc1.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_team_documents(self, db):
         """Test get_team_documents returns correct documents"""
         # Arrange
@@ -258,6 +266,7 @@ class TestCaretakerTaskService:
         assert documents.first().pk == doc1.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_project_lead(self, db):
         """Test analyze_caretakee_roles identifies project leads"""
         # Arrange
@@ -286,6 +295,7 @@ class TestCaretakerTaskService:
         assert len(roles["ba_leader_user_ids"]) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_team_member(self, db):
         """Test analyze_caretakee_roles identifies team members"""
         # Arrange
@@ -314,6 +324,7 @@ class TestCaretakerTaskService:
         assert len(roles["ba_leader_user_ids"]) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_ba_leader(self, db):
         """Test analyze_caretakee_roles identifies BA leaders"""
         # Arrange
@@ -332,6 +343,7 @@ class TestCaretakerTaskService:
         assert not roles["directorate_user_found"]
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_directorate_by_ba(self, db, directorate_user):
         """Test analyze_caretakee_roles identifies Directorate users by BA"""
         # Arrange
@@ -347,6 +359,7 @@ class TestCaretakerTaskService:
         assert roles["directorate_user_found"] is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_directorate_by_superuser(self, db):
         """Test analyze_caretakee_roles identifies superusers as Directorate"""
         # Arrange
@@ -361,6 +374,7 @@ class TestCaretakerTaskService:
         assert roles["directorate_user_found"] is True
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_closed_projects_excluded(self, db):
         """Test analyze_caretakee_roles excludes closed projects"""
         # Arrange
@@ -389,6 +403,7 @@ class TestCaretakerTaskService:
         assert user.id not in roles["team_member_user_ids"]
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_analyze_caretakee_roles_active_projects_included(self, db):
         """Test analyze_caretakee_roles includes active projects"""
         # Arrange
@@ -416,6 +431,7 @@ class TestCaretakerTaskService:
         assert user.id not in roles["team_member_user_ids"]
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_no_assignments(self, db):
         """Test get_tasks_for_user with no caretaker assignments"""
         # Arrange
@@ -433,6 +449,7 @@ class TestCaretakerTaskService:
         assert len(tasks["member_documents"]) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_with_directorate_documents(self, db, directorate_user):
         """Test get_tasks_for_user returns directorate documents"""
         # Arrange
@@ -461,6 +478,7 @@ class TestCaretakerTaskService:
         assert tasks["directorate_documents"][0].pk == doc.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_requesting_user_is_directorate(
         self, db, directorate_user
     ):
@@ -489,6 +507,7 @@ class TestCaretakerTaskService:
         assert len(tasks["directorate_documents"]) == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_with_ba_documents(self, db):
         """Test get_tasks_for_user returns BA documents"""
         # Arrange
@@ -519,6 +538,7 @@ class TestCaretakerTaskService:
         assert tasks["ba_documents"][0].pk == doc.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_with_lead_documents(self, db):
         """Test get_tasks_for_user returns project lead documents"""
         # Arrange
@@ -553,6 +573,7 @@ class TestCaretakerTaskService:
         assert tasks["lead_documents"][0].pk == doc.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_with_member_documents(self, db):
         """Test get_tasks_for_user returns team member documents"""
         # Arrange
@@ -587,6 +608,7 @@ class TestCaretakerTaskService:
         assert tasks["member_documents"][0].pk == doc.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_tasks_for_user_multiple_roles(self, db):
         """Test get_tasks_for_user handles user with multiple roles"""
         # Arrange
@@ -640,6 +662,7 @@ class TestCaretakerService:
     """Test CaretakerService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_caretakers(
         self, caretaker_user, caretakee_user, caretaker_assignment
     ):
@@ -652,6 +675,7 @@ class TestCaretakerService:
         assert caretaker_assignment in caretakers
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_list_caretakers_optimized_queries(
         self, caretaker_user, caretakee_user, caretaker_assignment
     ):
@@ -668,6 +692,7 @@ class TestCaretakerService:
                 # Should not trigger additional queries
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_caretaker_exists(self, caretaker_assignment):
         """Test get_caretaker returns existing caretaker"""
         # Act
@@ -679,6 +704,7 @@ class TestCaretakerService:
         assert caretaker.caretaker == caretaker_assignment.caretaker
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_caretaker_not_found(self, db):
         """Test get_caretaker raises NotFound for non-existent caretaker"""
         # Act & Assert
@@ -686,6 +712,7 @@ class TestCaretakerService:
             CaretakerService.get_caretaker(99999)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_with_user_objects(self, caretaker_user, caretakee_user):
         """Test create_caretaker with User objects"""
         # Act
@@ -706,6 +733,7 @@ class TestCaretakerService:
         assert caretaker.end_date is not None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_with_user_ids(self, caretaker_user, caretakee_user):
         """Test create_caretaker with user IDs"""
         # Act
@@ -721,6 +749,7 @@ class TestCaretakerService:
         assert caretaker.caretaker == caretaker_user
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_invalid_user_id(self, caretaker_user):
         """Test create_caretaker raises ValidationError for invalid user ID"""
         # Act & Assert
@@ -733,6 +762,7 @@ class TestCaretakerService:
         assert "user" in exc_info.value.detail
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_invalid_caretaker_id(self, caretakee_user):
         """Test create_caretaker raises ValidationError for invalid caretaker ID"""
         # Act & Assert
@@ -745,6 +775,8 @@ class TestCaretakerService:
         assert "caretaker" in exc_info.value.detail
 
     @pytest.mark.django_db
+    @pytest.mark.slow
+    @pytest.mark.integration
     def test_create_caretaker_self_caretaking(self, caretaker_user):
         """Test create_caretaker raises ValidationError for self-caretaking"""
         # Act & Assert
@@ -756,6 +788,7 @@ class TestCaretakerService:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_duplicate(
         self, caretaker_user, caretakee_user, caretaker_assignment
     ):
@@ -771,6 +804,7 @@ class TestCaretakerService:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker_caretaker_has_caretaker(self, db):
         """Test create_caretaker rejects if caretaker has a caretaker"""
         # Arrange
@@ -792,6 +826,7 @@ class TestCaretakerService:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_caretaker(self, caretaker_assignment):
         """Test update_caretaker updates fields"""
         # Arrange
@@ -813,6 +848,7 @@ class TestCaretakerService:
         assert updated.notes == new_notes
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_caretaker_not_found(self, db):
         """Test update_caretaker raises NotFound for non-existent caretaker"""
         # Act & Assert
@@ -820,6 +856,7 @@ class TestCaretakerService:
             CaretakerService.update_caretaker(pk=99999, data={"reason": "New reason"})
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_update_caretaker_ignores_invalid_fields(self, caretaker_assignment):
         """Test update_caretaker ignores fields that don't exist"""
         # Act
@@ -836,6 +873,7 @@ class TestCaretakerService:
         assert not hasattr(updated, "invalid_field")
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_delete_caretaker(self, caretaker_assignment, caretaker_user):
         """Test delete_caretaker removes caretaker relationship"""
         # Arrange
@@ -848,6 +886,7 @@ class TestCaretakerService:
         assert not Caretaker.objects.filter(pk=pk).exists()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_delete_caretaker_not_found(self, caretaker_user):
         """Test delete_caretaker raises NotFound for non-existent caretaker"""
         # Act & Assert
@@ -855,6 +894,7 @@ class TestCaretakerService:
             CaretakerService.delete_caretaker(99999, caretaker_user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_caretaker_exists(
         self, caretaker_user, caretakee_user, caretaker_assignment
     ):
@@ -868,6 +908,7 @@ class TestCaretakerService:
         assert caretaker.caretaker == caretaker_user
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_caretaker_not_exists(self, caretaker_user):
         """Test get_user_caretaker returns None when no caretaker"""
         # Act
@@ -881,6 +922,7 @@ class TestCaretakerRequestService:
     """Test CaretakerRequestService business logic"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_pending_requests_for_user(self, db):
         """Test get_pending_requests_for_user returns pending requests"""
         # Arrange
@@ -903,6 +945,7 @@ class TestCaretakerRequestService:
         assert task in requests
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_pending_requests_for_user_no_requests(self, db):
         """Test get_pending_requests_for_user returns empty when no requests"""
         # Arrange
@@ -915,6 +958,7 @@ class TestCaretakerRequestService:
         assert requests.count() == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_pending_requests_for_user_excludes_non_pending(self, db):
         """Test get_pending_requests_for_user excludes non-pending requests"""
         # Arrange
@@ -937,6 +981,7 @@ class TestCaretakerRequestService:
         assert requests.count() == 0
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_task_exists(self, db):
         """Test get_task returns existing task"""
         # Arrange
@@ -955,6 +1000,7 @@ class TestCaretakerRequestService:
         assert result.pk == task.pk
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_get_task_not_found(self, db):
         """Test get_task raises NotFound for non-existent task"""
         # Act & Assert
@@ -962,6 +1008,7 @@ class TestCaretakerRequestService:
             CaretakerRequestService.get_task(99999)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_caretaker_request_valid(self, db):
         """Test validate_caretaker_request passes for valid request"""
         # Arrange
@@ -978,6 +1025,7 @@ class TestCaretakerRequestService:
         CaretakerRequestService.validate_caretaker_request(task, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_caretaker_request_wrong_action(self, db):
         """Test validate_caretaker_request raises ValidationError for wrong action"""
         # Arrange
@@ -996,6 +1044,7 @@ class TestCaretakerRequestService:
             CaretakerRequestService.validate_caretaker_request(task, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_caretaker_request_already_processed(self, db):
         """Test validate_caretaker_request raises ValidationError for processed request"""
         # Arrange
@@ -1015,6 +1064,7 @@ class TestCaretakerRequestService:
             CaretakerRequestService.validate_caretaker_request(task, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_validate_caretaker_request_unauthorized_user(self, db):
         """Test validate_caretaker_request raises PermissionDenied for unauthorized user"""
         # Arrange
@@ -1035,6 +1085,7 @@ class TestCaretakerRequestService:
             CaretakerRequestService.validate_caretaker_request(task, other_user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_request_empty_secondary_users(self, db):
         """Test approve_request raises ValidationError when secondary_users is empty"""
         # Arrange
@@ -1056,6 +1107,7 @@ class TestCaretakerRequestService:
             CaretakerRequestService.approve_request(task.pk, superuser)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_request_success(self, db):
         """Test approve_request creates caretaker relationship"""
         # Arrange
@@ -1088,6 +1140,7 @@ class TestCaretakerRequestService:
         assert task.status == AdminTask.TaskStatus.FULFILLED
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_approve_request_validation_error(self, db):
         """Test approve_request raises ValidationError on failure"""
         # Arrange
@@ -1115,6 +1168,7 @@ class TestCaretakerRequestService:
                 CaretakerRequestService.approve_request(task.pk, user)
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_reject_request(self, db):
         """Test reject_request marks task as rejected"""
         # Arrange
@@ -1137,6 +1191,7 @@ class TestCaretakerRequestService:
         assert task.status == AdminTask.TaskStatus.REJECTED
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_auto_cancel_expired_request_expired(self, db):
         """Test auto_cancel_expired_request cancels expired request"""
         # Arrange
@@ -1163,6 +1218,7 @@ class TestCaretakerRequestService:
         assert "Auto-cancelled" in task.notes
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_auto_cancel_expired_request_not_expired(self, db):
         """Test auto_cancel_expired_request does not cancel non-expired request"""
         # Arrange
@@ -1188,6 +1244,7 @@ class TestCaretakerRequestService:
         assert task.status == AdminTask.TaskStatus.PENDING
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_auto_cancel_expired_request_no_end_date(self, db):
         """Test auto_cancel_expired_request does not cancel request without end_date"""
         # Arrange
@@ -1211,6 +1268,7 @@ class TestCaretakerRequestService:
         assert task.status == AdminTask.TaskStatus.PENDING
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_requests_caretaker_request(self, db):
         """Test get_user_requests returns caretaker request"""
         # Arrange
@@ -1234,6 +1292,7 @@ class TestCaretakerRequestService:
         assert requests["become_caretaker_request"] is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_requests_become_caretaker_request(self, db):
         """Test get_user_requests returns become caretaker request"""
         # Arrange
@@ -1257,6 +1316,7 @@ class TestCaretakerRequestService:
         assert requests["become_caretaker_request"].pk == task.pk
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_requests_auto_cancels_expired(self, db):
         """Test get_user_requests auto-cancels expired requests"""
         # Arrange
@@ -1282,6 +1342,7 @@ class TestCaretakerRequestService:
         assert task.status == AdminTask.TaskStatus.CANCELLED
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_user_requests_no_requests(self, db):
         """Test get_user_requests returns None when no requests"""
         # Arrange
