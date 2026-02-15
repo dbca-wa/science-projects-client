@@ -258,10 +258,10 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: backend/.test_durations
-          key: test-durations-${{ github.sha }}-${{ matrix.shard }}
+          key: test-durations-v2-${{ github.sha }}-${{ matrix.shard }}
           restore-keys: |
-            test-durations-combined-
-            test-durations-
+            test-durations-v2-combined-
+            test-durations-v2-
         continue-on-error: true
 
       - name: Run tests with coverage
@@ -316,7 +316,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: backend/.test_durations
-          key: test-durations-${{ github.sha }}-${{ matrix.shard }}
+          key: test-durations-v2-${{ github.sha }}-${{ matrix.shard }}
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
