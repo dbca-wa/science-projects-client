@@ -338,3 +338,115 @@ def mock_image():
     return SimpleUploadedFile(
         "test_image.jpg", image_io.read(), content_type="image/jpeg"
     )
+
+
+# Module-scoped fixtures for read-only tests
+# These fixtures are created once per module and shared across tests
+# Use these for tests that only read data and don't modify it
+
+
+@pytest.fixture(scope="module")
+def module_user(django_db_setup, django_db_blocker):
+    """
+    Provide a module-scoped regular user for read-only tests.
+
+    This fixture is created once per test module and shared across all tests.
+    Use this for tests that only read user data and don't modify it.
+
+    Returns:
+        User: Regular user instance (shared across module)
+    """
+    with django_db_blocker.unblock():
+        user, created = User.objects.get_or_create(
+            username="projects_module_user",
+            defaults={
+                "email": "projects_module@example.com",
+                "first_name": "Projects",
+                "last_name": "User",
+            },
+        )
+        yield user
+
+
+@pytest.fixture(scope="module")
+def module_superuser(django_db_setup, django_db_blocker):
+    """
+    Provide a module-scoped superuser for read-only tests.
+
+    This fixture is created once per test module and shared across all tests.
+    Use this for tests that only read superuser data and don't modify it.
+
+    Returns:
+        User: Superuser instance (shared across module)
+    """
+    with django_db_blocker.unblock():
+        user, created = User.objects.get_or_create(
+            username="projects_module_admin",
+            defaults={
+                "email": "projects_moduleadmin@example.com",
+                "first_name": "Projects",
+                "last_name": "Admin",
+                "is_superuser": True,
+                "is_staff": True,
+            },
+        )
+        if created:
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+        yield user
+
+
+@pytest.fixture(scope="module")
+def module_project_lead(django_db_setup, django_db_blocker):
+    """
+    Provide a module-scoped project lead user for read-only tests.
+
+    This fixture is created once per test module and shared across all tests.
+    Use this for tests that only read project lead data and don't modify it.
+
+    Returns:
+        User: Project lead user instance (shared across module)
+    """
+    with django_db_blocker.unblock():
+        user, created = User.objects.get_or_create(
+            username="projects_module_lead",
+            defaults={
+                "email": "projects_modulelead@example.com",
+                "first_name": "Projects",
+                "last_name": "Lead",
+            },
+        )
+        yield user
+
+
+@pytest.fixture(scope="module")
+def module_business_area(django_db_setup, django_db_blocker):
+    """
+    Provide a module-scoped business area for read-only tests.
+
+    This fixture is created once per test module and shared across all tests.
+    Use this for tests that only read business area data and don't modify it.
+
+    Returns:
+        BusinessArea: Business area instance (shared across module)
+    """
+    with django_db_blocker.unblock():
+        ba = BusinessAreaFactory()
+        yield ba
+
+
+@pytest.fixture(scope="module")
+def module_area(django_db_setup, django_db_blocker):
+    """
+    Provide a module-scoped location area for read-only tests.
+
+    This fixture is created once per test module and shared across all tests.
+    Use this for tests that only read area data and don't modify it.
+
+    Returns:
+        Area: Area instance (shared across module)
+    """
+    with django_db_blocker.unblock():
+        area = AreaFactory()
+        yield area
