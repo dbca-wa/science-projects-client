@@ -17,6 +17,7 @@ jobs:
   detect-changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
@@ -32,22 +33,34 @@ jobs:
             frontend:
               - 'frontend/**'
               - '.github/workflows/deploy-staging.yml'
+              - '.github/workflows/test.yml'
             backend:
               - 'backend/**'
               - '.github/workflows/deploy-staging.yml'
+              - '.github/workflows/test.yml'
+
+  # ====================== RUN TESTS ======================
+  run-tests:
+    name: Run Tests
+    needs: detect-changes
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    uses: ./.github/workflows/test.yml
 
   # ====================== BUILD FRONTEND TEST ======================
   build-frontend-test:
     name: Build Frontend (Test)
     runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true'
+    needs: [detect-changes, run-tests]
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      success() &&
+      needs.detect-changes.outputs.frontend == 'true'
 
     env:
       VITE_PRODUCTION_BASE_URL: "https://scienceprojects-test.dbca.wa.gov.au/"
       VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"
       VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles-test.dbca.wa.gov.au/"
-      VITE_SENTRY_ENVIRONMENT: "staging"
+      VITE_SENTRY_ENVIRONMENT: "test"
 
     steps:
       - name: Checkout code
@@ -74,27 +87,29 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:test
           build-args: |
             VITE_PRODUCTION_BACKEND_API_URL=${{ env.VITE_PRODUCTION_BACKEND_API_URL }}
-            VITE_VERSION=staging-${{ github.sha }}
-            VITE_SENTRY_ENVIRONMENT=staging
+            VITE_VERSION=test-${{ github.sha }}
+            VITE_SENTRY_ENVIRONMENT=test
             VITE_SENTRY_DSN=https://8dd0517876955893e7c6c13dda43ae8b@o4506736817405952.ingest.us.sentry.io/4507297807663104
           cache-from: type=gha,scope=frontend-staging
           cache-to: type=gha,mode=max,scope=frontend-staging
           labels: |
-            org.opencontainers.image.title=Science Projects Frontend (Staging)
-            org.opencontainers.image.version=staging-${{ steps.sha.outputs.SHORT_SHA }}
+            org.opencontainers.image.title=Science Projects Frontend (Test)
+            org.opencontainers.image.version=test-${{ steps.sha.outputs.SHORT_SHA }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-  # ====================== BUILD BACKEND ======================
-  build-backend:
-    name: Build Backend
+  # ====================== BUILD BACKEND TEST ======================
+  build-backend-test:
+    name: Build Backend (Test)
     runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.backend == 'true'
+    needs: [detect-changes, run-tests]
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      success() &&
+      needs.detect-changes.outputs.backend == 'true'
 
     steps:
       - name: Checkout code
@@ -116,17 +131,17 @@ jobs:
         id: sha
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      - name: Build and push Backend image
+      - name: Build and push Backend Test image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:test
           cache-from: type=gha,scope=backend-staging
           cache-to: type=gha,mode=max,scope=backend-staging
           labels: |
-            org.opencontainers.image.title=Science Projects Backend (Staging)
-            org.opencontainers.image.version=staging-${{ steps.sha.outputs.SHORT_SHA }}
+            org.opencontainers.image.title=Science Projects Backend (Test)
+            org.opencontainers.image.version=test-${{ steps.sha.outputs.SHORT_SHA }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
