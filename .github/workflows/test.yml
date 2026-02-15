@@ -16,8 +16,8 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      frontend: ${{ steps.filter.outputs.frontend }}
-      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.override.outputs.frontend || steps.filter.outputs.frontend }}
+      backend: ${{ steps.override.outputs.backend || steps.filter.outputs.backend }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,6 +33,19 @@ jobs:
             backend:
               - 'backend/**'
               - '.github/workflows/test.yml'
+      
+      # For releases, always test both frontend and backend
+      - name: Override for releases
+        id: override
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            echo "frontend=true" >> $GITHUB_OUTPUT
+            echo "backend=true" >> $GITHUB_OUTPUT
+            echo "✅ Release detected - testing both frontend and backend"
+          else
+            echo "frontend=${{ steps.filter.outputs.frontend }}" >> $GITHUB_OUTPUT
+            echo "backend=${{ steps.filter.outputs.backend }}" >> $GITHUB_OUTPUT
+          fi
 
   # ====================== FRONTEND TESTS ======================
   test-frontend:
