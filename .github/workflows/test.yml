@@ -3,6 +3,8 @@ name: Test
 on:
   pull_request:
     branches: [main, staging]
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -377,7 +379,7 @@ jobs:
     needs: [detect-changes, combine-frontend-coverage, combine-backend-coverage]
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' && 
+      github.event_name == 'release' && 
       always() && 
       (needs.combine-frontend-coverage.result == 'success' || needs.combine-backend-coverage.result == 'success')
 
