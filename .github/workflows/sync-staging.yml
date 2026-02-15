@@ -30,9 +30,11 @@ jobs:
           git fetch origin staging
           git checkout staging
           git reset --hard origin/main
+          # Create a sync commit with [skip ci] to prevent deploy-staging from running
+          git commit --allow-empty -m "chore: sync staging with main [skip ci]"
           git push origin staging --force
 
       - name: Notify sync complete
         run: |
-          echo "✅ Staging branch synced with main"
+          echo "✅ Staging branch synced with main [skip ci]"
           echo "Staging is now at commit: $(git rev-parse HEAD)"
