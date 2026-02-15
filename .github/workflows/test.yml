@@ -403,13 +403,13 @@ jobs:
           if [ -f "coverage-percentages/frontend-coverage-percentage/coverage-percentage.txt" ]; then
             COVERAGE=$(cat coverage-percentages/frontend-coverage-percentage/coverage-percentage.txt | cut -d'.' -f1)
             COLOR="red"
-            if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"
-            elif [ "$COVERAGE" -ge 80 ]; then COLOR="green"
-            elif [ "$COVERAGE" -ge 70 ]; then COLOR="yellow"
-            elif [ "$COVERAGE" -ge 60 ]; then COLOR="orange"
+            if [ "$COVERAGE" -ge 80 ]; then COLOR="brightgreen"
+            elif [ "$COVERAGE" -ge 70 ]; then COLOR="green"
+            elif [ "$COVERAGE" -ge 60 ]; then COLOR="yellow"
+            elif [ "$COVERAGE" -ge 50 ]; then COLOR="orange"
             fi
             
-            sed -i "s|frontend-coverage-[0-9]*%25-[a-z]*|frontend-coverage-${COVERAGE}%25-${COLOR}|g" README.md
+            sed -i "s|frontend--coverage-[0-9]*%-[a-z]*|frontend--coverage-${COVERAGE}%-${COLOR}|g" README.md
             echo "Updated frontend badge: ${COVERAGE}% (${COLOR})"
           fi
 
@@ -418,13 +418,13 @@ jobs:
           if [ -f "coverage-percentages/backend-coverage-percentage/coverage-percentage.txt" ]; then
             COVERAGE=$(cat coverage-percentages/backend-coverage-percentage/coverage-percentage.txt | cut -d'.' -f1)
             COLOR="red"
-            if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"
-            elif [ "$COVERAGE" -ge 80 ]; then COLOR="green"
-            elif [ "$COVERAGE" -ge 70 ]; then COLOR="yellow"
-            elif [ "$COVERAGE" -ge 60 ]; then COLOR="orange"
+            if [ "$COVERAGE" -ge 80 ]; then COLOR="brightgreen"
+            elif [ "$COVERAGE" -ge 70 ]; then COLOR="green"
+            elif [ "$COVERAGE" -ge 60 ]; then COLOR="yellow"
+            elif [ "$COVERAGE" -ge 50 ]; then COLOR="orange"
             fi
             
-            sed -i "s|backend-coverage-[0-9]*%25-[a-z]*|backend-coverage-${COVERAGE}%25-${COLOR}|g" README.md
+            sed -i "s|backend--coverage-[0-9]*%-[a-z]*|backend--coverage-${COVERAGE}%-${COLOR}|g" README.md
             echo "Updated backend badge: ${COVERAGE}% (${COLOR})"
           fi
 

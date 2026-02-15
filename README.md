@@ -1,9 +1,9 @@
 # Science Projects Management System
 
-[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
-![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-66%25-orange)
-![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
 [![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
+[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
+![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-66%-orange)
+![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%-green)
 [![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects/issues)
 
 A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
