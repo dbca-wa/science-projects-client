@@ -35,6 +35,7 @@ def superuser(db):
 class TestQuoteAdmin:
     """Tests for QuoteAdmin configuration"""
 
+    @pytest.mark.unit
     def test_list_display(self, quote_admin):
         """Test list_display configuration"""
         assert "text" in quote_admin.list_display
@@ -42,15 +43,18 @@ class TestQuoteAdmin:
         assert "created_at" in quote_admin.list_display
         assert "updated_at" in quote_admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, quote_admin):
         """Test list_filter configuration"""
         assert "author" in quote_admin.list_filter
 
+    @pytest.mark.unit
     def test_search_fields(self, quote_admin):
         """Test search_fields configuration"""
         assert "text" in quote_admin.search_fields
         assert "author" in quote_admin.search_fields
 
+    @pytest.mark.unit
     def test_actions(self, quote_admin):
         """Test admin actions are registered"""
         action_names = [action.__name__ for action in quote_admin.actions]
@@ -62,6 +66,7 @@ class TestQuoteAdmin:
 class TestAdminActions:
     """Tests for admin actions"""
 
+    @pytest.mark.integration
     def test_export_selected_quotes_txt(
         self, quote_admin, superuser, quote, quote2, db
     ):
@@ -76,6 +81,7 @@ class TestAdminActions:
         # Assert - action completes without error
         # (actual file creation is tested manually as it uses tempfile)
 
+    @pytest.mark.integration
     def test_export_all_quotes_txt(self, quote_admin, superuser, quote, quote2, db):
         """Test exporting all quotes to txt"""
         # Arrange
@@ -88,6 +94,7 @@ class TestAdminActions:
         # Assert - action completes without error
         # (actual file creation is tested manually as it uses tempfile)
 
+    @pytest.mark.integration
     def test_export_all_quotes_txt_multiple_selected(
         self, quote_admin, superuser, quote, quote2, db, capsys
     ):

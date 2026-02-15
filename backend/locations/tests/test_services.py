@@ -15,6 +15,7 @@ User = get_user_model()
 class TestAreaService:
     """Tests for Area service operations"""
 
+    @pytest.mark.unit
     def test_list_areas(self, dbca_region, dbca_district, ibra_region, db):
         """Test listing all areas"""
         # Act
@@ -26,6 +27,7 @@ class TestAreaService:
         assert dbca_district in areas
         assert ibra_region in areas
 
+    @pytest.mark.unit
     def test_list_areas_filtered_by_type(
         self, dbca_region, dbca_district, ibra_region, db
     ):
@@ -41,6 +43,7 @@ class TestAreaService:
         assert dbca_district not in dbca_regions
         assert ibra_region not in dbca_regions
 
+    @pytest.mark.unit
     def test_list_areas_empty(self, db):
         """Test listing areas when none exist"""
         # Act
@@ -49,6 +52,7 @@ class TestAreaService:
         # Assert
         assert areas.count() == 0
 
+    @pytest.mark.unit
     def test_get_area(self, dbca_region, db):
         """Test getting area by ID"""
         # Act
@@ -59,12 +63,14 @@ class TestAreaService:
         assert area.name == "Test DBCA Region"
         assert area.area_type == Area.AreaTypeChoices.AREA_TYPE_DBCA_REGION
 
+    @pytest.mark.unit
     def test_get_area_not_found(self, db):
         """Test getting non-existent area raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Area 999 not found"):
             AreaService.get_area(999)
 
+    @pytest.mark.integration
     def test_create_area(self, user, db):
         """Test creating an area"""
         # Arrange
@@ -81,6 +87,7 @@ class TestAreaService:
         assert area.name == "New DBCA Region"
         assert area.area_type == Area.AreaTypeChoices.AREA_TYPE_DBCA_REGION
 
+    @pytest.mark.integration
     def test_create_area_all_types(self, user, db):
         """Test creating areas of all types"""
         # Arrange
@@ -102,6 +109,7 @@ class TestAreaService:
             assert area.id is not None
             assert area.area_type == area_type
 
+    @pytest.mark.integration
     def test_update_area(self, dbca_region, user, db):
         """Test updating an area"""
         # Arrange
@@ -115,6 +123,7 @@ class TestAreaService:
         assert updated.name == "Updated DBCA Region"
         assert updated.area_type == Area.AreaTypeChoices.AREA_TYPE_DBCA_REGION
 
+    @pytest.mark.integration
     def test_update_area_type(self, dbca_region, user, db):
         """Test updating area type"""
         # Arrange
@@ -127,6 +136,7 @@ class TestAreaService:
         assert updated.id == dbca_region.id
         assert updated.area_type == Area.AreaTypeChoices.AREA_TYPE_DBCA_DISTRICT
 
+    @pytest.mark.integration
     def test_update_area_not_found(self, user, db):
         """Test updating non-existent area raises NotFound"""
         # Arrange
@@ -136,6 +146,7 @@ class TestAreaService:
         with pytest.raises(NotFound, match="Area 999 not found"):
             AreaService.update_area(999, user, data)
 
+    @pytest.mark.integration
     def test_delete_area(self, dbca_region, user, db):
         """Test deleting an area"""
         # Arrange
@@ -147,6 +158,7 @@ class TestAreaService:
         # Assert
         assert not Area.objects.filter(id=area_id).exists()
 
+    @pytest.mark.integration
     def test_delete_area_not_found(self, user, db):
         """Test deleting non-existent area raises NotFound"""
         # Act & Assert
@@ -157,6 +169,7 @@ class TestAreaService:
 class TestAreaModelValidation:
     """Tests for Area model validation"""
 
+    @pytest.mark.unit
     def test_area_unique_together(self, db):
         """Test area name and type must be unique together"""
         # Arrange
@@ -172,6 +185,7 @@ class TestAreaModelValidation:
                 area_type=Area.AreaTypeChoices.AREA_TYPE_DBCA_REGION,
             )
 
+    @pytest.mark.unit
     def test_area_same_name_different_type(self, db):
         """Test same name with different type is allowed"""
         # Arrange
@@ -191,6 +205,7 @@ class TestAreaModelValidation:
         assert area2.name == "Test Area"
         assert area2.area_type == Area.AreaTypeChoices.AREA_TYPE_DBCA_DISTRICT
 
+    @pytest.mark.unit
     def test_area_str_representation(self, dbca_region, db):
         """Test area string representation"""
         # Act

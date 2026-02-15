@@ -2,6 +2,8 @@
 Tests for agencies serializers
 """
 
+import pytest
+
 from agencies.serializers import (
     AffiliationSerializer,
     AgencySerializer,
@@ -22,6 +24,7 @@ from agencies.serializers import (
 class TestAffiliationSerializer:
     """Tests for AffiliationSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, affiliation, db):
         """Test serializing an affiliation"""
         # Arrange & Act
@@ -33,6 +36,7 @@ class TestAffiliationSerializer:
         assert "created_at" in serializer.data
         assert "updated_at" in serializer.data
 
+    @pytest.mark.unit
     def test_deserialization_valid(self, db):
         """Test deserializing valid affiliation data"""
         # Arrange
@@ -46,6 +50,7 @@ class TestAffiliationSerializer:
         affiliation = serializer.save()
         assert affiliation.name == "New Affiliation"
 
+    @pytest.mark.unit
     def test_deserialization_invalid_missing_name(self, db):
         """Test deserializing invalid data (missing name)"""
         # Arrange
@@ -62,6 +67,7 @@ class TestAffiliationSerializer:
 class TestAgencySerializer:
     """Tests for AgencySerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, agency, db):
         """Test serializing an agency"""
         # Arrange & Act
@@ -73,6 +79,7 @@ class TestAgencySerializer:
         assert serializer.data["is_active"] == agency.is_active
         assert serializer.data["key_stakeholder"] == agency.key_stakeholder.id
 
+    @pytest.mark.integration
     def test_deserialization_valid(self, user, db):
         """Test deserializing valid agency data"""
         # Arrange
@@ -95,6 +102,7 @@ class TestAgencySerializer:
 class TestTinyAgencySerializer:
     """Tests for TinyAgencySerializer"""
 
+    @pytest.mark.integration
     def test_serialization_without_image(self, agency, db):
         """Test serializing agency without image"""
         # Arrange & Act
@@ -105,6 +113,7 @@ class TestTinyAgencySerializer:
         assert serializer.data["name"] == agency.name
         assert serializer.data["image"] is None
 
+    @pytest.mark.integration
     def test_get_image_with_attribute_error(self, agency, db):
         """Test get_image handles AttributeError gracefully"""
         # Arrange
@@ -120,6 +129,7 @@ class TestTinyAgencySerializer:
 class TestBranchSerializer:
     """Tests for BranchSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, branch, db):
         """Test serializing a branch"""
         # Arrange & Act
@@ -131,6 +141,7 @@ class TestBranchSerializer:
         assert serializer.data["agency"] == branch.agency.id
         assert serializer.data["manager"] == branch.manager.id
 
+    @pytest.mark.integration
     def test_deserialization_valid(self, agency, user, db):
         """Test deserializing valid branch data"""
         # Arrange
@@ -153,6 +164,7 @@ class TestBranchSerializer:
 class TestTinyBranchSerializer:
     """Tests for TinyBranchSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, branch, db):
         """Test serializing a branch with tiny serializer"""
         # Arrange & Act
@@ -168,6 +180,7 @@ class TestTinyBranchSerializer:
 class TestMiniBranchSerializer:
     """Tests for MiniBranchSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, branch, db):
         """Test serializing a branch with mini serializer"""
         # Arrange & Act
@@ -183,6 +196,7 @@ class TestMiniBranchSerializer:
 class TestBusinessAreaSerializer:
     """Tests for BusinessAreaSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, business_area, db):
         """Test serializing a business area"""
         # Arrange & Act
@@ -194,6 +208,7 @@ class TestBusinessAreaSerializer:
         assert serializer.data["agency"] == business_area.agency.id
         assert serializer.data["division"] == business_area.division.id
 
+    @pytest.mark.integration
     def test_deserialization_valid(self, agency, division, user, db):
         """Test deserializing valid business area data"""
         # Arrange
@@ -220,6 +235,7 @@ class TestBusinessAreaSerializer:
 class TestTinyBusinessAreaSerializer:
     """Tests for TinyBusinessAreaSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, business_area, db):
         """Test serializing business area with tiny serializer"""
         # Arrange & Act
@@ -236,6 +252,7 @@ class TestTinyBusinessAreaSerializer:
 class TestMiniBASerializer:
     """Tests for MiniBASerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, business_area, db):
         """Test serializing business area with mini serializer"""
         # Arrange & Act
@@ -247,6 +264,7 @@ class TestMiniBASerializer:
         assert "leader" in serializer.data
         assert "caretaker" in serializer.data
 
+    @pytest.mark.integration
     def test_get_image_none(self, business_area, db):
         """Test get_image returns None when no image"""
         # Arrange
@@ -258,6 +276,7 @@ class TestMiniBASerializer:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_get_project_count(self, business_area, db):
         """Test get_project_count returns count"""
         # Arrange
@@ -269,6 +288,7 @@ class TestMiniBASerializer:
         # Assert
         assert result == 0
 
+    @pytest.mark.integration
     def test_get_division(self, business_area, db):
         """Test get_division returns division info"""
         # Arrange
@@ -282,6 +302,7 @@ class TestMiniBASerializer:
         assert result["id"] == business_area.division.id
         assert result["name"] == business_area.division.name
 
+    @pytest.mark.integration
     def test_get_division_none(self, agency, db):
         """Test get_division returns None when no division"""
         # Arrange
@@ -306,6 +327,7 @@ class TestMiniBASerializer:
 class TestDivisionSerializer:
     """Tests for DivisionSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, division, db):
         """Test serializing a division"""
         # Arrange & Act
@@ -317,6 +339,7 @@ class TestDivisionSerializer:
         assert serializer.data["slug"] == division.slug
         assert serializer.data["director"] == division.director.id
 
+    @pytest.mark.integration
     def test_deserialization_valid(self, user, db):
         """Test deserializing valid division data"""
         # Arrange
@@ -341,6 +364,7 @@ class TestDivisionSerializer:
 class TestTinyDivisionSerializer:
     """Tests for TinyDivisionSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, division, db):
         """Test serializing division with tiny serializer"""
         # Arrange & Act
@@ -351,6 +375,7 @@ class TestTinyDivisionSerializer:
         assert serializer.data["name"] == division.name
         assert serializer.data["slug"] == division.slug
 
+    @pytest.mark.integration
     def test_get_directorate_email_list_empty(self, division, db):
         """Test get_directorate_email_list with no users"""
         # Arrange
@@ -362,6 +387,7 @@ class TestTinyDivisionSerializer:
         # Assert
         assert result == []
 
+    @pytest.mark.integration
     def test_get_directorate_email_list_with_users(self, division, user, db):
         """Test get_directorate_email_list with users"""
         # Arrange
@@ -383,6 +409,7 @@ class TestTinyDivisionSerializer:
 class TestDepartmentalServiceSerializer:
     """Tests for DepartmentalServiceSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, departmental_service, db):
         """Test serializing a departmental service"""
         # Arrange & Act
@@ -393,6 +420,7 @@ class TestDepartmentalServiceSerializer:
         assert serializer.data["name"] == departmental_service.name
         assert serializer.data["director"] == departmental_service.director.id
 
+    @pytest.mark.integration
     def test_deserialization_valid(self, user, db):
         """Test deserializing valid departmental service data"""
         # Arrange
@@ -414,6 +442,7 @@ class TestDepartmentalServiceSerializer:
 class TestTinyDepartmentalServiceSerializer:
     """Tests for TinyDepartmentalServiceSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, departmental_service, db):
         """Test serializing departmental service with tiny serializer"""
         # Arrange & Act

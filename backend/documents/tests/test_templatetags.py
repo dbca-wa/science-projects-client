@@ -5,6 +5,7 @@ Tests for document template tags and filters
 from datetime import datetime
 from unittest.mock import Mock
 
+import pytest
 from django.template import Context
 
 from documents.templatetags.custom_filters import (
@@ -37,6 +38,7 @@ from documents.templatetags.custom_filters import (
 class TestStorePageNumber:
     """Tests for store_page_number simple tag"""
 
+    @pytest.mark.unit
     def test_store_page_number_creates_dict(self):
         """Test storing page number creates page_numbers dict"""
         context = Context({})
@@ -47,6 +49,7 @@ class TestStorePageNumber:
         assert "page_numbers" in context
         assert context["page_numbers"]["Project A"] == 5
 
+    @pytest.mark.unit
     def test_store_page_number_updates_existing(self):
         """Test storing page number updates existing dict"""
         context = Context({"page_numbers": {"Project A": 3}})
@@ -56,6 +59,7 @@ class TestStorePageNumber:
         assert context["page_numbers"]["Project A"] == 3
         assert context["page_numbers"]["Project B"] == 7
 
+    @pytest.mark.integration
     def test_store_page_number_overwrites_existing_project(self):
         """Test storing page number overwrites existing project"""
         context = Context({"page_numbers": {"Project A": 3}})
@@ -73,6 +77,7 @@ class TestStorePageNumber:
 class TestGetItem:
     """Tests for get_item filter"""
 
+    @pytest.mark.unit
     def test_get_item_from_dict(self):
         """Test getting item from dictionary"""
         data = {"key1": "value1", "key2": "value2"}
@@ -81,6 +86,7 @@ class TestGetItem:
 
         assert result == "value1"
 
+    @pytest.mark.unit
     def test_get_item_missing_key(self):
         """Test getting missing key returns None"""
         data = {"key1": "value1"}
@@ -89,12 +95,14 @@ class TestGetItem:
 
         assert result is None
 
+    @pytest.mark.unit
     def test_get_item_non_dict(self):
         """Test getting item from non-dict returns None"""
         result = get_item("not a dict", "key")
 
         assert result is None
 
+    @pytest.mark.unit
     def test_get_item_none_input(self):
         """Test getting item from None returns None"""
         result = get_item(None, "key")
@@ -110,6 +118,7 @@ class TestGetItem:
 class TestYearOnly:
     """Tests for year_only filter"""
 
+    @pytest.mark.unit
     def test_year_only_from_date(self):
         """Test extracting year from date object"""
         date = datetime(2023, 12, 25)
@@ -118,24 +127,28 @@ class TestYearOnly:
 
         assert result == 2023
 
+    @pytest.mark.unit
     def test_year_only_from_string(self):
         """Test extracting year from string"""
         result = year_only("2023-06-15")
 
         assert result == 2023
 
+    @pytest.mark.unit
     def test_year_only_invalid_string(self):
         """Test invalid string returns empty"""
         result = year_only("invalid date")
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_year_only_none(self):
         """Test None returns empty"""
         result = year_only(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_year_only_empty_string(self):
         """Test empty string returns empty"""
         result = year_only("")
@@ -151,18 +164,21 @@ class TestYearOnly:
 class TestReplaceBackslashes:
     """Tests for replace_backslashes filter"""
 
+    @pytest.mark.unit
     def test_replace_backslashes(self):
         """Test replacing backslashes with forward slashes"""
         result = replace_backslashes("path\\to\\file")
 
         assert result == "path/to/file"
 
+    @pytest.mark.unit
     def test_replace_backslashes_none(self):
         """Test None returns empty string"""
         result = replace_backslashes(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_replace_backslashes_no_backslashes(self):
         """Test string without backslashes unchanged"""
         result = replace_backslashes("path/to/file")
@@ -173,18 +189,21 @@ class TestReplaceBackslashes:
 class TestNewlineToBr:
     """Tests for newline_to_br filter"""
 
+    @pytest.mark.unit
     def test_newline_to_br(self):
         """Test replacing newlines with br tags"""
         result = newline_to_br("Line 1\nLine 2\nLine 3")
 
         assert result == "Line 1<br>Line 2<br>Line 3"
 
+    @pytest.mark.unit
     def test_newline_to_br_none(self):
         """Test None returns empty string"""
         result = newline_to_br(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_newline_to_br_no_newlines(self):
         """Test string without newlines unchanged"""
         result = newline_to_br("Single line")
@@ -195,18 +214,21 @@ class TestNewlineToBr:
 class TestSemicolonToComma:
     """Tests for semicolon_to_comma filter"""
 
+    @pytest.mark.unit
     def test_semicolon_to_comma(self):
         """Test replacing semicolons with commas"""
         result = semicolon_to_comma("Org 1; Org 2; Org 3")
 
         assert result == "Org 1, Org 2, Org 3"
 
+    @pytest.mark.unit
     def test_semicolon_to_comma_none(self):
         """Test None returns empty string"""
         result = semicolon_to_comma(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_semicolon_to_comma_no_semicolons(self):
         """Test string without semicolons unchanged"""
         result = semicolon_to_comma("Org 1, Org 2")
@@ -217,18 +239,21 @@ class TestSemicolonToComma:
 class TestEscapeSpecialCharacters:
     """Tests for escape_special_characters filter"""
 
+    @pytest.mark.unit
     def test_escape_special_characters(self):
         """Test escaping regex special characters"""
         result = escape_special_characters("test.*+?{}[]\\|()")
 
         assert result == r"test\.\*\+\?\{\}\[\]\\\|\(\)"
 
+    @pytest.mark.unit
     def test_escape_special_characters_none(self):
         """Test None returns empty string"""
         result = escape_special_characters(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_escape_special_characters_normal_text(self):
         """Test normal text unchanged"""
         result = escape_special_characters("normal text")
@@ -244,6 +269,7 @@ class TestEscapeSpecialCharacters:
 class TestExtractTextContent:
     """Tests for extract_text_content filter"""
 
+    @pytest.mark.unit
     def test_extract_text_content_removes_prefix(self):
         """Test removing text before first HTML tag"""
         html = "(DUPLICATE 1) <p>Content</p>"
@@ -252,6 +278,7 @@ class TestExtractTextContent:
 
         assert result == "<p>Content</p>"
 
+    @pytest.mark.unit
     def test_extract_text_content_removes_bold(self):
         """Test removing bold tags"""
         html = "<p><b>Bold</b> and <strong>Strong</strong></p>"
@@ -260,18 +287,21 @@ class TestExtractTextContent:
 
         assert result == "<p>Bold and Strong</p>"
 
+    @pytest.mark.unit
     def test_extract_text_content_none(self):
         """Test None returns empty string"""
         result = extract_text_content(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_extract_text_content_no_html(self):
         """Test plain text without HTML tags"""
         result = extract_text_content("Plain text")
 
         assert result == "Plain text"
 
+    @pytest.mark.unit
     def test_extract_text_content_complex(self):
         """Test complex HTML with prefix and bold"""
         html = "PREFIX TEXT <p><b>Title</b> and <strong>subtitle</strong></p>"
@@ -284,6 +314,7 @@ class TestExtractTextContent:
 class TestRemoveEmptyP:
     """Tests for remove_empty_p filter"""
 
+    @pytest.mark.unit
     def test_remove_empty_p_with_nbsp(self):
         """Test removing empty p tags with nbsp"""
         html = "<p>&nbsp;</p><p>Content</p>"
@@ -294,6 +325,7 @@ class TestRemoveEmptyP:
         # The p tag with &nbsp; should be removed
         assert len(result) > 0
 
+    @pytest.mark.unit
     def test_remove_empty_p_extracts_nbsp_tag(self):
         """Test that p tag with nbsp entity is extracted"""
         # BeautifulSoup converts &nbsp; to actual non-breaking space character
@@ -317,12 +349,14 @@ class TestRemoveEmptyP:
 
         assert "Content" in result
 
+    @pytest.mark.unit
     def test_remove_empty_p_none(self):
         """Test None returns empty string"""
         result = remove_empty_p(None)
 
         assert result == ""
 
+    @pytest.mark.unit
     def test_remove_empty_p_no_empty_tags(self):
         """Test HTML without empty p tags"""
         html = "<p>Content 1</p><p>Content 2</p>"
@@ -341,6 +375,7 @@ class TestRemoveEmptyP:
 class TestFilterByProjectKind:
     """Tests for filter_by_project_kind filter"""
 
+    @pytest.mark.integration
     def test_filter_by_project_kind(self):
         """Test filtering reports by project kind"""
         reports = [
@@ -353,6 +388,7 @@ class TestFilterByProjectKind:
 
         assert len(result) == 2
 
+    @pytest.mark.integration
     def test_filter_by_project_kind_multiple(self):
         """Test filtering by multiple kinds"""
         reports = [
@@ -365,6 +401,7 @@ class TestFilterByProjectKind:
 
         assert len(result) == 2
 
+    @pytest.mark.integration
     def test_filter_by_project_kind_no_match(self):
         """Test filtering with no matches"""
         reports = [
@@ -375,6 +412,7 @@ class TestFilterByProjectKind:
 
         assert len(result) == 0
 
+    @pytest.mark.integration
     def test_filter_by_project_kind_missing_attribute(self):
         """Test filtering with missing document attribute"""
         reports = [
@@ -389,6 +427,7 @@ class TestFilterByProjectKind:
 class TestFilterByRole:
     """Tests for filter_by_role filter"""
 
+    @pytest.mark.unit
     def test_filter_by_role(self):
         """Test filtering team members by role"""
         team_members = [
@@ -402,6 +441,7 @@ class TestFilterByRole:
         assert len(result) == 2
         assert result[0]["name"] == "Alice"
 
+    @pytest.mark.unit
     def test_filter_by_role_no_match(self):
         """Test filtering with no matches"""
         team_members = [
@@ -416,6 +456,7 @@ class TestFilterByRole:
 class TestIsStaffFilter:
     """Tests for is_staff_filter filter"""
 
+    @pytest.mark.integration
     def test_is_staff_filter(self):
         """Test filtering staff members"""
         team_members = [
@@ -428,6 +469,7 @@ class TestIsStaffFilter:
 
         assert len(result) == 2
 
+    @pytest.mark.integration
     def test_is_staff_filter_no_staff(self):
         """Test filtering with no staff members"""
         team_members = [
@@ -442,6 +484,7 @@ class TestIsStaffFilter:
 class TestFilterByArea:
     """Tests for filter_by_area filter"""
 
+    @pytest.mark.unit
     def test_filter_by_area(self):
         """Test filtering areas by type"""
         areas = [
@@ -454,6 +497,7 @@ class TestFilterByArea:
 
         assert len(result) == 2
 
+    @pytest.mark.unit
     def test_filter_by_area_multiple_types(self):
         """Test filtering by multiple area types"""
         areas = [
@@ -470,6 +514,7 @@ class TestFilterByArea:
 class TestGetScientists:
     """Tests for get_scientists filter"""
 
+    @pytest.mark.unit
     def test_get_scientists(self):
         """Test getting scientists from team members"""
         team_members = [
@@ -484,6 +529,7 @@ class TestGetScientists:
         assert result[0]["name"] == "Alice"
         assert result[1]["name"] == "Bob"
 
+    @pytest.mark.unit
     def test_get_scientists_no_scientists(self):
         """Test getting scientists with no matches"""
         team_members = [
@@ -503,34 +549,42 @@ class TestGetScientists:
 class TestGetStudentLevelText:
     """Tests for get_student_level_text filter"""
 
+    @pytest.mark.unit
     def test_get_student_level_pd(self):
         """Test Post-Doc level"""
         assert get_student_level_text("pd") == "Post-Doc"
 
+    @pytest.mark.unit
     def test_get_student_level_phd(self):
         """Test PhD level"""
         assert get_student_level_text("phd") == "PhD"
 
+    @pytest.mark.unit
     def test_get_student_level_msc(self):
         """Test MSc level"""
         assert get_student_level_text("msc") == "MSc"
 
+    @pytest.mark.unit
     def test_get_student_level_honours(self):
         """Test Honours level"""
         assert get_student_level_text("honours") == "BSc Honours"
 
+    @pytest.mark.unit
     def test_get_student_level_fourth_year(self):
         """Test Fourth Year level"""
         assert get_student_level_text("fourth_year") == "Fourth Year"
 
+    @pytest.mark.unit
     def test_get_student_level_third_year(self):
         """Test Third Year level"""
         assert get_student_level_text("third_year") == "Third Year"
 
+    @pytest.mark.unit
     def test_get_student_level_undergrad(self):
         """Test Undergraduate level"""
         assert get_student_level_text("undergrad") == "Undergraduate"
 
+    @pytest.mark.unit
     def test_get_student_level_unknown(self):
         """Test unknown level returns original value"""
         assert get_student_level_text("unknown") == "unknown"
@@ -544,6 +598,7 @@ class TestGetStudentLevelText:
 class TestSortByAffiliationAndName:
     """Tests for sort_by_affiliation_and_name filter"""
 
+    @pytest.mark.integration
     def test_sort_by_affiliation_and_name(self):
         """Test sorting team members by affiliation and name"""
         team_members = [
@@ -568,6 +623,7 @@ class TestSortByAffiliationAndName:
         assert result[0]["user"]["affiliation"]["name"] == "Org A"
         assert result[1]["user"]["affiliation"]["name"] == "Org B"
 
+    @pytest.mark.integration
     def test_sort_by_affiliation_and_name_no_affiliation(self):
         """Test sorting with missing affiliation"""
         team_members = [
@@ -591,6 +647,7 @@ class TestSortByAffiliationAndName:
         # Member without affiliation should come first (empty string sorts first)
         assert "affiliation" not in result[0]["user"]
 
+    @pytest.mark.integration
     def test_sort_by_affiliation_and_name_same_affiliation(self):
         """Test sorting by name when affiliation is same"""
         team_members = [
@@ -620,6 +677,7 @@ class TestSortByAffiliationAndName:
 class TestGroupByAffiliation:
     """Tests for group_by_affiliation filter"""
 
+    @pytest.mark.integration
     def test_group_by_affiliation(self):
         """Test grouping team members by affiliation"""
         team_members = [
@@ -654,6 +712,7 @@ class TestGroupByAffiliation:
         assert result[1][0] == "Org B"
         assert len(result[1][1]) == 1
 
+    @pytest.mark.integration
     def test_group_by_affiliation_no_affiliation(self):
         """Test grouping with missing affiliation"""
         team_members = [
@@ -679,6 +738,7 @@ class TestGroupByAffiliation:
 class TestAbbreviatedName:
     """Tests for abbreviated_name filter"""
 
+    @pytest.mark.integration
     def test_abbreviated_name_with_title(self):
         """Test abbreviated name with title"""
         user_obj = {
@@ -691,6 +751,7 @@ class TestAbbreviatedName:
 
         assert result == "Dr J Smith"
 
+    @pytest.mark.integration
     def test_abbreviated_name_without_title(self):
         """Test abbreviated name without title"""
         user_obj = {
@@ -702,6 +763,7 @@ class TestAbbreviatedName:
 
         assert result == "J Smith"
 
+    @pytest.mark.integration
     def test_abbreviated_name_empty_first_name(self):
         """Test abbreviated name with empty first name"""
         user_obj = {
@@ -713,6 +775,7 @@ class TestAbbreviatedName:
 
         assert result == "Smith"
 
+    @pytest.mark.unit
     def test_abbreviated_name_title_variations(self):
         """Test different title variations"""
         titles = {
@@ -736,6 +799,7 @@ class TestAbbreviatedName:
 class TestAbbreviatedNameWithPeriods:
     """Tests for abbreviated_name_with_periods filter"""
 
+    @pytest.mark.integration
     def test_abbreviated_name_with_periods_and_title(self):
         """Test abbreviated name with periods and title"""
         user_obj = {
@@ -748,6 +812,7 @@ class TestAbbreviatedNameWithPeriods:
 
         assert result == "Dr. J. Smith"
 
+    @pytest.mark.integration
     def test_abbreviated_name_with_periods_no_title(self):
         """Test abbreviated name with periods without title"""
         user_obj = {
@@ -759,6 +824,7 @@ class TestAbbreviatedNameWithPeriods:
 
         assert result == "J. Smith"
 
+    @pytest.mark.integration
     def test_abbreviated_name_with_periods_empty_first_name(self):
         """Test abbreviated name with periods and empty first name"""
         user_obj = {
@@ -771,6 +837,7 @@ class TestAbbreviatedNameWithPeriods:
 
         assert result == "Dr. Smith"
 
+    @pytest.mark.integration
     def test_abbreviated_name_with_periods_no_title_empty_first(self):
         """Test abbreviated name with periods, no title, empty first name"""
         user_obj = {

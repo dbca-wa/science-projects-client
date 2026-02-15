@@ -16,6 +16,7 @@ class TestCaretakerModel:
     """Tests for Caretaker model"""
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_create_caretaker(self):
         """Test creating a caretaker relationship"""
         # Arrange
@@ -36,6 +37,7 @@ class TestCaretakerModel:
         assert relationship.reason == "Going on leave"
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_str_representation(self):
         """Test string representation of caretaker"""
         # Arrange
@@ -55,6 +57,7 @@ class TestCaretakerModel:
         assert "caretaking for" in str_repr
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_unique_together_constraint(self):
         """Test unique_together constraint on user and caretaker"""
         # Arrange
@@ -75,6 +78,7 @@ class TestCaretakerModel:
             )
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_relationships(self):
         """Test ForeignKey relationships"""
         # Arrange
@@ -94,6 +98,7 @@ class TestCaretakerModel:
         assert relationship in caretaker.caretaking_for.all()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_optional_fields(self):
         """Test optional fields can be null/blank"""
         # Arrange
@@ -113,6 +118,7 @@ class TestCaretakerModel:
         assert relationship.end_date is None
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_caretaker_with_end_date(self):
         """Test caretaker with end_date"""
         # Arrange
@@ -135,6 +141,7 @@ class TestCaretakerModel:
         assert relationship.end_date == end_date
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_with_notes(self):
         """Test caretaker with notes"""
         # Arrange
@@ -153,6 +160,7 @@ class TestCaretakerModel:
         assert relationship.notes == notes
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_save_clears_cache(self):
         """Test save method clears cache for both users"""
         # Arrange
@@ -178,6 +186,7 @@ class TestCaretakerModel:
         assert cache.get(f"caretaking_{caretaker.pk}") is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_delete_clears_cache(self):
         """Test delete method clears cache for both users"""
         # Arrange
@@ -204,6 +213,7 @@ class TestCaretakerModel:
         assert cache.get(f"caretaking_{caretaker.pk}") is None
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_cascade_delete_on_user(self):
         """Test caretaker is deleted when user is deleted"""
         # Arrange
@@ -221,6 +231,7 @@ class TestCaretakerModel:
         assert not Caretaker.objects.filter(pk=relationship.pk).exists()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_cascade_delete_on_caretaker(self):
         """Test caretaker is deleted when caretaker user is deleted"""
         # Arrange
@@ -238,6 +249,7 @@ class TestCaretakerModel:
         assert not Caretaker.objects.filter(pk=relationship.pk).exists()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_multiple_relationships(self):
         """Test user can have multiple caretakers"""
         # Arrange
@@ -261,6 +273,7 @@ class TestCaretakerModel:
         assert relationship2 in user.caretakers.all()
 
     @pytest.mark.django_db
+    @pytest.mark.integration
     def test_caretaker_can_caretake_multiple_users(self):
         """Test caretaker can caretake for multiple users"""
         # Arrange
@@ -284,6 +297,7 @@ class TestCaretakerModel:
         assert relationship2 in caretaker.caretaking_for.all()
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_caretaker_meta_verbose_names(self):
         """Test model meta verbose names"""
         # Assert
@@ -291,6 +305,7 @@ class TestCaretakerModel:
         assert Caretaker._meta.verbose_name_plural == "Caretakers"
 
     @pytest.mark.django_db
+    @pytest.mark.unit
     def test_caretaker_indexes(self):
         """Test model has correct indexes"""
         # Arrange

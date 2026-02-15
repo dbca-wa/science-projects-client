@@ -4,6 +4,7 @@ Tests for adminoptions views
 
 from datetime import timedelta
 
+import pytest
 from django.utils import timezone
 from rest_framework import status
 
@@ -14,6 +15,7 @@ from common.tests.test_helpers import adminoptions_urls
 class TestAdminControls:
     """Tests for AdminControls view"""
 
+    @pytest.mark.integration
     def test_get_admin_controls(self, api_client, user, admin_options, db):
         """Test listing admin controls"""
         # Arrange
@@ -27,6 +29,7 @@ class TestAdminControls:
         assert len(response.data) == 1
         assert response.data[0]["id"] == admin_options.id
 
+    @pytest.mark.integration
     def test_post_admin_controls(self, api_client, user, db):
         """Test creating admin controls"""
         # Arrange
@@ -43,6 +46,7 @@ class TestAdminControls:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["maintainer"]["id"] == user.id
 
+    @pytest.mark.integration
     def test_post_admin_controls_invalid_data(self, api_client, user, db):
         """Test creating admin controls with invalid data"""
         # Arrange
@@ -55,6 +59,7 @@ class TestAdminControls:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_admin_controls_unauthenticated(self, api_client, db):
         """Test listing admin controls without authentication"""
         # Act
@@ -69,6 +74,7 @@ class TestAdminControls:
 class TestGetMaintainer:
     """Tests for GetMaintainer view"""
 
+    @pytest.mark.integration
     def test_get_maintainer(self, api_client, user, db):
         """Test getting maintainer"""
         # Arrange
@@ -87,6 +93,7 @@ class TestGetMaintainer:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["maintainer"]["id"] == user.id
 
+    @pytest.mark.integration
     def test_get_maintainer_unauthenticated(self, api_client, user, db):
         """Test getting maintainer without authentication"""
         # Arrange
@@ -109,6 +116,7 @@ class TestGetMaintainer:
 class TestAdminControlsDetail:
     """Tests for AdminControlsDetail view"""
 
+    @pytest.mark.integration
     def test_get_admin_controls_detail(self, api_client, user, admin_options, db):
         """Test getting admin controls detail"""
         # Arrange
@@ -121,6 +129,7 @@ class TestAdminControlsDetail:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == admin_options.id
 
+    @pytest.mark.integration
     def test_put_admin_controls_detail(self, api_client, user, admin_options, db):
         """Test updating admin controls"""
         # Arrange
@@ -138,6 +147,7 @@ class TestAdminControlsDetail:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["email_options"] == "disabled"
 
+    @pytest.mark.integration
     def test_put_admin_controls_merges_guide_content(
         self, api_client, user, admin_options, db
     ):
@@ -163,6 +173,7 @@ class TestAdminControlsDetail:
             "new": "content",
         }
 
+    @pytest.mark.integration
     def test_delete_admin_controls(self, api_client, user, admin_options, db):
         """Test deleting admin controls"""
         # Arrange
@@ -175,6 +186,7 @@ class TestAdminControlsDetail:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not AdminOptions.objects.filter(id=admin_options.id).exists()
 
+    @pytest.mark.integration
     def test_get_admin_controls_detail_not_found(self, api_client, user, db):
         """Test getting non-existent admin controls"""
         # Arrange
@@ -190,6 +202,7 @@ class TestAdminControlsDetail:
 class TestAdminControlsGuideContentUpdate:
     """Tests for AdminControlsGuideContentUpdate view"""
 
+    @pytest.mark.integration
     def test_post_guide_content_update(self, api_client, admin_user, admin_options, db):
         """Test updating guide content field"""
         # Arrange
@@ -214,6 +227,7 @@ class TestAdminControlsGuideContentUpdate:
         admin_options.refresh_from_db()
         assert admin_options.guide_content["test_field"] == "test content"
 
+    @pytest.mark.integration
     def test_post_guide_content_update_initializes_dict(
         self, api_client, admin_user, db
     ):
@@ -244,6 +258,7 @@ class TestAdminControlsGuideContentUpdate:
         admin_options.refresh_from_db()
         assert admin_options.guide_content == {"test_field": "test content"}
 
+    @pytest.mark.integration
     def test_post_guide_content_update_missing_field_key(
         self, api_client, admin_user, admin_options, db
     ):
@@ -265,6 +280,7 @@ class TestAdminControlsGuideContentUpdate:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
+    @pytest.mark.integration
     def test_post_guide_content_update_missing_content(
         self, api_client, admin_user, admin_options, db
     ):
@@ -285,6 +301,7 @@ class TestAdminControlsGuideContentUpdate:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_post_guide_content_update_requires_admin(
         self, api_client, user, admin_options, db
     ):
@@ -310,6 +327,7 @@ class TestAdminControlsGuideContentUpdate:
 class TestGuideSectionViewSet:
     """Tests for GuideSectionViewSet"""
 
+    @pytest.mark.integration
     def test_list_guide_sections(self, api_client, admin_user, guide_section, db):
         """Test listing guide sections"""
         # Arrange
@@ -323,6 +341,7 @@ class TestGuideSectionViewSet:
         assert len(response.data) == 1
         assert response.data[0]["id"] == guide_section.id
 
+    @pytest.mark.integration
     def test_create_guide_section(self, api_client, admin_user, db):
         """Test creating guide section"""
         # Arrange
@@ -345,6 +364,7 @@ class TestGuideSectionViewSet:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["title"] == "New Section"
 
+    @pytest.mark.integration
     def test_retrieve_guide_section(self, api_client, admin_user, guide_section, db):
         """Test retrieving guide section"""
         # Arrange
@@ -359,6 +379,7 @@ class TestGuideSectionViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == guide_section.id
 
+    @pytest.mark.integration
     def test_update_guide_section(self, api_client, admin_user, guide_section, db):
         """Test updating guide section"""
         # Arrange
@@ -383,6 +404,7 @@ class TestGuideSectionViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["title"] == "Updated Section"
 
+    @pytest.mark.integration
     def test_delete_guide_section(self, api_client, admin_user, guide_section, db):
         """Test deleting guide section"""
         # Arrange
@@ -397,6 +419,7 @@ class TestGuideSectionViewSet:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not GuideSection.objects.filter(id=guide_section.id).exists()
 
+    @pytest.mark.integration
     def test_reorder_sections(self, api_client, admin_user, db):
         """Test reordering guide sections"""
         # Arrange
@@ -424,6 +447,7 @@ class TestGuideSectionViewSet:
         assert section2.order == 0
         assert section1.order == 1
 
+    @pytest.mark.integration
     def test_reorder_fields(
         self, api_client, admin_user, guide_section, content_field, db
     ):
@@ -454,6 +478,7 @@ class TestGuideSectionViewSet:
         assert field2.order == 0
         assert content_field.order == 1
 
+    @pytest.mark.integration
     def test_guide_section_requires_admin(self, api_client, user, db):
         """Test guide section operations require admin permission"""
         # Arrange
@@ -469,6 +494,7 @@ class TestGuideSectionViewSet:
 class TestContentFieldViewSet:
     """Tests for ContentFieldViewSet"""
 
+    @pytest.mark.integration
     def test_list_content_fields(self, api_client, admin_user, content_field, db):
         """Test listing content fields"""
         # Arrange
@@ -481,6 +507,7 @@ class TestContentFieldViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_content_field(self, api_client, admin_user, guide_section, db):
         """Test creating content field"""
         # Arrange
@@ -502,6 +529,7 @@ class TestContentFieldViewSet:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["title"] == "New Field"
 
+    @pytest.mark.integration
     def test_retrieve_content_field(self, api_client, admin_user, content_field, db):
         """Test retrieving content field"""
         # Arrange
@@ -517,6 +545,7 @@ class TestContentFieldViewSet:
         # ContentField.id is UUID, so compare as string
         assert str(response.data["id"]) == str(content_field.id)
 
+    @pytest.mark.integration
     def test_update_content_field(self, api_client, admin_user, content_field, db):
         """Test updating content field"""
         # Arrange
@@ -539,6 +568,7 @@ class TestContentFieldViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["title"] == "Updated Field"
 
+    @pytest.mark.integration
     def test_delete_content_field(self, api_client, admin_user, content_field, db):
         """Test deleting content field"""
         # Arrange
@@ -553,6 +583,7 @@ class TestContentFieldViewSet:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ContentField.objects.filter(id=content_field.id).exists()
 
+    @pytest.mark.integration
     def test_content_field_requires_admin(self, api_client, user, db):
         """Test content field operations require admin permission"""
         # Arrange
@@ -568,6 +599,7 @@ class TestContentFieldViewSet:
 class TestAdminTasks:
     """Tests for AdminTasks view"""
 
+    @pytest.mark.integration
     def test_get_admin_tasks(self, api_client, user, admin_task_delete_project, db):
         """Test listing admin tasks"""
         # Arrange
@@ -580,6 +612,7 @@ class TestAdminTasks:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_post_delete_project_task(self, api_client, user, project, db):
         """Test creating delete project task"""
         # Arrange
@@ -601,6 +634,7 @@ class TestAdminTasks:
         project.refresh_from_db()
         assert project.deletion_requested is True
 
+    @pytest.mark.integration
     def test_post_delete_project_task_duplicate(
         self, api_client, user, admin_task_delete_project, db
     ):
@@ -619,6 +653,7 @@ class TestAdminTasks:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_post_delete_project_task_missing_reason(
         self, api_client, user, project, db
     ):
@@ -652,6 +687,7 @@ class TestAdminTasks:
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         ]
 
+    @pytest.mark.integration
     def test_post_merge_user_task(self, api_client, user, secondary_user, db):
         """Test creating merge user task"""
         # Arrange
@@ -670,6 +706,7 @@ class TestAdminTasks:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["action"] == AdminTask.ActionTypes.MERGEUSER
 
+    @pytest.mark.integration
     def test_post_merge_user_task_duplicate(
         self, api_client, user, admin_task_merge_user, db
     ):
@@ -689,6 +726,7 @@ class TestAdminTasks:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_post_set_caretaker_task(self, api_client, user, secondary_user, db):
         """Test creating set caretaker task"""
         # Arrange
@@ -709,6 +747,7 @@ class TestAdminTasks:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["action"] == AdminTask.ActionTypes.SETCARETAKER
 
+    @pytest.mark.integration
     def test_post_set_caretaker_task_past_end_date(
         self, api_client, user, secondary_user, db
     ):
@@ -730,6 +769,7 @@ class TestAdminTasks:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_post_set_caretaker_task_duplicate(
         self, api_client, user, admin_task_set_caretaker, db
     ):
@@ -751,6 +791,7 @@ class TestAdminTasks:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_post_set_caretaker_task_existing_caretaker(
         self, api_client, user, secondary_user, caretaker, db
     ):
@@ -776,6 +817,7 @@ class TestAdminTasks:
 class TestPendingTasks:
     """Tests for PendingTasks view"""
 
+    @pytest.mark.integration
     def test_get_pending_tasks(self, api_client, user, admin_task_delete_project, db):
         """Test listing pending tasks"""
         # Arrange
@@ -788,6 +830,7 @@ class TestPendingTasks:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_get_pending_tasks_auto_cancels_expired(self, api_client, user, db):
         """Test pending tasks auto-cancels expired caretaker requests"""
         # Arrange
@@ -825,6 +868,7 @@ class TestCheckPendingCaretakerRequestForUser:
     Tests have been enabled and should now pass.
     """
 
+    @pytest.mark.integration
     def test_check_pending_caretaker_request_exists(
         self, api_client, user, admin_task_set_caretaker, db
     ):
@@ -843,6 +887,7 @@ class TestCheckPendingCaretakerRequestForUser:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["has_request"] is True
 
+    @pytest.mark.integration
     def test_check_pending_caretaker_request_not_exists(self, api_client, user, db):
         """Test checking if user has no pending caretaker request"""
         # Arrange
@@ -860,6 +905,7 @@ class TestCheckPendingCaretakerRequestForUser:
 class TestGetPendingCaretakerRequestsForUser:
     """Tests for GetPendingCaretakerRequestsForUser view"""
 
+    @pytest.mark.integration
     def test_get_pending_caretaker_requests(self, api_client, user, secondary_user, db):
         """Test getting pending caretaker requests for user"""
         # Arrange
@@ -883,6 +929,7 @@ class TestGetPendingCaretakerRequestsForUser:
         assert len(response.data) == 1
         assert response.data[0]["id"] == task.id
 
+    @pytest.mark.integration
     def test_get_pending_caretaker_requests_missing_user_id(self, api_client, user, db):
         """Test getting pending caretaker requests without user_id fails"""
         # Arrange

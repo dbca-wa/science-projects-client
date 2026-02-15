@@ -21,6 +21,7 @@ class TestGetAllCaretakerAssignments:
     @patch(
         "caretakers.services.task_service.CaretakerTaskService.get_all_caretaker_assignments"
     )
+    @pytest.mark.integration
     def test_delegates_to_service(self, mock_service_method):
         """Test function delegates to CaretakerTaskService"""
         # Arrange
@@ -38,6 +39,7 @@ class TestGetAllCaretakerAssignments:
     @patch(
         "caretakers.services.task_service.CaretakerTaskService.get_all_caretaker_assignments"
     )
+    @pytest.mark.integration
     def test_passes_processed_users(self, mock_service_method):
         """Test function passes processed_users to service"""
         # Arrange
@@ -56,6 +58,7 @@ class TestGetAllCaretakerAssignments:
     @patch(
         "caretakers.services.task_service.CaretakerTaskService.get_all_caretaker_assignments"
     )
+    @pytest.mark.integration
     def test_returns_service_result(self, mock_service_method):
         """Test function returns result from service"""
         # Arrange
@@ -73,6 +76,7 @@ class TestGetAllCaretakerAssignments:
 class TestDeduplicateDocuments:
     """Tests for deduplicate_documents function"""
 
+    @pytest.mark.unit
     def test_deduplicate_empty_list(self):
         """Test deduplicating empty list returns empty list"""
         # Act
@@ -81,6 +85,7 @@ class TestDeduplicateDocuments:
         # Assert
         assert result == []
 
+    @pytest.mark.unit
     def test_deduplicate_single_document(self):
         """Test deduplicating single document returns same document"""
         # Arrange
@@ -93,6 +98,7 @@ class TestDeduplicateDocuments:
         assert len(result) == 1
         assert result[0] == doc
 
+    @pytest.mark.integration
     def test_deduplicate_unique_documents(self):
         """Test deduplicating unique documents returns all documents"""
         # Arrange
@@ -109,6 +115,7 @@ class TestDeduplicateDocuments:
         assert doc2 in result
         assert doc3 in result
 
+    @pytest.mark.integration
     def test_deduplicate_duplicate_documents(self):
         """Test deduplicating removes duplicate documents"""
         # Arrange
@@ -124,6 +131,7 @@ class TestDeduplicateDocuments:
         assert doc1 in result
         assert doc3 in result
 
+    @pytest.mark.integration
     def test_deduplicate_same_id_different_kind(self):
         """Test documents with same ID but different kind are kept"""
         # Arrange
@@ -138,6 +146,7 @@ class TestDeduplicateDocuments:
         assert doc1 in result
         assert doc2 in result
 
+    @pytest.mark.integration
     def test_deduplicate_serialized_documents(self):
         """Test deduplicating serialized documents (dicts)"""
         # Arrange
@@ -153,6 +162,7 @@ class TestDeduplicateDocuments:
         assert doc1 in result
         assert doc2 in result
 
+    @pytest.mark.integration
     def test_deduplicate_serialized_unique_documents(self):
         """Test deduplicating unique serialized documents"""
         # Arrange
@@ -166,6 +176,7 @@ class TestDeduplicateDocuments:
         # Assert
         assert len(result) == 3
 
+    @pytest.mark.integration
     def test_deduplicate_serialized_same_id_different_kind(self):
         """Test serialized documents with same ID but different kind are kept"""
         # Arrange
@@ -178,6 +189,7 @@ class TestDeduplicateDocuments:
         # Assert
         assert len(result) == 2
 
+    @pytest.mark.integration
     def test_deduplicate_handles_missing_kind_attribute(self):
         """Test deduplication handles documents without kind attribute"""
         # Arrange
@@ -192,6 +204,7 @@ class TestDeduplicateDocuments:
         # Should handle gracefully and include both
         assert len(result) == 2
 
+    @pytest.mark.integration
     def test_deduplicate_handles_missing_id_key_serialized(self):
         """Test deduplication handles serialized docs without id key"""
         # Arrange
@@ -206,6 +219,7 @@ class TestDeduplicateDocuments:
         assert len(result) == 1
         assert doc2 in result
 
+    @pytest.mark.integration
     def test_deduplicate_handles_missing_kind_key_serialized(self):
         """Test deduplication handles serialized docs without kind key"""
         # Arrange
@@ -220,6 +234,7 @@ class TestDeduplicateDocuments:
         assert len(result) == 1
         assert doc2 in result
 
+    @pytest.mark.integration
     def test_deduplicate_preserves_order(self):
         """Test deduplication preserves order of first occurrence"""
         # Arrange
@@ -238,6 +253,7 @@ class TestDeduplicateDocuments:
         assert result[1] == doc2
         assert result[2] == doc4
 
+    @pytest.mark.integration
     def test_deduplicate_multiple_duplicates(self):
         """Test deduplication with multiple duplicates"""
         # Arrange
@@ -254,6 +270,7 @@ class TestDeduplicateDocuments:
         assert doc1 in result
         assert doc4 in result
 
+    @pytest.mark.integration
     def test_deduplicate_mixed_valid_and_invalid_documents(self):
         """Test deduplication with mix of valid and invalid documents"""
         # Arrange

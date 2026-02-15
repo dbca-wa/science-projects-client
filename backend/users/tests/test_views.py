@@ -2,15 +2,18 @@
 Tests for user views
 """
 
+import pytest
 from rest_framework import status
 
 from common.tests.test_helpers import users_urls
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestAuthenticationViews:
     """Tests for authentication views"""
 
-    def test_login_success(self, api_client, user, db):
+    def test_login_success(self, api_client, user):
         """Test successful login"""
         # Arrange
         data = {
@@ -27,7 +30,7 @@ class TestAuthenticationViews:
         assert response.status_code == status.HTTP_200_OK
         assert "ok" in response.data
 
-    def test_login_missing_credentials(self, api_client, db):
+    def test_login_missing_credentials(self, api_client):
         """Test login with missing credentials"""
         # Arrange
         data = {"username": "testuser"}
@@ -38,7 +41,7 @@ class TestAuthenticationViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_login_invalid_credentials(self, api_client, user, db):
+    def test_login_invalid_credentials(self, api_client, user):
         """Test login with invalid credentials"""
         # Arrange
         data = {
@@ -54,7 +57,7 @@ class TestAuthenticationViews:
         # Assert
         assert "error" in response.data
 
-    def test_logout_authenticated(self, api_client, user, db):
+    def test_logout_authenticated(self, api_client, user):
         """Test logout as authenticated user"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -65,7 +68,7 @@ class TestAuthenticationViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    def test_logout_unauthenticated(self, api_client, db):
+    def test_logout_unauthenticated(self, api_client):
         """Test logout without authentication"""
         # Act
         response = api_client.post(users_urls.path("log-out"))
@@ -74,7 +77,7 @@ class TestAuthenticationViews:
         # DRF returns 403 when permission class denies access
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_change_password_success(self, api_client, user, db):
+    def test_change_password_success(self, api_client, user):
         """Test successful password change"""
         # Arrange
         user.set_password("oldpass123")
@@ -94,7 +97,7 @@ class TestAuthenticationViews:
         assert response.status_code == status.HTTP_200_OK
         assert "ok" in response.data
 
-    def test_change_password_wrong_old_password(self, api_client, user, db):
+    def test_change_password_wrong_old_password(self, api_client, user):
         """Test password change with wrong old password"""
         # Arrange
         user.set_password("oldpass123")
@@ -114,10 +117,12 @@ class TestAuthenticationViews:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserViews:
     """Tests for user CRUD views"""
 
-    def test_list_users_authenticated(self, api_client, user, user_factory, db):
+    def test_list_users_authenticated(self, api_client, user, user_factory):
         """Test listing users as authenticated user"""
         # Arrange
         user_factory.create_batch(3)
@@ -131,7 +136,7 @@ class TestUserViews:
         assert "users" in response.data
         assert len(response.data["users"]) > 0
 
-    def test_list_users_unauthenticated(self, api_client, db):
+    def test_list_users_unauthenticated(self, api_client):
         """Test listing users without authentication"""
         # Act
         response = api_client.get(users_urls.list())
@@ -140,7 +145,7 @@ class TestUserViews:
         # DRF returns 403 when permission class denies access
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_list_users_with_search(self, api_client, user, user_factory, db):
+    def test_list_users_with_search(self, api_client, user, user_factory):
         """Test listing users with search"""
         # Arrange
         user_factory(username="testuser123")
@@ -153,7 +158,7 @@ class TestUserViews:
         assert response.status_code == status.HTTP_200_OK
         assert "users" in response.data
 
-    def test_create_user(self, api_client, superuser, db):
+    def test_create_user(self, api_client, superuser):
         """Test creating a user"""
         # Arrange
         api_client.force_authenticate(user=superuser)
@@ -171,7 +176,7 @@ class TestUserViews:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["username"] == "newuser"
 
-    def test_get_user_detail(self, api_client, user, db):
+    def test_get_user_detail(self, api_client, user):
         """Test getting user detail"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -183,7 +188,7 @@ class TestUserViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["username"] == user.username
 
-    def test_update_user(self, api_client, user, db):
+    def test_update_user(self, api_client, user):
         """Test updating a user"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -196,7 +201,7 @@ class TestUserViews:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["first_name"] == "Updated"
 
-    def test_delete_user(self, api_client, superuser, user_factory, db):
+    def test_delete_user(self, api_client, superuser, user_factory):
         """Test deleting a user"""
         # Arrange
         target_user = user_factory()
@@ -209,10 +214,12 @@ class TestUserViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestProfileViews:
     """Tests for profile views"""
 
-    def test_list_user_profiles(self, api_client, user, user_profile, db):
+    def test_list_user_profiles(self, api_client, user, user_profile):
         """Test listing user profiles"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -224,7 +231,7 @@ class TestProfileViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
-    def test_get_user_profile_detail(self, api_client, user, user_profile, db):
+    def test_get_user_profile_detail(self, api_client, user, user_profile):
         """Test getting user profile detail"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -237,7 +244,7 @@ class TestProfileViews:
         # ProfilePageSerializer returns nested user object, not just ID
         assert response.data["user"]["id"] == user.id
 
-    def test_update_user_profile(self, api_client, user, user_profile, db):
+    def test_update_user_profile(self, api_client, user, user_profile):
         """Test updating user profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -251,7 +258,7 @@ class TestProfileViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
-    def test_update_personal_information(self, api_client, user, db):
+    def test_update_personal_information(self, api_client, user):
         """Test updating personal information"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -266,7 +273,7 @@ class TestProfileViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
-    def test_update_profile(self, api_client, user, user_profile, db):
+    def test_update_profile(self, api_client, user, user_profile):
         """Test updating profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -285,10 +292,12 @@ class TestProfileViews:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileViews:
     """Tests for staff profile views"""
 
-    def test_list_staff_profiles(self, api_client, staff_profile, db):
+    def test_list_staff_profiles(self, api_client, staff_profile):
         """Test listing staff profiles"""
         # Act
         response = api_client.get(users_urls.path("staffprofiles"))
@@ -297,7 +306,7 @@ class TestStaffProfileViews:
         assert response.status_code == status.HTTP_200_OK
         assert "profiles" in response.data
 
-    def test_list_staff_profiles_with_search(self, api_client, staff_profile, db):
+    def test_list_staff_profiles_with_search(self, api_client, staff_profile):
         """Test listing staff profiles with search"""
         # Act
         response = api_client.get(users_urls.path("staffprofiles"), {"search": "test"})
@@ -306,7 +315,7 @@ class TestStaffProfileViews:
         assert response.status_code == status.HTTP_200_OK
         assert "profiles" in response.data
 
-    def test_create_staff_profile(self, api_client, user, db):
+    def test_create_staff_profile(self, api_client, user):
         """Test creating staff profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -324,7 +333,7 @@ class TestStaffProfileViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_get_staff_profile_detail(self, api_client, staff_profile, db):
+    def test_get_staff_profile_detail(self, api_client, staff_profile):
         """Test getting staff profile detail"""
         # Act
         response = api_client.get(users_urls.path("staffprofiles", staff_profile.id))
@@ -334,7 +343,7 @@ class TestStaffProfileViews:
         # StaffProfileSerializer returns nested user object, not just ID
         assert response.data["user"]["id"] == staff_profile.user.id
 
-    def test_update_staff_profile(self, api_client, user, staff_profile, db):
+    def test_update_staff_profile(self, api_client, user, staff_profile):
         """Test updating staff profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -348,7 +357,7 @@ class TestStaffProfileViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
-    def test_delete_staff_profile(self, api_client, user, staff_profile, db):
+    def test_delete_staff_profile(self, api_client, user, staff_profile):
         """Test deleting staff profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -359,7 +368,7 @@ class TestStaffProfileViews:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-    def test_get_my_staff_profile(self, api_client, user, staff_profile, db):
+    def test_get_my_staff_profile(self, api_client, user, staff_profile):
         """Test getting current user's staff profile"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -370,7 +379,7 @@ class TestStaffProfileViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    def test_toggle_public_visibility(self, api_client, user, staff_profile, db):
+    def test_toggle_public_visibility(self, api_client, user, staff_profile):
         """Test toggling staff profile visibility"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -383,7 +392,7 @@ class TestStaffProfileViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_active_staff_emails(self, api_client, user, staff_profile, db):
+    def test_get_active_staff_emails(self, api_client, user, staff_profile):
         """Test getting active staff emails"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -396,6 +405,8 @@ class TestStaffProfileViews:
         assert isinstance(response.data, list)
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestProfileEntryViews:
     """Tests for profile entry views"""
 
@@ -442,10 +453,12 @@ class TestProfileEntryViews:
         assert isinstance(response.data, list)
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestProfileSectionViews:
     """Tests for profile section views"""
 
-    def test_get_staff_profile_hero(self, api_client, staff_profile, db):
+    def test_get_staff_profile_hero(self, api_client, staff_profile):
         """Test getting staff profile hero section"""
         # Act
         response = api_client.get(
@@ -456,7 +469,7 @@ class TestProfileSectionViews:
         assert response.status_code == status.HTTP_200_OK
         assert "user" in response.data
 
-    def test_get_staff_profile_overview(self, api_client, staff_profile, db):
+    def test_get_staff_profile_overview(self, api_client, staff_profile):
         """Test getting staff profile overview section"""
         # Act
         response = api_client.get(
@@ -467,7 +480,7 @@ class TestProfileSectionViews:
         assert response.status_code == status.HTTP_200_OK
         assert "expertise" in response.data
 
-    def test_get_staff_profile_cv(self, api_client, staff_profile, db):
+    def test_get_staff_profile_cv(self, api_client, staff_profile):
         """Test getting staff profile CV section"""
         # Act
         response = api_client.get(
@@ -480,10 +493,12 @@ class TestProfileSectionViews:
         assert "education_entries" in response.data
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestAdminViews:
     """Tests for admin operation views"""
 
-    def test_toggle_user_active(self, api_client, superuser, user_factory, db):
+    def test_toggle_user_active(self, api_client, superuser, user_factory):
         """Test toggling user active status"""
         # Arrange
         target_user = user_factory(is_active=True)
@@ -510,7 +525,7 @@ class TestAdminViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_switch_admin(self, api_client, superuser, user_factory, db):
+    def test_switch_admin(self, api_client, superuser, user_factory):
         """Test toggling user admin status"""
         # Arrange
         target_user = user_factory(is_superuser=False)
@@ -523,7 +538,7 @@ class TestAdminViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["is_superuser"] is True
 
-    def test_switch_admin_requires_admin(self, api_client, user, user_factory, db):
+    def test_switch_admin_requires_admin(self, api_client, user, user_factory):
         """Test switching admin requires admin permission"""
         # Arrange
         target_user = user_factory()
@@ -536,10 +551,12 @@ class TestAdminViews:
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUtilityViews:
     """Tests for utility views"""
 
-    def test_check_email_exists_true(self, api_client, user, db):
+    def test_check_email_exists_true(self, api_client, user):
         """Test checking if email exists - returns true"""
         # Act
         response = api_client.get(
@@ -550,7 +567,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["exists"] is True
 
-    def test_check_email_exists_false(self, api_client, db):
+    def test_check_email_exists_false(self, api_client):
         """Test checking if email exists - returns false"""
         # Act
         response = api_client.get(
@@ -561,7 +578,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["exists"] is False
 
-    def test_check_email_exists_missing_param(self, api_client, db):
+    def test_check_email_exists_missing_param(self, api_client):
         """Test checking email without email parameter"""
         # Act
         response = api_client.get(users_urls.path("check-email-exists"))
@@ -570,7 +587,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
-    def test_check_name_exists_true(self, api_client, user, db):
+    def test_check_name_exists_true(self, api_client, user):
         """Test checking if username exists - returns true"""
         # Act
         response = api_client.get(
@@ -581,7 +598,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["exists"] is True
 
-    def test_check_name_exists_false(self, api_client, db):
+    def test_check_name_exists_false(self, api_client):
         """Test checking if username exists - returns false"""
         # Act
         response = api_client.get(
@@ -592,7 +609,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["exists"] is False
 
-    def test_check_name_exists_missing_param(self, api_client, db):
+    def test_check_name_exists_missing_param(self, api_client):
         """Test checking username without username parameter"""
         # Act
         response = api_client.get(users_urls.path("check-name-exists"))
@@ -601,7 +618,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
-    def test_check_user_is_staff_true(self, api_client, user, staff_user, db):
+    def test_check_user_is_staff_true(self, api_client, user, staff_user):
         """Test checking if user is staff - returns true"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -615,7 +632,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["is_staff"] is True
 
-    def test_check_user_is_staff_false(self, api_client, user, user_factory, db):
+    def test_check_user_is_staff_false(self, api_client, user, user_factory):
         """Test checking if user is staff - returns false"""
         # Arrange
         regular_user = user_factory(is_staff=False)
@@ -630,7 +647,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["is_staff"] is False
 
-    def test_check_user_is_staff_missing_param(self, api_client, user, db):
+    def test_check_user_is_staff_missing_param(self, api_client, user):
         """Test checking staff status without user_id parameter"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -642,7 +659,7 @@ class TestUtilityViews:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
-    def test_me_authenticated(self, api_client, user, db):
+    def test_me_authenticated(self, api_client, user):
         """Test getting current user info"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -655,7 +672,7 @@ class TestUtilityViews:
         assert response.data["id"] == user.id
         assert response.data["username"] == user.username
 
-    def test_me_unauthenticated(self, api_client, db):
+    def test_me_unauthenticated(self, api_client):
         """Test getting current user without authentication"""
         # Act
         response = api_client.get(users_urls.path("me"))
@@ -663,7 +680,7 @@ class TestUtilityViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_small_internal_user_search(self, api_client, user, user_factory, db):
+    def test_small_internal_user_search(self, api_client, user, user_factory):
         """Test searching users"""
         # Arrange
         user_factory(username="searchuser1", first_name="Search", last_name="User1")
@@ -678,7 +695,7 @@ class TestUtilityViews:
         assert isinstance(response.data, list)
         assert len(response.data) >= 2
 
-    def test_small_internal_user_search_short_query(self, api_client, user, db):
+    def test_small_internal_user_search_short_query(self, api_client, user):
         """Test searching users with short query returns empty"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -691,6 +708,8 @@ class TestUtilityViews:
         assert response.data == []
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestStaffProfileAdvancedViews:
     """Tests for advanced staff profile views"""
 
@@ -714,7 +733,7 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert "profiles" in response.data
 
-    def test_check_staff_profile_exists_true(self, api_client, user, staff_profile, db):
+    def test_check_staff_profile_exists_true(self, api_client, user, staff_profile):
         """Test checking if staff profile exists - returns true"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -729,7 +748,7 @@ class TestStaffProfileAdvancedViews:
         assert response.data["exists"] is True
         assert "profile" in response.data
 
-    def test_check_staff_profile_exists_false(self, api_client, user, user_factory, db):
+    def test_check_staff_profile_exists_false(self, api_client, user, user_factory):
         """Test checking if staff profile exists - returns false"""
         # Arrange
         other_user = user_factory()
@@ -745,7 +764,7 @@ class TestStaffProfileAdvancedViews:
         assert response.data["exists"] is False
         assert response.data["profile"] is None
 
-    def test_check_staff_profile_missing_param(self, api_client, user, db):
+    def test_check_staff_profile_missing_param(self, api_client, user):
         """Test checking staff profile without user_id parameter"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -757,7 +776,7 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
-    def test_download_bcs_staff_csv(self, api_client, user, staff_profile, db):
+    def test_download_bcs_staff_csv(self, api_client, user, staff_profile):
         """Test downloading staff profiles as CSV"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -769,7 +788,7 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"] == "text/csv"
 
-    def test_staff_profile_projects(self, api_client, user, staff_profile, db):
+    def test_staff_profile_projects(self, api_client, user, staff_profile):
         """Test getting staff profile projects"""
         # Arrange - Create a project membership
         from common.tests.factories import ProjectFactory
@@ -789,7 +808,7 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
-    def test_staff_profile_projects_no_memberships(self, api_client, user_factory, db):
+    def test_staff_profile_projects_no_memberships(self, api_client, user_factory):
         """Test getting staff profile projects with no memberships"""
         # Arrange
         user = user_factory()
@@ -823,7 +842,7 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert "ok" in response.data
 
-    def test_public_email_staff_member_not_found(self, api_client, db):
+    def test_public_email_staff_member_not_found(self, api_client):
         """Test sending email to non-existent staff profile"""
         # Arrange
         data = {
@@ -840,10 +859,12 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.integration
+@pytest.mark.django_db(transaction=True)
 class TestUserProfileAdvancedViews:
     """Tests for advanced user profile views"""
 
-    def test_list_user_profiles_with_filter(self, api_client, user, user_profile, db):
+    def test_list_user_profiles_with_filter(self, api_client, user, user_profile):
         """Test listing user profiles with user filter"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -855,7 +876,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
-    def test_update_membership(self, api_client, user, user_work, db):
+    def test_update_membership(self, api_client, user, user_work):
         """Test updating user membership"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -872,7 +893,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["role"] == "Updated Role"
 
-    def test_update_membership_no_work(self, api_client, user, db):
+    def test_update_membership_no_work(self, api_client, user):
         """Test updating membership when user has no work record"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -887,7 +908,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert "error" in response.data
 
-    def test_remove_avatar_no_avatar(self, api_client, user, db):
+    def test_remove_avatar_no_avatar(self, api_client, user):
         """Test removing avatar when user has no avatar"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -898,7 +919,7 @@ class TestUserProfileAdvancedViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_list_user_works(self, api_client, user, user_work, db):
+    def test_list_user_works(self, api_client, user, user_work):
         """Test listing all user works"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -910,7 +931,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
-    def test_create_user_work(self, api_client, user, user_factory, business_area, db):
+    def test_create_user_work(self, api_client, user, user_factory, business_area):
         """Test creating user work"""
         # Arrange
         target_user = user_factory()
@@ -927,7 +948,7 @@ class TestUserProfileAdvancedViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_update_user_work(self, api_client, user, user_work, db):
+    def test_update_user_work(self, api_client, user, user_work):
         """Test updating user work"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -941,7 +962,7 @@ class TestUserProfileAdvancedViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
-    def test_users_projects(self, api_client, user, db):
+    def test_users_projects(self, api_client, user):
         """Test getting user's projects"""
         # Arrange - Create a project membership
         from common.tests.factories import ProjectFactory
@@ -961,7 +982,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.data, list)
 
-    def test_users_projects_no_memberships(self, api_client, user_factory, db):
+    def test_users_projects_no_memberships(self, api_client, user_factory):
         """Test getting user's projects with no memberships"""
         # Arrange
         user = user_factory()
@@ -973,7 +994,7 @@ class TestUserProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == []
 
-    def test_update_profile_user_not_found(self, api_client, user, db):
+    def test_update_profile_user_not_found(self, api_client, user):
         """Test updating profile for non-existent user"""
         # Arrange
         api_client.force_authenticate(user=user)
@@ -985,7 +1006,7 @@ class TestUserProfileAdvancedViews:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_update_profile_user_no_profile(self, api_client, user, user_factory, db):
+    def test_update_profile_user_no_profile(self, api_client, user, user_factory):
         """Test updating profile for user without profile"""
         # Arrange
         target_user = user_factory()

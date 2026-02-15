@@ -6,7 +6,18 @@
 ![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
 
 
-A comprehensive project management system for scientific research projects, developed by the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia.
+A project management and approval system for scientific research projects.
+
+## Key Features
+
+- **Annual Report Generation** - PDF generation of annual reports with customisable templates (key deliverable)
+- **Rich Text Editor** - Bespoke editor for project documentation with formatting and media support
+- **Document Management** - Project wizard with related document generation and PDF export capabilities
+- **Caretaker System** - Workflow for temporary project ownership delegation with approval processes
+- **Email Notifications** - Automated notifications for project updates, tasks, and approvals workflow
+- **Team Collaboration** - Manage internal teams, external collaborators, and stakeholder relationships
+- **Role-Based Access Control** - Granular permissions for different user types and project roles
+- **Audit Trails** - Complete history of all project changes and activities
 
 ## Quick Start
 

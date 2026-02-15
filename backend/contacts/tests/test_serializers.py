@@ -2,6 +2,8 @@
 Tests for contact serializers
 """
 
+import pytest
+
 from contacts.models import AgencyContact, BranchContact
 from contacts.serializers import (
     AddressSerializer,
@@ -18,6 +20,7 @@ from contacts.serializers import (
 class TestTinyAddressSerializer:
     """Tests for TinyAddressSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, address_for_agency, db):
         """Test serializing address with nested agency"""
         # Act
@@ -35,6 +38,7 @@ class TestTinyAddressSerializer:
         assert data["agency"]["name"] == "Test Agency"
         assert data["branch"] is None
 
+    @pytest.mark.unit
     def test_serialization_with_branch(self, address_for_branch, db):
         """Test serializing address with nested branch"""
         # Act
@@ -52,6 +56,7 @@ class TestTinyAddressSerializer:
 class TestAddressSerializer:
     """Tests for AddressSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, address_for_agency, db):
         """Test serializing address"""
         # Act
@@ -64,6 +69,7 @@ class TestAddressSerializer:
         assert data["city"] == "Test City"
         assert data["agency"] == address_for_agency.agency.id
 
+    @pytest.mark.integration
     def test_deserialization_with_agency(self, agency, db):
         """Test deserializing address with agency"""
         # Arrange
@@ -86,6 +92,7 @@ class TestAddressSerializer:
         assert address.agency == agency
         assert address.branch is None
 
+    @pytest.mark.unit
     def test_deserialization_with_branch(self, branch, db):
         """Test deserializing address with branch"""
         # Arrange
@@ -108,6 +115,7 @@ class TestAddressSerializer:
         assert address.branch == branch
         assert address.agency is None
 
+    @pytest.mark.unit
     def test_validation_branch_uniqueness(self, branch, address_for_branch, db):
         """Test validation prevents duplicate branch addresses"""
         # Arrange - address_for_branch already exists for this branch
@@ -130,6 +138,7 @@ class TestAddressSerializer:
             serializer.errors
         )
 
+    @pytest.mark.unit
     def test_validation_allows_update_same_branch(self, address_for_branch, db):
         """Test validation allows updating existing address for same branch"""
         # Arrange - updating existing address
@@ -150,6 +159,7 @@ class TestAddressSerializer:
         address = serializer.save()
         assert address.street == "Updated St"
 
+    @pytest.mark.integration
     def test_get_agency_method(self, address_for_agency, db):
         """Test get_agency method returns agency data"""
         # Arrange
@@ -168,6 +178,7 @@ class TestAddressSerializer:
         )
         assert agency_data["is_active"] is True
 
+    @pytest.mark.integration
     def test_get_agency_method_none(self, address_for_branch, db):
         """Test get_agency method returns None when no agency"""
         # Arrange
@@ -179,6 +190,7 @@ class TestAddressSerializer:
         # Assert
         assert agency_data is None
 
+    @pytest.mark.unit
     def test_get_branch_method(self, address_for_branch, db):
         """Test get_branch method returns branch data"""
         # Arrange
@@ -193,6 +205,7 @@ class TestAddressSerializer:
         assert branch_data["name"] == "Test Branch"
         assert branch_data["agency"] == address_for_branch.branch.agency.id
 
+    @pytest.mark.integration
     def test_get_branch_method_none(self, address_for_agency, db):
         """Test get_branch method returns None when no branch"""
         # Arrange
@@ -208,6 +221,7 @@ class TestAddressSerializer:
 class TestTinyUserContactSerializer:
     """Tests for TinyUserContactSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, user_contact, db):
         """Test serializing user contact with nested user"""
         # Act
@@ -224,6 +238,7 @@ class TestTinyUserContactSerializer:
 class TestUserContactSerializer:
     """Tests for UserContactSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, user_contact, db):
         """Test serializing user contact"""
         # Act
@@ -239,6 +254,7 @@ class TestUserContactSerializer:
         assert data["alt_phone"] == "0987654321"
         assert data["fax"] == "1112223333"
 
+    @pytest.mark.integration
     def test_serialization_all_fields(self, user_contact, db):
         """Test all fields are serialized"""
         # Act
@@ -259,6 +275,7 @@ class TestUserContactSerializer:
 class TestTinyAgencyContactSerializer:
     """Tests for TinyAgencyContactSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, agency_contact, db):
         """Test serializing agency contact with nested agency and address"""
         # Act
@@ -273,6 +290,7 @@ class TestTinyAgencyContactSerializer:
         assert data["address"]["id"] == agency_contact.address.id
         assert data["address"]["street"] == "123 Test St"
 
+    @pytest.mark.integration
     def test_serialization_without_address(self, agency, db):
         """Test serializing agency contact without address"""
         # Arrange
@@ -293,6 +311,7 @@ class TestTinyAgencyContactSerializer:
 class TestAgencyContactSerializer:
     """Tests for AgencyContactSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, agency_contact, db):
         """Test serializing agency contact"""
         # Act
@@ -308,6 +327,7 @@ class TestAgencyContactSerializer:
         assert data["fax"] == "1112223333"
         assert data["address"]["id"] == agency_contact.address.id
 
+    @pytest.mark.integration
     def test_serialization_all_fields(self, agency_contact, db):
         """Test all fields are serialized"""
         # Act
@@ -329,6 +349,7 @@ class TestAgencyContactSerializer:
 class TestTinyBranchContactSerializer:
     """Tests for TinyBranchContactSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, branch_contact, db):
         """Test serializing branch contact with nested branch and address"""
         # Act
@@ -343,6 +364,7 @@ class TestTinyBranchContactSerializer:
         assert data["address"]["id"] == branch_contact.address.id
         assert data["address"]["street"] == "456 Branch St"
 
+    @pytest.mark.unit
     def test_serialization_without_address(self, branch, db):
         """Test serializing branch contact without address"""
         # Arrange
@@ -363,6 +385,7 @@ class TestTinyBranchContactSerializer:
 class TestBranchContactSerializer:
     """Tests for BranchContactSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, branch_contact, db):
         """Test serializing branch contact"""
         # Act
@@ -378,6 +401,7 @@ class TestBranchContactSerializer:
         assert data["fax"] == "1112223333"
         assert data["address"]["id"] == branch_contact.address.id
 
+    @pytest.mark.unit
     def test_serialization_all_fields(self, branch_contact, db):
         """Test all fields are serialized"""
         # Act

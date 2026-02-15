@@ -2,6 +2,7 @@
 Tests for medias admin
 """
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 
 from medias.admin import (
@@ -34,6 +35,7 @@ from medias.models import (
 class TestAgencyImageAdminForm:
     """Tests for AgencyImageAdminForm"""
 
+    @pytest.mark.unit
     def test_form_fields(self, db):
         """Test form has correct fields"""
         # Act
@@ -44,6 +46,7 @@ class TestAgencyImageAdminForm:
         assert form.fields["file"].required is True
         assert form.fields["file"].label == "Upload File"
 
+    @pytest.mark.unit
     def test_form_meta_model(self, db):
         """Test form Meta model"""
         # Act
@@ -57,6 +60,7 @@ class TestAgencyImageAdminForm:
 class TestAgencyImageAdmin:
     """Tests for AgencyImageAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -67,6 +71,7 @@ class TestAgencyImageAdmin:
         assert "file" in admin.list_display
         assert "size_in_mb" in admin.list_display
 
+    @pytest.mark.unit
     def test_form_class(self, db):
         """Test admin uses AgencyImageAdminForm"""
         # Arrange
@@ -75,6 +80,7 @@ class TestAgencyImageAdmin:
         # Assert
         assert admin.form == AgencyImageAdminForm
 
+    @pytest.mark.integration
     def test_size_in_mb_with_size(self, agency_image, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -90,6 +96,7 @@ class TestAgencyImageAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.integration
     def test_size_in_mb_without_size(self, agency_image, db):
         """Test size_in_mb method without size"""
         # Arrange
@@ -106,6 +113,7 @@ class TestAgencyImageAdmin:
         # Only None triggers "Unknown"
         assert result == "0.00 MB"
 
+    @pytest.mark.unit
     def test_size_in_mb_attributes(self, db):
         """Test size_in_mb method attributes"""
         # Arrange
@@ -117,6 +125,7 @@ class TestAgencyImageAdmin:
         assert hasattr(admin.size_in_mb, "short_description")
         assert admin.size_in_mb.short_description == "Size (MB)"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -127,6 +136,7 @@ class TestAgencyImageAdmin:
         assert hasattr(admin, "recalculate_photo_sizes")
         assert callable(admin.recalculate_photo_sizes)
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_description(self, db):
         """Test recalculate_photo_sizes action description"""
         # Arrange
@@ -142,6 +152,7 @@ class TestAgencyImageAdmin:
 class TestProjectDocumentPDFAdmin:
     """Tests for ProjectDocumentPDFAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -154,6 +165,7 @@ class TestProjectDocumentPDFAdmin:
         assert "document" in admin.list_display
         assert "project" in admin.list_display
 
+    @pytest.mark.unit
     def test_search_fields(self, db):
         """Test search_fields configuration"""
         # Arrange
@@ -162,6 +174,7 @@ class TestProjectDocumentPDFAdmin:
         # Assert
         assert "project" in admin.search_fields
 
+    @pytest.mark.integration
     def test_size_in_mb_with_size(self, project_document_pdf, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -175,6 +188,7 @@ class TestProjectDocumentPDFAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.integration
     def test_size_in_mb_without_size(self, project_document_pdf, db):
         """Test size_in_mb method without size"""
         # Arrange
@@ -188,6 +202,7 @@ class TestProjectDocumentPDFAdmin:
         # Assert
         assert result == "0.00 MB"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -200,6 +215,7 @@ class TestProjectDocumentPDFAdmin:
 class TestAECEndorsementPDFAdmin:
     """Tests for AECEndorsementPDFAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -211,6 +227,7 @@ class TestAECEndorsementPDFAdmin:
         assert "size_in_mb" in admin.list_display
         assert "creator" in admin.list_display
 
+    @pytest.mark.unit
     def test_size_in_mb_with_size(self, aec_endorsement_pdf, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -224,6 +241,7 @@ class TestAECEndorsementPDFAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -236,6 +254,7 @@ class TestAECEndorsementPDFAdmin:
 class TestAnnualReportPDFAdmin:
     """Tests for AnnualReportPDFAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -248,6 +267,7 @@ class TestAnnualReportPDFAdmin:
         assert "size_in_mb" in admin.list_display
         assert "creator" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -256,6 +276,7 @@ class TestAnnualReportPDFAdmin:
         # Assert
         assert "report" in admin.list_filter
 
+    @pytest.mark.unit
     def test_size_in_mb_with_size(self, annual_report_pdf, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -269,6 +290,7 @@ class TestAnnualReportPDFAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -281,6 +303,7 @@ class TestAnnualReportPDFAdmin:
 class TestLegacyAnnualReportPDFAdmin:
     """Tests for LegacyAnnualReportPDFAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -293,6 +316,7 @@ class TestLegacyAnnualReportPDFAdmin:
         assert "size_in_mb" in admin.list_display
         assert "creator" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -301,6 +325,7 @@ class TestLegacyAnnualReportPDFAdmin:
         # Assert
         assert "year" in admin.list_filter
 
+    @pytest.mark.unit
     def test_size_in_mb_with_size(self, legacy_annual_report_pdf, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -314,6 +339,7 @@ class TestLegacyAnnualReportPDFAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -326,6 +352,7 @@ class TestLegacyAnnualReportPDFAdmin:
 class TestAnnualReportMediaAdmin:
     """Tests for AnnualReportMediaAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -338,6 +365,7 @@ class TestAnnualReportMediaAdmin:
         assert "size_in_mb" in admin.list_display
         assert "uploader" in admin.list_display
 
+    @pytest.mark.unit
     def test_list_filter(self, db):
         """Test list_filter configuration"""
         # Arrange
@@ -347,6 +375,7 @@ class TestAnnualReportMediaAdmin:
         assert "report" in admin.list_filter
         assert "kind" in admin.list_filter
 
+    @pytest.mark.unit
     def test_size_in_mb_with_size(self, annual_report_media, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -360,6 +389,7 @@ class TestAnnualReportMediaAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -372,6 +402,7 @@ class TestAnnualReportMediaAdmin:
 class TestBusinessAreaPhotoAdmin:
     """Tests for BusinessAreaPhotoAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -384,6 +415,7 @@ class TestBusinessAreaPhotoAdmin:
         assert "size_in_mb" in admin.list_display
         assert "uploader" in admin.list_display
 
+    @pytest.mark.integration
     def test_size_in_mb_with_size(self, business_area_photo, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -397,6 +429,7 @@ class TestBusinessAreaPhotoAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -409,6 +442,7 @@ class TestBusinessAreaPhotoAdmin:
 class TestProjectPhotoAdmin:
     """Tests for ProjectPhotoAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -421,6 +455,7 @@ class TestProjectPhotoAdmin:
         assert "project" in admin.list_display
         assert "uploader" in admin.list_display
 
+    @pytest.mark.integration
     def test_size_in_mb_with_size(self, project_photo, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -434,6 +469,7 @@ class TestProjectPhotoAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -446,6 +482,7 @@ class TestProjectPhotoAdmin:
 class TestProjectPlanMethodologyPhotoAdmin:
     """Tests for ProjectPlanMethodologyPhotoAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -460,6 +497,7 @@ class TestProjectPlanMethodologyPhotoAdmin:
         assert "project_plan" in admin.list_display
         assert "uploader" in admin.list_display
 
+    @pytest.mark.unit
     def test_size_in_mb_with_size(self, methodology_photo, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -475,6 +513,7 @@ class TestProjectPlanMethodologyPhotoAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange
@@ -489,6 +528,7 @@ class TestProjectPlanMethodologyPhotoAdmin:
 class TestUserAvatarAdmin:
     """Tests for UserAvatarAdmin"""
 
+    @pytest.mark.unit
     def test_list_display(self, db):
         """Test list_display configuration"""
         # Arrange
@@ -500,6 +540,7 @@ class TestUserAvatarAdmin:
         assert "size_in_mb" in admin.list_display
         assert "user" in admin.list_display
 
+    @pytest.mark.integration
     def test_size_in_mb_with_size(self, user_avatar, db):
         """Test size_in_mb method with size"""
         # Arrange
@@ -513,6 +554,7 @@ class TestUserAvatarAdmin:
         assert "MB" in result
         assert result != "Unknown"
 
+    @pytest.mark.integration
     def test_size_in_mb_without_size(self, user_avatar, db):
         """Test size_in_mb method without size"""
         # Arrange
@@ -526,6 +568,7 @@ class TestUserAvatarAdmin:
         # Assert
         assert result == "0.00 MB"
 
+    @pytest.mark.unit
     def test_recalculate_photo_sizes_action_exists(self, db):
         """Test recalculate_photo_sizes action is configured"""
         # Arrange

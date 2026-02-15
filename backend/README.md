@@ -1,9 +1,5 @@
 # Science Projects Management System (SPMS) Backend
 
-[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/ci.yml)
-[![Backend Coverage](https://raw.githubusercontent.com/dbca-wa/science-projects/badges/backend-coverage.svg)](https://github.com/dbca-wa/science-projects/actions)
-[![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
-[![Issues](https://img.shields.io/static/v1?label=docs&message=Issues&color=brightgreen)](https://github.com/dbca-wa/science-projects/issues)
 
 > **Note**: This is the backend component of the Science Projects monorepo. See the [root README](../README.md) for the complete system overview.
 
@@ -192,21 +188,118 @@ See [Feature Development](../documentation/backend/development/feature-developme
 
 ## Testing
 
+### Quick Start
+
 ```bash
-# Run all tests
+# Fast feedback - unit tests only (26 seconds)
+poetry run pytest -m unit
+
+# Integration tests (44 seconds)
+poetry run pytest -m integration
+
+# Full test suite (68 seconds)
 poetry run pytest
 
-# Run with coverage
+# With coverage report
+poetry run pytest --cov=. --cov-report=html
+```
+
+### Test Categories
+
+Tests are organised into three categories using pytest markers:
+
+**Unit Tests** (`@pytest.mark.unit`):
+- Pure Python logic, no database
+- Serializer validation
+- Utility functions
+- Fast execution (< 30 seconds total)
+
+**Integration Tests** (`@pytest.mark.integration`):
+- View tests with database
+- Service layer tests
+- API endpoint tests
+- Medium execution (< 2 minutes total)
+
+**Slow Tests** (`@pytest.mark.slow`):
+- Complex workflows
+- Multi-model transactions
+- Admin action tests
+- Slower execution (< 3 minutes total)
+
+### Running Specific Test Categories
+
+```bash
+# Unit tests only - fastest feedback
+poetry run pytest -m unit
+
+# Integration tests only
+poetry run pytest -m integration
+
+# Slow tests only
+poetry run pytest -m slow
+
+# All except slow tests
+poetry run pytest -m "not slow"
+
+# Specific app with category
+poetry run pytest users/tests/ -m unit
+```
+
+### Development Workflow
+
+**During Development** (rapid iteration):
+```bash
+poetry run pytest -m unit  # 26 seconds
+```
+
+**Before Committing** (thorough validation):
+```bash
+poetry run pytest -m integration  # 44 seconds
+```
+
+**Before Pushing** (final check):
+```bash
+poetry run pytest  # 68 seconds
+```
+
+### Coverage Reports
+
+Coverage reports are available in `htmlcov/index.html` after running tests with coverage:
+
+```bash
+# Generate coverage report
 poetry run pytest --cov=. --cov-report=html
 
+# Open in browser
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+```
+
+### Additional Test Options
+
+```bash
 # Run specific app tests
 poetry run pytest agencies/tests/
 
-# Run in parallel
+# Run in parallel (faster)
 poetry run pytest -n auto
+
+# Verbose output
+poetry run pytest -v
+
+# Stop on first failure
+poetry run pytest -x
+
+# Show test durations
+poetry run pytest --durations=10
 ```
 
-Coverage reports are available in `htmlcov/index.html` after running tests with coverage.
+### Test Documentation
+
+For detailed testing guidelines, see:
+- [Testing Guidelines](docs/testing/guidelines.md) - Comprehensive guide
+- [Marker Reference](docs/testing/markers.md) - Complete marker documentation
+- [Performance Report](docs/testing/performance-report.md) - Optimization metrics
 
 ## Code Quality
 

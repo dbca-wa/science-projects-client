@@ -2,6 +2,8 @@
 Tests for document serializers
 """
 
+import pytest
+
 from documents.serializers.base import (
     AnnualReportCreateSerializer,
     AnnualReportSerializer,
@@ -19,6 +21,7 @@ from documents.serializers.base import (
 class TestTinyProjectDocumentSerializer:
     """Tests for TinyProjectDocumentSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_document, db):
         """Test serializing a project document"""
         # Arrange
@@ -39,6 +42,7 @@ class TestTinyProjectDocumentSerializer:
 class TestProjectDocumentSerializer:
     """Tests for ProjectDocumentSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_document, db):
         """Test serializing a project document"""
         # Arrange
@@ -58,6 +62,7 @@ class TestProjectDocumentSerializer:
 class TestProjectDocumentCreateSerializer:
     """Tests for ProjectDocumentCreateSerializer"""
 
+    @pytest.mark.integration
     def test_validation_valid_data(self, project_with_lead, db):
         """Test validation with valid data"""
         # Arrange
@@ -74,6 +79,7 @@ class TestProjectDocumentCreateSerializer:
         assert is_valid is True
         assert serializer.validated_data["kind"] == "concept"
 
+    @pytest.mark.unit
     def test_validation_missing_required_field(self, db):
         """Test validation with missing required field"""
         # Arrange
@@ -93,6 +99,7 @@ class TestProjectDocumentCreateSerializer:
 class TestProjectDocumentUpdateSerializer:
     """Tests for ProjectDocumentUpdateSerializer"""
 
+    @pytest.mark.unit
     def test_validation_valid_data(self, db):
         """Test validation with valid data"""
         # Arrange
@@ -112,6 +119,7 @@ class TestProjectDocumentUpdateSerializer:
 class TestTinyAnnualReportSerializer:
     """Tests for TinyAnnualReportSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, annual_report, db):
         """Test serializing an annual report"""
         # Arrange
@@ -130,6 +138,7 @@ class TestTinyAnnualReportSerializer:
 class TestMiniAnnualReportSerializer:
     """Tests for MiniAnnualReportSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, annual_report, db):
         """Test serializing an annual report"""
         # Arrange
@@ -148,6 +157,7 @@ class TestMiniAnnualReportSerializer:
 class TestAnnualReportSerializer:
     """Tests for AnnualReportSerializer"""
 
+    @pytest.mark.unit
     def test_serialization(self, annual_report, db):
         """Test serializing an annual report"""
         # Arrange
@@ -166,6 +176,7 @@ class TestAnnualReportSerializer:
 class TestAnnualReportCreateSerializer:
     """Tests for AnnualReportCreateSerializer"""
 
+    @pytest.mark.unit
     def test_validation_valid_data(self, db):
         """Test validation with valid data"""
         # Arrange
@@ -183,6 +194,7 @@ class TestAnnualReportCreateSerializer:
         assert is_valid is True
         assert serializer.validated_data["year"] == 2024
 
+    @pytest.mark.unit
     def test_validation_missing_required_field(self, db):
         """Test validation with missing required field"""
         # Arrange
@@ -203,6 +215,7 @@ class TestAnnualReportCreateSerializer:
 class TestAnnualReportUpdateSerializer:
     """Tests for AnnualReportUpdateSerializer"""
 
+    @pytest.mark.unit
     def test_validation_valid_data(self, db):
         """Test validation with valid data"""
         # Arrange
@@ -228,6 +241,7 @@ class TestAnnualReportUpdateSerializer:
 class TestTinyProjectDocumentSerializerWithUserDocsBelongTo:
     """Tests for TinyProjectDocumentSerializerWithUserDocsBelongTo"""
 
+    @pytest.mark.integration
     def test_serialization_with_user_context(self, project_document, user, db):
         """Test serializing with user in context"""
         # Arrange
@@ -249,6 +263,7 @@ class TestTinyProjectDocumentSerializerWithUserDocsBelongTo:
         assert data["for_user"]["display_last_name"] == user.display_last_name
         assert "image" in data["for_user"]
 
+    @pytest.mark.integration
     def test_serialization_with_user_with_avatar(
         self, project_document, user_with_avatar, db
     ):
@@ -267,6 +282,7 @@ class TestTinyProjectDocumentSerializerWithUserDocsBelongTo:
         assert data["for_user"]["image"] is not None
         assert "avatar" in data["for_user"]["image"]
 
+    @pytest.mark.integration
     def test_serialization_without_user_context(self, project_document, db):
         """Test serializing without user in context"""
         # Arrange
@@ -280,6 +296,7 @@ class TestTinyProjectDocumentSerializerWithUserDocsBelongTo:
         assert "for_user" in data
         assert data["for_user"] is None
 
+    @pytest.mark.integration
     def test_get_created_year(self, project_document, db):
         """Test get_created_year method"""
         # Arrange

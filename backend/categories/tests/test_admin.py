@@ -2,6 +2,7 @@
 Tests for categories admin
 """
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 
 from categories.admin import ProjectCategoryAdmin
@@ -11,6 +12,7 @@ from categories.models import ProjectCategory
 class TestProjectCategoryAdmin:
     """Tests for ProjectCategoryAdmin"""
 
+    @pytest.mark.unit
     def test_admin_list_display(self, db):
         """Test admin list display configuration"""
         # Arrange
@@ -23,6 +25,7 @@ class TestProjectCategoryAdmin:
         assert "name" in list_display
         assert "kind" in list_display
 
+    @pytest.mark.unit
     def test_admin_list_filter(self, db):
         """Test admin list filter configuration"""
         # Arrange
@@ -34,6 +37,7 @@ class TestProjectCategoryAdmin:
         # Assert
         assert "kind" in list_filter
 
+    @pytest.mark.unit
     def test_admin_registered(self, db):
         """Test ProjectCategory is registered with admin"""
         # Arrange
@@ -45,6 +49,7 @@ class TestProjectCategoryAdmin:
         # Assert
         assert is_registered
 
+    @pytest.mark.unit
     def test_admin_model_admin_class(self, db):
         """Test correct admin class is registered"""
         # Arrange

@@ -11,6 +11,7 @@ from communications.models import ChatRoom, Comment, DirectMessage, Reaction
 class TestChatRoom:
     """Tests for ChatRoom model"""
 
+    @pytest.mark.unit
     def test_create_chat_room(self, db):
         """Test creating a chat room"""
         # Act
@@ -21,6 +22,7 @@ class TestChatRoom:
         assert room.created_at is not None
         assert room.updated_at is not None
 
+    @pytest.mark.integration
     def test_chat_room_add_users(self, user, other_user, db):
         """Test adding users to chat room"""
         # Arrange
@@ -34,6 +36,7 @@ class TestChatRoom:
         assert user in room.users.all()
         assert other_user in room.users.all()
 
+    @pytest.mark.integration
     def test_chat_room_str_with_users(self, chat_room, user, other_user, db):
         """Test chat room string representation with users"""
         # Act
@@ -44,6 +47,7 @@ class TestChatRoom:
         assert user.username in result or str(user) in result
         assert other_user.username in result or str(other_user) in result
 
+    @pytest.mark.integration
     def test_chat_room_str_without_users(self, db):
         """Test chat room string representation without users"""
         # Arrange
@@ -55,6 +59,7 @@ class TestChatRoom:
         # Assert
         assert "Chat Room" in result
 
+    @pytest.mark.integration
     def test_chat_room_users_relationship(self, user, db):
         """Test ManyToMany relationship with users"""
         # Arrange
@@ -67,6 +72,7 @@ class TestChatRoom:
         # Assert
         assert room in user_rooms
 
+    @pytest.mark.unit
     def test_chat_room_verbose_name(self, db):
         """Test model verbose name"""
         # Act
@@ -81,6 +87,7 @@ class TestChatRoom:
 class TestDirectMessage:
     """Tests for DirectMessage model"""
 
+    @pytest.mark.integration
     def test_create_direct_message(self, user, chat_room, db):
         """Test creating a direct message"""
         # Act
@@ -100,6 +107,7 @@ class TestDirectMessage:
         assert message.is_public is True
         assert message.is_removed is False
 
+    @pytest.mark.integration
     def test_direct_message_str(self, direct_message, user, db):
         """Test direct message string representation"""
         # Act
@@ -109,6 +117,7 @@ class TestDirectMessage:
         assert str(user) in result
         assert "Test message" in result
 
+    @pytest.mark.integration
     def test_direct_message_without_user(self, chat_room, db):
         """Test creating message without user (null allowed)"""
         # Act
@@ -121,6 +130,7 @@ class TestDirectMessage:
         assert message.user is None
         assert message.text == "Anonymous message"
 
+    @pytest.mark.integration
     def test_direct_message_is_public_default(self, user, chat_room, db):
         """Test is_public defaults to True"""
         # Act
@@ -133,6 +143,7 @@ class TestDirectMessage:
         # Assert
         assert message.is_public is True
 
+    @pytest.mark.integration
     def test_direct_message_is_removed_default(self, user, chat_room, db):
         """Test is_removed defaults to False"""
         # Act
@@ -145,6 +156,7 @@ class TestDirectMessage:
         # Assert
         assert message.is_removed is False
 
+    @pytest.mark.unit
     def test_direct_message_chat_room_relationship(self, direct_message, chat_room, db):
         """Test ForeignKey relationship with chat room"""
         # Act
@@ -153,6 +165,7 @@ class TestDirectMessage:
         # Assert
         assert direct_message in room_messages
 
+    @pytest.mark.integration
     def test_direct_message_user_relationship(self, direct_message, user, db):
         """Test ForeignKey relationship with user"""
         # Act
@@ -161,6 +174,7 @@ class TestDirectMessage:
         # Assert
         assert direct_message in user_messages
 
+    @pytest.mark.unit
     def test_direct_message_verbose_name(self, db):
         """Test model verbose name"""
         # Act
@@ -175,6 +189,7 @@ class TestDirectMessage:
 class TestComment:
     """Tests for Comment model"""
 
+    @pytest.mark.integration
     def test_create_comment(self, user, project_document, db):
         """Test creating a comment"""
         # Act
@@ -194,6 +209,7 @@ class TestComment:
         assert comment.is_public is True
         assert comment.is_removed is False
 
+    @pytest.mark.unit
     def test_comment_str(self, comment, db):
         """Test comment string representation"""
         # Act
@@ -202,6 +218,7 @@ class TestComment:
         # Assert
         assert "Test comment" in result
 
+    @pytest.mark.integration
     def test_comment_str_with_html(self, user, project_document, db):
         """Test comment string representation with HTML content"""
         # Arrange
@@ -218,6 +235,7 @@ class TestComment:
         # extract_text_content should strip HTML tags
         assert result is not None
 
+    @pytest.mark.integration
     def test_comment_without_user(self, project_document, db):
         """Test creating comment without user (null allowed)"""
         # Act
@@ -230,6 +248,7 @@ class TestComment:
         assert comment.user is None
         assert comment.text == "Anonymous comment"
 
+    @pytest.mark.unit
     def test_comment_get_reactions_with_reactions(
         self, comment, reaction_on_comment, db
     ):
@@ -241,6 +260,7 @@ class TestComment:
         assert reactions is not None
         assert reaction_on_comment in reactions
 
+    @pytest.mark.unit
     def test_comment_get_reactions_without_reactions(self, comment, db):
         """Test get_reactions method without reactions"""
         # Act
@@ -250,6 +270,7 @@ class TestComment:
         assert reactions is not None
         assert reactions.count() == 0
 
+    @pytest.mark.integration
     def test_comment_is_public_default(self, user, project_document, db):
         """Test is_public defaults to True"""
         # Act
@@ -262,6 +283,7 @@ class TestComment:
         # Assert
         assert comment.is_public is True
 
+    @pytest.mark.integration
     def test_comment_is_removed_default(self, user, project_document, db):
         """Test is_removed defaults to False"""
         # Act
@@ -274,6 +296,7 @@ class TestComment:
         # Assert
         assert comment.is_removed is False
 
+    @pytest.mark.integration
     def test_comment_document_relationship(self, comment, project_document, db):
         """Test ForeignKey relationship with document"""
         # Act
@@ -282,6 +305,7 @@ class TestComment:
         # Assert
         assert comment in document_comments
 
+    @pytest.mark.unit
     def test_comment_verbose_name(self, db):
         """Test model verbose name"""
         # Act
@@ -296,6 +320,7 @@ class TestComment:
 class TestReaction:
     """Tests for Reaction model"""
 
+    @pytest.mark.integration
     def test_create_reaction_on_comment(self, user, comment, db):
         """Test creating a reaction on a comment"""
         # Act
@@ -312,6 +337,7 @@ class TestReaction:
         assert reaction.direct_message is None
         assert reaction.reaction == Reaction.ReactionChoices.THUMBUP
 
+    @pytest.mark.integration
     def test_create_reaction_on_direct_message(self, user, direct_message, db):
         """Test creating a reaction on a direct message"""
         # Act
@@ -328,6 +354,7 @@ class TestReaction:
         assert reaction.comment is None
         assert reaction.reaction == Reaction.ReactionChoices.HEART
 
+    @pytest.mark.unit
     def test_reaction_str_with_comment(self, reaction_on_comment, comment, db):
         """Test reaction string representation with comment"""
         # Act
@@ -337,6 +364,7 @@ class TestReaction:
         assert "Reaction to" in result
         assert str(comment) in result
 
+    @pytest.mark.unit
     def test_reaction_str_with_direct_message(
         self, reaction_on_message, direct_message, db
     ):
@@ -348,6 +376,7 @@ class TestReaction:
         assert "Reaction to" in result
         assert str(direct_message) in result
 
+    @pytest.mark.integration
     def test_reaction_str_with_neither(self, user, db):
         """Test reaction string representation with neither comment nor message"""
         # Arrange - Create reaction without calling save (to bypass validation)
@@ -362,6 +391,7 @@ class TestReaction:
         # Assert
         assert "Reaction object null" in result
 
+    @pytest.mark.integration
     def test_reaction_clean_with_neither_comment_nor_message(self, user, db):
         """Test clean method raises error when neither comment nor message"""
         # Arrange
@@ -374,6 +404,7 @@ class TestReaction:
         with pytest.raises(ValidationError, match="must be associated with either"):
             reaction.clean()
 
+    @pytest.mark.integration
     def test_reaction_clean_with_both_comment_and_message(
         self, user, comment, direct_message, db
     ):
@@ -390,6 +421,7 @@ class TestReaction:
         with pytest.raises(ValidationError, match="cannot be associated with both"):
             reaction.clean()
 
+    @pytest.mark.integration
     def test_reaction_save_calls_clean(self, user, db):
         """Test save method calls clean and raises validation error"""
         # Arrange
@@ -402,6 +434,7 @@ class TestReaction:
         with pytest.raises(ValidationError):
             reaction.save()
 
+    @pytest.mark.unit
     def test_reaction_choices(self, db):
         """Test all reaction choices are available"""
         # Act
@@ -418,6 +451,7 @@ class TestReaction:
         assert ("funny", "Funny") in choices
         assert ("surprised", "Surprised") in choices
 
+    @pytest.mark.unit
     def test_reaction_comment_relationship(self, reaction_on_comment, comment, db):
         """Test ForeignKey relationship with comment"""
         # Act
@@ -426,6 +460,7 @@ class TestReaction:
         # Assert
         assert reaction_on_comment in comment_reactions
 
+    @pytest.mark.unit
     def test_reaction_direct_message_relationship(
         self, reaction_on_message, direct_message, db
     ):
@@ -436,6 +471,7 @@ class TestReaction:
         # Assert
         assert reaction_on_message in message_reactions
 
+    @pytest.mark.integration
     def test_reaction_user_relationship(self, reaction_on_comment, user, db):
         """Test ForeignKey relationship with user"""
         # Act
@@ -444,6 +480,7 @@ class TestReaction:
         # Assert
         assert reaction_on_comment in user_reactions
 
+    @pytest.mark.unit
     def test_reaction_verbose_name(self, db):
         """Test model verbose name"""
         # Act

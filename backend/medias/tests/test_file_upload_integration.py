@@ -34,6 +34,7 @@ from medias.models import (
 class TestProjectPhotoUpload:
     """Integration tests for ProjectPhoto uploads."""
 
+    @pytest.mark.integration
     def test_valid_jpeg_upload(self, user, project):
         """Test uploading valid JPEG image."""
         # Create valid JPEG file
@@ -51,6 +52,7 @@ class TestProjectPhotoUpload:
         assert photo.size > 0
         assert photo.project == project
 
+    @pytest.mark.integration
     def test_valid_png_upload(self, user, project):
         """Test uploading valid PNG image."""
         # Create valid PNG file
@@ -67,6 +69,7 @@ class TestProjectPhotoUpload:
         assert photo.file is not None
         assert photo.size > 0
 
+    @pytest.mark.integration
     def test_invalid_file_type_rejected(self, user, project):
         """Test that non-image file is rejected."""
         # Create PDF file (not an image)
@@ -79,6 +82,7 @@ class TestProjectPhotoUpload:
         with pytest.raises(FileValidationError):
             ProjectPhoto.objects.create(file=pdf_file, project=project, uploader=user)
 
+    @pytest.mark.integration
     def test_extension_mismatch_rejected(self, user, project):
         """Test that extension mismatch is detected."""
         # Create JPEG with PNG extension
@@ -96,6 +100,7 @@ class TestProjectPhotoUpload:
 class TestAnnualReportMediaUpload:
     """Integration tests for AnnualReportMedia uploads."""
 
+    @pytest.mark.integration
     def test_valid_image_upload(self, user, annual_report):
         """Test uploading valid image for annual report."""
         # Create valid JPEG file
@@ -116,6 +121,7 @@ class TestAnnualReportMediaUpload:
         assert media.size > 0
         assert media.kind == AnnualReportMedia.MediaTypes.COVER
 
+    @pytest.mark.integration
     def test_invalid_file_rejected(self, user, annual_report):
         """Test that invalid file is rejected."""
         # Create invalid file
@@ -138,6 +144,7 @@ class TestAnnualReportMediaUpload:
 class TestUserAvatarUpload:
     """Integration tests for UserAvatar uploads."""
 
+    @pytest.mark.integration
     def test_valid_avatar_upload(self, user):
         """Test uploading valid avatar image."""
         # Create valid JPEG file
@@ -153,6 +160,7 @@ class TestUserAvatarUpload:
         assert avatar.size > 0
         assert avatar.user == user
 
+    @pytest.mark.integration
     def test_invalid_avatar_rejected(self, user):
         """Test that invalid avatar is rejected."""
         # Create PDF file (not an image)
@@ -170,6 +178,7 @@ class TestUserAvatarUpload:
 class TestBusinessAreaPhotoUpload:
     """Integration tests for BusinessAreaPhoto uploads."""
 
+    @pytest.mark.integration
     def test_valid_photo_upload(self, user, business_area):
         """Test uploading valid business area photo."""
         # Create valid PNG file
@@ -186,6 +195,7 @@ class TestBusinessAreaPhotoUpload:
         assert photo.file is not None
         assert photo.size > 0
 
+    @pytest.mark.integration
     def test_invalid_photo_rejected(self, user, business_area):
         """Test that invalid photo is rejected."""
         # Create invalid file
@@ -205,6 +215,7 @@ class TestBusinessAreaPhotoUpload:
 class TestAgencyImageUpload:
     """Integration tests for AgencyImage uploads."""
 
+    @pytest.mark.integration
     def test_valid_image_upload(self, agency):
         """Test uploading valid agency image."""
         # Create valid JPEG file
@@ -219,6 +230,7 @@ class TestAgencyImageUpload:
         assert image.file is not None
         assert image.size > 0
 
+    @pytest.mark.integration
     def test_invalid_image_rejected(self, agency):
         """Test that invalid image is rejected."""
         # Create PDF file (not an image)
@@ -236,6 +248,7 @@ class TestAgencyImageUpload:
 class TestMethodologyPhotoUpload:
     """Integration tests for ProjectPlanMethodologyPhoto uploads."""
 
+    @pytest.mark.integration
     def test_valid_photo_upload(self, user, project_plan):
         """Test uploading valid methodology photo."""
         # Create valid JPEG file
@@ -252,6 +265,7 @@ class TestMethodologyPhotoUpload:
         assert photo.file is not None
         assert photo.size > 0
 
+    @pytest.mark.integration
     def test_invalid_photo_rejected(self, user, project_plan):
         """Test that invalid photo is rejected."""
         # Create invalid file
@@ -271,6 +285,7 @@ class TestMethodologyPhotoUpload:
 class TestProjectDocumentPDFUpload:
     """Integration tests for ProjectDocumentPDF uploads."""
 
+    @pytest.mark.integration
     def test_valid_pdf_upload(self, project, project_document):
         """Test uploading valid PDF document."""
         # Create valid PDF file
@@ -287,6 +302,7 @@ class TestProjectDocumentPDFUpload:
         assert pdf.file is not None
         assert pdf.size > 0
 
+    @pytest.mark.integration
     def test_invalid_pdf_rejected(self, project, project_document):
         """Test that invalid PDF is rejected."""
         # Create JPEG file (not a PDF)
@@ -301,6 +317,7 @@ class TestProjectDocumentPDFUpload:
                 file=fake_pdf, document=project_document, project=project
             )
 
+    @pytest.mark.integration
     def test_extension_mismatch_rejected(self, project, project_document):
         """Test that extension mismatch is detected."""
         # Create PDF with JPG extension
@@ -320,6 +337,7 @@ class TestProjectDocumentPDFUpload:
 class TestAnnualReportPDFUpload:
     """Integration tests for AnnualReportPDF uploads."""
 
+    @pytest.mark.integration
     def test_valid_pdf_upload(self, user, annual_report):
         """Test uploading valid annual report PDF."""
         # Create valid PDF file
@@ -336,6 +354,7 @@ class TestAnnualReportPDFUpload:
         assert pdf.file is not None
         assert pdf.size > 0
 
+    @pytest.mark.integration
     def test_invalid_pdf_rejected(self, user, annual_report):
         """Test that invalid PDF is rejected."""
         # Create invalid file
@@ -355,6 +374,7 @@ class TestAnnualReportPDFUpload:
 class TestAECEndorsementPDFUpload:
     """Integration tests for AECEndorsementPDF uploads."""
 
+    @pytest.mark.integration
     def test_valid_pdf_upload(self, user, endorsement):
         """Test uploading valid AEC endorsement PDF."""
         # Create valid PDF file
@@ -371,6 +391,7 @@ class TestAECEndorsementPDFUpload:
         assert pdf.file is not None
         assert pdf.size > 0
 
+    @pytest.mark.integration
     def test_invalid_pdf_rejected(self, user, endorsement):
         """Test that invalid PDF is rejected."""
         # Create JPEG file (not a PDF)
@@ -390,6 +411,7 @@ class TestAECEndorsementPDFUpload:
 class TestFileSizeValidation:
     """Integration tests for file size validation."""
 
+    @pytest.mark.integration
     def test_oversized_image_rejected(self, user, project):
         """Test that oversized image is rejected."""
         # Create 11MB JPEG file (exceeds 10MB limit)
@@ -402,6 +424,7 @@ class TestFileSizeValidation:
         with pytest.raises(FileValidationError, match="exceeds maximum"):
             ProjectPhoto.objects.create(file=large_file, project=project, uploader=user)
 
+    @pytest.mark.integration
     def test_oversized_pdf_rejected(self, user, annual_report):
         """Test that oversized PDF is rejected."""
         # Create 101MB PDF file (exceeds 100MB limit for annual reports)

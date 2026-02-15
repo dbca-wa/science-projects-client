@@ -20,6 +20,7 @@ from projects.models import (
 class TestGetNextAvailableNumberForYear:
     """Tests for get_next_available_number_for_year function"""
 
+    @pytest.mark.integration
     def test_returns_1_when_no_projects_exist(self, db):
         """Test returns 1 when no projects exist for current year"""
         # Arrange - no projects exist
@@ -32,6 +33,7 @@ class TestGetNextAvailableNumberForYear:
         # Assert
         assert result == 1
 
+    @pytest.mark.integration
     def test_returns_next_number_when_projects_exist(self, db, project):
         """Test returns next available number when projects exist"""
         # Arrange
@@ -50,6 +52,7 @@ class TestGetNextAvailableNumberForYear:
 class TestProject:
     """Tests for Project model"""
 
+    @pytest.mark.integration
     def test_get_deletion_request_id_returns_none_when_no_request(self, project, db):
         """Test get_deletion_request_id returns None when no deletion request exists"""
         # Act
@@ -58,6 +61,7 @@ class TestProject:
         # Assert
         assert result is None
 
+    @pytest.mark.integration
     def test_get_deletion_request_id_returns_id_when_request_exists(self, project, db):
         """Test get_deletion_request_id returns task ID when deletion request exists"""
         # Arrange
@@ -75,6 +79,7 @@ class TestProject:
         # Assert
         assert result == task.id
 
+    @pytest.mark.integration
     def test_extract_inner_text(self, project, db):
         """Test extract_inner_text method"""
         # Arrange
@@ -86,6 +91,7 @@ class TestProject:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.integration
     def test_extract_inner_text_with_complex_html(self, project, db):
         """Test extract_inner_text with complex HTML"""
         # Arrange
@@ -98,6 +104,7 @@ class TestProject:
         assert "First" in result
         assert "Second" in result
 
+    @pytest.mark.integration
     def test_project_kind_to_tag_science(self, project, db):
         """Test project_kind_to_tag for science project"""
         # Arrange
@@ -109,6 +116,7 @@ class TestProject:
         # Assert
         assert result == "SP"
 
+    @pytest.mark.integration
     def test_project_kind_to_tag_student(self, project, db):
         """Test project_kind_to_tag for student project"""
         # Arrange
@@ -120,6 +128,7 @@ class TestProject:
         # Assert
         assert result == "STP"
 
+    @pytest.mark.integration
     def test_project_kind_to_tag_external(self, project, db):
         """Test project_kind_to_tag for external project"""
         # Arrange
@@ -131,6 +140,7 @@ class TestProject:
         # Assert
         assert result == "EXT"
 
+    @pytest.mark.integration
     def test_project_kind_to_tag_core_function(self, project, db):
         """Test project_kind_to_tag for core function project"""
         # Arrange
@@ -142,6 +152,7 @@ class TestProject:
         # Assert
         assert result == "CF"
 
+    @pytest.mark.integration
     def test_project_kind_to_tag_unknown(self, project, db):
         """Test project_kind_to_tag for unknown project kind"""
         # Arrange
@@ -153,6 +164,7 @@ class TestProject:
         # Assert
         assert result == "UNKNOWN"
 
+    @pytest.mark.integration
     def test_get_project_tag(self, project, db):
         """Test get_project_tag method"""
         # Arrange
@@ -166,6 +178,7 @@ class TestProject:
         # Assert
         assert result == "SP-2023-42"
 
+    @pytest.mark.integration
     def test_get_description_non_external(self, project, db):
         """Test get_description for non-external project"""
         # Arrange
@@ -178,6 +191,7 @@ class TestProject:
         # Assert
         assert result == "Test description"
 
+    @pytest.mark.integration
     def test_get_description_external_with_details(self, project, db):
         """Test get_description for external project with details"""
         # Arrange
@@ -196,6 +210,7 @@ class TestProject:
         # Assert
         assert result == "<p>External description</p>"
 
+    @pytest.mark.integration
     def test_get_description_external_without_details(self, project, db):
         """Test get_description for external project without details"""
         # Arrange
@@ -208,6 +223,7 @@ class TestProject:
         # Assert
         assert result == ""
 
+    @pytest.mark.integration
     def test_str_representation(self, project, db):
         """Test string representation of Project"""
         # Arrange
@@ -225,6 +241,7 @@ class TestProject:
 class TestProjectDetail:
     """Tests for ProjectDetail model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, project_with_lead, db):
         """Test string representation of ProjectDetail"""
         # Arrange
@@ -241,6 +258,7 @@ class TestProjectDetail:
 class TestProjectArea:
     """Tests for ProjectArea model"""
 
+    @pytest.mark.unit
     def test_str_representation(self, db):
         """Test string representation of ProjectArea"""
         # Arrange
@@ -261,6 +279,7 @@ class TestProjectArea:
         assert "2" in result
         assert "3" in result
 
+    @pytest.mark.unit
     def test_save_raises_error_on_duplicate_areas(self, db):
         """Test save raises ValidationError when duplicate area IDs exist"""
         # Arrange
@@ -278,6 +297,7 @@ class TestProjectArea:
 
         assert "Duplicate primary keys found in areas" in str(exc_info.value)
 
+    @pytest.mark.unit
     def test_save_succeeds_with_unique_areas(self, db):
         """Test save succeeds when all area IDs are unique"""
         # Arrange
@@ -300,6 +320,7 @@ class TestProjectArea:
 class TestProjectMember:
     """Tests for ProjectMember model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, project_with_lead, project_lead, db):
         """Test string representation of ProjectMember"""
         # Arrange
@@ -312,6 +333,7 @@ class TestProjectMember:
         assert str(project_lead) in result
         assert str(project_with_lead) in result
 
+    @pytest.mark.integration
     def test_unique_together_constraint(self, project_with_lead, project_lead, db):
         """Test unique_together constraint prevents duplicate user on same project"""
         # Arrange - member already exists from fixture
@@ -325,6 +347,7 @@ class TestProjectMember:
                 role="research",
             )
 
+    @pytest.mark.integration
     def test_default_values(self, project, user, db):
         """Test default values for ProjectMember fields"""
         # Arrange & Act
@@ -343,6 +366,7 @@ class TestProjectMember:
 class TestStudentProjectDetails:
     """Tests for StudentProjectDetails model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, project, db):
         """Test string representation of StudentProjectDetails"""
         # Arrange
@@ -359,6 +383,8 @@ class TestStudentProjectDetails:
         assert "phd" in result
         assert "Test University" in result
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_clean_removes_stale_affiliations(self, project, db):
         """Test clean method removes stale affiliation references"""
         # Arrange
@@ -378,6 +404,7 @@ class TestStudentProjectDetails:
         # Assert
         assert details.organisation == "Valid Affiliation"
 
+    @pytest.mark.integration
     def test_clean_handles_empty_organisation(self, project, db):
         """Test clean method handles empty organisation field"""
         # Arrange
@@ -393,6 +420,7 @@ class TestStudentProjectDetails:
         # Assert
         assert details.organisation == ""
 
+    @pytest.mark.integration
     def test_clean_handles_none_organisation(self, project, db):
         """Test clean method handles None organisation field"""
         # Arrange
@@ -412,6 +440,7 @@ class TestStudentProjectDetails:
 class TestExternalProjectDetails:
     """Tests for ExternalProjectDetails model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, project, db):
         """Test string representation of ExternalProjectDetails"""
         # Arrange
@@ -427,6 +456,8 @@ class TestExternalProjectDetails:
         assert str(project) in result
         assert "Partner Organization" in result
 
+    @pytest.mark.integration
+    @pytest.mark.integration
     def test_clean_removes_stale_affiliations(self, project, db):
         """Test clean method removes stale affiliation references"""
         # Arrange
@@ -445,6 +476,7 @@ class TestExternalProjectDetails:
         # Assert
         assert details.collaboration_with == "Valid Partner"
 
+    @pytest.mark.integration
     def test_clean_handles_empty_collaboration_with(self, project, db):
         """Test clean method handles empty collaboration_with field"""
         # Arrange
@@ -459,6 +491,7 @@ class TestExternalProjectDetails:
         # Assert
         assert details.collaboration_with == ""
 
+    @pytest.mark.integration
     def test_clean_handles_none_collaboration_with(self, project, db):
         """Test clean method handles None collaboration_with field"""
         # Arrange

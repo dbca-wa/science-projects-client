@@ -2,12 +2,15 @@
 Tests for categories serializers
 """
 
+import pytest
+
 from categories.serializers import ProjectCategorySerializer
 
 
 class TestProjectCategorySerializer:
     """Tests for ProjectCategorySerializer"""
 
+    @pytest.mark.integration
     def test_serialize_category(self, project_category, db):
         """Test serializing category to JSON"""
         # Arrange
@@ -21,6 +24,7 @@ class TestProjectCategorySerializer:
         assert data["name"] == project_category.name
         assert data["kind"] == project_category.kind
 
+    @pytest.mark.integration
     def test_serialize_multiple_categories(
         self, project_category, student_category, db
     ):
@@ -37,6 +41,7 @@ class TestProjectCategorySerializer:
         assert data[0]["id"] == project_category.id
         assert data[1]["id"] == student_category.id
 
+    @pytest.mark.unit
     def test_deserialize_valid_data(self, db):
         """Test deserializing valid JSON to category"""
         # Arrange
@@ -55,6 +60,7 @@ class TestProjectCategorySerializer:
         assert category.name == "New Category"
         assert category.kind == "science"
 
+    @pytest.mark.unit
     def test_deserialize_missing_name(self, db):
         """Test deserializing with missing name"""
         # Arrange
@@ -70,6 +76,7 @@ class TestProjectCategorySerializer:
         assert not is_valid
         assert "name" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_missing_kind(self, db):
         """Test deserializing with missing kind"""
         # Arrange
@@ -85,6 +92,7 @@ class TestProjectCategorySerializer:
         assert not is_valid
         assert "kind" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_invalid_kind(self, db):
         """Test deserializing with invalid kind"""
         # Arrange
@@ -101,6 +109,7 @@ class TestProjectCategorySerializer:
         assert not is_valid
         assert "kind" in serializer.errors
 
+    @pytest.mark.unit
     def test_deserialize_empty_name(self, db):
         """Test deserializing with empty name"""
         # Arrange
@@ -117,6 +126,7 @@ class TestProjectCategorySerializer:
         assert not is_valid
         assert "name" in serializer.errors
 
+    @pytest.mark.integration
     def test_update_category(self, project_category, db):
         """Test updating category via serializer"""
         # Arrange
@@ -135,6 +145,7 @@ class TestProjectCategorySerializer:
         assert updated_category.name == "Updated Biodiversity"
         assert updated_category.id == project_category.id
 
+    @pytest.mark.integration
     def test_partial_update_category(self, project_category, db):
         """Test partial update of category via serializer"""
         # Arrange
@@ -154,6 +165,7 @@ class TestProjectCategorySerializer:
         assert updated_category.name == "Partially Updated"
         assert updated_category.kind == project_category.kind  # Unchanged
 
+    @pytest.mark.unit
     def test_serializer_fields(self, db):
         """Test serializer includes correct fields"""
         # Arrange
@@ -168,6 +180,7 @@ class TestProjectCategorySerializer:
         assert "kind" in fields
         assert len(fields) == 3
 
+    @pytest.mark.integration
     def test_serialize_all_kind_choices(
         self,
         project_category,

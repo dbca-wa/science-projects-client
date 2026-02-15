@@ -11,6 +11,7 @@ from locations.models import Area
 class TestAreaModel:
     """Tests for Area model"""
 
+    @pytest.mark.unit
     def test_create_area_valid_data(self, db):
         """Test creating area with valid data"""
         area = Area.objects.create(
@@ -24,6 +25,7 @@ class TestAreaModel:
         assert area.created_at is not None
         assert area.updated_at is not None
 
+    @pytest.mark.unit
     def test_area_str_method(self, db):
         """Test Area __str__ method returns name"""
         area = Area.objects.create(
@@ -33,6 +35,7 @@ class TestAreaModel:
 
         assert str(area) == "Perth District"
 
+    @pytest.mark.unit
     def test_area_type_dbca_region(self, db):
         """Test creating area with DBCA region type"""
         area = Area.objects.create(
@@ -42,6 +45,7 @@ class TestAreaModel:
 
         assert area.area_type == "dbcaregion"
 
+    @pytest.mark.unit
     def test_area_type_dbca_district(self, db):
         """Test creating area with DBCA district type"""
         area = Area.objects.create(
@@ -51,6 +55,7 @@ class TestAreaModel:
 
         assert area.area_type == "dbcadistrict"
 
+    @pytest.mark.unit
     def test_area_type_ibra_region(self, db):
         """Test creating area with IBRA region type"""
         area = Area.objects.create(
@@ -60,6 +65,7 @@ class TestAreaModel:
 
         assert area.area_type == "ibra"
 
+    @pytest.mark.unit
     def test_area_type_imcra_region(self, db):
         """Test creating area with IMCRA region type"""
         area = Area.objects.create(
@@ -69,6 +75,7 @@ class TestAreaModel:
 
         assert area.area_type == "imcra"
 
+    @pytest.mark.unit
     def test_area_type_nrm_region(self, db):
         """Test creating area with NRM region type"""
         area = Area.objects.create(
@@ -78,6 +85,7 @@ class TestAreaModel:
 
         assert area.area_type == "nrm"
 
+    @pytest.mark.unit
     def test_area_unique_together_constraint(self, db):
         """Test unique_together constraint on name and area_type"""
         # Create first area
@@ -93,6 +101,7 @@ class TestAreaModel:
                 area_type=Area.AreaTypeChoices.AREA_TYPE_DBCA_DISTRICT,
             )
 
+    @pytest.mark.unit
     def test_area_same_name_different_type_allowed(self, db):
         """Test same name with different area_type is allowed"""
         # Create area with DBCA district type
@@ -111,6 +120,7 @@ class TestAreaModel:
         assert area1.area_type != area2.area_type
         assert Area.objects.filter(name="Perth").count() == 2
 
+    @pytest.mark.unit
     def test_area_name_max_length(self, db):
         """Test area name respects max_length of 150"""
         long_name = "A" * 150
@@ -122,6 +132,7 @@ class TestAreaModel:
         assert len(area.name) == 150
         assert area.name == long_name
 
+    @pytest.mark.unit
     def test_area_name_exceeds_max_length(self, db):
         """Test area name exceeding max_length raises error"""
         too_long_name = "A" * 151
@@ -132,14 +143,17 @@ class TestAreaModel:
                 area_type=Area.AreaTypeChoices.AREA_TYPE_DBCA_DISTRICT,
             )
 
+    @pytest.mark.unit
     def test_area_verbose_name(self, db):
         """Test model verbose_name is set correctly"""
         assert Area._meta.verbose_name == "Area"
 
+    @pytest.mark.unit
     def test_area_verbose_name_plural(self, db):
         """Test model verbose_name_plural is set correctly"""
         assert Area._meta.verbose_name_plural == "Areas"
 
+    @pytest.mark.unit
     def test_area_created_at_auto_set(self, db):
         """Test created_at is automatically set on creation"""
         area = Area.objects.create(
@@ -149,6 +163,7 @@ class TestAreaModel:
 
         assert area.created_at is not None
 
+    @pytest.mark.unit
     def test_area_updated_at_auto_set(self, db):
         """Test updated_at is automatically set on creation"""
         area = Area.objects.create(
@@ -158,6 +173,7 @@ class TestAreaModel:
 
         assert area.updated_at is not None
 
+    @pytest.mark.unit
     def test_area_updated_at_changes_on_save(self, db):
         """Test updated_at changes when model is saved"""
         area = Area.objects.create(
@@ -176,6 +192,7 @@ class TestAreaModel:
 
         assert area.updated_at > original_updated_at
 
+    @pytest.mark.unit
     def test_area_queryset_filter_by_type(self, db):
         """Test filtering areas by area_type"""
         # Create areas of different types
@@ -200,6 +217,7 @@ class TestAreaModel:
         assert districts.count() == 2
         assert all(a.area_type == "dbcadistrict" for a in districts)
 
+    @pytest.mark.unit
     def test_area_queryset_filter_by_name(self, db):
         """Test filtering areas by name"""
         Area.objects.create(
@@ -217,6 +235,7 @@ class TestAreaModel:
         assert perth_areas.count() == 1
         assert perth_areas.first().name == "Perth District"
 
+    @pytest.mark.unit
     def test_area_update_name(self, db):
         """Test updating area name"""
         area = Area.objects.create(
@@ -230,6 +249,7 @@ class TestAreaModel:
         area.refresh_from_db()
         assert area.name == "Updated Name"
 
+    @pytest.mark.unit
     def test_area_update_area_type(self, db):
         """Test updating area type"""
         area = Area.objects.create(
@@ -243,6 +263,7 @@ class TestAreaModel:
         area.refresh_from_db()
         assert area.area_type == "dbcaregion"
 
+    @pytest.mark.unit
     def test_area_delete(self, db):
         """Test deleting an area"""
         area = Area.objects.create(
@@ -255,6 +276,7 @@ class TestAreaModel:
 
         assert not Area.objects.filter(id=area_id).exists()
 
+    @pytest.mark.unit
     def test_area_count(self, db):
         """Test counting areas"""
         # Create multiple areas
@@ -266,6 +288,7 @@ class TestAreaModel:
 
         assert Area.objects.count() == 5
 
+    @pytest.mark.unit
     def test_area_ordering(self, db):
         """Test areas can be ordered by name"""
         Area.objects.create(

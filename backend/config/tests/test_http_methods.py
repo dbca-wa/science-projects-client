@@ -3,6 +3,7 @@ Test HTTP methods work correctly without trailing slashes.
 Verifies that PUT/PATCH/DELETE requests don't cause 500 errors.
 """
 
+import pytest
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
@@ -21,6 +22,7 @@ class HTTPMethodsTestCase(TestCase):
         )
         self.client = Client()
 
+    @pytest.mark.integration
     def test_put_request_no_500_error(self):
         """Test that PUT requests don't cause 500 errors (original issue)."""
         # This was the original failing request
@@ -36,6 +38,7 @@ class HTTPMethodsTestCase(TestCase):
             "PUT request should not cause 500 error with APPEND_SLASH=False",
         )
 
+    @pytest.mark.integration
     def test_patch_request_no_500_error(self):
         """Test that PATCH requests don't cause 500 errors."""
         response = self.client.patch(
@@ -46,6 +49,7 @@ class HTTPMethodsTestCase(TestCase):
             response.status_code, 500, "PATCH request should not cause 500 error"
         )
 
+    @pytest.mark.integration
     def test_delete_request_no_500_error(self):
         """Test that DELETE requests don't cause 500 errors."""
         response = self.client.delete(users_urls.detail(self.user.id))
@@ -54,6 +58,7 @@ class HTTPMethodsTestCase(TestCase):
             response.status_code, 500, "DELETE request should not cause 500 error"
         )
 
+    @pytest.mark.integration
     def test_get_request_works(self):
         """Test that GET requests still work."""
         response = self.client.get(users_urls.detail(self.user.id))
@@ -63,6 +68,7 @@ class HTTPMethodsTestCase(TestCase):
             response.status_code, [200, 401, 403], "GET request should work normally"
         )
 
+    @pytest.mark.integration
     def test_post_request_works(self):
         """Test that POST requests still work."""
         response = self.client.post(users_urls.list(), content_type="application/json")
@@ -72,6 +78,7 @@ class HTTPMethodsTestCase(TestCase):
             response.status_code, 500, "POST request should not cause 500 error"
         )
 
+    @pytest.mark.integration
     def test_no_301_redirects(self):
         """Test that requests don't cause 301 redirects."""
         # Test various endpoints

@@ -13,6 +13,7 @@ from caretakers.models import Caretaker
 class TestContentFieldModel:
     """Tests for ContentField model"""
 
+    @pytest.mark.unit
     def test_create_content_field(self, guide_section, db):
         """Test creating content field with valid data"""
         field = ContentField.objects.create(
@@ -29,11 +30,13 @@ class TestContentFieldModel:
         assert field.section == guide_section
         assert field.order == 1
 
+    @pytest.mark.unit
     def test_content_field_str_method(self, content_field, db):
         """Test ContentField __str__ method"""
         expected = f"{content_field.section.title} - {content_field.field_key}"
         assert str(content_field) == expected
 
+    @pytest.mark.unit
     def test_content_field_ordering(self, guide_section, db):
         """Test ContentField ordering by order field"""
         field1 = ContentField.objects.create(
@@ -51,6 +54,7 @@ class TestContentFieldModel:
         assert fields[1] == field1
         assert fields[2] == field3
 
+    @pytest.mark.unit
     def test_content_field_unique_together(self, guide_section, db):
         """Test ContentField unique_together constraint"""
         ContentField.objects.create(
@@ -66,6 +70,7 @@ class TestContentFieldModel:
 class TestGuideSectionModel:
     """Tests for GuideSection model"""
 
+    @pytest.mark.unit
     def test_create_guide_section(self, db):
         """Test creating guide section with valid data"""
         section = GuideSection.objects.create(
@@ -83,10 +88,12 @@ class TestGuideSectionModel:
         assert section.category == "test"
         assert section.is_active is True
 
+    @pytest.mark.unit
     def test_guide_section_str_method(self, guide_section, db):
         """Test GuideSection __str__ method"""
         assert str(guide_section) == guide_section.title
 
+    @pytest.mark.unit
     def test_guide_section_ordering(self, db):
         """Test GuideSection ordering by order field"""
         section1 = GuideSection.objects.create(
@@ -104,6 +111,7 @@ class TestGuideSectionModel:
         assert sections[1] == section1
         assert sections[2] == section3
 
+    @pytest.mark.unit
     def test_guide_section_defaults(self, db):
         """Test GuideSection default values"""
         section = GuideSection.objects.create(id="defaults", title="Defaults")
@@ -115,6 +123,7 @@ class TestGuideSectionModel:
 class TestAdminOptionsModel:
     """Tests for AdminOptions model"""
 
+    @pytest.mark.integration
     def test_create_admin_options(self, admin_user, db):
         """Test creating AdminOptions with valid data"""
         options = AdminOptions.objects.create(
@@ -127,10 +136,12 @@ class TestAdminOptionsModel:
         assert options.maintainer == admin_user
         assert options.guide_content == {"test": "content"}
 
+    @pytest.mark.unit
     def test_admin_options_str_method(self, admin_options, db):
         """Test AdminOptions __str__ method"""
         assert str(admin_options) == "Admin Options"
 
+    @pytest.mark.integration
     def test_admin_options_email_choices(self, admin_user, db):
         """Test AdminOptions email_options choices"""
         for choice in AdminOptions.EmailOptions:
@@ -140,6 +151,7 @@ class TestAdminOptionsModel:
             assert options.email_options == choice
             options.delete()
 
+    @pytest.mark.unit
     def test_admin_options_get_guide_content(self, admin_options, db):
         """Test get_guide_content method"""
         content = admin_options.get_guide_content("test_field")
@@ -149,6 +161,7 @@ class TestAdminOptionsModel:
         content = admin_options.get_guide_content("nonexistent")
         assert content == ""
 
+    @pytest.mark.unit
     def test_admin_options_set_guide_content(self, admin_options, db):
         """Test set_guide_content method"""
         admin_options.set_guide_content("new_field", "New content")
@@ -158,12 +171,14 @@ class TestAdminOptionsModel:
         refreshed = AdminOptions.objects.get(pk=admin_options.pk)
         assert refreshed.guide_content["new_field"] == "New content"
 
+    @pytest.mark.unit
     def test_admin_options_singleton_validation(self, admin_options, db):
         """Test that only one AdminOptions instance can exist"""
         with pytest.raises(ValidationError):
             new_options = AdminOptions(email_options=AdminOptions.EmailOptions.DISABLED)
             new_options.clean()
 
+    @pytest.mark.integration
     def test_admin_options_defaults(self, admin_user, db):
         """Test AdminOptions default values"""
         options = AdminOptions.objects.create(maintainer=admin_user)
@@ -174,6 +189,8 @@ class TestAdminOptionsModel:
 class TestAdminTaskModel:
     """Tests for AdminTask model"""
 
+    @pytest.mark.slow
+    @pytest.mark.integration
     def test_create_admin_task_delete_project(self, user, project, db):
         """Test creating AdminTask for project deletion"""
         task = AdminTask.objects.create(
@@ -190,6 +207,7 @@ class TestAdminTaskModel:
         assert task.requester == user
         assert task.reason == "Test reason"
 
+    @pytest.mark.integration
     def test_create_admin_task_merge_user(self, user, secondary_user, db):
         """Test creating AdminTask for user merge"""
         task = AdminTask.objects.create(
@@ -204,6 +222,7 @@ class TestAdminTaskModel:
         assert task.primary_user == user
         assert task.secondary_users == [secondary_user.pk]
 
+    @pytest.mark.integration
     def test_create_admin_task_set_caretaker(self, user, secondary_user, db):
         """Test creating AdminTask for setting caretaker"""
         task = AdminTask.objects.create(
@@ -218,12 +237,14 @@ class TestAdminTaskModel:
         assert task.primary_user == user
         assert task.secondary_users == [secondary_user.pk]
 
+    @pytest.mark.integration
     def test_admin_task_str_method(self, admin_task_delete_project, db):
         """Test AdminTask __str__ method"""
         task = admin_task_delete_project
         expected = f"{task.action} - {task.project} - {task.requester}"
         assert str(task) == expected
 
+    @pytest.mark.integration
     def test_admin_task_action_choices(self, user, db):
         """Test AdminTask action choices"""
         for action in AdminTask.ActionTypes:
@@ -233,6 +254,7 @@ class TestAdminTaskModel:
             assert task.action == action
             task.delete()
 
+    @pytest.mark.integration
     def test_admin_task_status_choices(self, user, db):
         """Test AdminTask status choices"""
         for status in AdminTask.TaskStatus:
@@ -248,6 +270,7 @@ class TestAdminTaskModel:
 class TestCaretakerModel:
     """Tests for Caretaker model"""
 
+    @pytest.mark.integration
     def test_create_caretaker(self, user, secondary_user, db):
         """Test creating Caretaker with valid data"""
         caretaker = Caretaker.objects.create(
@@ -258,6 +281,7 @@ class TestCaretakerModel:
         assert caretaker.caretaker == secondary_user
         assert caretaker.reason == "Test reason"
 
+    @pytest.mark.unit
     def test_caretaker_str_method(self, caretaker, db):
         """Test Caretaker __str__ method
 
@@ -268,6 +292,7 @@ class TestCaretakerModel:
         expected = f"{caretaker.caretaker} caretaking for {caretaker.user}"
         assert str(caretaker) == expected
 
+    @pytest.mark.integration
     def test_caretaker_cache_clear_on_save(self, user, secondary_user, db):
         """Test that cache is cleared when caretaker is saved"""
         # Set some cache values
@@ -285,6 +310,7 @@ class TestCaretakerModel:
         assert cache.get(f"caretakers_{secondary_user.pk}") is None
         assert cache.get(f"caretaking_{secondary_user.pk}") is None
 
+    @pytest.mark.integration
     def test_caretaker_cache_clear_on_delete(self, caretaker, db):
         """Test that cache is cleared when caretaker is deleted"""
         user_pk = caretaker.user.pk
@@ -305,6 +331,7 @@ class TestCaretakerModel:
         assert cache.get(f"caretakers_{caretaker_pk}") is None
         assert cache.get(f"caretaking_{caretaker_pk}") is None
 
+    @pytest.mark.integration
     def test_caretaker_with_end_date(self, user, secondary_user, db):
         """Test creating Caretaker with end_date"""
         from datetime import timedelta
@@ -317,6 +344,7 @@ class TestCaretakerModel:
         )
         assert caretaker.end_date == end_date
 
+    @pytest.mark.integration
     def test_caretaker_with_notes(self, user, secondary_user, db):
         """Test creating Caretaker with notes"""
         caretaker = Caretaker.objects.create(

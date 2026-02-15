@@ -2,6 +2,7 @@
 Tests for categories views
 """
 
+import pytest
 from rest_framework import status
 
 from categories.models import ProjectCategory
@@ -11,6 +12,7 @@ from common.tests.test_helpers import categories_urls
 class TestProjectCategoryViewSet:
     """Tests for ProjectCategoryViewSet"""
 
+    @pytest.mark.integration
     def test_list_categories(self, api_client, user, project_category, db):
         """Test listing categories"""
         # Arrange
@@ -24,6 +26,7 @@ class TestProjectCategoryViewSet:
         assert len(response.data) == 1
         assert response.data[0]["id"] == project_category.id
 
+    @pytest.mark.integration
     def test_list_categories_filters_science_only(
         self, api_client, user, project_category, student_category, db
     ):
@@ -39,6 +42,7 @@ class TestProjectCategoryViewSet:
         assert len(response.data) == 1  # Only science category
         assert response.data[0]["kind"] == "science"
 
+    @pytest.mark.integration
     def test_list_categories_empty(self, api_client, user, db):
         """Test listing categories when none exist"""
         # Arrange
@@ -51,6 +55,7 @@ class TestProjectCategoryViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 0
 
+    @pytest.mark.integration
     def test_retrieve_category(self, api_client, user, project_category, db):
         """Test retrieving single category"""
         # Arrange
@@ -65,6 +70,7 @@ class TestProjectCategoryViewSet:
         assert response.data["name"] == project_category.name
         assert response.data["kind"] == project_category.kind
 
+    @pytest.mark.integration
     def test_retrieve_category_not_found(self, api_client, user, db):
         """Test retrieving non-existent category"""
         # Arrange
@@ -76,6 +82,7 @@ class TestProjectCategoryViewSet:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_create_category(self, api_client, user, db):
         """Test creating category"""
         # Arrange
@@ -94,6 +101,7 @@ class TestProjectCategoryViewSet:
         assert response.data["kind"] == "science"
         assert ProjectCategory.objects.filter(name="New Category").exists()
 
+    @pytest.mark.integration
     def test_create_category_invalid_data(self, api_client, user, db):
         """Test creating category with invalid data"""
         # Arrange
@@ -110,6 +118,7 @@ class TestProjectCategoryViewSet:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "name" in response.data
 
+    @pytest.mark.integration
     def test_create_category_missing_kind(self, api_client, user, db):
         """Test creating category without kind"""
         # Arrange
@@ -125,6 +134,7 @@ class TestProjectCategoryViewSet:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "kind" in response.data
 
+    @pytest.mark.integration
     def test_create_category_invalid_kind(self, api_client, user, db):
         """Test creating category with invalid kind"""
         # Arrange
@@ -141,6 +151,7 @@ class TestProjectCategoryViewSet:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "kind" in response.data
 
+    @pytest.mark.integration
     def test_update_category(self, api_client, user, project_category, db):
         """Test updating category"""
         # Arrange
@@ -161,6 +172,7 @@ class TestProjectCategoryViewSet:
         project_category.refresh_from_db()
         assert project_category.name == "Updated Category"
 
+    @pytest.mark.integration
     def test_update_category_partial(self, api_client, user, project_category, db):
         """Test partial update of category"""
         # Arrange
@@ -181,6 +193,7 @@ class TestProjectCategoryViewSet:
         assert project_category.name == "Partially Updated"
         assert project_category.kind == "science"  # Unchanged
 
+    @pytest.mark.integration
     def test_update_category_not_found(self, api_client, user, db):
         """Test updating non-existent category"""
         # Arrange
@@ -196,6 +209,7 @@ class TestProjectCategoryViewSet:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_delete_category(self, api_client, user, project_category, db):
         """Test deleting category"""
         # Arrange
@@ -209,6 +223,7 @@ class TestProjectCategoryViewSet:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ProjectCategory.objects.filter(id=category_id).exists()
 
+    @pytest.mark.integration
     def test_delete_category_not_found(self, api_client, user, db):
         """Test deleting non-existent category"""
         # Arrange
@@ -220,6 +235,7 @@ class TestProjectCategoryViewSet:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_list_multiple_science_categories(self, api_client, user, db):
         """Test listing multiple science categories"""
         # Arrange
@@ -239,6 +255,7 @@ class TestProjectCategoryViewSet:
         assert "Marine Science" in names
         assert "Student Project" not in names
 
+    @pytest.mark.integration
     def test_create_all_kind_types(self, api_client, user, db):
         """Test creating categories with all kind types"""
         # Arrange
@@ -255,6 +272,7 @@ class TestProjectCategoryViewSet:
             assert response.status_code == status.HTTP_201_CREATED
             assert response.data["kind"] == kind
 
+    @pytest.mark.integration
     def test_viewset_queryset_filters_science(self, api_client, user, db):
         """Test viewset queryset only includes science categories"""
         # Arrange
@@ -275,6 +293,7 @@ class TestProjectCategoryViewSet:
         # Verify other categories exist but aren't returned
         assert ProjectCategory.objects.count() == 4
 
+    @pytest.mark.integration
     def test_list_categories_unauthenticated(self, api_client, project_category, db):
         """Test listing categories without authentication"""
         # Act
@@ -283,6 +302,7 @@ class TestProjectCategoryViewSet:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_category_unauthenticated(self, api_client, db):
         """Test creating category without authentication"""
         # Arrange

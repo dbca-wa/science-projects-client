@@ -15,6 +15,7 @@ User = get_user_model()
 class TestAddressService:
     """Tests for Address service operations"""
 
+    @pytest.mark.integration
     def test_list_addresses(self, address_for_agency, db):
         """Test listing all addresses"""
         # Act
@@ -24,6 +25,7 @@ class TestAddressService:
         assert addresses.count() == 1
         assert address_for_agency in addresses
 
+    @pytest.mark.integration
     def test_get_address(self, address_for_agency, db):
         """Test getting address by ID"""
         # Act
@@ -33,12 +35,14 @@ class TestAddressService:
         assert address.id == address_for_agency.id
         assert address.street == "123 Test St"
 
+    @pytest.mark.unit
     def test_get_address_not_found(self, db):
         """Test getting non-existent address raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Address 999 not found"):
             ContactService.get_address(999)
 
+    @pytest.mark.integration
     def test_create_address_for_agency(self, user, agency, db):
         """Test creating an address for an agency"""
         # Arrange
@@ -61,6 +65,7 @@ class TestAddressService:
         assert address.agency == agency
         assert address.branch is None
 
+    @pytest.mark.integration
     def test_create_address_for_branch(self, user, branch, db):
         """Test creating an address for a branch"""
         # Arrange
@@ -82,6 +87,7 @@ class TestAddressService:
         assert address.branch == branch
         assert address.agency is None
 
+    @pytest.mark.integration
     def test_update_address(self, address_for_agency, user, db):
         """Test updating an address"""
         # Arrange
@@ -94,6 +100,7 @@ class TestAddressService:
         assert updated.id == address_for_agency.id
         assert updated.street == "Updated Street"
 
+    @pytest.mark.integration
     def test_delete_address(self, address_for_agency, user, db):
         """Test deleting an address"""
         # Arrange
@@ -109,6 +116,7 @@ class TestAddressService:
 class TestAddressValidation:
     """Tests for Address model validation"""
 
+    @pytest.mark.integration
     def test_address_requires_agency_or_branch(self, db):
         """Test address must have either agency or branch"""
         # Arrange
@@ -124,6 +132,7 @@ class TestAddressValidation:
         with pytest.raises(Exception):  # ValidationError
             address.save()
 
+    @pytest.mark.integration
     def test_address_cannot_have_both(self, agency, branch, db):
         """Test address cannot have both agency and branch"""
         # Arrange
@@ -141,6 +150,7 @@ class TestAddressValidation:
         with pytest.raises(Exception):  # ValidationError
             address.save()
 
+    @pytest.mark.integration
     def test_address_with_agency_valid(self, agency, db):
         """Test address with agency is valid"""
         # Arrange
@@ -161,6 +171,7 @@ class TestAddressValidation:
         assert address.agency == agency
         assert address.branch is None
 
+    @pytest.mark.unit
     def test_address_with_branch_valid(self, branch, db):
         """Test address with branch is valid"""
         # Arrange
@@ -185,6 +196,7 @@ class TestAddressValidation:
 class TestAgencyContactService:
     """Tests for AgencyContact service operations"""
 
+    @pytest.mark.integration
     def test_list_agency_contacts(self, agency_contact, db):
         """Test listing all agency contacts"""
         # Act
@@ -194,6 +206,7 @@ class TestAgencyContactService:
         assert contacts.count() == 1
         assert agency_contact in contacts
 
+    @pytest.mark.integration
     def test_get_agency_contact(self, agency_contact, db):
         """Test getting agency contact by ID"""
         # Act
@@ -203,12 +216,14 @@ class TestAgencyContactService:
         assert contact.id == agency_contact.id
         assert contact.email == "agency@example.com"
 
+    @pytest.mark.integration
     def test_get_agency_contact_not_found(self, db):
         """Test getting non-existent agency contact raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Agency contact 999 not found"):
             ContactService.get_agency_contact(999)
 
+    @pytest.mark.integration
     def test_create_agency_contact(self, user, agency, address_for_agency, db):
         """Test creating an agency contact"""
         # Arrange
@@ -227,6 +242,7 @@ class TestAgencyContactService:
         assert contact.email == "newagency@example.com"
         assert contact.agency == agency
 
+    @pytest.mark.integration
     def test_update_agency_contact(self, agency_contact, user, db):
         """Test updating an agency contact"""
         # Arrange
@@ -239,6 +255,7 @@ class TestAgencyContactService:
         assert updated.id == agency_contact.id
         assert updated.email == "updated@example.com"
 
+    @pytest.mark.integration
     def test_delete_agency_contact(self, agency_contact, user, db):
         """Test deleting an agency contact"""
         # Arrange
@@ -254,6 +271,7 @@ class TestAgencyContactService:
 class TestBranchContactService:
     """Tests for BranchContact service operations"""
 
+    @pytest.mark.unit
     def test_list_branch_contacts(self, branch_contact, db):
         """Test listing all branch contacts"""
         # Act
@@ -263,6 +281,7 @@ class TestBranchContactService:
         assert contacts.count() == 1
         assert branch_contact in contacts
 
+    @pytest.mark.unit
     def test_get_branch_contact(self, branch_contact, db):
         """Test getting branch contact by ID"""
         # Act
@@ -272,12 +291,14 @@ class TestBranchContactService:
         assert contact.id == branch_contact.id
         assert contact.email == "branch@example.com"
 
+    @pytest.mark.unit
     def test_get_branch_contact_not_found(self, db):
         """Test getting non-existent branch contact raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Branch contact 999 not found"):
             ContactService.get_branch_contact(999)
 
+    @pytest.mark.integration
     def test_create_branch_contact(self, user, branch, address_for_branch, db):
         """Test creating a branch contact"""
         # Arrange
@@ -296,6 +317,7 @@ class TestBranchContactService:
         assert contact.email == "newbranch@example.com"
         assert contact.branch == branch
 
+    @pytest.mark.integration
     def test_update_branch_contact(self, branch_contact, user, db):
         """Test updating a branch contact"""
         # Arrange
@@ -308,6 +330,7 @@ class TestBranchContactService:
         assert updated.id == branch_contact.id
         assert updated.email == "updatedbranch@example.com"
 
+    @pytest.mark.integration
     def test_delete_branch_contact(self, branch_contact, user, db):
         """Test deleting a branch contact"""
         # Arrange
@@ -323,6 +346,7 @@ class TestBranchContactService:
 class TestUserContactService:
     """Tests for UserContact service operations"""
 
+    @pytest.mark.integration
     def test_list_user_contacts(self, user_contact, db):
         """Test listing all user contacts"""
         # Act
@@ -332,6 +356,7 @@ class TestUserContactService:
         assert contacts.count() == 1
         assert user_contact in contacts
 
+    @pytest.mark.integration
     def test_get_user_contact(self, user_contact, db):
         """Test getting user contact by ID"""
         # Act
@@ -341,12 +366,14 @@ class TestUserContactService:
         assert contact.id == user_contact.id
         assert contact.email == "user@example.com"
 
+    @pytest.mark.integration
     def test_get_user_contact_not_found(self, db):
         """Test getting non-existent user contact raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="User contact 999 not found"):
             ContactService.get_user_contact(999)
 
+    @pytest.mark.integration
     def test_create_user_contact(self, user, user_factory, db):
         """Test creating a user contact"""
         # Arrange
@@ -365,6 +392,7 @@ class TestUserContactService:
         assert contact.email == "newcontact@example.com"
         assert contact.user == new_user
 
+    @pytest.mark.integration
     def test_update_user_contact(self, user_contact, user, db):
         """Test updating a user contact"""
         # Arrange
@@ -377,6 +405,7 @@ class TestUserContactService:
         assert updated.id == user_contact.id
         assert updated.email == "updateduser@example.com"
 
+    @pytest.mark.integration
     def test_delete_user_contact(self, user_contact, user, db):
         """Test deleting a user contact"""
         # Arrange

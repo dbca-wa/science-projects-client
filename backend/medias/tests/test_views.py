@@ -19,6 +19,7 @@ URL Mapping:
 - Project Document PDFs: NOT IN urls.py - needs to be added
 """
 
+import pytest
 from rest_framework import status
 
 from common.tests.test_helpers import medias_urls
@@ -37,6 +38,7 @@ from medias.models import (
 class TestAnnualReportPDFViews:
     """Tests for annual report PDF views"""
 
+    @pytest.mark.integration
     def test_list_annual_report_pdfs_authenticated(
         self, api_client, user, annual_report_pdf, db
     ):
@@ -51,6 +53,7 @@ class TestAnnualReportPDFViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_annual_report_pdfs_unauthenticated(self, api_client, db):
         """Test listing annual report PDFs without authentication"""
         # Act
@@ -59,6 +62,7 @@ class TestAnnualReportPDFViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_annual_report_pdf_valid_data(
         self, api_client, user, annual_report, mock_file, db
     ):
@@ -79,6 +83,7 @@ class TestAnnualReportPDFViews:
         assert response.status_code == status.HTTP_201_CREATED
         assert AnnualReportPDF.objects.count() == 1
 
+    @pytest.mark.integration
     def test_create_annual_report_pdf_invalid_data(self, api_client, user, db):
         """Test creating annual report PDF with invalid data"""
         # Arrange
@@ -91,6 +96,7 @@ class TestAnnualReportPDFViews:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.integration
     def test_get_annual_report_pdf_detail(
         self, api_client, user, annual_report_pdf, db
     ):
@@ -105,6 +111,7 @@ class TestAnnualReportPDFViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == annual_report_pdf.id
 
+    @pytest.mark.integration
     def test_update_annual_report_pdf(self, api_client, user, annual_report_pdf, db):
         """Test updating annual report PDF"""
         # Arrange
@@ -119,6 +126,7 @@ class TestAnnualReportPDFViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_annual_report_pdf(self, api_client, user, annual_report_pdf, db):
         """Test deleting annual report PDF"""
         # Arrange
@@ -136,6 +144,7 @@ class TestAnnualReportPDFViews:
 class TestLegacyAnnualReportPDFViews:
     """Tests for legacy annual report PDF views"""
 
+    @pytest.mark.integration
     def test_list_legacy_pdfs_authenticated(
         self, api_client, user, legacy_annual_report_pdf, db
     ):
@@ -150,6 +159,7 @@ class TestLegacyAnnualReportPDFViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_legacy_pdf_valid_data(self, api_client, user, mock_file, db):
         """Test creating legacy PDF with valid data"""
         # Arrange
@@ -168,6 +178,7 @@ class TestLegacyAnnualReportPDFViews:
         assert response.status_code == status.HTTP_201_CREATED
         assert LegacyAnnualReportPDF.objects.count() == 1
 
+    @pytest.mark.integration
     def test_get_legacy_pdf_detail(
         self, api_client, user, legacy_annual_report_pdf, db
     ):
@@ -184,6 +195,7 @@ class TestLegacyAnnualReportPDFViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == legacy_annual_report_pdf.id
 
+    @pytest.mark.integration
     def test_update_legacy_pdf(self, api_client, user, legacy_annual_report_pdf, db):
         """Test updating legacy PDF"""
         # Arrange
@@ -200,6 +212,7 @@ class TestLegacyAnnualReportPDFViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_legacy_pdf(self, api_client, user, legacy_annual_report_pdf, db):
         """Test deleting legacy PDF"""
         # Arrange
@@ -217,6 +230,7 @@ class TestLegacyAnnualReportPDFViews:
 class TestAnnualReportMediaViews:
     """Tests for annual report media views"""
 
+    @pytest.mark.integration
     def test_list_annual_report_media_authenticated(
         self, api_client, user, annual_report_media, db
     ):
@@ -231,6 +245,7 @@ class TestAnnualReportMediaViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_annual_report_media_valid_data(
         self, api_client, user, annual_report, mock_image, db
     ):
@@ -252,6 +267,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_annual_report_media_detail(
         self, api_client, user, annual_report_media, db
     ):
@@ -268,6 +284,7 @@ class TestAnnualReportMediaViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == annual_report_media.id
 
+    @pytest.mark.integration
     def test_update_annual_report_media(
         self, api_client, user, annual_report_media, db
     ):
@@ -286,6 +303,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_annual_report_media(
         self, api_client, user, annual_report_media, db
     ):
@@ -301,6 +319,7 @@ class TestAnnualReportMediaViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not AnnualReportMedia.objects.filter(id=media_id).exists()
 
+    @pytest.mark.integration
     def test_get_latest_report_media(self, api_client, user, annual_report_media, db):
         """Test getting latest report's media"""
         # Arrange
@@ -312,6 +331,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_get_report_media_by_report(
         self, api_client, user, annual_report_media, annual_report, db
     ):
@@ -327,6 +347,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_upload_report_media_new(
         self, api_client, user, annual_report, mock_image, db
     ):
@@ -348,6 +369,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_upload_report_media_update_existing(
         self, api_client, user, annual_report_media, annual_report, mock_image, db
     ):
@@ -369,6 +391,7 @@ class TestAnnualReportMediaViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_delete_report_media_by_section(
         self, api_client, user, annual_report_media, annual_report, db
     ):
@@ -393,6 +416,7 @@ class TestAnnualReportMediaViews:
 class TestUserAvatarViews:
     """Tests for user avatar views"""
 
+    @pytest.mark.integration
     def test_list_user_avatars_authenticated(self, api_client, user, user_avatar, db):
         """Test listing user avatars as authenticated user"""
         # Arrange
@@ -405,6 +429,7 @@ class TestUserAvatarViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_user_avatars_unauthenticated(self, api_client, user_avatar, db):
         """Test listing user avatars without authentication (read-only)"""
         # Act
@@ -413,6 +438,7 @@ class TestUserAvatarViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_create_user_avatar_valid_data(self, api_client, user, mock_image, db):
         """Test creating user avatar with valid data"""
         # Arrange
@@ -430,6 +456,7 @@ class TestUserAvatarViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_user_avatar_detail(self, api_client, user, user_avatar, db):
         """Test getting user avatar detail"""
         # Arrange
@@ -442,6 +469,7 @@ class TestUserAvatarViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == user_avatar.id
 
+    @pytest.mark.integration
     def test_update_user_avatar_as_owner(self, api_client, user, user_avatar, db):
         """Test updating user avatar as owner"""
         # Arrange
@@ -456,6 +484,7 @@ class TestUserAvatarViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_user_avatar_as_superuser(
         self, api_client, superuser, user_avatar, db
     ):
@@ -472,6 +501,7 @@ class TestUserAvatarViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_user_avatar_permission_denied(self, api_client, user_avatar, db):
         """Test updating user avatar without permission"""
         # Arrange
@@ -492,6 +522,7 @@ class TestUserAvatarViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_user_avatar_as_owner(self, api_client, user, user_avatar, db):
         """Test deleting user avatar as owner"""
         # Arrange
@@ -505,6 +536,7 @@ class TestUserAvatarViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not UserAvatar.objects.filter(id=avatar_id).exists()
 
+    @pytest.mark.integration
     def test_delete_user_avatar_permission_denied(self, api_client, user_avatar, db):
         """Test deleting user avatar without permission"""
         # Arrange
@@ -526,6 +558,7 @@ class TestUserAvatarViews:
 class TestBusinessAreaPhotoViews:
     """Tests for business area photo views"""
 
+    @pytest.mark.integration
     def test_list_business_area_photos_authenticated(
         self, api_client, user, business_area_photo, db
     ):
@@ -540,6 +573,7 @@ class TestBusinessAreaPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_business_area_photo_valid_data(
         self, api_client, user, business_area, mock_image, db
     ):
@@ -560,6 +594,7 @@ class TestBusinessAreaPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_business_area_photo_detail(
         self, api_client, user, business_area_photo, db
     ):
@@ -576,6 +611,7 @@ class TestBusinessAreaPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == business_area_photo.id
 
+    @pytest.mark.integration
     def test_update_business_area_photo_as_uploader(
         self, api_client, user, business_area_photo, db
     ):
@@ -594,6 +630,7 @@ class TestBusinessAreaPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_business_area_photo_permission_denied(
         self, api_client, business_area_photo, db
     ):
@@ -618,6 +655,7 @@ class TestBusinessAreaPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_business_area_photo_as_uploader(
         self, api_client, user, business_area_photo, db
     ):
@@ -633,6 +671,7 @@ class TestBusinessAreaPhotoViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not BusinessAreaPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_business_area_photo_permission_denied(
         self, api_client, business_area_photo, db
     ):
@@ -658,6 +697,7 @@ class TestBusinessAreaPhotoViews:
 class TestProjectPhotoViews:
     """Tests for project photo views"""
 
+    @pytest.mark.integration
     def test_list_project_photos_authenticated(
         self, api_client, user, project_photo, db
     ):
@@ -672,6 +712,7 @@ class TestProjectPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_project_photo_valid_data(
         self, api_client, user, project, mock_image, db
     ):
@@ -692,6 +733,7 @@ class TestProjectPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_project_photo_detail(self, api_client, user, project_photo, db):
         """Test getting project photo detail"""
         # Arrange
@@ -704,6 +746,7 @@ class TestProjectPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == project_photo.id
 
+    @pytest.mark.integration
     def test_update_project_photo_as_uploader(
         self, api_client, user, project_photo, db
     ):
@@ -720,6 +763,7 @@ class TestProjectPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_project_photo_permission_denied(
         self, api_client, project_photo, db
     ):
@@ -742,6 +786,7 @@ class TestProjectPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_project_photo_as_uploader(
         self, api_client, user, project_photo, db
     ):
@@ -757,6 +802,7 @@ class TestProjectPhotoViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ProjectPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_project_photo_permission_denied(
         self, api_client, project_photo, db
     ):
@@ -782,6 +828,7 @@ class TestProjectPhotoViews:
 class TestMethodologyPhotoViews:
     """Tests for methodology photo views"""
 
+    @pytest.mark.integration
     def test_list_methodology_photos_authenticated(
         self, api_client, user, methodology_photo, db
     ):
@@ -796,6 +843,7 @@ class TestMethodologyPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_methodology_photo_valid_data(
         self, api_client, user, project_plan, mock_image, db
     ):
@@ -815,6 +863,7 @@ class TestMethodologyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_methodology_photo_detail(
         self, api_client, user, methodology_photo, project_plan, db
     ):
@@ -830,6 +879,7 @@ class TestMethodologyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.integration
     def test_update_methodology_photo_as_uploader(
         self, api_client, user, methodology_photo, project_plan, db
     ):
@@ -846,6 +896,7 @@ class TestMethodologyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_methodology_photo_permission_denied(
         self, api_client, methodology_photo, project_plan, db
     ):
@@ -868,6 +919,7 @@ class TestMethodologyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_methodology_photo_as_uploader(
         self, api_client, user, methodology_photo, project_plan, db
     ):
@@ -885,6 +937,7 @@ class TestMethodologyPhotoViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ProjectPlanMethodologyPhoto.objects.filter(id=photo_id).exists()
 
+    @pytest.mark.integration
     def test_delete_methodology_photo_permission_denied(
         self, api_client, methodology_photo, project_plan, db
     ):
@@ -910,6 +963,7 @@ class TestMethodologyPhotoViews:
 class TestAgencyPhotoViews:
     """Tests for agency photo views"""
 
+    @pytest.mark.integration
     def test_list_agency_photos_authenticated(self, api_client, user, agency_image, db):
         """Test listing agency photos as authenticated user"""
         # Arrange
@@ -922,6 +976,7 @@ class TestAgencyPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_agency_photo_valid_data(
         self, api_client, superuser, agency, mock_image, db
     ):
@@ -941,6 +996,7 @@ class TestAgencyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.integration
     def test_get_agency_photo_detail(self, api_client, user, agency_image, db):
         """Test getting agency photo detail"""
         # Arrange
@@ -953,6 +1009,7 @@ class TestAgencyPhotoViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == agency_image.id
 
+    @pytest.mark.integration
     def test_update_agency_photo_as_superuser(
         self, api_client, superuser, agency_image, db
     ):
@@ -969,6 +1026,7 @@ class TestAgencyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
 
+    @pytest.mark.integration
     def test_update_agency_photo_permission_denied(
         self, api_client, user, agency_image, db
     ):
@@ -985,6 +1043,7 @@ class TestAgencyPhotoViews:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_delete_agency_photo_as_superuser(
         self, api_client, superuser, agency_image, db
     ):
@@ -1000,6 +1059,7 @@ class TestAgencyPhotoViews:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not AgencyImage.objects.filter(id=image_id).exists()
 
+    @pytest.mark.integration
     def test_delete_agency_photo_permission_denied(
         self, api_client, user, agency_image, db
     ):
@@ -1017,6 +1077,7 @@ class TestAgencyPhotoViews:
 class TestProjectDocumentPDFViews:
     """Tests for project document PDF views"""
 
+    @pytest.mark.integration
     def test_list_project_document_pdfs_authenticated(
         self, api_client, user, project_document_pdf, db
     ):
@@ -1031,6 +1092,7 @@ class TestProjectDocumentPDFViews:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_create_project_document_pdf_valid_data(
         self, api_client, user, project, project_document, mock_file, db
     ):

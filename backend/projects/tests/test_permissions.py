@@ -4,6 +4,8 @@ Tests for project permissions
 
 from unittest.mock import Mock
 
+import pytest
+
 from projects.permissions.project_permissions import (
     CanEditProject,
     CanManageProjectMembers,
@@ -16,6 +18,7 @@ from projects.permissions.project_permissions import (
 class TestCanViewProject:
     """Tests for CanViewProject permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_has_permission(self, user, db):
         """Test authenticated user has view permission"""
         # Arrange
@@ -28,6 +31,7 @@ class TestCanViewProject:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_no_permission(self, db):
         """Test unauthenticated user has no view permission"""
         # Arrange
@@ -41,6 +45,7 @@ class TestCanViewProject:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_authenticated_user_can_view_any_project(self, user, project, db):
         """Test authenticated user can view any project"""
         # Arrange
@@ -53,6 +58,7 @@ class TestCanViewProject:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_cannot_view_project(self, project, db):
         """Test unauthenticated user cannot view project"""
         # Arrange
@@ -70,6 +76,7 @@ class TestCanViewProject:
 class TestCanEditProject:
     """Tests for CanEditProject permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_has_permission(self, user, db):
         """Test authenticated user has base permission"""
         # Arrange
@@ -82,6 +89,7 @@ class TestCanEditProject:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_no_permission(self, db):
         """Test unauthenticated user has no permission"""
         # Arrange
@@ -95,6 +103,7 @@ class TestCanEditProject:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_superuser_can_edit_any_project(self, superuser, project, db):
         """Test superuser can edit any project"""
         # Arrange
@@ -107,6 +116,7 @@ class TestCanEditProject:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_project_leader_can_edit(self, project_with_lead, project_lead, db):
         """Test project leader can edit their project"""
         # Arrange
@@ -119,6 +129,7 @@ class TestCanEditProject:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_non_leader_member_cannot_edit(
         self, project_with_members, user_factory, db
     ):
@@ -135,6 +146,7 @@ class TestCanEditProject:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_non_member_cannot_edit(self, project, user_factory, db):
         """Test non-member cannot edit project"""
         # Arrange
@@ -152,6 +164,7 @@ class TestCanEditProject:
 class TestCanManageProjectMembers:
     """Tests for CanManageProjectMembers permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_has_permission(self, user, db):
         """Test authenticated user has base permission"""
         # Arrange
@@ -164,6 +177,7 @@ class TestCanManageProjectMembers:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_no_permission(self, db):
         """Test unauthenticated user has no permission"""
         # Arrange
@@ -177,6 +191,7 @@ class TestCanManageProjectMembers:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_superuser_can_manage_members(self, superuser, project, db):
         """Test superuser can manage members of any project"""
         # Arrange
@@ -189,6 +204,7 @@ class TestCanManageProjectMembers:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_project_leader_can_manage_members(
         self, project_with_lead, project_lead, db
     ):
@@ -203,6 +219,7 @@ class TestCanManageProjectMembers:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_non_leader_member_cannot_manage_members(self, project_with_members, db):
         """Test non-leader member cannot manage members"""
         # Arrange
@@ -216,6 +233,7 @@ class TestCanManageProjectMembers:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_non_member_cannot_manage_members(self, project, user_factory, db):
         """Test non-member cannot manage members"""
         # Arrange
@@ -233,6 +251,7 @@ class TestCanManageProjectMembers:
 class TestIsProjectLeader:
     """Tests for IsProjectLeader permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_has_permission(self, user, db):
         """Test authenticated user has base permission"""
         # Arrange
@@ -245,6 +264,7 @@ class TestIsProjectLeader:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_no_permission(self, db):
         """Test unauthenticated user has no permission"""
         # Arrange
@@ -258,6 +278,7 @@ class TestIsProjectLeader:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_superuser_is_project_leader(self, superuser, project, db):
         """Test superuser is considered project leader"""
         # Arrange
@@ -270,6 +291,7 @@ class TestIsProjectLeader:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_project_leader_passes_check(self, project_with_lead, project_lead, db):
         """Test project leader passes leader check"""
         # Arrange
@@ -282,6 +304,7 @@ class TestIsProjectLeader:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_non_leader_member_fails_check(self, project_with_members, db):
         """Test non-leader member fails leader check"""
         # Arrange
@@ -295,6 +318,7 @@ class TestIsProjectLeader:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_non_member_fails_check(self, project, user_factory, db):
         """Test non-member fails leader check"""
         # Arrange
@@ -312,6 +336,7 @@ class TestIsProjectLeader:
 class TestIsProjectMember:
     """Tests for IsProjectMember permission"""
 
+    @pytest.mark.integration
     def test_authenticated_user_has_permission(self, user, db):
         """Test authenticated user has base permission"""
         # Arrange
@@ -324,6 +349,7 @@ class TestIsProjectMember:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_unauthenticated_user_no_permission(self, db):
         """Test unauthenticated user has no permission"""
         # Arrange
@@ -337,6 +363,7 @@ class TestIsProjectMember:
         # Assert
         assert result is False
 
+    @pytest.mark.integration
     def test_superuser_is_project_member(self, superuser, project, db):
         """Test superuser is considered project member"""
         # Arrange
@@ -349,6 +376,7 @@ class TestIsProjectMember:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_project_leader_is_member(self, project_with_lead, project_lead, db):
         """Test project leader is considered a member"""
         # Arrange
@@ -361,6 +389,7 @@ class TestIsProjectMember:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_non_leader_member_is_member(self, project_with_members, db):
         """Test non-leader member passes member check"""
         # Arrange
@@ -374,6 +403,7 @@ class TestIsProjectMember:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_non_member_fails_check(self, project, user_factory, db):
         """Test non-member fails member check"""
         # Arrange

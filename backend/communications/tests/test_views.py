@@ -22,6 +22,7 @@ def api_client():
 class TestChatRoomsView:
     """Tests for ChatRooms view"""
 
+    @pytest.mark.integration
     def test_list_chat_rooms_authenticated(self, api_client, user, chat_room, db):
         """Test listing chat rooms as authenticated user"""
         # Arrange
@@ -34,6 +35,7 @@ class TestChatRoomsView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_chat_rooms_unauthenticated(self, api_client, chat_room, db):
         """Test listing chat rooms without authentication"""
         # Act
@@ -44,6 +46,7 @@ class TestChatRoomsView:
         # IsAuthenticated permission returns 403 for unauthenticated requests
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_chat_room_valid(self, api_client, user, db):
         """Test creating chat room with valid data"""
         # Arrange
@@ -57,6 +60,7 @@ class TestChatRoomsView:
         assert response.status_code == status.HTTP_201_CREATED
         assert "id" in response.data
 
+    @pytest.mark.integration
     def test_create_chat_room_unauthenticated(self, api_client, db):
         """Test creating chat room without authentication"""
         # Arrange
@@ -74,6 +78,7 @@ class TestChatRoomsView:
 class TestChatRoomDetailView:
     """Tests for ChatRoomDetail view"""
 
+    @pytest.mark.integration
     def test_get_chat_room_authenticated(self, api_client, user, chat_room, db):
         """Test getting chat room detail as authenticated user"""
         # Arrange
@@ -86,6 +91,7 @@ class TestChatRoomDetailView:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == chat_room.id
 
+    @pytest.mark.integration
     def test_get_chat_room_not_found(self, api_client, user, db):
         """Test getting non-existent chat room"""
         # Arrange
@@ -97,6 +103,7 @@ class TestChatRoomDetailView:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_chat_room_valid(self, api_client, user, chat_room, db):
         """Test updating chat room with valid data"""
         # Arrange
@@ -112,6 +119,7 @@ class TestChatRoomDetailView:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["id"] == chat_room.id
 
+    @pytest.mark.integration
     def test_delete_chat_room(self, api_client, user, chat_room, db):
         """Test deleting chat room"""
         # Arrange
@@ -129,6 +137,7 @@ class TestChatRoomDetailView:
 class TestDirectMessagesView:
     """Tests for DirectMessages view"""
 
+    @pytest.mark.integration
     def test_list_direct_messages_authenticated(
         self, api_client, user, direct_message, db
     ):
@@ -143,6 +152,7 @@ class TestDirectMessagesView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_direct_messages_unauthenticated(self, api_client, direct_message, db):
         """Test listing direct messages without authentication"""
         # Act
@@ -153,6 +163,7 @@ class TestDirectMessagesView:
         # IsAuthenticated permission returns 403 for unauthenticated requests
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_direct_message_valid(self, api_client, user, chat_room, db):
         """Test creating direct message with valid data"""
         # Arrange
@@ -171,6 +182,7 @@ class TestDirectMessagesView:
         assert response.status_code == status.HTTP_201_CREATED
         assert "id" in response.data
 
+    @pytest.mark.integration
     def test_create_direct_message_invalid(self, api_client, user, db):
         """Test creating direct message with invalid data"""
         # Arrange
@@ -187,6 +199,7 @@ class TestDirectMessagesView:
 class TestDirectMessageDetailView:
     """Tests for DirectMessageDetail view"""
 
+    @pytest.mark.integration
     def test_get_direct_message_authenticated(
         self, api_client, user, direct_message, db
     ):
@@ -204,6 +217,7 @@ class TestDirectMessageDetailView:
         assert response.data["id"] == direct_message.id
         assert response.data["text"] == "Test message"
 
+    @pytest.mark.integration
     def test_get_direct_message_not_found(self, api_client, user, db):
         """Test getting non-existent direct message"""
         # Arrange
@@ -215,6 +229,7 @@ class TestDirectMessageDetailView:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_direct_message_valid(self, api_client, user, direct_message, db):
         """Test updating direct message with valid data"""
         # Arrange
@@ -230,6 +245,7 @@ class TestDirectMessageDetailView:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["id"] == direct_message.id
 
+    @pytest.mark.integration
     def test_delete_direct_message(self, api_client, user, direct_message, db):
         """Test deleting direct message"""
         # Arrange
@@ -249,6 +265,7 @@ class TestDirectMessageDetailView:
 class TestCommentsView:
     """Tests for Comments view"""
 
+    @pytest.mark.integration
     def test_list_comments_authenticated(self, api_client, user, comment, db):
         """Test listing comments as authenticated user"""
         # Arrange
@@ -261,6 +278,7 @@ class TestCommentsView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_comments_unauthenticated(self, api_client, comment, db):
         """Test listing comments without authentication"""
         # Act
@@ -271,6 +289,7 @@ class TestCommentsView:
         # IsAuthenticated permission returns 403 for unauthenticated requests
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_create_comment_valid(self, api_client, user, project_document, db):
         """Test creating comment with valid data"""
         # Arrange
@@ -289,6 +308,7 @@ class TestCommentsView:
         assert response.status_code == status.HTTP_201_CREATED
         assert "id" in response.data
 
+    @pytest.mark.integration
     def test_create_comment_invalid(self, api_client, user, db):
         """Test creating comment with invalid data"""
         # Arrange
@@ -305,6 +325,7 @@ class TestCommentsView:
 class TestCommentDetailView:
     """Tests for CommentDetail view"""
 
+    @pytest.mark.integration
     def test_get_comment_authenticated(self, api_client, user, comment, db):
         """Test getting comment detail as authenticated user"""
         # Arrange
@@ -318,6 +339,7 @@ class TestCommentDetailView:
         assert response.data["id"] == comment.id
         assert response.data["text"] == "Test comment"
 
+    @pytest.mark.integration
     def test_get_comment_not_found(self, api_client, user, db):
         """Test getting non-existent comment"""
         # Arrange
@@ -329,6 +351,7 @@ class TestCommentDetailView:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_comment_valid(self, api_client, user, comment, db):
         """Test updating comment with valid data"""
         # Arrange
@@ -344,6 +367,7 @@ class TestCommentDetailView:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["id"] == comment.id
 
+    @pytest.mark.integration
     def test_delete_comment_by_creator(self, api_client, user, comment, db):
         """Test deleting comment by creator"""
         # Arrange
@@ -357,6 +381,7 @@ class TestCommentDetailView:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not Comment.objects.filter(id=comment_id).exists()
 
+    @pytest.mark.integration
     def test_delete_comment_by_superuser(self, api_client, superuser, comment, db):
         """Test deleting comment by superuser"""
         # Arrange
@@ -370,6 +395,7 @@ class TestCommentDetailView:
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not Comment.objects.filter(id=comment_id).exists()
 
+    @pytest.mark.integration
     def test_delete_comment_permission_denied(
         self, api_client, other_user, comment, db
     ):
@@ -387,6 +413,7 @@ class TestCommentDetailView:
 class TestReactionsView:
     """Tests for Reactions view"""
 
+    @pytest.mark.integration
     def test_list_reactions_authenticated(
         self, api_client, user, reaction_on_comment, db
     ):
@@ -401,6 +428,7 @@ class TestReactionsView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
+    @pytest.mark.integration
     def test_list_reactions_unauthenticated(self, api_client, reaction_on_comment, db):
         """Test listing reactions without authentication"""
         # Act
@@ -411,6 +439,7 @@ class TestReactionsView:
         # IsAuthenticated permission returns 403 for unauthenticated requests
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @pytest.mark.integration
     def test_toggle_reaction_create(self, api_client, user, comment, db):
         """Test toggling reaction creates new reaction"""
         # Arrange
@@ -427,6 +456,7 @@ class TestReactionsView:
         assert response.status_code == status.HTTP_201_CREATED
         assert "id" in response.data
 
+    @pytest.mark.integration
     def test_toggle_reaction_delete(self, api_client, user, comment, db):
         """Test toggling reaction deletes existing reaction"""
         # Arrange
@@ -447,6 +477,7 @@ class TestReactionsView:
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    @pytest.mark.integration
     def test_toggle_reaction_missing_comment(self, api_client, user, db):
         """Test toggling reaction without comment ID"""
         # Arrange
@@ -464,6 +495,7 @@ class TestReactionsView:
 class TestReactionDetailView:
     """Tests for ReactionDetail view"""
 
+    @pytest.mark.integration
     def test_get_reaction_authenticated(
         self, api_client, user, reaction_on_comment, db
     ):
@@ -480,6 +512,7 @@ class TestReactionDetailView:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == reaction_on_comment.id
 
+    @pytest.mark.integration
     def test_get_reaction_not_found(self, api_client, user, db):
         """Test getting non-existent reaction"""
         # Arrange
@@ -491,6 +524,7 @@ class TestReactionDetailView:
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.integration
     def test_update_reaction_valid(self, api_client, user, reaction_on_comment, db):
         """Test updating reaction with valid data"""
         # Arrange
@@ -506,6 +540,7 @@ class TestReactionDetailView:
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.data["id"] == reaction_on_comment.id
 
+    @pytest.mark.integration
     def test_delete_reaction(self, api_client, user, reaction_on_comment, db):
         """Test deleting reaction"""
         # Arrange

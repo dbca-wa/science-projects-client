@@ -4,12 +4,15 @@ Tests for document models
 
 from datetime import datetime
 
+import pytest
+
 from documents.models import AnnualReport, CustomPublication, Endorsement, ProjectPlan
 
 
 class TestAnnualReport:
     """Tests for AnnualReport model"""
 
+    @pytest.mark.unit
     def test_save_sets_default_dm_sign(self, db):
         """Test that save() sets default dm_sign if not provided"""
         # Arrange
@@ -27,6 +30,7 @@ class TestAnnualReport:
         assert "Dr Margaret Byrne" in report.dm_sign
         assert "October 2024" in report.dm_sign
 
+    @pytest.mark.unit
     def test_str_representation(self, annual_report, db):
         """Test string representation of AnnualReport"""
         # Act
@@ -40,6 +44,7 @@ class TestAnnualReport:
 class TestProjectDocument:
     """Tests for ProjectDocument model"""
 
+    @pytest.mark.integration
     def test_get_serializer_class(self, project_document, db):
         """Test get_serializer_class method"""
         # Arrange
@@ -53,6 +58,7 @@ class TestProjectDocument:
         assert hasattr(serializer_class, "Meta")
         assert serializer_class.Meta.model == Model
 
+    @pytest.mark.integration
     def test_has_project_document_data_concept_plan(
         self, concept_plan_with_details, db
     ):
@@ -66,6 +72,7 @@ class TestProjectDocument:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_has_project_document_data_project_plan(self, db, project_with_lead):
         """Test has_project_document_data for project plan"""
         # Arrange
@@ -86,6 +93,7 @@ class TestProjectDocument:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_has_project_document_data_progress_report(
         self, progress_report_with_details, db
     ):
@@ -99,6 +107,7 @@ class TestProjectDocument:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_has_project_document_data_student_report(
         self, student_report_with_details, db
     ):
@@ -112,6 +121,7 @@ class TestProjectDocument:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_has_project_document_data_project_closure(self, project_closure, db):
         """Test has_project_document_data for project closure"""
         # Arrange
@@ -123,6 +133,7 @@ class TestProjectDocument:
         # Assert
         assert result is True
 
+    @pytest.mark.integration
     def test_str_representation(self, project_document, db):
         """Test string representation of ProjectDocument"""
         # Act
@@ -136,6 +147,7 @@ class TestProjectDocument:
 class TestConceptPlan:
     """Tests for ConceptPlan model"""
 
+    @pytest.mark.unit
     def test_extract_inner_text(self, concept_plan_with_details, db):
         """Test extract_inner_text method"""
         # Arrange
@@ -147,6 +159,7 @@ class TestConceptPlan:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.unit
     def test_str_representation(self, concept_plan_with_details, db):
         """Test string representation of ConceptPlan"""
         # Act
@@ -159,6 +172,7 @@ class TestConceptPlan:
 class TestProjectPlan:
     """Tests for ProjectPlan model"""
 
+    @pytest.mark.integration
     def test_extract_inner_text(self, db, project_with_lead):
         """Test extract_inner_text method"""
         # Arrange
@@ -180,6 +194,7 @@ class TestProjectPlan:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.integration
     def test_str_representation(self, db, project_with_lead):
         """Test string representation of ProjectPlan"""
         # Arrange
@@ -204,6 +219,7 @@ class TestProjectPlan:
 class TestProgressReport:
     """Tests for ProgressReport model"""
 
+    @pytest.mark.unit
     def test_extract_inner_text(self, progress_report_with_details, db):
         """Test extract_inner_text method"""
         # Arrange
@@ -215,6 +231,7 @@ class TestProgressReport:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.unit
     def test_str_representation(self, progress_report_with_details, db):
         """Test string representation of ProgressReport"""
         # Act
@@ -228,6 +245,7 @@ class TestProgressReport:
 class TestStudentReport:
     """Tests for StudentReport model"""
 
+    @pytest.mark.unit
     def test_extract_inner_text(self, student_report_with_details, db):
         """Test extract_inner_text method"""
         # Arrange
@@ -239,6 +257,7 @@ class TestStudentReport:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.unit
     def test_str_representation(self, student_report_with_details, db):
         """Test string representation of StudentReport"""
         # Act
@@ -252,6 +271,7 @@ class TestStudentReport:
 class TestProjectClosure:
     """Tests for ProjectClosure model"""
 
+    @pytest.mark.integration
     def test_extract_inner_text(self, project_closure, db):
         """Test extract_inner_text method"""
         # Arrange
@@ -263,6 +283,7 @@ class TestProjectClosure:
         # Assert
         assert result == "Test content here"
 
+    @pytest.mark.integration
     def test_str_representation(self, project_closure, db):
         """Test string representation of ProjectClosure"""
         # Act
@@ -275,6 +296,7 @@ class TestProjectClosure:
 class TestEndorsement:
     """Tests for Endorsement model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, db, project_with_lead):
         """Test string representation of Endorsement"""
         # Arrange
@@ -302,6 +324,7 @@ class TestEndorsement:
 class TestCustomPublication:
     """Tests for CustomPublication model"""
 
+    @pytest.mark.integration
     def test_str_representation(self, db, user):
         """Test string representation of CustomPublication"""
         # Arrange

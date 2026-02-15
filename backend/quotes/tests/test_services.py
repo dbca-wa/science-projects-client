@@ -17,6 +17,7 @@ User = get_user_model()
 class TestQuoteService:
     """Tests for Quote service operations"""
 
+    @pytest.mark.unit
     def test_list_quotes(self, quote, quote2, db):
         """Test listing all quotes"""
         # Act
@@ -27,6 +28,7 @@ class TestQuoteService:
         assert quote in quotes
         assert quote2 in quotes
 
+    @pytest.mark.unit
     def test_list_quotes_empty(self, db):
         """Test listing quotes when none exist"""
         # Act
@@ -35,6 +37,7 @@ class TestQuoteService:
         # Assert
         assert quotes.count() == 0
 
+    @pytest.mark.unit
     def test_get_quote(self, quote, db):
         """Test getting quote by ID"""
         # Act
@@ -45,12 +48,14 @@ class TestQuoteService:
         assert result.text == "Test quote text"
         assert result.author == "Test Author"
 
+    @pytest.mark.unit
     def test_get_quote_not_found(self, db):
         """Test getting non-existent quote raises NotFound"""
         # Act & Assert
         with pytest.raises(NotFound, match="Quote 999 not found"):
             QuoteService.get_quote(999)
 
+    @pytest.mark.unit
     def test_get_random_quote(self, quote, quote2, db):
         """Test getting random quote"""
         # Act
@@ -60,6 +65,7 @@ class TestQuoteService:
         assert result is not None
         assert result in [quote, quote2]
 
+    @pytest.mark.unit
     def test_get_random_quote_empty(self, db):
         """Test getting random quote when none exist"""
         # Act
@@ -68,6 +74,7 @@ class TestQuoteService:
         # Assert
         assert result is None
 
+    @pytest.mark.unit
     def test_create_quote(self, db):
         """Test creating a quote"""
         # Arrange
@@ -84,6 +91,7 @@ class TestQuoteService:
         assert quote.text == "New quote text"
         assert quote.author == "New Author"
 
+    @pytest.mark.unit
     def test_create_quote_duplicate_text(self, quote, db):
         """Test creating quote with duplicate text fails"""
         # Arrange
@@ -96,6 +104,7 @@ class TestQuoteService:
         with pytest.raises(Exception):  # IntegrityError
             QuoteService.create_quote(data)
 
+    @pytest.mark.unit
     def test_update_quote(self, quote, db):
         """Test updating a quote"""
         # Arrange
@@ -109,6 +118,7 @@ class TestQuoteService:
         assert updated.text == "Updated quote text"
         assert updated.author == "Test Author"  # Unchanged
 
+    @pytest.mark.unit
     def test_update_quote_author(self, quote, db):
         """Test updating quote author"""
         # Arrange
@@ -122,6 +132,7 @@ class TestQuoteService:
         assert updated.author == "Updated Author"
         assert updated.text == "Test quote text"  # Unchanged
 
+    @pytest.mark.unit
     def test_update_quote_not_found(self, db):
         """Test updating non-existent quote raises NotFound"""
         # Arrange
@@ -131,6 +142,7 @@ class TestQuoteService:
         with pytest.raises(NotFound, match="Quote 999 not found"):
             QuoteService.update_quote(999, data)
 
+    @pytest.mark.unit
     def test_delete_quote(self, quote, db):
         """Test deleting a quote"""
         # Arrange
@@ -142,6 +154,7 @@ class TestQuoteService:
         # Assert
         assert not Quote.objects.filter(id=quote_id).exists()
 
+    @pytest.mark.unit
     def test_delete_quote_not_found(self, db):
         """Test deleting non-existent quote raises NotFound"""
         # Act & Assert
@@ -157,6 +170,7 @@ class TestQuoteFileOperations:
         new_callable=mock_open,
         read_data="Quote 1 - Author 1\nQuote 2 - Author 2\n",
     )
+    @pytest.mark.unit
     def test_load_quotes_from_file(self, mock_file, db):
         """Test loading quotes from file"""
         # Act
@@ -172,6 +186,7 @@ class TestQuoteFileOperations:
         new_callable=mock_open,
         read_data="Quote 1 - Author 1\nQuote 1 - Author 1\n",
     )
+    @pytest.mark.unit
     def test_load_quotes_removes_duplicates(self, mock_file, db):
         """Test loading quotes removes duplicates"""
         # Act
@@ -186,6 +201,7 @@ class TestQuoteFileOperations:
         new_callable=mock_open,
         read_data="Quote with - multiple - dashes - Author\n",
     )
+    @pytest.mark.unit
     def test_load_quotes_handles_multiple_dashes(self, mock_file, db):
         """Test loading quotes handles multiple dashes correctly"""
         # Act
@@ -199,6 +215,7 @@ class TestQuoteFileOperations:
         }
 
     @patch("builtins.open", new_callable=mock_open, read_data="Quote without author\n")
+    @pytest.mark.unit
     def test_load_quotes_handles_missing_author(self, mock_file, db):
         """Test loading quotes handles missing author"""
         # Act
@@ -208,6 +225,7 @@ class TestQuoteFileOperations:
         assert len(quotes) == 1
         assert quotes[0] == {"text": "quote without author", "author": ""}
 
+    @pytest.mark.unit
     def test_bulk_create_quotes(self, db):
         """Test bulk creating quotes"""
         # Arrange
@@ -225,6 +243,7 @@ class TestQuoteFileOperations:
         assert len(result["errors"]) == 0
         assert Quote.objects.count() == 3
 
+    @pytest.mark.unit
     def test_bulk_create_quotes_empty_list(self, db):
         """Test bulk creating quotes with empty list"""
         # Arrange
@@ -242,6 +261,7 @@ class TestQuoteFileOperations:
 class TestQuoteModelValidation:
     """Tests for Quote model validation"""
 
+    @pytest.mark.unit
     def test_quote_text_unique(self, quote, db):
         """Test quote text must be unique"""
         # Act & Assert
@@ -251,6 +271,7 @@ class TestQuoteModelValidation:
                 author="Different Author",
             )
 
+    @pytest.mark.unit
     def test_quote_str_representation(self, quote, db):
         """Test quote string representation"""
         # Act

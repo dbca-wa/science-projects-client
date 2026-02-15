@@ -2,6 +2,8 @@
 Tests for project serializers
 """
 
+import pytest
+
 from projects.serializers.areas import ProjectAreaSerializer
 from projects.serializers.base import (
     CreateProjectSerializer,
@@ -37,6 +39,7 @@ from projects.serializers.members import (
 class TestCreateProjectSerializer:
     """Tests for CreateProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing a project"""
         # Arrange
@@ -51,6 +54,7 @@ class TestCreateProjectSerializer:
         assert data["kind"] == project.kind
         assert data["status"] == project.status
 
+    @pytest.mark.integration
     def test_validation_valid_data(self, business_area, db):
         """Test validation with valid data"""
         # Arrange
@@ -75,6 +79,7 @@ class TestCreateProjectSerializer:
 class TestProjectSerializer:
     """Tests for ProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing a project"""
         # Arrange
@@ -90,6 +95,7 @@ class TestProjectSerializer:
         assert "deletion_request_id" in data
         assert "areas" in data
 
+    @pytest.mark.integration
     def test_get_deletion_request_id_none(self, project, db):
         """Test get_deletion_request_id returns None when no request"""
         # Arrange
@@ -101,6 +107,7 @@ class TestProjectSerializer:
         # Assert
         assert data["deletion_request_id"] is None
 
+    @pytest.mark.integration
     def test_get_deletion_request_id_with_request(self, project, db):
         """Test get_deletion_request_id returns ID when request exists"""
         # Arrange
@@ -119,6 +126,7 @@ class TestProjectSerializer:
         # Assert
         assert data["deletion_request_id"] == task.id
 
+    @pytest.mark.integration
     def test_get_areas_empty(self, db):
         """Test get_areas returns empty list when no areas"""
         # Arrange
@@ -150,6 +158,7 @@ class TestProjectSerializer:
         # Assert
         assert data["areas"] == []
 
+    @pytest.mark.integration
     def test_get_areas_with_areas(self, db):
         """Test get_areas returns area data when areas exist"""
         # Arrange
@@ -192,6 +201,7 @@ class TestProjectSerializer:
 class TestProjectUpdateSerializer:
     """Tests for ProjectUpdateSerializer"""
 
+    @pytest.mark.unit
     def test_validation_valid_data(self, db):
         """Test validation with valid data"""
         # Arrange
@@ -212,6 +222,7 @@ class TestProjectUpdateSerializer:
 class TestTinyProjectSerializer:
     """Tests for TinyProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing a project with minimal fields"""
         # Arrange
@@ -234,6 +245,7 @@ class TestTinyProjectSerializer:
 class TestProblematicProjectSerializer:
     """Tests for ProblematicProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing a problematic project"""
         # Arrange
@@ -256,6 +268,7 @@ class TestProblematicProjectSerializer:
 class TestUserProfileProjectSerializer:
     """Tests for UserProfileProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing a project for user profile"""
         # Arrange
@@ -278,6 +291,7 @@ class TestUserProfileProjectSerializer:
 class TestPkAndKindOnlyProjectSerializer:
     """Tests for PkAndKindOnlyProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing project with only ID and kind"""
         # Arrange
@@ -295,6 +309,7 @@ class TestPkAndKindOnlyProjectSerializer:
 class TestProjectDetailSerializer:
     """Tests for ProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, db):
         """Test serializing project details"""
         # Arrange
@@ -312,6 +327,7 @@ class TestProjectDetailSerializer:
 class TestProjectDetailViewSerializer:
     """Tests for ProjectDetailViewSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, db):
         """Test serializing project details for view"""
         # Arrange
@@ -327,6 +343,7 @@ class TestProjectDetailViewSerializer:
         assert data["project"]["id"] == detail.project.id
         assert data["project"]["title"] == detail.project.title
 
+    @pytest.mark.integration
     def test_get_creator_with_user(self, project_with_lead, user, db):
         """Test get_creator returns user data"""
         # Arrange
@@ -342,6 +359,7 @@ class TestProjectDetailViewSerializer:
         assert data["creator"]["id"] == user.id
         assert data["creator"]["username"] == user.username
 
+    @pytest.mark.integration
     def test_get_creator_none(self, project_with_lead, db):
         """Test get_creator returns None when no creator"""
         # Arrange
@@ -360,6 +378,7 @@ class TestProjectDetailViewSerializer:
 class TestTinyProjectDetailSerializer:
     """Tests for TinyProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, db):
         """Test serializing minimal project details"""
         # Arrange
@@ -378,6 +397,7 @@ class TestTinyProjectDetailSerializer:
 class TestStudentProjectDetailSerializer:
     """Tests for StudentProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing student project details"""
         # Arrange
@@ -402,6 +422,7 @@ class TestStudentProjectDetailSerializer:
 class TestTinyStudentProjectDetailSerializer:
     """Tests for TinyStudentProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing minimal student project details"""
         # Arrange
@@ -428,6 +449,7 @@ class TestTinyStudentProjectDetailSerializer:
 class TestExternalProjectDetailSerializer:
     """Tests for ExternalProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing external project details"""
         # Arrange
@@ -454,6 +476,7 @@ class TestExternalProjectDetailSerializer:
 class TestTinyExternalProjectDetailSerializer:
     """Tests for TinyExternalProjectDetailSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing minimal external project details"""
         # Arrange
@@ -481,6 +504,7 @@ class TestTinyExternalProjectDetailSerializer:
 class TestProjectMemberSerializer:
     """Tests for ProjectMemberSerializer"""
 
+    @pytest.mark.integration
     def test_validation_valid_data(self, project, user, db):
         """Test validation with valid data"""
         # Arrange
@@ -499,6 +523,7 @@ class TestProjectMemberSerializer:
         assert is_valid is True
         assert serializer.validated_data["role"] == "supervising"
 
+    @pytest.mark.integration
     def test_validation_missing_role(self, project, user, db):
         """Test validation fails when role is missing"""
         # Arrange
@@ -520,6 +545,7 @@ class TestProjectMemberSerializer:
 class TestTinyProjectMemberSerializer:
     """Tests for TinyProjectMemberSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, project_lead, db):
         """Test serializing minimal project member"""
         # Arrange
@@ -540,6 +566,7 @@ class TestTinyProjectMemberSerializer:
 class TestMiniProjectMemberSerializer:
     """Tests for MiniProjectMemberSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, project_lead, db):
         """Test serializing mini project member"""
         # Arrange
@@ -571,6 +598,7 @@ class TestMiniProjectMemberSerializer:
 class TestProjectAreaSerializer:
     """Tests for ProjectAreaSerializer"""
 
+    @pytest.mark.integration
     def test_serialization_with_areas(self, db):
         """Test serializing project area with location data"""
         # Arrange
@@ -612,6 +640,7 @@ class TestProjectAreaSerializer:
         assert data["areas"][0]["id"] == area1.id
         assert data["areas"][1]["id"] == area2.id
 
+    @pytest.mark.integration
     def test_serialization_empty_areas(self, db):
         """Test serializing project area with no areas"""
         # Arrange
@@ -649,6 +678,7 @@ class TestProjectAreaSerializer:
 class TestARProjectSerializer:
     """Tests for ARProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing project for annual report"""
         # Arrange
@@ -665,6 +695,7 @@ class TestARProjectSerializer:
         # Note: team_members is defined as SerializerMethodField without ()
         # so it's not actually a field in the serialized data
 
+    @pytest.mark.integration
     def test_serialization_with_image(self, project, mock_image, db):
         """Test serializing project with image"""
         # Arrange
@@ -691,6 +722,7 @@ class TestARProjectSerializer:
 class TestARExternalProjectSerializer:
     """Tests for ARExternalProjectSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project_with_lead, project_lead, db):
         """Test serializing external project for annual report"""
         # Arrange
@@ -723,6 +755,7 @@ class TestARExternalProjectSerializer:
         assert "funding" in data
         assert "team_members" in data
 
+    @pytest.mark.integration
     def test_get_partners_with_external_info(self, project_with_lead, project_lead, db):
         """Test get_partners returns collaboration_with"""
         # Arrange
@@ -752,6 +785,7 @@ class TestARExternalProjectSerializer:
         # Assert
         assert data["partners"] == "Partner Organization"
 
+    @pytest.mark.integration
     def test_get_partners_without_external_info(
         self, project_with_lead, project_lead, db, capsys
     ):
@@ -778,6 +812,7 @@ class TestARExternalProjectSerializer:
         captured = capsys.readouterr()
         assert "EXCEPTION (NO PARTNERS):" in captured.out
 
+    @pytest.mark.integration
     def test_get_funding_with_external_info(self, project_with_lead, project_lead, db):
         """Test get_funding returns budget"""
         # Arrange
@@ -807,6 +842,7 @@ class TestARExternalProjectSerializer:
         # Assert
         assert data["funding"] == "$100,000"
 
+    @pytest.mark.integration
     def test_get_funding_without_external_info(
         self, project_with_lead, project_lead, db, capsys
     ):
@@ -833,6 +869,7 @@ class TestARExternalProjectSerializer:
         captured = capsys.readouterr()
         assert "EXCEPTION (NO FUNDING):" in captured.out
 
+    @pytest.mark.integration
     def test_get_partners_method_directly(self, project_with_lead, db):
         """Test get_partners method directly without full serialization"""
         # Arrange
@@ -853,6 +890,7 @@ class TestARExternalProjectSerializer:
         # Assert
         assert result == "Direct Test Partner"
 
+    @pytest.mark.integration
     def test_get_funding_method_directly(self, project_with_lead, db):
         """Test get_funding method directly without full serialization"""
         # Arrange
@@ -873,6 +911,7 @@ class TestARExternalProjectSerializer:
         # Assert
         assert result == "$75,000"
 
+    @pytest.mark.integration
     def test_get_partners_method_no_info(self, project_with_lead, db, capsys):
         """Test get_partners method returns empty string when no external info"""
         # Arrange
@@ -886,6 +925,7 @@ class TestARExternalProjectSerializer:
         captured = capsys.readouterr()
         assert "EXCEPTION (NO PARTNERS):" in captured.out
 
+    @pytest.mark.integration
     def test_get_funding_method_no_info(self, project_with_lead, db, capsys):
         """Test get_funding method returns empty string when no external info"""
         # Arrange
@@ -903,6 +943,7 @@ class TestARExternalProjectSerializer:
 class TestTinyStudentProjectARSerializer:
     """Tests for TinyStudentProjectARSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing student project for annual report"""
         # Arrange
@@ -931,6 +972,7 @@ class TestTinyStudentProjectARSerializer:
         assert "start_date" in data
         assert "end_date" in data
 
+    @pytest.mark.integration
     def test_get_student_level(self, project, db):
         """Test get_student_level returns level from student_project_info"""
         # Arrange
@@ -949,6 +991,7 @@ class TestTinyStudentProjectARSerializer:
         # Assert
         assert data["student_level"] == "phd"
 
+    @pytest.mark.integration
     def test_serialization_with_image(self, project, mock_image, db):
         """Test serializing student project with image"""
         # Arrange
@@ -979,6 +1022,7 @@ class TestTinyStudentProjectARSerializer:
 class TestProjectDataTableSerializer:
     """Tests for ProjectDataTableSerializer"""
 
+    @pytest.mark.integration
     def test_serialization(self, project, db):
         """Test serializing project for data table"""
         # Arrange
@@ -1001,6 +1045,7 @@ class TestProjectDataTableSerializer:
         assert "start_date" in data
         assert "end_date" in data
 
+    @pytest.mark.integration
     def test_get_start_date_with_date(self, project, db):
         """Test get_start_date returns year when start_date exists"""
         # Arrange
@@ -1016,6 +1061,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["start_date"] == 2023
 
+    @pytest.mark.integration
     def test_get_start_date_without_date(self, project, db):
         """Test get_start_date returns None when no start_date"""
         # Arrange
@@ -1029,6 +1075,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["start_date"] is None
 
+    @pytest.mark.integration
     def test_get_end_date_with_date(self, project, db):
         """Test get_end_date returns year when end_date exists"""
         # Arrange
@@ -1045,6 +1092,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["end_date"] == 2024
 
+    @pytest.mark.integration
     def test_get_end_date_without_date(self, project, db):
         """Test get_end_date returns None when no start_date"""
         # Arrange
@@ -1059,6 +1107,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["end_date"] is None
 
+    @pytest.mark.integration
     def test_get_role_from_context(self, project, db):
         """Test get_role returns role from context"""
         # Arrange
@@ -1072,6 +1121,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["role"] == "supervising"
 
+    @pytest.mark.integration
     def test_get_role_without_context(self, project, db):
         """Test get_role returns None when no context"""
         # Arrange
@@ -1083,6 +1133,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["role"] is None
 
+    @pytest.mark.integration
     def test_get_role_not_in_context(self, db):
         """Test get_role returns None when project not in context"""
         # Arrange
@@ -1124,6 +1175,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["role"] is None
 
+    @pytest.mark.integration
     def test_get_tag(self, project, db):
         """Test get_tag returns project tag"""
         # Arrange
@@ -1139,6 +1191,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["tag"] == "SP-2023-42"
 
+    @pytest.mark.integration
     def test_get_description_science_project(self, project, db):
         """Test get_description returns project description for science project"""
         # Arrange
@@ -1153,6 +1206,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["description"] == "Science project description"
 
+    @pytest.mark.integration
     def test_get_description_external_project(self, db):
         """Test get_description returns external description for external project"""
         # Arrange
@@ -1191,6 +1245,7 @@ class TestProjectDataTableSerializer:
         # Assert
         assert data["description"] == "External project description"
 
+    @pytest.mark.integration
     def test_get_description_external_project_no_info(self, db):
         """Test get_description returns empty string for external project without info"""
         # Arrange
