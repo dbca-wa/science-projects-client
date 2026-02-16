@@ -25,5 +25,16 @@ export const getMyProjects = async (): Promise<IProjectData[]> => {
 
 export const getAdminTasks = async (): Promise<IAdminTask[]> => {
 	const response = await apiClient.get<IAdminTask[]>("adminoptions/tasks");
-	return response.filter((task) => task.status === "pending");
+	console.log("🔍 [DEBUG] Raw API response from adminoptions/tasks:", response);
+	console.log("🔍 [DEBUG] Response length:", response.length);
+	console.log(
+		"🔍 [DEBUG] Response types:",
+		response.map((t) => ({ id: t.id, action: t.action, status: t.status }))
+	);
+
+	const filtered = response.filter((task) => task.status === "pending");
+	console.log("🔍 [DEBUG] Filtered pending tasks:", filtered);
+	console.log("🔍 [DEBUG] Filtered length:", filtered.length);
+
+	return filtered;
 };

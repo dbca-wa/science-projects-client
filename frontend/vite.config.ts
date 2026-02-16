@@ -61,7 +61,8 @@ const CSP_CONFIG = {
 		objectSrc: ["'none'"],
 		baseUri: ["'self'"],
 		formAction: ["'self'"],
-		reportUri: "/api/csp-report",
+		// Note: report-uri is deprecated and doesn't work in meta tags anyway
+		// Use report-to directive in HTTP headers instead if CSP reporting is needed
 	} as CSPConfig,
 };
 
@@ -107,9 +108,6 @@ function generateCSP(config: CSPConfig): string {
 	}
 	if (config.formAction.length > 0) {
 		directives.push(`form-action ${config.formAction.join(" ")}`);
-	}
-	if (config.reportUri) {
-		directives.push(`report-uri ${config.reportUri}`);
 	}
 
 	return directives.join("; ");

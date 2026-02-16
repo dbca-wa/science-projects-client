@@ -80,6 +80,12 @@ const Dashboard = observer(() => {
 		refetch: refetchAdminTasks,
 	} = useAdminTasks();
 
+	// Debug logging for admin tasks
+	console.log("🎯 [DASHBOARD] Admin tasks received:", adminTasks);
+	console.log("🎯 [DASHBOARD] Admin tasks count:", adminTasks.length);
+	console.log("🎯 [DASHBOARD] Admin tasks loading:", adminTasksLoading);
+	console.log("🎯 [DASHBOARD] Admin tasks error:", adminTasksError);
+
 	// Fetch endorsement tasks
 	const {
 		data: endorsementTasks,
@@ -137,6 +143,13 @@ const Dashboard = observer(() => {
 		(endorsementTasks?.hc?.length || 0);
 	const adminTasksCount =
 		caretakerTasksCount + projectDeletionTasksCount + endorsementTasksCount;
+
+	// Debug logging for task counts
+	console.log("📊 [DASHBOARD] Task counts breakdown:");
+	console.log("  - Caretaker tasks:", caretakerTasksCount);
+	console.log("  - Project deletion tasks:", projectDeletionTasksCount);
+	console.log("  - Endorsement tasks:", endorsementTasksCount);
+	console.log("  - Total admin tasks count:", adminTasksCount);
 
 	const handleProjectClick = (projectId: number, event: React.MouseEvent) => {
 		const url = `/projects/${projectId}/overview`;

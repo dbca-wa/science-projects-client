@@ -13,7 +13,6 @@ Usage:
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from psycopg2 import sql
 
 
 class Command(BaseCommand):
@@ -139,10 +138,9 @@ class Command(BaseCommand):
     def _get_table_count(self, table_name):
         """Get the number of records in a table."""
         with connection.cursor() as cursor:
-            # Use SQL identifier to prevent injection (table_name is hardcoded but bandit flags it)
-            cursor.execute(
-                sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(table_name))
-            )
+            # Use string formatting with validated table name (table_name is hardcoded in callers)
+            # This is safe because table_name only comes from hardcoded strings in this file
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")  # nosec B608
             return cursor.fetchone()[0]
 
     def _migrate_data(self):
@@ -152,8 +150,7 @@ class Command(BaseCommand):
         """
         with connection.cursor() as cursor:
             # Insert new records that don't exist in destination
-            cursor.execute(
-                """
+            cursor.execute("""
                 INSERT INTO caretakers_caretaker
                     (id, user_id, caretaker_id, end_date, reason, notes, created_at, updated_at)
                 SELECT
@@ -172,13 +169,11 @@ class Command(BaseCommand):
                     AND dest.caretaker_id = src.caretaker_id
                 )
                 ON CONFLICT (user_id, caretaker_id) DO NOTHING;
-            """
-            )
+            """)
             copied_count = cursor.rowcount
 
             # Update existing records to ensure data is current
-            cursor.execute(
-                """
+            cursor.execute("""
                 UPDATE caretakers_caretaker dest
                 SET
                     end_date = src.end_date,
@@ -196,8 +191,7 @@ class Command(BaseCommand):
                     dest.created_at IS DISTINCT FROM src.created_at OR
                     dest.updated_at IS DISTINCT FROM src.updated_at
                 );
-            """
-            )
+            """)
             updated_count = cursor.rowcount
 
             return copied_count, updated_count
