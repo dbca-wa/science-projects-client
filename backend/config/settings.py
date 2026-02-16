@@ -278,29 +278,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-    ],
-    "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
-    ],
-    "DEFAULT_THROTTLE_RATES": {
-        # General API rate limits
-        "anon": "200/hour",  # Anonymous users (login page, public endpoints)
-        "user": "1000/hour",  # Authenticated users (normal usage)
-        # Specific endpoint rate limits (use custom throttle classes)
-        "burst": "30/minute",  # Burst protection for rapid requests
-        "login": "5/minute",  # Login attempts (prevents brute force)
-        "password_reset": "3/hour",  # Password reset requests
-    },
-}
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -322,24 +299,55 @@ WSGI_APPLICATION = "config.wsgi.application"
 # endregion ========================================================================================
 
 # region Cache Configuration ======================================================
-# Import cache keys and TTL values (needed by services)
-from config.cache_settings import CACHE_KEYS, CACHE_TTL  # noqa: E402, F401
-
-# Use dummy cache for tests, Redis for production/development
-if os.environ.get("PYTEST_RUNNING"):
-    # Dummy cache for tests (no Redis required)
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
-    }
-else:
-    # Redis cache for production/development
-    from config.cache_settings import CACHES  # noqa: E402, F401
+# Import cache keys, TTL values, and Redis availability flag
+from config.cache_settings import (  # noqa: E402, F401
+    CACHE_KEYS,
+    CACHE_TTL,
+    CACHES,
+    REDIS_AVAILABLE,
+)
 
 # endregion ========================================================================================
 
 # region Logs and Tracking =======================================================================
+# Initialize logger early for use in configuration
+LOGGER = logging.getLogger(__name__)
+
+# endregion ========================================================================================
+
+# region REST Framework Configuration =============================================
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+
+# Only enable throttling if Redis is available (throttling requires cache)
+if REDIS_AVAILABLE:
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ]
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+        # General API rate limits
+        "anon": "200/hour",  # Anonymous users (login page, public endpoints)
+        "user": "1000/hour",  # Authenticated users (normal usage)
+        # Specific endpoint rate limits (use custom throttle classes)
+        "burst": "30/minute",  # Burst protection for rapid requests
+        "login": "5/minute",  # Login attempts (prevents brute force)
+        "password_reset": "3/hour",  # Password reset requests
+    }
+    LOGGER.info("THROTTLING: Rate limiting ENABLED (Redis available)")
+else:
+    # No throttling without Redis (throttling requires cache backend)
+    LOGGER.info("THROTTLING: Rate limiting DISABLED (Redis unavailable)")
+
+# endregion ========================================================================================
+
+# region Sentry Configuration =====================================================
 # Initialize Sentry only if SENTRY_URL is provided (optional)
 SENTRY_URL = env("SENTRY_URL", default=None)
 if ENVIRONMENT != "development" and SENTRY_URL:
@@ -434,8 +442,6 @@ LOGGING = {
         "handlers": ["console"],
     },
 }
-
-LOGGER = logging.getLogger(__name__)
 
 # endregion ========================================================================================
 
