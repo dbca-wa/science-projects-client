@@ -180,12 +180,16 @@ export default defineConfig({
 				"**/*.d.ts",
 				"**/types/",
 			],
-			thresholds: {
-				lines: 40,
-				functions: 40,
-				branches: 40,
-				statements: 40,
-			},
+			// Disable thresholds during CI sharded runs (checked after combining coverage)
+			// Enable thresholds for local development runs
+			thresholds: process.env.CI
+				? undefined
+				: {
+						lines: 40,
+						functions: 40,
+						branches: 40,
+						statements: 40,
+					},
 		},
 	},
 });

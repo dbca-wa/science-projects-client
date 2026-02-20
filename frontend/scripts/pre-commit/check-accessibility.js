@@ -6,7 +6,7 @@
  * Configuration is loaded from package.json accessibility section.
  */
 
-import { execSync } from "child_process";
+import { spawnSync } from "child_process";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -30,15 +30,15 @@ if (files.length === 0) {
 
 try {
 	// Run the comprehensive scanner
+	// Use spawnSync with array arguments to prevent shell injection
 	const scannerPath = resolve(__dirname, "../accessibility/scanner.js");
-	const command = `node ${scannerPath} ${files.join(" ")}`;
 
-	execSync(command, {
+	const result = spawnSync("node", [scannerPath, ...files], {
 		stdio: "inherit",
 		cwd: process.cwd(),
 	});
 
-	process.exit(0);
+	process.exit(result.status || 0);
 } catch (error) {
 	// Scanner already displays errors, just exit
 	process.exit(0);

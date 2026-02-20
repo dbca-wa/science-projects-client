@@ -284,16 +284,24 @@ const UserListPage = observer(() => {
 														<SelectItem value="All">
 															All Business Areas
 														</SelectItem>
-														{sortedBusinessAreas?.map((ba) => (
-															<SelectItem key={ba.id} value={ba.id!.toString()}>
-																{typeof ba.division === "object" &&
-																ba.division?.slug
-																	? `[${ba.division.slug}] `
-																	: ""}
-																{ba.name}
-																{!ba.is_active ? " (INACTIVE)" : ""}
-															</SelectItem>
-														))}
+														{sortedBusinessAreas
+															?.filter(
+																(ba): ba is typeof ba & { id: number } =>
+																	ba.id !== undefined
+															)
+															.map((ba) => (
+																<SelectItem
+																	key={ba.id}
+																	value={ba.id.toString()}
+																>
+																	{typeof ba.division === "object" &&
+																	ba.division?.slug
+																		? `[${ba.division.slug}] `
+																		: ""}
+																	{ba.name}
+																	{!ba.is_active ? " (INACTIVE)" : ""}
+																</SelectItem>
+															))}
 													</SelectContent>
 												</Select>
 											</div>
