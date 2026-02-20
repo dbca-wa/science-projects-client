@@ -169,14 +169,14 @@ const ProjectMapPage = observer(() => {
 	// Fullscreen mode: true fullscreen map with floating sidebar or minimized filter button
 	return (
 		<div className="fixed inset-0 z-50 bg-background">
-			{/* Fullscreen map */}
-			<div className="absolute inset-0">
-				<MapErrorBoundary>
-					<FullMapContainer fullscreen={true} />
-				</MapErrorBoundary>
-			</div>
+			{/* Hide navigation menu in fullscreen mode */}
+			<style>{`
+				header, nav[aria-label="Main navigation"], .navitar {
+					display: none !important;
+				}
+			`}</style>
 
-			{/* Minimized filter button - top right corner, positioned to not conflict with map controls */}
+			{/* FIRST: Minimized filter button - for tab order */}
 			{store.state.filtersMinimized && (
 				<div
 					ref={filterButtonRef}
@@ -214,7 +214,7 @@ const ProjectMapPage = observer(() => {
 				</div>
 			)}
 
-			{/* Floating sidebar - animated */}
+			{/* SECOND: Floating sidebar - for tab order */}
 			{!store.state.filtersMinimized && (
 				<div
 					ref={sidebarRef}
@@ -261,6 +261,13 @@ const ProjectMapPage = observer(() => {
 					</div>
 				</div>
 			)}
+
+			{/* THIRD: Fullscreen map (map buttons will be inside, markers after) */}
+			<div className="absolute inset-0">
+				<MapErrorBoundary>
+					<FullMapContainer fullscreen={true} />
+				</MapErrorBoundary>
+			</div>
 		</div>
 	);
 });

@@ -69,6 +69,7 @@ export const BaseCombobox = forwardRef(
 			debounceMs = 300,
 			maxResults = 10,
 			minSearchLength = 0,
+			ariaLabel,
 		} = props;
 
 		const inputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +79,14 @@ export const BaseCombobox = forwardRef(
 		const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
 		const [filteredItems, setFilteredItems] = useState<T[]>([]);
 		const [isCreating, setIsCreating] = useState(false);
+
+		// Generate unique IDs for accessibility
+		const inputId = useRef(
+			`combobox-input-${Math.random().toString(36).substr(2, 9)}`
+		).current;
+		const helperTextId = useRef(
+			`combobox-helper-${Math.random().toString(36).substr(2, 9)}`
+		).current;
 
 		// Debounce search term
 		const debouncedSearchTerm = useDebouncedValue(searchTerm, debounceMs);
@@ -209,7 +218,11 @@ export const BaseCombobox = forwardRef(
 				ref={wrapperRef}
 				className={cn("w-full", isRequired && "required", wrapperClassName)}
 			>
-				{label && <Label className="mb-2">{label}</Label>}
+				{label && (
+					<Label htmlFor={inputId} className="mb-2">
+						{label}
+					</Label>
+				)}
 				{value && renderSelected ? (
 					renderSelected(value, handleClearSelection)
 				) : (
@@ -238,6 +251,7 @@ export const BaseCombobox = forwardRef(
 						)}
 						<Input
 							ref={inputRef}
+							id={inputId}
 							type="text"
 							value={searchTerm}
 							onChange={(event) => {
@@ -261,6 +275,9 @@ export const BaseCombobox = forwardRef(
 							autoFocus={autoFocus}
 							autoComplete="off"
 							disabled={disabled}
+							aria-required={isRequired}
+							aria-describedby={helperText ? helperTextId : undefined}
+							aria-label={!label ? ariaLabel : undefined}
 						/>
 					</div>
 				)}
@@ -285,7 +302,10 @@ export const BaseCombobox = forwardRef(
 					</div>
 				)}
 				{helperText && (
-					<p className={cn("text-sm text-muted-foreground mt-2")}>
+					<p
+						id={helperTextId}
+						className={cn("text-sm text-muted-foreground mt-2")}
+					>
 						{helperText}
 					</p>
 				)}

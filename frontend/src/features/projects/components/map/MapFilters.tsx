@@ -16,6 +16,7 @@ import { useProjectMapStore } from "@/app/stores/store-context";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { BusinessAreaMultiSelect } from "@/shared/components/BusinessAreaMultiSelect";
 import { UserCombobox } from "@/shared/components/user";
+import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
 
 interface MapFiltersProps {
 	projectCount: number;
@@ -108,46 +109,83 @@ export const MapFilters = observer(
 		return (
 			<div className="w-full select-none bg-background">
 				<div className="p-4 w-full space-y-3">
-					{/* Row 1: Search and User Filter (side by side on lg+, stacked on mobile) */}
-					<div
-						className={`grid grid-cols-1 ${!isFullscreen ? "lg:grid-cols-2" : ""} gap-3`}
-					>
-						{/* Search Input - FIRST on mobile, right on desktop - EMPHASIZED */}
-						<div
-							className={`relative w-full order-1 ${!isFullscreen ? "lg:order-2" : ""}`}
-						>
-							<Input
-								type="text"
-								placeholder="Search projects by name, keyword, or tag..."
-								value={localSearchTerm}
-								onChange={handleSearchChange}
-								variant="search"
-								className="pl-10 pr-8 text-sm rounded-md"
-							/>
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
-							{localSearchTerm && (
-								<button
-									onClick={handleClearSearch}
-									className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-								>
-									<X className="size-4" />
-								</button>
-							)}
-						</div>
+					<ResponsiveLayout
+						breakpoint={isFullscreen ? "xl" : "lg"}
+						mobileContent={
+							<div className="space-y-3">
+								{/* Row 1 Mobile: Search Input (top) */}
+								<div className="relative w-full">
+									<Input
+										type="text"
+										placeholder="Search projects by name, keyword, or tag..."
+										value={localSearchTerm}
+										onChange={handleSearchChange}
+										variant="search"
+										className="pl-10 pr-8 text-sm rounded-md"
+									/>
+									<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
+									{localSearchTerm && (
+										<button
+											onClick={handleClearSearch}
+											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+										>
+											<X className="size-4" />
+										</button>
+									)}
+								</div>
 
-						{/* User Filter with icon - SECOND on mobile, left on desktop */}
-						<div
-							className={`w-full order-2 ${!isFullscreen ? "lg:order-1" : ""}`}
-						>
-							<UserCombobox
-								value={store.state.filters.user || null}
-								onValueChange={handleUserChange}
-								placeholder="Filter by user"
-								className="text-sm rounded-md"
-								showIcon={true}
-							/>
-						</div>
-					</div>
+								{/* Row 2 Mobile: User Filter */}
+								<div className="w-full">
+									<UserCombobox
+										value={store.state.filters.user || null}
+										onValueChange={handleUserChange}
+										placeholder="Filter by user"
+										ariaLabel="Filter projects by user"
+										className="text-sm rounded-md"
+										showIcon={true}
+									/>
+								</div>
+							</div>
+						}
+						desktopContent={
+							<div
+								className={`grid ${!isFullscreen ? "grid-cols-2" : "grid-cols-1"} gap-3`}
+							>
+								{/* Row 1 Desktop: User Filter (left) */}
+								<div className="w-full">
+									<UserCombobox
+										value={store.state.filters.user || null}
+										onValueChange={handleUserChange}
+										placeholder="Filter by user"
+										ariaLabel="Filter projects by user"
+										className="text-sm rounded-md"
+										showIcon={true}
+									/>
+								</div>
+
+								{/* Row 1 Desktop: Search Input (right) */}
+								<div className="relative w-full">
+									<Input
+										type="text"
+										placeholder="Search projects by name, keyword, or tag..."
+										value={localSearchTerm}
+										onChange={handleSearchChange}
+										variant="search"
+										className="pl-10 pr-8 text-sm rounded-md"
+									/>
+									<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
+									{localSearchTerm && (
+										<button
+											onClick={handleClearSearch}
+											className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+										>
+											<X className="size-4" />
+										</button>
+									)}
+								</div>
+							</div>
+						}
+					/>
 
 					{/* Row 2: Year, Project Status, Project Kind, Business Area (4-column grid) */}
 					<div
@@ -220,7 +258,6 @@ export const MapFilters = observer(
 						{/* Business Area Multi-Select */}
 						<div className="w-full">
 							<BusinessAreaMultiSelect
-								key={`ba-${store.state.filters.selectedBusinessAreas.join(",")}`}
 								selectedBusinessAreas={
 									store.state.filters.selectedBusinessAreas
 								}

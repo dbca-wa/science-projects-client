@@ -54,7 +54,17 @@ export const RegionLayer = ({
 			// Store original style
 			const originalStyle = { ...style };
 
-			// Hover effects
+			// CRITICAL: Immediately make non-focusable when layer is created
+			const element = (layer as any)._path;
+			if (element) {
+				element.setAttribute("tabindex", "-1");
+				element.setAttribute("aria-hidden", "true");
+				element.setAttribute("focusable", "false");
+				element.style.outline = "none";
+				element.style.pointerEvents = "auto"; // Keep mouse events
+			}
+
+			// Hover effects only (no keyboard interaction)
 			layer.on({
 				mouseover: (e) => {
 					const target = e.target;
@@ -80,9 +90,19 @@ export const RegionLayer = ({
 						});
 					}
 				},
+				add: () => {
+					// Double-check attributes after add event
+					const el = (layer as any)._path;
+					if (el) {
+						el.setAttribute("tabindex", "-1");
+						el.setAttribute("aria-hidden", "true");
+						el.setAttribute("focusable", "false");
+						el.style.outline = "none";
+					}
+				},
 			});
 
-			// Add tooltip with region name if available
+			// Add tooltip with region name if available (hover only, not on focus)
 			const regionName =
 				feature.properties?.name ||
 				feature.properties?.NAME ||
@@ -94,10 +114,22 @@ export const RegionLayer = ({
 				"Unknown Region";
 
 			if (regionName && regionName !== "Unknown Region") {
-				layer.bindTooltip(regionName, {
+				// CRITICAL: Bind tooltip but make it non-interactive
+				const tooltip = layer.bindTooltip(regionName, {
 					permanent: false,
 					direction: "center",
 					className: "region-tooltip",
+					interactive: false, // Prevent tooltip from being interactive
+				});
+
+				// Make tooltip element non-focusable
+				layer.on("tooltipopen", () => {
+					const tooltipElement = (tooltip as any)._tooltip?._container;
+					if (tooltipElement) {
+						tooltipElement.setAttribute("tabindex", "-1");
+						tooltipElement.setAttribute("aria-hidden", "true");
+						tooltipElement.style.pointerEvents = "none";
+					}
 				});
 			}
 		}

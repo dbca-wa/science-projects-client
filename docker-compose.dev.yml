@@ -34,11 +34,15 @@ services:
             - DEBUG=True
             - PYTHONPATH=/usr/src/app/backend
             - DATABASE_URL=postgresql://postgres:postgres@db:5432/science_projects
+            - REDIS_URL=redis://redis:6379/1
         env_file:
             - ./backend/.env
         command: python manage.py runserver 0.0.0.0:8000
         depends_on:
-            - db
+            db:
+                condition: service_started
+            redis:
+                condition: service_healthy
         networks:
             - science-projects-dev
 
@@ -57,8 +61,26 @@ services:
         networks:
             - science-projects-dev
 
+    # Redis Cache Service
+    redis:
+        image: redis:7-alpine
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        command: redis-server --appendonly yes
+        networks:
+            - science-projects-dev
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+            start_period: 5s
+
 volumes:
     postgres_data: # Volume for persistent DB data
+    redis_data: # Volume for persistent Redis data
 
 networks:
     science-projects-dev:

@@ -46,17 +46,17 @@ describe("MapControls", () => {
 		render(<MapControlsWrapper />);
 
 		expect(screen.getByLabelText("Enter map fullscreen")).toBeInTheDocument();
-		expect(screen.getByLabelText("Reset map view")).toBeInTheDocument();
+		expect(
+			screen.getByLabelText("Reset map view to Western Australia")
+		).toBeInTheDocument();
 		expect(screen.getByTestId("layer-popover")).toBeInTheDocument();
 	});
 
 	it("should have proper button titles", () => {
 		render(<MapControlsWrapper />);
 
-		expect(screen.getByTitle("Enter map fullscreen")).toBeInTheDocument();
-		expect(
-			screen.getByTitle("Reset to Western Australia view")
-		).toBeInTheDocument();
+		expect(screen.getByTitle("Toggle Fullscreen")).toBeInTheDocument();
+		expect(screen.getByTitle("Reset")).toBeInTheDocument();
 	});
 
 	it("should handle map fullscreen toggle", () => {
@@ -73,7 +73,7 @@ describe("MapControls", () => {
 		render(<MapControlsWrapper />);
 
 		expect(screen.getByLabelText("Enter map fullscreen")).toBeInTheDocument();
-		expect(screen.getByTitle("Enter map fullscreen")).toBeInTheDocument();
+		expect(screen.getByTitle("Toggle Fullscreen")).toBeInTheDocument();
 	});
 
 	it("should show correct fullscreen button state when in fullscreen", () => {
@@ -81,7 +81,7 @@ describe("MapControls", () => {
 		render(<MapControlsWrapper />);
 
 		expect(screen.getByLabelText("Exit map fullscreen")).toBeInTheDocument();
-		expect(screen.getByTitle("Exit map fullscreen")).toBeInTheDocument();
+		expect(screen.getByTitle("Toggle Fullscreen")).toBeInTheDocument();
 	});
 
 	it("should render LayerPopover component", () => {
@@ -93,18 +93,13 @@ describe("MapControls", () => {
 	it("should have proper styling classes", () => {
 		render(<MapControlsWrapper />);
 
-		// Check top-right controls
-		const topControls = document.querySelector(".absolute.top-4.right-4");
-		expect(topControls).toBeInTheDocument();
-
-		const fullscreenButton = topControls?.querySelector(
-			'button[title="Enter map fullscreen"]'
-		);
-		const resetButton = topControls?.querySelector(
-			'button[title="Reset to Western Australia view"]'
+		// Check that buttons exist with proper styling
+		const fullscreenButton = screen.getByLabelText("Enter map fullscreen");
+		const resetButton = screen.getByLabelText(
+			"Reset map view to Western Australia"
 		);
 
-		// Check that top buttons have proper styling (flex-1 h-8 for matching layers button width)
+		// Check that buttons have proper styling (flex-1 h-8 for matching layers button width)
 		expect(fullscreenButton).toHaveClass("flex-1", "h-8", "p-0");
 		expect(resetButton).toHaveClass("flex-1", "h-8", "p-0");
 	});
@@ -112,21 +107,19 @@ describe("MapControls", () => {
 	it("should have proper accessibility attributes", () => {
 		render(<MapControlsWrapper />);
 
-		// Check top-right controls
-		const topControls = document.querySelector(".absolute.top-4.right-4");
-		expect(topControls).toBeInTheDocument();
-
-		const fullscreenButton = topControls?.querySelector(
-			'button[title="Enter map fullscreen"]'
-		);
-		const resetButton = topControls?.querySelector(
-			'button[title="Reset to Western Australia view"]'
+		// Check that buttons have proper accessibility attributes
+		const fullscreenButton = screen.getByLabelText("Enter map fullscreen");
+		const resetButton = screen.getByLabelText(
+			"Reset map view to Western Australia"
 		);
 
 		expect(fullscreenButton).toHaveAttribute(
 			"aria-label",
 			"Enter map fullscreen"
 		);
-		expect(resetButton).toHaveAttribute("aria-label", "Reset map view");
+		expect(resetButton).toHaveAttribute(
+			"aria-label",
+			"Reset map view to Western Australia"
+		);
 	});
 });

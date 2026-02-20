@@ -1,13 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Maximize, Minimize, RotateCcw } from "lucide-react";
-import { useMap } from "react-leaflet";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import type L from "leaflet";
 import { Button } from "@/shared/components/ui/button";
 import { LayerPopover } from "./LayerPopover";
 import { HeatmapToggle } from "./HeatmapToggle";
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
-import L from "leaflet";
 
 /**
  * ZoomControls component
@@ -84,21 +83,12 @@ import L from "leaflet";
 /**
  * MapControlButtons component
  *
- * Internal component that uses useMap hook to access the Leaflet map instance.
- * Must be rendered inside a MapContainer.
+ * Map control buttons that can be rendered inside or outside the Leaflet map.
+ * When rendered outside, they don't need Leaflet event prevention.
  */
 const MapControlButtons = observer(() => {
-	const map = useMap();
 	const store = useProjectMapStore();
 	const [isMapFullscreen, setIsMapFullscreen] = useState(false);
-	const containerRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		if (containerRef.current) {
-			L.DomEvent.disableClickPropagation(containerRef.current);
-			L.DomEvent.disableScrollPropagation(containerRef.current);
-		}
-	}, []);
 
 	// Listen for fullscreen changes
 	useEffect(() => {
@@ -125,27 +115,17 @@ const MapControlButtons = observer(() => {
 	const handleResetView = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		e.preventDefault();
-		// Reset to Western Australia view
-		map.setView([-25.2744, 122.2402], 6);
-		mapAnnouncements.viewReset();
+		// Get the map instance from the window (set by FullMapContainer)
+		const map = (window as Window & { __leafletMap?: L.Map }).__leafletMap;
+		if (map) {
+			// Reset to Western Australia view
+			map.setView([-25.2744, 122.2402], 6);
+			mapAnnouncements.viewReset();
+		}
 	};
 
 	return (
-		<div
-			ref={containerRef}
-			className="absolute top-4 right-4 z-30 flex flex-col gap-2 leaflet-control"
-			onMouseDown={(e) => e.stopPropagation()}
-			onMouseMove={(e) => e.stopPropagation()}
-			onMouseUp={(e) => e.stopPropagation()}
-			onDragStart={(e) => {
-				e.stopPropagation();
-				e.preventDefault();
-			}}
-			onDoubleClick={(e) => {
-				e.stopPropagation();
-				e.preventDefault();
-			}}
-		>
+		<>
 			{/* Map Actions - Fullscreen and Reset in same row, matching layers button width */}
 			<div className="flex gap-1">
 				<Button
@@ -153,8 +133,8 @@ const MapControlButtons = observer(() => {
 					size="sm"
 					onClick={handleResetView}
 					className="flex-1 h-8 p-0 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-					aria-label="Reset map view"
-					title="Reset to Western Australia view"
+					aria-label="Reset map view to Western Australia"
+					title="Reset"
 				>
 					<RotateCcw className="h-4 w-4" />
 				</Button>
@@ -170,9 +150,7 @@ const MapControlButtons = observer(() => {
 					aria-label={
 						isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"
 					}
-					title={
-						isMapFullscreen ? "Exit map fullscreen" : "Enter map fullscreen"
-					}
+					title="Toggle Fullscreen"
 				>
 					{isMapFullscreen ? (
 						<Minimize className="h-4 w-4" />
@@ -185,39 +163,25 @@ const MapControlButtons = observer(() => {
 			{/* Heatmap Toggle - Full width button */}
 			<HeatmapToggle />
 
-			{/* Layer Controls - Hidden on small screens unless fullscreen */}
-			<div className={isMapFullscreen ? "" : "hidden sm:block"}>
-				<LayerPopover />
-			</div>
-		</div>
+			{/* Layer Controls - Always rendered for tab order, but visually hidden on mobile */}
+			<LayerPopover isFullscreen={isMapFullscreen} />
+		</>
 	);
 });
 
 /**
  * MapControls component
  *
- * Floating action buttons positioned in the corners of the map.
- * Provides map interaction controls and layer management.
- *
- * Layout:
- * - Top-left: Zoom in, Zoom out (next to MapStats badge)
- * - Top-right: Reset view, Fullscreen toggle, Heatmap toggle, Layer controls
+ * Floating action buttons for map interaction controls.
+ * Can be rendered inside or outside the Leaflet MapContainer.
  *
  * Features:
  * - Map fullscreen toggle (not browser fullscreen)
  * - Reset view button (fit all markers)
- * - Zoom in/out buttons
+ * - Heatmap toggle
  * - Layer controls via LayerPopover
  * - Proper ARIA labels and keyboard support
- * - Leaflet event prevention to avoid map pan on button clicks
- *
- * Note: This component must be rendered inside a MapContainer to access the map instance.
  */
 export const MapControls = observer(() => {
-	return (
-		<>
-			<MapControlButtons />
-			{/* <ZoomControls /> */}
-		</>
-	);
+	return <MapControlButtons />;
 });

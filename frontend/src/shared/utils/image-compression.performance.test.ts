@@ -5,7 +5,7 @@
  * and that there's no significant performance regression.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { compressImage } from "./image-compression.utils";
 import imageCompression from "browser-image-compression";
 import { getCompressionWorkerUrl } from "./compression-worker";
@@ -13,10 +13,8 @@ import { getCompressionWorkerUrl } from "./compression-worker";
 vi.mock("browser-image-compression");
 vi.mock("./compression-worker");
 
-const mockImageCompression = imageCompression as ReturnType<typeof vi.fn>;
-const mockGetCompressionWorkerUrl = getCompressionWorkerUrl as ReturnType<
-	typeof vi.fn
->;
+const mockImageCompression = imageCompression as unknown as Mock;
+const mockGetCompressionWorkerUrl = getCompressionWorkerUrl as unknown as Mock;
 
 describe("Image Compression Performance", () => {
 	beforeEach(() => {

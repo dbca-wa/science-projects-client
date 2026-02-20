@@ -57,9 +57,7 @@ export const HeatmapToggle = observer(() => {
 			aria-label={
 				store.isHeatmapMode ? "Switch to marker view" : "Switch to heatmap view"
 			}
-			title={
-				store.isHeatmapMode ? "Switch to marker view" : "Switch to heatmap view"
-			}
+			title={store.isHeatmapMode ? "Toggle Markers" : "Toggle Heatmap"}
 		>
 			{store.isHeatmapMode ? (
 				<>

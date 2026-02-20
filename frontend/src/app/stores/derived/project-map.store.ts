@@ -399,6 +399,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		if (!this.state.mapFullscreen) {
 			this.state.filtersMinimized = false;
 		}
+		this.saveToLocalStorage();
 	};
 
 	/**

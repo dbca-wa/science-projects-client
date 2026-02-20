@@ -20,57 +20,78 @@ import NavitarContent from "./NavitarContent";
 
 interface NavitarProps {
 	shouldShowName?: boolean;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 }
 
 /**
  * Navitar component - User avatar dropdown menu
  * Wrapped with observer to react to user data loading
  */
-export const Navitar = observer(({ shouldShowName = false }: NavitarProps) => {
-	const authStore = useAuthStore();
-	const { data: currentUser } = useCurrentUser();
-	const { width: windowSize } = useWindowSize();
-	const [open, setOpen] = useState(false);
+export const Navitar = observer(
+	({
+		shouldShowName = false,
+		open: controlledOpen,
+		onOpenChange: controlledOnOpenChange,
+	}: NavitarProps) => {
+		const authStore = useAuthStore();
+		const { data: currentUser } = useCurrentUser();
+		const { width: windowSize } = useWindowSize();
+		const [internalOpen, setInternalOpen] = useState(false);
 
-	// Use fresh user data from TanStack Query, fallback to authStore
-	const userData = currentUser || authStore.user;
+		// Use controlled or uncontrolled state
+		const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+		const setOpen = controlledOnOpenChange || setInternalOpen;
 
-	// Calculate display name with truncation logic
-	const displayName = userData?.display_first_name
-		? userData.display_first_name.length < 12
-			? userData.display_first_name
-			: windowSize >= BREAKPOINTS.xl
+		// Use fresh user data from TanStack Query, fallback to authStore
+		const userData = currentUser || authStore.user;
+
+		// Calculate display name with truncation logic
+		const displayName = userData?.display_first_name
+			? userData.display_first_name.length < 12
 				? userData.display_first_name
-				: `${userData.display_first_name.substring(0, 9)}...`
-		: userData?.username;
+				: windowSize >= BREAKPOINTS.xl
+					? userData.display_first_name
+					: `${userData.display_first_name.substring(0, 9)}...`
+			: userData?.username;
 
-	const avatarSrc = getImageUrl(userData?.image);
-	const userInitial = userData?.username
-		? userData.username.charAt(0).toUpperCase()
-		: "U";
+		const avatarSrc = getImageUrl(userData?.image);
+		const userInitial = userData?.username
+			? userData.username.charAt(0).toUpperCase()
+			: "U";
 
-	return (
-		<div className="relative">
-			<DropdownMenu open={open} onOpenChange={setOpen}>
-				<DropdownMenuTrigger asChild>
-					<button className="flex items-center gap-1 cursor-pointer select-none">
-						{shouldShowName && displayName && (
-							<span className="mx-3 text-sm font-medium text-white/90">
-								{displayName}
-							</span>
-						)}
-						<Avatar className="h-8 w-8">
-							<AvatarImage src={avatarSrc} alt={displayName} />
-							<AvatarFallback>{userInitial}</AvatarFallback>
-						</Avatar>
-						<IoCaretDown size={13} className="ml-1 text-white/90" />
-					</button>
-				</DropdownMenuTrigger>
+		return (
+			<div className="relative">
+				<DropdownMenu open={open} onOpenChange={setOpen}>
+					<DropdownMenuTrigger asChild>
+						<button
+							className="flex items-center gap-1 cursor-pointer select-none"
+							aria-label="User menu"
+							aria-expanded={open}
+							aria-haspopup="menu"
+						>
+							{shouldShowName && displayName && (
+								<span className="mx-3 text-sm font-medium text-white/90">
+									{displayName}
+								</span>
+							)}
+							<Avatar className="h-8 w-8">
+								<AvatarImage src={avatarSrc} alt={displayName} />
+								<AvatarFallback>{userInitial}</AvatarFallback>
+							</Avatar>
+							<IoCaretDown
+								size={13}
+								className="ml-1 text-white/90"
+								aria-hidden="true"
+							/>
+						</button>
+					</DropdownMenuTrigger>
 
-				<DropdownMenuContent className="!z-[99999] !p-0 w-80" align="end">
-					<NavitarContent onClose={() => setOpen(false)} />
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
-	);
-});
+					<DropdownMenuContent className="!z-[99999] !p-0 w-80" align="end">
+						<NavitarContent onClose={() => setOpen(false)} />
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+		);
+	}
+);

@@ -1,0 +1,104 @@
+/**
+ * Map Accessibility Styles
+ *
+ * These styles ensure proper keyboard navigation in the Leaflet map:
+ * - Region layer SVG paths are NOT focusable (no tab stops)
+ * - Project markers ARE focusable (handled via JavaScript)
+ * - TileLayer is NOT focusable
+ * - Tooltips and popups are NOT focusable
+ */
+
+/* CRITICAL: Prevent ALL SVG paths from being focusable */
+.leaflet-container svg path {
+	pointer-events: auto !important; /* Keep mouse events */
+	outline: none !important; /* Remove focus outline */
+}
+
+/* Prevent region layer SVG paths from being focusable */
+.leaflet-container .leaflet-overlay-pane svg path {
+	pointer-events: auto !important; /* Keep mouse events */
+	outline: none !important; /* Remove focus outline */
+}
+
+/* Prevent region layer tooltips from being keyboard-accessible */
+.leaflet-container .leaflet-tooltip {
+	pointer-events: none; /* Tooltips should not intercept events */
+}
+
+/* Ensure tile layer images are not focusable */
+.leaflet-container .leaflet-tile-pane img {
+	pointer-events: none;
+}
+
+/* Prevent ALL Leaflet panes from being focusable except marker pane */
+.leaflet-pane:not(.leaflet-marker-pane) {
+	pointer-events: auto !important;
+}
+
+.leaflet-pane:not(.leaflet-marker-pane) * {
+	outline: none !important;
+}
+
+/* CRITICAL: Prevent tooltip/popup divs from being focusable (causes double-tab issue) */
+.leaflet-marker-pane > div:not(.project-marker) {
+	pointer-events: none !important;
+	outline: none !important;
+}
+
+.leaflet-marker-pane > div:not(.project-marker) * {
+	pointer-events: none !important;
+	outline: none !important;
+}
+
+/* Ensure ONLY project-marker divs are focusable */
+.leaflet-marker-pane .project-marker {
+	pointer-events: auto !important;
+}
+
+/* Project markers should be focusable - ensure they have SUPER OBVIOUS focus */
+.leaflet-container .leaflet-marker-pane .project-marker {
+	cursor: pointer !important;
+	transition: all 0.15s ease-in-out !important;
+}
+
+/* Pulsing animation for focused marker - pulses the glow */
+@keyframes marker-focus-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 5px white,
+			0 0 0 10px #2563eb,
+			0 0 0 15px white,
+			0 0 0 20px #2563eb,
+			0 0 40px 20px rgba(37, 99, 235, 0.9),
+			0 0 60px 30px rgba(37, 99, 235, 0.6),
+			0 0 80px 40px rgba(37, 99, 235, 0.3);
+	}
+	50% {
+		box-shadow:
+			0 0 0 5px white,
+			0 0 0 10px #2563eb,
+			0 0 0 15px white,
+			0 0 0 20px #2563eb,
+			0 0 50px 25px rgba(37, 99, 235, 1),
+			0 0 70px 35px rgba(37, 99, 235, 0.8),
+			0 0 90px 45px rgba(37, 99, 235, 0.5);
+	}
+}
+
+/* Prevent map container and tile pane from being focusable */
+.leaflet-container {
+	outline: none !important;
+}
+
+.leaflet-container:focus {
+	outline: none !important;
+}
+
+.leaflet-pane {
+	outline: none !important;
+}
+
+.leaflet-pane:focus {
+	outline: none !important;
+}

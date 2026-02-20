@@ -105,7 +105,6 @@ const ProjectListPage = observer(() => {
 
 	const handlePageChange = (newPage: number) => {
 		projectSearchStore.setCurrentPage(newPage);
-		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	const handleClearFilters = () => {

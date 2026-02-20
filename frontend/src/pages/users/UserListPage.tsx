@@ -18,6 +18,17 @@ import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
 import { PageTransition } from "@/shared/components/PageTransition";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
+import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
+import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
 
 /**
  * UserListPage
@@ -55,6 +66,10 @@ const UserListPage = observer(() => {
 		filters: userSearchStore.state.filters,
 		page: userSearchStore.state.currentPage,
 	});
+
+	// Fetch business areas for desktop filter dropdown
+	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
+		useBusinessAreas();
 
 	// Delay sheet opening until after page transition completes
 	const [shouldShowSheet, setShouldShowSheet] = useState(false);
@@ -142,6 +157,24 @@ const UserListPage = observer(() => {
 		userSearchStore.clearSearchAndFilters();
 	};
 
+	// Sort business areas by division for desktop dropdown
+	const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+	const sortedBusinessAreas = businessAreas?.slice().sort((a, b) => {
+		const aDivSlug =
+			typeof a.division === "object" && a.division?.slug ? a.division.slug : "";
+		const bDivSlug =
+			typeof b.division === "object" && b.division?.slug ? b.division.slug : "";
+
+		const aIndex = orderedDivisionSlugs.indexOf(aDivSlug);
+		const bIndex = orderedDivisionSlugs.indexOf(bDivSlug);
+
+		if (aIndex !== bIndex) {
+			return aIndex - bIndex;
+		}
+
+		return a.name.localeCompare(b.name);
+	});
+
 	// Error state - only show if error persists
 	if (shouldShowError) {
 		return (
@@ -194,46 +227,215 @@ const UserListPage = observer(() => {
 				<div className="grid grid-cols-1 items-center border border-gray-300 dark:border-gray-500 w-full select-none mb-0">
 					<div className="col-span-full pb-4">
 						<div className="p-4 border-b border-gray-300 dark:border-gray-500 w-full space-y-3">
-							{/* Layout: UserFilterPanel on left, UserSearchBar on right */}
-							<div className="flex flex-col md:flex-row gap-4">
-								{/* Search Input - shows first on mobile */}
-								<div className="flex-1 order-1 md:order-2">
-									<UserSearchBar
-										value={userSearchStore.state.searchTerm}
-										onChange={handleSearchChange}
-									/>
-
-									{/* Remember my search and Clear - hidden on mobile, shown on desktop below search */}
-									<div className="hidden md:flex mt-3 gap-2 justify-end">
-										<SearchControls
-											saveSearch={userSearchStore.state.saveSearch}
-											onToggleSaveSearch={handleToggleSaveSearch}
-											filterCount={userSearchStore.filterCount}
-											onClearFilters={handleClearFilters}
-											className="flex gap-2"
+							<ResponsiveLayout
+								mobileContent={
+									<div className="flex flex-col gap-4">
+										{/* Search Input - visual position 1 on mobile */}
+										<UserSearchBar
+											value={userSearchStore.state.searchTerm}
+											onChange={handleSearchChange}
 										/>
+
+										{/* Business Area + Filters - visual position 2 on mobile */}
+										<UserFilterPanel
+											filters={userSearchStore.state.filters}
+											onFiltersChange={handleFiltersChange}
+										/>
+
+										{/* Remember my search and Clear - visual position 3 on mobile (at the bottom) */}
+										<div className="flex gap-2 justify-end">
+											<SearchControls
+												saveSearch={userSearchStore.state.saveSearch}
+												onToggleSaveSearch={handleToggleSaveSearch}
+												filterCount={userSearchStore.filterCount}
+												onClearFilters={handleClearFilters}
+												className="flex gap-2 ml-auto"
+											/>
+										</div>
 									</div>
-								</div>
+								}
+								desktopContent={
+									<div className="space-y-3">
+										{/* Row 1: Business Area (left) and Search (right) */}
+										<div className="flex flex-row gap-4">
+											{/* Business Area Dropdown - left side, row 1 */}
+											<div className="flex-1">
+												<Select
+													value={
+														userSearchStore.state.filters.businessArea?.toString() ||
+														"All"
+													}
+													onValueChange={(value) => {
+														handleFiltersChange({
+															...userSearchStore.state.filters,
+															businessArea:
+																value === "All" ? undefined : Number(value),
+														});
+													}}
+													disabled={isLoadingBusinessAreas}
+												>
+													<SelectTrigger
+														className="w-full !h-10 text-sm rounded-md"
+														aria-label="Filter by business area"
+													>
+														<SelectValue placeholder="All Business Areas" />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="All">
+															All Business Areas
+														</SelectItem>
+														{sortedBusinessAreas
+															?.filter(
+																(ba): ba is typeof ba & { id: number } =>
+																	ba.id !== undefined
+															)
+															.map((ba) => (
+																<SelectItem
+																	key={ba.id}
+																	value={ba.id.toString()}
+																>
+																	{typeof ba.division === "object" &&
+																	ba.division?.slug
+																		? `[${ba.division.slug}] `
+																		: ""}
+																	{ba.name}
+																	{!ba.is_active ? " (INACTIVE)" : ""}
+																</SelectItem>
+															))}
+													</SelectContent>
+												</Select>
+											</div>
 
-								{/* Business Area + Filters - shows second on mobile, expands naturally */}
-								<div className="w-full md:w-auto md:flex-1 order-2 md:order-1">
-									<UserFilterPanel
-										filters={userSearchStore.state.filters}
-										onFiltersChange={handleFiltersChange}
-									/>
-								</div>
+											{/* Search Input - right side, row 1 */}
+											<div className="flex-1">
+												<UserSearchBar
+													value={userSearchStore.state.searchTerm}
+													onChange={handleSearchChange}
+												/>
+											</div>
+										</div>
 
-								{/* Remember my search and Clear - shown on mobile at bottom, hidden on desktop */}
-								<div className="flex md:hidden order-3 gap-2 justify-end">
-									<SearchControls
-										saveSearch={userSearchStore.state.saveSearch}
-										onToggleSaveSearch={handleToggleSaveSearch}
-										filterCount={userSearchStore.filterCount}
-										onClearFilters={handleClearFilters}
-										className="flex gap-2 ml-auto"
-									/>
-								</div>
-							</div>
+										{/* Row 2: Filter Checkboxes (left) and Remember Search (right) */}
+										<div className="flex flex-row gap-4 items-start">
+											{/* Filter Checkboxes - left side, row 2 */}
+											<div className="flex-1">
+												<div className="flex flex-wrap gap-x-5 gap-y-2">
+													<div className="flex items-center space-x-2">
+														<Checkbox
+															id="external-filter-desktop"
+															checked={
+																userSearchStore.state.filters.onlyExternal
+															}
+															onCheckedChange={() => {
+																handleFiltersChange({
+																	...userSearchStore.state.filters,
+																	onlyExternal:
+																		!userSearchStore.state.filters.onlyExternal,
+																	onlyStaff: false,
+																	onlySuperuser: false,
+																	onlyBALead: false,
+																});
+															}}
+														/>
+														<Label
+															htmlFor="external-filter-desktop"
+															className="text-sm font-normal cursor-pointer whitespace-nowrap"
+														>
+															Only External
+														</Label>
+													</div>
+
+													<div className="flex items-center space-x-2">
+														<Checkbox
+															id="staff-filter-desktop"
+															checked={userSearchStore.state.filters.onlyStaff}
+															onCheckedChange={() => {
+																handleFiltersChange({
+																	...userSearchStore.state.filters,
+																	onlyStaff:
+																		!userSearchStore.state.filters.onlyStaff,
+																	onlyExternal: false,
+																	onlySuperuser: false,
+																	onlyBALead: false,
+																});
+															}}
+															className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
+														/>
+														<Label
+															htmlFor="staff-filter-desktop"
+															className="text-sm font-normal cursor-pointer whitespace-nowrap"
+														>
+															Only Staff
+														</Label>
+													</div>
+
+													<div className="flex items-center space-x-2">
+														<Checkbox
+															id="ba-lead-filter-desktop"
+															checked={userSearchStore.state.filters.onlyBALead}
+															onCheckedChange={() => {
+																handleFiltersChange({
+																	...userSearchStore.state.filters,
+																	onlyBALead:
+																		!userSearchStore.state.filters.onlyBALead,
+																	onlyExternal: false,
+																	onlyStaff: false,
+																	onlySuperuser: false,
+																});
+															}}
+															className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-500"
+														/>
+														<Label
+															htmlFor="ba-lead-filter-desktop"
+															className="text-sm font-normal cursor-pointer whitespace-nowrap"
+														>
+															Only BA Lead
+														</Label>
+													</div>
+
+													<div className="flex items-center space-x-2">
+														<Checkbox
+															id="superuser-filter-desktop"
+															checked={
+																userSearchStore.state.filters.onlySuperuser
+															}
+															onCheckedChange={() => {
+																handleFiltersChange({
+																	...userSearchStore.state.filters,
+																	onlySuperuser:
+																		!userSearchStore.state.filters
+																			.onlySuperuser,
+																	onlyExternal: false,
+																	onlyStaff: false,
+																	onlyBALead: false,
+																});
+															}}
+															className="data-[state=checked]:bg-blue-600 data-[state-checked]:border-blue-500"
+														/>
+														<Label
+															htmlFor="superuser-filter-desktop"
+															className="text-sm font-normal cursor-pointer whitespace-nowrap"
+														>
+															Only Admin
+														</Label>
+													</div>
+												</div>
+											</div>
+
+											{/* Remember Search Controls - right side, row 2 */}
+											<div className="flex-1 flex justify-end">
+												<SearchControls
+													saveSearch={userSearchStore.state.saveSearch}
+													onToggleSaveSearch={handleToggleSaveSearch}
+													filterCount={userSearchStore.filterCount}
+													onClearFilters={handleClearFilters}
+													className="flex gap-2"
+												/>
+											</div>
+										</div>
+									</div>
+								}
+							/>
 						</div>
 					</div>
 

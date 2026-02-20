@@ -34,7 +34,7 @@ describe("LayerPopover", () => {
 	it("should render layer controls trigger button", () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		expect(trigger).toBeInTheDocument();
 		expect(trigger).toHaveTextContent("Layers");
 	});
@@ -42,7 +42,7 @@ describe("LayerPopover", () => {
 	it("should open popover when trigger is clicked", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -53,7 +53,7 @@ describe("LayerPopover", () => {
 	it("should render all layer checkboxes", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -68,7 +68,7 @@ describe("LayerPopover", () => {
 	it("should show correct layer states", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -83,7 +83,7 @@ describe("LayerPopover", () => {
 	it("should handle layer toggle", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -99,7 +99,7 @@ describe("LayerPopover", () => {
 
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -113,7 +113,7 @@ describe("LayerPopover", () => {
 	it("should render Show All and Hide All buttons", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -125,7 +125,7 @@ describe("LayerPopover", () => {
 	it("should handle Show All button click", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -139,7 +139,7 @@ describe("LayerPopover", () => {
 	it("should handle Hide All button click", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -161,7 +161,7 @@ describe("LayerPopover", () => {
 
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -175,7 +175,7 @@ describe("LayerPopover", () => {
 
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -187,7 +187,7 @@ describe("LayerPopover", () => {
 	it("should render display options", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -200,7 +200,7 @@ describe("LayerPopover", () => {
 	it("should handle Show Labels toggle", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -214,7 +214,7 @@ describe("LayerPopover", () => {
 	it("should handle Show Colors toggle", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -231,7 +231,7 @@ describe("LayerPopover", () => {
 
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -248,7 +248,7 @@ describe("LayerPopover", () => {
 
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -259,7 +259,7 @@ describe("LayerPopover", () => {
 	it("should render layer descriptions", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -277,7 +277,7 @@ describe("LayerPopover", () => {
 	it("should render color indicators", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
@@ -292,7 +292,7 @@ describe("LayerPopover", () => {
 	it("should have proper accessibility attributes", async () => {
 		render(<LayerPopover />);
 
-		const trigger = screen.getByRole("button", { name: /layer controls/i });
+		const trigger = screen.getByRole("button", { name: /adjust layers/i });
 		fireEvent.click(trigger);
 
 		await waitFor(() => {

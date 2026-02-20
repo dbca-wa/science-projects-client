@@ -55,14 +55,18 @@ export function AppLayout() {
 				<Header />
 
 				{/* Content Wrapper with responsive padding */}
-				<div className="mx-4 sm:mx-6 md:mx-[10%] lg:mx-[15%] py-2 flex flex-col min-h-screen">
+				<main
+					id="main-content"
+					tabIndex={-1}
+					className="mx-4 sm:mx-6 md:mx-[10%] lg:mx-[15%] py-2 flex flex-col min-h-screen focus:outline-none"
+				>
 					<ContentBox>
 						<Outlet />
 					</ContentBox>
 
 					{/* Background Image - Handles its own theme reactivity */}
 					<BackgroundImage />
-				</div>
+				</main>
 
 				{/* Footer */}
 				<Footer />

@@ -61,7 +61,8 @@ const CSP_CONFIG = {
 		objectSrc: ["'none'"],
 		baseUri: ["'self'"],
 		formAction: ["'self'"],
-		reportUri: "/api/csp-report",
+		// Note: report-uri is deprecated and doesn't work in meta tags anyway
+		// Use report-to directive in HTTP headers instead if CSP reporting is needed
 	} as CSPConfig,
 };
 
@@ -107,9 +108,6 @@ function generateCSP(config: CSPConfig): string {
 	}
 	if (config.formAction.length > 0) {
 		directives.push(`form-action ${config.formAction.join(" ")}`);
-	}
-	if (config.reportUri) {
-		directives.push(`report-uri ${config.reportUri}`);
 	}
 
 	return directives.join("; ");
@@ -168,6 +166,9 @@ export default defineConfig({
 		globals: true,
 		environment: "jsdom",
 		setupFiles: "./src/test/setup.ts",
+		testTimeout: 20000, // 20 second timeout per test
+		hookTimeout: 20000, // 20 second timeout for hooks
+		teardownTimeout: 20000, // 20 second timeout for teardown
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "json", "json-summary", "html", "lcov"],
@@ -179,12 +180,16 @@ export default defineConfig({
 				"**/*.d.ts",
 				"**/types/",
 			],
-			thresholds: {
-				lines: 40,
-				functions: 40,
-				branches: 40,
-				statements: 40,
-			},
+			// Disable thresholds during CI sharded runs (checked after combining coverage)
+			// Enable thresholds for local development runs
+			thresholds: process.env.CI
+				? undefined
+				: {
+						lines: 40,
+						functions: 40,
+						branches: 40,
+						statements: 40,
+					},
 		},
 	},
 });

@@ -27,11 +27,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const [hovered, setHovered] = useState(false);
+	const [focused, setFocused] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const handleClick = (e: React.MouseEvent) => {
-		if (e.ctrlKey || e.metaKey) {
+	const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+		// Check if it's a keyboard event
+		if ("key" in e) {
+			// Only handle Enter and Space keys
+			if (e.key !== "Enter" && e.key !== " ") {
+				return;
+			}
+			e.preventDefault();
+		}
+
+		// Check for Ctrl/Cmd modifier
+		const isModifierClick = "ctrlKey" in e && (e.ctrlKey || e.metaKey);
+
+		if (isModifierClick) {
 			// Ctrl/Cmd + Click: Open in new tab
 			window.open(`/projects/${project.id}/overview`, "_blank");
 		} else {
@@ -66,67 +79,81 @@ export function ProjectCard({ project }: ProjectCardProps) {
 		<Card
 			className={cn(
 				"group relative h-[325px] cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 p-0",
-				"hover:scale-105 hover:shadow-2xl",
-				"border border-gray-200 dark:border-gray-700"
+				"hover:scale-105 hover:shadow-2xl focus-within:scale-105 focus-within:shadow-2xl",
+				"border border-gray-200 dark:border-gray-700",
+				"focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-600 focus-within:ring-offset-2"
 			)}
-			onClick={handleClick}
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
+			role="article"
+			aria-label={`Project: ${plainTextTitle}`}
 		>
-			{/* Project Tag (top-left) */}
-			<div className="absolute left-2 top-2 z-10">
-				<span
-					className="inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold text-white"
-					style={{ backgroundColor: kindColor }}
-				>
-					{projectTag}
-				</span>
-			</div>
-
-			{/* Status Badge (top-right, shows on hover) */}
-			{hovered && (
-				<div className="absolute right-0 top-2 z-10 animate-in slide-in-from-right duration-300">
+			{/* Keyboard accessible wrapper */}
+			<div
+				role="button"
+				tabIndex={0}
+				onClick={handleClick}
+				onKeyDown={handleClick}
+				onMouseEnter={() => setHovered(true)}
+				onMouseLeave={() => setHovered(false)}
+				onFocus={() => setFocused(true)}
+				onBlur={() => setFocused(false)}
+				className="h-full w-full focus:outline-none"
+				aria-label={`View project ${plainTextTitle}. Press Enter to open, or Ctrl+Enter to open in new tab.`}
+			>
+				{/* Project Tag (top-left) */}
+				<div className="absolute left-2 top-2 z-10">
 					<span
-						className="inline-flex items-center justify-center rounded-l-2xl px-5 py-1 text-xs font-normal text-white"
-						style={{ backgroundColor: statusColor }}
+						className="inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold text-white"
+						style={{ backgroundColor: kindColor }}
 					>
-						{statusDisplay}
+						{projectTag}
 					</span>
 				</div>
-			)}
 
-			{/* Image */}
-			<div className="relative h-full w-full">
-				{!imageLoaded && !imageError && (
-					<div className="absolute inset-0 animate-pulse bg-gray-200 dark:bg-gray-800" />
-				)}
-				{hasImage && !imageError ? (
-					<img
-						src={imageUrl}
-						alt={plainTextTitle}
-						className={cn(
-							"h-full w-full object-cover transition-opacity duration-300",
-							imageLoaded ? "opacity-100" : "opacity-0"
-						)}
-						onLoad={() => setImageLoaded(true)}
-						onError={() => {
-							setImageError(true);
-							setImageLoaded(true);
-						}}
-						loading="lazy"
-					/>
-				) : (
-					<div className="project-fallback-image h-full w-full bg-cover bg-center bg-no-repeat" />
+				{/* Status Badge (top-right, shows on hover or focus) */}
+				{(hovered || focused) && (
+					<div className="absolute right-0 top-2 z-10 animate-in slide-in-from-right duration-300">
+						<span
+							className="inline-flex items-center justify-center rounded-l-2xl px-5 py-1 text-xs font-normal text-white"
+							style={{ backgroundColor: statusColor }}
+						>
+							{statusDisplay}
+						</span>
+					</div>
 				)}
 
-				{/* Gradient overlay */}
-				<div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />
+				{/* Image */}
+				<div className="relative h-full w-full">
+					{!imageLoaded && !imageError && (
+						<div className="absolute inset-0 animate-pulse bg-gray-200 dark:bg-gray-800" />
+					)}
+					{hasImage && !imageError ? (
+						<img
+							src={imageUrl}
+							alt={plainTextTitle}
+							className={cn(
+								"h-full w-full object-cover transition-opacity duration-300",
+								imageLoaded ? "opacity-100" : "opacity-0"
+							)}
+							onLoad={() => setImageLoaded(true)}
+							onError={() => {
+								setImageError(true);
+								setImageLoaded(true);
+							}}
+							loading="lazy"
+						/>
+					) : (
+						<div className="project-fallback-image h-full w-full bg-cover bg-center bg-no-repeat" />
+					)}
 
-				{/* Title (bottom-left) */}
-				<div className="absolute bottom-0 left-0 z-10 p-4">
-					<h3 className="line-clamp-3 text-[17px] font-semibold text-white">
-						{plainTextTitle}
-					</h3>
+					{/* Gradient overlay */}
+					<div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />
+
+					{/* Title (bottom-left) */}
+					<div className="absolute bottom-0 left-0 z-10 p-4">
+						<h3 className="line-clamp-3 text-[17px] font-semibold text-white">
+							{plainTextTitle}
+						</h3>
+					</div>
 				</div>
 			</div>
 		</Card>

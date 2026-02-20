@@ -38,6 +38,9 @@ export interface BaseComboboxProps<T> {
 	className?: string;
 	wrapperClassName?: string;
 
+	// Accessibility
+	ariaLabel?: string; // Fallback accessible name when label is not provided
+
 	// Search configuration
 	debounceMs?: number;
 	maxResults?: number;

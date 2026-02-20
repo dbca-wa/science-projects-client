@@ -1,12 +1,9 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import {
-	MapContainer as LeafletMap,
-	TileLayer,
-	useMapEvents,
-} from "react-leaflet";
+import { MapContainer as LeafletMap, TileLayer } from "react-leaflet";
 import type { Map as LeafletMapType } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "./map-accessibility.css"; // Custom CSS for map accessibility
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { useProjectsForMap } from "@/features/projects/hooks/useProjectsForMap";
 import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
@@ -19,72 +16,10 @@ import { RegionLabel } from "./RegionLabel";
 import { MapControls } from "./MapControls";
 import { MapStats } from "./MapStats";
 import { ZoomLevel } from "./ZoomLevel";
+import { MapClickHandler } from "./MapClickHandler";
+import { MAP_CONFIG, LAYER_TO_GEOJSON_KEY } from "./map-utils";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { GEOJSON_PROPERTY_NAMES } from "@/features/projects/types/map.types";
-
-/**
- * Map configuration
- */
-const MAP_CONFIG = {
-	center: [-25.2744, 122.2402] as [number, number],
-	zoom: 6,
-	minZoom: 5,
-	maxZoom: 18,
-};
-
-/**
- * MapClickHandler component
- *
- * Handles map click events to clear marker selection and custom double-click zoom
- */
-const MapClickHandler = ({
-	onZoomChange,
-}: {
-	onZoomChange: (zoom: number) => void;
-}) => {
-	const store = useProjectMapStore();
-
-	const map = useMapEvents({
-		click: () => {
-			store.clearMarkerSelection();
-		},
-		dblclick: (e) => {
-			// Check if the double-click originated from a button or control element
-			const target = e.originalEvent.target as HTMLElement;
-
-			// Check if click is on a button, control, or their children
-			const isOnControl =
-				target.closest("button") ||
-				target.closest(".leaflet-control") ||
-				target.closest('[role="dialog"]') || // Popovers
-				target.closest("[data-radix-popper-content-wrapper]"); // Radix popovers
-
-			// Only zoom if NOT on a control
-			if (!isOnControl) {
-				map.zoomIn();
-			}
-		},
-		zoomend: () => {
-			onZoomChange(map.getZoom());
-		},
-	});
-
-	return null;
-};
-
-/**
- * Mapping from layer type strings to GeoJSON data keys
- */
-const LAYER_TO_GEOJSON_KEY: Record<
-	string,
-	keyof typeof GEOJSON_PROPERTY_NAMES
-> = {
-	dbcaregion: "dbcaRegions",
-	dbcadistrict: "dbcaDistricts",
-	nrm: "nrm",
-	ibra: "ibra",
-	imcra: "imcra",
-};
 
 interface FullMapContainerProps {
 	fullscreen?: boolean;
@@ -116,6 +51,7 @@ export const FullMapContainer = observer(
 		const store = useProjectMapStore();
 		const mapRef = useRef<LeafletMapType | null>(null);
 		const [currentZoom, setCurrentZoom] = useState<number>(MAP_CONFIG.zoom);
+		const [mapReady, setMapReady] = useState(false);
 
 		// Fetch data with reactive filters
 		const {
@@ -165,6 +101,20 @@ export const FullMapContainer = observer(
 			return () => window.removeEventListener("resize", handleResize);
 		}, []);
 
+		// Expose map instance to window for MapControls (when rendered outside map)
+		useEffect(() => {
+			if (mapRef.current) {
+				(window as Window & { __leafletMap?: LeafletMapType }).__leafletMap =
+					mapRef.current;
+				setMapReady(true);
+			}
+			return () => {
+				const w = window as Window & { __leafletMap?: LeafletMapType };
+				delete w.__leafletMap;
+				setMapReady(false);
+			};
+		}, [mapReady]);
+
 		// Cleanup on unmount - prevent memory leaks
 		useEffect(() => {
 			return () => {
@@ -177,12 +127,101 @@ export const FullMapContainer = observer(
 						mapRef.current?.removeLayer(layer);
 					});
 
-					// Remove the map instance
-					mapRef.current.remove();
+					// Don't call remove() - let React Leaflet handle it
 					mapRef.current = null;
 				}
 			};
 		}, []);
+
+		// CRITICAL: Make ALL Leaflet elements non-focusable except project markers
+		useEffect(() => {
+			if (!mapRef.current) return;
+
+			const makeNonFocusable = () => {
+				const mapContainer = mapRef.current?.getContainer();
+				if (!mapContainer) return;
+
+				// Find ALL elements in the map
+				const allElements = mapContainer.querySelectorAll("*");
+
+				allElements.forEach((element) => {
+					if (element instanceof HTMLElement || element instanceof SVGElement) {
+						// Skip project markers - they should be focusable
+						if (element.classList.contains("project-marker")) {
+							return;
+						}
+
+						// Make everything else non-focusable
+						element.setAttribute("tabindex", "-1");
+						element.setAttribute("aria-hidden", "true");
+
+						// For images (tiles)
+						if (element instanceof HTMLImageElement) {
+							element.setAttribute("tabindex", "-1");
+							element.style.pointerEvents = "none";
+						}
+
+						// For SVG elements
+						if (element instanceof SVGElement) {
+							element.setAttribute("focusable", "false");
+						}
+					}
+				});
+			};
+
+			// Run immediately
+			makeNonFocusable();
+
+			// Run again after a delay to catch dynamically added elements
+			const timer = setTimeout(makeNonFocusable, 500);
+
+			// Set up MutationObserver to catch dynamically added tiles
+			const mapContainer = mapRef.current.getContainer();
+			const observer = new MutationObserver(() => {
+				makeNonFocusable();
+			});
+
+			observer.observe(mapContainer, {
+				childList: true,
+				subtree: true,
+			});
+
+			// Run on map events that might add new elements
+			const map = mapRef.current;
+			map.on("layeradd", makeNonFocusable);
+			map.on("zoomend", makeNonFocusable);
+			map.on("moveend", makeNonFocusable);
+			map.on("load", makeNonFocusable);
+
+			// Add global focus listener to log what's getting focus (for debugging)
+			const handleFocus = (e: FocusEvent) => {
+				const target = e.target as HTMLElement;
+				if (
+					mapContainer.contains(target) &&
+					!target.classList.contains("project-marker")
+				) {
+					// Uncomment for debugging:
+					// console.warn('⚠️ Non-marker element got focus:', {
+					// 	element: target,
+					// 	tagName: target.tagName,
+					// 	className: target.className,
+					// 	id: target.id,
+					// });
+				}
+			};
+
+			document.addEventListener("focus", handleFocus, true);
+
+			return () => {
+				clearTimeout(timer);
+				observer.disconnect();
+				map.off("layeradd", makeNonFocusable);
+				map.off("zoomend", makeNonFocusable);
+				map.off("moveend", makeNonFocusable);
+				map.off("load", makeNonFocusable);
+				document.removeEventListener("focus", handleFocus, true);
+			};
+		}, [mapRef.current, clusters]);
 
 		if (projectsLoading || geoJsonLoading) {
 			return (
@@ -227,22 +266,53 @@ export const FullMapContainer = observer(
 			<div
 				className={`${fullscreen ? "w-full h-full" : "flex-1 min-h-[375px] sm:min-h-[400px]"} relative z-10 rounded-md overflow-hidden`}
 			>
+				{/* Map controls - positioned absolutely OUTSIDE the map container but in correct DOM order */}
+				<div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+					<MapControls />
+				</div>
+
 				<LeafletMap
 					center={MAP_CONFIG.center}
 					zoom={MAP_CONFIG.zoom}
 					minZoom={MAP_CONFIG.minZoom}
 					maxZoom={MAP_CONFIG.maxZoom}
 					style={{ height: "100%", width: "100%" }}
-					ref={mapRef}
+					ref={(map) => {
+						if (map && !mapRef.current) {
+							mapRef.current = map;
+							setMapReady(true);
+						}
+					}}
 					zoomControl={false} // Disable default zoom controls since we have custom ones
 					attributionControl={false} // Disable attribution control
 					doubleClickZoom={false} // Disable double-click zoom to prevent button clicks from zooming
+					keyboard={false} // Disable keyboard navigation on map container itself
 				>
 					<MapClickHandler onZoomChange={setCurrentZoom} />
 					<TileLayer
 						attribution=""
 						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 					/>
+
+					{/* Conditional rendering based on visualization mode */}
+					{store.isMarkerMode &&
+						/* Render project markers */
+						Array.from(clusters.values()).map((cluster, index) => (
+							<ProjectMarker
+								key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
+								projects={cluster.projects}
+								position={cluster.coords}
+							/>
+						))}
+
+					{store.isHeatmapMode && geoJsonData && (
+						/* Render heatmap layer */
+						<HeatmapLayer
+							projects={projects}
+							geoJsonData={geoJsonData}
+							isVisible={true}
+						/>
+					)}
 
 					{/* Render region layers */}
 					{geoJsonData &&
@@ -281,29 +351,6 @@ export const FullMapContainer = observer(
 								/>
 							));
 						})}
-
-					{/* Conditional rendering based on visualization mode */}
-					{store.isMarkerMode &&
-						/* Render project markers */
-						Array.from(clusters.values()).map((cluster, index) => (
-							<ProjectMarker
-								key={`cluster-${cluster.coords[0]}-${cluster.coords[1]}-${index}`}
-								projects={cluster.projects}
-								position={cluster.coords}
-							/>
-						))}
-
-					{store.isHeatmapMode && geoJsonData && (
-						/* Render heatmap layer */
-						<HeatmapLayer
-							projects={projects}
-							geoJsonData={geoJsonData}
-							isVisible={true}
-						/>
-					)}
-
-					{/* Map controls inside the map container */}
-					<MapControls />
 				</LeafletMap>
 
 				{/* Map statistics - top-left corner, only show in normal (non-fullscreen) mode */}

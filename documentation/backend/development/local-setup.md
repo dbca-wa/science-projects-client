@@ -288,27 +288,21 @@ poetry run pre-commit run --all-files
 
 ## Database Seeding
 
-For development with realistic data, you can seed the database with production data.
+For development with realistic data, you can seed your local environment with production data.
 
-### Obtaining Data Dumps
+**Quick Overview:**
+- Download seeding data from SharePoint (files.zip and SQL dump)
+- Extract media files to `backend/files/`
+- Restore database from SQL dump using psql or pgAdmin
+- Verify seeding with provided commands
 
-Contact the Ecoinformatics Line Manager to obtain:
-1. `spms_prod.sql` - Production database dump
-2. `media_files.zip` - Production media files
+**See the complete guide:** [Seeding Guide](seeding-guide.md)
 
-### Importing Database Dump
-
-```powershell
-psql -U postgres -d spms -f spms_prod.sql
-```
-
-### Setting Up Media Files
-
-```powershell
-Expand-Archive -Path media_files.zip -DestinationPath temp_media
-Move-Item -Path temp_media\* -Destination files\ -Force
-Remove-Item -Path temp_media -Recurse
-```
+The seeding guide includes:
+- Step-by-step instructions for local and staging environments
+- Troubleshooting common issues
+- Security and data handling best practices
+- OIM ticket template for staging environment seeding
 
 ## Creating a Complete Superuser
 

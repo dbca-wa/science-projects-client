@@ -10,7 +10,8 @@ New to the project? Start here:
 
 1. **[getting-started.md](getting-started.md)** - Quick setup guide (< 30 minutes)
 2. **[local-setup.md](local-setup.md)** - Detailed environment setup
-3. **[testing-guide.md](testing-guide.md)** - Run your first tests
+3. **[seeding-guide.md](seeding-guide.md)** - Set up with production-like data
+4. **[testing-guide.md](testing-guide.md)** - Run your first tests
 
 ## Development Guides
 
