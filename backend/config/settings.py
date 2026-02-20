@@ -323,15 +323,12 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-}
-
-# Only enable throttling if Redis is available (throttling requires cache)
-if REDIS_AVAILABLE:
-    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = [
+    # Throttle configuration (always present, but only enforced if Redis is available)
+    "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
-    ]
-    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+    ],
+    "DEFAULT_THROTTLE_RATES": {
         # General API rate limits
         "anon": "200/hour",  # Anonymous users (login page, public endpoints)
         "user": "1000/hour",  # Authenticated users (normal usage)
@@ -339,11 +336,17 @@ if REDIS_AVAILABLE:
         "burst": "30/minute",  # Burst protection for rapid requests
         "login": "5/minute",  # Login attempts (prevents brute force)
         "password_reset": "3/hour",  # Password reset requests
-    }
+    },
+}
+
+# Log throttling status based on Redis availability
+if REDIS_AVAILABLE:
     LOGGER.info("THROTTLING: Rate limiting ENABLED (Redis available)")
 else:
-    # No throttling without Redis (throttling requires cache backend)
-    LOGGER.info("THROTTLING: Rate limiting DISABLED (Redis unavailable)")
+    # Throttling configuration is present but won't be enforced without Redis
+    LOGGER.info(
+        "THROTTLING: Rate limiting DISABLED (Redis unavailable - throttling requires cache backend)"
+    )
 
 # endregion ========================================================================================
 
