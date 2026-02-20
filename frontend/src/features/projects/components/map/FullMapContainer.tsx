@@ -287,7 +287,6 @@ export const FullMapContainer = observer(
 					attributionControl={false} // Disable attribution control
 					doubleClickZoom={false} // Disable double-click zoom to prevent button clicks from zooming
 					keyboard={false} // Disable keyboard navigation on map container itself
-					tabIndex={-1} // Prevent map container from being focusable
 				>
 					<MapClickHandler onZoomChange={setCurrentZoom} />
 					<TileLayer

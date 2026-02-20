@@ -6,7 +6,7 @@
  */
 
 import { configureAxe, type JestAxeConfigureOptions } from "jest-axe";
-import type { Result as AxeResult, RunOptions, Spec } from "axe-core";
+import type { AxeResults, RunOptions, UnlabelledFrameSelector } from "axe-core";
 
 /**
  * WCAG 2.2 Level AA configuration for axe-core
@@ -57,7 +57,7 @@ export interface AxeViolation {
 	helpUrl: string;
 	tags: string[];
 	nodes: Array<{
-		target: string[];
+		target: UnlabelledFrameSelector;
 		html: string;
 		failureSummary: string;
 		impact: "critical" | "serious" | "moderate" | "minor";
@@ -80,10 +80,14 @@ export interface ProcessedAxeResults {
 /**
  * Process axe-core results into structured format
  */
-export function processAxeResults(results: AxeResult): ProcessedAxeResults {
+export function processAxeResults(results: AxeResults): ProcessedAxeResults {
 	const violations: AxeViolation[] = results.violations.map((violation) => ({
 		id: violation.id,
-		impact: violation.impact as "critical" | "serious" | "moderate" | "minor",
+		impact: (violation.impact || "minor") as
+			| "critical"
+			| "serious"
+			| "moderate"
+			| "minor",
 		description: violation.description,
 		help: violation.help,
 		helpUrl: violation.helpUrl,
@@ -92,7 +96,11 @@ export function processAxeResults(results: AxeResult): ProcessedAxeResults {
 			target: node.target,
 			html: node.html,
 			failureSummary: node.failureSummary || "",
-			impact: node.impact as "critical" | "serious" | "moderate" | "minor",
+			impact: (node.impact || "minor") as
+				| "critical"
+				| "serious"
+				| "moderate"
+				| "minor",
 		})),
 	}));
 
@@ -143,7 +151,10 @@ export function formatViolation(violation: AxeViolation): string {
 	lines.push(`\nAffected elements (${violation.nodes.length}):`);
 
 	violation.nodes.forEach((node, index) => {
-		lines.push(`\n  ${index + 1}. ${node.target.join(" > ")}`);
+		const targetStr = Array.isArray(node.target)
+			? node.target.join(" > ")
+			: String(node.target);
+		lines.push(`\n  ${index + 1}. ${targetStr}`);
 		lines.push(
 			`     ${node.html.substring(0, 100)}${node.html.length > 100 ? "..." : ""}`
 		);
@@ -177,7 +188,7 @@ export function formatResultsSummary(results: ProcessedAxeResults): string {
 /**
  * Custom matcher for jest-axe that provides better error messages
  */
-export function expectNoViolations(results: AxeResult): void {
+export function expectNoViolations(results: AxeResults): void {
 	const processed = processAxeResults(results);
 
 	if (processed.violationCount > 0) {

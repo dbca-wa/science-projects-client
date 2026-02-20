@@ -35,7 +35,7 @@ fi
 
 echo "→ Running TypeScript (type checking)..."
 if command -v bun &> /dev/null; then
-    bun run tsc --noEmit || {
+    bun run tsc -b || {
         echo "TypeScript errors found. Please fix before committing."
         exit 1
     }

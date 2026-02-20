@@ -33,6 +33,7 @@ const ProjectMarkerComponent = observer(
 		const markerRef = useRef<L.Marker>(null);
 		const [isHovered, setIsHovered] = useState(false);
 		const lastFocusedElement = useRef<HTMLElement | null>(null);
+		const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 		// Determine if this marker is selected
 		const isSelected = store.isMarkerSelected(position);
@@ -68,11 +69,23 @@ const ProjectMarkerComponent = observer(
 				popupRef.current.close();
 			}
 
+			// Clear any existing timeout
+			if (focusTimeoutRef.current) {
+				clearTimeout(focusTimeoutRef.current);
+			}
+
 			// Return focus to the marker that opened the popup
 			if (lastFocusedElement.current) {
 				// Small delay to ensure popup is fully closed
-				setTimeout(() => {
-					lastFocusedElement.current?.focus();
+				focusTimeoutRef.current = setTimeout(() => {
+					// Check if element is still in the DOM before focusing
+					if (
+						lastFocusedElement.current &&
+						document.contains(lastFocusedElement.current)
+					) {
+						lastFocusedElement.current.focus();
+					}
+					focusTimeoutRef.current = null;
 				}, 50);
 			}
 		};
@@ -103,7 +116,9 @@ const ProjectMarkerComponent = observer(
 			let observer: MutationObserver | undefined;
 
 			const setupKeyboardAccess = () => {
-				const markerElement = (marker as any)._icon;
+				// Access Leaflet's internal _icon property (HTMLElement)
+				const markerElement = (marker as L.Marker & { _icon?: HTMLElement })
+					._icon;
 				if (!markerElement) return;
 
 				// Make marker focusable
@@ -120,7 +135,7 @@ const ProjectMarkerComponent = observer(
 					if (markerPane) {
 						// Find all divs that are NOT project markers
 						const allDivs = markerPane.querySelectorAll("div");
-						allDivs.forEach((div) => {
+						allDivs.forEach((div: Element) => {
 							if (
 								div instanceof HTMLElement &&
 								!div.classList.contains("project-marker")
@@ -168,7 +183,7 @@ const ProjectMarkerComponent = observer(
 				};
 
 				// Handle focus - apply visual effects and center map on marker
-				const handleFocus = (e: FocusEvent) => {
+				const handleFocus = (_e: FocusEvent) => {
 					// Pan map to center this marker
 					const map = (window as Window & { __leafletMap?: L.Map })
 						.__leafletMap;
@@ -233,7 +248,7 @@ const ProjectMarkerComponent = observer(
 				};
 
 				// Handle blur - restore all markers
-				const handleBlur = (e: FocusEvent) => {
+				const handleBlur = (_e: FocusEvent) => {
 					// Find the marker pane
 					const markerPane = document.querySelector(".leaflet-marker-pane");
 					if (markerPane) {
@@ -269,7 +284,7 @@ const ProjectMarkerComponent = observer(
 			};
 
 			// Try to set up immediately if icon exists
-			if ((marker as any)._icon) {
+			if ((marker as L.Marker & { _icon?: HTMLElement })._icon) {
 				setupKeyboardAccess();
 			}
 
@@ -287,6 +302,15 @@ const ProjectMarkerComponent = observer(
 				if (cleanup) cleanup();
 			};
 		}, [projects.length, handleMarkerClick]);
+
+		// Cleanup focus timeout on unmount
+		useEffect(() => {
+			return () => {
+				if (focusTimeoutRef.current) {
+					clearTimeout(focusTimeoutRef.current);
+				}
+			};
+		}, []);
 
 		return (
 			<Marker

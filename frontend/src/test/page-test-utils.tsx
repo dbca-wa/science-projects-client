@@ -101,7 +101,7 @@ export function renderPage(ui: ReactElement, options: PageTestOptions = {}) {
  * expect(results).toHaveNoViolations();
  * ```
  */
-export async function testAccessibility(container: Element | Document) {
+export async function testAccessibility(container: Element) {
 	return await axe(container);
 }
 

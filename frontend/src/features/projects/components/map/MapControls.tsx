@@ -1,13 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Maximize, Minimize, RotateCcw } from "lucide-react";
-import { useMap } from "react-leaflet";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import type L from "leaflet";
 import { Button } from "@/shared/components/ui/button";
 import { LayerPopover } from "./LayerPopover";
 import { HeatmapToggle } from "./HeatmapToggle";
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
-import L from "leaflet";
 
 /**
  * ZoomControls component
@@ -117,7 +116,7 @@ const MapControlButtons = observer(() => {
 		e.stopPropagation();
 		e.preventDefault();
 		// Get the map instance from the window (set by FullMapContainer)
-		const map = (window as any).__leafletMap;
+		const map = (window as Window & { __leafletMap?: L.Map }).__leafletMap;
 		if (map) {
 			// Reset to Western Australia view
 			map.setView([-25.2744, 122.2402], 6);
