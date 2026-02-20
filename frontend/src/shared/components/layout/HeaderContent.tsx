@@ -38,7 +38,7 @@ export default function HeaderContent({
 	};
 
 	return (
-		<div className="flex flex-col h-full">
+		<nav aria-label="Mobile navigation" className="flex flex-col h-full">
 			{/* Top Section - My Profile & Dark Mode Toggle */}
 			<div className="border-b border-gray-700 py-3">
 				<div className="flex items-center gap-2 px-3">
@@ -48,7 +48,7 @@ export default function HeaderContent({
 						onClick={() => navigateAndClose("/users/me")}
 					>
 						<span className="flex items-center gap-3">
-							<User className="text-xl" />
+							<User className="text-xl" aria-hidden="true" />
 							<span>My Profile</span>
 						</span>
 					</Button>
@@ -65,16 +65,16 @@ export default function HeaderContent({
 				<div className="flex flex-col gap-1">
 					{/* Projects Section */}
 					<div className="flex flex-col gap-1">
-						<div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
+						<h2 className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
 							Projects
-						</div>
+						</h2>
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
 							onClick={() => navigateAndClose("/projects")}
 						>
 							<span className="flex items-center gap-3">
-								<CgBrowse className="text-xl" />
+								<CgBrowse className="text-xl" aria-hidden="true" />
 								<span>Browse Projects</span>
 							</span>
 						</Button>
@@ -84,7 +84,7 @@ export default function HeaderContent({
 							onClick={() => navigateAndClose("/projects/map")}
 						>
 							<span className="flex items-center gap-3">
-								<FaMapMarkedAlt className="text-xl" />
+								<FaMapMarkedAlt className="text-xl" aria-hidden="true" />
 								<span>Project Map</span>
 							</span>
 						</Button>
@@ -94,7 +94,7 @@ export default function HeaderContent({
 							onClick={() => navigateAndClose("/projects/create")}
 						>
 							<span className="flex items-center gap-3">
-								<CgPlayListAdd className="text-xl" />
+								<CgPlayListAdd className="text-xl" aria-hidden="true" />
 								<span>Create New Project</span>
 							</span>
 						</Button>
@@ -102,16 +102,16 @@ export default function HeaderContent({
 
 					{/* Users Section */}
 					<div className="flex flex-col gap-1">
-						<div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
+						<h2 className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
 							Users
-						</div>
+						</h2>
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
 							onClick={() => navigateAndClose("/users")}
 						>
 							<span className="flex items-center gap-3">
-								<ImUsers className="text-xl" />
+								<ImUsers className="text-xl" aria-hidden="true" />
 								<span>Browse Users</span>
 							</span>
 						</Button>
@@ -121,7 +121,7 @@ export default function HeaderContent({
 							onClick={() => navigateAndClose("/users/create")}
 						>
 							<span className="flex items-center gap-3">
-								<FaUserPlus className="text-xl" />
+								<FaUserPlus className="text-xl" aria-hidden="true" />
 								<span>Add User</span>
 							</span>
 						</Button>
@@ -132,7 +132,7 @@ export default function HeaderContent({
 								onClick={() => navigateAndClose("/users/create-staff")}
 							>
 								<span className="flex items-center gap-3">
-									<FaUserPlus className="text-xl" />
+									<FaUserPlus className="text-xl" aria-hidden="true" />
 									<span>Add DBCA User (Admin)</span>
 								</span>
 							</Button>
@@ -141,9 +141,9 @@ export default function HeaderContent({
 
 					{/* Quick Links Section */}
 					<div className="flex flex-col gap-1">
-						<div className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
+						<h2 className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
 							Quick Links
-						</div>
+						</h2>
 
 						<Button
 							variant="ghost"
@@ -151,7 +151,7 @@ export default function HeaderContent({
 							onClick={() => navigateAndClose("/guide")}
 						>
 							<span className="flex items-center gap-3">
-								<BookOpen className="text-xl" />
+								<BookOpen className="text-xl" aria-hidden="true" />
 								<span>Quick Guide</span>
 							</span>
 						</Button>
@@ -163,9 +163,10 @@ export default function HeaderContent({
 								window.open("https://data.bio.wa.gov.au/", "_blank");
 								onClose();
 							}}
+							aria-label="Data Catalogue (opens in new tab)"
 						>
 							<span className="flex items-center gap-3">
-								<BookOpen className="text-xl" />
+								<BookOpen className="text-xl" aria-hidden="true" />
 								<span>Data Catalogue</span>
 							</span>
 						</Button>
@@ -180,9 +181,10 @@ export default function HeaderContent({
 								);
 								onClose();
 							}}
+							aria-label="Scientific Sites Register (opens in new tab)"
 						>
 							<span className="flex items-center gap-3">
-								<BookOpen className="text-xl" />
+								<BookOpen className="text-xl" aria-hidden="true" />
 								<span>Scientific Sites Register</span>
 							</span>
 						</Button>
@@ -198,11 +200,11 @@ export default function HeaderContent({
 					onClick={handleLogout}
 				>
 					<span className="flex items-center gap-3">
-						<LogOut className="text-xl" />
+						<LogOut className="text-xl" aria-hidden="true" />
 						<span>Logout</span>
 					</span>
 				</Button>
 			</div>
-		</div>
+		</nav>
 	);
 }

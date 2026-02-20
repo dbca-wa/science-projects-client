@@ -14,6 +14,7 @@ This section contains guides and standards for developing the Science Projects M
 
 - [Code Style](./code-style.md) - TypeScript standards and ESLint configuration
 - [Testing Guide](./testing-guide.md) - Testing philosophy and implementation
+- [Accessibility](./accessibility.md) - WCAG 2.2 AA compliance and accessible development
 - [Feature Development](./feature-development.md) - Feature development workflow
 - [Pre-commit Hooks](./pre-commit.md) - Pre-commit checks and validation
 
@@ -21,9 +22,10 @@ This section contains guides and standards for developing the Science Projects M
 
 1. **Setup**: Follow the [Getting Started](./getting-started.md) guide
 2. **Code Style**: Adhere to [Code Style](./code-style.md) standards
-3. **Testing**: Write tests following the [Testing Guide](./testing-guide.md)
-4. **Feature Development**: Use the [Feature Development](./feature-development.md) workflow
-5. **Pre-commit**: Ensure [Pre-commit Hooks](./pre-commit.md) pass before committing
+3. **Accessibility**: Ensure [Accessibility](./accessibility.md) compliance (WCAG 2.2 AA)
+4. **Testing**: Write tests following the [Testing Guide](./testing-guide.md)
+5. **Feature Development**: Use the [Feature Development](./feature-development.md) workflow
+6. **Pre-commit**: Ensure [Pre-commit Hooks](./pre-commit.md) pass before committing
 
 ## Quick Reference
 
@@ -40,6 +42,12 @@ bun run dev
 bun run test
 bun run test:watch
 bun run test:coverage
+
+# Run accessibility tests
+bun run test --run "a11y"
+
+# Run accessibility scanner
+node scripts/accessibility/scanner.js src/pages/MyPage.tsx
 
 # Lint and format
 bun run lint

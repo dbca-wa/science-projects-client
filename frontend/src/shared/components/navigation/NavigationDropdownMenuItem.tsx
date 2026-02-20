@@ -5,8 +5,10 @@ import { hasModifierKey } from "@/shared/utils/navigation.utils";
 import { cn } from "@/shared/lib/utils";
 import type { ComponentProps } from "react";
 
-interface NavigationDropdownMenuItemProps
-	extends Omit<ComponentProps<typeof DropdownMenuItem>, "onClick"> {
+interface NavigationDropdownMenuItemProps extends Omit<
+	ComponentProps<typeof DropdownMenuItem>,
+	"onClick"
+> {
 	targetPath: string;
 	onNavigate?: () => void; // Callback to close dropdown after navigation
 	children: React.ReactNode;
@@ -26,12 +28,14 @@ interface NavigationDropdownMenuItemProps
  * - Active route highlighting: Light blue background when on current route
  * - Disabled when active: Cannot click to navigate to current route
  * - No race conditions: Navigation completes before dropdown closes
+ * - Arrow key navigation: NOT tab-focusable (use arrow keys in menu)
  *
  * Implementation:
  * - Uses asChild pattern to make anchor tag become the DropdownMenuItem
  * - Anchor inherits all padding and styling from DropdownMenuItem
  * - Entire clickable area (including padding) triggers navigation
  * - Compares base paths (strips query params) for active state
+ * - tabIndex={-1} prevents Tab key from focusing (arrow keys only)
  *
  * @example
  * const [open, setOpen] = useState(false);
@@ -104,12 +108,13 @@ export const NavigationDropdownMenuItem = forwardRef<
 				href={isActive ? undefined : targetPath}
 				onClick={handleClick}
 				className={cn(
-					"no-underline select-none",
+					"no-underline select-none outline-none",
 					isActive && "cursor-default pointer-events-none"
 				)}
+				role="menuitem"
 				aria-current={isActive ? "page" : undefined}
 				aria-disabled={isActive ? "true" : undefined}
-				tabIndex={isActive ? -1 : undefined}
+				tabIndex={isActive ? undefined : -1}
 			>
 				{children}
 			</a>

@@ -63,6 +63,8 @@ function SingleProjectPopup({
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "Escape" && onClose) {
+				event.preventDefault();
+				event.stopPropagation();
 				onClose();
 				mapAnnouncements.popupClosed();
 			}
@@ -148,6 +150,7 @@ function MultiProjectPopup({
 	const navigate = useNavigate();
 	const headerRef = useRef<HTMLHeadingElement>(null);
 	const [displayCount, setDisplayCount] = useState(20);
+	const focusIndexAfterLoadRef = useRef<number | null>(null);
 
 	// Focus the first interactive element when popup opens
 	useEffect(() => {
@@ -162,10 +165,29 @@ function MultiProjectPopup({
 		mapAnnouncements.markerSelected(projects.length);
 	}, [projects.length]);
 
+	// Focus management after loading more items
+	useEffect(() => {
+		if (focusIndexAfterLoadRef.current !== null) {
+			const targetIndex = focusIndexAfterLoadRef.current;
+			// Small delay to ensure DOM has updated
+			setTimeout(() => {
+				const targetProject = document.querySelector(
+					`[data-project-item="${targetIndex}"]`
+				) as HTMLElement;
+				if (targetProject) {
+					targetProject.focus();
+				}
+				focusIndexAfterLoadRef.current = null;
+			}, 50);
+		}
+	}, [displayCount]);
+
 	// Handle escape key to close popup
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "Escape" && onClose) {
+				event.preventDefault();
+				event.stopPropagation();
 				onClose();
 				mapAnnouncements.popupClosed();
 			}
@@ -190,6 +212,8 @@ function MultiProjectPopup({
 	};
 
 	const handleLoadMore = () => {
+		// Save the index of the last currently displayed item
+		focusIndexAfterLoadRef.current = displayProjects.length - 1;
 		// Load 10 more projects at a time
 		setDisplayCount((prev) => Math.min(prev + 10, projects.length));
 	};
@@ -202,38 +226,44 @@ function MultiProjectPopup({
 		if (event.key === "Enter" || event.key === " ") {
 			event.preventDefault();
 			handleProjectClick(projectId);
-		} else if (event.key === "Tab") {
-			// Handle circular tab navigation within the popup
-			const isLastItem = currentIndex === displayProjects.length - 1;
-			const isFirstItem = currentIndex === 0;
-
-			if (!event.shiftKey && isLastItem && !hasMore) {
-				// Tab on last item when no Load More button - go to first item
-				event.preventDefault();
-				const firstProject = document.querySelector(
-					'[data-project-item="0"]'
+		} else if (event.key === "ArrowDown") {
+			// Arrow down - move to next project
+			event.preventDefault();
+			const nextIndex = currentIndex + 1;
+			if (nextIndex < displayProjects.length) {
+				const nextProject = document.querySelector(
+					`[data-project-item="${nextIndex}"]`
 				) as HTMLElement;
-				if (firstProject) {
-					firstProject.focus();
+				if (nextProject) {
+					nextProject.focus();
 				}
-			} else if (event.shiftKey && isFirstItem) {
-				// Shift+Tab on first item - go to last focusable item
-				event.preventDefault();
-				if (hasMore) {
-					const loadMoreButton = document.querySelector(
-						"[data-load-more-button]"
-					) as HTMLElement;
-					if (loadMoreButton) {
-						loadMoreButton.focus();
-					}
-				} else {
-					const lastProject = document.querySelector(
-						`[data-project-item="${displayProjects.length - 1}"]`
-					) as HTMLElement;
-					if (lastProject) {
-						lastProject.focus();
-					}
+			} else if (hasMore) {
+				// If at last project and there's a Load More button, focus it
+				const loadMoreButton = document.querySelector(
+					"[data-load-more-button]"
+				) as HTMLElement;
+				if (loadMoreButton) {
+					loadMoreButton.focus();
 				}
+			}
+		} else if (event.key === "ArrowUp") {
+			// Arrow up - move to previous project
+			event.preventDefault();
+			const prevIndex = currentIndex - 1;
+			if (prevIndex >= 0) {
+				const prevProject = document.querySelector(
+					`[data-project-item="${prevIndex}"]`
+				) as HTMLElement;
+				if (prevProject) {
+					prevProject.focus();
+				}
+			}
+		} else if (event.key === "Tab") {
+			// Tab should close the popup - use setTimeout to avoid interfering with focus events
+			if (onClose) {
+				setTimeout(() => {
+					onClose();
+				}, 0);
 			}
 		}
 	};
@@ -242,25 +272,21 @@ function MultiProjectPopup({
 		if (event.key === "Enter" || event.key === " ") {
 			event.preventDefault();
 			handleLoadMore();
+		} else if (event.key === "ArrowUp") {
+			// Arrow up from Load More - go to last project
+			event.preventDefault();
+			const lastProject = document.querySelector(
+				`[data-project-item="${displayProjects.length - 1}"]`
+			) as HTMLElement;
+			if (lastProject) {
+				lastProject.focus();
+			}
 		} else if (event.key === "Tab") {
-			if (event.shiftKey) {
-				// Shift+Tab on Load More - go to last project
-				event.preventDefault();
-				const lastProject = document.querySelector(
-					`[data-project-item="${displayProjects.length - 1}"]`
-				) as HTMLElement;
-				if (lastProject) {
-					lastProject.focus();
-				}
-			} else {
-				// Tab on Load More - go to first project
-				event.preventDefault();
-				const firstProject = document.querySelector(
-					'[data-project-item="0"]'
-				) as HTMLElement;
-				if (firstProject) {
-					firstProject.focus();
-				}
+			// Tab should close the popup - use setTimeout to avoid interfering with focus events
+			if (onClose) {
+				setTimeout(() => {
+					onClose();
+				}, 0);
 			}
 		}
 	};

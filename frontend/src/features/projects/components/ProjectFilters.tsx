@@ -16,6 +16,7 @@ import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { UserCombobox } from "@/shared/components/user";
+import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
 
 interface ProjectFiltersProps {
 	searchTerm: string;
@@ -118,32 +119,64 @@ export const ProjectFilters = observer(
 		return (
 			<div className="border border-gray-300 dark:border-gray-500 w-full select-none">
 				<div className="p-4 w-full space-y-3">
-					{/* Row 1: User Filter and Search (side by side on lg+, stacked on mobile) */}
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-						{/* Search Input - FIRST on mobile, right on desktop - EMPHASIZED */}
-						<div className="relative w-full order-1 lg:order-2">
-							<Input
-								type="text"
-								placeholder="Search projects by name, keyword, or tag..."
-								value={localSearchTerm}
-								onChange={handleSearchChange}
-								variant="search"
-								className="pl-10 text-sm rounded-md"
-							/>
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
-						</div>
+					<ResponsiveLayout
+						mobileContent={
+							<div className="space-y-3">
+								{/* Row 1 Mobile: Search Input (top) */}
+								<div className="relative w-full">
+									<Input
+										type="text"
+										placeholder="Search projects by name, keyword, or tag..."
+										value={localSearchTerm}
+										onChange={handleSearchChange}
+										variant="search"
+										className="pl-10 text-sm rounded-md"
+									/>
+									<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
+								</div>
 
-						{/* User Filter with icon - SECOND on mobile, left on desktop */}
-						<div className="w-full order-2 lg:order-1">
-							<UserCombobox
-								value={filters.user || null}
-								onValueChange={handleUserChange}
-								placeholder="Filter by user"
-								className="text-sm rounded-md"
-								showIcon={true}
-							/>
-						</div>
-					</div>
+								{/* Row 2 Mobile: User Filter */}
+								<div className="w-full">
+									<UserCombobox
+										value={filters.user || null}
+										onValueChange={handleUserChange}
+										placeholder="Filter by user"
+										ariaLabel="Filter projects by user"
+										className="text-sm rounded-md"
+										showIcon={true}
+									/>
+								</div>
+							</div>
+						}
+						desktopContent={
+							<div className="grid grid-cols-2 gap-3">
+								{/* Row 1 Desktop: User Filter (left) */}
+								<div className="w-full">
+									<UserCombobox
+										value={filters.user || null}
+										onValueChange={handleUserChange}
+										placeholder="Filter by user"
+										ariaLabel="Filter projects by user"
+										className="text-sm rounded-md"
+										showIcon={true}
+									/>
+								</div>
+
+								{/* Row 1 Desktop: Search Input (right) */}
+								<div className="relative w-full">
+									<Input
+										type="text"
+										placeholder="Search projects by name, keyword, or tag..."
+										value={localSearchTerm}
+										onChange={handleSearchChange}
+										variant="search"
+										className="pl-10 text-sm rounded-md"
+									/>
+									<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
+								</div>
+							</div>
+						}
+					/>
 
 					{/* Row 2: Business Area, Year, Project Status, Project Kind */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -157,7 +190,10 @@ export const ProjectFilters = observer(
 							}
 							disabled={isLoadingBusinessAreas}
 						>
-							<SelectTrigger className="w-full text-sm rounded-md">
+							<SelectTrigger
+								className="w-full text-sm rounded-md"
+								aria-label="Filter by business area"
+							>
 								<SelectValue placeholder="All Business Areas" />
 							</SelectTrigger>
 							<SelectContent>
@@ -183,7 +219,10 @@ export const ProjectFilters = observer(
 								})
 							}
 						>
-							<SelectTrigger className="w-full text-sm rounded-md">
+							<SelectTrigger
+								className="w-full text-sm rounded-md"
+								aria-label="Filter by year"
+							>
 								<SelectValue placeholder="All Years" />
 							</SelectTrigger>
 							<SelectContent>
@@ -205,7 +244,10 @@ export const ProjectFilters = observer(
 								})
 							}
 						>
-							<SelectTrigger className="w-full text-sm rounded-md">
+							<SelectTrigger
+								className="w-full text-sm rounded-md"
+								aria-label="Filter by project status"
+							>
 								<SelectValue placeholder="All Statuses" />
 							</SelectTrigger>
 							<SelectContent>
@@ -232,7 +274,10 @@ export const ProjectFilters = observer(
 								})
 							}
 						>
-							<SelectTrigger className="w-full text-sm rounded-md">
+							<SelectTrigger
+								className="w-full text-sm rounded-md"
+								aria-label="Filter by project kind"
+							>
 								<SelectValue placeholder="All Kinds" />
 							</SelectTrigger>
 							<SelectContent>

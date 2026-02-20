@@ -439,6 +439,3 @@ def test_project_update():
   - ADR-005: pytest Testing Framework
 
 ---
-
-**Created**: 2024-02-07
-**Purpose**: Comprehensive testing guide for SPMS backend

@@ -53,3 +53,8 @@ dist/
 
 # Raw data files (source files)
 public/data/raw/
+
+# Accessibility scanner output (if generated)
+scripts/accessibility/results/
+scripts/accessibility/*.json
+scripts/accessibility/*.html

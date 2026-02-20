@@ -1,21 +1,15 @@
 import { Link, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
-import { IoCaretDown } from "react-icons/io5";
 import { Navitar } from "./Navitar";
 import { Button } from "@/shared/components/ui/button";
-import { NavigationDropdownMenuItem } from "@/shared/components/navigation/NavigationDropdownMenuItem";
+import { NavigationDropdownMenu } from "@/shared/components/navigation/NavigationDropdownMenu";
+import { NavigationDropdownMenuContent } from "@/shared/components/navigation/NavigationDropdownMenuContent";
 import { Sheet, SheetContent } from "@/shared/components/ui/sheet";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";
@@ -75,6 +69,29 @@ export const Header = observer(() => {
 	// Controlled dropdown state
 	const [projectsOpen, setProjectsOpen] = useState(false);
 	const [usersOpen, setUsersOpen] = useState(false);
+	const [navitarOpen, setNavitarOpen] = useState(false);
+
+	// Close other menus when one opens
+	useEffect(() => {
+		if (projectsOpen) {
+			setUsersOpen(false);
+			setNavitarOpen(false);
+		}
+	}, [projectsOpen]);
+
+	useEffect(() => {
+		if (usersOpen) {
+			setProjectsOpen(false);
+			setNavitarOpen(false);
+		}
+	}, [usersOpen]);
+
+	useEffect(() => {
+		if (navitarOpen) {
+			setProjectsOpen(false);
+			setUsersOpen(false);
+		}
+	}, [navitarOpen]);
 
 	// Show hamburger menu on screens smaller than lg breakpoint
 	const shouldShowHamburger = width < BREAKPOINTS.lg;
@@ -87,6 +104,21 @@ export const Header = observer(() => {
 
 	return (
 		<header className="bg-gray-900 rounded-b py-0.5">
+			{/* Skip to main content link for keyboard users */}
+			<button
+				onClick={(e) => {
+					e.preventDefault();
+					const mainContent = document.getElementById("main-content");
+					if (mainContent) {
+						mainContent.focus();
+						mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
+					}
+				}}
+				className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100000] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded focus:outline-none focus:ring-2 focus:ring-white"
+			>
+				Skip to main content
+			</button>
+
 			<div className="px-4 sm:px-6 md:px-[10%] lg:px-[15%] py-4 lg:py-1">
 				<div className="flex items-center justify-between">
 					{/* Left side - Logo */}
@@ -95,6 +127,7 @@ export const Header = observer(() => {
 						<Link
 							to="/"
 							className="px-5 text-white/70 hover:text-white/90 text-lg font-bold select-none no-underline transition-colors"
+							aria-label="SPMS Home"
 						>
 							SPMS
 						</Link>
@@ -107,100 +140,91 @@ export const Header = observer(() => {
 						</div>
 					) : (
 						/* Desktop - Full Navigation */
-						<div className="flex items-center justify-between flex-grow">
+						<nav
+							aria-label="Main navigation"
+							className="flex items-center justify-between flex-grow"
+						>
 							<div className="flex items-center gap-1">
 								{/* Projects Menu */}
-								<div className="relative">
-									<DropdownMenu
-										open={projectsOpen}
-										onOpenChange={setProjectsOpen}
-									>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-											>
-												Projects
-												<IoCaretDown className="ml-1 h-3 w-3" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-											<DropdownMenuLabel className="text-center text-xs text-gray-500">
-												Projects
-											</DropdownMenuLabel>
-											<NavigationDropdownMenuItem
-												targetPath="/projects"
-												onNavigate={() => setProjectsOpen(false)}
-												className="hover:bg-gray-100 cursor-pointer select-none"
-											>
-												<CgBrowse className="mr-2 size-4" />
-												Browse Projects
-											</NavigationDropdownMenuItem>
-											<NavigationDropdownMenuItem
-												targetPath="/projects/map"
-												onNavigate={() => setProjectsOpen(false)}
-												className="hover:bg-gray-100 cursor-pointer select-none"
-											>
-												<FaMapMarkedAlt className="mr-2 size-4" />
-												Project Map
-											</NavigationDropdownMenuItem>
-											<NavigationDropdownMenuItem
-												targetPath="/projects/create"
-												onNavigate={() => setProjectsOpen(false)}
-												className="hover:bg-gray-100 cursor-pointer select-none"
-											>
-												<CgPlayListAdd className="mr-2 size-4" />
-												Create New Project
-											</NavigationDropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
+								<NavigationDropdownMenu
+									label="Projects"
+									open={projectsOpen}
+									onOpenChange={setProjectsOpen}
+								>
+									<NavigationDropdownMenuContent
+										label="Projects"
+										items={[
+											{
+												targetPath: "/projects",
+												icon: (
+													<CgBrowse className="size-4" aria-hidden="true" />
+												),
+												label: "Browse Projects",
+											},
+											{
+												targetPath: "/projects/map",
+												icon: (
+													<FaMapMarkedAlt
+														className="size-4"
+														aria-hidden="true"
+													/>
+												),
+												label: "Project Map",
+											},
+											{
+												targetPath: "/projects/create",
+												icon: (
+													<CgPlayListAdd
+														className="size-4"
+														aria-hidden="true"
+													/>
+												),
+												label: "Create New Project",
+											},
+										]}
+										onClose={() => setProjectsOpen(false)}
+									/>
+								</NavigationDropdownMenu>
 
 								{/* Users Menu */}
-								<div className="relative">
-									<DropdownMenu open={usersOpen} onOpenChange={setUsersOpen}>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-											>
-												Users
-												<IoCaretDown className="ml-1 h-3 w-3" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-											<DropdownMenuLabel className="text-center text-xs text-gray-500">
-												Users
-											</DropdownMenuLabel>
-											<NavigationDropdownMenuItem
-												targetPath="/users"
-												onNavigate={() => setUsersOpen(false)}
-												className="hover:bg-gray-100 cursor-pointer select-none"
-											>
-												<ImUsers className="mr-2 size-4" />
-												Browse Users
-											</NavigationDropdownMenuItem>
-											<NavigationDropdownMenuItem
-												targetPath="/users/create"
-												onNavigate={() => setUsersOpen(false)}
-												className="hover:bg-gray-100 cursor-pointer select-none"
-											>
-												<FaUserPlus className="mr-2 size-4" />
-												Add User
-											</NavigationDropdownMenuItem>
-											{authStore.isSuperuser && (
-												<NavigationDropdownMenuItem
-													targetPath="/users/create-staff"
-													onNavigate={() => setUsersOpen(false)}
-													className="hover:bg-gray-100 cursor-pointer select-none"
-												>
-													<FaUserPlus className="mr-2 size-4" />
-													Add DBCA User (Admin)
-												</NavigationDropdownMenuItem>
-											)}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
+								<NavigationDropdownMenu
+									label="Users"
+									open={usersOpen}
+									onOpenChange={setUsersOpen}
+								>
+									<NavigationDropdownMenuContent
+										label="Users"
+										items={[
+											{
+												targetPath: "/users",
+												icon: <ImUsers className="size-4" aria-hidden="true" />,
+												label: "Browse Users",
+											},
+											{
+												targetPath: "/users/create",
+												icon: (
+													<FaUserPlus className="size-4" aria-hidden="true" />
+												),
+												label: "Add User",
+											},
+											...(authStore.isSuperuser
+												? [
+														{
+															targetPath: "/users/create-staff",
+															icon: (
+																<FaUserPlus
+																	className="size-4"
+																	aria-hidden="true"
+																/>
+															),
+															label: "Add DBCA User (Admin)",
+														},
+													]
+												: []),
+										]}
+										onClose={() => setUsersOpen(false)}
+									/>
+								</NavigationDropdownMenu>
 
 								{/* Reports Menu - COMMENTED OUT: Not yet implemented */}
 								{/*
@@ -272,9 +296,13 @@ export const Header = observer(() => {
 
 							{/* Right side - Navitar with name */}
 							<div className="flex items-center px-3">
-								<Navitar shouldShowName />
+								<Navitar
+									shouldShowName
+									open={navitarOpen}
+									onOpenChange={setNavitarOpen}
+								/>
 							</div>
-						</div>
+						</nav>
 					)}
 				</div>
 			</div>

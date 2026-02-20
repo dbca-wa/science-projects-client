@@ -65,6 +65,9 @@ export interface UserComboboxProps {
 	disabled?: boolean;
 	className?: string;
 	wrapperClassName?: string;
+
+	// Accessibility
+	ariaLabel?: string; // Accessible name when label is not provided
 }
 
 export interface UserComboboxRef {
@@ -81,6 +84,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 			excludeUserIds = [],
 			placeholder = "Search for a user...",
 			showIcon = false,
+			ariaLabel = "Search for a user", // Default accessible name
 			...props
 		},
 		ref
@@ -136,6 +140,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 				}
 				showIcon={showIcon}
 				placeholder={placeholder}
+				ariaLabel={ariaLabel}
 				{...props}
 				ref={ref}
 			/>

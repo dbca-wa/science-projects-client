@@ -4,6 +4,7 @@
 [![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
 ![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-66%25-orange)
 ![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
+![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA%20Compliant-green)
 
 
 A project management and approval system for scientific research projects.
@@ -207,7 +208,7 @@ The CI/CD pipeline uses a modular approach with reusable workflows:
 
 **test.yml** (reusable workflow):
 - Called by deploy-staging.yml and deploy-prod.yml
-- Frontend tests (2-way sharding, ~2 min)
+- Frontend tests (2-way sharding, ~2 min) - includes accessibility tests
 - Backend tests (4-way sharding, ~10 min)
 - Coverage combining and validation
 - Path-based execution (only test changed code)

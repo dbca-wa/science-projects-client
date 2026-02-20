@@ -10,7 +10,8 @@ Welcome to the Science Projects Management System (SPMS) backend documentation. 
 
 1. [Getting Started](development/getting-started.md) - Get up and running in under 30 minutes
 2. [Local Setup](development/local-setup.md) - Detailed setup instructions
-3. [Testing Guide](development/testing-guide.md) - Run your first tests
+3. [Seeding Guide](development/seeding-guide.md) - Set up with production-like data
+4. [Testing Guide](development/testing-guide.md) - Run your first tests
 
 ## Documentation Structure
 
@@ -85,6 +86,7 @@ Operational procedures, monitoring, and troubleshooting for the entire system.
 
 1. [Getting Started](development/getting-started.md)
 2. [Local Setup](development/local-setup.md)
+3. [Seeding Guide](development/seeding-guide.md)
 
 ### Adding a Feature
 

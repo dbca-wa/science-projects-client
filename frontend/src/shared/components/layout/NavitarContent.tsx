@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthStore, useUIStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
@@ -8,9 +9,9 @@ import {
 } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
 import { User, LogOut, Moon, Sun, BookOpen } from "lucide-react";
-import { useState } from "react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
+import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
 
 interface NavitarContentProps {
 	onClose: () => void;
@@ -19,12 +20,15 @@ interface NavitarContentProps {
 /**
  * NavitarContent - The content inside the Navitar popover
  * Captures MobX state on mount to prevent flickering during close animation
+ * Implements WCAG 2.2 keyboard navigation with arrow keys and focus management
  */
 export default function NavitarContent({ onClose }: NavitarContentProps) {
 	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const uiStore = useUIStore();
 	const { mutate: logout } = useLogout();
+	const { handleKeyDown, registerMenuItem, focusFirstItem } =
+		useMenuKeyboardNavigation(onClose);
 
 	// Capture store values once on mount using useState with initializer function
 	const [snapshot] = useState(() => ({
@@ -36,8 +40,13 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 	const displayName = getUserDisplayName(snapshot.userData);
 	const initials = getUserInitials(snapshot.userData);
 
+	// Focus first menu item when component mounts
+	useEffect(() => {
+		focusFirstItem();
+	}, [focusFirstItem]);
+
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col" onKeyDown={handleKeyDown}>
 			{/* User Info Section */}
 			<div className="p-4">
 				<div className="flex gap-3 items-center">
@@ -65,18 +74,21 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 				</div>
 
 				{/* My SPMS Profile */}
-				<div
+				<button
+					ref={registerMenuItem(0)}
+					type="button"
 					onClick={() => {
 						navigate("/users/me");
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<User className="h-4 w-4" />
+						<User className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm">My SPMS Profile</span>
 					</div>
-				</div>
+				</button>
 			</div>
 
 			<Separator />
@@ -90,22 +102,25 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 				</div>
 
 				{/* Toggle Dark Mode */}
-				<div
+				<button
+					ref={registerMenuItem(1)}
+					type="button"
 					onClick={() => {
 						uiStore.toggleTheme();
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
 						{snapshot.theme === "dark" ? (
-							<Sun className="h-4 w-4" />
+							<Sun className="h-4 w-4" aria-hidden="true" />
 						) : (
-							<Moon className="h-4 w-4" />
+							<Moon className="h-4 w-4" aria-hidden="true" />
 						)}
 						<span className="text-sm">Toggle Dark Mode</span>
 					</div>
-				</div>
+				</button>
 			</div>
 
 			<Separator />
@@ -119,53 +134,64 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 				</div>
 
 				{/* Quick Guide */}
-				<div
+				<button
+					ref={registerMenuItem(2)}
+					type="button"
 					onClick={() => {
 						navigate("/guide");
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<BookOpen className="h-4 w-4" />
+						<BookOpen className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm">Quick Guide</span>
 					</div>
-				</div>
+				</button>
 
 				{/* Data Catalogue */}
-				<div
+				<button
+					ref={registerMenuItem(3)}
+					type="button"
 					onClick={() => {
 						window.open("https://data.bio.wa.gov.au/", "_blank");
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<BookOpen className="h-4 w-4" />
+						<BookOpen className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm">Data Catalogue</span>
 					</div>
-				</div>
+				</button>
 
 				{/* Scientific Sites Register */}
-				<div
+				<button
+					ref={registerMenuItem(4)}
+					type="button"
 					onClick={() => {
 						window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<BookOpen className="h-4 w-4" />
+						<BookOpen className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm">Scientific Sites Register</span>
 					</div>
-				</div>
+				</button>
 			</div>
 
 			<Separator />
 
 			{/* Logout Section */}
 			<div className="py-1">
-				<div
+				<button
+					ref={registerMenuItem(5)}
+					type="button"
 					onClick={() => {
 						logout(undefined, {
 							onSuccess: () => {
@@ -174,13 +200,14 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 						});
 						onClose();
 					}}
-					className="cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-red-600 dark:text-red-400"
+					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded text-red-600 dark:text-red-400"
+					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<LogOut className="h-4 w-4" />
+						<LogOut className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm font-medium">Logout</span>
 					</div>
-				</div>
+				</button>
 			</div>
 		</div>
 	);
