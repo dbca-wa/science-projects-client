@@ -1,14 +1,13 @@
 import { observer } from "mobx-react-lite";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { handleProfileUpdate } from "../../utils/profile-update.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
-import { RichTextEditor } from "@/shared/components/editor";
+import { FormRichTextEditor } from "@/shared/components/editor";
+import { UnsavedChangesDialog } from "@/shared/components/editor/UnsavedChangesDialog";
 import {
 	Dialog,
 	DialogContent,
@@ -26,7 +25,6 @@ import {
 	FormMessage,
 } from "@/shared/components/ui/form";
 import { Button } from "@/shared/components/ui/button";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
@@ -45,8 +43,10 @@ interface EditProfileModalProps {
 }
 
 export const EditProfileModal = observer(
-	({ isOpen, onClose, user, onSuccess }: EditProfileModalProps) => {
-		const queryClient = useQueryClient();
+	({ isOpen, onClose, user }: EditProfileModalProps) => {
+		// const queryClient = useQueryClient();
+		const [isUnsavedDialogOpen, setIsUnsavedDialogOpen] = useState(false);
+		const [_pendingClose, setPendingClose] = useState(false);
 
 		const form = useForm<ProfileFormData>({
 			resolver: zodResolver(profileSchema),
@@ -57,6 +57,12 @@ export const EditProfileModal = observer(
 			},
 		});
 
+		const updateMutation = {
+			isSuccess: false,
+			isPending: false,
+			mutate: (data: ProfileFormData) => console.log("Update:", data),
+		};
+
 		// Reset form when user data changes or modal opens
 		React.useEffect(() => {
 			if (isOpen) {
@@ -65,35 +71,51 @@ export const EditProfileModal = observer(
 					about: user.about || "",
 					expertise: user.expertise || "",
 				});
+				setPendingClose(false);
 			}
-		}, [isOpen, user.image?.file, user.about, user.expertise, form]);
+		}, [isOpen, user.image, user.about, user.expertise, form]);
 
-		const updateMutation = useMutation({
-			mutationFn: (data: ProfileFormData) =>
-				handleProfileUpdate({
-					userId: user.id!,
-					data,
-					queryClient,
-					hasExistingImage: !!user.image,
-				}),
-			onSuccess: () => {
-				toast.success("Profile updated successfully");
-				onSuccess();
-				onClose();
-			},
-			onError: (error: Error) => {
-				const message = error.message || "Failed to update profile";
-				toast.error(message);
-			},
-		});
+		// Block browser-level navigation when form is dirty
+
+		useEffect(() => {
+			const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+				if (form.formState.isDirty && isOpen && !updateMutation.isSuccess) {
+					e.preventDefault();
+					e.returnValue = "";
+				}
+			};
+
+			window.addEventListener("beforeunload", handleBeforeUnload);
+			return () =>
+				window.removeEventListener("beforeunload", handleBeforeUnload);
+		}, [form.formState.isDirty, isOpen, updateMutation.isSuccess]);
 
 		const handleSubmit = (data: ProfileFormData) => {
 			updateMutation.mutate(data);
 		};
 
 		const handleClose = () => {
-			form.reset();
+			// Check if form has unsaved changes
+			if (form.formState.isDirty && !updateMutation.isSuccess) {
+				setPendingClose(true);
+				setIsUnsavedDialogOpen(true);
+			} else {
+				form.reset();
+				onClose();
+			}
+		};
+
+		// Dialog handlers for unsaved changes
+		const handleProceedClose = () => {
+			setIsUnsavedDialogOpen(false);
+			setPendingClose(false);
+			form.reset(); // Reset form to mark as not dirty
 			onClose();
+		};
+
+		const handleCancelClose = () => {
+			setIsUnsavedDialogOpen(false);
+			setPendingClose(false);
 		};
 
 		return (
@@ -141,13 +163,14 @@ export const EditProfileModal = observer(
 									<FormItem>
 										<FormLabel>About</FormLabel>
 										<FormControl>
-											<RichTextEditor
+											<FormRichTextEditor
 												value={field.value || ""}
 												onChange={field.onChange}
 												placeholder="Tell us about yourself..."
-												toolbar="full"
+												toolbar="profile"
 												disabled={updateMutation.isPending}
-												minHeight="150px"
+												wordLimit={500}
+												aria-label="About"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -163,13 +186,14 @@ export const EditProfileModal = observer(
 									<FormItem>
 										<FormLabel>Expertise</FormLabel>
 										<FormControl>
-											<RichTextEditor
+											<FormRichTextEditor
 												value={field.value || ""}
 												onChange={field.onChange}
 												placeholder="Describe your areas of expertise..."
-												toolbar="full"
+												toolbar="profile"
 												disabled={updateMutation.isPending}
-												minHeight="150px"
+												wordLimit={500}
+												aria-label="Expertise"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -196,6 +220,12 @@ export const EditProfileModal = observer(
 						</form>
 					</Form>
 				</DialogContent>
+
+				<UnsavedChangesDialog
+					isOpen={isUnsavedDialogOpen}
+					onProceed={handleProceedClose}
+					onCancel={handleCancelClose}
+				/>
 			</Dialog>
 		);
 	}

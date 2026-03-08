@@ -109,6 +109,7 @@ function PopoverTrigger({
 				onClick?: (e: React.MouseEvent) => void;
 				ref?: React.Ref<HTMLElement>;
 			}>,
+			// eslint-disable-next-line react-hooks/refs
 			{
 				onClick: handleClick,
 				ref: triggerRef,
@@ -131,11 +132,13 @@ function PopoverContent({
 	className,
 	children,
 	align = "end",
+	side = "bottom",
 	sideOffset = 4,
 }: {
 	className?: string;
 	children: React.ReactNode;
 	align?: "start" | "center" | "end";
+	side?: "top" | "bottom" | "left" | "right";
 	sideOffset?: number;
 }) {
 	const context = React.useContext(PopoverContext);
@@ -149,7 +152,7 @@ function PopoverContent({
 		left: number;
 	} | null>(null);
 
-	// Calculate position BEFORE showing (prevents flash)
+	// Calculate position - uses two-pass render to measure content first
 	React.useEffect(() => {
 		if (!open || !triggerRef.current) {
 			setPosition(null);
@@ -157,37 +160,85 @@ function PopoverContent({
 		}
 
 		const updatePosition = () => {
-			const triggerRect = triggerRef.current!.getBoundingClientRect();
-			const contentRect = contentRef.current?.getBoundingClientRect();
+			if (!contentRef.current || !triggerRef.current) return;
 
+			const triggerRect = triggerRef.current.getBoundingClientRect();
+			const contentRect = contentRef.current.getBoundingClientRect();
+			const contentWidth = contentRect.width;
+			const contentHeight = contentRect.height;
+
+			const viewportWidth = window.innerWidth;
+			const viewportHeight = window.innerHeight;
+
+			let top = 0;
 			let left = 0;
-			const top = triggerRect.bottom + sideOffset;
 
-			if (align === "end") {
-				left = triggerRect.right - (contentRect?.width || 288); // 288px = min-w-72
-			} else if (align === "center") {
-				left =
-					triggerRect.left +
-					triggerRect.width / 2 -
-					(contentRect?.width || 288) / 2;
-			} else {
-				left = triggerRect.left;
+			// Calculate vertical position based on side
+			if (side === "top") {
+				top = triggerRect.top - contentHeight - sideOffset;
+				// Collision detection: if would go off top, position below instead
+				if (top < 0) {
+					top = triggerRect.bottom + sideOffset;
+				}
+			} else if (side === "bottom") {
+				top = triggerRect.bottom + sideOffset;
+				// Collision detection: if would go off bottom, position above instead
+				if (top + contentHeight > viewportHeight) {
+					top = triggerRect.top - contentHeight - sideOffset;
+				}
+			} else if (side === "left") {
+				top = triggerRect.top + triggerRect.height / 2 - contentHeight / 2;
+			} else if (side === "right") {
+				top = triggerRect.top + triggerRect.height / 2 - contentHeight / 2;
+			}
+
+			// Calculate horizontal position based on side and align
+			if (side === "top" || side === "bottom") {
+				if (align === "end") {
+					left = triggerRect.right - contentWidth;
+				} else if (align === "center") {
+					left = triggerRect.left + triggerRect.width / 2 - contentWidth / 2;
+				} else {
+					left = triggerRect.left;
+				}
+
+				// Collision detection: keep within viewport horizontally
+				if (left < 0) {
+					left = 8; // 8px padding from edge
+				} else if (left + contentWidth > viewportWidth) {
+					left = viewportWidth - contentWidth - 8;
+				}
+			} else if (side === "left") {
+				left = triggerRect.left - contentWidth - sideOffset;
+				// Collision detection: if would go off left, position right instead
+				if (left < 0) {
+					left = triggerRect.right + sideOffset;
+				}
+			} else if (side === "right") {
+				left = triggerRect.right + sideOffset;
+				// Collision detection: if would go off right, position left instead
+				if (left + contentWidth > viewportWidth) {
+					left = triggerRect.left - contentWidth - sideOffset;
+				}
 			}
 
 			setPosition({ top, left });
 		};
 
-		// Calculate position immediately
-		updatePosition();
+		// Use requestAnimationFrame to ensure content is rendered before measuring
+		const rafId = requestAnimationFrame(() => {
+			updatePosition();
+		});
 
 		window.addEventListener("resize", updatePosition);
 		window.addEventListener("scroll", updatePosition, true);
 
 		return () => {
+			cancelAnimationFrame(rafId);
 			window.removeEventListener("resize", updatePosition);
 			window.removeEventListener("scroll", updatePosition, true);
 		};
-	}, [open, align, sideOffset, triggerRef]);
+	}, [open, align, side, sideOffset, triggerRef]);
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
@@ -237,26 +288,29 @@ function PopoverContent({
 		return () => document.removeEventListener("keydown", handleEscape);
 	}, [open, onOpenChange]);
 
-	// Don't render until we have position calculated
-	if (!open || !position) return null;
+	// Don't render if not open
+	if (!open) return null;
 
 	return createPortal(
 		<div
 			ref={contentRef}
 			data-slot="popover-content"
 			className={cn(
-				"fixed z-[9999] min-w-72 rounded-lg p-4 shadow-md outline-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
-				shouldAnimate && "transition-all duration-150 ease-out",
-				shouldAnimate && isOpening && "opacity-0 scale-95 -translate-y-1",
-				shouldAnimate && isClosing && "opacity-0 scale-95 -translate-y-1",
+				"fixed z-[9998] min-w-72 rounded-lg p-4 shadow-md outline-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
 				shouldAnimate &&
-					!isOpening &&
-					!isClosing &&
-					"opacity-100 scale-100 translate-y-0",
+					"transition-opacity transition-transform duration-150 ease-out",
+				shouldAnimate && isOpening && "opacity-0 scale-95",
+				shouldAnimate && isClosing && "opacity-0 scale-95",
+				shouldAnimate && !isOpening && !isClosing && "opacity-100 scale-100",
 				!shouldAnimate && "opacity-100 scale-100",
+				!position && "opacity-0", // Hide while measuring
 				className
 			)}
-			style={{ top: `${position.top}px`, left: `${position.left}px` }}
+			style={
+				position
+					? { top: `${position.top}px`, left: `${position.left}px` }
+					: { top: "-9999px", left: "-9999px" } // Off-screen while measuring
+			}
 			role="dialog"
 			aria-modal="true"
 		>

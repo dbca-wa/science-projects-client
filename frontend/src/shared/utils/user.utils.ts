@@ -15,9 +15,9 @@ import { getImageUrl } from "@/shared/utils/image.utils";
 interface UserLike {
 	display_first_name?: string | null;
 	display_last_name?: string | null;
-	first_name?: string;
-	last_name?: string;
-	username?: string;
+	first_name?: string | null;
+	last_name?: string | null;
+	username?: string | null;
 }
 
 /**

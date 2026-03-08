@@ -1,7 +1,9 @@
 import { cn } from "@/shared/lib/utils";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { getProjectKindDisplay } from "../utils/project.utils";
-import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
+import { Badge } from "@/shared/components/ui/badge";
+import type { VariantProps } from "class-variance-authority";
+import { badgeVariants } from "@/shared/components/ui/badge";
 
 interface ProjectKindBadgeProps {
 	kind: ProjectKind | string;
@@ -9,25 +11,20 @@ interface ProjectKindBadgeProps {
 }
 
 /**
- * ProjectKindBadge component displays project kind with color coding
- * - Uses shadcn Badge component
- * - Color-coded based on kind type (matches original SPMS colors)
+ * ProjectKindBadge component displays project kind with colour coding
+ * - Uses shadcn Badge component with project kind variants
+ * - Colour-coded based on kind type (matches original SPMS colours)
  * - Handles all project kind types
  */
 export function ProjectKindBadge({ kind, className }: ProjectKindBadgeProps) {
 	const displayText = getProjectKindDisplay(kind);
-	const color =
-		PROJECT_KIND_COLORS[kind as ProjectKind] || PROJECT_KIND_COLORS.science;
+	const variant = `kind_${kind}` as VariantProps<
+		typeof badgeVariants
+	>["variant"];
 
 	return (
-		<span
-			className={cn(
-				"inline-flex items-center justify-center rounded-full border border-transparent px-2 py-0.5 text-xs font-medium text-white",
-				className
-			)}
-			style={{ backgroundColor: color }}
-		>
+		<Badge className={cn(className)} variant={variant}>
 			{displayText}
-		</span>
+		</Badge>
 	);
 }

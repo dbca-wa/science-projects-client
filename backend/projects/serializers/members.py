@@ -96,6 +96,7 @@ class MiniUserSerializer(ModelSerializer):
                 "display_first_name": obj.caretaker.display_first_name,
                 "display_last_name": obj.caretaker.display_last_name,
                 "email": obj.caretaker.email,
+                "image": obj.caretaker.get_image(),
             }
             for obj in caretakers
         ]

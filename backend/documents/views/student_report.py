@@ -67,15 +67,15 @@ class StudentReportDetail(APIView):
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk):
-        """Update student report"""
+    def patch(self, request, pk):
+        """Partial update student report"""
         try:
             student_report = StudentReport.objects.get(pk=pk)
         except StudentReport.DoesNotExist:
             raise NotFound
 
         settings.LOGGER.info(
-            f"{request.user} is updating student report {student_report}"
+            f"{request.user} is partially updating student report {student_report}"
         )
 
         serializer = StudentReportSerializer(
@@ -94,7 +94,37 @@ class StudentReportDetail(APIView):
 
         return Response(
             TinyStudentReportSerializer(updated_student_report).data,
-            status=HTTP_202_ACCEPTED,
+            status=HTTP_200_OK,
+        )
+
+    def put(self, request, pk):
+        """Full update student report"""
+        try:
+            student_report = StudentReport.objects.get(pk=pk)
+        except StudentReport.DoesNotExist:
+            raise NotFound
+
+        settings.LOGGER.info(
+            f"{request.user} is updating student report {student_report}"
+        )
+
+        serializer = StudentReportSerializer(
+            student_report,
+            data=request.data,
+            partial=False,
+        )
+
+        if not serializer.is_valid():
+            settings.LOGGER.error(f"{serializer.errors}")
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        updated_student_report = serializer.save()
+        updated_student_report.document.modifier = request.user
+        updated_student_report.document.save()
+
+        return Response(
+            TinyStudentReportSerializer(updated_student_report).data,
+            status=HTTP_200_OK,
         )
 
     def delete(self, request, pk):

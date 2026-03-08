@@ -102,9 +102,11 @@ describe("coordinate-calculation", () => {
 		});
 
 		it("should handle null/undefined strings", () => {
-			expect(fuzzyMatch(null as any, "Perth")).toBe(true); // null becomes "", "" is contained in "Perth"
-			expect(fuzzyMatch("Perth", undefined as any)).toBe(true); // undefined becomes "", "" is contained in "Perth"
-			expect(fuzzyMatch(null as any, undefined as any)).toBe(true); // both become ""
+			expect(fuzzyMatch(null as unknown as string, "Perth")).toBe(true); // null becomes "", "" is contained in "Perth"
+			expect(fuzzyMatch("Perth", undefined as unknown as string)).toBe(true); // undefined becomes "", "" is contained in "Perth"
+			expect(
+				fuzzyMatch(null as unknown as string, undefined as unknown as string)
+			).toBe(true); // both become ""
 		});
 	});
 
@@ -146,8 +148,12 @@ describe("coordinate-calculation", () => {
 
 		it("should return null for empty area name", () => {
 			expect(matchToGeoJSON("", mockGeoJSON, "NAME")).toBeNull();
-			expect(matchToGeoJSON(null, mockGeoJSON, "NAME")).toBeNull();
-			expect(matchToGeoJSON(undefined, mockGeoJSON, "NAME")).toBeNull();
+			expect(
+				matchToGeoJSON(null as unknown as string, mockGeoJSON, "NAME")
+			).toBeNull();
+			expect(
+				matchToGeoJSON(undefined as unknown as string, mockGeoJSON, "NAME")
+			).toBeNull();
 		});
 
 		it("should return null for null GeoJSON", () => {

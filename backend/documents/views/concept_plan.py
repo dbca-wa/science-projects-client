@@ -92,19 +92,37 @@ class ConceptPlanDetail(APIView):
             {"error": "Concept plan not found"}, status=HTTP_400_BAD_REQUEST
         )
 
-    def put(self, request, pk):
-        """Update concept plan"""
+    def patch(self, request, pk):
+        """Partial update concept plan"""
         serializer = ConceptPlanUpdateSerializer(data=request.data, partial=True)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        # Delegate to service
         document = ConceptPlanService.update_concept_plan(
             pk=pk, user=request.user, data=serializer.validated_data
         )
 
-        # Get updated concept plan
+        data = ConceptPlanService.get_concept_plan_data(document)
+        if "details" in data:
+            result = ConceptPlanSerializer(data["details"])
+            return Response(result.data, status=HTTP_200_OK)
+
+        return Response(
+            {"error": "Failed to update concept plan"}, status=HTTP_400_BAD_REQUEST
+        )
+
+    def put(self, request, pk):
+        """Full update concept plan"""
+        serializer = ConceptPlanUpdateSerializer(data=request.data, partial=False)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        document = ConceptPlanService.update_concept_plan(
+            pk=pk, user=request.user, data=serializer.validated_data
+        )
+
         data = ConceptPlanService.get_concept_plan_data(document)
         if "details" in data:
             result = ConceptPlanSerializer(data["details"])

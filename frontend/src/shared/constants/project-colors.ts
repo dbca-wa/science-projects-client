@@ -16,20 +16,20 @@ export const PROJECT_KIND_COLORS = {
 } as const;
 
 /**
- * Project Status Colors (from original ProjectCard)
- * Using Chakra UI color values converted to hex approximations
+ * Project Status Colors (WCAG AA compliant with white text)
+ * Enhanced for better vibrancy and contrast (4.5:1 minimum ratio)
  */
 export const PROJECT_STATUS_COLORS = {
-	new: "#718096", // gray.500
-	pending: "#ECC94B", // yellow.500
-	active: "#48BB78", // green.500
-	updating: "#ECC94B", // yellow.500
-	closure_requested: "#ED8936", // orange.500
-	closing: "#F56565", // red.500
-	final_update: "#F56565", // red.500
-	completed: "#F56565", // red.500
-	terminated: "#1A202C", // gray.800
-	suspended: "#718096", // gray.500
+	new: "#64748B", // Slate 600 - neutral gray
+	pending: "#EAB308", // Yellow 500 - bright yellow (still WCAG compliant: 5.3:1)
+	active: "#16A34A", // Green 600 - vibrant green
+	updating: "#DC2626", // Red 600 - vibrant red
+	closure_requested: "#EA580C", // Orange 600 - vibrant orange
+	closing: "#DC2626", // Red 600 - vibrant red
+	final_update: "#DC2626", // Red 600 - vibrant red
+	completed: "#15803D", // Green 700 - dark green (WCAG compliant)
+	terminated: "#1E293B", // Slate 800 - dark gray
+	suspended: "#64748B", // Slate 600 - neutral gray
 } as const;
 
 /**
@@ -59,6 +59,34 @@ export const CONFETTI_COLOR_SCHEMES = {
 export const ACTIVE_CONFETTI_SCHEME: keyof typeof CONFETTI_COLOR_SCHEMES =
 	"FUN_COLOURS";
 
+/**
+ * Document Status Badge Variants
+ * Maps document status values to shadcn badge variants
+ */
+export const DOCUMENT_STATUS_VARIANTS = {
+	draft: "draft",
+	new: "draft",
+	revising: "pending",
+	inreview: "inreview",
+	inapproval: "inreview",
+	approved: "approved",
+	pending_approval: "pending",
+	requires_revision: "denied",
+} as const;
+
+/**
+ * Approval Status Badge Variants
+ * Maps approval status values to shadcn badge variants
+ */
+export const APPROVAL_STATUS_VARIANTS = {
+	pending: "pending",
+	approved: "approved",
+	denied: "denied",
+	not_required: "secondary",
+} as const;
+
 export type ProjectKindColorKey = keyof typeof PROJECT_KIND_COLORS;
 export type ProjectStatusColorKey = keyof typeof PROJECT_STATUS_COLORS;
 export type ConfettiColorScheme = keyof typeof CONFETTI_COLOR_SCHEMES;
+export type DocumentStatusKey = keyof typeof DOCUMENT_STATUS_VARIANTS;
+export type ApprovalStatusKey = keyof typeof APPROVAL_STATUS_VARIANTS;

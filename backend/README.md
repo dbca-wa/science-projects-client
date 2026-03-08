@@ -301,6 +301,43 @@ For detailed testing guidelines, see:
 - [Marker Reference](docs/testing/markers.md) - Complete marker documentation
 - [Performance Report](docs/testing/performance-report.md) - Optimization metrics
 
+## Maintenance Commands
+
+Django management commands for database maintenance and troubleshooting.
+
+### Fix Database Sequences
+
+After data migrations or bulk imports, PostgreSQL sequences can become out of sync, causing "duplicate key" errors. Use the `fix_sequences` command to automatically fix all sequences:
+
+```bash
+# Preview what will be fixed (dry run)
+poetry run python manage.py fix_sequences --dry-run
+
+# Fix all sequences
+poetry run python manage.py fix_sequences
+```
+
+**When to run:**
+- After importing data from another database
+- After running data migrations with explicit IDs
+- When encountering "duplicate key value violates unique constraint" errors
+- After bulk creating records with custom IDs
+
+**Output example:**
+```
+Checking 60 models...
+✓ ProjectMember                  | Fixed: 3287 → 3867 (max_id: 3866)
+✓ Project                        | Fixed: 1047 → 1292 (max_id: 1291)
+
+======================================================================
+Fixed:   37 sequences
+Skipped: 20 sequences (already correct)
+
+✓ All sequences have been fixed!
+```
+
+See [Management Commands README](common/management/commands/README.md) for complete documentation.
+
 ## Code Quality
 
 Pre-commit hooks automatically run on every commit:

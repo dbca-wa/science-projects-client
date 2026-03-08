@@ -5,6 +5,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/shared/components/ui/card";
+import { cn } from "@/shared/lib/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { Briefcase, Building2, Users } from "lucide-react";
 import { useState } from "react";
@@ -30,9 +31,10 @@ export const MembershipSection = ({
 
 	return (
 		<Card
-			className={
+			className={cn(
+				"mb-4",
 				onClick ? "cursor-pointer transition-shadow hover:shadow-md" : ""
-			}
+			)}
 			onClick={onClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}

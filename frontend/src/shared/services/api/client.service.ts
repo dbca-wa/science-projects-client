@@ -198,6 +198,18 @@ export class ApiClientService {
 		return response.data;
 	}
 
+	async postBlob(
+		url: string,
+		data?: unknown,
+		config?: AxiosRequestConfig
+	): Promise<Blob> {
+		const response = await this.client.post(url, data, {
+			...config,
+			responseType: "blob",
+		});
+		return response.data;
+	}
+
 	// Configuration methods
 	setUnauthorisedHandler(handler: () => void): void {
 		this.onUnauthorised = handler;

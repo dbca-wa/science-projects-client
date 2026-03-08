@@ -748,27 +748,6 @@ class TestAdminTasks:
         assert response.data["action"] == AdminTask.ActionTypes.SETCARETAKER
 
     @pytest.mark.integration
-    def test_post_set_caretaker_task_past_end_date(
-        self, api_client, user, secondary_user, db
-    ):
-        """Test creating set caretaker task with past end date fails"""
-        # Arrange
-        api_client.force_authenticate(user=user)
-        past_date = (timezone.now() - timedelta(days=1)).date()
-        data = {
-            "action": AdminTask.ActionTypes.SETCARETAKER,
-            "primary_user": user.id,
-            "secondary_users": [secondary_user.id],
-            "reason": "Test caretaker",
-            "end_date": past_date.isoformat(),
-        }
-
-        # Act
-        response = api_client.post(adminoptions_urls.path("tasks"), data, format="json")
-
-        # Assert
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
     @pytest.mark.integration
     def test_post_set_caretaker_task_duplicate(
         self, api_client, user, admin_task_set_caretaker, db
@@ -829,31 +808,6 @@ class TestPendingTasks:
         # Assert
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
-
-    @pytest.mark.integration
-    def test_get_pending_tasks_auto_cancels_expired(self, api_client, user, db):
-        """Test pending tasks auto-cancels expired caretaker requests"""
-        # Arrange
-        api_client.force_authenticate(user=user)
-        past_date = timezone.now() - timedelta(days=1)
-        task = AdminTask.objects.create(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            requester=user,
-            primary_user=user,
-            secondary_users=[user.id],
-            reason="Test",
-            end_date=past_date,
-        )
-
-        # Act
-        response = api_client.get(adminoptions_urls.path("tasks", "pending"))
-
-        # Assert
-        assert response.status_code == status.HTTP_200_OK
-        task.refresh_from_db()
-        assert task.status == AdminTask.TaskStatus.CANCELLED
-        assert "Auto-cancelled" in task.notes
 
 
 class TestCheckPendingCaretakerRequestForUser:

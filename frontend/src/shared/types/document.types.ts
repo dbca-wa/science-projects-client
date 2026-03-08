@@ -122,7 +122,7 @@ export interface IProjectPlan {
 	methodology_image: IMethodologyImage | null;
 	project_tasks: string | null;
 	related_projects: string | null;
-	endorsements: IEndorsement;
+	endorsements: IEndorsement | null;
 }
 
 export interface IProgressReport {

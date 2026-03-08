@@ -262,12 +262,6 @@ class AdminTask(CommonModel):
         help_text="The date the task was initiated",
     )
 
-    end_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text="The date the task was completed",
-    )
-
     notes = models.TextField(
         blank=True,
         null=True,

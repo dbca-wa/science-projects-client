@@ -92,7 +92,7 @@ class Comment(admin.ModelAdmin):
         "is_removed",
     ]
 
-    search_fields = ["text", "user__username", "document__project"]
+    search_fields = ["text", "user__username", "document__project__title"]
 
     @admin.display(description="Document")
     def document_truncated(self, obj):

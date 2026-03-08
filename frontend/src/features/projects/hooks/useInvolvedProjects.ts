@@ -15,7 +15,10 @@ export function useInvolvedProjects(userId: number) {
 		enabled: !!userId,
 		retry: (failureCount, error) => {
 			// Don't retry on 404 or auth errors
-			const status = (error as any)?.response?.status;
+			const status =
+				error && typeof error === "object" && "response" in error
+					? (error.response as { status?: number })?.status
+					: undefined;
 			if (status === 404 || status === 401 || status === 403) {
 				return false;
 			}

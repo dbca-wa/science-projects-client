@@ -1,14 +1,18 @@
 /**
  * PrepopulateHTMLPlugin
  *
- * Lexical plugin that loads initial HTML content into the editor.
+ * Lexical plugin that loads initial HTML content into the editor ONCE on mount.
+ * This plugin should only handle the initial content loading, not subsequent updates.
+ *
+ * For controlled component behavior (responding to external value changes like Clear button),
+ * use ControlledValuePlugin instead.
  *
  * Security: All HTML content is sanitised using DOMPurify before rendering
  * to prevent XSS attacks from stored content. This addresses CodeQL/Seer
  * vulnerabilities related to incomplete regex-based sanitisation.
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $getRoot, $insertNodes } from "lexical";
@@ -22,10 +26,11 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 	html,
 }) => {
 	const [editor] = useLexicalComposerContext();
-	const [isInitialized, setIsInitialized] = React.useState(false);
+	const isInitialized = useRef(false);
 
 	useEffect(() => {
-		if (!html || isInitialized) return;
+		// Only run once on mount
+		if (isInitialized.current) return;
 
 		try {
 			// SECURITY: Sanitise HTML using DOMPurify to prevent XSS attacks
@@ -34,11 +39,14 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 			// - Script tag variations
 			// - Event handler attribute variations
 			// - Dangerous URL protocols (javascript:, data:, vbscript:)
-			const sanitisedHTML = sanitizeRichText(html);
+			const sanitisedHTML = html ? sanitizeRichText(html) : "";
 
 			// Store current scroll position
 			const scrollX = window.scrollX;
 			const scrollY = window.scrollY;
+
+			// Store currently focused element
+			const activeElement = document.activeElement as HTMLElement;
 
 			// Get the root element and prevent it from being scrolled into view
 			const rootElement = editor.getRootElement();
@@ -47,15 +55,30 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 				const originalScrollIntoView = rootElement.scrollIntoView;
 				rootElement.scrollIntoView = () => {};
 
+				// Temporarily override focus to prevent auto-focus
+				// Use try-catch for test environments where focus may be read-only
+				let originalFocus: (() => void) | undefined;
+				try {
+					originalFocus = rootElement.focus;
+					rootElement.focus = () => {};
+				} catch {
+					// In test environments (JSDOM), focus may be read-only
+					// This is acceptable as we don't need focus prevention in tests
+					originalFocus = undefined;
+				}
+
 				editor.update(
 					() => {
-						const parser = new DOMParser();
-						const dom = parser.parseFromString(sanitisedHTML, "text/html");
-						const nodes = $generateNodesFromDOM(editor, dom);
-
 						const root = $getRoot();
 						root.clear();
-						$insertNodes(nodes);
+
+						// Only insert nodes if there's content
+						if (sanitisedHTML) {
+							const parser = new DOMParser();
+							const dom = parser.parseFromString(sanitisedHTML, "text/html");
+							const nodes = $generateNodesFromDOM(editor, dom);
+							$insertNodes(nodes);
+						}
 					},
 					{
 						discrete: true,
@@ -66,17 +89,34 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 				// Restore scroll position immediately after content insertion
 				window.scrollTo(scrollX, scrollY);
 
-				// Restore scrollIntoView after a delay
+				// Restore focus to the previously focused element if it wasn't the editor
+				if (
+					activeElement &&
+					activeElement !== rootElement &&
+					activeElement !== document.body
+				) {
+					activeElement.focus();
+				}
+
+				// Restore scrollIntoView and focus after a delay
 				setTimeout(() => {
 					rootElement.scrollIntoView = originalScrollIntoView;
+					// Only restore focus if we successfully overrode it
+					if (originalFocus) {
+						try {
+							rootElement.focus = originalFocus;
+						} catch {
+							// Ignore errors in test environments
+						}
+					}
 				}, 100);
 			}
 
-			setIsInitialized(true);
+			isInitialized.current = true;
 		} catch (error) {
 			console.error("[PrepopulateHTMLPlugin] Error loading HTML:", error);
 		}
-	}, [editor, html, isInitialized]);
+	}, [editor, html]);
 
 	return null;
 };

@@ -1,14 +1,21 @@
 /**
  * SaveOnCtrlSPlugin
  *
- * Listens for Ctrl+S (Cmd+S on Mac) and triggers form submission.
+ * Listens for Ctrl+S (Cmd+S on Mac) and triggers save callback.
+ * Only triggers for the focused editor to prevent multiple saves.
  */
 
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { KEY_DOWN_COMMAND, COMMAND_PRIORITY_HIGH } from "lexical";
 
-export const SaveOnCtrlSPlugin = () => {
+interface SaveOnCtrlSPluginProps {
+	onSave?: () => void;
+}
+
+export const SaveOnCtrlSPlugin: React.FC<SaveOnCtrlSPluginProps> = ({
+	onSave,
+}) => {
 	const [editor] = useLexicalComposerContext();
 
 	useEffect(() => {
@@ -20,27 +27,24 @@ export const SaveOnCtrlSPlugin = () => {
 					(isMac ? event.metaKey : event.ctrlKey) && event.key === "s";
 
 				if (isCtrlS) {
-					event.preventDefault();
-					event.stopPropagation();
-
-					// Find the closest form element
+					// Only handle if this editor is focused
 					const editorElement = editor.getRootElement();
-					if (editorElement) {
-						const form = editorElement.closest("form");
-						if (form) {
-							// Trigger form submission
-							form.requestSubmit();
-						}
-					}
+					if (editorElement && editorElement.contains(document.activeElement)) {
+						event.preventDefault();
+						event.stopPropagation();
 
-					return true; // Command handled
+						// Call the save callback
+						onSave?.();
+
+						return true; // Command handled
+					}
 				}
 
 				return false; // Command not handled
 			},
 			COMMAND_PRIORITY_HIGH
 		);
-	}, [editor]);
+	}, [editor, onSave]);
 
 	return null;
 };

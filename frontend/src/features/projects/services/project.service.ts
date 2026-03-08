@@ -1,4 +1,5 @@
 import { apiClient } from "@/shared/services/api/client.service";
+import { PROJECT_ENDPOINTS } from "./project.endpoints";
 import type {
 	IProjectData,
 	IFullProjectDetails,
@@ -77,7 +78,7 @@ export const getAllProjects = async (
 		queryParams.append("only_inactive", "true");
 	}
 
-	const url = `projects/list${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+	const url = `${PROJECT_ENDPOINTS.LIST}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
 	return apiClient.get<ProjectListResponse>(url);
 };
 
@@ -87,7 +88,7 @@ export const getAllProjects = async (
 export const getProjectById = async (
 	id: number | string
 ): Promise<IFullProjectDetails> => {
-	return apiClient.get<IFullProjectDetails>(`projects/${id}`);
+	return apiClient.get<IFullProjectDetails>(PROJECT_ENDPOINTS.DETAIL(id));
 };
 
 /**
@@ -96,7 +97,7 @@ export const getProjectById = async (
 export const createProject = async (
 	data: Partial<IProjectData>
 ): Promise<IProjectData> => {
-	return apiClient.post<IProjectData>("projects/list", data);
+	return apiClient.post<IProjectData>(PROJECT_ENDPOINTS.LIST, data);
 };
 
 /**
@@ -106,7 +107,7 @@ export const updateProject = async (
 	id: number | string,
 	data: Partial<IProjectData>
 ): Promise<IProjectData> => {
-	return apiClient.put<IProjectData>(`projects/${id}`, data);
+	return apiClient.patch<IProjectData>(PROJECT_ENDPOINTS.DETAIL(id), data);
 };
 
 /**
@@ -116,35 +117,37 @@ export const updateProjectStatus = async (
 	id: number | string,
 	status: ProjectStatus
 ): Promise<IProjectData> => {
-	return apiClient.put<IProjectData>(`projects/${id}`, { status });
+	return apiClient.patch<IProjectData>(PROJECT_ENDPOINTS.DETAIL(id), {
+		status,
+	});
 };
 
 /**
  * Delete a project
  */
 export const deleteProject = async (id: number | string): Promise<void> => {
-	return apiClient.delete<void>(`projects/${id}`);
+	return apiClient.delete<void>(PROJECT_ENDPOINTS.DETAIL(id));
 };
 
 /**
  * Get list of all project years
  */
 export const getAllProjectYears = async (): Promise<number[]> => {
-	return apiClient.get<number[]>("projects/listofyears");
+	return apiClient.get<number[]>(PROJECT_ENDPOINTS.YEARS);
 };
 
 /**
  * Download projects CSV (Full)
  */
 export const downloadProjectsCSV = async (): Promise<Blob> => {
-	return apiClient.getBlob("projects/download");
+	return apiClient.getBlob(PROJECT_ENDPOINTS.DOWNLOAD);
 };
 
 /**
  * Download projects CSV (Annual Report)
  */
 export const downloadProjectsCSVAR = async (): Promise<Blob> => {
-	return apiClient.getBlob("projects/download-ar");
+	return apiClient.getBlob(PROJECT_ENDPOINTS.DOWNLOAD_AR);
 };
 
 // Export as default service object
@@ -237,7 +240,7 @@ export const getProjectsForMap = async (
 		queryParams.append("only_inactive", "true");
 	}
 
-	const url = `projects/map${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+	const url = `${PROJECT_ENDPOINTS.MAP}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
 	return apiClient.get<ProjectMapResponse>(url);
 };
 
@@ -254,5 +257,110 @@ export const getInvolvedProjects = async (
  * Get projects for the current authenticated user
  */
 export const getMyProjects = async (): Promise<IProjectData[]> => {
-	return apiClient.get<IProjectData[]>("projects/mine");
+	return apiClient.get<IProjectData[]>(PROJECT_ENDPOINTS.MINE);
+};
+
+// ============================================================================
+// PROJECT DOCUMENT UPDATES
+// ============================================================================
+
+/**
+ * Update project description
+ */
+export const updateProjectDescription = async (
+	id: number | string,
+	description: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.DETAIL(id), { description });
+};
+
+/**
+ * Update external project details field
+ */
+export const updateExternalProjectField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.EXTERNAL_DETAIL(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update concept plan field
+ */
+export const updateConceptPlanField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.CONCEPT_PLAN(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update project plan field
+ */
+export const updateProjectPlanField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_PLAN(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update project plan endorsement field
+ */
+export const updateProjectPlanEndorsementField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_PLAN_ENDORSEMENT(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update progress report field
+ */
+export const updateProgressReportField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.PROGRESS_REPORT(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update student report field
+ */
+export const updateStudentReportField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.STUDENT_REPORT(id), {
+		[field]: content,
+	});
+};
+
+/**
+ * Update project closure field
+ */
+export const updateProjectClosureField = async (
+	id: number | string,
+	field: string,
+	content: string
+): Promise<void> => {
+	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_CLOSURE(id), {
+		[field]: content,
+	});
 };

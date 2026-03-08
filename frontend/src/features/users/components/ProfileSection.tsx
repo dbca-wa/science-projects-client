@@ -9,6 +9,7 @@ import {
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { useState } from "react";
 import { UserAvatar } from "./UserAvatar";
+import { cn } from "@/shared/lib/utils";
 
 interface ProfileSectionProps {
 	user: IUserData | IUserMe;
@@ -28,9 +29,10 @@ export const ProfileSection = ({ user, onClick }: ProfileSectionProps) => {
 
 	return (
 		<Card
-			className={
+			className={cn(
+				"mb-4",
 				onClick ? "cursor-pointer transition-shadow hover:shadow-md" : ""
-			}
+			)}
 			onClick={onClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}

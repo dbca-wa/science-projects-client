@@ -13,6 +13,7 @@ import {
 	buildAdminTaskDetails,
 	extractTextFromHTML,
 } from "../utils/dashboard.utils";
+import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface AdminTasksDataTableProps {
 	tasks: IAdminTask[];
@@ -31,7 +32,10 @@ export const AdminTasksDataTable = ({ tasks }: AdminTasksDataTableProps) => {
 					`${row.requester.display_first_name} ${row.requester.display_last_name}`,
 				cell: (row) => (
 					<div>
-						<div className="font-semibold text-blue-600 dark:text-blue-400">
+						<div
+							className="font-semibold hover:underline cursor-pointer"
+							style={{ color: LINK_COLOR }}
+						>
 							{row.requester.display_first_name}{" "}
 							{row.requester.display_last_name}
 						</div>

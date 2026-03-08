@@ -28,6 +28,7 @@ const ProjectCreateWizardPage = lazy(
 const ProjectDetailPage = lazy(
 	() => import("@/pages/projects/ProjectDetailPage")
 );
+const EditProjectPage = lazy(() => import("@/pages/projects/EditProjectPage"));
 const ProjectMapPage = lazy(() => import("@/pages/projects/ProjectMapPage"));
 
 /**
@@ -258,6 +259,16 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		showInSidebar: false,
 		layoutWrapper: "content",
 		breadcrumbParent: "/projects",
+	},
+	{
+		name: "Edit Project",
+		path: "/projects/:id/edit",
+		iconKey: "projects",
+		component: EditProjectPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		breadcrumbParent: "/projects/:id/overview",
 	},
 	{
 		name: "Project Overview",

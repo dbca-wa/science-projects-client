@@ -20,9 +20,11 @@ class TinyProjectClosureSerializer(serializers.ModelSerializer):
             "document",
             "reason",
             "intended_outcome",
+            "scientific_outputs",
             "knowledge_transfer",
             "data_location",
             "hardcopy_location",
+            "backup_location",
         ]
 
 
@@ -45,9 +47,11 @@ class ProjectClosureCreateSerializer(serializers.ModelSerializer):
             "document",
             "reason",
             "intended_outcome",
+            "scientific_outputs",
             "knowledge_transfer",
             "data_location",
             "hardcopy_location",
+            "backup_location",
         ]
 
 
@@ -59,7 +63,9 @@ class ProjectClosureUpdateSerializer(serializers.ModelSerializer):
         fields = [
             "reason",
             "intended_outcome",
+            "scientific_outputs",
             "knowledge_transfer",
             "data_location",
             "hardcopy_location",
+            "backup_location",
         ]

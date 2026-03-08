@@ -1,6 +1,5 @@
 import { useRef, useEffect, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { DropdownMenuLabel } from "@/shared/components/ui/dropdown-menu";
 import { hasModifierKey } from "@/shared/utils/navigation.utils";
 import { cn } from "@/shared/lib/utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
@@ -80,9 +79,11 @@ export function NavigationDropdownMenuContent({
 
 	return (
 		<div ref={menuRef} className="flex flex-col" onKeyDown={handleKeyDown}>
-			<DropdownMenuLabel className="text-center text-xs text-gray-500">
-				{label}
-			</DropdownMenuLabel>
+			<div className="px-4 py-2">
+				<span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+					{label}
+				</span>
+			</div>
 
 			{items.map((item, index) => {
 				const isActive = isPathActive(item.targetPath);
@@ -95,7 +96,7 @@ export function NavigationDropdownMenuContent({
 						onClick={(e) => handleNavigate(item.targetPath, e)}
 						disabled={isActive}
 						className={cn(
-							"w-full text-left px-2 py-1.5 text-sm rounded-sm flex items-center gap-2",
+							"w-full text-left p-2.5 px-4 text-sm rounded flex items-center gap-2",
 							"select-none focus:outline-none",
 							isActive
 								? "bg-blue-100 dark:bg-blue-900/30 cursor-default focus:bg-blue-200 dark:focus:bg-blue-800/50 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600"

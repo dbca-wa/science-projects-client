@@ -2,11 +2,9 @@
 Tests for user models
 """
 
-from datetime import timedelta
 from unittest.mock import Mock, patch
 
 import pytest
-from django.utils import timezone
 
 from users.models import (
     DOIPublication,
@@ -168,39 +166,17 @@ class TestUserModel:
         assert caretakers.count() == 1
 
     @pytest.mark.integration
-    def test_get_caretakers_excludes_expired(self, user, user_factory):
-        """Test that get_caretakers excludes expired caretakers"""
-        # Arrange
-        from caretakers.models import Caretaker
-
-        caretaker_user = user_factory()
-
-        # Create expired caretaker
-        Caretaker.objects.create(
-            user=user,
-            caretaker=caretaker_user,
-            end_date=timezone.now() - timedelta(days=1),
-        )
-
-        # Act
-        caretakers = user.get_caretakers()
-
-        # Assert
-        assert caretakers.count() == 0
-
-    @pytest.mark.integration
     def test_get_all_caretakers(self, user, user_factory):
-        """Test getting all caretakers including expired"""
+        """Test getting all caretakers"""
         # Arrange
         from caretakers.models import Caretaker
 
         caretaker_user = user_factory()
 
-        # Create expired caretaker
+        # Create caretaker
         Caretaker.objects.create(
             user=user,
             caretaker=caretaker_user,
-            end_date=timezone.now() - timedelta(days=1),
         )
 
         # Act
@@ -221,7 +197,6 @@ class TestUserModel:
         Caretaker.objects.create(
             user=other_user,
             caretaker=user,
-            end_date=None,
         )
 
         # Act

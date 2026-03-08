@@ -22,7 +22,10 @@ export function useMyProjects(enabled = true) {
 		},
 		retry: (failureCount, error) => {
 			// Don't retry on auth errors
-			const status = (error as any)?.response?.status;
+			const status =
+				error && typeof error === "object" && "response" in error
+					? (error.response as { status?: number })?.status
+					: undefined;
 			if (status === 401 || status === 403) {
 				return false;
 			}

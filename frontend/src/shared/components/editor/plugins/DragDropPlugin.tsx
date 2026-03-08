@@ -21,7 +21,7 @@ import {
 import { mergeRegister } from "@lexical/utils";
 import { GripVertical } from "lucide-react";
 
-const SPACE = 4;
+const SPACE = 16; // Center in the 3rem (48px) left padding: (48 - 16) / 2 = 16px
 const TARGET_LINE_HALF_HEIGHT = 2;
 const DRAG_DATA_FORMAT = "application/x-lexical-drag-block";
 
@@ -118,9 +118,11 @@ export const DragDropPlugin = () => {
 	const targetLineRef = useRef<HTMLDivElement>(null);
 	const isDraggingRef = useRef(false);
 
-	// Get the parent container (which includes toolbar + editor)
+	// Get the editor container (the .editor-container div)
+	// This is the correct anchor for positioning the drag handle
 	const editorRoot = editor.getRootElement();
-	const anchorElem = editorRoot?.parentElement || editorRoot;
+	const anchorElem =
+		(editorRoot?.closest(".editor-container") as HTMLElement) || editorRoot;
 
 	// Track mouse movement to show/hide drag handle
 	useEffect(() => {
@@ -252,16 +254,20 @@ export const DragDropPlugin = () => {
 					padding: "4px",
 					borderRadius: "4px",
 					transition: "opacity 0.2s",
+					zIndex: 10,
 				}}
 				onMouseEnter={(e) => {
-					e.currentTarget.style.backgroundColor = "rgb(243 244 246)";
+					const isDark = document.documentElement.classList.contains("dark");
+					e.currentTarget.style.backgroundColor = isDark
+						? "rgb(55 65 81)"
+						: "rgb(243 244 246)";
 				}}
 				onMouseLeave={(e) => {
 					e.currentTarget.style.backgroundColor = "transparent";
 				}}
 			>
 				<GripVertical
-					className="w-4 h-4 text-gray-400"
+					className="w-4 h-4 text-gray-500 dark:text-gray-400"
 					style={{ pointerEvents: "none" }}
 				/>
 			</div>
@@ -276,6 +282,7 @@ export const DragDropPlugin = () => {
 					top: 0,
 					opacity: 0,
 					willChange: "transform",
+					zIndex: 10,
 				}}
 			/>
 		</>,

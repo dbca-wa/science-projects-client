@@ -8,6 +8,7 @@ from .areas import ProjectAreaSerializer
 # Base project serializers
 from .base import (
     CreateProjectSerializer,
+    MyProjectSerializer,
     PkAndKindOnlyProjectSerializer,
     ProblematicProjectSerializer,
     ProjectSerializer,
@@ -49,6 +50,7 @@ __all__ = [
     "ProjectSerializer",
     "ProjectUpdateSerializer",
     "TinyProjectSerializer",
+    "MyProjectSerializer",
     "ProblematicProjectSerializer",
     "UserProfileProjectSerializer",
     "PkAndKindOnlyProjectSerializer",

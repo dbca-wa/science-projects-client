@@ -67,7 +67,10 @@ export const userCreateSchema = z.object({
 			"File must be less than 5MB"
 		)
 		.refine(
-			(file) => ACCEPTED_FILE_TYPES.IMAGES.includes(file.type as any),
+			(file) =>
+				ACCEPTED_FILE_TYPES.IMAGES.includes(
+					file.type as (typeof ACCEPTED_FILE_TYPES.IMAGES)[number]
+				),
 			"File must be JPG, PNG, or GIF"
 		)
 		.optional()

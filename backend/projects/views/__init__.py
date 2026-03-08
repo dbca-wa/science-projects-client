@@ -26,11 +26,13 @@ from .export import DownloadAllProjectsAsCSV, DownloadARProjectsAsCSV
 from .map import ProjectMap
 from .members import (
     MembersForProject,
+    MentionableUsersForProject,
     ProjectLeaderDetail,
     ProjectMemberDetail,
     ProjectMembers,
     PromoteToLeader,
 )
+from .reports import CreateProgressReport, CreateStudentReport
 from .search import MyProjects, SmallProjectSearch
 from .utils import (
     CoreFunctionProjects,
@@ -65,11 +67,15 @@ __all__ = [
     "ProjectMemberDetail",
     "ProjectLeaderDetail",
     "MembersForProject",
+    "MentionableUsersForProject",
     "PromoteToLeader",
     # Areas
     "ProjectAreas",
     "ProjectAreaDetail",
     "AreasForProject",
+    # Reports
+    "CreateProgressReport",
+    "CreateStudentReport",
     # Admin
     "UnapprovedThisFY",
     "ProblematicProjects",

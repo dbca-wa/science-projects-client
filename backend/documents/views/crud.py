@@ -58,11 +58,27 @@ class ProjectDocuments(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        # Delegate to service
+        kind = serializer.validated_data["kind"]
+        project = serializer.validated_data["project"]
+
+        # Use ClosureService for project closures
+        if kind == "projectclosure":
+            from ..services.closure_service import ClosureService
+
+            # Create closure with additional data from request
+            project_closure = ClosureService.create_closure(
+                user=request.user, project=project, data=request.data
+            )
+
+            # Serialize and return the document
+            result = ProjectDocumentSerializer(project_closure.document)
+            return Response(result.data, status=HTTP_201_CREATED)
+
+        # Delegate to service for other document types
         document = DocumentService.create_document(
             user=request.user,
-            project=serializer.validated_data["project"],
-            kind=serializer.validated_data["kind"],
+            project=project,
+            kind=kind,
         )
 
         # Serialize and return

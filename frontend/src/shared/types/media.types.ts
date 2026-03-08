@@ -61,9 +61,9 @@ export const VARIANT_CONFIG: Record<ImageUploadVariant, VariantConfig> = {
 		placeholder: "Upload banner image",
 	},
 	project: {
-		aspectRatio: "4:3",
+		aspectRatio: "25:18", // Matches PDF output (225px:162px)
 		previewShape: "rectangle",
-		defaultSize: "h-64 w-full",
+		defaultSize: "h-64 w-full max-w-md", // Constrain width for better aspect ratio display
 		placeholder: "Upload project image",
 	},
 	default: {

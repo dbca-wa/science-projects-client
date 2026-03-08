@@ -4,5 +4,6 @@
  */
 
 export * from "./breakpoints";
+export * from "./colors";
 export * from "./query";
 export * from "./file";

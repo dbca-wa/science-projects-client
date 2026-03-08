@@ -90,6 +90,10 @@ class TinyUserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     affiliation = serializers.SerializerMethodField()
     business_area = serializers.SerializerMethodField()
+    branch = serializers.SerializerMethodField()
+    about = serializers.SerializerMethodField()
+    expertise = serializers.SerializerMethodField()
+    phone = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -108,6 +112,11 @@ class TinyUserSerializer(serializers.ModelSerializer):
             "image",
             "affiliation",
             "business_area",
+            "branch",
+            "about",
+            "expertise",
+            "phone",
+            "date_joined",
         )
 
     def get_name(self, obj):
@@ -115,7 +124,12 @@ class TinyUserSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         try:
-            return obj.avatar.file.url if obj.avatar and obj.avatar.file else None
+            if obj.avatar and obj.avatar.file:
+                return {
+                    "file": obj.avatar.file.url,
+                    "old_file": obj.avatar.file.url,  # Same as file for avatars
+                }
+            return None
         except UserAvatar.DoesNotExist:
             return None
 
@@ -136,6 +150,28 @@ class TinyUserSerializer(serializers.ModelSerializer):
                 else None
             )
         return None
+
+    def get_branch(self, obj):
+        from agencies.serializers import TinyBranchSerializer
+
+        if hasattr(obj, "work") and obj.work and obj.work.branch:
+            return TinyBranchSerializer(obj.work.branch).data
+        return None
+
+    def get_about(self, obj):
+        if hasattr(obj, "staff_profile") and obj.staff_profile:
+            return obj.staff_profile.about or ""
+        return ""
+
+    def get_expertise(self, obj):
+        if hasattr(obj, "staff_profile") and obj.staff_profile:
+            return obj.staff_profile.expertise or ""
+        return ""
+
+    def get_phone(self, obj):
+        if hasattr(obj, "contact") and obj.contact:
+            return obj.contact.phone or ""
+        return ""
 
 
 class PrivateTinyUserSerializer(serializers.ModelSerializer):

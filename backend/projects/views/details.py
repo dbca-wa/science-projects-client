@@ -212,13 +212,12 @@ class ExternalProjectAdditionalDetail(APIView):
         serializer = TinyExternalProjectDetailSerializer(detail)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk):
-        """Update external project detail"""
+    def patch(self, request, pk):
+        """Partial update external project detail"""
         serializer = ExternalProjectDetailSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        # Get the detail first to get the project_id
         detail = DetailsService.get_external_details(pk)
         if not detail:
             raise NotFound(f"External project detail {pk} not found")
@@ -230,7 +229,26 @@ class ExternalProjectAdditionalDetail(APIView):
         )
 
         result_serializer = TinyExternalProjectDetailSerializer(detail)
-        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
+        return Response(result_serializer.data, status=HTTP_200_OK)
+
+    def put(self, request, pk):
+        """Full update external project detail"""
+        serializer = ExternalProjectDetailSerializer(data=request.data, partial=False)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        detail = DetailsService.get_external_details(pk)
+        if not detail:
+            raise NotFound(f"External project detail {pk} not found")
+
+        detail = DetailsService.update_external_details(
+            project_id=detail.project.pk,
+            data=serializer.validated_data,
+            user=request.user,
+        )
+
+        result_serializer = TinyExternalProjectDetailSerializer(detail)
+        return Response(result_serializer.data, status=HTTP_200_OK)
 
     def delete(self, request, pk):
         """Delete external project detail"""

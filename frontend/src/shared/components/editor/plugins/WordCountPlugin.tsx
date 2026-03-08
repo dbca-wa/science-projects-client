@@ -1,10 +1,11 @@
 /**
  * WordCountPlugin
  *
- * Tracks word count and displays indicator with warnings when approaching limit.
+ * Tracks word count internally for validation purposes.
+ * Does NOT render UI - use WordCounter component for display.
  */
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot } from "lexical";
 import type { WordCountPluginProps } from "@/shared/types/editor.types";
@@ -40,20 +41,8 @@ export const WordCountPlugin: React.FC<WordCountPluginProps> = ({
 
 		// TODO: Implement input prevention when word limit is exceeded
 		// This requires more complex handling with Lexical's node transforms
-	}, [editor, wordLimit]);
+	}, [editor, wordLimit, wordCount]);
 
-	if (!wordLimit) return null;
-
-	const percentage = (wordCount / wordLimit) * 100;
-	const isWarning = percentage >= 80 && percentage < 100;
-	const isError = percentage >= 100;
-
-	return (
-		<div
-			className={`editor-word-count ${isWarning ? "warning" : ""} ${isError ? "error" : ""}`}
-		>
-			{wordCount} / {wordLimit} words
-			{isError && " (limit exceeded)"}
-		</div>
-	);
+	// No UI rendering - WordCounter component handles display
+	return null;
 };

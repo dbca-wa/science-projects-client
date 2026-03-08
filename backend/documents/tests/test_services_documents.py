@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 
 from common.tests.factories import ProjectDocumentFactory, ProjectFactory, UserFactory
 from documents.models import ProjectDocument
@@ -72,15 +72,14 @@ class TestConceptPlanService:
 
         user = UserFactory()
         concept_plan = ConceptPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"background": "Updated background"}
 
         # Act
-        updated = ConceptPlanService.update_concept_plan(
-            concept_plan.document.pk, user, data
-        )
+        updated = ConceptPlanService.update_concept_plan(concept_plan.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        concept_plan.refresh_from_db()
+        assert concept_plan.background == "Updated background"
         assert updated.modifier == user
 
     @pytest.mark.django_db
@@ -92,11 +91,11 @@ class TestConceptPlanService:
 
         user = UserFactory()
         project_plan = ProjectPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"background": "Updated"}
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="not a concept plan"):
-            ConceptPlanService.update_concept_plan(project_plan.document.pk, user, data)
+        with pytest.raises(NotFound, match="ConceptPlan with pk"):
+            ConceptPlanService.update_concept_plan(project_plan.pk, user, data)
 
     @pytest.mark.django_db
     @pytest.mark.unit
@@ -107,15 +106,16 @@ class TestConceptPlanService:
 
         user = UserFactory()
         concept_plan = ConceptPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW, "details": "Updated"}
+        data = {"background": "Updated", "aims": "New aims"}
 
         # Act
-        updated = ConceptPlanService.update_concept_plan(
-            concept_plan.document.pk, user, data
-        )
+        updated = ConceptPlanService.update_concept_plan(concept_plan.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        concept_plan.refresh_from_db()
+        assert concept_plan.background == "Updated"
+        assert concept_plan.aims == "New aims"
+        assert updated.modifier == user
 
     @pytest.mark.django_db
     @pytest.mark.unit
@@ -207,15 +207,14 @@ class TestProjectPlanService:
 
         user = UserFactory()
         project_plan = ProjectPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"project_tasks": "Updated tasks"}
 
         # Act
-        updated = ProjectPlanService.update_project_plan(
-            project_plan.document.pk, user, data
-        )
+        updated = ProjectPlanService.update_project_plan(project_plan.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        project_plan.refresh_from_db()
+        assert project_plan.project_tasks == "Updated tasks"
         assert updated.modifier == user
 
     @pytest.mark.django_db
@@ -227,11 +226,11 @@ class TestProjectPlanService:
 
         user = UserFactory()
         concept_plan = ConceptPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"project_tasks": "Updated"}
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="not a project plan"):
-            ProjectPlanService.update_project_plan(concept_plan.document.pk, user, data)
+        with pytest.raises(NotFound, match="ProjectPlan with pk"):
+            ProjectPlanService.update_project_plan(concept_plan.pk, user, data)
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -242,15 +241,16 @@ class TestProjectPlanService:
 
         user = UserFactory()
         project_plan = ProjectPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW, "details": "Updated"}
+        data = {"project_tasks": "Updated", "methodology": "New methodology"}
 
         # Act
-        updated = ProjectPlanService.update_project_plan(
-            project_plan.document.pk, user, data
-        )
+        updated = ProjectPlanService.update_project_plan(project_plan.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        project_plan.refresh_from_db()
+        assert project_plan.project_tasks == "Updated"
+        assert project_plan.methodology == "New methodology"
+        assert updated.modifier == user
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -349,13 +349,14 @@ class TestClosureService:
 
         user = UserFactory()
         project_closure = ProjectClosureFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"scientific_outputs": "Updated outputs"}
 
         # Act
-        updated = ClosureService.update_closure(project_closure.document.pk, user, data)
+        updated = ClosureService.update_closure(project_closure.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        project_closure.refresh_from_db()
+        assert project_closure.scientific_outputs == "Updated outputs"
         assert updated.modifier == user
 
     @pytest.mark.django_db
@@ -367,11 +368,11 @@ class TestClosureService:
 
         user = UserFactory()
         concept_plan = ConceptPlanFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW}
+        data = {"scientific_outputs": "Updated"}
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="not a project closure"):
-            ClosureService.update_closure(concept_plan.document.pk, user, data)
+        with pytest.raises(NotFound, match="ProjectClosure with pk"):
+            ClosureService.update_closure(concept_plan.pk, user, data)
 
     @pytest.mark.django_db
     @pytest.mark.unit
@@ -383,13 +384,16 @@ class TestClosureService:
 
         user = UserFactory()
         project_closure = ProjectClosureFactory()
-        data = {"status": ProjectDocument.StatusChoices.INREVIEW, "details": "Updated"}
+        data = {"scientific_outputs": "Updated", "backup_location": "New location"}
 
         # Act
-        updated = ClosureService.update_closure(project_closure.document.pk, user, data)
+        updated = ClosureService.update_closure(project_closure.pk, user, data)
 
         # Assert
-        assert updated.status == ProjectDocument.StatusChoices.INREVIEW
+        project_closure.refresh_from_db()
+        assert project_closure.scientific_outputs == "Updated"
+        assert project_closure.backup_location == "New location"
+        assert updated.modifier == user
 
     @pytest.mark.django_db
     @patch(

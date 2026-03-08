@@ -1,31 +1,45 @@
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
+import { useWindowSize } from "@/shared/hooks/useWindowSize";
+import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 
 interface ProjectKeywordsProps {
 	keywords: string | null | undefined;
 	className?: string;
-	maxVisible?: number;
 }
 
 /**
  * ProjectKeywords component displays project keywords as tags
  * - Parses keyword string to array
  * - Displays as tags with responsive grid
- * - Implements show more/less functionality
+ * - Implements show more/less functionality with responsive limits
  * - Handles empty/null keywords gracefully
+ *
+ * Responsive limits:
+ * - 1 column (mobile): max 8 items
+ * - 2 columns (sm): max 8 items
+ * - 3 columns (xl): max 9 items
+ * - 4 columns (2xl): max 12 items
  */
-export function ProjectKeywords({
-	keywords,
-	className,
-	maxVisible = 5,
-}: ProjectKeywordsProps) {
+export function ProjectKeywords({ keywords, className }: ProjectKeywordsProps) {
 	const [showAll, setShowAll] = useState(false);
+	const { width } = useWindowSize();
+
+	// Determine max visible based on breakpoint
+	const getMaxVisible = (): number => {
+		if (width >= BREAKPOINTS["2xl"]) return 12; // 4 columns
+		if (width >= BREAKPOINTS.xl) return 9; // 3 columns
+		if (width >= BREAKPOINTS.sm) return 8; // 2 columns
+		return 8; // 1 column
+	};
+
+	const maxVisible = getMaxVisible();
 
 	// Parse keywords string to array
 	const parseKeywords = (): string[] => {
 		if (!keywords || keywords === "") {
-			return ["None"];
+			return [];
 		}
 		return keywords
 			.split(", ")
@@ -34,19 +48,30 @@ export function ProjectKeywords({
 
 	const keywordArray = parseKeywords();
 	const hasMore = keywordArray.length > maxVisible;
-	const displayedKeywords = showAll
+	// Automatically reset showAll when there's no more items to show
+	const effectiveShowAll = showAll && hasMore;
+	const displayedKeywords = effectiveShowAll
 		? keywordArray
 		: keywordArray.slice(0, maxVisible);
 
+	// Show placeholder if no keywords
+	if (keywordArray.length === 0) {
+		return (
+			<div className={cn("text-gray-500 dark:text-gray-400 italic", className)}>
+				This project has no keywords
+			</div>
+		);
+	}
+
 	return (
 		<div className={cn("flex flex-col gap-2", className)}>
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
 				{displayedKeywords.map((tag, index) => (
 					<div
 						key={index}
-						className="flex items-center justify-center text-center min-h-[50px] px-3 py-2 text-sm rounded-md bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+						className="flex items-center justify-center text-center min-h-[50px] px-3 py-2 text-sm rounded bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 border border-purple-200 dark:border-purple-800 overflow-hidden"
 					>
-						{tag}
+						<span className="truncate">{tag}</span>
 					</div>
 				))}
 			</div>
@@ -54,10 +79,10 @@ export function ProjectKeywords({
 				<Button
 					variant="ghost"
 					size="sm"
-					onClick={() => setShowAll(!showAll)}
+					onClick={() => setShowAll(!effectiveShowAll)}
 					className="self-start"
 				>
-					{showAll
+					{effectiveShowAll
 						? "Show Less"
 						: `Show More (${keywordArray.length - maxVisible} more)`}
 				</Button>

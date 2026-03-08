@@ -78,9 +78,11 @@ class EndorsementDetail(APIView):
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk):
-        """Update endorsement"""
-        settings.LOGGER.info(f"{request.user} is updating endorsement for {pk}")
+    def patch(self, request, pk):
+        """Partial update endorsement"""
+        settings.LOGGER.info(
+            f"{request.user} is partially updating endorsement for {pk}"
+        )
 
         try:
             endorsement = Endorsement.objects.get(pk=pk)
@@ -100,7 +102,32 @@ class EndorsementDetail(APIView):
         updated_endorsement = serializer.save()
         return Response(
             TinyEndorsementSerializer(updated_endorsement).data,
-            status=HTTP_202_ACCEPTED,
+            status=HTTP_200_OK,
+        )
+
+    def put(self, request, pk):
+        """Full update endorsement"""
+        settings.LOGGER.info(f"{request.user} is updating endorsement for {pk}")
+
+        try:
+            endorsement = Endorsement.objects.get(pk=pk)
+        except Endorsement.DoesNotExist:
+            raise NotFound
+
+        serializer = EndorsementSerializer(
+            endorsement,
+            data=request.data,
+            partial=False,
+        )
+
+        if not serializer.is_valid():
+            settings.LOGGER.error(f"{serializer.errors}")
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        updated_endorsement = serializer.save()
+        return Response(
+            TinyEndorsementSerializer(updated_endorsement).data,
+            status=HTTP_200_OK,
         )
 
 

@@ -5,11 +5,8 @@ Tests that AdminTask views (ApproveTask, RejectTask, CancelTask) work correctly
 with the new caretakers.models.Caretaker model.
 """
 
-from datetime import timedelta
-
 import pytest
 from django.test import TestCase, override_settings
-from django.utils import timezone
 
 from adminoptions.models import AdminTask
 from caretakers.models import Caretaker
@@ -44,7 +41,6 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
     def test_approve_caretaker_task_creates_caretaker(self):
         """Test that approving a caretaker AdminTask creates a Caretaker object"""
         # Create a pending caretaker request
-        end_date = timezone.now() + timedelta(days=30)
         task = AdminTask.objects.create(
             action=AdminTask.ActionTypes.SETCARETAKER,
             status=AdminTask.TaskStatus.PENDING,
@@ -52,7 +48,6 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             secondary_users=[self.caretaker_user.pk],
             requester=self.user_needing_caretaker,
             reason="Going on leave",
-            end_date=end_date,
             notes="Test caretaker request",
         )
 
@@ -68,7 +63,6 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             user=self.user_needing_caretaker,
             caretaker=self.caretaker_user,
             reason=task.reason,
-            end_date=task.end_date,
             notes=task.notes,
         )
 
@@ -83,7 +77,6 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
         self.assertEqual(caretaker.caretaker, self.caretaker_user)
         self.assertEqual(caretaker.reason, "Going on leave")
         self.assertEqual(caretaker.notes, "Test caretaker request")
-        self.assertIsNotNone(caretaker.end_date)
 
         # Verify task is fulfilled
         task.refresh_from_db()
@@ -145,16 +138,15 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
 
     @pytest.mark.integration
     def test_caretaker_with_null_end_date(self):
-        """Test creating a caretaker with no end date (permanent caretaker)"""
-        # Create a pending caretaker request with no end date
+        """Test creating a caretaker without automatic expiration (manual management)"""
+        # Create a pending caretaker request
         task = AdminTask.objects.create(
             action=AdminTask.ActionTypes.SETCARETAKER,
             status=AdminTask.TaskStatus.PENDING,
             primary_user=self.user_needing_caretaker,
             secondary_users=[self.caretaker_user.pk],
             requester=self.user_needing_caretaker,
-            reason="Permanent leave",
-            end_date=None,  # No end date
+            reason="Manual caretaker management",
         )
 
         # Approve and create caretaker
@@ -165,16 +157,15 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
             user=self.user_needing_caretaker,
             caretaker=self.caretaker_user,
             reason=task.reason,
-            end_date=task.end_date,  # Will be None
             notes=task.notes,
         )
 
         task.status = AdminTask.TaskStatus.FULFILLED
         task.save()
 
-        # Verify caretaker was created with null end_date
+        # Verify caretaker was created (no end_date field exists)
         caretaker = Caretaker.objects.first()
-        self.assertIsNone(caretaker.end_date)
+        self.assertIsNotNone(caretaker)
 
     @pytest.mark.integration
     def test_multiple_caretakers_for_same_user(self):
@@ -323,12 +314,10 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
     def test_user_model_get_caretakers_method(self):
         """Test that User.get_caretakers() works with new Caretaker model"""
         # Create a caretaker relationship
-        end_date = timezone.now() + timedelta(days=30)
         Caretaker.objects.create(
             user=self.user_needing_caretaker,
             caretaker=self.caretaker_user,
             reason="Test get_caretakers",
-            end_date=end_date,
         )
 
         # Test get_caretakers method
@@ -340,12 +329,10 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
     def test_user_model_get_caretaking_for_method(self):
         """Test that User.get_caretaking_for() works with new Caretaker model"""
         # Create a caretaker relationship
-        end_date = timezone.now() + timedelta(days=30)
         Caretaker.objects.create(
             user=self.user_needing_caretaker,
             caretaker=self.caretaker_user,
             reason="Test get_caretaking_for",
-            end_date=end_date,
         )
 
         # Test get_caretaking_for method
@@ -355,21 +342,19 @@ class AdminTaskCaretakerIntegrationTest(TestCase):
 
     @pytest.mark.integration
     def test_expired_caretaker_not_returned_by_get_caretakers(self):
-        """Test that expired caretakers are not returned by get_caretakers()"""
-        # Create an expired caretaker relationship
-        expired_date = timezone.now() - timedelta(days=1)
+        """Test that all caretakers are returned (no automatic expiration)"""
+        # Create a caretaker relationship (no expiration)
         Caretaker.objects.create(
             user=self.user_needing_caretaker,
             caretaker=self.caretaker_user,
-            reason="Expired caretaker",
-            end_date=expired_date,
+            reason="Active caretaker",
         )
 
-        # Test get_caretakers method (should not return expired)
+        # Test get_caretakers method (should return the caretaker)
         caretakers = self.user_needing_caretaker.get_caretakers()
-        self.assertEqual(caretakers.count(), 0)
+        self.assertEqual(caretakers.count(), 1)
 
-        # Test get_all_caretakers method (should return expired)
+        # Test get_all_caretakers method (should also return the caretaker)
         all_caretakers = self.user_needing_caretaker.get_all_caretakers()
         self.assertEqual(all_caretakers.count(), 1)
 

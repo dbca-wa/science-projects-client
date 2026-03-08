@@ -29,8 +29,8 @@ migrate_caretaker_data_action.short_description = (
 
 @admin.register(Caretaker)
 class CaretakerAdmin(admin.ModelAdmin):
-    list_display = ["user", "caretaker", "end_date", "created_at"]
-    list_filter = ["end_date", "created_at"]
+    list_display = ["user", "caretaker", "created_at"]
+    list_filter = ["created_at"]
     search_fields = ["user__email", "caretaker__email", "reason"]
     raw_id_fields = ["user", "caretaker"]
     date_hierarchy = "created_at"

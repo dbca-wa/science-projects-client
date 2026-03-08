@@ -191,7 +191,7 @@ class NotificationService:
 
         Args:
             document: Document instance
-            comment: Comment text
+            comment: Comment text (HTML content)
             mentioned_user: User who was mentioned
             commenter: User who made the comment
         """
@@ -203,14 +203,29 @@ class NotificationService:
             }
         ]
 
+        # Truncate comment to first 200 characters for email
+        comment_excerpt = comment[:200] + "..." if len(comment) > 200 else comment
+
+        # Build document URL (assuming frontend URL pattern)
+        from django.conf import settings
+
+        frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:5173")
+        document_url = f"{frontend_url}/projects/{document.project.pk}/overview"
+
         EmailService.send_document_notification(
             notification_type="mention",
             document=document,
             recipients=recipients,
             actioning_user=commenter,
             additional_context={
-                "email_subject": f"You were mentioned in {document.kind.title()}",
-                "comment": comment,
+                "email_subject": f"SPMS: You were mentioned in a comment on {document.kind.title()} ({document.project.get_project_tag()})",
+                "is_mention": True,
+                "commenter_name": commenter.get_full_name(),
+                "document_type_title": document.kind.title(),
+                "project_name": document.project.title,
+                "project_tag": document.project.get_project_tag(),
+                "comment_content": comment_excerpt,
+                "document_url": document_url,
             },
         )
 

@@ -55,6 +55,7 @@ export const ProjectsMenuContent = ({
 };
 
 // Export menu items for use in different contexts
+// eslint-disable-next-line react-refresh/only-export-components
 export const projectsMenuItems = [
 	{
 		path: "/projects",

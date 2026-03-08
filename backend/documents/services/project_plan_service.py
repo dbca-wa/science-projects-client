@@ -46,14 +46,24 @@ class ProjectPlanService:
         Update project plan document
 
         Args:
-            pk: Document primary key
+            pk: ProjectPlan primary key
             user: User updating the project plan
             data: Updated project plan data
 
         Returns:
             Updated ProjectDocument instance
         """
-        document = DocumentService.get_document(pk)
+        from rest_framework.exceptions import NotFound
+
+        from ..models import ProjectPlan
+
+        # Get ProjectPlan object directly
+        try:
+            project_plan = ProjectPlan.objects.get(pk=pk)
+        except ProjectPlan.DoesNotExist:
+            raise NotFound(f"ProjectPlan with pk {pk} not found")
+
+        document = project_plan.document
 
         if document.kind != "projectplan":
             from rest_framework.exceptions import ValidationError
@@ -62,13 +72,16 @@ class ProjectPlanService:
 
         settings.LOGGER.info(f"{user} is updating project plan {document}")
 
-        # Update base document
-        document = DocumentService.update_document(pk, user, data)
+        # Update ProjectPlan fields
+        for field, value in data.items():
+            if hasattr(project_plan, field):
+                setattr(project_plan, field, value)
 
-        # Update project plan details and endorsements if provided
-        if data:
-            # Details update logic here
-            pass
+        project_plan.save()
+
+        # Update modifier on ProjectDocument
+        document.modifier = user
+        document.save()
 
         return document
 

@@ -463,36 +463,6 @@ class AdminTasks(APIView):
                 )
 
         elif data["action"] == AdminTask.ActionTypes.SETCARETAKER:
-            # Validate end_date is not in the past
-            if data.get("end_date"):
-                from datetime import datetime
-
-                from django.utils import timezone
-
-                # Parse the end_date
-                try:
-                    if isinstance(data["end_date"], str):
-                        end_date = datetime.fromisoformat(
-                            data["end_date"].replace("Z", "+00:00")
-                        ).date()
-                    else:
-                        end_date = data["end_date"]
-
-                    if end_date < timezone.now().date():
-                        settings.LOGGER.error(
-                            msg="Error in setting caretaker: End date cannot be in the past"
-                        )
-                        return Response(
-                            "End date cannot be in the past",
-                            status=HTTP_400_BAD_REQUEST,
-                        )
-                except (ValueError, AttributeError) as e:
-                    settings.LOGGER.error(msg=f"Error parsing end_date: {e}")
-                    return Response(
-                        "Invalid end date format",
-                        status=HTTP_400_BAD_REQUEST,
-                    )
-
             # First check if there is already a pending caretaker request for this user
             if self.check_existing_caretaker_task(data):
                 settings.LOGGER.error(
@@ -538,29 +508,7 @@ class PendingTasks(APIView):
 
     def get(self, req):
         settings.LOGGER.info(msg=f"{req.user} is getting all pending admin tasks")
-
-        # Auto-cancel expired pending caretaker requests before returning
-        from django.utils import timezone
-
-        expired_caretaker_requests = AdminTask.objects.filter(
-            status=AdminTask.TaskStatus.PENDING,
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            end_date__lt=timezone.now(),  # Compare datetime to datetime
-        )
-
-        if expired_caretaker_requests.exists():
-            count = expired_caretaker_requests.count()
-            settings.LOGGER.info(
-                msg=f"Auto-cancelling {count} expired caretaker request(s)"
-            )
-            for request in expired_caretaker_requests:
-                request.status = AdminTask.TaskStatus.CANCELLED
-                request.notes = (
-                    request.notes or ""
-                ) + "\n[Auto-cancelled: end date passed while request was pending]"
-                request.save()
-
-        # Get all remaining pending tasks
+        # Get all pending tasks
         all = AdminTask.objects.filter(status=AdminTask.TaskStatus.PENDING)
         ser = AdminTaskSerializer(
             all,
@@ -841,7 +789,6 @@ class ApproveTask(APIView):
                         user=user_who_needs_caretaker,
                         caretaker=caretaker,
                         reason=task.reason,
-                        end_date=task.end_date,  # This will be null if the caretaker is permanent
                         notes=task.notes,
                     )
                 else:
@@ -1170,7 +1117,6 @@ class RespondToCaretakerRequest(APIView):
                         user=user_who_needs_caretaker,
                         caretaker=caretaker,
                         reason=task.reason,
-                        end_date=task.end_date,
                         notes=task.notes,
                     )
 

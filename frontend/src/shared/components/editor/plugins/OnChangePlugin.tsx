@@ -13,6 +13,30 @@ interface OnChangePluginProps {
 	onChange?: (html: string) => void;
 }
 
+/**
+ * Normalize HTML content for comparison.
+ * Treats empty paragraphs as equivalent to empty string.
+ */
+function normalizeHtml(html: string): string {
+	// Trim whitespace
+	const trimmed = html.trim();
+
+	// Empty paragraph variations are considered empty
+	const emptyParagraphPatterns = [
+		'<p class="editor-paragraph mb-2"><br></p>',
+		'<p class="editor-paragraph"><br></p>',
+		"<p><br></p>",
+		"<p></p>",
+		"",
+	];
+
+	if (emptyParagraphPatterns.includes(trimmed)) {
+		return "";
+	}
+
+	return trimmed;
+}
+
 export const OnChangePlugin: React.FC<OnChangePluginProps> = ({ onChange }) => {
 	const [editor] = useLexicalComposerContext();
 	const initialContent = useRef<string>("");
@@ -32,31 +56,31 @@ export const OnChangePlugin: React.FC<OnChangePluginProps> = ({ onChange }) => {
 			}) => {
 				editorState.read(() => {
 					const html = $generateHtmlFromNodes(editor);
+					const normalizedHtml = normalizeHtml(html);
 
 					// Store initial content on first update (while non-editable)
 					if (!hasStoredInitial.current) {
-						initialContent.current = html;
+						initialContent.current = normalizedHtml;
 						hasStoredInitial.current = true;
 						return;
 					}
 
 					// If editor is not editable yet, keep updating initial content
 					if (!editor.isEditable()) {
-						initialContent.current = html;
+						initialContent.current = normalizedHtml;
 						return;
 					}
 
 					// If this is the first time becoming editable, update initial content and skip onChange
 					if (tags.has("becoming-editable") || !becameEditableOnce.current) {
-						initialContent.current = html;
+						initialContent.current = normalizedHtml;
 						becameEditableOnce.current = true;
 						return;
 					}
 
-					// Only call onChange if content actually changed from initial
-					if (html !== initialContent.current) {
-						onChange(html);
-					}
+					// Always call onChange for any update after editor becomes editable
+					// This ensures undo/redo updates trigger onChange
+					onChange(html);
 				});
 			}
 		);

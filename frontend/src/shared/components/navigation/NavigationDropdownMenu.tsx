@@ -47,7 +47,7 @@ export function NavigationDropdownMenu({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
-					className="bg-white text-gray-900 border-gray-200 !p-0"
+					className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 !p-0"
 					align="start"
 					sideOffset={4}
 				>

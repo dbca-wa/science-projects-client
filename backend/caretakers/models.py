@@ -27,10 +27,6 @@ class Caretaker(CommonModel):
         help_text="The user acting as caretaker",
     )
 
-    end_date = models.DateTimeField(
-        blank=True, null=True, help_text="When caretaker relationship expires"
-    )
-
     reason = models.TextField(
         blank=True, null=True, help_text="Reason for caretaker request"
     )
@@ -44,7 +40,6 @@ class Caretaker(CommonModel):
         indexes = [
             models.Index(fields=["user"]),
             models.Index(fields=["caretaker"]),
-            models.Index(fields=["end_date"]),
         ]
 
     def __str__(self):

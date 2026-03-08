@@ -25,7 +25,9 @@ const config = {
 				xs: `${BREAKPOINTS.xs}px`, // 320px
 				sm: `${BREAKPOINTS.sm}px`, // 640px
 				md: `${BREAKPOINTS.md}px`, // 768px
+				project: "808px", // Custom breakpoint for project detail tabs
 				lg: `${BREAKPOINTS.lg}px`, // 1024px
+				"modal-lg": `${BREAKPOINTS["modal-lg"]}px`, // 1140px - Custom for modal layout
 				xl: `${BREAKPOINTS.xl}px`, // 1280px - 3 columns
 				"2xl": `${BREAKPOINTS["2xl"]}px`, // 1536px - 3 columns (Tailwind default)
 				"3xl": `${BREAKPOINTS["3xl"]}px`, // 2048px - 4 columns (2K standard)
@@ -88,14 +90,40 @@ const config = {
 						height: "0",
 					},
 				},
+				shimmer: {
+					"0%": {
+						transform: "translateX(-100%)",
+					},
+					"100%": {
+						transform: "translateX(100%)",
+					},
+				},
+				buttonBounce: {
+					"0%": {
+						transform: "scale(1)",
+					},
+					"50%": {
+						transform: "scale(1.1)",
+					},
+					"100%": {
+						transform: "scale(1)",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
+				shimmer: "shimmer 2s ease-in-out infinite",
+				buttonBounce: "buttonBounce 0.3s ease-out",
 			},
 		},
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		require("tailwindcss-animate"),
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		require("@tailwindcss/container-queries"),
+	],
 } satisfies Config;
 
 export default config;

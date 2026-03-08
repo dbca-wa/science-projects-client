@@ -3,13 +3,11 @@ import { useNavigate, useLocation } from "react-router";
 import { Card } from "@/shared/components/ui/card";
 import { cn } from "@/shared/lib/utils";
 import type { IProjectData } from "@/shared/types/project.types";
-import { getProjectStatusDisplay, getProjectTag } from "../utils/project.utils";
+import { getProjectStatusDisplay } from "../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
-import {
-	PROJECT_KIND_COLORS,
-	PROJECT_STATUS_COLORS,
-} from "@/shared/constants/project-colors";
+import { ProjectTag } from "./ProjectTag";
+import { PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {
 	project: IProjectData;
@@ -57,13 +55,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
 		}
 	};
 
-	const projectTag = getProjectTag(project);
 	const statusDisplay = getProjectStatusDisplay(project.status);
 
 	// Get colors from constants
-	const kindColor = project.kind
-		? PROJECT_KIND_COLORS[project.kind]
-		: PROJECT_KIND_COLORS.science;
 	const statusColor = project.status
 		? PROJECT_STATUS_COLORS[project.status]
 		: PROJECT_STATUS_COLORS.new;
@@ -78,7 +72,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
 	return (
 		<Card
 			className={cn(
-				"group relative h-[325px] cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 p-0",
+				"group relative cursor-pointer overflow-hidden rounded-3xl transition-all duration-300 p-0",
+				"aspect-[25/18]", // Match ImageUpload preview aspect ratio
 				"hover:scale-105 hover:shadow-2xl focus-within:scale-105 focus-within:shadow-2xl",
 				"border border-gray-200 dark:border-gray-700",
 				"focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-600 focus-within:ring-offset-2"
@@ -101,12 +96,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 			>
 				{/* Project Tag (top-left) */}
 				<div className="absolute left-2 top-2 z-10">
-					<span
-						className="inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold text-white"
-						style={{ backgroundColor: kindColor }}
-					>
-						{projectTag}
-					</span>
+					<ProjectTag project={project} />
 				</div>
 
 				{/* Status Badge (top-right, shows on hover or focus) */}
@@ -128,6 +118,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 					)}
 					{hasImage && !imageError ? (
 						<img
+							draggable={false}
 							src={imageUrl}
 							alt={plainTextTitle}
 							className={cn(

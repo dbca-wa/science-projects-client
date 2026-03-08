@@ -46,14 +46,24 @@ class ConceptPlanService:
         Update concept plan document
 
         Args:
-            pk: Document primary key
+            pk: ConceptPlan primary key
             user: User updating the concept plan
             data: Updated concept plan data
 
         Returns:
             Updated ProjectDocument instance
         """
-        document = DocumentService.get_document(pk)
+        from rest_framework.exceptions import NotFound
+
+        from ..models import ConceptPlan
+
+        # Get ConceptPlan object directly
+        try:
+            concept_plan = ConceptPlan.objects.get(pk=pk)
+        except ConceptPlan.DoesNotExist:
+            raise NotFound(f"ConceptPlan with pk {pk} not found")
+
+        document = concept_plan.document
 
         if document.kind != "concept":
             from rest_framework.exceptions import ValidationError
@@ -62,13 +72,16 @@ class ConceptPlanService:
 
         settings.LOGGER.info(f"{user} is updating concept plan {document}")
 
-        # Update base document
-        document = DocumentService.update_document(pk, user, data)
+        # Update ConceptPlan fields
+        for field, value in data.items():
+            if hasattr(concept_plan, field):
+                setattr(concept_plan, field, value)
 
-        # Update concept plan details if provided
-        if data and hasattr(document, "concept_plan_details"):
-            # Details update logic here
-            pass
+        concept_plan.save()
+
+        # Update modifier on ProjectDocument
+        document.modifier = user
+        document.save()
 
         return document
 

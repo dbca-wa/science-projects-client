@@ -16,6 +16,7 @@ export interface IAffiliation {
 	created_at?: Date;
 	updated_at?: Date;
 	name: string;
+	slug?: string;
 }
 
 // BRANCH ============================================================================

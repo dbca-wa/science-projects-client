@@ -179,7 +179,11 @@ export function ProjectsDataTable({
 					return a.title.localeCompare(b.title);
 				},
 				width: "auto",
-				cell: (row) => <ProjectStatusBadge status={row.status} />,
+				cell: (row) => (
+					<div className="flex items-center">
+						<ProjectStatusBadge status={row.status} />
+					</div>
+				),
 			});
 		}
 
@@ -214,10 +218,14 @@ export function ProjectsDataTable({
 				width: "auto",
 				cell: (row) => {
 					const role = row.role;
-					return role ? (
-						<RoleText role={role} />
-					) : (
-						<span className="text-sm text-muted-foreground">—</span>
+					return (
+						<div className="flex items-center">
+							{role ? (
+								<RoleText role={role} />
+							) : (
+								<span className="text-sm text-muted-foreground">—</span>
+							)}
+						</div>
 					);
 				},
 			});

@@ -84,6 +84,31 @@ class MemberService:
             )
 
     @staticmethod
+    def get_member_by_id(member_id):
+        """
+        Get a project member by their member ID
+
+        Args:
+            member_id: ProjectMember ID
+
+        Returns:
+            ProjectMember instance
+
+        Raises:
+            NotFound: If member doesn't exist
+        """
+        try:
+            return ProjectMember.objects.select_related(
+                "user",
+                "user__profile",
+                "user__work",
+                "project",
+                "project__business_area",
+            ).get(pk=member_id)
+        except ProjectMember.DoesNotExist:
+            raise NotFound(f"Member with ID {member_id} not found")
+
+    @staticmethod
     def get_project_leader(project_id):
         """
         Get the project leader
@@ -217,17 +242,34 @@ class MemberService:
             f"{requesting_user} is promoting user {user_id} to leader of project {project_id}"
         )
 
-        # Demote current leader(s)
-        ProjectMember.objects.filter(project_id=project_id, is_leader=True).update(
-            is_leader=False
+        # Get the member being promoted
+        new_leader = MemberService.get_member(project_id, user_id)
+        new_leader_position = new_leader.position or 100
+
+        # Get current leader(s) and their positions
+        current_leaders = ProjectMember.objects.filter(
+            project_id=project_id, is_leader=True
         )
 
-        # Promote new leader
-        member = MemberService.get_member(project_id, user_id)
-        member.is_leader = True
-        member.save()
+        # Shift members down to make room at position 0
+        # Only shift members that are at or above the new leader's current position
+        members_to_shift = ProjectMember.objects.filter(
+            project_id=project_id, position__lt=new_leader_position
+        ).exclude(user_id=user_id)
 
-        return member
+        for member in members_to_shift:
+            member.position = (member.position or 0) + 1
+            member.save()
+
+        # Demote current leader(s) - they've already been shifted down by 1
+        current_leaders.update(is_leader=False)
+
+        # Promote new leader to position 0
+        new_leader.is_leader = True
+        new_leader.position = 0
+        new_leader.save()
+
+        return new_leader
 
     @staticmethod
     def get_members_for_project(project_id):

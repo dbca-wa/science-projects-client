@@ -61,7 +61,7 @@ export const FullMapContainer = observer(
 		} = useProjectsForMap(store.apiParams);
 		const { data: geoJsonData, loading: geoJsonLoading } = useGeoJSON();
 
-		const projects = mapData?.projects || [];
+		const projects = useMemo(() => mapData?.projects || [], [mapData]);
 
 		// Calculate coordinates for all projects using the original function
 		const projectsWithCoords = useMemo(() => {
@@ -221,7 +221,7 @@ export const FullMapContainer = observer(
 				map.off("load", makeNonFocusable);
 				document.removeEventListener("focus", handleFocus, true);
 			};
-		}, [mapRef.current, clusters]);
+		}, [mapRef.current, clusters]); // eslint-disable-line react-hooks/exhaustive-deps
 
 		if (projectsLoading || geoJsonLoading) {
 			return (

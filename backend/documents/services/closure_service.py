@@ -21,11 +21,13 @@ class ClosureService:
         Args:
             user: User creating the closure
             project: Project instance
-            data: Closure data
+            data: Closure data (reason, intended_outcome, etc.)
 
         Returns:
-            ProjectDocument instance
+            ProjectClosure instance
         """
+        from ..models import ProjectClosure
+
         settings.LOGGER.info(f"{user} is creating closure for project {project}")
 
         # Create base document
@@ -33,12 +35,31 @@ class ClosureService:
             user=user, project=project, kind="projectclosure", data=data
         )
 
-        # Create closure details if provided
-        if data:
-            # Details creation logic here
-            pass
+        # Create closure details
+        closure_data = {
+            "document": document,
+            "project": project,
+        }
 
-        return document
+        # Add optional fields if provided
+        if data:
+            if "reason" in data:
+                closure_data["reason"] = data["reason"]
+            if "intended_outcome" in data or "outcome" in data:
+                # Support both 'intended_outcome' and 'outcome' field names
+                closure_data["intended_outcome"] = data.get(
+                    "intended_outcome", data.get("outcome")
+                )
+
+        project_closure = ProjectClosure.objects.create(**closure_data)
+
+        # Update project status to closure_requested
+        project.status = "closure_requested"
+        project.save()
+
+        settings.LOGGER.info(f"Project {project} status changed to closure_requested")
+
+        return project_closure
 
     @staticmethod
     @transaction.atomic
@@ -47,14 +68,24 @@ class ClosureService:
         Update project closure document
 
         Args:
-            pk: Document primary key
+            pk: ProjectClosure primary key
             user: User updating the closure
             data: Updated closure data
 
         Returns:
             Updated ProjectDocument instance
         """
-        document = DocumentService.get_document(pk)
+        from rest_framework.exceptions import NotFound
+
+        from ..models import ProjectClosure
+
+        # Get ProjectClosure object directly
+        try:
+            project_closure = ProjectClosure.objects.get(pk=pk)
+        except ProjectClosure.DoesNotExist:
+            raise NotFound(f"ProjectClosure with pk {pk} not found")
+
+        document = project_closure.document
 
         if document.kind != "projectclosure":
             from rest_framework.exceptions import ValidationError
@@ -63,13 +94,16 @@ class ClosureService:
 
         settings.LOGGER.info(f"{user} is updating closure {document}")
 
-        # Update base document
-        document = DocumentService.update_document(pk, user, data)
+        # Update ProjectClosure fields
+        for field, value in data.items():
+            if hasattr(project_closure, field):
+                setattr(project_closure, field, value)
 
-        # Update closure details if provided
-        if data:
-            # Details update logic here
-            pass
+        project_closure.save()
+
+        # Update modifier on ProjectDocument
+        document.modifier = user
+        document.save()
 
         return document
 

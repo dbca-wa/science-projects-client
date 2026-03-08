@@ -6,7 +6,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/shared/components/ui/form";
-import { Textarea } from "@/shared/components/ui/textarea";
+import { FormRichTextEditor } from "@/shared/components/editor";
 
 // Type constraint for forms that have profile fields
 type ProfileFieldsType = {
@@ -40,12 +40,14 @@ export const ProfileFields = <T extends FieldValues & ProfileFieldsType>({
 					<FormItem>
 						<FormLabel>About</FormLabel>
 						<FormControl>
-							<Textarea
-								placeholder="Tell us about this user..."
-								className="min-h-[120px] resize-y"
-								{...field}
+							<FormRichTextEditor
 								value={field.value || ""}
+								onChange={field.onChange}
+								placeholder="Tell us about this user..."
 								disabled={disabled}
+								toolbar="profile"
+								wordLimit={500}
+								aria-label="About"
 							/>
 						</FormControl>
 						<FormMessage />
@@ -61,12 +63,14 @@ export const ProfileFields = <T extends FieldValues & ProfileFieldsType>({
 					<FormItem>
 						<FormLabel>Expertise</FormLabel>
 						<FormControl>
-							<Textarea
-								placeholder="List areas of expertise..."
-								className="min-h-[120px] resize-y"
-								{...field}
+							<FormRichTextEditor
 								value={field.value || ""}
+								onChange={field.onChange}
+								placeholder="List areas of expertise..."
 								disabled={disabled}
+								toolbar="profile"
+								wordLimit={500}
+								aria-label="Expertise"
 							/>
 						</FormControl>
 						<FormMessage />

@@ -20,12 +20,12 @@ export const getProjectStatusDisplay = (
 
 	const statusMap: Record<ProjectStatus, string> = {
 		new: "New",
-		pending: "Pending",
-		active: "Active",
-		updating: "Updating",
+		pending: "Pending Project Plan",
+		active: "Active (Approved)",
+		updating: "Update Requested",
 		closure_requested: "Closure Requested",
-		closing: "Closing",
-		final_update: "Final Update",
+		closing: "Closure Pending Final Update",
+		final_update: "Final Update Requested",
 		completed: "Completed",
 		terminated: "Terminated",
 		suspended: "Suspended",

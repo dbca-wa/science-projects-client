@@ -16,9 +16,13 @@ urlpatterns = [
         "<int:pk>/toggle_user_profile_visibility",
         views.ToggleUserProfileVisibilityForProject.as_view(),
     ),
+    # PROJECT REPORTS
+    path("<int:pk>/progress-reports", views.CreateProgressReport.as_view()),
+    path("<int:pk>/student-reports", views.CreateStudentReport.as_view()),
     # PROJECT SPECIFIC URLS
     path("<int:pk>/project_docs", views.ProjectDocs.as_view()),
     path("<int:pk>/team", views.MembersForProject.as_view()),
+    path("<int:pk>/mentionable-users", views.MentionableUsersForProject.as_view()),
     path("<int:pk>/areas", views.AreasForProject.as_view()),
     path("<int:pk>/details", views.SelectedProjectAdditionalDetail.as_view()),
     path("<int:pk>/suspend", views.SuspendProject.as_view()),

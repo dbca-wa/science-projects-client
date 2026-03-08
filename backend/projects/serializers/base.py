@@ -79,6 +79,35 @@ class TinyProjectSerializer(ModelSerializer):
         )
 
 
+class MyProjectSerializer(ModelSerializer):
+    """Serializer for user's projects with role information"""
+
+    image = TinyProjectPhotoSerializer(read_only=True)
+    business_area = TinyBusinessAreaSerializer(read_only=True)
+    role = serializers.CharField(read_only=True)
+    tag = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Project
+        fields = (
+            "id",
+            "title",
+            "status",
+            "kind",
+            "year",
+            "number",
+            "business_area",
+            "image",
+            "role",
+            "tag",
+            "created_at",
+        )
+
+    def get_tag(self, obj):
+        return obj.get_project_tag()
+
+
 class ProblematicProjectSerializer(ModelSerializer):
     """Serializer for problematic projects view"""
 

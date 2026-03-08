@@ -46,5 +46,6 @@ export const useCaretakingChain = (userData: IUserMe | undefined): number[] => {
 		if (!userData?.id) return []; // Ensure valid user data
 		const visited = new Set<number>();
 		return getCaretakingChainIds(userData, visited);
-	}, [userData?.id, JSON.stringify(userData?.caretaking_for)]);
+		// Note: userData is included to ensure the chain updates when caretaking relationships change
+	}, [userData]);
 };

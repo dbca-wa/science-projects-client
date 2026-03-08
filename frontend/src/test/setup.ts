@@ -48,6 +48,13 @@ Object.defineProperty(window, "matchMedia", {
 	})),
 });
 
+// Mock ResizeObserver for Radix UI components
+global.ResizeObserver = class ResizeObserver {
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
+};
+
 // Setup JSDOM for tests that need DOM APIs
 beforeAll(() => {
 	if (typeof window === "undefined") {

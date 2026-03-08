@@ -14,16 +14,20 @@ import type { IProjectData } from "@/shared/types/project.types";
 describe("getProjectStatusDisplay", () => {
 	it("should return formatted status for valid status", () => {
 		expect(getProjectStatusDisplay("new")).toBe("New");
-		expect(getProjectStatusDisplay("pending")).toBe("Pending");
-		expect(getProjectStatusDisplay("active")).toBe("Active");
-		expect(getProjectStatusDisplay("updating")).toBe("Updating");
+		expect(getProjectStatusDisplay("pending")).toBe("Pending Project Plan");
+		expect(getProjectStatusDisplay("active")).toBe("Active (Approved)");
+		expect(getProjectStatusDisplay("updating")).toBe("Update Requested");
 		expect(getProjectStatusDisplay("closure_requested")).toBe(
 			"Closure Requested"
 		);
-		expect(getProjectStatusDisplay("closing")).toBe("Closing");
-		expect(getProjectStatusDisplay("final_update")).toBe("Final Update");
-		expect(getProjectStatusDisplay("completed")).toBe("Completed");
-		expect(getProjectStatusDisplay("terminated")).toBe("Terminated");
+		expect(getProjectStatusDisplay("closing")).toBe(
+			"Closure Pending Final Update"
+		);
+		expect(getProjectStatusDisplay("final_update")).toBe(
+			"Final Update Requested"
+		);
+		expect(getProjectStatusDisplay("completed")).toBe("Completed and Closed");
+		expect(getProjectStatusDisplay("terminated")).toBe("Terminated and Closed");
 		expect(getProjectStatusDisplay("suspended")).toBe("Suspended");
 	});
 

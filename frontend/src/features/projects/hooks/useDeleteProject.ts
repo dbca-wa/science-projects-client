@@ -1,29 +1,64 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteProject } from "../services/project.service";
 import { toast } from "sonner";
+import { apiClient } from "@/shared/services/api/client.service";
+import { extractUserFriendlyMessage } from "@/shared/utils/error.utils";
+import { useNavigate } from "react-router";
 
 /**
- * Hook for deleting a project
- * - Invalidates project list cache on success
- * - Shows success/error toast notifications
- *
- * @returns TanStack Query mutation for project deletion
+ * Delete a project (superuser only)
+ */
+const deleteProject = async (projectId: number): Promise<void> => {
+	return apiClient.delete<void>(`projects/${projectId}`);
+};
+
+/**
+ * Hook for deleting a project (superuser only)
  */
 export const useDeleteProject = () => {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (id: number | string) => deleteProject(id),
-		onSuccess: () => {
-			// Invalidate project list to refetch without deleted project
-			queryClient.invalidateQueries({ queryKey: ["projects"] });
+		mutationFn: deleteProject,
+		onSuccess: async (_, projectId) => {
+			console.log(
+				"[useDeleteProject] Mutation succeeded, invalidating queries for project:",
+				projectId
+			);
 
-			// Show success toast
-			toast.success("Project deleted successfully");
+			// Invalidate project detail query
+			await queryClient.invalidateQueries({
+				predicate: (query) => {
+					const [resource, type, id] = query.queryKey;
+					return (
+						resource === "projects" &&
+						type === "detail" &&
+						(id === projectId || id === String(projectId))
+					);
+				},
+			});
+
+			// Invalidate projects list
+			await queryClient.invalidateQueries({
+				predicate: (query) => {
+					const [resource, type] = query.queryKey;
+					return resource === "projects" && type === "list";
+				},
+			});
+
+			console.log(
+				"[useDeleteProject] Query invalidation complete, navigating to projects list"
+			);
+
+			toast.success("Project deleted");
+			navigate("/projects");
 		},
 		onError: (error: Error) => {
-			// Show error toast
-			toast.error(`Failed to delete project: ${error.message}`);
+			const message = extractUserFriendlyMessage(
+				error,
+				"Could not delete project"
+			);
+			toast.error(message);
 		},
 	});
 };

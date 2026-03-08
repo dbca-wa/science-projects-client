@@ -28,13 +28,27 @@ class ProjectYears(APIView):
 
 
 class SuspendProject(APIView):
-    """Suspend a project"""
+    """Suspend or unsuspend a project"""
 
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        """Suspend project by ID"""
-        project = ProjectService.suspend_project(pk, request.user)
+        """Suspend or unsuspend project by ID"""
+        # Get the suspend parameter from request body (default to True for backwards compatibility)
+        suspend = request.data.get("suspend", True)
+
+        project = ProjectService.get_project(pk)
+
+        if suspend:
+            # Suspend the project
+            settings.LOGGER.info(f"{request.user} is suspending project: {project}")
+            project.status = Project.StatusChoices.SUSPENDED
+        else:
+            # Unsuspend the project
+            settings.LOGGER.info(f"{request.user} is unsuspending project: {project}")
+            project.status = Project.StatusChoices.ACTIVE
+
+        project.save()
         serializer = TinyProjectSerializer(project)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)
 
