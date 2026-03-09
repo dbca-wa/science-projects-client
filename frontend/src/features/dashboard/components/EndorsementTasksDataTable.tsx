@@ -12,6 +12,7 @@ import { FaBiohazard } from "react-icons/fa";
 import { PiPlantFill } from "react-icons/pi";
 import type { IEndorsement } from "../types/dashboard.types";
 import { extractTextFromHTML } from "../utils/dashboard.utils";
+import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface EndorsementTasksDataTableProps {
 	tasks: IEndorsement[];
@@ -88,7 +89,10 @@ export const EndorsementTasksDataTable = ({
 					);
 					return (
 						<div>
-							<div className="font-semibold text-blue-600 dark:text-blue-400 break-words">
+							<div
+								className="font-semibold break-words hover:underline cursor-pointer"
+								style={{ color: LINK_COLOR }}
+							>
 								{projectTitle}
 							</div>
 							{/* Type description - visible only on mobile */}

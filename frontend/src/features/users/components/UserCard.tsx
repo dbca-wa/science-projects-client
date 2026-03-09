@@ -31,9 +31,6 @@ export const UserCard = ({
 		}
 	};
 
-	// Card is clickable based on clickable prop
-	const isClickable = clickable;
-
 	// Get display name
 	const displayName = getUserDisplayName(user) || `No Name (${user.username})`;
 
@@ -44,34 +41,27 @@ export const UserCard = ({
 			: displayName;
 
 	// Get role/status text and color
-	const getRoleInfo = () => {
-		let text = "";
-		let colorClass = "";
-
+	const getRoleInfo = (): { text: string; colorClass: string } => {
 		// Check if user is a BA Lead (has business_areas_led array with items)
 		// Handle both ID array format and object array format
 		const isBALead =
 			user.business_areas_led && user.business_areas_led.length > 0;
 
 		if (user.is_superuser) {
-			text = user.role === "Executive" ? "Executive" : "Admin";
-			if (isBALead) {
-				text += " (BA Lead)";
-			}
-			colorClass =
+			const text = user.role === "Executive" ? "Executive" : "Admin";
+			const textWithBA = isBALead ? `${text} (BA Lead)` : text;
+			const colorClass =
 				user.role === "Executive" ? "text-orange-600" : "text-blue-600";
+			return { text: textWithBA, colorClass };
 		} else if (user.is_staff) {
-			text = "Staff";
-			if (isBALead) {
-				text += " (BA Lead)";
-			}
-			colorClass = "text-green-600";
+			const text = isBALead ? "Staff (BA Lead)" : "Staff";
+			const colorClass = "text-green-600";
+			return { text, colorClass };
 		} else {
-			text = "External User";
-			colorClass = "text-gray-500";
+			const text = "External User";
+			const colorClass = "text-gray-500";
+			return { text, colorClass };
 		}
-
-		return { text, colorClass };
 	};
 
 	const roleInfo = getRoleInfo();
@@ -107,8 +97,8 @@ export const UserCard = ({
 
 	return (
 		<div
-			className={`grid grid-cols-1 lg:grid-cols-[8fr_4fr] xl:grid-cols-[4fr_4fr_2.5fr] items-center p-4 border border-gray-300 dark:border-gray-500 w-full select-none ${isClickable ? "cursor-pointer hover:shadow-md" : "cursor-default"} transition-shadow`}
-			onClick={isClickable ? handleClick : undefined}
+			className={`grid grid-cols-1 lg:grid-cols-[8fr_4fr] xl:grid-cols-[4fr_4fr_2.5fr] items-center p-4 border border-gray-300 dark:border-gray-500 w-full select-none ${clickable ? "cursor-pointer hover:shadow-md" : "cursor-default"} transition-shadow`}
+			onClick={clickable ? handleClick : undefined}
 		>
 			{/* User info column */}
 			<div className="flex ml-2">
@@ -117,7 +107,7 @@ export const UserCard = ({
 				</div>
 
 				<div className="ml-2 xl:ml-4 w-full overflow-hidden ">
-					{isClickable ? (
+					{clickable ? (
 						<button
 							className="font-bold text-left hover:underline text-gray-600 cursor-pointer"
 							onClick={handleClick}

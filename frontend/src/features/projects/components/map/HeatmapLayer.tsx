@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet.heat";
 import type { IProjectData } from "@/shared/types/project.types";
 import type { GeoJSONData } from "@/features/projects/types/map.types";
-import { calculateCoordinates } from "@/features/projects/utils/coordinate-calculation";
+import { calculateCoordinates } from "@/features/projects/utils/map/coordinate-calculation.utils";
 import { logger } from "@/shared/services/logger.service";
 
 /**

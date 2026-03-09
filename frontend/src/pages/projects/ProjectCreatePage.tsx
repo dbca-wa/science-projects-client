@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { ProjectTypeCard } from "@/features/projects/components/ProjectTypeCard";
+import { ProjectTypeCard } from "@/features/projects/components/cards/ProjectTypeCard";
 import {
 	FlaskConical,
 	Briefcase,

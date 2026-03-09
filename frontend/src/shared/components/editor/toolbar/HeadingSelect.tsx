@@ -2,22 +2,10 @@
  * HeadingSelect Component
  *
  * Dropdown for selecting heading levels (H1, H2, H3, Normal).
+ * Receives state and actions from parent Toolbar component.
  */
 
-import React, { useCallback, useEffect, useState } from "react";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-	$getSelection,
-	$isRangeSelection,
-	SELECTION_CHANGE_COMMAND,
-} from "lexical";
-import {
-	$createHeadingNode,
-	$isHeadingNode,
-	type HeadingTagType,
-} from "@lexical/rich-text";
-import { $setBlocksType } from "@lexical/selection";
-import { $createParagraphNode, $isParagraphNode } from "lexical";
+import React from "react";
 import {
 	Select,
 	SelectContent,
@@ -25,96 +13,69 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import type { HeadingSelectProps } from "@/shared/types/editor.types";
 
-type BlockType = "paragraph" | "h1" | "h2" | "h3";
+type BlockType = "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 const blockTypeLabels: Record<BlockType, string> = {
 	paragraph: "Normal",
 	h1: "Heading 1",
 	h2: "Heading 2",
 	h3: "Heading 3",
+	h4: "Heading 4",
+	h5: "Heading 5",
+	h6: "Heading 6",
 };
 
 export const HeadingSelect: React.FC<HeadingSelectProps> = ({
+	blockType,
+	onSetBlockType,
 	disabled = false,
 	disableHeadings = false,
 }) => {
-	const [editor] = useLexicalComposerContext();
-	const [blockType, setBlockType] = useState<BlockType>("paragraph");
-
-	const updateToolbar = useCallback(() => {
-		const selection = $getSelection();
-		if ($isRangeSelection(selection)) {
-			const anchorNode = selection.anchor.getNode();
-			const element =
-				anchorNode.getKey() === "root"
-					? anchorNode
-					: anchorNode.getTopLevelElementOrThrow();
-
-			if ($isHeadingNode(element)) {
-				const tag = element.getTag();
-				setBlockType(tag as BlockType);
-			} else if ($isParagraphNode(element)) {
-				setBlockType("paragraph");
-			}
-		}
-	}, []);
-
-	useEffect(() => {
-		return editor.registerCommand(
-			SELECTION_CHANGE_COMMAND,
-			() => {
-				updateToolbar();
-				return false;
-			},
-			1
-		);
-	}, [editor, updateToolbar]);
-
-	const formatHeading = (headingType: BlockType) => {
-		if (blockType === headingType) return;
-
+	const handleValueChange = (value: string) => {
 		// If headings are disabled and user tries to select a heading, do nothing
-		if (disableHeadings && headingType !== "paragraph") {
+		if (disableHeadings && value !== "paragraph") {
 			return;
 		}
-
-		editor.update(() => {
-			const selection = $getSelection();
-			if ($isRangeSelection(selection)) {
-				if (headingType === "paragraph") {
-					$setBlocksType(selection, () => $createParagraphNode());
-				} else {
-					$setBlocksType(selection, () =>
-						$createHeadingNode(headingType as HeadingTagType)
-					);
-				}
-			}
-		});
+		onSetBlockType(value as BlockType);
 	};
 
 	return (
-		<Select
-			value={blockType}
-			onValueChange={(value) => formatHeading(value as BlockType)}
-			disabled={disabled}
-		>
-			<SelectTrigger className="h-8 w-[130px]">
-				<SelectValue />
-			</SelectTrigger>
-			<SelectContent>
-				<SelectItem value="paragraph">{blockTypeLabels.paragraph}</SelectItem>
-				<SelectItem value="h1" disabled={disableHeadings}>
-					{blockTypeLabels.h1}
-				</SelectItem>
-				<SelectItem value="h2" disabled={disableHeadings}>
-					{blockTypeLabels.h2}
-				</SelectItem>
-				<SelectItem value="h3" disabled={disableHeadings}>
-					{blockTypeLabels.h3}
-				</SelectItem>
-			</SelectContent>
-		</Select>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Select
+					value={blockType}
+					onValueChange={handleValueChange}
+					disabled={disabled}
+				>
+					<SelectTrigger className="h-8 w-[130px]" aria-label="Text style">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="paragraph">
+							{blockTypeLabels.paragraph}
+						</SelectItem>
+						<SelectItem value="h1" disabled={disableHeadings}>
+							{blockTypeLabels.h1}
+						</SelectItem>
+						<SelectItem value="h2" disabled={disableHeadings}>
+							{blockTypeLabels.h2}
+						</SelectItem>
+						<SelectItem value="h3" disabled={disableHeadings}>
+							{blockTypeLabels.h3}
+						</SelectItem>
+					</SelectContent>
+				</Select>
+			</TooltipTrigger>
+			<TooltipContent side="bottom">
+				<p>Text style</p>
+			</TooltipContent>
+		</Tooltip>
 	);
 };

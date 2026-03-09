@@ -21,6 +21,8 @@ const AlertDialogContext = React.createContext<{
 	shouldAnimate: boolean;
 } | null>(null);
 
+const AlertDialogTitleContext = React.createContext<string | null>(null);
+
 function AlertDialog({
 	children,
 	open,
@@ -96,6 +98,7 @@ function AlertDialogContent({
 
 	const { open, onOpenChange } = context;
 	const contentRef = React.useRef<HTMLDivElement>(null);
+	const titleId = React.useId();
 
 	// Handle backdrop click to close
 	React.useEffect(() => {
@@ -130,8 +133,11 @@ function AlertDialogContent({
 					)}
 					role="alertdialog"
 					aria-modal="true"
+					aria-labelledby={titleId}
 				>
-					{children}
+					<AlertDialogTitleContext.Provider value={titleId}>
+						{children}
+					</AlertDialogTitleContext.Provider>
 				</div>
 			</div>
 		</AlertDialogPortal>
@@ -160,6 +166,7 @@ function AlertDialogFooter({
 			data-slot="alert-dialog-footer"
 			className={cn(
 				"flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+				"mt-8", // Increased spacing between content and footer
 				className
 			)}
 			{...props}
@@ -174,8 +181,11 @@ function AlertDialogTitle({
 	className?: string;
 	children: React.ReactNode;
 }) {
+	const titleId = React.useContext(AlertDialogTitleContext);
+
 	return (
 		<h2
+			id={titleId || undefined}
 			data-slot="alert-dialog-title"
 			className={cn("text-lg font-semibold", className)}
 			{...props}

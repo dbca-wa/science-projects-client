@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { NavigationBlocker } from "./NavigationBlocker";
 
 /**
  * BackgroundImage - Isolated component that reacts to theme changes
@@ -45,10 +46,14 @@ ContentBox.displayName = "ContentBox";
 /**
  * AppLayout component
  * Provides the main layout structure with header, content area, and footer
+ * Includes navigation blocking for unsaved editor changes
  */
 export function AppLayout() {
 	return (
 		<div className="fixed top-0 left-0 w-screen h-screen overflow-hidden flex flex-col">
+			{/* Navigation blocker for unsaved editor changes */}
+			<NavigationBlocker />
+
 			{/* Scrollable container */}
 			<div className="top-0 left-0 right-0 overflow-y-auto no-scrollbar">
 				{/* Header */}

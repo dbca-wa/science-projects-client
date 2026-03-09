@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router";
+import { useNavigate, useBlocker } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,7 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
 import { handleProfileUpdate } from "@/features/users/utils/profile-update.utils";
 import { ImageUpload } from "@/shared/components/media";
-import { RichTextEditor } from "@/shared/components/editor";
+import { FormRichTextEditor } from "@/shared/components/editor";
+import { FormUnsavedChangesDialog } from "@/shared/components/editor/FormUnsavedChangesDialog";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import {
 	Form,
@@ -59,17 +60,6 @@ const ProfileEditPage = observer(() => {
 		},
 	});
 
-	// Update form when user data loads
-	React.useEffect(() => {
-		if (user) {
-			form.reset({
-				image: getImageUrl(user.image),
-				about: user.about || "",
-				expertise: user.expertise || "",
-			});
-		}
-	}, [user, form]);
-
 	const updateMutation = useMutation({
 		mutationFn: (data: ProfileFormData) =>
 			handleProfileUpdate({
@@ -87,6 +77,72 @@ const ProfileEditPage = observer(() => {
 			toast.error(message);
 		},
 	});
+
+	// Block navigation when form has unsaved changes
+	const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+		const isDirty = form.formState.isDirty;
+		const pathChanged = currentLocation.pathname !== nextLocation.pathname;
+		const isSaving = updateMutation.isPending;
+
+		// Don't block if:
+		// - Form is not dirty
+		// - Path hasn't changed
+		// - Currently saving (user clicked save button)
+		// - Save was successful
+		return isDirty && pathChanged && !isSaving && !updateMutation.isSuccess;
+	});
+
+	// Block browser-level navigation (tab close, refresh, back button)
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			// Don't block if saving or save was successful
+			if (
+				form.formState.isDirty &&
+				!updateMutation.isPending &&
+				!updateMutation.isSuccess
+			) {
+				e.preventDefault();
+				e.returnValue = "";
+			}
+		};
+
+		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+	}, [
+		form.formState.isDirty,
+		updateMutation.isPending,
+		updateMutation.isSuccess,
+	]);
+
+	// Dialog handlers
+	const handleStay = () => {
+		if (blocker.state === "blocked") {
+			blocker.reset?.();
+		}
+	};
+
+	const handleLeave = () => {
+		form.reset(); // Reset form to mark as not dirty
+		if (blocker.state === "blocked") {
+			blocker.proceed?.();
+		}
+	};
+
+	// Update form when user data loads
+	React.useEffect(() => {
+		if (user) {
+			form.reset(
+				{
+					image: getImageUrl(user.image),
+					about: user.about || "",
+					expertise: user.expertise || "",
+				},
+				{
+					keepDefaultValues: false, // Reset default values to new values
+				}
+			);
+		}
+	}, [user, form]);
 
 	const handleSubmit = (data: ProfileFormData) => {
 		updateMutation.mutate(data);
@@ -202,15 +258,17 @@ const ProfileEditPage = observer(() => {
 									name="about"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>About</FormLabel>
 											<FormControl>
-												<RichTextEditor
+												<FormRichTextEditor
+													label="About"
+													description="Tell us about yourself and your background (max 500 words)"
 													value={field.value || ""}
 													onChange={field.onChange}
-													placeholder="Tell us about yourself..."
+													placeholder="Start typing..."
 													toolbar="profile"
 													disabled={updateMutation.isPending}
-													minHeight="150px"
+													wordLimit={500}
+													aria-label="About"
 												/>
 											</FormControl>
 											<FormMessage />
@@ -224,15 +282,17 @@ const ProfileEditPage = observer(() => {
 									name="expertise"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Expertise</FormLabel>
 											<FormControl>
-												<RichTextEditor
+												<FormRichTextEditor
+													label="Expertise"
+													description="Describe your areas of expertise and specialisations (max 500 words)"
 													value={field.value || ""}
 													onChange={field.onChange}
-													placeholder="Describe your areas of expertise..."
+													placeholder="Start typing..."
 													toolbar="profile"
 													disabled={updateMutation.isPending}
-													minHeight="150px"
+													wordLimit={500}
+													aria-label="Expertise"
 												/>
 											</FormControl>
 											<FormMessage />
@@ -261,6 +321,12 @@ const ProfileEditPage = observer(() => {
 						</Form>
 					</CardContent>
 				</Card>
+
+				<FormUnsavedChangesDialog
+					isOpen={blocker.state === "blocked"}
+					onStay={handleStay}
+					onLeave={handleLeave}
+				/>
 			</div>
 		</PageTransition>
 	);

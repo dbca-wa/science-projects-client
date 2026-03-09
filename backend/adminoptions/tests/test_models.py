@@ -332,18 +332,6 @@ class TestCaretakerModel:
         assert cache.get(f"caretaking_{caretaker_pk}") is None
 
     @pytest.mark.integration
-    def test_caretaker_with_end_date(self, user, secondary_user, db):
-        """Test creating Caretaker with end_date"""
-        from datetime import timedelta
-
-        from django.utils import timezone
-
-        end_date = timezone.now() + timedelta(days=30)
-        caretaker = Caretaker.objects.create(
-            user=user, caretaker=secondary_user, reason="Test", end_date=end_date
-        )
-        assert caretaker.end_date == end_date
-
     @pytest.mark.integration
     def test_caretaker_with_notes(self, user, secondary_user, db):
         """Test creating Caretaker with notes"""

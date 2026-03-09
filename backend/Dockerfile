@@ -183,5 +183,8 @@ EXPOSE 8000
 # HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 #     CMD curl -f http://127.0.0.1:8000/health/ || exit 1
 
+# Set TMPDIR so Gunicorn uses /tmp for all temporary files including control server socket
+ENV TMPDIR=/tmp
+
 # Launch production server
 CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp"]

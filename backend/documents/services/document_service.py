@@ -148,6 +148,17 @@ class DocumentService:
         document = DocumentService.get_document(pk)
         settings.LOGGER.info(f"{user} is deleting document {document}")
 
+        # If deleting a closure document, revert project status to "updating"
+        if document.kind == "projectclosure":
+            from projects.models import Project
+
+            project = document.project
+            project.status = Project.StatusChoices.UPDATING
+            project.save()
+            settings.LOGGER.info(
+                f"Reverted project {project} status to 'updating' after deleting closure"
+            )
+
         document.delete()
 
     @staticmethod

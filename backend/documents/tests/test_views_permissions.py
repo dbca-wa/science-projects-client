@@ -613,7 +613,7 @@ class TestConceptPlanDetail:
 
         # Act
         response = api_client.put(
-            documents_urls.path("conceptplans", concept_plan_with_details.document.id),
+            documents_urls.path("conceptplans", concept_plan_with_details.pk),
             data=data,
             format="json",
         )

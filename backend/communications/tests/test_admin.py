@@ -5,9 +5,14 @@ Tests for communications admin
 import pytest
 from django.contrib.admin.sites import AdminSite
 
-from communications.admin import ChatRoomAdmin, ChatRoomForm
-from communications.admin import Comment as CommentAdmin
-from communications.admin import DirectMessageAdmin, ReactionAdmin, UserFilterWidget
+from communications.admin import (
+    ChatRoomAdmin,
+    ChatRoomForm,
+    CommentAdmin,
+    DirectMessageAdmin,
+    ReactionAdmin,
+    UserFilterWidget,
+)
 from communications.models import ChatRoom, Comment, DirectMessage, Reaction
 
 
@@ -211,7 +216,7 @@ class TestCommentAdmin:
         # Assert
         assert "text" in admin.search_fields
         assert "user__username" in admin.search_fields
-        assert "document__project" in admin.search_fields
+        assert "document__project__title" in admin.search_fields
 
     @pytest.mark.unit
     def test_document_truncated_short(self, comment, db):

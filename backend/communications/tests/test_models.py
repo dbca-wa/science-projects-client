@@ -441,12 +441,9 @@ class TestReaction:
         choices = Reaction.ReactionChoices.choices
 
         # Assert
-        assert len(choices) == 8
+        assert len(choices) == 5
         assert ("thumbup", "Thumbs Up") in choices
-        assert ("thumbdown", "Thumbs Down") in choices
         assert ("heart", "Heart") in choices
-        assert ("brokenheart", "Broken Heart") in choices
-        assert ("hundred", "Hundred") in choices
         assert ("confused", "Confused") in choices
         assert ("funny", "Funny") in choices
         assert ("surprised", "Surprised") in choices

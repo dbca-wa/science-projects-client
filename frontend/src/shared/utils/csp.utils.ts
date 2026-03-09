@@ -22,7 +22,7 @@ export function generateNonce(): string {
 
 		// Convert to base64
 		return btoa(String.fromCharCode(...array));
-	} catch (error) {
+	} catch {
 		// Fallback for environments without crypto API
 		console.warn("Crypto API unavailable, using fallback nonce generation");
 

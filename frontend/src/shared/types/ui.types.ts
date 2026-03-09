@@ -11,6 +11,7 @@ export interface ISearchTerm {
 	searchTerm: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IDesignProps {
 	// Reserved for future design props
 }

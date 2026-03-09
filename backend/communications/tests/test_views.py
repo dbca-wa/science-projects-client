@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from common.tests.test_helpers import communications_urls
-from communications.models import ChatRoom, Comment, DirectMessage, Reaction
+from communications.models import ChatRoom, DirectMessage, Reaction
 
 User = get_user_model()
 
@@ -294,6 +294,17 @@ class TestCommentsView:
         """Test creating comment with valid data"""
         # Arrange
         api_client.force_authenticate(user=user)
+
+        # Add user as project member so they have permission to comment
+        from projects.models import ProjectMember
+
+        ProjectMember.objects.create(
+            project=project_document.project,
+            user=user,
+            role="team",
+            position=1,
+        )
+
         data = {
             "user": user.id,
             "document": project_document.id,
@@ -356,6 +367,17 @@ class TestCommentDetailView:
         """Test updating comment with valid data"""
         # Arrange
         api_client.force_authenticate(user=user)
+
+        # Add user as project member so they have permission to edit
+        from projects.models import ProjectMember
+
+        ProjectMember.objects.create(
+            project=comment.document.project,
+            user=user,
+            role="team",
+            position=1,
+        )
+
         data = {"text": "Updated comment"}
 
         # Act
@@ -379,7 +401,9 @@ class TestCommentDetailView:
 
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert not Comment.objects.filter(id=comment_id).exists()
+        # Comment is soft deleted (is_removed=True), not hard deleted
+        comment.refresh_from_db()
+        assert comment.is_removed is True
 
     @pytest.mark.integration
     def test_delete_comment_by_superuser(self, api_client, superuser, comment, db):
@@ -393,7 +417,9 @@ class TestCommentDetailView:
 
         # Assert
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert not Comment.objects.filter(id=comment_id).exists()
+        # Comment is soft deleted (is_removed=True), not hard deleted
+        comment.refresh_from_db()
+        assert comment.is_removed is True
 
     @pytest.mark.integration
     def test_delete_comment_permission_denied(
@@ -444,9 +470,21 @@ class TestReactionsView:
         """Test toggling reaction creates new reaction"""
         # Arrange
         api_client.force_authenticate(user=user)
+
+        # Add user as project member so they have permission to react
+        from projects.models import ProjectMember
+
+        ProjectMember.objects.create(
+            project=comment.document.project,
+            user=user,
+            role="team",
+            position=1,
+        )
+
         data = {
             "user": user.id,
             "comment": comment.id,
+            "reaction": Reaction.ReactionChoices.THUMBUP,
         }
 
         # Act
@@ -461,6 +499,17 @@ class TestReactionsView:
         """Test toggling reaction deletes existing reaction"""
         # Arrange
         api_client.force_authenticate(user=user)
+
+        # Add user as project member so they have permission to react
+        from projects.models import ProjectMember
+
+        ProjectMember.objects.create(
+            project=comment.document.project,
+            user=user,
+            role="team",
+            position=1,
+        )
+
         Reaction.objects.create(
             user=user,
             comment=comment,
@@ -469,6 +518,7 @@ class TestReactionsView:
         data = {
             "user": user.id,
             "comment": comment.id,
+            "reaction": Reaction.ReactionChoices.THUMBUP,
         }
 
         # Act

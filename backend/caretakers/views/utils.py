@@ -70,7 +70,6 @@ class AdminSetCaretaker(APIView):
         primary_user_id = request.data.get("userPk")
         secondary_user_id = request.data.get("caretakerPk")
         reason = request.data.get("reason")
-        end_date = request.data.get("endDate")
         notes = request.data.get("notes")
 
         if not primary_user_id or not secondary_user_id:
@@ -96,7 +95,6 @@ class AdminSetCaretaker(APIView):
                 user=primary_user_id,
                 caretaker=secondary_user_id,
                 reason=reason,
-                end_date=end_date if end_date else None,
                 notes=notes if notes else None,
             )
             return Response(status=HTTP_200_OK)

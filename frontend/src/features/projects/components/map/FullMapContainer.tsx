@@ -7,8 +7,8 @@ import "./map-accessibility.css"; // Custom CSS for map accessibility
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { useProjectsForMap } from "@/features/projects/hooks/useProjectsForMap";
 import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
-import { calculateProjectCoordinates } from "@/features/projects/utils/coordinate-calculation";
-import { clusterProjects } from "@/features/projects/utils/clustering";
+import { calculateProjectCoordinates } from "@/features/projects/utils/map/coordinate-calculation.utils";
+import { clusterProjects } from "@/features/projects/utils/map/clustering.utils";
 import { ProjectMarker } from "./ProjectMarker";
 import { HeatmapLayer } from "./HeatmapLayer";
 import { RegionLayer } from "./RegionLayer";
@@ -61,7 +61,7 @@ export const FullMapContainer = observer(
 		} = useProjectsForMap(store.apiParams);
 		const { data: geoJsonData, loading: geoJsonLoading } = useGeoJSON();
 
-		const projects = mapData?.projects || [];
+		const projects = useMemo(() => mapData?.projects || [], [mapData]);
 
 		// Calculate coordinates for all projects using the original function
 		const projectsWithCoords = useMemo(() => {
@@ -221,7 +221,7 @@ export const FullMapContainer = observer(
 				map.off("load", makeNonFocusable);
 				document.removeEventListener("focus", handleFocus, true);
 			};
-		}, [mapRef.current, clusters]);
+		}, [mapRef.current, clusters]); // eslint-disable-line react-hooks/exhaustive-deps
 
 		if (projectsLoading || geoJsonLoading) {
 			return (

@@ -7,6 +7,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
@@ -215,6 +216,57 @@ class UserService:
         )
 
     @staticmethod
+    def _is_valid_cached_user(cached_user):
+        """
+        Validate that cached user is a complete User instance with all relationships loaded
+
+        Args:
+            cached_user: Object retrieved from cache
+
+        Returns:
+            bool: True if valid User instance with all relationships, False otherwise
+        """
+        # Type check - must be a User instance
+        if not isinstance(cached_user, User):
+            return False
+
+        # Check select_related relationships are loaded
+        try:
+            # Verify profile relationship (required)
+            _ = cached_user.profile
+
+            # Verify work relationship (optional - may not exist for external users)
+            # Use hasattr to check if relationship exists without triggering query
+            if hasattr(cached_user, "work"):
+                try:
+                    # If work exists, verify it's loaded
+                    _ = cached_user.work
+                    # If work exists, verify nested business_area
+                    _ = cached_user.work.business_area
+                except ObjectDoesNotExist:
+                    # Work relationship exists but object doesn't exist
+                    # This is incomplete cache data
+                    return False
+            # If work doesn't exist (external user), that's valid
+
+        except AttributeError:
+            # Missing required relationships means incomplete cache
+            return False
+        except User.DoesNotExist:
+            # User doesn't exist means incomplete cache
+            return False
+
+        # Check prefetch_related relationships are loaded
+        # Django stores prefetched objects in _prefetched_objects_cache
+        if not hasattr(cached_user, "_prefetched_objects_cache"):
+            return False
+
+        if "groups" not in cached_user._prefetched_objects_cache:
+            return False
+
+        return True
+
+    @staticmethod
     def get_user(user_id):
         """
         Get user by ID with caching
@@ -233,12 +285,21 @@ class UserService:
         try:
             cached_user = cache.get(cache_key)
             if cached_user is not None:
-                logger.debug(f"Cache hit for user {user_id} profile")
-                return cached_user
+                # Validate cached data before returning
+                if UserService._is_valid_cached_user(cached_user):
+                    logger.debug(f"Cache hit for user {user_id} profile")
+                    return cached_user
+                else:
+                    # Invalid cache entry - log and continue to database query
+                    logger.warning(
+                        f"Invalid cached data for user {user_id}: "
+                        f"type={type(cached_user).__name__}, "
+                        f"is_user={isinstance(cached_user, User)}"
+                    )
         except Exception as e:
             logger.warning(f"Cache error for user {user_id} profile: {e}")
 
-        # Cache miss - query database
+        # Cache miss or invalid cache - query database
         logger.debug(f"Cache miss for user {user_id} profile")
         try:
             user = (
@@ -253,9 +314,10 @@ class UserService:
                 .get(pk=user_id)
             )
 
-            # Cache for 10 minutes
+            # Cache the fresh data for 10 minutes
             try:
                 cache.set(cache_key, user, timeout=settings.CACHE_TTL["user_profile"])
+                logger.debug(f"Cached user {user_id} profile after recovery")
             except Exception as e:
                 logger.warning(f"Failed to cache user {user_id} profile: {e}")
 

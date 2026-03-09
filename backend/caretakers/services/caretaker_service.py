@@ -58,7 +58,7 @@ class CaretakerService:
 
     @staticmethod
     @transaction.atomic
-    def create_caretaker(user, caretaker, reason, end_date=None, notes=None):
+    def create_caretaker(user, caretaker, reason, notes=None):
         """
         Create a new caretaker relationship
 
@@ -66,7 +66,6 @@ class CaretakerService:
             user: User being caretaken for
             caretaker: User acting as caretaker
             reason: Reason for caretaker relationship
-            end_date: Optional end date
             notes: Optional notes
 
         Returns:
@@ -106,7 +105,6 @@ class CaretakerService:
             user=user,
             caretaker=caretaker,
             reason=reason,
-            end_date=end_date,
             notes=notes,
         )
 

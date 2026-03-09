@@ -9,9 +9,26 @@
 	position: relative;
 	width: 100%;
 	max-width: 100%;
-	overflow: hidden;
 	scroll-margin-top: 0;
 	scroll-margin-bottom: 0;
+	/* No border-radius or overflow here - parent container handles it */
+}
+
+/* Content wrapper - connects with toolbar */
+.editor-content-wrapper {
+	position: relative;
+	border: none; /* No border - parent container handles it */
+	background-color: hsl(var(--background));
+}
+
+.dark .editor-content-wrapper {
+	background-color: rgb(31 41 55); /* dark:bg-gray-800 */
+}
+
+/* Content wrapper when no toolbar (readOnly or toolbar="none") */
+.editor-container:not(:has(.editor-toolbar)) .editor-content-wrapper {
+	border-top: 1px solid hsl(var(--border));
+	border-radius: 0.375rem;
 }
 
 .editor-input {
@@ -22,7 +39,8 @@
 	outline: none;
 	padding: 1rem;
 	padding-left: 3rem; /* Extra space for drag handles */
-	caret-color: rgb(17 24 39);
+	padding-right: 3rem; /* Balanced padding on right */
+	caret-color: hsl(var(--foreground));
 	overflow-x: auto;
 	overflow-y: auto;
 	max-width: 100%;
@@ -32,10 +50,6 @@
 	scroll-margin-bottom: 0;
 }
 
-.dark .editor-input {
-	caret-color: rgb(243 244 246);
-}
-
 .editor-input:focus {
 	outline: none;
 }
@@ -43,15 +57,19 @@
 /* Placeholder */
 .editor-placeholder {
 	position: absolute;
-	top: 1rem;
-	left: 3rem; /* Align with text, not drag handle area */
-	color: rgb(156 163 175);
+	top: 0;
+	left: 0; /* Align with cursor position */
+	color: rgb(107 114 128); /* text-gray-500 */
+	font-style: italic;
 	pointer-events: none;
 	user-select: none;
+	padding: 1rem;
+	padding-left: 3rem; /* Match editor-input padding for drag handles */
+	padding-right: 3rem; /* Balanced padding on right */
 }
 
 .dark .editor-placeholder {
-	color: rgb(107 114 128);
+	color: rgb(156 163 175); /* text-gray-400 in dark mode */
 }
 
 /* Paragraph */
@@ -106,10 +124,10 @@
 }
 
 .editor-li {
-	font-size: 0.875rem;
+	font-size: 1rem; /* Match paragraph font size */
 	padding: 0;
 	margin: 0;
-	margin-bottom: 0.25rem;
+	margin-bottom: 0.5rem; /* Match paragraph spacing */
 	list-style-position: outside;
 }
 
@@ -180,12 +198,16 @@
 	.editor-input {
 		padding: 0.75rem;
 		padding-left: 2rem; /* Reduced drag handle space on mobile */
+		padding-right: 2rem; /* Balanced padding on right */
 		font-size: 0.9375rem; /* Slightly smaller text on mobile */
 	}
 
 	.editor-placeholder {
-		top: 0.75rem;
-		left: 2rem;
+		top: 0;
+		left: 0;
+		padding: 0.75rem;
+		padding-left: 2rem; /* Match mobile editor-input padding */
+		padding-right: 2rem; /* Balanced padding on right */
 	}
 
 	/* Reduce list indentation on mobile to prevent overflow */
@@ -308,16 +330,45 @@
 }
 
 /* Read-only mode */
-.editor-readonly {
-	border: none;
-	background-color: transparent;
-	padding: 0;
+.editor-readonly .editor-content-wrapper {
+	/* Keep the white rounded background like editing mode */
+	border: 1px solid hsl(var(--border));
+	border-radius: 0.375rem;
+	background-color: #ffffff; /* Force white background */
+	box-shadow:
+		0 1px 3px 0 rgb(0 0 0 / 0.1),
+		0 1px 2px -1px rgb(0 0 0 / 0.1); /* Add shadow */
+}
+
+.dark .editor-readonly .editor-content-wrapper {
+	background-color: hsl(var(--background)); /* Dark mode background */
 }
 
 .editor-readonly .editor-input {
-	padding: 0;
-	padding-left: 0; /* No drag handle space in read-only */
+	padding: 1rem;
+	padding-left: 1rem; /* No drag handle space in read-only, but keep padding */
 	cursor: default;
+}
+
+/* Display-only mode (inside InlineSaveEditor) - no background/border */
+.editor-readonly .editor-content-wrapper-display {
+	/* No border, no background - transparent to parent */
+	border: none;
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+}
+
+.editor-readonly .editor-input-display {
+	padding: 0; /* No padding - parent handles it */
+	cursor: default;
+	min-height: auto;
+}
+
+/* Clickable display mode - inherit cursor from parent */
+.editor-readonly.editor-clickable .editor-input-display,
+.editor-readonly.editor-clickable .editor-input-display * {
+	cursor: inherit !important;
 }
 
 /* Toolbar */
@@ -325,15 +376,17 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.25rem;
-	padding: 0.5rem;
-	border-bottom: 1px solid rgb(229 231 235);
-	background-color: rgb(249 250 251);
+	gap: 0.5rem;
+	padding: 0.75rem;
+	border: none; /* No border - parent container handles it */
+	border-bottom: 2px solid hsl(var(--border)); /* Only bottom border for visual separation */
+	background-color: hsl(var(--muted) / 0.5);
+	box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .dark .editor-toolbar {
-	border-bottom-color: rgb(55 65 81);
-	background-color: rgb(17 24 39);
+	background-color: rgb(15, 21, 33); /* dark:bg-gray-800 */
+	border-bottom-color: rgb(55 65 81); /* dark:border-gray-700 */
 }
 
 .editor-toolbar-button {
@@ -344,22 +397,27 @@
 	width: 2rem;
 	border-radius: 0.25rem;
 	transition: background-color 0.15s;
+	color: rgb(55 65 81); /* text-gray-700 */
+}
+
+.dark .editor-toolbar-button {
+	color: rgb(209 213 219); /* dark:text-gray-300 */
 }
 
 .editor-toolbar-button:hover {
-	background-color: rgb(229 231 235);
+	background-color: rgb(229 231 235); /* hover:bg-gray-200 */
 }
 
 .dark .editor-toolbar-button:hover {
-	background-color: rgb(55 65 81);
+	background-color: rgb(55 65 81); /* dark:hover:bg-gray-700 */
 }
 
 .editor-toolbar-button.active {
-	background-color: rgb(229 231 235);
+	background-color: rgb(229 231 235); /* bg-gray-200 */
 }
 
 .dark .editor-toolbar-button.active {
-	background-color: rgb(55 65 81);
+	background-color: rgb(55 65 81); /* dark:bg-gray-700 */
 }
 
 .editor-toolbar-button:disabled {
@@ -369,13 +427,13 @@
 
 .editor-toolbar-separator {
 	width: 1px;
-	height: 1.5rem;
-	background-color: rgb(209 213 219);
-	margin: 0 0.25rem;
+	height: 1.75rem;
+	background-color: rgb(209 213 219); /* gray-300 for light mode */
+	margin: 0 0.5rem;
 }
 
 .dark .editor-toolbar-separator {
-	background-color: rgb(75 85 99);
+	background-color: rgb(75 85 99); /* gray-600 for dark mode */
 }
 
 /* Word count indicator */
@@ -428,4 +486,275 @@
 
 .dark .editor-container.disabled {
 	background-color: rgb(31 41 55);
+}
+
+/* ============================================ */
+/* Table Styles */
+/* ============================================ */
+
+/* Table container */
+.editor-table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	overflow-x: auto;
+	overflow-y: visible;
+	table-layout: fixed;
+	width: 100%;
+	margin: 1.5rem 0;
+	border: 2px solid rgb(209 213 219); /* gray-300 - visible border */
+}
+
+.dark .editor-table {
+	border-color: rgb(75 85 99); /* gray-600 */
+}
+
+/* Table rows */
+.editor-table-row {
+	border: 1px solid rgb(209 213 219); /* gray-300 */
+}
+
+.dark .editor-table-row {
+	border-color: rgb(75 85 99); /* gray-600 */
+}
+
+/* Table cells - base styles */
+.editor-table-cell {
+	border: 1px solid rgb(209 213 219); /* gray-300 - visible border */
+	min-width: 100px;
+	width: fit-content;
+	word-wrap: break-word;
+	vertical-align: top;
+	text-align: start;
+	padding: 0.5rem 0.75rem;
+	position: relative;
+	outline: none;
+	background-color: rgb(255 255 255); /* white */
+}
+
+.dark .editor-table-cell {
+	background-color: rgb(31 41 55); /* gray-800 */
+	border-color: rgb(75 85 99); /* gray-600 */
+}
+
+/* Table cell paragraphs */
+.editor-table-cell p {
+	text-wrap: balance;
+	margin-bottom: 0.25rem;
+}
+
+.editor-table-cell p:last-child {
+	margin-bottom: 0;
+}
+
+/* Table header cells */
+.editor-table-cell-header {
+	background-color: rgb(249 250 251); /* gray-50 */
+	font-weight: 600;
+	text-align: start;
+}
+
+.dark .editor-table-cell-header {
+	background-color: rgb(31 41 55); /* gray-800 */
+}
+
+/* Table cell selection */
+.editor-table-selection *::selection {
+	background-color: transparent;
+}
+
+.editor-table-selected {
+	outline: 2px solid rgb(59 130 246); /* blue-500 */
+}
+
+/* Selected cell background */
+.editor-table-cell-selected {
+	background-color: rgb(219 234 254); /* blue-100 */
+}
+
+.dark .editor-table-cell-selected {
+	background-color: rgb(30 58 138); /* blue-900 */
+}
+
+/* Primary selected cell (active cell) */
+.editor-table-cell-primary-selected {
+	border: 2px solid rgb(59 130 246); /* blue-500 */
+	display: block;
+	height: calc(100% - 2px);
+	position: absolute;
+	width: calc(100% - 2px);
+	left: -1px;
+	top: -1px;
+	z-index: 2;
+}
+
+/* Cell being edited */
+.editor-table-cell-editing {
+	box-shadow: 0 0 0 2px rgb(59 130 246); /* blue-500 */
+	border-radius: 0.25rem;
+}
+
+/* Cell resize handle */
+.editor-table-cell-resizer {
+	position: absolute;
+	right: -4px;
+	height: 100%;
+	width: 8px;
+	cursor: ew-resize;
+	z-index: 10;
+	top: 0;
+}
+
+/* Cell resize ruler (visual indicator during resize) */
+.editor-table-cell-resize-ruler {
+	display: block;
+	position: absolute;
+	width: 1px;
+	background-color: rgb(59 130 246); /* blue-500 */
+	height: 100%;
+	top: 0;
+}
+
+/* Sorted indicator */
+.editor-table-cell-sorted-indicator {
+	display: block;
+	opacity: 0.5;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	background-color: rgb(156 163 175); /* gray-400 */
+}
+
+/* Add columns button */
+.editor-table-add-columns {
+	position: absolute;
+	top: 0;
+	width: 20px;
+	background-color: rgb(243 244 246); /* gray-100 */
+	height: 100%;
+	right: -25px;
+	animation: table-controls-fade-in 0.2s ease;
+	border: 0;
+	cursor: pointer;
+	transition: background-color 0.15s;
+}
+
+.dark .editor-table-add-columns {
+	background-color: rgb(55 65 81); /* gray-700 */
+}
+
+.editor-table-add-columns:after {
+	content: "+";
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	opacity: 0.6;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: rgb(107 114 128); /* gray-500 */
+}
+
+.dark .editor-table-add-columns:after {
+	color: rgb(209 213 219); /* gray-300 */
+}
+
+.editor-table-add-columns:hover {
+	background-color: rgb(219 234 254); /* blue-100 */
+}
+
+.dark .editor-table-add-columns:hover {
+	background-color: rgb(30 58 138); /* blue-900 */
+}
+
+/* Add rows button */
+.editor-table-add-rows {
+	position: absolute;
+	bottom: -25px;
+	width: calc(100% - 25px);
+	background-color: rgb(243 244 246); /* gray-100 */
+	height: 20px;
+	left: 0;
+	animation: table-controls-fade-in 0.2s ease;
+	border: 0;
+	cursor: pointer;
+	transition: background-color 0.15s;
+}
+
+.dark .editor-table-add-rows {
+	background-color: rgb(55 65 81); /* gray-700 */
+}
+
+.editor-table-add-rows:after {
+	content: "+";
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	opacity: 0.6;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: rgb(107 114 128); /* gray-500 */
+}
+
+.dark .editor-table-add-rows:after {
+	color: rgb(209 213 219); /* gray-300 */
+}
+
+.editor-table-add-rows:hover {
+	background-color: rgb(219 234 254); /* blue-100 */
+}
+
+.dark .editor-table-add-rows:hover {
+	background-color: rgb(30 58 138); /* blue-900 */
+}
+
+/* Table controls fade-in animation */
+@keyframes table-controls-fade-in {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+/* Table action button container */
+.editor-table-action-button-container {
+	display: block;
+	right: 5px;
+	top: 6px;
+	position: absolute;
+	z-index: 4;
+	width: 20px;
+	height: 20px;
+}
+
+/* Table action button (cell menu) */
+.editor-table-action-button {
+	background-color: rgb(243 244 246); /* gray-100 */
+	display: block;
+	border: 0;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	color: rgb(55 65 81); /* gray-700 */
+	cursor: pointer;
+	transition: background-color 0.15s;
+}
+
+.dark .editor-table-action-button {
+	background-color: rgb(55 65 81); /* gray-700 */
+	color: rgb(209 213 219); /* gray-300 */
+}
+
+.editor-table-action-button:hover {
+	background-color: rgb(229 231 235); /* gray-200 */
+}
+
+.dark .editor-table-action-button:hover {
+	background-color: rgb(75 85 99); /* gray-600 */
 }

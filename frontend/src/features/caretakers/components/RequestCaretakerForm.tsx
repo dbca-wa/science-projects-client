@@ -30,7 +30,6 @@ import {
 import {
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
@@ -124,9 +123,13 @@ export const RequestCaretakerForm = ({
 		},
 	});
 
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const watchedReason = form.watch("reason");
+
 	const watchedCaretakerUserId = form.watch("caretakerUserId");
+
 	const watchedEndDate = form.watch("endDate");
+
 	const watchedNotes = form.watch("notes");
 
 	// Check if form is valid based on current values
@@ -371,20 +374,18 @@ export const RequestCaretakerForm = ({
 									className="cursor-pointer select-none text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
 								>
 									Approve as Admin
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<Info className="h-4 w-4 text-muted-foreground cursor-help" />
-											</TooltipTrigger>
-											<TooltipContent>
-												<p className="max-w-xs">
-													As an admin, you can approve this caretaker request
-													immediately after submission. If unchecked, the
-													request will be pending and require approval later.
-												</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Info className="h-4 w-4 text-muted-foreground cursor-help" />
+										</TooltipTrigger>
+										<TooltipContent>
+											<p className="max-w-xs">
+												As an admin, you can approve this caretaker request
+												immediately after submission. If unchecked, the request
+												will be pending and require approval later.
+											</p>
+										</TooltipContent>
+									</Tooltip>
 								</label>
 							</div>
 						)}

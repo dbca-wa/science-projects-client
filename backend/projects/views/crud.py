@@ -229,6 +229,13 @@ class ProjectDetails(APIView):
             ProjectPlan,
             StudentReport,
         )
+        from documents.serializers import (
+            TinyConceptPlanSerializer,
+            TinyProgressReportSerializer,
+            TinyProjectClosureSerializer,
+            TinyProjectPlanSerializer,
+            TinyStudentReportSerializer,
+        )
 
         from ..models import (
             ExternalProjectDetails,
@@ -298,10 +305,7 @@ class ProjectDetails(APIView):
             concept_plan = ConceptPlan.objects.select_related("document").get(
                 project=project
             )
-            documents["concept_plan"] = {
-                "id": concept_plan.id,
-                "status": concept_plan.document.status,
-            }
+            documents["concept_plan"] = TinyConceptPlanSerializer(concept_plan).data
         except ConceptPlan.DoesNotExist:
             pass
 
@@ -310,10 +314,7 @@ class ProjectDetails(APIView):
             project_plan = ProjectPlan.objects.select_related("document").get(
                 project=project
             )
-            documents["project_plan"] = {
-                "id": project_plan.id,
-                "status": project_plan.document.status,
-            }
+            documents["project_plan"] = TinyProjectPlanSerializer(project_plan).data
         except ProjectPlan.DoesNotExist:
             pass
 
@@ -323,9 +324,9 @@ class ProjectDetails(APIView):
             .select_related("document")
             .order_by("-year", "-id")
         )
-        documents["progress_reports"] = [
-            {"id": pr.id, "status": pr.document.status} for pr in progress_reports
-        ]
+        documents["progress_reports"] = TinyProgressReportSerializer(
+            progress_reports, many=True
+        ).data
 
         # Get student reports
         student_reports = (
@@ -333,19 +334,18 @@ class ProjectDetails(APIView):
             .select_related("document")
             .order_by("-id")
         )
-        documents["student_reports"] = [
-            {"id": sr.id, "status": sr.document.status} for sr in student_reports
-        ]
+        documents["student_reports"] = TinyStudentReportSerializer(
+            student_reports, many=True
+        ).data
 
         # Get project closure
         try:
             project_closure = ProjectClosure.objects.select_related("document").get(
                 project=project
             )
-            documents["project_closure"] = {
-                "id": project_closure.id,
-                "status": project_closure.document.status,
-            }
+            documents["project_closure"] = TinyProjectClosureSerializer(
+                project_closure
+            ).data
         except ProjectClosure.DoesNotExist:
             pass
 
@@ -367,16 +367,32 @@ class ProjectDetails(APIView):
         """
         Instantiate and return the list of permissions that this view requires.
         """
-        if self.request.method in ["PUT", "DELETE"]:
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsAuthenticated(), CanEditProject()]
         return [IsAuthenticated()]
 
-    def put(self, request, pk):
-        """Update project"""
+    def patch(self, request, pk):
+        """Partial update project"""
         project = ProjectService.get_project(pk)
         self.check_object_permissions(request, project)
 
         serializer = ProjectUpdateSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        project = ProjectService.update_project(
+            pk=pk, user=request.user, data=serializer.validated_data
+        )
+
+        result_serializer = ProjectSerializer(project)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
+
+    def put(self, request, pk):
+        """Full update project (replace entire resource)"""
+        project = ProjectService.get_project(pk)
+        self.check_object_permissions(request, project)
+
+        serializer = ProjectUpdateSerializer(data=request.data, partial=False)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 

@@ -70,39 +70,6 @@ class CaretakerRequestService:
             raise PermissionDenied("You are not authorized to respond to this request")
 
     @staticmethod
-    @transaction.atomic
-    def auto_cancel_expired_request(task):
-        """
-        Auto-cancel a caretaker request if it has expired
-
-        Args:
-            task: AdminTask instance
-
-        Returns:
-            bool: True if cancelled, False if not expired
-        """
-        # Only cancel if task has end_date and it's in the past
-        if not task.end_date:
-            return False
-
-        # Convert end_date to date if it's a datetime
-        end_date = task.end_date
-        if isinstance(end_date, datetime):
-            end_date = end_date.date()
-
-        if end_date >= timezone.now().date():
-            return False
-
-        # Cancel the task
-        task.status = AdminTask.TaskStatus.CANCELLED
-        task.notes = f"Auto-cancelled: Request expired on {end_date}"
-        task.save()
-
-        settings.LOGGER.info(f"Auto-cancelled expired caretaker request {task.pk}")
-
-        return True
-
-    @staticmethod
     def get_user_requests(user):
         """
         Get caretaker requests for a user
@@ -110,8 +77,6 @@ class CaretakerRequestService:
         Returns both:
         - caretaker_request: Request where user is primary_user (wants someone to be THEIR caretaker)
         - become_caretaker_request: Request where user is in secondary_users (someone wants THEM to be caretaker)
-
-        Auto-cancels any expired requests.
 
         Args:
             user: User instance
@@ -133,14 +98,6 @@ class CaretakerRequestService:
             .first()
         )
 
-        # Auto-cancel if expired
-        if caretaker_request:
-            cancelled = CaretakerRequestService.auto_cancel_expired_request(
-                caretaker_request
-            )
-            if cancelled:
-                caretaker_request = None
-
         # Get become caretaker request (someone wants user to be their caretaker)
         become_caretaker_request = (
             AdminTask.objects.filter(
@@ -154,14 +111,6 @@ class CaretakerRequestService:
             )
             .first()
         )
-
-        # Auto-cancel if expired
-        if become_caretaker_request:
-            cancelled = CaretakerRequestService.auto_cancel_expired_request(
-                become_caretaker_request
-            )
-            if cancelled:
-                become_caretaker_request = None
 
         return {
             "caretaker_request": caretaker_request,
@@ -358,7 +307,6 @@ class CaretakerRequestService:
                 user=task.primary_user,
                 caretaker=caretaker,
                 reason=task.reason,
-                end_date=task.end_date,
                 notes=task.notes,
             )
         except Exception as e:

@@ -309,6 +309,77 @@ class TestMembersForProject:
         assert isinstance(response.data, list)
         assert len(response.data) >= 4  # 1 leader + 3 members
 
+    @pytest.mark.integration
+    def test_reorder_team_members(self, api_client, user, project_with_members, db):
+        """Test reordering team members via drag and drop"""
+        # Arrange
+        api_client.force_authenticate(user=user)
+
+        # Get current members
+        members = list(project_with_members.members.all().order_by("position"))
+        assert len(members) >= 2, "Need at least 2 members to test reordering"
+
+        # Create reorder payload - swap positions of first two non-leader members
+        non_leaders = [m for m in members if not m.is_leader]
+        assert len(non_leaders) >= 2, "Need at least 2 non-leader members"
+
+        reorder_data = {
+            "members": [
+                {"id": non_leaders[0].pk, "position": 3},
+                {"id": non_leaders[1].pk, "position": 2},
+            ]
+        }
+
+        # Act
+        response = api_client.put(
+            projects_urls.path(project_with_members.pk, "team"),
+            data=reorder_data,
+            format="json",
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.data, list)
+
+        # Verify positions were updated
+        updated_member_0 = project_with_members.members.get(pk=non_leaders[0].pk)
+        updated_member_1 = project_with_members.members.get(pk=non_leaders[1].pk)
+        assert updated_member_0.position == 3
+        assert updated_member_1.position == 2
+
+    @pytest.mark.integration
+    def test_reorder_keeps_leader_at_position_one(
+        self, api_client, user, project_with_members, db
+    ):
+        """Test that leader always stays at position 1 when reordering"""
+        # Arrange
+        api_client.force_authenticate(user=user)
+
+        # Get leader (use first() in case there are multiple)
+        leader = project_with_members.members.filter(is_leader=True).first()
+        assert leader is not None, "Project should have a leader"
+
+        # Try to move leader to position 5
+        reorder_data = {
+            "members": [
+                {"id": leader.pk, "position": 5},
+            ]
+        }
+
+        # Act
+        response = api_client.put(
+            projects_urls.path(project_with_members.pk, "team"),
+            data=reorder_data,
+            format="json",
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+        # Verify leader is still at position 1
+        leader.refresh_from_db()
+        assert leader.position == 1, "Leader should always be at position 1"
+
 
 class TestProjectLeaderDetail:
     """Tests for ProjectLeaderDetail view"""

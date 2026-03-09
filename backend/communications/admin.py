@@ -77,7 +77,7 @@ class ChatRoomAdmin(admin.ModelAdmin):
 
 
 @admin.register(Comment)
-class Comment(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin):
     list_display = [
         "text",
         "user",
@@ -92,7 +92,7 @@ class Comment(admin.ModelAdmin):
         "is_removed",
     ]
 
-    search_fields = ["text", "user__username", "document__project"]
+    search_fields = ["text", "user__username", "document__project__title"]
 
     @admin.display(description="Document")
     def document_truncated(self, obj):

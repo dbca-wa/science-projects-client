@@ -12,18 +12,20 @@ import type {
 
 export interface IUserData {
 	id: number;
-	username: string;
+	username: string | null;
 	email: string;
-	display_first_name: string;
-	display_last_name: string;
-	first_name: string;
-	last_name: string;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	first_name: string | null;
+	last_name: string | null;
 	is_superuser: boolean;
 	is_staff: boolean;
 	is_active: boolean;
+	is_aec?: boolean;
 	image: IImageData;
 	business_area: IBusinessArea | undefined;
-	role: string;
+	role: string | null;
+	// Note: IUserMe has role as string | null
 	branch: IBranch;
 	affiliation: IAffiliation;
 	branches?: IBranch[];
@@ -36,12 +38,13 @@ export interface IUserData {
 	title?: string;
 	about?: string;
 	expertise?: string;
+	date_joined?: Date;
 }
 
 export interface IMiniUser {
 	id: number;
-	first_name: string;
-	last_name: string;
+	first_name: string | null;
+	last_name: string | null;
 	username: string;
 	email: string;
 	is_active: boolean;
@@ -69,8 +72,8 @@ export interface IUserMe {
 	phone: string;
 	fax: string;
 	username: string;
-	first_name: string;
-	last_name: string;
+	first_name: string | null;
+	last_name: string | null;
 	title: string;
 	is_superuser: boolean;
 	is_staff: boolean;
@@ -96,8 +99,8 @@ export interface IMemberUserDetails extends IUserData {
 export interface IPersonalInformation {
 	display_first_name: string | null;
 	display_last_name: string | null;
-	first_name: string;
-	last_name: string;
+	first_name: string | null;
+	last_name: string | null;
 	email: string;
 	title: string;
 	phone: string;

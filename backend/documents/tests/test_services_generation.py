@@ -24,10 +24,13 @@ class TestPDFService:
     """Test PDFService business logic"""
 
     @pytest.mark.django_db
+    @patch("medias.models.validate_document_upload")
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
     @pytest.mark.unit
-    def test_generate_document_pdf_success(self, mock_render, mock_subprocess):
+    def test_generate_document_pdf_success(
+        self, mock_render, mock_subprocess, mock_validate
+    ):
         """Test generate_document_pdf creates PDF successfully"""
         # Arrange
         from documents.tests.factories import ConceptPlanFactory
@@ -35,6 +38,11 @@ class TestPDFService:
         concept_plan = ConceptPlanFactory()
         mock_render.return_value = "<html>Test document</html>"
         mock_subprocess.return_value = Mock(returncode=0, stderr="")
+        # Mock file validation to return sanitised name and mime type
+        mock_validate.return_value = (
+            f"{concept_plan.document.project.pk}_concept_{concept_plan.document.pk}.pdf",
+            "application/pdf",
+        )
 
         # Act
         with patch("builtins.open", create=True) as mock_open:
@@ -45,15 +53,18 @@ class TestPDFService:
 
         # Assert
         assert pdf_file is not None
-        assert pdf_file.name == f"concept_{concept_plan.document.pk}.pdf"
+        assert pdf_file.file.name.endswith(".pdf")
         mock_render.assert_called_once()
         mock_subprocess.assert_called_once()
 
     @pytest.mark.django_db
+    @patch("medias.models.validate_document_upload")
     @patch("documents.services.pdf_service.subprocess.run")
     @patch("documents.services.pdf_service.render_to_string")
     @pytest.mark.unit
-    def test_generate_document_pdf_custom_template(self, mock_render, mock_subprocess):
+    def test_generate_document_pdf_custom_template(
+        self, mock_render, mock_subprocess, mock_validate
+    ):
         """Test generate_document_pdf uses custom template"""
         # Arrange
         from documents.tests.factories import ConceptPlanFactory
@@ -61,6 +72,11 @@ class TestPDFService:
         concept_plan = ConceptPlanFactory()
         mock_render.return_value = "<html>Custom template</html>"
         mock_subprocess.return_value = Mock(returncode=0, stderr="")
+        # Mock file validation to return sanitised name and mime type
+        mock_validate.return_value = (
+            f"{concept_plan.document.project.pk}_concept_{concept_plan.document.pk}.pdf",
+            "application/pdf",
+        )
 
         # Act
         with patch("builtins.open", create=True) as mock_open:

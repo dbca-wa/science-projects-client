@@ -15,13 +15,13 @@ export const userDetailKeys = {
  * - Only enabled when userId is provided
  * - Automatically refetches in background when data becomes stale
  *
- * @param userId - User primary key
+ * @param userId - User primary key (optional)
  * @returns TanStack Query result with user detail data
  */
-export const useUserDetail = (userId: number) => {
+export const useUserDetail = (userId: number | undefined) => {
 	return useQuery({
-		queryKey: userDetailKeys.detail(userId),
-		queryFn: () => getFullUser(userId),
+		queryKey: userDetailKeys.detail(userId as number),
+		queryFn: () => getFullUser(userId as number),
 		staleTime: 5 * 60_000, // 5 minutes
 		enabled: !!userId, // Only fetch if userId is provided
 	});

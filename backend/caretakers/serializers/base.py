@@ -22,7 +22,6 @@ class CaretakerSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "caretaker",
-            "end_date",
             "reason",
             "notes",
             "created_at",

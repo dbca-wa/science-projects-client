@@ -7,6 +7,10 @@
 // Main components
 export { RichTextEditor } from "./RichTextEditor";
 export { RichTextDisplay } from "./RichTextDisplay";
+export { FormRichTextEditor } from "./FormRichTextEditor";
+export { InlineSaveEditor } from "./InlineSaveEditor";
+export { WordCounter } from "./WordCounter";
+export { FormUnsavedChangesDialog } from "./FormUnsavedChangesDialog";
 
 // Types
 export type {
@@ -21,6 +25,10 @@ export type {
 	AutoLinkPluginProps,
 	TabIndentationPluginProps,
 } from "@/shared/types/editor.types";
+
+export type { FormRichTextEditorProps } from "./FormRichTextEditor";
+export type { InlineSaveEditorProps } from "./InlineSaveEditor";
+export type { WordCounterProps } from "./WordCounter";
 
 // Toolbar components (will be implemented in subsequent tasks)
 // export { Toolbar } from './toolbar/Toolbar';

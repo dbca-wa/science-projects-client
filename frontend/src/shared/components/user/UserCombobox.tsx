@@ -65,6 +65,7 @@ export interface UserComboboxProps {
 	disabled?: boolean;
 	className?: string;
 	wrapperClassName?: string;
+	maxResults?: number; // Maximum number of results to display (default: 10)
 
 	// Accessibility
 	ariaLabel?: string; // Accessible name when label is not provided
@@ -85,6 +86,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 			placeholder = "Search for a user...",
 			showIcon = false,
 			ariaLabel = "Search for a user", // Default accessible name
+			maxResults = 10, // Default to 10 results
 			...props
 		},
 		ref
@@ -105,7 +107,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 				onlySuperuser: false,
 				ignoreArray: excludeUserIds,
 			});
-			return result.users.slice(0, 10);
+			return result.users.slice(0, maxResults);
 		};
 
 		// Handle clear selection (exposed via ref)
@@ -141,6 +143,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 				showIcon={showIcon}
 				placeholder={placeholder}
 				ariaLabel={ariaLabel}
+				maxResults={maxResults}
 				{...props}
 				ref={ref}
 			/>

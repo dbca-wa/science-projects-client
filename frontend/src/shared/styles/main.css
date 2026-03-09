@@ -163,6 +163,135 @@
 		animation: step-pulse 2s ease-in-out infinite;
 	}
 
+	/* Pulsing border animation for unsaved changes */
+	@keyframes pulse-border {
+		0%,
+		100% {
+			border-color: rgb(239 68 68); /* red-500 */
+			box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+		}
+		50% {
+			border-color: rgb(220 38 38); /* red-600 */
+			box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+		}
+	}
+
+	.dark .animate-pulse-border {
+		@keyframes pulse-border {
+			0%,
+			100% {
+				border-color: rgb(220 38 38); /* red-600 */
+				box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+			}
+			50% {
+				border-color: rgb(185 28 28); /* red-700 */
+				box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
+			}
+		}
+	}
+
+	.animate-pulse-border {
+		animation: pulse-border 2s ease-in-out infinite;
+	}
+
+	/* Editor highlight animation for navigation blocking */
+	@keyframes highlight-pulse {
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+		}
+		50% {
+			box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+		}
+	}
+
+	.editor-highlight {
+		animation: highlight-pulse 1s ease-in-out 2;
+	}
+
+	/* Content diff highlighting styles */
+	.diff-addition {
+		background-color: #dcfce7;
+		color: #14532d;
+		padding: 0 0.25rem;
+		border-radius: 0.25rem;
+		font-weight: 500;
+	}
+
+	.dark .diff-addition {
+		background-color: rgba(34, 197, 94, 0.2);
+		color: #86efac;
+	}
+
+	.diff-deletion {
+		background-color: #fee2e2;
+		color: #7f1d1d;
+		text-decoration: line-through;
+		padding: 0 0.25rem;
+		border-radius: 0.25rem;
+	}
+
+	.dark .diff-deletion {
+		background-color: rgba(239, 68, 68, 0.2);
+		color: #fca5a5;
+	}
+
+	/* Basic prose styling for diff display */
+	.diff-prose p {
+		margin-bottom: 0.75rem;
+	}
+
+	.diff-prose p:last-child {
+		margin-bottom: 0;
+	}
+
+	.diff-prose ul,
+	.diff-prose ol {
+		margin: 0.75rem 0;
+		padding-left: 1.5rem;
+	}
+
+	.diff-prose li {
+		margin-bottom: 0.25rem;
+	}
+
+	.diff-prose h2,
+	.diff-prose h3,
+	.diff-prose h4 {
+		font-weight: 600;
+		margin-top: 1rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.diff-prose h2 {
+		font-size: 1.25rem;
+	}
+
+	.diff-prose h3 {
+		font-size: 1.125rem;
+	}
+
+	.diff-prose h4 {
+		font-size: 1rem;
+	}
+
+	.diff-prose strong {
+		font-weight: 600;
+	}
+
+	.diff-prose em {
+		font-style: italic;
+	}
+
+	.diff-prose a {
+		color: #2563eb;
+		text-decoration: underline;
+	}
+
+	.dark .diff-prose a {
+		color: #60a5fa;
+	}
+
 	/* Table styling utilities */
 	.table-header-row {
 		background-color: transparent;

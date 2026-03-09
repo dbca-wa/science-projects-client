@@ -15,7 +15,7 @@ import {
 import { MapPin, Plus } from "lucide-react";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
-import { DownloadProjectsCSVButton } from "@/features/projects/components/DownloadProjectsCSVButton";
+import { DownloadProjectsCSVButton } from "@/features/projects/components/list/DownloadProjectsCSVButton";
 import { PageTransition } from "@/shared/components/PageTransition";
 
 /**

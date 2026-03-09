@@ -55,7 +55,7 @@ export const RegionLayer = ({
 			const originalStyle = { ...style };
 
 			// CRITICAL: Immediately make non-focusable when layer is created
-			const element = (layer as any)._path;
+			const element = (layer as L.Path & { _path?: HTMLElement })._path;
 			if (element) {
 				element.setAttribute("tabindex", "-1");
 				element.setAttribute("aria-hidden", "true");
@@ -92,7 +92,7 @@ export const RegionLayer = ({
 				},
 				add: () => {
 					// Double-check attributes after add event
-					const el = (layer as any)._path;
+					const el = (layer as L.Path & { _path?: HTMLElement })._path;
 					if (el) {
 						el.setAttribute("tabindex", "-1");
 						el.setAttribute("aria-hidden", "true");
@@ -124,7 +124,10 @@ export const RegionLayer = ({
 
 				// Make tooltip element non-focusable
 				layer.on("tooltipopen", () => {
-					const tooltipElement = (tooltip as any)._tooltip?._container;
+					const tooltipInstance = tooltip as unknown as L.Tooltip & {
+						_tooltip?: { _container?: HTMLElement };
+					};
+					const tooltipElement = tooltipInstance._tooltip?._container;
 					if (tooltipElement) {
 						tooltipElement.setAttribute("tabindex", "-1");
 						tooltipElement.setAttribute("aria-hidden", "true");

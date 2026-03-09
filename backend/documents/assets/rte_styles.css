@@ -1204,28 +1204,24 @@ margin: 30px 0;
 border: 1px black solid;
 }
 
-.table-light th,
-.table-light td,
-.table-light tr {
-  border: 1px solid black !important;
-}
+/* Removed !important border rule that was overriding inline styles */
 
 .table-cell-light {
-  border: 1px solid #575757;
   background-color: #ffffff;
-
-  width: 75px;
+  outline: none;
+  min-width: 75px;
   word-wrap: break-word;
+  padding: 12px 16px;
   vertical-align: top;
   text-align: start;
-  padding: 6px 8px;
-  outline: none;
-  border: 1px black solid;
+  border-right: 0.5px solid #d1d5db;
+  border-bottom: 0.5px solid #d1d5db;
   }
 
   .table-cell-header-light {
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(242, 243, 245);
     text-align: start;
+    font-weight: 600;
     }
 
 

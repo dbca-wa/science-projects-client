@@ -5,6 +5,8 @@ import { EditorStore } from "./derived/editor.store";
 import { UserSearchStore } from "./derived/user-search.store";
 import { ProjectSearchStore } from "./derived/project-search.store";
 import { ProjectWizardStore } from "./derived/project-wizard.store";
+import { CreateProjectWizardStore } from "./derived/create-project-wizard.store";
+import { EditProjectStore } from "./derived/edit-project.store";
 import { ProjectMapStore } from "./derived/project-map.store";
 import { MyProjectsStore } from "./derived/my-projects.store";
 
@@ -18,6 +20,8 @@ class RootStore {
 	userSearchStore: UserSearchStore;
 	projectSearchStore: ProjectSearchStore;
 	projectWizardStore: ProjectWizardStore;
+	createProjectWizardStore: CreateProjectWizardStore;
+	editProjectStore: EditProjectStore;
 	projectMapStore: ProjectMapStore;
 	myProjectsStore: MyProjectsStore;
 
@@ -28,6 +32,8 @@ class RootStore {
 		this.userSearchStore = new UserSearchStore();
 		this.projectSearchStore = new ProjectSearchStore();
 		this.projectWizardStore = new ProjectWizardStore();
+		this.createProjectWizardStore = new CreateProjectWizardStore();
+		this.editProjectStore = new EditProjectStore();
 		this.projectMapStore = new ProjectMapStore();
 		this.myProjectsStore = new MyProjectsStore();
 	}
@@ -57,5 +63,8 @@ export const useEditorStore = () => useStore().editorStore;
 export const useUserSearchStore = () => useStore().userSearchStore;
 export const useProjectSearchStore = () => useStore().projectSearchStore;
 export const useProjectWizardStore = () => useStore().projectWizardStore;
+export const useCreateProjectWizardStore = () =>
+	useStore().createProjectWizardStore;
+export const useEditProjectStore = () => useStore().editProjectStore;
 export const useProjectMapStore = () => useStore().projectMapStore;
 export const useMyProjectsStore = () => useStore().myProjectsStore;

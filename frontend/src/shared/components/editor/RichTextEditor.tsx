@@ -5,24 +5,28 @@
  * Supports multiple toolbar configurations, word limits, and React Hook Form integration.
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "@lexical/rich-text";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { LinkNode, AutoLinkNode } from "@lexical/link";
+import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
 import { editorTheme } from "./theme";
 import { OnChangePlugin } from "./plugins/OnChangePlugin";
 import { PrepopulateHTMLPlugin } from "./plugins/PrepopulateHTMLPlugin";
+import { ControlledValuePlugin } from "./plugins/ControlledValuePlugin";
 import { AutoLinkPlugin } from "./plugins/AutoLinkPlugin";
+import { AutoFocusPlugin } from "./plugins/AutoFocusPlugin";
 import { TabIndentationPlugin } from "./plugins/TabIndentationPlugin";
 import { WordCountPlugin } from "./plugins/WordCountPlugin";
 import { PreventAutoFocusPlugin } from "./plugins/PreventAutoFocusPlugin";
@@ -32,6 +36,8 @@ import { DragDropPlugin } from "./plugins/DragDropPlugin";
 import { PastePlugin } from "./plugins/PastePlugin";
 import { ListMaxIndentPlugin } from "./plugins/ListMaxIndentPlugin";
 import { RemoveEmptyListItemsPlugin } from "./plugins/RemoveEmptyListItemsPlugin";
+import { EditorStoreIntegrationPlugin } from "./plugins/EditorStoreIntegrationPlugin";
+import { MoveCursorToEndPlugin } from "./plugins/MoveCursorToEndPlugin";
 import { Toolbar } from "./toolbar/Toolbar";
 import "@/shared/styles/editor.css";
 
@@ -47,8 +53,14 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
 		const rootElement = editor.getRootElement();
 		if (!rootElement) return;
 
-		const makeEditable = () => {
+		const makeEditable = (event: Event) => {
 			if (!editor.isEditable()) {
+				// Prevent default to stop browser from setting cursor position
+				event.preventDefault();
+
+				// Restore focusability
+				rootElement.setAttribute("tabindex", "0");
+
 				// Make editable without triggering onChange by using a special tag
 				editor.setEditable(true);
 
@@ -61,7 +73,14 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
 		rootElement.addEventListener("click", makeEditable);
 		rootElement.addEventListener("focusin", makeEditable);
 
+		// CRITICAL: Delay making the editor focusable to prevent auto-focus during initialization
+		// This ensures all editors have mounted and content has been populated before any can receive focus
+		const timeoutId = setTimeout(() => {
+			// Editor is now ready to receive focus from user interaction
+		}, 600);
+
 		return () => {
+			clearTimeout(timeoutId);
 			rootElement.removeEventListener("click", makeEditable);
 			rootElement.removeEventListener("focusin", makeEditable);
 		};
@@ -70,77 +89,135 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
 	return null;
 };
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({
-	value,
-	onChange,
-	placeholder = "Enter text...",
-	readOnly = false,
-	disabled = false,
-	toolbar = "full",
-	wordLimit,
-	className = "",
-	minHeight = "150px",
-	"aria-label": ariaLabel,
-	"aria-describedby": ariaDescribedby,
-}) => {
-	const handleError = (error: Error) => {
-		console.error("[RichTextEditor] Lexical error:", error);
-	};
+export const RichTextEditor = React.forwardRef<
+	HTMLDivElement,
+	RichTextEditorProps
+>(
+	(
+		{
+			value,
+			onChange,
+			onSave,
+			placeholder = "Enter text...",
+			readOnly = false,
+			disabled = false,
+			autoFocus = false,
+			moveCursorToEnd = false,
+			toolbar = "full",
+			wordLimit,
+			limitCanBePassed: _limitCanBePassed = false,
+			className = "",
+			minHeight = "150px",
+			"aria-label": ariaLabel,
+			"aria-describedby": ariaDescribedby,
+			"aria-invalid": ariaInvalid,
+		},
+		ref
+	) => {
+		const [_currentContent, setCurrentContent] = useState(value || "");
 
-	const shouldBeEditable = !readOnly && !disabled;
+		const handleError = (error: Error) => {
+			console.error("[RichTextEditor] Lexical error:", error);
+		};
 
-	const initialConfig = {
-		namespace: "RichTextEditor",
-		editable: false, // Start as non-editable, becomes editable on user interaction
-		theme: editorTheme,
-		onError: handleError,
-		nodes: [HeadingNode, ListNode, ListItemNode, LinkNode, AutoLinkNode],
-	};
+		const handleContentChange = (html: string) => {
+			setCurrentContent(html);
+			onChange?.(html);
+		};
 
-	return (
-		<div className={`editor-container ${className}`}>
-			<LexicalComposer initialConfig={initialConfig}>
-				<div className="relative border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-950 overflow-hidden">
+		const shouldBeEditable = !readOnly && !disabled;
+		const shouldStartEditable =
+			shouldBeEditable && (autoFocus || moveCursorToEnd);
+
+		const initialConfig = {
+			namespace: "RichTextEditor",
+			editable: shouldStartEditable, // Start editable if autoFocus or moveCursorToEnd
+			theme: editorTheme,
+			onError: handleError,
+			nodes: [
+				HeadingNode,
+				ListNode,
+				ListItemNode,
+				LinkNode,
+				AutoLinkNode,
+				TableNode,
+				TableCellNode,
+				TableRowNode,
+			],
+		};
+
+		return (
+			<div
+				ref={ref}
+				className={`editor-container ${readOnly ? "editor-readonly" : ""} ${className}`}
+			>
+				<LexicalComposer initialConfig={initialConfig}>
+					{/* Toolbar - separate from content area */}
 					{!readOnly && toolbar !== "none" && (
 						<Toolbar mode={toolbar} disabled={disabled} />
 					)}
 
-					<RichTextPlugin
-						contentEditable={
-							<ContentEditable
-								className="editor-input"
-								style={{ minHeight }}
-								aria-label={ariaLabel}
-								aria-describedby={ariaDescribedby}
-								autoFocus={false}
-							/>
-						}
-						placeholder={
-							!readOnly ? (
-								<div className="editor-placeholder">{placeholder}</div>
-							) : null
-						}
-						ErrorBoundary={LexicalErrorBoundary}
-					/>
+					{/* Content area - with border */}
+					<div className="editor-content-wrapper">
+						<RichTextPlugin
+							contentEditable={
+								<ContentEditable
+									className="editor-input"
+									style={{ minHeight }}
+									role="textbox"
+									aria-label={ariaLabel}
+									aria-describedby={ariaDescribedby}
+									aria-multiline="true"
+									aria-readonly={readOnly}
+									aria-invalid={ariaInvalid}
+									contentEditable={!readOnly && !disabled}
+									// Prevent auto-focus during initialization
+									tabIndex={readOnly ? -1 : 0}
+								/>
+							}
+							placeholder={
+								!readOnly ? (
+									<div className="editor-placeholder" aria-hidden="false">
+										{placeholder}
+									</div>
+								) : null
+							}
+							ErrorBoundary={LexicalErrorBoundary}
+						/>
+					</div>
 
+					{/* Word count display removed - now handled by InlineSaveEditor */}
+
+					{/* Plugins */}
 					<HistoryPlugin />
 					<ListPlugin />
 					<ListMaxIndentPlugin maxDepth={9} />
 					<RemoveEmptyListItemsPlugin />
 					<LinkPlugin />
 					<AutoLinkPlugin />
+					<TablePlugin hasCellMerge={false} hasCellBackgroundColor={false} />
 					<TabIndentationPlugin />
+					{/* PreventAutoFocusPlugin must come before EditableOnInteractionPlugin */}
 					<PreventAutoFocusPlugin />
 					<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
 					<SubscriptSuperscriptPlugin />
-					<SaveOnCtrlSPlugin />
+					<SaveOnCtrlSPlugin onSave={onSave} />
 					<PastePlugin />
 					{!readOnly && <DragDropPlugin />}
-					<OnChangePlugin onChange={onChange} />
+					{autoFocus && <AutoFocusPlugin />}
+					{moveCursorToEnd && <MoveCursorToEndPlugin />}
+					<OnChangePlugin onChange={handleContentChange} />
+					{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
 					<PrepopulateHTMLPlugin html={value} />
+					{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
+					<ControlledValuePlugin value={value} />
 					{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
-				</div>
-			</LexicalComposer>
-		</div>
-	);
-};
+					{/* EditorStore integration - must come after other plugins */}
+					<EditorStoreIntegrationPlugin />
+				</LexicalComposer>
+			</div>
+		);
+	}
+);
+
+RichTextEditor.displayName = "RichTextEditor";

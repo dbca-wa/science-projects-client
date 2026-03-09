@@ -20,7 +20,7 @@ interface InAppSearchSectionProps {
  */
 export const InAppSearchSection = ({ user }: InAppSearchSectionProps) => {
 	return (
-		<Card>
+		<Card className="mb-4">
 			<CardHeader>
 				<CardTitle className="text-lg font-bold">
 					In-App Search Appearance

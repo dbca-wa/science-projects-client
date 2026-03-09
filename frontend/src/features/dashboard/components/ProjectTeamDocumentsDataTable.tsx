@@ -28,6 +28,7 @@ import {
 	type IDocumentTaskWithLevel,
 } from "../utils/document-tasks.utils";
 import { TASK_LEVEL_CONFIG } from "../constants/document-tasks.constants";
+import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface ProjectTeamDocumentsDataTableProps {
 	teamTasks: IProjectDocument[];
@@ -114,7 +115,10 @@ export const ProjectTeamDocumentsDataTable = ({
 					const plainTitle = extractPlainTextTitle(row.project.title);
 					return (
 						<div className="space-y-1">
-							<div className="font-semibold text-blue-600 dark:text-blue-400 break-words">
+							<div
+								className="font-semibold break-words hover:underline cursor-pointer"
+								style={{ color: LINK_COLOR }}
+							>
 								{plainTitle}
 							</div>
 							<div className="text-sm text-gray-600 dark:text-gray-400">

@@ -17,7 +17,7 @@ class CaretakerCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Caretaker
-        fields = ["user", "caretaker", "end_date", "reason", "notes"]
+        fields = ["user", "caretaker", "reason", "notes"]
 
     def validate(self, data):
         """Validate caretaker relationship"""

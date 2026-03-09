@@ -6,7 +6,6 @@ import {
 import {
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -30,29 +29,27 @@ export const CaretakeeCell = ({ user }: CaretakeeCellProps) => {
 	const initials = `${user.display_first_name[0]}${user.display_last_name[0]}`;
 
 	return (
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<div className="flex items-center gap-2">
-						<Avatar className="size-6">
-							<AvatarImage src={getImageUrl(user.image)} alt={fullName} />
-							<AvatarFallback className="text-xs">{initials}</AvatarFallback>
-						</Avatar>
-						<div className="min-w-0">
-							<p className="text-sm font-medium truncate">
-								<span className="text-muted-foreground">For: </span>
-								{fullName}
-							</p>
-						</div>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<div className="flex items-center gap-2">
+					<Avatar className="size-6">
+						<AvatarImage src={getImageUrl(user.image)} alt={fullName} />
+						<AvatarFallback className="text-xs">{initials}</AvatarFallback>
+					</Avatar>
+					<div className="min-w-0">
+						<p className="text-sm font-medium truncate">
+							<span className="text-muted-foreground">For: </span>
+							{fullName}
+						</p>
 					</div>
-				</TooltipTrigger>
-				<TooltipContent>
-					<div className="space-y-1">
-						<p className="font-semibold">{fullName}</p>
-						<p className="text-xs text-muted-foreground">{user.email}</p>
-					</div>
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
+				</div>
+			</TooltipTrigger>
+			<TooltipContent>
+				<div className="space-y-1">
+					<p className="font-semibold">{fullName}</p>
+					<p className="text-xs text-muted-foreground">{user.email}</p>
+				</div>
+			</TooltipContent>
+		</Tooltip>
 	);
 };

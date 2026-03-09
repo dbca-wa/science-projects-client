@@ -136,6 +136,32 @@ class TestDocumentService:
 
     @pytest.mark.django_db
     @pytest.mark.integration
+    def test_delete_closure_document_reverts_status(self):
+        """Test deleting closure document reverts project status to updating"""
+        # Arrange
+        from documents.tests.factories import ProjectClosureFactory
+        from projects.models import Project
+
+        user = UserFactory()
+        project_closure = ProjectClosureFactory()
+        project = project_closure.document.project
+
+        # Set project status to closure_requested
+        project.status = Project.StatusChoices.CLOSUREREQ
+        project.save()
+
+        document_pk = project_closure.document.pk
+
+        # Act
+        DocumentService.delete_document(document_pk, user)
+
+        # Assert
+        assert not ProjectDocument.objects.filter(pk=document_pk).exists()
+        project.refresh_from_db()
+        assert project.status == Project.StatusChoices.UPDATING
+
+    @pytest.mark.django_db
+    @pytest.mark.integration
     def test_get_documents_pending_action_stage_one(self):
         """Test get_documents_pending_action for stage 1"""
         # Arrange

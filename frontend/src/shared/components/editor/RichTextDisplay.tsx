@@ -6,52 +6,41 @@
  */
 
 import React from "react";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { HeadingNode } from "@lexical/rich-text";
-import { ListNode, ListItemNode } from "@lexical/list";
-import { LinkNode, AutoLinkNode } from "@lexical/link";
-
 import type { RichTextDisplayProps } from "@/shared/types/editor.types";
-import { editorTheme } from "./theme";
-import { PrepopulateHTMLPlugin } from "./plugins/PrepopulateHTMLPlugin";
+import { sanitiseHtml } from "@/shared/utils/html-sanitise.utils";
 import "@/shared/styles/editor.css";
 
 export const RichTextDisplay: React.FC<RichTextDisplayProps> = ({
 	content,
 	className = "",
+	emptyMessage = "No content",
 }) => {
-	const handleError = (error: Error) => {
-		console.error("[RichTextDisplay] Lexical error:", error);
-	};
+	// Sanitise HTML content to prevent XSS
+	const sanitisedContent = content ? sanitiseHtml(content) : "";
 
-	const initialConfig = {
-		namespace: "RichTextDisplay",
-		editable: false,
-		theme: editorTheme,
-		onError: handleError,
-		nodes: [HeadingNode, ListNode, ListItemNode, LinkNode, AutoLinkNode],
-	};
-
-	// If no content, return null
-	if (!content) {
-		return null;
+	// If no content, show empty message
+	if (!sanitisedContent) {
+		return (
+			<div className={`${className} italic text-gray-500 dark:text-gray-400`}>
+				{emptyMessage}
+			</div>
+		);
 	}
 
+	// Check if parent has cursor-pointer class (clickable context)
+	const isClickable = className.includes("cursor-inherit");
+
+	// For display-only, render HTML directly without Lexical to avoid accessibility issues
 	return (
-		<div className={`editor-readonly ${className}`}>
-			<LexicalComposer initialConfig={initialConfig}>
-				<RichTextPlugin
-					contentEditable={
-						<ContentEditable className="editor-input p-0 min-h-0" />
-					}
-					placeholder={null}
-					ErrorBoundary={LexicalErrorBoundary}
-				/>
-				<PrepopulateHTMLPlugin html={content} />
-			</LexicalComposer>
+		<div
+			className={`editor-container editor-readonly ${isClickable ? "editor-clickable" : ""} ${className}`}
+		>
+			<div
+				className="editor-input-display"
+				dangerouslySetInnerHTML={{ __html: sanitisedContent }}
+				role="article"
+				aria-label="Content display"
+			/>
 		</div>
 	);
 };

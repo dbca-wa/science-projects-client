@@ -10,7 +10,7 @@ import {
 import { CaretakerSection, CaretakerNotification } from "@/features/caretakers";
 import { CaretakerApprovalModal } from "@/features/caretakers/components/CaretakerApprovalModal";
 import { useMyProjects } from "@/features/projects/hooks/useMyProjects";
-import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";
+import { ProjectsDataTable } from "@/features/projects/components/list/ProjectsDataTable";
 import { useMyProjectsStore } from "@/app/stores/store-context";
 import { observer } from "mobx-react-lite";
 import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";

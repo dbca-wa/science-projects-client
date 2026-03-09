@@ -3,6 +3,9 @@
  *
  * Prevents the editor from auto-focusing on mount and auto-scrolling.
  * This is important when multiple editors are on the same page.
+ *
+ * Works in conjunction with EditableOnInteractionPlugin which restores
+ * focusability when the user clicks on the editor.
  */
 
 import { useEffect } from "react";
@@ -31,12 +34,9 @@ export const PreventAutoFocusPlugin: React.FC = () => {
 			}
 		}
 
-		// Make editor non-focusable initially
-		rootElement.setAttribute("tabindex", "-1");
-
-		// Restore focusability and scrollIntoView after initialization is complete
+		// Restore scrollIntoView after initialization is complete
+		// Note: tabindex is managed by EditableOnInteractionPlugin
 		const timeoutId = setTimeout(() => {
-			rootElement.setAttribute("tabindex", "0");
 			rootElement.scrollIntoView = originalScrollIntoView;
 		}, 500);
 

@@ -22,6 +22,7 @@ export const BreadcrumbProvider = ({ children }: { children: ReactNode }) => {
 	);
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBreadcrumbContext = () => {
 	const context = useContext(BreadcrumbContext);
 	if (!context) {
@@ -36,6 +37,7 @@ export const useBreadcrumbContext = () => {
  * Hook for pages to set custom breadcrumb items
  * This will override the automatic breadcrumbs from route config
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSetBreadcrumbs = (items?: BreadcrumbItem[]) => {
 	const { setOverrideItems } = useBreadcrumbContext();
 

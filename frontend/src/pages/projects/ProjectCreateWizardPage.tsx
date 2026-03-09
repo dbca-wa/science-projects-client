@@ -1,24 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useProjectWizardStore } from "@/app/stores/store-context";
-import { useCreateProject } from "@/features/projects/hooks/useCreateProject";
-import { useWizardNavigation } from "@/features/projects/hooks/useWizardNavigation";
-import { useWizardPersistence } from "@/features/projects/hooks/useWizardPersistence";
-import { Stepper } from "@/shared/components/ui/stepper";
-import { ProgressBar } from "@/features/projects/components/wizard/ProgressBar";
-import { WizardStep } from "@/features/projects/components/wizard/WizardStep";
-import { WizardNavigation } from "@/features/projects/components/wizard/WizardNavigation";
-import { BaseInformationStep } from "@/features/projects/components/wizard-steps/BaseInformationStep";
-import { ProjectDetailsStep } from "@/features/projects/components/wizard-steps/ProjectDetailsStep";
-import { LocationStep } from "@/features/projects/components/wizard-steps/LocationStep";
-import { ExternalDetailsStep } from "@/features/projects/components/wizard-steps/ExternalDetailsStep";
-import { StudentDetailsStep } from "@/features/projects/components/wizard-steps/StudentDetailsStep";
-import { ArrowLeft, Info, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { useCreateProjectWizardStore } from "@/app/stores/store-context";
+import { WizardContainer } from "@/features/projects/components/wizard/WizardContainer";
+import { ArrowLeft } from "lucide-react";
 import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
 import type { ProjectKind } from "@/shared/types/project.types";
-import { Button } from "@/shared/components/ui/button";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { toast } from "sonner";
+import { cn } from "@/shared/lib/utils";
 
 const PROJECT_TYPE_NAMES: Record<ProjectKind, string> = {
 	science: "Science Project",
@@ -30,27 +21,37 @@ const PROJECT_TYPE_NAMES: Record<ProjectKind, string> = {
 const ProjectCreateWizardPage = observer(() => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const wizardStore = useProjectWizardStore();
-	const createProjectMutation = useCreateProject();
-	const wizardNavigation = useWizardNavigation();
-	const { clearDraft, hasDraft } = useWizardPersistence();
+	const store = useCreateProjectWizardStore();
 	const projectKind = searchParams.get("kind") as ProjectKind | null;
-	const [direction, setDirection] = useState<"forward" | "backward">("forward");
-	const [showDraftNotification, setShowDraftNotification] = useState(false);
 
-	// Check for draft on mount
-	useEffect(() => {
-		if (hasDraft()) {
-			setShowDraftNotification(true);
-		}
-	}, [hasDraft]);
-
-	// Initialize wizard store with project kind
+	// Initialize wizard store with project kind and restore from session storage
 	useEffect(() => {
 		if (projectKind && PROJECT_TYPE_NAMES[projectKind]) {
-			wizardStore.setProjectKind(projectKind);
+			store.setProjectKind(projectKind);
+
+			// Try to restore from session storage
+			const restored = store.restoreFromSessionStorage();
+			if (restored && typeof restored === "object" && restored.success) {
+				// Show appropriate toast based on whether image was present
+				if (restored.hadImage) {
+					toast.info("Draft restored", {
+						description:
+							"Note: Images are not saved in drafts and will need to be re-uploaded",
+						duration: 5000,
+					});
+				} else {
+					toast.info("Draft restored", {
+						description: "Your previous work has been restored",
+					});
+				}
+			}
 		}
-	}, [projectKind, wizardStore]);
+
+		// Cleanup on unmount
+		return () => {
+			// Don't clear draft on unmount - let user decide
+		};
+	}, [projectKind, store]);
 
 	// Redirect if no project kind
 	if (!projectKind || !PROJECT_TYPE_NAMES[projectKind]) {
@@ -58,136 +59,47 @@ const ProjectCreateWizardPage = observer(() => {
 		return null;
 	}
 
-	// Define steps based on project kind
-	const baseSteps = [
-		{ label: "Base Information", shortLabel: "Base Info" },
-		{ label: "Project Details", shortLabel: "Details" },
-		{ label: "Location", shortLabel: "Location" },
-	];
+	const handleComplete = (projectId: number) => {
+		toast.success("Project created successfully", {
+			description: "Redirecting to project page...",
+		});
 
-	// Add conditional step for external or student projects
-	const steps =
-		projectKind === "external"
-			? [...baseSteps, { label: "External Details", shortLabel: "External" }]
-			: projectKind === "student"
-				? [...baseSteps, { label: "Student Details", shortLabel: "Student" }]
-				: baseSteps;
+		// Clear draft on successful creation
+		store.clearDraft();
 
-	const handleNext = () => {
-		if (wizardStore.state.currentStep < wizardStore.totalSteps - 1) {
-			// Validate and navigate to next step
-			const success = wizardNavigation.goToNextStep();
-			if (success) {
-				setDirection("forward");
-			}
-		} else {
-			// Last step - validate and submit project
-			const success = wizardNavigation.goToNextStep();
-			if (success) {
-				handleSubmit();
-			}
-		}
-	};
-
-	const handleSubmit = async () => {
-		const formData = wizardStore.state.formData;
-
-		// Set submitting state
-		wizardStore.setSubmitting(true);
-
-		try {
-			// Transform wizard data to API format
-			const projectData: Record<string, unknown> = {
-				// Base Information
-				title: formData.baseInformation.title,
-				description: formData.baseInformation.description,
-				keywords: formData.baseInformation.keywords.join(", "),
-				kind: wizardStore.state.projectKind,
-
-				// Project Details
-				start_date: formData.projectDetails.start_date,
-				end_date: formData.projectDetails.end_date,
-				business_area: formData.projectDetails.business_area,
-				data_custodian: formData.projectDetails.data_custodian,
-				project_leader: formData.projectDetails.project_leader,
-
-				// Location
-				areas: formData.location.areas,
-			};
-
-			// Add image if provided
-			if (formData.baseInformation.image) {
-				projectData.image = formData.baseInformation.image;
-			}
-
-			// Add departmental service if provided
-			if (formData.projectDetails.departmental_service) {
-				projectData.departmental_service =
-					formData.projectDetails.departmental_service;
-			}
-
-			// Add external details if external project
-			if (
-				wizardStore.state.projectKind === "external" &&
-				formData.externalDetails
-			) {
-				projectData.external = {
-					collaboration_with: formData.externalDetails.collaboration_with,
-					budget: formData.externalDetails.budget,
-					description: formData.externalDetails.external_description,
-					aims: formData.externalDetails.aims,
-				};
-			}
-
-			// Add student details if student project
-			if (
-				wizardStore.state.projectKind === "student" &&
-				formData.studentDetails
-			) {
-				projectData.student = {
-					organisation: formData.studentDetails.organisation,
-					level: formData.studentDetails.level,
-				};
-			}
-
-			// Submit the project
-			const createdProject =
-				await createProjectMutation.mutateAsync(projectData);
-
-			// Clear draft and reset wizard
-			clearDraft();
-			wizardStore.resetWizard();
-
-			// Navigate to project detail page with success flag
-			navigate(`/projects/${createdProject.id}/overview`, {
-				state: { showSuccessAnimation: true },
-			});
-		} catch (error) {
-			console.error("Failed to create project:", error);
-			// Error toast is handled by the mutation hook
-		} finally {
-			wizardStore.setSubmitting(false);
-		}
-	};
-
-	const handleBack = () => {
-		setDirection("backward");
-		wizardNavigation.goToPreviousStep();
+		// Navigate to project detail page after short delay
+		setTimeout(() => {
+			navigate(`/projects/${projectId}/overview`);
+		}, 1500);
 	};
 
 	const handleCancel = () => {
-		// TODO: Show confirmation dialog
-		clearDraft();
-		wizardNavigation.resetWizard();
+		// Ask user if they want to save draft
+		const hasDraft = store.state.isDirty;
+
+		if (hasDraft) {
+			const confirmLeave = window.confirm(
+				"You have unsaved changes. Do you want to save your draft?"
+			);
+
+			if (confirmLeave) {
+				store.saveToSessionStorage();
+				toast.info("Draft saved", {
+					description: "You can resume your work later",
+				});
+			}
+		}
+
+		// Navigate back to project type selector
 		navigate("/projects/create");
 	};
 
 	const projectColor = PROJECT_KIND_COLORS[projectKind];
-	const currentStep = wizardStore.state.currentStep;
+	const thisYear = new Date().getFullYear();
 
 	return (
 		<PageTransition>
-			<div className="container mx-auto max-w-5xl px-4 sm:px-6 py-4 sm:py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+			<div className="w-full px-4 sm:px-6 py-4 sm:py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 				{/* Header */}
 				<div className="mb-6 sm:mb-8">
 					<button
@@ -198,122 +110,92 @@ const ProjectCreateWizardPage = observer(() => {
 						<span className="hidden sm:inline">Back to project types</span>
 						<span className="sm:hidden">Back</span>
 					</button>
-					<div className="flex items-center gap-3">
-						<div
-							className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg text-xl sm:text-2xl font-bold text-white shadow-md flex-shrink-0"
-							style={{ backgroundColor: projectColor }}
-						>
-							{currentStep + 1}
-						</div>
-						<div className="min-w-0 flex-1">
-							<h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
-								Create {PROJECT_TYPE_NAMES[projectKind]}
-							</h1>
-							<p className="text-sm sm:text-base text-muted-foreground">
-								<span className="hidden sm:inline">
-									{steps[currentStep].label}
-								</span>
-								<span className="sm:hidden">
-									{steps[currentStep].shortLabel}
-								</span>{" "}
-								• Step {currentStep + 1} of {wizardStore.totalSteps}
-							</p>
-						</div>
-					</div>
-				</div>
-
-				{/* Draft Notification */}
-				{showDraftNotification && (
-					<div className="mb-6 sm:mb-8 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950 p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-						<div className="flex items-start gap-3">
-							<div className="flex-shrink-0">
-								<Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="flex items-center justify-between gap-4">
+						{/* Left: Title with step badge */}
+						<div className="flex items-center gap-3 min-w-0 flex-1">
+							<div
+								className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg text-xl sm:text-2xl font-bold text-white shadow-md flex-shrink-0"
+								style={{ backgroundColor: projectColor }}
+							>
+								{store.state.currentStep + 1}
 							</div>
-							<div className="flex-1 min-w-0">
-								<h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-									Draft Restored
-								</h3>
-								<p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-									Your previous progress has been restored. You can continue
-									where you left off or start fresh.
+							<div className="min-w-0 flex-1">
+								<h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
+									Create {PROJECT_TYPE_NAMES[projectKind]} - {thisYear}
+								</h1>
+								<p className="text-sm sm:text-base text-muted-foreground">
+									Step {store.state.currentStep + 1} of {store.totalSteps}
 								</p>
 							</div>
-							<div className="flex-shrink-0 flex gap-2">
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => {
-										clearDraft();
-										wizardStore.resetWizard();
-										setShowDraftNotification(false);
+						</div>
+
+						{/* Right: Preview toggle (only on standard screens) */}
+						<div className="3xl:hidden shrink-0">
+							<div className="relative inline-flex h-11 items-center justify-center rounded-xl p-1.5 bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-blue-950/40 dark:to-indigo-950/40 backdrop-blur-xl border border-blue-200/60 dark:border-blue-700/40 shadow-lg shadow-blue-100/50 dark:shadow-blue-900/20">
+								{/* Sliding background indicator with enhanced glassmorphism */}
+								<motion.div
+									className="absolute h-8 rounded-lg"
+									initial={false}
+									animate={{
+										x: store.state.showPreview ? "100%" : "0%",
 									}}
-									className="text-blue-700 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-100"
-								>
-									Clear Draft
-								</Button>
+									transition={{
+										type: "spring",
+										stiffness: 300,
+										damping: 30,
+									}}
+									style={{
+										left: "6px",
+										top: "6px",
+										width: "calc(50% - 6px)",
+										background:
+											"linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.2) 100%)",
+										backdropFilter: "blur(16px) saturate(180%)",
+										WebkitBackdropFilter: "blur(16px) saturate(180%)",
+										border: "1px solid rgba(59, 130, 246, 0.3)",
+										boxShadow:
+											"0 8px 32px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(59, 130, 246, 0.1)",
+									}}
+								/>
+
+								{/* Form button */}
 								<button
-									onClick={() => setShowDraftNotification(false)}
-									className="text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300"
+									type="button"
+									onClick={() => store.setShowPreview(false)}
+									className={cn(
+										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
+										!store.state.showPreview
+											? "text-blue-600 dark:text-blue-400"
+											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+									)}
+									aria-pressed={!store.state.showPreview}
+									aria-label="Show form view"
 								>
-									<X className="h-4 w-4" />
+									Form
+								</button>
+
+								{/* Preview button */}
+								<button
+									type="button"
+									onClick={() => store.setShowPreview(true)}
+									className={cn(
+										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
+										store.state.showPreview
+											? "text-blue-600 dark:text-blue-400"
+											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+									)}
+									aria-pressed={store.state.showPreview}
+									aria-label="Show preview"
+								>
+									Preview
 								</button>
 							</div>
 						</div>
 					</div>
-				)}
-
-				{/* Progress Bar */}
-				<div className="mb-6 sm:mb-8">
-					<ProgressBar
-						currentStep={currentStep}
-						totalSteps={wizardStore.totalSteps}
-						color={projectColor}
-					/>
 				</div>
 
-				{/* Stepper - Hide on mobile, show on tablet+ */}
-				<div className="mb-6 sm:mb-8 hidden sm:block">
-					<Stepper
-						steps={steps}
-						currentStep={currentStep}
-						completedSteps={wizardStore.state.completedSteps}
-						onStepClick={(stepIndex) => {
-							wizardNavigation.goToStep(stepIndex);
-						}}
-						orientation="horizontal"
-					/>
-				</div>
-
-				{/* Step Content */}
-				<div className="mb-6 sm:mb-8 min-h-[300px] sm:min-h-[400px] rounded-xl border bg-card p-4 sm:p-6 md:p-8 shadow-sm">
-					<WizardStep
-						title={steps[currentStep].label}
-						isActive={true}
-						direction={direction}
-					>
-						{currentStep === 0 && <BaseInformationStep />}
-						{currentStep === 1 && <ProjectDetailsStep />}
-						{currentStep === 2 && <LocationStep />}
-						{currentStep === 3 && projectKind === "external" && (
-							<ExternalDetailsStep />
-						)}
-						{currentStep === 3 && projectKind === "student" && (
-							<StudentDetailsStep />
-						)}
-					</WizardStep>
-				</div>
-
-				{/* Navigation */}
-				<WizardNavigation
-					onBack={handleBack}
-					onNext={handleNext}
-					onCancel={handleCancel}
-					canGoBack={wizardNavigation.canGoToPreviousStep}
-					canGoNext={wizardNavigation.canGoToNextStep}
-					isLastStep={currentStep === wizardStore.totalSteps - 1}
-					isSubmitting={wizardStore.state.isSubmitting}
-					primaryColor={projectColor}
-				/>
+				{/* Wizard Container - handles all wizard UI */}
+				<WizardContainer onComplete={handleComplete} onCancel={handleCancel} />
 			</div>
 		</PageTransition>
 	);

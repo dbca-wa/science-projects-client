@@ -109,36 +109,12 @@ class TestCaretakerModel:
         relationship = Caretaker.objects.create(
             user=user,
             caretaker=caretaker,
-            # No reason, notes, or end_date
+            # No reason or notes
         )
 
         # Assert
         assert relationship.reason is None
         assert relationship.notes is None
-        assert relationship.end_date is None
-
-    @pytest.mark.django_db
-    @pytest.mark.unit
-    def test_caretaker_with_end_date(self):
-        """Test caretaker with end_date"""
-        # Arrange
-        from datetime import timedelta
-
-        from django.utils import timezone
-
-        user = UserFactory()
-        caretaker = UserFactory()
-        end_date = timezone.now() + timedelta(days=30)
-
-        # Act
-        relationship = Caretaker.objects.create(
-            user=user,
-            caretaker=caretaker,
-            end_date=end_date,
-        )
-
-        # Assert
-        assert relationship.end_date == end_date
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -314,4 +290,3 @@ class TestCaretakerModel:
         # Assert
         assert ["user"] in indexes
         assert ["caretaker"] in indexes
-        assert ["end_date"] in indexes

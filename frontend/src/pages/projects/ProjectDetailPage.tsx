@@ -1,6 +1,11 @@
 import { useParams, useNavigate, useLocation } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useProject } from "@/features/projects/hooks/useProject";
+import { useUserDetail } from "@/features/users/hooks/useUserDetail";
+import { useCaretakerPermissions } from "@/features/caretakers/hooks/useCaretakerPermissions";
+import { useCurrentUser } from "@/features/auth";
+import { isCaretakerOfAdmin } from "@/features/projects/utils/caretaker-admin.utils";
+import type { IUserData } from "@/shared/types/user.types";
 import {
 	Tabs,
 	TabsContent,
@@ -39,15 +44,76 @@ export default function ProjectDetailPage({
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { data, isLoading, error } = useProject(id);
+	const { data, isLoading, error, isFetching } = useProject(id);
 	const { fireConfetti } = useConfetti();
 	const [hasShownConfetti, setHasShownConfetti] = useState(false);
 
-	// Check for success animation flag from navigation state
+	// Debug logging
+	console.log("[ProjectDetailPage] Render:", {
+		isLoading,
+		isFetching,
+		hasData: !!data,
+		hasProject: !!data?.project,
+		hasError: !!error,
+		projectStatus: data?.project?.status,
+	});
+
+	// ALWAYS call these hooks - they must be called unconditionally
+	const { data: currentUser } = useCurrentUser();
+	const caretakerPerms = useCaretakerPermissions();
+
+	// ALWAYS call useUserDetail hooks - pass undefined when data doesn't exist
+	const { data: conceptPlanCreator } = useUserDetail(
+		data?.documents?.concept_plan?.document.creator
+	);
+	const { data: conceptPlanModifier } = useUserDetail(
+		data?.documents?.concept_plan?.document.modifier
+	);
+
+	const { data: projectPlanCreator } = useUserDetail(
+		data?.documents?.project_plan?.document.creator
+	);
+	const { data: projectPlanModifier } = useUserDetail(
+		data?.documents?.project_plan?.document.modifier
+	);
+
+	const { data: projectClosureCreator } = useUserDetail(
+		data?.documents?.project_closure?.document.creator
+	);
+	const { data: projectClosureModifier } = useUserDetail(
+		data?.documents?.project_closure?.document.modifier
+	);
+
+	// ALWAYS call useMemo hooks
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	const userIsCaretakerOfProjectLeader = useMemo(() => {
+		if (!data?.project) return false;
+		return caretakerPerms.canActAsProjectLead(data.project);
+	}, [caretakerPerms, data?.project]);
+
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	const userIsCaretakerOfBaLeader = useMemo(() => {
+		if (!data?.project?.business_area) return false;
+		return caretakerPerms.canActAsBusinessAreaLead(data.project.business_area);
+	}, [caretakerPerms, data?.project]);
+
+	const userIsCaretakerOfAdmin = useMemo(() => {
+		return isCaretakerOfAdmin(
+			currentUser,
+			data?.members as Array<{ user: IUserData }> | null,
+			caretakerPerms.canActForUser
+		);
+	}, [currentUser, data?.members, caretakerPerms]);
+
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	const isBaLead = useMemo(() => {
+		if (!currentUser || !data?.project?.business_area?.leader) return false;
+		return currentUser.id === data.project.business_area.leader;
+	}, [currentUser, data?.project]);
+
+	// ALWAYS call useEffect
 	useEffect(() => {
 		const state = location.state as { showSuccessAnimation?: boolean } | null;
-
-		// Also check for URL parameter for testing (e.g., ?confetti=true)
 		const searchParams = new URLSearchParams(location.search);
 		const testConfetti = searchParams.get("confetti") === "true";
 
@@ -56,14 +122,11 @@ export default function ProjectDetailPage({
 			!hasShownConfetti &&
 			data
 		) {
-			// Fire confetti after a short delay to ensure canvas is rendered
 			const timer = setTimeout(() => {
 				setHasShownConfetti(true);
-				// Fire confetti with project kind colors
 				fireConfetti();
 			}, 100);
 
-			// Clear the state to prevent confetti on refresh (but keep URL param for testing)
 			if (state?.showSuccessAnimation) {
 				window.history.replaceState({}, document.title);
 			}
@@ -72,13 +135,24 @@ export default function ProjectDetailPage({
 		}
 	}, [location.state, location.search, hasShownConfetti, data, fireConfetti]);
 
-	// Handle tab change and navigate to the appropriate route
-	const handleTabChange = (value: string) => {
-		navigate(`/projects/${id}/${value}`);
-	};
+	// NOW we can do early returns - all hooks have been called
+	// Only show loading on INITIAL load, not on background refetch
+	if (isLoading && !data) {
+		console.log("[ProjectDetailPage] Returning loading screen");
+		return (
+			<div className="flex items-center justify-center min-h-[400px]">
+				<div className="text-center space-y-4">
+					<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+					<div className="text-lg font-medium text-muted-foreground">
+						Loading project...
+					</div>
+				</div>
+			</div>
+		);
+	}
 
-	// Error state - project not found (only show when not loading)
-	if (!isLoading && (error || !data)) {
+	if (error || !data || !data.project) {
+		console.log("[ProjectDetailPage] Returning error screen");
 		return (
 			<div className="flex min-h-[60vh] items-center justify-center">
 				<div className="max-w-2xl space-y-6 text-center">
@@ -119,12 +193,15 @@ export default function ProjectDetailPage({
 		);
 	}
 
-	// Don't destructure until we know data exists and has required fields
-	if (!data || !data.project) {
-		return null;
-	}
+	console.log("[ProjectDetailPage] Rendering main content");
 
+	// Safe to destructure now
 	const { project, documents, details, members } = data;
+
+	// Handle tab change and navigate to the appropriate route
+	const handleTabChange = (value: string) => {
+		navigate(`/projects/${id}/${value}`);
+	};
 
 	// Manual breadcrumbs with project title (sanitised to remove HTML)
 	const manualBreadcrumbs = [
@@ -164,99 +241,136 @@ export default function ProjectDetailPage({
 	].filter((tab) => tab.show);
 
 	return (
-		<>
-			{isLoading ? (
-				<div className="flex items-center justify-center min-h-[400px]">
-					<div className="text-center space-y-4">
-						<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
-						<div className="text-lg font-medium text-muted-foreground">
-							Loading project...
-						</div>
-					</div>
-				</div>
-			) : (
-				<PageTransition>
-					<div className="space-y-6">
-						{/* Breadcrumbs */}
-						<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
+		<PageTransition>
+			<div className="space-y-6">
+				{/* Breadcrumbs */}
+				<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
-						<Tabs value={selectedTab} onValueChange={handleTabChange}>
-							{/* Desktop: Horizontal tabs */}
-							<TabsList className="hidden w-full justify-start md:inline-flex">
+				<Tabs value={selectedTab} onValueChange={handleTabChange}>
+					{/* Desktop: Horizontal tabs */}
+					<TabsList className="hidden w-full justify-start project:inline-flex">
+						{availableTabs.map((tabItem) => (
+							<TabsTrigger key={tabItem.value} value={tabItem.value}>
+								{tabItem.label}
+							</TabsTrigger>
+						))}
+					</TabsList>
+
+					{/* Mobile: Shadcn Select dropdown */}
+					<div className="project:hidden">
+						<Select value={selectedTab} onValueChange={handleTabChange}>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Select a tab" />
+							</SelectTrigger>
+							<SelectContent>
 								{availableTabs.map((tabItem) => (
-									<TabsTrigger key={tabItem.value} value={tabItem.value}>
+									<SelectItem key={tabItem.value} value={tabItem.value}>
 										{tabItem.label}
-									</TabsTrigger>
+									</SelectItem>
 								))}
-							</TabsList>
+							</SelectContent>
+						</Select>
+					</div>
 
-							{/* Mobile: Shadcn Select dropdown */}
-							<div className="md:hidden">
-								<Select value={selectedTab} onValueChange={handleTabChange}>
-									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Select a tab" />
-									</SelectTrigger>
-									<SelectContent>
-										{availableTabs.map((tabItem) => (
-											<SelectItem key={tabItem.value} value={tabItem.value}>
-												{tabItem.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
+					{/* Overview Tab */}
+					<TabsContent value="overview">
+						<OverviewTab
+							project={project}
+							details={details}
+							members={members}
+							documents={documents}
+						/>
+					</TabsContent>
 
-							{/* Overview Tab */}
-							<TabsContent value="overview">
-								<OverviewTab
+					{/* Concept Plan Tab */}
+					{documents?.concept_plan && (
+						<TabsContent value="concept">
+							<ConceptPlanTab
+								conceptPlan={documents.concept_plan}
+								project={project}
+								members={members}
+								projectId={project.id}
+								creator={conceptPlanCreator}
+								modifier={conceptPlanModifier}
+								userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+								userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+								userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
+								all_documents={documents}
+								isBaLead={isBaLead}
+							/>
+						</TabsContent>
+					)}
+
+					{/* Project Plan Tab */}
+					{documents?.project_plan && (
+						<TabsContent value="project">
+							<ProjectPlanTab
+								projectPlan={documents.project_plan}
+								project={project}
+								members={members}
+								projectId={project.id}
+								hasProgressReports={
+									documents.progress_reports &&
+									documents.progress_reports.length > 0
+								}
+								creator={projectPlanCreator}
+								modifier={projectPlanModifier}
+								userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+								userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+								userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
+								all_documents={documents}
+								isBaLead={isBaLead}
+								userData={currentUser}
+							/>
+						</TabsContent>
+					)}
+
+					{/* Progress Reports Tab */}
+					{documents?.progress_reports &&
+						documents.progress_reports.length > 0 && (
+							<TabsContent value="progress">
+								<ProgressReportsTab
+									progressReports={documents.progress_reports}
 									project={project}
-									details={details}
 									members={members}
+									projectId={project.id}
 								/>
 							</TabsContent>
+						)}
 
-							{/* Concept Plan Tab */}
-							{documents?.concept_plan && (
-								<TabsContent value="concept">
-									<ConceptPlanTab document={documents.concept_plan} />
-								</TabsContent>
-							)}
+					{/* Student Reports Tab */}
+					{documents?.student_reports &&
+						documents.student_reports.length > 0 && (
+							<TabsContent value="student">
+								<StudentReportsTab
+									studentReports={documents.student_reports}
+									project={project}
+									members={members}
+									projectId={project.id}
+								/>
+							</TabsContent>
+						)}
 
-							{/* Project Plan Tab */}
-							{documents?.project_plan && (
-								<TabsContent value="project">
-									<ProjectPlanTab document={documents.project_plan} />
-								</TabsContent>
-							)}
-
-							{/* Progress Reports Tab */}
-							{documents?.progress_reports &&
-								documents.progress_reports.length > 0 && (
-									<TabsContent value="progress">
-										<ProgressReportsTab
-											documents={documents.progress_reports}
-										/>
-									</TabsContent>
-								)}
-
-							{/* Student Reports Tab */}
-							{documents?.student_reports &&
-								documents.student_reports.length > 0 && (
-									<TabsContent value="student">
-										<StudentReportsTab documents={documents.student_reports} />
-									</TabsContent>
-								)}
-
-							{/* Project Closure Tab */}
-							{documents?.project_closure && (
-								<TabsContent value="closure">
-									<ProjectClosureTab document={documents.project_closure} />
-								</TabsContent>
-							)}
-						</Tabs>
-					</div>
-				</PageTransition>
-			)}
-		</>
+					{/* Project Closure Tab */}
+					{documents?.project_closure && (
+						<TabsContent value="closure">
+							<ProjectClosureTab
+								projectClosure={documents.project_closure}
+								project={project}
+								members={members}
+								projectId={project.id}
+								creator={projectClosureCreator}
+								modifier={projectClosureModifier}
+								userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+								userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+								userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
+								all_documents={documents}
+								isBaLead={isBaLead}
+							/>
+						</TabsContent>
+					)}
+				</Tabs>
+			</div>
+		</PageTransition>
 	);
 }

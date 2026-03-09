@@ -45,9 +45,11 @@ export function ConfettiPortal({ isActive, children }: ConfettiPortalProps) {
 	}, []);
 
 	// Only render if active and portal root exists
+	// eslint-disable-next-line react-hooks/refs
 	if (!isActive || !portalRoot.current) {
 		return null;
 	}
 
+	// eslint-disable-next-line react-hooks/refs
 	return createPortal(children, portalRoot.current);
 }

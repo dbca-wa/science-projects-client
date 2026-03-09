@@ -14,6 +14,7 @@ export const BREAKPOINTS = {
 	sm: 640,
 	md: 768,
 	lg: 1024,
+	"modal-lg": 1140, // Custom breakpoint for modal layout
 	xl: 1600,
 	"2xl": 1880, // Tailwind default - maintains 3 columns
 	"3xl": 2200, // 2K standard - transition to 4 columns
@@ -24,8 +25,11 @@ export type BreakpointKey = keyof typeof BREAKPOINTS;
 
 /**
  * Get current breakpoint based on window width
+ * Returns standard breakpoints only (excludes custom breakpoints like modal-lg)
  */
-export function getCurrentBreakpoint(width: number): BreakpointKey {
+export function getCurrentBreakpoint(
+	width: number
+): Exclude<BreakpointKey, "modal-lg"> {
 	if (width >= BREAKPOINTS["4xl"]) return "4xl";
 	if (width >= BREAKPOINTS["3xl"]) return "3xl";
 	if (width >= BREAKPOINTS["2xl"]) return "2xl";

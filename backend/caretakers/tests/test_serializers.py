@@ -4,10 +4,7 @@ Tests for caretaker serializers
 Tests serialization and validation logic.
 """
 
-from datetime import timedelta
-
 import pytest
-from django.utils import timezone
 
 from caretakers.models import Caretaker
 from caretakers.serializers.base import CaretakerSerializer
@@ -49,16 +46,15 @@ class TestCaretakerSerializer:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_serialize_caretaker_with_end_date(self):
-        """Test serializing caretaker with end_date"""
+    def test_serialize_caretaker_with_notes(self):
+        """Test serializing caretaker with notes"""
         # Arrange
         user = UserFactory()
         caretaker = UserFactory()
-        end_date = timezone.now() + timedelta(days=30)
         relationship = Caretaker.objects.create(
             user=user,
             caretaker=caretaker,
-            end_date=end_date,
+            notes="Test notes",
         )
 
         # Act
@@ -66,7 +62,7 @@ class TestCaretakerSerializer:
         data = serializer.data
 
         # Assert
-        assert data["end_date"] is not None
+        assert data["notes"] == "Test notes"
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -85,7 +81,6 @@ class TestCaretakerSerializer:
         data = serializer.data
 
         # Assert
-        assert data["end_date"] is None
         assert data["reason"] is None
         assert data["notes"] is None
 
@@ -138,7 +133,6 @@ class TestCaretakerSerializer:
             "id",
             "user",
             "caretaker",
-            "end_date",
             "reason",
             "notes",
             "created_at",
@@ -207,16 +201,15 @@ class TestCaretakerCreateSerializer:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_create_caretaker_with_end_date(self):
-        """Test creating caretaker with end_date"""
+    def test_create_caretaker_with_notes(self):
+        """Test creating caretaker with notes"""
         # Arrange
         user = UserFactory()
         caretaker = UserFactory()
-        end_date = timezone.now() + timedelta(days=30)
         data = {
             "user": user.pk,
             "caretaker": caretaker.pk,
-            "end_date": end_date.isoformat(),
+            "notes": "Test notes",
         }
 
         # Act
@@ -225,7 +218,7 @@ class TestCaretakerCreateSerializer:
         # Assert
         assert serializer.is_valid()
         relationship = serializer.save()
-        assert relationship.end_date is not None
+        assert relationship.notes == "Test notes"
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -434,7 +427,7 @@ class TestCaretakerCreateSerializer:
         serializer = CaretakerCreateSerializer()
 
         # Assert
-        expected_fields = {"user", "caretaker", "end_date", "reason", "notes"}
+        expected_fields = {"user", "caretaker", "reason", "notes"}
         assert set(serializer.fields.keys()) == expected_fields
 
     @pytest.mark.django_db

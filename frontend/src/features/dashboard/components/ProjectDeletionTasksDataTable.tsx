@@ -13,6 +13,7 @@ import {
 	extractTextFromHTML,
 } from "../utils/dashboard.utils";
 import { format } from "date-fns";
+import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface ProjectDeletionTasksDataTableProps {
 	tasks: IAdminTask[];
@@ -60,7 +61,10 @@ export const ProjectDeletionTasksDataTable = ({
 						<div className="space-y-1">
 							{/* Project title */}
 							{row.project && (
-								<div className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 break-words">
+								<div
+									className="text-sm font-semibold break-words hover:underline cursor-pointer"
+									style={{ color: LINK_COLOR }}
+								>
 									{projectTitle} (ID: {row.project.id})
 								</div>
 							)}

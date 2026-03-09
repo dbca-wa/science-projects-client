@@ -23,17 +23,21 @@ class DownloadProjectDocument(APIView):
         document = DocumentService.get_document(pk)
 
         # Check if PDF exists
-        if hasattr(document, "pdf") and document.pdf:
+        if hasattr(document, "pdf") and document.pdf and document.pdf.file:
             return FileResponse(
                 document.pdf.file,
                 as_attachment=True,
-                filename=f"{document.kind}_{document.pk}.pdf",
+                filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
             )
 
         # Generate PDF if not exists
-        pdf_file = PDFService.generate_document_pdf(document)
+        doc_pdf = PDFService.generate_document_pdf(document)
 
-        return FileResponse(pdf_file, as_attachment=True, filename=pdf_file.name)
+        return FileResponse(
+            doc_pdf.file,
+            as_attachment=True,
+            filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
+        )
 
 
 class BeginProjectDocGeneration(APIView):
@@ -42,27 +46,25 @@ class BeginProjectDocGeneration(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        """Start PDF generation for project document"""
+        """Generate and return PDF for project document"""
         document = DocumentService.get_document(pk)
 
         # Mark as in progress
         PDFService.mark_pdf_generation_started(document)
 
-        # TODO: Trigger async PDF generation task
-        # For now, generate synchronously
+        # Generate PDF and return file
         try:
-            PDFService.generate_document_pdf(document)
-            # Save PDF to document
-            # document.pdf.save(pdf_file.name, pdf_file)
+            doc_pdf = PDFService.generate_document_pdf(document)
             PDFService.mark_pdf_generation_complete(document)
+
+            return FileResponse(
+                doc_pdf.file,
+                as_attachment=True,
+                filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
+            )
         except Exception:
             PDFService.mark_pdf_generation_complete(document)
             raise
-
-        return Response(
-            {"message": "PDF generation started", "document_id": document.pk},
-            status=HTTP_202_ACCEPTED,
-        )
 
 
 class CancelProjectDocGeneration(APIView):

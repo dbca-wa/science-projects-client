@@ -3,7 +3,7 @@ import { useRef, memo, useState, useEffect, useCallback } from "react";
 import { Marker, Popup } from "react-leaflet";
 import type { IProjectData } from "@/shared/types/project.types";
 import { ProjectPopup } from "./ProjectPopup";
-import { createProjectMarker } from "@/features/projects/utils/marker-creation";
+import { createProjectMarker } from "@/features/projects/utils/map/marker-creation.utils";
 import { useProjectMapStore } from "@/app/stores/store-context";
 
 interface ProjectMarkerProps {

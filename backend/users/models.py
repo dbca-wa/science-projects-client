@@ -109,7 +109,6 @@ class User(AbstractUser):
             "is_superuser": self.is_superuser,
             "email": self.email,
             "image": avatar.get("file") if avatar else None,
-            "end_date": caretaker_instance.end_date if caretaker_instance else None,
         }
 
     def get_caretakers_recursive(self, depth=0, max_depth=12, current_path=None):
@@ -175,26 +174,16 @@ class User(AbstractUser):
         return result
 
     def get_caretakers(self):
-        """Get active caretakers for this user (excludes expired)"""
-        from django.utils import timezone
-
-        all = Caretaker.objects.filter(user=self).filter(
-            models.Q(end_date__isnull=True) | models.Q(end_date__gt=timezone.now())
-        )
-        return all
+        """Get all caretakers for this user"""
+        return Caretaker.objects.filter(user=self)
 
     def get_all_caretakers(self):
         """Get all caretakers for this user (including expired) - for admin/audit purposes"""
         return Caretaker.objects.filter(user=self)
 
     def get_caretaking_for(self):
-        """Get active users this user is caretaking for (excludes expired)"""
-        from django.utils import timezone
-
-        all = Caretaker.objects.filter(caretaker=self).filter(
-            models.Q(end_date__isnull=True) | models.Q(end_date__gt=timezone.now())
-        )
-        return all
+        """Get all users this user is caretaking for"""
+        return Caretaker.objects.filter(caretaker=self)
 
     def get_all_caretaking_for(self):
         """Get all users this user is caretaking for (including expired) - for admin/audit purposes"""

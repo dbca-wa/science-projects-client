@@ -9,7 +9,7 @@ import {
 import { Upload, X, Link as LinkIcon, Crop } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
-import { AdjustImageModal } from "./AdjustImageModal";
+import { AdjustImageModal } from "./AdjustImageModal.tsx";
 import {
 	type ImageUploadProps,
 	type ImageUploadMode,
@@ -169,7 +169,14 @@ export const ImageUpload = ({
 			}
 
 			setOriginalFileName(result.file.name);
-			onChange(result.file);
+
+			// Create preview URL for the crop modal
+			const previewUrl = URL.createObjectURL(result.file);
+			setImageToCrop(previewUrl);
+			setIsCropModalOpen(true);
+
+			// DON'T call onChange here - wait for user to apply crop
+			// onChange(result.file);
 		} catch (error) {
 			// Dismiss loading toast
 			if (loadingToast) {
@@ -188,6 +195,13 @@ export const ImageUpload = ({
 
 	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0] || null;
+
+		// Immediately reset the file input to prevent React Hook Form from detecting the change
+		// We'll handle the file separately and only call onChange when user clicks Apply
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+
 		handleFileSelect(file);
 	};
 
@@ -236,13 +250,35 @@ export const ImageUpload = ({
 
 	const handleCropClick = () => {
 		if (!preview || disabled) return;
+
+		// When cropping an existing image, we need to track that this is a re-crop
+		// so we don't mark the form as dirty until Apply is clicked
 		setImageToCrop(preview);
+		setOriginalFileName(value && isFile(value) ? value.name : "image.jpg");
 		setIsCropModalOpen(true);
 	};
 
 	const handleCropComplete = (croppedFile: File) => {
 		onChange(croppedFile);
 		setIsCropModalOpen(false);
+		// Clean up the preview URL
+		if (imageToCrop) {
+			URL.revokeObjectURL(imageToCrop);
+			setImageToCrop(null);
+		}
+	};
+
+	const handleCropCancel = () => {
+		setIsCropModalOpen(false);
+		// Clean up the preview URL
+		if (imageToCrop) {
+			URL.revokeObjectURL(imageToCrop);
+			setImageToCrop(null);
+		}
+		// Reset file input so user can select the same file again
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
 	};
 
 	const renderPreview = () => {
@@ -295,8 +331,11 @@ export const ImageUpload = ({
 		return (
 			<div
 				className={cn(
-					"relative overflow-hidden rounded-lg",
-					config.defaultSize
+					"relative overflow-hidden",
+					variant === "project" ? "rounded-3xl" : "rounded-lg",
+					variant === "project"
+						? "w-full aspect-[25/18]" // Adaptive width with aspect ratio
+						: config.defaultSize
 				)}
 			>
 				<img
@@ -304,10 +343,6 @@ export const ImageUpload = ({
 					alt="Preview"
 					className="w-full h-full object-cover"
 				/>
-				{/* Gradient overlay for project variant (matches ProjectCard) */}
-				{variant === "project" && (
-					<div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-black/75 to-transparent" />
-				)}
 			</div>
 		);
 	};
@@ -496,12 +531,18 @@ export const ImageUpload = ({
 			{imageToCrop && (
 				<AdjustImageModal
 					isOpen={isCropModalOpen}
-					onClose={() => setIsCropModalOpen(false)}
+					onClose={handleCropCancel}
 					imageUrl={imageToCrop}
 					onCropComplete={handleCropComplete}
 					fileName={originalFileName}
 					defaultAspect={
-						variant === "avatar" ? 1 : variant === "banner" ? 16 / 9 : undefined
+						variant === "avatar"
+							? 1
+							: variant === "banner"
+								? 16 / 9
+								: variant === "project"
+									? 25 / 18
+									: undefined
 					}
 					variant={variant}
 				/>

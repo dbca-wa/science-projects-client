@@ -5,11 +5,18 @@ import type {
 } from "@/shared/types/org.types";
 
 /**
+ * Get all location areas with their IDs, names, and types
+ * Returns raw location data for coordinate calculation and other uses
+ */
+export const getLocationMetadata = async (): Promise<ISimpleLocationData[]> => {
+	return apiClient.get<ISimpleLocationData[]>("locations/list");
+};
+
+/**
  * Get all locations organized by area type
  */
 export const getAllLocations = async (): Promise<OrganisedLocationData> => {
-	const locationsData =
-		await apiClient.get<ISimpleLocationData[]>("locations/list");
+	const locationsData = await getLocationMetadata();
 
 	// Organize locations based on their 'area_type'
 	const organizedLocations: OrganisedLocationData = {

@@ -1,6 +1,13 @@
 import type { IBusinessArea, ISimpleLocationData } from "./org.types";
 import type { IAffiliation } from "./org.types";
 import type { IImageData } from "./media.types";
+import type {
+	IConceptPlan,
+	IProjectPlan,
+	IProgressReport,
+	IStudentReport,
+	IProjectClosure,
+} from "./document.types";
 
 // Re-export IImageData for convenience
 export type { IImageData };
@@ -129,21 +136,38 @@ export interface IExtendedProjectDetails {
 	student: IStudentProjectDetails | [];
 }
 
+// Caretaker Details
+export interface ICaretakerDetails {
+	id: number;
+	display_first_name: string;
+	display_last_name: string;
+	email: string;
+	image?: IImageData;
+}
+
 // Project Member User Details
 export interface IMemberUserDetails {
 	id: number;
 	is_staff: boolean;
 	is_superuser: boolean;
+	is_active: boolean;
 	username: string | null;
 	display_first_name: string | null;
 	display_last_name: string | null;
 	first_name: string | null;
 	last_name: string | null;
 	email: string;
-	business_area: string | null;
+	phone: string | null;
+	business_area: string | null | IBusinessArea;
 	branch: string | null;
+	agency: string | null;
 	role: string | null;
 	image: IImageData;
+	affiliation: IAffiliation;
+	about: string | null;
+	expertise: string | null;
+	date_joined: string | null;
+	caretakers?: ICaretakerDetails[];
 }
 
 // Project Member
@@ -159,13 +183,13 @@ export interface IProjectMember {
 	affiliation: IAffiliation;
 }
 
-// Project Documents (placeholder - will be expanded when implementing documents)
+// Project Documents
 export interface IProjectDocuments {
-	concept_plan: Record<string, unknown> | null;
-	project_plan: Record<string, unknown> | null;
-	progress_reports: Record<string, unknown>[];
-	student_reports: Record<string, unknown>[];
-	project_closure: Record<string, unknown> | null;
+	concept_plan: IConceptPlan | null;
+	project_plan: IProjectPlan | null;
+	progress_reports: IProgressReport[];
+	student_reports: IStudentReport[];
+	project_closure: IProjectClosure | null;
 }
 
 // Project Areas

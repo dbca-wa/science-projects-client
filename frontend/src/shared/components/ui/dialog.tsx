@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { XIcon } from "lucide-react";
+import { XIcon, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import {
@@ -212,21 +212,62 @@ function DialogOverlay() {
 	);
 }
 
+/**
+ * DialogContent component
+ *
+ * Main content container for the dialog with optional scroll indicators.
+ *
+ * @param enableScrollIndicators - When true, displays animated scroll indicators (ChevronUp/ChevronDown)
+ *                                  to show when content is scrollable. Requires adding `data-scrollable`
+ *                                  attribute to the scrollable container element.
+ *
+ * @example
+ * ```tsx
+ * <DialogContent enableScrollIndicators={true}>
+ *   <DialogHeader>...</DialogHeader>
+ *   <div className="overflow-y-auto" data-scrollable>
+ *     {/* Scrollable content *\/}
+ *   </div>
+ * </DialogContent>
+ * ```
+ */
 function DialogContent({
 	className,
 	children,
 	showCloseButton = true,
+	enableScrollIndicators = false,
 }: {
 	className?: string;
 	children: React.ReactNode;
 	showCloseButton?: boolean;
+	enableScrollIndicators?: boolean;
 }) {
 	const context = React.useContext(DialogContext);
 	if (!context) throw new Error("DialogContent must be used within a Dialog");
 
 	const { onOpenChange, isClosing, shouldAnimate } = context;
-	const contentRef = React.useRef<HTMLDivElement>(null);
 	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
+
+	// Scroll indicator state
+	const [showScrollDown, setShowScrollDown] = React.useState(false);
+	const [showScrollUp, setShowScrollUp] = React.useState(false);
+	const [scrollableElement, setScrollableElement] =
+		React.useState<HTMLElement | null>(null);
+	const [indicatorPosition, setIndicatorPosition] = React.useState<{
+		top: number;
+		right: number;
+		bottom: number;
+	} | null>(null);
+
+	// Use callback ref to know when the element is mounted
+	const [contentElement, setContentElement] =
+		React.useState<HTMLDivElement | null>(null);
+	const contentRefCallback = React.useCallback(
+		(node: HTMLDivElement | null) => {
+			setContentElement(node);
+		},
+		[]
+	);
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
@@ -237,12 +278,146 @@ function DialogContent({
 		return () => clearTimeout(timer);
 	}, [shouldAnimate]);
 
+	// Handle scroll indicators
+	React.useEffect(() => {
+		if (!enableScrollIndicators) {
+			return;
+		}
+
+		if (!contentElement) {
+			return;
+		}
+
+		// let scrollableElement: HTMLElement | null = null;
+		let scrollListener: (() => void) | null = null;
+		let resizeObserver: ResizeObserver | null = null;
+		let mutationObserver: MutationObserver | null = null;
+		let warningTimeout: NodeJS.Timeout | null = null;
+		let updateIndicatorPosition: (() => void) | null = null;
+
+		const setupScrollMonitoring = (element: HTMLElement) => {
+			// Store the scrollable element for portal rendering
+			setScrollableElement(element);
+
+			// Add relative positioning to the scrollable element if not already present
+			const computedStyle = window.getComputedStyle(element);
+			if (computedStyle.position === "static") {
+				element.style.position = "relative";
+			}
+
+			updateIndicatorPosition = () => {
+				const rect = element.getBoundingClientRect();
+				setIndicatorPosition({
+					top: rect.top,
+					right: window.innerWidth - rect.right,
+					bottom: window.innerHeight - rect.bottom,
+				});
+			};
+
+			const handleScroll = () => {
+				const { scrollTop, scrollHeight, clientHeight } = element;
+				const isScrollable = scrollHeight > clientHeight;
+
+				// Show down arrow if scrollable and not at bottom
+				const shouldShowDown =
+					isScrollable && scrollTop < scrollHeight - clientHeight - 10;
+				const shouldShowUp = isScrollable && scrollTop > 10;
+
+				setShowScrollDown(shouldShowDown);
+				setShowScrollUp(shouldShowUp);
+
+				// Update position on scroll
+				updateIndicatorPosition?.();
+			};
+
+			// Wait for dialog animation to complete (ANIMATION_OPEN_DELAY + small buffer)
+			setTimeout(() => {
+				handleScroll();
+				updateIndicatorPosition?.();
+			}, 250);
+
+			// Add scroll listener
+			scrollListener = handleScroll;
+			element.addEventListener("scroll", handleScroll);
+			window.addEventListener("scroll", updateIndicatorPosition);
+			window.addEventListener("resize", updateIndicatorPosition);
+
+			// Check on resize
+			resizeObserver = new ResizeObserver(() => {
+				handleScroll();
+				updateIndicatorPosition?.();
+			});
+			resizeObserver.observe(element);
+		};
+
+		// Try to find scrollable element immediately
+		const element = contentElement.querySelector(
+			"[data-scrollable]"
+		) as HTMLElement;
+
+		if (element) {
+			setupScrollMonitoring(element);
+		} else {
+			// Use MutationObserver to wait for element to be added
+			mutationObserver = new MutationObserver(() => {
+				const foundElement = contentElement?.querySelector(
+					"[data-scrollable]"
+				) as HTMLElement;
+				if (foundElement) {
+					setupScrollMonitoring(foundElement);
+					mutationObserver?.disconnect();
+					if (warningTimeout) {
+						clearTimeout(warningTimeout);
+					}
+				}
+			});
+
+			mutationObserver.observe(contentElement, {
+				childList: true,
+				subtree: true,
+			});
+
+			// Show warning after 5 seconds if element not found
+			warningTimeout = setTimeout(() => {
+				mutationObserver?.disconnect();
+				console.warn(
+					"Dialog: enableScrollIndicators is true but no element with data-scrollable attribute found. " +
+						"Add data-scrollable to your scrollable container element."
+				);
+			}, 5000);
+		}
+
+		return () => {
+			const element = contentElement?.querySelector(
+				"[data-scrollable]"
+			) as HTMLElement | null;
+			if (element && scrollListener) {
+				element.removeEventListener("scroll", scrollListener);
+			}
+			if (updateIndicatorPosition) {
+				window.removeEventListener("scroll", updateIndicatorPosition);
+				window.removeEventListener("resize", updateIndicatorPosition);
+			}
+			if (resizeObserver) {
+				resizeObserver.disconnect();
+			}
+			if (mutationObserver) {
+				mutationObserver.disconnect();
+			}
+			if (warningTimeout) {
+				clearTimeout(warningTimeout);
+			}
+			setScrollableElement(null);
+			setIndicatorPosition(null);
+		};
+	}, [enableScrollIndicators, contentElement]);
+
 	return (
 		<DialogPortal data-slot="dialog-portal">
 			<DialogOverlay />
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none overflow-y-auto">
 				<div
-					ref={contentRef}
+					ref={contentRefCallback}
 					data-slot="dialog-content"
 					className={cn(
 						"relative w-full max-w-[calc(100%-2rem)] rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 sm:max-w-lg pointer-events-auto my-8",
@@ -259,6 +434,61 @@ function DialogContent({
 					role="dialog"
 					aria-modal="true"
 				>
+					{/* Render scroll indicators using fixed positioning via portal to body */}
+					{enableScrollIndicators &&
+						scrollableElement &&
+						indicatorPosition &&
+						ReactDOM.createPortal(
+							<>
+								{/* Scroll indicator - Up (top-right) */}
+								{showScrollUp && (
+									<button
+										type="button"
+										className="fixed z-50 transition-all duration-300 cursor-pointer"
+										style={{
+											top: `${indicatorPosition.top + 8}px`,
+											right: `${indicatorPosition.right + 8}px`,
+										}}
+										onClick={() => {
+											scrollableElement.scrollTo({
+												top: 0,
+												behavior: "smooth",
+											});
+										}}
+										aria-label="Scroll to top"
+									>
+										<div className="bg-white rounded-full p-2 shadow-lg animate-bounce pointer-events-none">
+											<ChevronUp className="size-6 stroke-[3] text-blue-500" />
+										</div>
+									</button>
+								)}
+
+								{/* Scroll indicator - Down (bottom-right) */}
+								{showScrollDown && (
+									<button
+										type="button"
+										className="fixed z-50 transition-all duration-300 cursor-pointer"
+										style={{
+											bottom: `${indicatorPosition.bottom + 8}px`,
+											right: `${indicatorPosition.right + 8}px`,
+										}}
+										onClick={() => {
+											scrollableElement.scrollTo({
+												top: scrollableElement.scrollHeight,
+												behavior: "smooth",
+											});
+										}}
+										aria-label="Scroll to bottom"
+									>
+										<div className="bg-white rounded-full p-2 shadow-lg animate-bounce pointer-events-none">
+											<ChevronDown className="size-6 stroke-[3] text-blue-500" />
+										</div>
+									</button>
+								)}
+							</>,
+							document.body
+						)}
+
 					{children}
 					{showCloseButton && (
 						<button
@@ -292,6 +522,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
 			data-slot="dialog-footer"
 			className={cn(
 				"flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+				"mt-8", // Increased spacing between content and footer
 				className
 			)}
 			{...props}

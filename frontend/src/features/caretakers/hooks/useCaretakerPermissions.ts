@@ -61,7 +61,7 @@ export const useCaretakerPermissions = () => {
 					hasNestedCaretakee(caretakee, targetUserId)
 			);
 		},
-		[user?.caretaking_for]
+		[user]
 	);
 
 	/**

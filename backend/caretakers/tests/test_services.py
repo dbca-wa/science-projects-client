@@ -4,12 +4,10 @@ Tests for caretaker services
 Tests business logic in caretaker services.
 """
 
-from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from adminoptions.models import AdminTask
@@ -720,7 +718,6 @@ class TestCaretakerService:
             user=caretakee_user,
             caretaker=caretaker_user,
             reason="Test reason",
-            end_date=timezone.now() + timedelta(days=30),
             notes="Test notes",
         )
 
@@ -730,7 +727,6 @@ class TestCaretakerService:
         assert caretaker.caretaker == caretaker_user
         assert caretaker.reason == "Test reason"
         assert caretaker.notes == "Test notes"
-        assert caretaker.end_date is not None
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -1113,7 +1109,6 @@ class TestCaretakerRequestService:
         # Arrange
         user = UserFactory()
         caretakee = UserFactory()
-        end_date = timezone.now() + timedelta(days=30)
 
         task = AdminTask.objects.create(
             action=AdminTask.ActionTypes.SETCARETAKER,
@@ -1121,7 +1116,6 @@ class TestCaretakerRequestService:
             primary_user=caretakee,
             secondary_users=[user.pk],
             reason="Test request",
-            end_date=end_date,
             notes="Test notes",
         )
 
@@ -1192,83 +1186,6 @@ class TestCaretakerRequestService:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_auto_cancel_expired_request_expired(self, db):
-        """Test auto_cancel_expired_request cancels expired request"""
-        # Arrange
-        user = UserFactory()
-        caretakee = UserFactory()
-
-        # Create task with end_date in the past
-        past_date = timezone.now() - timedelta(days=1)
-        task = AdminTask.objects.create(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            primary_user=caretakee,
-            secondary_users=[user.pk],
-            end_date=past_date,
-        )
-
-        # Act
-        result = CaretakerRequestService.auto_cancel_expired_request(task)
-
-        # Assert
-        assert result is True
-        task.refresh_from_db()
-        assert task.status == AdminTask.TaskStatus.CANCELLED
-        assert "Auto-cancelled" in task.notes
-
-    @pytest.mark.django_db
-    @pytest.mark.integration
-    def test_auto_cancel_expired_request_not_expired(self, db):
-        """Test auto_cancel_expired_request does not cancel non-expired request"""
-        # Arrange
-        user = UserFactory()
-        caretakee = UserFactory()
-
-        # Create task with end_date in the future
-        future_date = timezone.now() + timedelta(days=1)
-        task = AdminTask.objects.create(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            primary_user=caretakee,
-            secondary_users=[user.pk],
-            end_date=future_date,
-        )
-
-        # Act
-        result = CaretakerRequestService.auto_cancel_expired_request(task)
-
-        # Assert
-        assert result is False
-        task.refresh_from_db()
-        assert task.status == AdminTask.TaskStatus.PENDING
-
-    @pytest.mark.django_db
-    @pytest.mark.integration
-    def test_auto_cancel_expired_request_no_end_date(self, db):
-        """Test auto_cancel_expired_request does not cancel request without end_date"""
-        # Arrange
-        user = UserFactory()
-        caretakee = UserFactory()
-
-        task = AdminTask.objects.create(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            primary_user=caretakee,
-            secondary_users=[user.pk],
-            end_date=None,
-        )
-
-        # Act
-        result = CaretakerRequestService.auto_cancel_expired_request(task)
-
-        # Assert
-        assert result is False
-        task.refresh_from_db()
-        assert task.status == AdminTask.TaskStatus.PENDING
-
-    @pytest.mark.django_db
-    @pytest.mark.integration
     def test_get_user_requests_caretaker_request(self, db):
         """Test get_user_requests returns caretaker request"""
         # Arrange
@@ -1314,32 +1231,6 @@ class TestCaretakerRequestService:
         assert requests["caretaker_request"] is None
         assert requests["become_caretaker_request"] is not None
         assert requests["become_caretaker_request"].pk == task.pk
-
-    @pytest.mark.django_db
-    @pytest.mark.integration
-    def test_get_user_requests_auto_cancels_expired(self, db):
-        """Test get_user_requests auto-cancels expired requests"""
-        # Arrange
-        user = UserFactory()
-        caretaker = UserFactory()
-
-        # Create expired request
-        past_date = timezone.now() - timedelta(days=1)
-        task = AdminTask.objects.create(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            primary_user=user,
-            secondary_users=[caretaker.pk],
-            end_date=past_date,
-        )
-
-        # Act
-        requests = CaretakerRequestService.get_user_requests(user)
-
-        # Assert
-        assert requests["caretaker_request"] is None
-        task.refresh_from_db()
-        assert task.status == AdminTask.TaskStatus.CANCELLED
 
     @pytest.mark.django_db
     @pytest.mark.integration

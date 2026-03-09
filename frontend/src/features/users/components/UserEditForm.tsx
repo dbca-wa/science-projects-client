@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router";
+import { useNavigate, useBlocker } from "react-router";
 import {
 	Form,
 	FormControl,
@@ -31,13 +31,14 @@ import {
 } from "lucide-react";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { ImageUpload } from "@/shared/components/media";
-import { RichTextEditor } from "@/shared/components/editor";
+import { FormRichTextEditor } from "@/shared/components/editor";
+import { UnsavedChangesDialog } from "@/shared/components/editor/UnsavedChangesDialog";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
 import {
-	userEditSchema,
 	type UserEditFormData,
+	userEditSchema,
 } from "../schemas/userEdit.schema";
 import { sanitiseFormData } from "@/shared/utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
@@ -70,10 +71,11 @@ export const UserEditForm = ({
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
 	const { data: branches, isLoading: isLoadingBranches } = useBranches();
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+	// Initialize form
 	const form = useForm<UserEditFormData>({
 		resolver: zodResolver(userEditSchema),
-		mode: "onBlur",
 		defaultValues: {
 			displayFirstName: "",
 			displayLastName: "",
@@ -85,9 +87,55 @@ export const UserEditForm = ({
 			branch: undefined,
 			businessArea: undefined,
 			affiliation: undefined,
-			image: null,
+			image: "",
 		},
 	});
+
+	// Block navigation when form has unsaved changes
+	const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+		const isDirty = form.formState.isDirty;
+		const pathChanged = currentLocation.pathname !== nextLocation.pathname;
+
+		return isDirty && pathChanged && !updateMutation.isSuccess;
+	});
+
+	// Handle blocker state changes - synchronizing with React Router blocker
+	// This is necessary to show the unsaved changes dialog when navigation is blocked
+	useEffect(() => {
+		if (blocker.state === "blocked") {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronizing with React Router blocker state
+			setIsDialogOpen(true);
+		}
+	}, [blocker.state]);
+
+	// Block browser-level navigation (tab close, refresh, back button)
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			if (form.formState.isDirty && !updateMutation.isSuccess) {
+				e.preventDefault();
+				e.returnValue = "";
+			}
+		};
+
+		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+	}, [form.formState.isDirty, updateMutation.isSuccess]);
+
+	// Dialog handlers
+	const handleProceed = () => {
+		setIsDialogOpen(false);
+		form.reset(); // Reset form to mark as not dirty
+		if (blocker.state === "blocked") {
+			blocker.proceed?.();
+		}
+	};
+
+	const handleCancelDialog = () => {
+		setIsDialogOpen(false);
+		if (blocker.state === "blocked") {
+			blocker.reset?.();
+		}
+	};
 
 	// Pre-populate form when user data loads AND dropdown data has loaded
 	useEffect(() => {
@@ -118,18 +166,6 @@ export const UserEditForm = ({
 			});
 		}
 	}, [user, branches, businessAreas, form]);
-
-	// Warn user about unsaved changes
-	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (form.formState.isDirty && !form.formState.isSubmitting) {
-				e.preventDefault();
-			}
-		};
-
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [form.formState.isDirty, form.formState.isSubmitting]);
 
 	const onSubmit = async (data: UserEditFormData) => {
 		try {
@@ -220,13 +256,14 @@ export const UserEditForm = ({
 								<FormItem>
 									<FormLabel>About</FormLabel>
 									<FormControl>
-										<RichTextEditor
+										<FormRichTextEditor
 											value={field.value || ""}
 											onChange={field.onChange}
 											placeholder="Tell us about this user..."
-											toolbar="profile"
+											toolbar="full"
 											disabled={isSubmitting}
-											minHeight="150px"
+											wordLimit={500}
+											aria-label="About"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -242,13 +279,14 @@ export const UserEditForm = ({
 								<FormItem>
 									<FormLabel>Expertise</FormLabel>
 									<FormControl>
-										<RichTextEditor
+										<FormRichTextEditor
 											value={field.value || ""}
 											onChange={field.onChange}
 											placeholder="List areas of expertise..."
-											toolbar="profile"
+											toolbar="full"
 											disabled={isSubmitting}
-											minHeight="150px"
+											wordLimit={500}
+											aria-label="Expertise"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -650,6 +688,12 @@ export const UserEditForm = ({
 					</Button>
 				</div>
 			</form>
+
+			<UnsavedChangesDialog
+				isOpen={isDialogOpen}
+				onProceed={handleProceed}
+				onCancel={handleCancelDialog}
+			/>
 		</Form>
 	);
 };

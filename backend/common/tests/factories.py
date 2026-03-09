@@ -101,6 +101,21 @@ class BusinessAreaFactory(DjangoModelFactory):
     data_custodian = factory.SubFactory(UserFactory)
 
 
+class UserWorkFactory(DjangoModelFactory):
+    """Factory for creating test user work details"""
+
+    class Meta:
+        model = "users.UserWork"
+        skip_postgeneration_save = True
+
+    user = factory.SubFactory(UserFactory)
+    agency = factory.SubFactory(AgencyFactory)
+    branch = factory.SubFactory(BranchFactory)
+    business_area = factory.SubFactory(BusinessAreaFactory)
+    affiliation = factory.SubFactory(AffiliationFactory)
+    role = "DBCA Member"
+
+
 class ProjectFactory(DjangoModelFactory):
     """Factory for creating test projects"""
 

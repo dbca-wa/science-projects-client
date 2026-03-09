@@ -68,8 +68,71 @@ class ProjectPlanDetail(APIView):
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
+    def patch(self, request, pk):
+        """Partial update project plan"""
+        settings.LOGGER.info(
+            f"{request.user} is partially updating project plan details for project plan id: {pk}"
+        )
+
+        try:
+            project_plan = ProjectPlan.objects.get(pk=pk)
+        except ProjectPlan.DoesNotExist:
+            raise NotFound
+
+        # Handle endorsement updates
+        if (
+            "data_management" in request.data
+            or "specimens" in request.data
+            or "involves_animals" in request.data
+            or "involves_plants" in request.data
+        ):
+            endorsement_to_edit = Endorsement.objects.filter(project_plan=pk).first()
+
+            if endorsement_to_edit:
+                if "specimens" in request.data:
+                    endorsement_to_edit.no_specimens = request.data["specimens"]
+
+                if "data_management" in request.data:
+                    endorsement_to_edit.data_management = request.data[
+                        "data_management"
+                    ]
+
+                if (
+                    "involves_animals" in request.data
+                    or "involves_plants" in request.data
+                ):
+                    involves_animals_value = request.data.get("involves_animals")
+                    request.data.get("involves_plants")
+                    aec_approval_value = request.data.get("ae_endorsement_provided")
+
+                    if involves_animals_value:
+                        endorsement_to_edit.ae_endorsement_provided = aec_approval_value
+                    else:
+                        endorsement_to_edit.ae_endorsement_provided = False
+
+                endorsement_to_edit.save()
+
+        serializer = ProjectPlanSerializer(
+            project_plan,
+            data=request.data,
+            partial=True,
+        )
+
+        if not serializer.is_valid():
+            settings.LOGGER.error(f"{serializer.errors}")
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        updated_project_plan = serializer.save()
+        updated_project_plan.document.modifier = request.user
+        updated_project_plan.document.save()
+
+        return Response(
+            TinyProjectPlanSerializer(updated_project_plan).data,
+            status=HTTP_200_OK,
+        )
+
     def put(self, request, pk):
-        """Update project plan"""
+        """Full update project plan"""
         settings.LOGGER.info(
             f"{request.user} is updating project plan details for project plan id: {pk}"
         )
@@ -105,22 +168,17 @@ class ProjectPlanDetail(APIView):
                     request.data.get("involves_plants")
                     aec_approval_value = request.data.get("ae_endorsement_provided")
 
-                    # Auto set the endorsement to false if it does not involve plants or animals
                     if involves_animals_value:
                         endorsement_to_edit.ae_endorsement_provided = aec_approval_value
                     else:
                         endorsement_to_edit.ae_endorsement_provided = False
 
-                    # Note: There is no hc_endorsement field in the model
-                    # Plant endorsement info is stored in no_specimens field
-
                 endorsement_to_edit.save()
 
-        # Update project plan
         serializer = ProjectPlanSerializer(
             project_plan,
             data=request.data,
-            partial=True,
+            partial=True,  # Allow partial updates for PUT as well
         )
 
         if not serializer.is_valid():
@@ -133,7 +191,7 @@ class ProjectPlanDetail(APIView):
 
         return Response(
             TinyProjectPlanSerializer(updated_project_plan).data,
-            status=HTTP_202_ACCEPTED,
+            status=HTTP_202_ACCEPTED,  # Match expected status code
         )
 
     def delete(self, request, pk):

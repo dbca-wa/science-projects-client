@@ -8,7 +8,7 @@ import React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getSelection, $isRangeSelection, $isTextNode } from "lexical";
 import { RemoveFormatting } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
+import { BaseToolbarButton } from "./BaseToolbarButton";
 
 interface ClearFormattingButtonProps {
 	disabled?: boolean;
@@ -38,17 +38,11 @@ export const ClearFormattingButton: React.FC<ClearFormattingButtonProps> = ({
 	};
 
 	return (
-		<Button
-			type="button"
-			variant="ghost"
-			size="sm"
-			className="h-8 w-8 p-0"
+		<BaseToolbarButton
+			icon={RemoveFormatting}
+			label="Clear formatting"
 			onClick={handleClick}
 			disabled={disabled}
-			aria-label="Clear formatting"
-			title="Clear formatting"
-		>
-			<RemoveFormatting className="h-4 w-4" />
-		</Button>
+		/>
 	);
 };

@@ -31,8 +31,11 @@ class ProjectMembers(APIView):
 
     def post(self, request):
         """Add member to project"""
+        settings.LOGGER.info(f"Received POST data: {request.data}")
+
         serializer = ProjectMemberSerializer(data=request.data)
         if not serializer.is_valid():
+            settings.LOGGER.error(f"Validation errors: {serializer.errors}")
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
         member = MemberService.add_member(
@@ -109,6 +112,45 @@ class MembersForProject(APIView):
         serializer = TinyProjectMemberSerializer(members, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
+    def put(self, request, pk):
+        """Reorder team members (drag and drop)"""
+        settings.LOGGER.info(f"{request.user} is reordering members for project {pk}")
+
+        members_data = request.data.get("members", [])
+        if not members_data:
+            return Response(
+                {"error": "members array is required"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        # Update positions for all members
+        # Leader always stays at position 1
+        for item in members_data:
+            member_id = item.get("id")
+            new_position = item.get("position")
+
+            if not member_id or new_position is None:
+                continue
+
+            try:
+                member = MemberService.get_member_by_id(member_id)
+
+                # Leader always gets position 1, regardless of drag position
+                if member.is_leader:
+                    member.position = 1
+                else:
+                    member.position = new_position
+
+                member.save()
+            except Exception as e:
+                settings.LOGGER.error(f"Error updating member {member_id}: {e}")
+                continue
+
+        # Return updated team list
+        members = MemberService.get_members_for_project(pk)
+        serializer = TinyProjectMemberSerializer(members, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class PromoteToLeader(APIView):
     """Promote member to project leader"""
@@ -132,3 +174,75 @@ class PromoteToLeader(APIView):
 
         serializer = TinyProjectMemberSerializer(member)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)
+
+
+class MentionableUsersForProject(APIView):
+    """Get all users who can be mentioned in project comments"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        """
+        Get all mentionable users for a project.
+
+        Returns all users who have permission to comment on the project:
+        - Project team members
+        - Business area leads (users in same BA as project)
+        - Directorate users (users in "Directorate" BA, case-sensitive)
+        - Superusers
+        - Caretakers of all above users
+        """
+        from django.contrib.auth import get_user_model
+
+        from caretakers.models import Caretaker
+        from projects.models import Project
+        from users.serializers import TinyUserSerializer
+
+        User = get_user_model()
+
+        try:
+            project = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return Response(
+                {"error": f"Project {pk} not found"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        mentionable_users = set()
+
+        # 1. Project team members
+        team_member_ids = project.members.values_list("pk", flat=True)
+        mentionable_users.update(team_member_ids)
+
+        # 2. Business area leads (users in same BA as project)
+        if project.business_area:
+            ba_user_ids = User.objects.filter(
+                work__business_area=project.business_area
+            ).values_list("pk", flat=True)
+            mentionable_users.update(ba_user_ids)
+
+        # 3. Directorate users (case-sensitive "Directorate")
+        directorate_user_ids = User.objects.filter(
+            work__business_area__name="Directorate"
+        ).values_list("pk", flat=True)
+        mentionable_users.update(directorate_user_ids)
+
+        # 4. Superusers
+        superuser_ids = User.objects.filter(is_superuser=True).values_list(
+            "pk", flat=True
+        )
+        mentionable_users.update(superuser_ids)
+
+        # 5. Caretakers of all above users
+        caretaker_ids = Caretaker.objects.filter(
+            user__pk__in=mentionable_users
+        ).values_list("caretaker_id", flat=True)
+        mentionable_users.update(caretaker_ids)
+
+        # Get user objects and serialise
+        users = User.objects.filter(pk__in=mentionable_users).select_related(
+            "work", "work__business_area", "work__branch", "avatar"
+        )
+
+        serializer = TinyUserSerializer(users, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)

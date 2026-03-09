@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { useEffect, useRef, memo, useState } from "react";
 import type { IProjectData } from "@/shared/types/project.types";
 import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
-import { ProjectStatusBadge } from "@/features/projects/components/ProjectStatusBadge";
+import { ProjectStatusBadge } from "@/features/projects/components/badges/ProjectStatusBadge";
 import { mapAnnouncements } from "@/shared/utils/screen-reader.utils";
 
 interface ProjectPopupProps {

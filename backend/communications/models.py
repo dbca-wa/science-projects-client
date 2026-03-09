@@ -66,6 +66,12 @@ class DirectMessage(CommonModel):
 
 
 class Comment(CommonModel):
+    """
+    Model Definition for Comments on Project Documents
+
+    Supports threaded replies via parent_comment field and @mentions tracking.
+    """
+
     user = models.ForeignKey(
         "users.User",
         blank=True,
@@ -86,6 +92,16 @@ class Comment(CommonModel):
     is_public = models.BooleanField(default=True)
     is_removed = models.BooleanField(default=False)
 
+    # New fields for threaded replies (nullable for backward compatibility)
+    parent_comment = models.ForeignKey(
+        "self",
+        related_name="replies",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="Parent comment for threaded replies",
+    )
+
     def get_reactions(self):
         try:
             return self.reactions.all()
@@ -99,6 +115,45 @@ class Comment(CommonModel):
     class Meta:
         verbose_name = "Comment"
         verbose_name_plural = "Comments"
+        indexes = [
+            models.Index(fields=["document", "-created_at"]),
+            models.Index(fields=["user"]),
+            models.Index(fields=["parent_comment"]),
+        ]
+
+
+class CommentMention(CommonModel):
+    """
+    Model Definition for Comment Mentions
+
+    Tracks when users are @mentioned in comments for notification purposes.
+    """
+
+    comment = models.ForeignKey(
+        "communications.Comment",
+        related_name="mentions",
+        on_delete=models.CASCADE,
+        help_text="The comment containing the mention",
+    )
+    mentioned_user = models.ForeignKey(
+        "users.User",
+        related_name="comment_mentions",
+        on_delete=models.CASCADE,
+        help_text="The user who was mentioned",
+    )
+
+    class Meta:
+        verbose_name = "Comment Mention"
+        verbose_name_plural = "Comment Mentions"
+        unique_together = [["comment", "mentioned_user"]]
+        indexes = [
+            models.Index(fields=["comment"]),
+            models.Index(fields=["mentioned_user"]),
+        ]
+
+    def __str__(self) -> str:
+        mentioned_name = self.mentioned_user.get_full_name()
+        return f"@{mentioned_name} in comment {self.comment.pk}"
 
 
 class Reaction(CommonModel):
@@ -108,12 +163,9 @@ class Reaction(CommonModel):
 
     class ReactionChoices(models.TextChoices):
         THUMBUP = "thumbup", "Thumbs Up"
-        THUMBDOWN = "thumbdown", "Thumbs Down"
         HEART = "heart", "Heart"
-        BROKENHEART = "brokenheart", "Broken Heart"
-        HUNDRED = "hundred", "Hundred"
-        CONFUSED = "confused", "Confused"
         FUNNY = "funny", "Funny"
+        CONFUSED = "confused", "Confused"
         SURPRISED = "surprised", "Surprised"
 
     user = models.ForeignKey(

@@ -4,24 +4,34 @@
  * Type definitions for the Lexical-based rich text editor component.
  */
 
-export type ToolbarMode = "full" | "simple" | "minimal" | "none" | "profile";
+export type ToolbarMode =
+	| "full"
+	| "simple"
+	| "minimal"
+	| "none"
+	| "profile"
+	| "projectTitle"
+	| "projectDescription";
 
 export interface RichTextEditorProps {
 	// Content
 	value?: string;
 	onChange?: (html: string) => void;
+	onSave?: () => void; // Callback for Ctrl+S keyboard shortcut
 
 	// Configuration
 	placeholder?: string;
 	readOnly?: boolean;
 	disabled?: boolean;
 	autoFocus?: boolean;
+	moveCursorToEnd?: boolean; // Move cursor to end when editor becomes editable (for inline editors)
 
 	// Toolbar
 	toolbar?: ToolbarMode;
 
 	// Validation
 	wordLimit?: number;
+	limitCanBePassed?: boolean; // If true, shows "Aim for max of X words", if false shows "Limit: X words"
 	required?: boolean;
 
 	// Styling
@@ -31,11 +41,13 @@ export interface RichTextEditorProps {
 	// Accessibility
 	"aria-label"?: string;
 	"aria-describedby"?: string;
+	"aria-invalid"?: boolean;
 }
 
 export interface RichTextDisplayProps {
 	content: string;
 	className?: string;
+	emptyMessage?: string;
 }
 
 export interface ToolbarProps {
@@ -45,16 +57,91 @@ export interface ToolbarProps {
 
 export interface FormatButtonProps {
 	format: "bold" | "italic" | "underline";
+	isActive: boolean;
+	onToggle: () => void;
 	disabled?: boolean;
 }
 
 export interface HeadingSelectProps {
+	blockType: "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+	onSetBlockType: (
+		blockType: "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+	) => void;
 	disabled?: boolean;
 	disableHeadings?: boolean; // Disable H1/H2/H3 but keep Normal enabled
 }
 
-export interface LinkButtonProps {
+export interface ListButtonProps {
+	listType: "bullet" | "number";
+	isActive: boolean;
+	onToggle: () => void;
 	disabled?: boolean;
+}
+
+export interface UnifiedListButtonProps {
+	isList: boolean;
+	listType: "bullet" | "number" | null;
+	onCycleList: () => void;
+	disabled?: boolean;
+}
+
+export interface UndoRedoButtonsProps {
+	canUndo: boolean;
+	canRedo: boolean;
+	onUndo: () => void;
+	onRedo: () => void;
+	disabled?: boolean;
+}
+
+export interface LinkButtonProps {
+	isActive: boolean;
+	disabled?: boolean;
+}
+
+export interface SubscriptButtonProps {
+	isActive: boolean;
+	onToggle: () => void;
+	disabled?: boolean;
+}
+
+export interface SuperscriptButtonProps {
+	isActive: boolean;
+	onToggle: () => void;
+	disabled?: boolean;
+}
+
+export interface IndentButtonProps {
+	disabled?: boolean;
+	onIndent: () => void;
+	canIndent: boolean;
+}
+
+export interface OutdentButtonProps {
+	disabled?: boolean;
+	onOutdent: () => void;
+	canOutdent: boolean;
+}
+
+export interface AlignmentButtonProps {
+	disabled?: boolean;
+	alignment: "left" | "center" | "right" | "justify";
+	onCycleAlignment: () => void;
+}
+
+export interface StrikethroughButtonProps {
+	isActive: boolean;
+	onToggle: () => void;
+	disabled?: boolean;
+}
+
+export interface TableButtonProps {
+	disabled?: boolean;
+	onInsertTable: (rows: number, columns: number) => void;
+}
+
+export interface ClearEditorButtonProps {
+	disabled?: boolean;
+	onClear: () => void;
 }
 
 export interface WordCountPluginProps {
@@ -62,10 +149,12 @@ export interface WordCountPluginProps {
 	onWordCountChange?: (count: number) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AutoLinkPluginProps {
 	// No props needed for now
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TabIndentationPluginProps {
 	// No props needed for now
 }

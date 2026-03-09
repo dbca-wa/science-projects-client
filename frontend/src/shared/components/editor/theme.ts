@@ -50,4 +50,20 @@ export const editorTheme: EditorThemeClasses = {
 	// Quote styles
 	quote:
 		"editor-quote border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic mb-2",
+
+	// Table styles
+	table: "editor-table",
+	tableCell: "editor-table-cell",
+	tableCellHeader: "editor-table-cell-header",
+	tableRow: "editor-table-row",
+	tableSelected: "editor-table-selected",
+	tableCellSelected: "editor-table-cell-selected",
+	tableCellPrimarySelected: "editor-table-cell-primary-selected",
+	tableCellEditing: "editor-table-cell-editing",
+	tableCellResizer: "editor-table-cell-resizer",
+	tableCellSortedIndicator: "editor-table-cell-sorted-indicator",
+	tableAddColumns: "editor-table-add-columns",
+	tableAddRows: "editor-table-add-rows",
+	tableCellResizeRuler: "editor-table-cell-resize-ruler",
+	tableSelection: "editor-table-selection",
 };
