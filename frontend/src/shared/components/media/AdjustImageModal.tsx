@@ -9,8 +9,8 @@ import {
 	DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { LivePreviews } from "./previews/LivePreviews";
-import { CropControls } from "./CropControls";
+import { LivePreviews } from "./previews/LivePreviews.tsx";
+import { CropControls } from "./CropControls.tsx";
 import { useImageCrop } from "@/shared/hooks/useImageCrop";
 import { useImagePreview } from "@/shared/hooks/useImagePreview";
 import { generateCroppedImage } from "@/shared/utils/image-canvas.utils";

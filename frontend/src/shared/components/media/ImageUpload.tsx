@@ -9,7 +9,7 @@ import {
 import { Upload, X, Link as LinkIcon, Crop } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
-import { AdjustImageModal } from "./AdjustImageModal";
+import { AdjustImageModal } from "./AdjustImageModal.tsx";
 import {
 	type ImageUploadProps,
 	type ImageUploadMode,
