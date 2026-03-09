@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from "@/shared/services/api/client.service";
+import { COMMENT_ENDPOINTS } from "./comment.endpoints";
 import type {
 	IComment,
 	ICommentCreate,
@@ -20,9 +21,7 @@ import type {
  */
 export const getComments = async (documentId: number): Promise<IComment[]> => {
 	try {
-		return await apiClient.get<IComment[]>(
-			`/communications/comments?document_id=${documentId}`
-		);
+		return await apiClient.get<IComment[]>(COMMENT_ENDPOINTS.LIST(documentId));
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to fetch comments",
@@ -39,9 +38,7 @@ export const getComments = async (documentId: number): Promise<IComment[]> => {
  */
 export const getComment = async (commentId: number): Promise<IComment> => {
 	try {
-		return await apiClient.get<IComment>(
-			`/communications/comments/${commentId}`
-		);
+		return await apiClient.get<IComment>(COMMENT_ENDPOINTS.DETAIL(commentId));
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to fetch comment",
@@ -60,7 +57,7 @@ export const createComment = async (
 	data: ICommentCreate
 ): Promise<IComment> => {
 	try {
-		return await apiClient.post<IComment>(`/communications/comments`, data);
+		return await apiClient.post<IComment>(COMMENT_ENDPOINTS.CREATE(), data);
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to create comment",
@@ -82,7 +79,7 @@ export const updateComment = async (
 ): Promise<IComment> => {
 	try {
 		return await apiClient.put<IComment>(
-			`/communications/comments/${commentId}`,
+			COMMENT_ENDPOINTS.UPDATE(commentId),
 			data
 		);
 	} catch (error) {
@@ -101,7 +98,7 @@ export const updateComment = async (
  */
 export const deleteComment = async (commentId: number): Promise<void> => {
 	try {
-		await apiClient.delete<void>(`/communications/comments/${commentId}`);
+		await apiClient.delete<void>(COMMENT_ENDPOINTS.DELETE(commentId));
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to delete comment",

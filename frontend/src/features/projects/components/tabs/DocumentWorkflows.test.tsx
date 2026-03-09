@@ -29,13 +29,13 @@ import {
 	useDocumentAction,
 	useDeleteDocument,
 } from "../../hooks/useDocumentAction";
-import * as documentActionService from "../../services/document-action.service";
+import * as documentActionService from "../../services/document.service";
 import { toast } from "sonner";
 import { toCompactDocumentType } from "@/shared/utils/document.utils";
-import type { DocumentActionResponse } from "../../services/document-action.service";
+import type { DocumentActionResponse } from "../../services/document.service";
 
 // Mock services
-vi.mock("../../services/document-action.service");
+vi.mock("../../services/document.service");
 vi.mock("sonner");
 
 describe.skip("Document Action Workflows - Preservation Tests", () => {

@@ -41,6 +41,7 @@ export interface RichTextEditorProps {
 	// Accessibility
 	"aria-label"?: string;
 	"aria-describedby"?: string;
+	"aria-invalid"?: boolean;
 }
 
 export interface RichTextDisplayProps {

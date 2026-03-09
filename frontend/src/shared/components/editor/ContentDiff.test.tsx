@@ -142,9 +142,11 @@ describe("ContentDiff - Preservation Tests", () => {
 		const changesButton = screen.getByRole("button", { name: /changes/i });
 		await user.click(changesButton);
 
-		// Should show Changes view
+		// Should show Changes view (check for heading, not button)
 		await waitFor(() => {
-			expect(screen.getByText("Changes")).toBeInTheDocument();
+			expect(
+				screen.getByRole("heading", { name: /changes/i })
+			).toBeInTheDocument();
 		});
 
 		// Click Preview button

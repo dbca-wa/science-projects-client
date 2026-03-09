@@ -89,20 +89,26 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		const buttons = screen.getAllByRole("button");
 		expect(buttons.length).toBeGreaterThan(0);
 
-		// Tab to first button
+		// Find first two enabled buttons
+		const enabledButtons = buttons.filter(
+			(button) => !button.hasAttribute("disabled")
+		);
+		expect(enabledButtons.length).toBeGreaterThanOrEqual(2);
+
+		// Tab to first enabled button
 		await user.tab();
 
-		// Verify first button is focused
+		// Verify first enabled button is focused
 		await waitFor(() => {
-			expect(buttons[0]).toHaveFocus();
+			expect(enabledButtons[0]).toHaveFocus();
 		});
 
-		// Tab to next button
+		// Tab to next enabled button
 		await user.tab();
 
-		// Verify second button is focused
+		// Verify second enabled button is focused
 		await waitFor(() => {
-			expect(buttons[1]).toHaveFocus();
+			expect(enabledButtons[1]).toHaveFocus();
 		});
 
 		console.log("✓ Tab key navigation works through toolbar (preserved)");

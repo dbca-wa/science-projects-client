@@ -62,6 +62,11 @@ export function formatProjectYear(
 export function formatProjectTag(project: IProjectData): string {
 	const type = PROJECT_KIND_TO_TYPE[project.kind];
 
+	// Handle missing year gracefully
+	if (!project.year) {
+		return `${type}--${project.number}`;
+	}
+
 	// For now, use the year field as both start and end
 	// TODO: Update when start_year and end_year fields are available
 	const year = project.year.toString();

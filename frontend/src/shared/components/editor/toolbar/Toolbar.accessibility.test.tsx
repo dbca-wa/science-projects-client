@@ -93,13 +93,19 @@ describe("Toolbar - Accessibility", () => {
 
 			const buttons = screen.getAllByRole("button");
 
-			// Tab to first button
-			await user.tab();
-			expect(buttons[0]).toHaveFocus();
+			// Find first two enabled buttons
+			const enabledButtons = buttons.filter(
+				(button) => !button.hasAttribute("disabled")
+			);
+			expect(enabledButtons.length).toBeGreaterThanOrEqual(2);
 
-			// Tab to second button
+			// Tab to first enabled button
 			await user.tab();
-			expect(buttons[1]).toHaveFocus();
+			expect(enabledButtons[0]).toHaveFocus();
+
+			// Tab to second enabled button
+			await user.tab();
+			expect(enabledButtons[1]).toHaveFocus();
 		});
 
 		it("should support Enter key to activate toolbar buttons", async () => {
@@ -157,9 +163,15 @@ describe("Toolbar - Accessibility", () => {
 
 			const buttons = screen.getAllByRole("button");
 
-			// Tab to first button
+			// Find first enabled button
+			const firstEnabledButton = buttons.find(
+				(button) => !button.hasAttribute("disabled")
+			);
+			expect(firstEnabledButton).toBeDefined();
+
+			// Tab to first enabled button
 			await user.tab();
-			expect(buttons[0]).toHaveFocus();
+			expect(firstEnabledButton).toHaveFocus();
 
 			// Arrow right to next button
 			await user.keyboard("{ArrowRight}");

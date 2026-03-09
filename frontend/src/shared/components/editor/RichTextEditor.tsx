@@ -89,116 +89,135 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
 	return null;
 };
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({
-	value,
-	onChange,
-	onSave,
-	placeholder = "Enter text...",
-	readOnly = false,
-	disabled = false,
-	autoFocus = false,
-	moveCursorToEnd = false,
-	toolbar = "full",
-	wordLimit,
-	limitCanBePassed: _limitCanBePassed = false,
-	className = "",
-	minHeight = "150px",
-	"aria-label": ariaLabel,
-	"aria-describedby": ariaDescribedby,
-}) => {
-	const [_currentContent, setCurrentContent] = useState(value || "");
+export const RichTextEditor = React.forwardRef<
+	HTMLDivElement,
+	RichTextEditorProps
+>(
+	(
+		{
+			value,
+			onChange,
+			onSave,
+			placeholder = "Enter text...",
+			readOnly = false,
+			disabled = false,
+			autoFocus = false,
+			moveCursorToEnd = false,
+			toolbar = "full",
+			wordLimit,
+			limitCanBePassed: _limitCanBePassed = false,
+			className = "",
+			minHeight = "150px",
+			"aria-label": ariaLabel,
+			"aria-describedby": ariaDescribedby,
+			"aria-invalid": ariaInvalid,
+		},
+		ref
+	) => {
+		const [_currentContent, setCurrentContent] = useState(value || "");
 
-	const handleError = (error: Error) => {
-		console.error("[RichTextEditor] Lexical error:", error);
-	};
+		const handleError = (error: Error) => {
+			console.error("[RichTextEditor] Lexical error:", error);
+		};
 
-	const handleContentChange = (html: string) => {
-		setCurrentContent(html);
-		onChange?.(html);
-	};
+		const handleContentChange = (html: string) => {
+			setCurrentContent(html);
+			onChange?.(html);
+		};
 
-	const shouldBeEditable = !readOnly && !disabled;
-	const shouldStartEditable =
-		shouldBeEditable && (autoFocus || moveCursorToEnd);
+		const shouldBeEditable = !readOnly && !disabled;
+		const shouldStartEditable =
+			shouldBeEditable && (autoFocus || moveCursorToEnd);
 
-	const initialConfig = {
-		namespace: "RichTextEditor",
-		editable: shouldStartEditable, // Start editable if autoFocus or moveCursorToEnd
-		theme: editorTheme,
-		onError: handleError,
-		nodes: [
-			HeadingNode,
-			ListNode,
-			ListItemNode,
-			LinkNode,
-			AutoLinkNode,
-			TableNode,
-			TableCellNode,
-			TableRowNode,
-		],
-	};
+		const initialConfig = {
+			namespace: "RichTextEditor",
+			editable: shouldStartEditable, // Start editable if autoFocus or moveCursorToEnd
+			theme: editorTheme,
+			onError: handleError,
+			nodes: [
+				HeadingNode,
+				ListNode,
+				ListItemNode,
+				LinkNode,
+				AutoLinkNode,
+				TableNode,
+				TableCellNode,
+				TableRowNode,
+			],
+		};
 
-	return (
-		<div
-			className={`editor-container ${readOnly ? "editor-readonly" : ""} ${className}`}
-		>
-			<LexicalComposer initialConfig={initialConfig}>
-				{/* Toolbar - separate from content area */}
-				{!readOnly && toolbar !== "none" && (
-					<Toolbar mode={toolbar} disabled={disabled} />
-				)}
+		return (
+			<div
+				ref={ref}
+				className={`editor-container ${readOnly ? "editor-readonly" : ""} ${className}`}
+			>
+				<LexicalComposer initialConfig={initialConfig}>
+					{/* Toolbar - separate from content area */}
+					{!readOnly && toolbar !== "none" && (
+						<Toolbar mode={toolbar} disabled={disabled} />
+					)}
 
-				{/* Content area - with border */}
-				<div className="editor-content-wrapper">
-					<RichTextPlugin
-						contentEditable={
-							<ContentEditable
-								className="editor-input"
-								style={{ minHeight }}
-								aria-label={ariaLabel}
-								aria-describedby={ariaDescribedby}
-								// Prevent auto-focus during initialization
-								tabIndex={-1}
-							/>
-						}
-						placeholder={
-							!readOnly ? (
-								<div className="editor-placeholder">{placeholder}</div>
-							) : null
-						}
-						ErrorBoundary={LexicalErrorBoundary}
-					/>
-				</div>
+					{/* Content area - with border */}
+					<div className="editor-content-wrapper">
+						<RichTextPlugin
+							contentEditable={
+								<ContentEditable
+									className="editor-input"
+									style={{ minHeight }}
+									role="textbox"
+									aria-label={ariaLabel}
+									aria-describedby={ariaDescribedby}
+									aria-multiline="true"
+									aria-readonly={readOnly}
+									aria-invalid={ariaInvalid}
+									contentEditable={!readOnly && !disabled}
+									// Prevent auto-focus during initialization
+									tabIndex={readOnly ? -1 : 0}
+								/>
+							}
+							placeholder={
+								!readOnly ? (
+									<div className="editor-placeholder" aria-hidden="false">
+										{placeholder}
+									</div>
+								) : null
+							}
+							ErrorBoundary={LexicalErrorBoundary}
+						/>
+					</div>
 
-				{/* Word count display removed - now handled by InlineSaveEditor */}
+					{/* Word count display removed - now handled by InlineSaveEditor */}
 
-				{/* Plugins */}
-				<HistoryPlugin />
-				<ListPlugin />
-				<ListMaxIndentPlugin maxDepth={9} />
-				<RemoveEmptyListItemsPlugin />
-				<LinkPlugin />
-				<AutoLinkPlugin />
-				<TablePlugin hasCellMerge={false} hasCellBackgroundColor={false} />
-				<TabIndentationPlugin />
-				{/* PreventAutoFocusPlugin must come before EditableOnInteractionPlugin */}
-				<PreventAutoFocusPlugin />
-				<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
-				<SubscriptSuperscriptPlugin />
-				<SaveOnCtrlSPlugin onSave={onSave} />
-				<PastePlugin />
-				{!readOnly && <DragDropPlugin />}
-				{autoFocus && <AutoFocusPlugin />}
-				{moveCursorToEnd && <MoveCursorToEndPlugin />}
-				<OnChangePlugin onChange={handleContentChange} />
-				{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
-				<PrepopulateHTMLPlugin html={value} />
-				{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
-				<ControlledValuePlugin value={value} />
-				{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
-				{/* EditorStore integration - must come after other plugins */}
-				<EditorStoreIntegrationPlugin />
-			</LexicalComposer>
-		</div>
-	);
-};
+					{/* Plugins */}
+					<HistoryPlugin />
+					<ListPlugin />
+					<ListMaxIndentPlugin maxDepth={9} />
+					<RemoveEmptyListItemsPlugin />
+					<LinkPlugin />
+					<AutoLinkPlugin />
+					<TablePlugin hasCellMerge={false} hasCellBackgroundColor={false} />
+					<TabIndentationPlugin />
+					{/* PreventAutoFocusPlugin must come before EditableOnInteractionPlugin */}
+					<PreventAutoFocusPlugin />
+					<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
+					<SubscriptSuperscriptPlugin />
+					<SaveOnCtrlSPlugin onSave={onSave} />
+					<PastePlugin />
+					{!readOnly && <DragDropPlugin />}
+					{autoFocus && <AutoFocusPlugin />}
+					{moveCursorToEnd && <MoveCursorToEndPlugin />}
+					<OnChangePlugin onChange={handleContentChange} />
+					{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
+					<PrepopulateHTMLPlugin html={value} />
+					{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
+					<ControlledValuePlugin value={value} />
+					{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
+					{/* EditorStore integration - must come after other plugins */}
+					<EditorStoreIntegrationPlugin />
+				</LexicalComposer>
+			</div>
+		);
+	}
+);
+
+RichTextEditor.displayName = "RichTextEditor";

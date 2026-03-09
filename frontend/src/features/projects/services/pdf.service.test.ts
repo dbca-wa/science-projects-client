@@ -7,7 +7,7 @@ import type { DocumentType } from "@/shared/utils/document.utils";
 vi.mock("@/shared/services/api/client.service", () => ({
 	apiClient: {
 		getBlob: vi.fn(),
-		post: vi.fn(),
+		postBlob: vi.fn(),
 	},
 }));
 
@@ -53,16 +53,14 @@ describe("pdf.service - Bug Condition Exploration", () => {
 
 			documentTypes.forEach((documentType) => {
 				it(`should construct correct generate URL for ${documentType}`, async () => {
-					(apiClient.post as Mock).mockResolvedValue({
-						success: true,
-						message: "PDF generated successfully",
-					});
+					const mockBlob = new Blob(["test"], { type: "application/pdf" });
+					(apiClient.postBlob as Mock).mockResolvedValue(mockBlob);
 
 					await generatePdf(documentType, 3216);
 
 					// Expected: documents/generate_project_document/3216
 					// Current (buggy): documents/{documentType}/3216/pdf/generate
-					expect(apiClient.post).toHaveBeenCalledWith(
+					expect(apiClient.postBlob).toHaveBeenCalledWith(
 						"documents/generate_project_document/3216",
 						{}
 					);

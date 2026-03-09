@@ -6,8 +6,8 @@ import { formatDetailedDateTime } from "@/shared/utils/date.utils";
 import { getDocumentTypeIdLabel } from "@/shared/utils/document.utils";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { UserLink } from "@/shared/components/user";
-import { ProjectTag } from "@/features/projects/components/ProjectTag";
-import { ProjectStatusBadge } from "@/features/projects/components/ProjectStatusBadge";
+import { ProjectTag } from "@/features/projects/components/badges/ProjectTag";
+import { ProjectStatusBadge } from "@/features/projects/components/badges/ProjectStatusBadge";
 import { useUserDetail } from "@/features/users/hooks";
 
 interface DocumentDetailsSectionProps {

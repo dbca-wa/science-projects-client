@@ -55,6 +55,34 @@ global.ResizeObserver = class ResizeObserver {
 	disconnect = vi.fn();
 };
 
+// Mock getBoundingClientRect for Lexical editor
+Element.prototype.getBoundingClientRect = vi.fn(() => ({
+	width: 0,
+	height: 0,
+	top: 0,
+	left: 0,
+	bottom: 0,
+	right: 0,
+	x: 0,
+	y: 0,
+	toJSON: () => ({}),
+}));
+
+// Mock Range.prototype.getBoundingClientRect for Lexical selection
+if (typeof Range !== "undefined") {
+	Range.prototype.getBoundingClientRect = vi.fn(() => ({
+		width: 0,
+		height: 0,
+		top: 0,
+		left: 0,
+		bottom: 0,
+		right: 0,
+		x: 0,
+		y: 0,
+		toJSON: () => ({}),
+	}));
+}
+
 // Setup JSDOM for tests that need DOM APIs
 beforeAll(() => {
 	if (typeof window === "undefined") {

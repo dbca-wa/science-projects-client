@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useProjectAreas } from "@/features/locations/hooks/useProjectAreas";
+import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
 import { Input } from "@/shared/components/ui/input";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Button } from "@/shared/components/ui/button";

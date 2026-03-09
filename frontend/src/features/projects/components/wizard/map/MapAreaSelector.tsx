@@ -4,7 +4,7 @@ import type { Map as LeafletMapType } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
-import { useProjectAreas } from "@/features/locations/hooks/useProjectAreas";
+import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
 import { MAP_CONFIG } from "@/features/projects/components/map/map-utils";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";

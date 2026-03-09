@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UpdateProjectPayload } from "@/features/projects/types/editProject.types";
+import type { UpdateProjectPayload } from "@/features/projects/types/project.types";
 import { apiClient } from "@/shared/services/api/client.service";
 
 /**

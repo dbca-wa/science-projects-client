@@ -1,4 +1,5 @@
 import { apiClient } from "@/shared/services/api/client.service";
+import { PDF_ENDPOINTS } from "./pdf.endpoints";
 import type { DocumentType } from "@/shared/utils/document.utils";
 
 /**
@@ -14,8 +15,7 @@ export const downloadPdf = async (
 	_documentType: DocumentType,
 	documentId: number
 ): Promise<Blob> => {
-	const url = `documents/downloadProjectDocument/${documentId}`;
-	return apiClient.getBlob(url);
+	return apiClient.getBlob(PDF_ENDPOINTS.DOWNLOAD(documentId));
 };
 
 /**
@@ -26,8 +26,7 @@ export const generatePdf = async (
 	_documentType: DocumentType,
 	documentId: number
 ): Promise<Blob> => {
-	const url = `documents/generate_project_document/${documentId}`;
-	return apiClient.postBlob(url, {});
+	return apiClient.postBlob(PDF_ENDPOINTS.GENERATE(documentId), {});
 };
 
 /**

@@ -5,29 +5,29 @@ import type {
 	IExternalProjectDetails,
 	IProjectDocuments,
 } from "@/shared/types/project.types";
-import { ProjectImageWithTag } from "../ProjectImageWithTag";
-import { ProjectStatusBadge } from "../ProjectStatusBadge";
-import { ProjectKindBadge } from "../ProjectKindBadge";
+import { ProjectImageWithTag } from "../images/ProjectImageWithTag";
+import { ProjectStatusBadge } from "@/shared/components/projects/ProjectStatusBadge";
+import { ProjectKindBadge } from "@/shared/components/projects/ProjectKindBadge";
 import { DatasetReviewLink } from "../DatasetReviewLink";
 import { EditProjectButton } from "../overview/EditProjectButton";
 import { ProjectActionsDropdown } from "../overview/ProjectActionsDropdown";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { InlineSaveEditor } from "@/shared/components/editor/InlineSaveEditor";
-import { ProjectKeywordsSection } from "../ProjectKeywordsSection";
-import { formatAuthors } from "../../utils/authors.utils";
+import { ProjectKeywordsSection } from "../keywords/ProjectKeywordsSection";
+import { formatAuthors } from "../../utils/authors/authors.utils";
 import { formatYearRange } from "../../utils/year.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { Info, Building2, Calendar, Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/features/auth";
-import { checkTeamManagementPermissions } from "../../utils/team-permissions.utils";
+import { checkTeamManagementPermissions } from "../../utils/permissions/team-permissions.utils";
 import { ProjectTeamSection } from "../team/ProjectTeamSection";
 import { ExternalProjectSections } from "../overview/ExternalProjectSections";
 import { StudentProjectSections } from "../overview/StudentProjectSections";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateStudentReportModal } from "../modals/CreateStudentReportModal";
-import { CreateProgressReportModal } from "../CreateProgressReportModal";
+import { CreateProgressReportModal } from "../modals/CreateProgressReportModal";
 import { ProjectSuspensionModal } from "../modals/ProjectSuspensionModal";
 import { ProjectClosureModal } from "../modals/ProjectClosureModal";
 import { ReopenProjectModal } from "../modals/ReopenProjectModal";

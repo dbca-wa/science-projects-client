@@ -68,6 +68,7 @@ describe("CONTENT_TYPE_CONFIGS", () => {
 				// Student Report fields
 				"student-report-progress-report",
 				// Project Closure fields
+				"project-closure-intended-outcome",
 				"project-closure-reason",
 				"project-closure-scientific-outputs",
 				"project-closure-knowledge-transfer",

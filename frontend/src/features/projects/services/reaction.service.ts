@@ -5,6 +5,7 @@
  */
 
 import { apiClient } from "@/shared/services/api/client.service";
+import { REACTION_ENDPOINTS } from "./reaction.endpoints";
 import type { IReaction, ReactionType } from "@/shared/types/comment.types";
 
 /**
@@ -15,9 +16,7 @@ import type { IReaction, ReactionType } from "@/shared/types/comment.types";
  */
 export const getReactions = async (commentId: number): Promise<IReaction[]> => {
 	try {
-		return await apiClient.get<IReaction[]>(
-			`/communications/reactions?comment_id=${commentId}`
-		);
+		return await apiClient.get<IReaction[]>(REACTION_ENDPOINTS.LIST(commentId));
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to fetch reactions",
@@ -39,7 +38,7 @@ export const toggleReaction = async (
 	reactionType: ReactionType
 ): Promise<IReaction | null> => {
 	try {
-		return await apiClient.post<IReaction | null>(`/communications/reactions`, {
+		return await apiClient.post<IReaction | null>(REACTION_ENDPOINTS.TOGGLE(), {
 			comment: commentId,
 			reaction: reactionType,
 		});

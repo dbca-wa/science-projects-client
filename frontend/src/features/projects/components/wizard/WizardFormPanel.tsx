@@ -1,9 +1,9 @@
 import type { ProjectKind } from "@/shared/types/project.types";
-import { Step1BaseInformation } from "./steps/Step1BaseInformation";
-import { Step2ProjectDetails } from "./steps/Step2ProjectDetails";
-import { Step3LocationSelection } from "./steps/Step3LocationSelection";
-import { Step4ExternalDetails } from "./steps/Step4ExternalDetails";
-import { Step4StudentDetails } from "./steps/Step4StudentDetails";
+import { BaseInformationStep } from "./steps/BaseInformationStep";
+import { ProjectDetailsStep } from "./steps/ProjectDetailsStep";
+import { LocationStep } from "./steps/LocationStep";
+import { ExternalDetailsStep } from "./steps/ExternalDetailsStep";
+import { StudentDetailsStep } from "./steps/StudentDetailsStep";
 
 interface WizardFormPanelProps {
 	currentStep: number;
@@ -27,17 +27,17 @@ export function WizardFormPanel({
 	const renderStep = () => {
 		switch (currentStep) {
 			case 0:
-				return <Step1BaseInformation />;
+				return <BaseInformationStep />;
 			case 1:
-				return <Step2ProjectDetails />;
+				return <ProjectDetailsStep />;
 			case 2:
-				return <Step3LocationSelection />;
+				return <LocationStep />;
 			case 3:
 				if (projectKind === "external") {
-					return <Step4ExternalDetails />;
+					return <ExternalDetailsStep />;
 				}
 				if (projectKind === "student") {
-					return <Step4StudentDetails />;
+					return <StudentDetailsStep />;
 				}
 				return null;
 			default:

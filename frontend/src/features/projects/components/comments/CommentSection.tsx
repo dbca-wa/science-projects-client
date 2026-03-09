@@ -14,7 +14,7 @@ import {
 } from "@/features/projects/hooks/useComments";
 import { useCurrentUser } from "@/features/auth";
 import { useProject } from "@/features/projects/hooks/useProject";
-import { canUserComment } from "@/features/projects/utils/comment-permissions.utils";
+import { canUserComment } from "@/features/projects/utils/permissions/comment-permissions.utils";
 
 interface CommentSectionProps {
 	documentId: number;

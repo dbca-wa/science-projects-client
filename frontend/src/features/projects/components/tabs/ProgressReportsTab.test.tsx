@@ -58,17 +58,8 @@ vi.mock("@/shared/components/editor", () => ({
 }));
 
 vi.mock("@/shared/components/ProjectSection", () => ({
-	ProjectSection: ({
-		title,
-		children,
-	}: {
-		title: string;
-		children: React.ReactNode;
-	}) => (
-		<section data-testid={`section-${title}`}>
-			<h2>{title}</h2>
-			{children}
-		</section>
+	ProjectSection: ({ children }: { children: React.ReactNode }) => (
+		<section data-testid="project-section">{children}</section>
 	),
 }));
 
@@ -237,14 +228,10 @@ describe("ProgressReportsTab", () => {
 				/>
 			);
 
-			// Check that sections have h2 headings
-			expect(
-				screen.getByRole("heading", { name: "Context" })
-			).toBeInTheDocument();
-			expect(screen.getByRole("heading", { name: "Aims" })).toBeInTheDocument();
-			expect(
-				screen.getByRole("heading", { name: "Progress" })
-			).toBeInTheDocument();
+			// Check that sections have accessible labels (InlineSaveEditor provides labels, not headings)
+			expect(screen.getByLabelText("Context")).toBeInTheDocument();
+			expect(screen.getByLabelText("Aims")).toBeInTheDocument();
+			expect(screen.getByLabelText("Progress")).toBeInTheDocument();
 		});
 
 		it("should have accessible form labels", () => {
@@ -277,12 +264,16 @@ describe("ProgressReportsTab", () => {
 				/>
 			);
 
-			// All sections should be present
-			expect(screen.getByTestId("section-Context")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Aims")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Progress")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Implications")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Future")).toBeInTheDocument();
+			// All sections should be present (check by editor test-ids)
+			expect(screen.getByTestId("inline-editor-Context")).toBeInTheDocument();
+			expect(screen.getByTestId("inline-editor-Aims")).toBeInTheDocument();
+			expect(screen.getByTestId("inline-editor-Progress")).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Management Implications")
+			).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Future Directions")
+			).toBeInTheDocument();
 		});
 
 		it("should display content from selected year", () => {

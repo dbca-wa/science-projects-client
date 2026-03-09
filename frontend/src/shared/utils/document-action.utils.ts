@@ -11,13 +11,27 @@ import type {
  */
 
 /**
+ * Format document type for display in lowercase
+ */
+function formatDocumentType(documentType: DocumentType): string {
+	const mapping: Record<DocumentType, string> = {
+		concept: "concept plan",
+		projectplan: "project plan",
+		progressreport: "progress report",
+		studentreport: "student report",
+		projectclosure: "project closure",
+	};
+	return mapping[documentType] || documentType;
+}
+
+/**
  * Get the title for a document action modal
  */
 export function getActionTitle(
 	action: DocumentAction,
 	documentType: DocumentType
 ): string {
-	const docTypeName = documentType.replace(/_/g, " ");
+	const docTypeName = formatDocumentType(documentType);
 
 	switch (action) {
 		case "submit":
@@ -70,7 +84,7 @@ export function getActionDescription(
 export function getFinalApprovalDescription(
 	documentType: DocumentType
 ): string {
-	const docTypeName = documentType.replace(/_/g, " ");
+	const docTypeName = formatDocumentType(documentType);
 	return `This is the final approval stage for the ${docTypeName}. Once approved, the document will be fully approved and can proceed to the next phase.`;
 }
 

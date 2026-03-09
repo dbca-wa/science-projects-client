@@ -19,7 +19,7 @@ import {
 	useDownloadPdf,
 	useGeneratePdf,
 } from "@/features/projects/hooks/usePdfOperations";
-import { getCurrentApprovalStage } from "@/features/projects/utils/approval.utils";
+import { getCurrentApprovalStage } from "@/features/projects/utils/authors/approval.utils";
 
 interface DocumentActionsSectionWithModalsProps {
 	document: IMainDoc;

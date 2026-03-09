@@ -21,7 +21,7 @@ import type {
 	IProjectDocuments,
 } from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
-import { canManageProject } from "@/features/projects/utils/permissions";
+import { canEditProject } from "@/features/projects/utils/permissions";
 
 interface ProjectActionsDropdownProps {
 	project: IProjectData;
@@ -55,7 +55,7 @@ export function ProjectActionsDropdown({
 	onCancelDeletionRequest,
 }: ProjectActionsDropdownProps) {
 	// Check if user can manage project
-	const hasManagePermission = canManageProject(currentUser, project);
+	const hasManagePermission = canEditProject(currentUser, project);
 
 	// Don't render if user doesn't have permission
 	if (!hasManagePermission) {

@@ -103,7 +103,7 @@ export const Header = observer(() => {
 	};
 
 	return (
-		<header className="bg-gray-900 rounded-b py-0.5">
+		<header className="sticky top-0 z-50 bg-gray-900 rounded-b py-0.5">
 			{/* Skip to main content link for keyboard users */}
 			<button
 				onClick={(e) => {

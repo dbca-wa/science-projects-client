@@ -7,8 +7,8 @@ import "./map-accessibility.css"; // Custom CSS for map accessibility
 import { useProjectMapStore } from "@/app/stores/store-context";
 import { useProjectsForMap } from "@/features/projects/hooks/useProjectsForMap";
 import { useGeoJSON } from "@/features/projects/hooks/useGeoJSON";
-import { calculateProjectCoordinates } from "@/features/projects/utils/coordinate-calculation";
-import { clusterProjects } from "@/features/projects/utils/clustering";
+import { calculateProjectCoordinates } from "@/features/projects/utils/map/coordinate-calculation.utils";
+import { clusterProjects } from "@/features/projects/utils/map/clustering.utils";
 import { ProjectMarker } from "./ProjectMarker";
 import { HeatmapLayer } from "./HeatmapLayer";
 import { RegionLayer } from "./RegionLayer";

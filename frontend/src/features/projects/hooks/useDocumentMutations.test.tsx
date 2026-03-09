@@ -137,7 +137,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
 	 */
 	it("should invalidate queries after progress report creation", async () => {
-		const mockResponse = { id: 111, year: 2026, project: 222 };
+		const mockResponse = { id: 111, year: 2026, project: 456 };
 		vi.mocked(apiClient.apiClient.post).mockResolvedValue(mockResponse);
 
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
@@ -155,7 +155,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 
 		// Verify query invalidation
 		expect(invalidateSpy).toHaveBeenCalledWith({
-			queryKey: ["projects", 222],
+			queryKey: ["projects", 456],
 		});
 
 		console.log("✓ Query invalidation triggers after save (preserved)");
@@ -187,7 +187,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 
 		// Verify both detail and list queries are invalidated
 		expect(invalidateSpy).toHaveBeenCalledWith({
-			queryKey: ["projects", "detail", 333],
+			queryKey: ["projects", "detail", 789],
 		});
 		expect(invalidateSpy).toHaveBeenCalledWith({
 			queryKey: ["projects"],
@@ -314,6 +314,15 @@ describe("Document Save Operations - Preservation Tests", () => {
 	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
 	 */
 	it("should support partial project updates", async () => {
+		const mockResponse = {
+			id: 789,
+			title: "Original Title",
+			business_area: 1,
+			start_date: "2024-01-01",
+			project_areas: [1],
+		};
+		vi.mocked(apiClient.apiClient.put).mockResolvedValue(mockResponse);
+
 		const { result } = renderHook(() => useUpdateProject(), { wrapper });
 
 		// Update with all required fields
@@ -347,6 +356,12 @@ describe("Document Save Operations - Preservation Tests", () => {
 			project_areas: [1, 2],
 		};
 
+		const mockResponse = {
+			id: 789,
+			...inputData,
+		};
+		vi.mocked(apiClient.apiClient.put).mockResolvedValue(mockResponse);
+
 		const { result } = renderHook(() => useUpdateProject(), { wrapper });
 
 		result.current.mutate({
@@ -367,7 +382,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
 	 */
 	it("should accept valid year for progress report", async () => {
-		const mockResponse = { id: 999, year: 2026, project: 999 };
+		const mockResponse = { id: 999, year: 2026, project: 456 };
 		vi.mocked(apiClient.apiClient.post).mockResolvedValue(mockResponse);
 
 		const { result } = renderHook(() => useCreateProgressReport(), { wrapper });
@@ -383,7 +398,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 
 		// Verify year was sent correctly
 		expect(apiClient.apiClient.post).toHaveBeenCalledWith(
-			"projects/999/progress-reports",
+			"projects/456/progress-reports",
 			{ year: 2026 }
 		);
 

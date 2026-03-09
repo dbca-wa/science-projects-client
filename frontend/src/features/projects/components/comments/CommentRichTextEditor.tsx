@@ -14,7 +14,7 @@ import { PrepopulateHTMLPlugin } from "./PrepopulateHTMLPlugin";
 import {
 	generateCommentHTML,
 	extractMentionedUsers,
-} from "@/features/projects/utils/comment-html.utils";
+} from "@/features/projects/utils/comments/comment-html.utils";
 import { ensureRichText } from "@/shared/utils/rich-text.utils";
 import {
 	Avatar,

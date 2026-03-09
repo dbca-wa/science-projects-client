@@ -22,12 +22,13 @@ export function WordCounter({
 }: WordCounterProps) {
 	const wordCount = useMemo(() => countWords(content), [content]);
 	const isOverLimit = limit !== undefined && wordCount > limit;
+	const isApproachingLimit = limit !== undefined && wordCount >= limit * 0.9;
 
 	return (
 		<div
 			className="text-sm"
 			role="status"
-			aria-live="polite"
+			aria-live={isApproachingLimit ? "assertive" : "polite"}
 			aria-atomic="true"
 		>
 			<span

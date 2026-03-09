@@ -35,6 +35,20 @@ export type ApprovalStage =
 	| "directorate"
 	| "complete";
 
+/**
+ * Format document type for display in lowercase
+ */
+function formatDocumentType(documentType: DocumentType): string {
+	const mapping: Record<DocumentType, string> = {
+		concept: "concept plan",
+		projectplan: "project plan",
+		progressreport: "progress report",
+		studentreport: "student report",
+		projectclosure: "project closure",
+	};
+	return mapping[documentType] || documentType;
+}
+
 interface UnifiedDocumentActionModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -97,7 +111,7 @@ export function UnifiedDocumentActionModal({
 
 	// Get modal content based on action and stage
 	const getModalTitle = (): string => {
-		const docTypeName = documentType.replace(/_/g, " ");
+		const docTypeName = formatDocumentType(documentType);
 
 		switch (action) {
 			case "submit":

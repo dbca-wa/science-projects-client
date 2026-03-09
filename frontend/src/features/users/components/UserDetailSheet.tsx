@@ -7,9 +7,9 @@ import {
 	useBecomeCaretaker,
 	useCancelBecomeCaretakerRequest,
 } from "@/features/caretakers/hooks";
-import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
+import { useInvolvedProjects } from "@/shared/hooks/queries/useInvolvedProjects";
 import { UserAdminActionButtons } from "./UserAdminActionButtons";
-import { ProjectsDataTable } from "@/features/projects/components/ProjectsDataTable";
+import { ProjectsDataTable } from "@/shared/components/projects/ProjectsDataTable";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {

@@ -61,17 +61,8 @@ vi.mock("@/shared/components/editor", () => ({
 }));
 
 vi.mock("@/shared/components/ProjectSection", () => ({
-	ProjectSection: ({
-		title,
-		children,
-	}: {
-		title: string;
-		children: React.ReactNode;
-	}) => (
-		<section data-testid={`section-${title}`}>
-			<h2>{title}</h2>
-			{children}
-		</section>
+	ProjectSection: ({ children }: { children: React.ReactNode }) => (
+		<section data-testid="project-section">{children}</section>
 	),
 }));
 
@@ -224,10 +215,8 @@ describe("StudentReportsTab", () => {
 				/>
 			);
 
-			// Check that section has h2 heading
-			expect(
-				screen.getByRole("heading", { name: "Progress Report" })
-			).toBeInTheDocument();
+			// InlineSaveEditor provides its own label, no separate heading needed
+			expect(screen.getByLabelText("Progress Report")).toBeInTheDocument();
 		});
 
 		it("should have accessible form labels", () => {
@@ -259,8 +248,10 @@ describe("StudentReportsTab", () => {
 				/>
 			);
 
-			// Progress Report section should be present
-			expect(screen.getByTestId("section-Progress Report")).toBeInTheDocument();
+			// Progress Report editor should be present
+			expect(
+				screen.getByTestId("inline-editor-Progress Report")
+			).toBeInTheDocument();
 		});
 
 		it("should display content from selected year", () => {

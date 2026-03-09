@@ -101,7 +101,7 @@ export function DocumentTabLayout({
 
 				{/* Right column: Details, Actions, and Comments (only visible on 2XL+, sticky positioning with scroll) */}
 				<div className="hidden 2xl:block">
-					<div className="2xl:sticky 2xl:top-4 2xl:max-h-[calc(100vh-2rem)] 2xl:overflow-y-auto space-y-6">
+					<div className="2xl:sticky 2xl:top-20 2xl:max-h-[calc(100vh-6rem)] 2xl:overflow-y-auto space-y-6">
 						<DocumentDetailsSection
 							document={document}
 							project={project}

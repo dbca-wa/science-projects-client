@@ -3,9 +3,9 @@ import { toast } from "sonner";
 import {
 	performDocumentAction,
 	deleteDocument,
-} from "../services/document-action.service";
+} from "../services/document.service";
 import type { DocumentType } from "@/shared/utils/document.utils";
-import type { DocumentActionRequest } from "../services/document-action.service";
+import type { DocumentActionRequest } from "../services/document.service";
 import { extractUserFriendlyMessage } from "@/shared/utils/error.utils";
 
 /**

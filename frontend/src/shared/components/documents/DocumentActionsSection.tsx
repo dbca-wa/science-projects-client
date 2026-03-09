@@ -14,10 +14,10 @@ import type { DocumentType } from "@/shared/utils/document.utils";
 import {
 	getApprovalState,
 	getCurrentApprovalStage,
-} from "@/features/projects/utils/approval.utils";
+} from "@/features/projects/utils/authors/approval.utils";
 import { useCurrentUser } from "@/features/auth";
-import { isUserAtApprovalStage } from "@/features/projects/utils/permissions.utils";
-import { findProjectLeader } from "@/features/projects/utils/team.utils";
+import { isUserAtApprovalStage } from "@/features/projects/utils/permissions/project-permissions.utils";
+import { findProjectLeader } from "@/features/projects/utils/team/team.utils";
 
 interface DocumentActionsSectionProps {
 	document: IMainDoc;

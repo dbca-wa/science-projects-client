@@ -27,8 +27,6 @@ export function ProjectStatusOverlay({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [fontSize, setFontSize] = useState(32);
 
-	const displayText = status.toUpperCase();
-
 	// Calculate font size based on container dimensions
 	useEffect(() => {
 		const updateFontSize = () => {
@@ -52,6 +50,13 @@ export function ProjectStatusOverlay({
 
 		return () => resizeObserver.disconnect();
 	}, []);
+
+	// Early return if status is undefined or null
+	if (!status) {
+		return null;
+	}
+
+	const displayText = status.toUpperCase();
 
 	// Only show for suspended or terminated projects
 	if (status !== "suspended" && status !== "terminated") {

@@ -4,9 +4,9 @@ import type { CreateProjectFormData } from "@/app/stores/derived/create-project-
 import type { ProjectKind } from "@/shared/types/project.types";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { useServices } from "@/features/agencies/hooks/useServices";
+import { useServices } from "@/shared/hooks/queries/useServices";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
-import { useProjectAreas } from "@/features/locations/hooks/useProjectAreas";
+import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
 
 interface WizardPreviewPanelProps {
 	formData: CreateProjectFormData;

@@ -54,7 +54,7 @@ export const HeadingSelect: React.FC<HeadingSelectProps> = ({
 					onValueChange={handleValueChange}
 					disabled={disabled}
 				>
-					<SelectTrigger className="h-8 w-[130px]">
+					<SelectTrigger className="h-8 w-[130px]" aria-label="Text style">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

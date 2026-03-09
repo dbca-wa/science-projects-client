@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import type { IProjectData } from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
-import { canManageProject } from "@/features/projects/utils/permissions";
+import { canEditProject } from "@/features/projects/utils/permissions";
 
 interface EditProjectButtonProps {
 	project: IProjectData;
@@ -17,7 +17,7 @@ export function EditProjectButton({
 	const navigate = useNavigate();
 
 	// Check if user can manage project
-	const hasManagePermission = canManageProject(currentUser, project);
+	const hasManagePermission = canEditProject(currentUser, project);
 
 	// Don't render if user doesn't have permission
 	if (!hasManagePermission) {

@@ -7,6 +7,7 @@
  */
 
 import { apiClient } from "@/shared/services/api/client.service";
+import { TEAM_ENDPOINTS } from "./team.endpoints";
 import type {
 	ITeamMember,
 	IInviteTeamMemberRequest,
@@ -25,7 +26,7 @@ export const getProjectTeam = async (
 ): Promise<ITeamMember[]> => {
 	try {
 		const result = await apiClient.get<ITeamMember[]>(
-			`/projects/${projectId}/team`
+			TEAM_ENDPOINTS.LIST(projectId)
 		);
 		// Ensure we always return an array, never undefined
 		return result ?? [];
@@ -61,10 +62,7 @@ export const inviteTeamMember = async (
 			short_code: "",
 		};
 
-		return await apiClient.post<ITeamMember>(
-			`/projects/project_members`,
-			payload
-		);
+		return await apiClient.post<ITeamMember>(TEAM_ENDPOINTS.CREATE(), payload);
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to invite team member",
@@ -88,7 +86,7 @@ export const updateTeamMember = async (
 ): Promise<ITeamMember> => {
 	try {
 		return await apiClient.put<ITeamMember>(
-			`/projects/project_members/${projectId}/${userId}`,
+			TEAM_ENDPOINTS.UPDATE(projectId, userId),
 			data
 		);
 	} catch (error) {
@@ -111,9 +109,7 @@ export const removeTeamMember = async (
 	userId: number
 ): Promise<void> => {
 	try {
-		await apiClient.delete<void>(
-			`/projects/project_members/${projectId}/${userId}`
-		);
+		await apiClient.delete<void>(TEAM_ENDPOINTS.DELETE(projectId, userId));
 	} catch (error) {
 		throw new Error(
 			error instanceof Error ? error.message : "Failed to remove team member",
@@ -135,7 +131,7 @@ export const updateTeamPositions = async (
 ): Promise<ITeamMember[]> => {
 	try {
 		return await apiClient.put<ITeamMember[]>(
-			`/projects/${projectId}/team`,
+			TEAM_ENDPOINTS.UPDATE_POSITIONS(projectId),
 			data
 		);
 	} catch (error) {
@@ -161,7 +157,7 @@ export const promoteToLeader = async (
 	userId: number
 ): Promise<void> => {
 	try {
-		await apiClient.post<void>(`/projects/promote`, {
+		await apiClient.post<void>(TEAM_ENDPOINTS.PROMOTE_LEADER(), {
 			project_id: projectId,
 			user_id: userId,
 		});

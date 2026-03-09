@@ -19,6 +19,20 @@ interface DeleteDocumentModalProps {
 	isDeleting?: boolean;
 }
 
+/**
+ * Format document type for display in lowercase
+ */
+function formatDocumentType(documentType: DocumentType): string {
+	const mapping: Record<DocumentType, string> = {
+		concept: "concept plan",
+		projectplan: "project plan",
+		progressreport: "progress report",
+		studentreport: "student report",
+		projectclosure: "project closure",
+	};
+	return mapping[documentType] || documentType;
+}
+
 export function DeleteDocumentModal({
 	isOpen,
 	onClose,
@@ -26,7 +40,7 @@ export function DeleteDocumentModal({
 	documentType,
 	isDeleting = false,
 }: DeleteDocumentModalProps) {
-	const docTypeName = documentType.replace(/_/g, " ");
+	const docTypeName = formatDocumentType(documentType);
 
 	return (
 		<AlertDialog open={isOpen} onOpenChange={onClose}>

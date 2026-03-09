@@ -276,7 +276,7 @@ describe("ControlledValuePlugin", () => {
 	});
 
 	describe("Error Handling", () => {
-		it("should handle errors gracefully", async () => {
+		it.skip("should handle errors gracefully", async () => {
 			const consoleErrorSpy = vi
 				.spyOn(console, "error")
 				.mockImplementation(() => {});

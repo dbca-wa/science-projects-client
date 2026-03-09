@@ -61,17 +61,8 @@ vi.mock("@/shared/components/editor", () => ({
 }));
 
 vi.mock("@/shared/components/ProjectSection", () => ({
-	ProjectSection: ({
-		title,
-		children,
-	}: {
-		title: string;
-		children: React.ReactNode;
-	}) => (
-		<section data-testid={`section-${title}`}>
-			<h2>{title}</h2>
-			{children}
-		</section>
+	ProjectSection: ({ children }: { children: React.ReactNode }) => (
+		<section data-testid="project-section">{children}</section>
 	),
 }));
 
@@ -208,25 +199,17 @@ describe("ConceptPlanTab", () => {
 				/>
 			);
 
-			// Check that sections have h2 headings
+			// InlineSaveEditor provides labels, no separate headings needed
+			expect(screen.getByLabelText("Background")).toBeInTheDocument();
+			expect(screen.getByLabelText("Aims")).toBeInTheDocument();
+			expect(screen.getByLabelText("Expected Outcomes")).toBeInTheDocument();
+			expect(screen.getByLabelText("Collaborations")).toBeInTheDocument();
+			expect(screen.getByLabelText("Strategic Context")).toBeInTheDocument();
 			expect(
-				screen.getByRole("heading", { name: "Background" })
-			).toBeInTheDocument();
-			expect(screen.getByRole("heading", { name: "Aims" })).toBeInTheDocument();
-			expect(
-				screen.getByRole("heading", { name: "Outcome" })
-			).toBeInTheDocument();
-			expect(
-				screen.getByRole("heading", { name: "Collaborations" })
+				screen.getByLabelText("Staff Time Allocation (FTE)")
 			).toBeInTheDocument();
 			expect(
-				screen.getByRole("heading", { name: "Strategic Context" })
-			).toBeInTheDocument();
-			expect(
-				screen.getByRole("heading", { name: "Staff Time Allocation" })
-			).toBeInTheDocument();
-			expect(
-				screen.getByRole("heading", { name: "Budget" })
+				screen.getByLabelText("Indicative Operating Budget ($)")
 			).toBeInTheDocument();
 		});
 
@@ -243,13 +226,15 @@ describe("ConceptPlanTab", () => {
 			// All editors should have labels
 			expect(screen.getByLabelText("Background")).toBeInTheDocument();
 			expect(screen.getByLabelText("Aims")).toBeInTheDocument();
-			expect(screen.getByLabelText("Outcome")).toBeInTheDocument();
+			expect(screen.getByLabelText("Expected Outcomes")).toBeInTheDocument();
 			expect(screen.getByLabelText("Collaborations")).toBeInTheDocument();
 			expect(screen.getByLabelText("Strategic Context")).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Staff Time Allocation")
+				screen.getByLabelText("Staff Time Allocation (FTE)")
 			).toBeInTheDocument();
-			expect(screen.getByLabelText("Budget")).toBeInTheDocument();
+			expect(
+				screen.getByLabelText("Indicative Operating Budget ($)")
+			).toBeInTheDocument();
 		});
 	});
 
@@ -264,18 +249,26 @@ describe("ConceptPlanTab", () => {
 				/>
 			);
 
-			// All sections should be present
-			expect(screen.getByTestId("section-Background")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Aims")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Outcome")).toBeInTheDocument();
-			expect(screen.getByTestId("section-Collaborations")).toBeInTheDocument();
+			// All sections should be present (check by editor labels)
 			expect(
-				screen.getByTestId("section-Strategic Context")
+				screen.getByTestId("inline-editor-Background")
+			).toBeInTheDocument();
+			expect(screen.getByTestId("inline-editor-Aims")).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Expected Outcomes")
 			).toBeInTheDocument();
 			expect(
-				screen.getByTestId("section-Staff Time Allocation")
+				screen.getByTestId("inline-editor-Collaborations")
 			).toBeInTheDocument();
-			expect(screen.getByTestId("section-Budget")).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Strategic Context")
+			).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Staff Time Allocation (FTE)")
+			).toBeInTheDocument();
+			expect(
+				screen.getByTestId("inline-editor-Indicative Operating Budget ($)")
+			).toBeInTheDocument();
 		});
 
 		it("should display content in all sections", () => {
@@ -295,9 +288,9 @@ describe("ConceptPlanTab", () => {
 			expect(screen.getByTestId("inline-editor-Aims")).toHaveTextContent(
 				"Test aims"
 			);
-			expect(screen.getByTestId("inline-editor-Outcome")).toHaveTextContent(
-				"Test outcome"
-			);
+			expect(
+				screen.getByTestId("inline-editor-Expected Outcomes")
+			).toHaveTextContent("Test outcome");
 			expect(
 				screen.getByTestId("inline-editor-Collaborations")
 			).toHaveTextContent("Test collaborations");
@@ -305,11 +298,11 @@ describe("ConceptPlanTab", () => {
 				screen.getByTestId("inline-editor-Strategic Context")
 			).toHaveTextContent("Test strategic context");
 			expect(
-				screen.getByTestId("inline-editor-Staff Time Allocation")
+				screen.getByTestId("inline-editor-Staff Time Allocation (FTE)")
 			).toHaveTextContent("Test staff time allocation");
-			expect(screen.getByTestId("inline-editor-Budget")).toHaveTextContent(
-				"Test budget"
-			);
+			expect(
+				screen.getByTestId("inline-editor-Indicative Operating Budget ($)")
+			).toHaveTextContent("Test budget");
 		});
 
 		it("should show empty state when no concept plan", () => {
@@ -343,11 +336,11 @@ describe("ConceptPlanTab", () => {
 			const sections = [
 				"Background",
 				"Aims",
-				"Outcome",
+				"Expected Outcomes",
 				"Collaborations",
 				"Strategic Context",
-				"Staff Time Allocation",
-				"Budget",
+				"Staff Time Allocation (FTE)",
+				"Indicative Operating Budget ($)",
 			];
 
 			sections.forEach((section) => {
@@ -373,11 +366,11 @@ describe("ConceptPlanTab", () => {
 			const sections = [
 				"Background",
 				"Aims",
-				"Outcome",
+				"Expected Outcomes",
 				"Collaborations",
 				"Strategic Context",
-				"Staff Time Allocation",
-				"Budget",
+				"Staff Time Allocation (FTE)",
+				"Indicative Operating Budget ($)",
 			];
 
 			sections.forEach((section) => {

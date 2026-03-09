@@ -228,10 +228,9 @@ describe("usePdfOperations", () => {
 
 		describe("Generate Functionality", () => {
 			it("should call generatePdf service with correct parameters", async () => {
-				(pdfService.generatePdf as Mock).mockResolvedValue({
-					success: true,
-					message: "PDF generated successfully",
-				});
+				const mockBlob = new Blob(["test"], { type: "application/pdf" });
+				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
+				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -247,10 +246,9 @@ describe("usePdfOperations", () => {
 			});
 
 			it("should show success toast on successful generation", async () => {
-				(pdfService.generatePdf as Mock).mockResolvedValue({
-					success: true,
-					message: "PDF generated successfully",
-				});
+				const mockBlob = new Blob(["test"], { type: "application/pdf" });
+				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
+				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -262,16 +260,15 @@ describe("usePdfOperations", () => {
 
 				await waitFor(() => {
 					expect(toast.success).toHaveBeenCalledWith(
-						"PDF generated successfully"
+						"PDF generated and downloaded successfully"
 					);
 				});
 			});
 
-			it("should show custom success message from response", async () => {
-				(pdfService.generatePdf as Mock).mockResolvedValue({
-					success: true,
-					message: "Custom success message",
-				});
+			it("should trigger blob download with correct filename", async () => {
+				const mockBlob = new Blob(["test"], { type: "application/pdf" });
+				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
+				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -282,34 +279,17 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(toast.success).toHaveBeenCalledWith("Custom success message");
-				});
-			});
-
-			it("should show error toast when response indicates failure", async () => {
-				(pdfService.generatePdf as Mock).mockResolvedValue({
-					success: false,
-					message: "Generation failed",
-				});
-
-				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
-
-				result.current.mutate({
-					documentType: "concept",
-					documentId: 123,
-					filename: "test.pdf",
-				});
-
-				await waitFor(() => {
-					expect(toast.error).toHaveBeenCalledWith("Generation failed");
+					expect(pdfService.triggerBlobDownload).toHaveBeenCalledWith(
+						mockBlob,
+						"test.pdf"
+					);
 				});
 			});
 
 			it("should set isSuccess to true after successful generation", async () => {
-				(pdfService.generatePdf as Mock).mockResolvedValue({
-					success: true,
-					message: "PDF generated successfully",
-				});
+				const mockBlob = new Blob(["test"], { type: "application/pdf" });
+				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
+				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 

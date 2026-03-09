@@ -41,7 +41,7 @@ import { fadeInVariants } from "@/shared/config/animations";
 import {
 	canUserEditComment,
 	canUserDeleteComment,
-} from "@/features/projects/utils/comment-permissions.utils";
+} from "@/features/projects/utils/permissions/comment-permissions.utils";
 import type { IComment, ReactionType } from "@/shared/types/comment.types";
 import type { IFullProjectDetails } from "@/shared/types/project.types";
 

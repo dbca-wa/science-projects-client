@@ -37,6 +37,46 @@ vi.mock("@/features/caretakers/hooks/useCaretakerPermissions", () => ({
 		canActForUser: () => false,
 	}),
 }));
+vi.mock("@/features/projects/hooks/useProjectTeam", () => ({
+	useProjectTeam: () => ({
+		data: [],
+		isLoading: false,
+		error: null,
+	}),
+}));
+vi.mock("@/features/projects/hooks/useComments", () => ({
+	useComments: () => ({
+		data: [],
+		isLoading: false,
+		error: null,
+	}),
+	useComment: () => ({
+		data: null,
+		isLoading: false,
+		error: null,
+	}),
+	useCreateComment: () => ({
+		mutate: vi.fn(),
+		mutateAsync: vi.fn(),
+		isPending: false,
+		isError: false,
+		error: null,
+	}),
+	useUpdateComment: () => ({
+		mutate: vi.fn(),
+		mutateAsync: vi.fn(),
+		isPending: false,
+		isError: false,
+		error: null,
+	}),
+	useDeleteComment: () => ({
+		mutate: vi.fn(),
+		mutateAsync: vi.fn(),
+		isPending: false,
+		isError: false,
+		error: null,
+	}),
+}));
 
 describe("Tab Navigation - Preservation Tests", () => {
 	let queryClient: QueryClient;
@@ -45,19 +85,37 @@ describe("Tab Navigation - Preservation Tests", () => {
 		project: {
 			id: 123,
 			title: "Test Project",
+			status: "active",
+			kind: "science",
+			year: 2024,
+			number: 1,
 			business_area: { id: 1, name: "BCS", leader: 1 },
 		},
 		documents: {
 			concept_plan: {
 				document: { id: 1, creator: 1, modifier: 1 },
+				team_members: [],
+				comments: [],
 			},
 			project_plan: {
 				document: { id: 2, creator: 1, modifier: 1 },
+				team_members: [],
+				comments: [],
 			},
-			progress_reports: [{ document: { id: 3, creator: 1, modifier: 1 } }],
-			student_reports: [{ document: { id: 4, creator: 1, modifier: 1 } }],
+			progress_reports: [
+				{
+					document: { id: 3, creator: 1, modifier: 1 },
+					team_members: [],
+				},
+			],
+			student_reports: [
+				{
+					document: { id: 4, creator: 1, modifier: 1 },
+				},
+			],
 			project_closure: {
 				document: { id: 5, creator: 1, modifier: 1 },
+				team_members: [],
 			},
 		},
 		details: {},
@@ -116,8 +174,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("overview");
 
 		await waitFor(() => {
-			// Overview tab should be visible
-			expect(screen.getByText("Overview")).toBeInTheDocument();
+			// Overview tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Overview");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Overview tab displays correctly (preserved)");
@@ -132,8 +191,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("concept");
 
 		await waitFor(() => {
-			// Concept Plan tab should be visible
-			expect(screen.getByText("Concept Plan")).toBeInTheDocument();
+			// Concept Plan tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Concept Plan");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Concept plan tab displays correctly (preserved)");
@@ -148,8 +208,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("project");
 
 		await waitFor(() => {
-			// Project Plan tab should be visible
-			expect(screen.getByText("Project Plan")).toBeInTheDocument();
+			// Project Plan tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Project Plan");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Project plan tab displays correctly (preserved)");
@@ -164,8 +225,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("progress");
 
 		await waitFor(() => {
-			// Progress Reports tab should be visible
-			expect(screen.getByText("Progress Reports")).toBeInTheDocument();
+			// Progress Reports tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Progress Reports");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Progress reports tab displays correctly (preserved)");
@@ -180,8 +242,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("student");
 
 		await waitFor(() => {
-			// Student Reports tab should be visible
-			expect(screen.getByText("Student Reports")).toBeInTheDocument();
+			// Student Reports tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Student Reports");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Student reports tab displays correctly (preserved)");
@@ -196,8 +259,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("closure");
 
 		await waitFor(() => {
-			// Project Closure tab should be visible
-			expect(screen.getByText("Project Closure")).toBeInTheDocument();
+			// Project Closure tab should be visible (use getAllByText since it appears in desktop and mobile)
+			const tabs = screen.getAllByText("Project Closure");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Project closure tab displays correctly (preserved)");
@@ -224,9 +288,12 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("overview");
 
 		await waitFor(() => {
-			// Overview and Concept Plan should be visible
-			expect(screen.getByText("Overview")).toBeInTheDocument();
-			expect(screen.getByText("Concept Plan")).toBeInTheDocument();
+			// Overview and Concept Plan should be visible (use getAllByText since they appear in desktop and mobile)
+			const overviewTabs = screen.getAllByText("Overview");
+			expect(overviewTabs.length).toBeGreaterThan(0);
+
+			const conceptTabs = screen.getAllByText("Concept Plan");
+			expect(conceptTabs.length).toBeGreaterThan(0);
 
 			// Other tabs should not be visible
 			expect(screen.queryByText("Project Plan")).not.toBeInTheDocument();
@@ -247,7 +314,8 @@ describe("Tab Navigation - Preservation Tests", () => {
 		const { rerender } = renderWithRouter("concept");
 
 		await waitFor(() => {
-			expect(screen.getByText("Concept Plan")).toBeInTheDocument();
+			const tabs = screen.getAllByText("Concept Plan");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		// Re-render with same tab
@@ -266,7 +334,8 @@ describe("Tab Navigation - Preservation Tests", () => {
 
 		// Tab should still be selected
 		await waitFor(() => {
-			expect(screen.getByText("Concept Plan")).toBeInTheDocument();
+			const tabs = screen.getAllByText("Concept Plan");
+			expect(tabs.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Tab selection maintained (preserved)");
@@ -281,8 +350,9 @@ describe("Tab Navigation - Preservation Tests", () => {
 		renderWithRouter("overview");
 
 		await waitFor(() => {
-			// Project title should be in breadcrumbs
-			expect(screen.getByText("Test Project")).toBeInTheDocument();
+			// Project title should be in breadcrumbs (use getAllByText since it appears in breadcrumb and page title)
+			const titles = screen.getAllByText("Test Project");
+			expect(titles.length).toBeGreaterThan(0);
 		});
 
 		console.log("✓ Project data available to all tabs (preserved)");

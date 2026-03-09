@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "@/shared/components/ui/button";
 import { RichTextEditor } from "./RichTextEditor";
@@ -85,10 +85,12 @@ export const InlineSaveEditor = observer(
 		const [hasChanges, setHasChanges] = useState(false);
 		const [isFocused, setIsFocused] = useState(false);
 		const [isHovered, setIsHovered] = useState(false);
+		const [statusMessage, setStatusMessage] = useState("");
 
 		// Refs for focus management and navigation blocking
-		const editButtonRef = useRef<HTMLButtonElement>(null);
+		const editButtonRef = useRef<HTMLDivElement>(null);
 		const editorContainerRef = useRef<HTMLDivElement>(null);
+		const editorRef = useRef<HTMLDivElement>(null);
 		const containerRef = useRef<HTMLDivElement>(null);
 
 		// Local state for saved content (optimistic update)
@@ -108,6 +110,7 @@ export const InlineSaveEditor = observer(
 				inlineEditStore.unregisterEditor(contentType, entityId);
 
 				setHasChanges(false);
+				setStatusMessage("Content saved successfully");
 				onSaveSuccess?.();
 				onEditEnd?.();
 
@@ -125,6 +128,7 @@ export const InlineSaveEditor = observer(
 		// Handle entering edit mode
 		const handleEditClick = () => {
 			inlineEditStore.startEdit(contentType, entityId);
+			setStatusMessage("Edit mode activated");
 
 			// Note: Editor registration is handled by useEffect
 			// This ensures it works both on initial click and after tab switches
@@ -138,11 +142,12 @@ export const InlineSaveEditor = observer(
 		// Handle save
 		const handleSave = () => {
 			if (!hasChanges || updateMutation.isPending) return;
+			setStatusMessage("Saving content...");
 			updateMutation.mutate(editedContent);
 		};
 
 		// Handle cancel
-		const handleCancel = () => {
+		const handleCancel = useCallback(() => {
 			inlineEditStore.endEdit(contentType, entityId);
 
 			// Unregister editor from enhanced store
@@ -151,6 +156,7 @@ export const InlineSaveEditor = observer(
 			setEditedContent(savedContent);
 			setHasChanges(false);
 			setIsFocused(false); // Clear focus when canceling
+			setStatusMessage("Editing cancelled");
 			onCancel?.();
 			onEditEnd?.();
 
@@ -158,7 +164,7 @@ export const InlineSaveEditor = observer(
 			setTimeout(() => {
 				editButtonRef.current?.focus();
 			}, 0);
-		};
+		}, [contentType, entityId, savedContent, onCancel, onEditEnd]);
 
 		// Handle content change
 		const handleContentChange = (newContent: string) => {
@@ -240,6 +246,30 @@ export const InlineSaveEditor = observer(
 			};
 		}, [isEditing]);
 
+		// Focus editor when entering edit mode
+		useEffect(() => {
+			if (isEditing && editorRef.current) {
+				setTimeout(() => {
+					editorRef.current?.focus();
+				}, 100);
+			}
+		}, [isEditing]);
+
+		// Escape key handler for edit mode
+		useEffect(() => {
+			if (!isEditing) return;
+
+			const handleEscape = (e: KeyboardEvent) => {
+				if (e.key === "Escape") {
+					e.preventDefault();
+					handleCancel();
+				}
+			};
+
+			document.addEventListener("keydown", handleEscape);
+			return () => document.removeEventListener("keydown", handleEscape);
+		}, [isEditing, handleCancel]);
+
 		// Determine placeholder and empty message
 		const effectivePlaceholder = placeholder || config.defaultPlaceholder;
 		const effectiveEmptyMessage = emptyMessage || config.defaultEmptyMessage;
@@ -251,6 +281,9 @@ export const InlineSaveEditor = observer(
 		}, [editedContent, wordLimit]);
 
 		const isOverLimit = wordLimit !== undefined && wordCount > wordLimit;
+
+		// Generate unique IDs for ARIA
+		const errorId = `error-${contentType}-${entityId}`;
 
 		// Render label with optional word limit
 		const renderLabel = () => {
@@ -276,9 +309,20 @@ export const InlineSaveEditor = observer(
 
 		return (
 			<div className={`space-y-6 ${className}`}>
+				{/* Screen reader status announcements */}
+				<div
+					role="status"
+					aria-live="polite"
+					aria-atomic="true"
+					className="sr-only"
+				>
+					{statusMessage}
+				</div>
+
 				{!isEditing ? (
 					// View mode - Clickable container with hover effect
 					<div
+						ref={editButtonRef}
 						className={`bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden ${
 							canEdit
 								? "cursor-pointer transition-all hover:border-blue-300 dark:hover:border-blue-600"
@@ -297,7 +341,7 @@ export const InlineSaveEditor = observer(
 						role={canEdit ? "button" : undefined}
 						aria-label={
 							canEdit
-								? `Click to edit ${typeof label === "string" ? label : "content"}`
+								? `Edit ${typeof label === "string" ? label : "content"}`
 								: undefined
 						}
 					>
@@ -352,6 +396,7 @@ export const InlineSaveEditor = observer(
 							}`}
 						>
 							<RichTextEditor
+								ref={editorRef}
 								value={editedContent}
 								onChange={handleContentChange}
 								onSave={handleSave}
@@ -363,7 +408,21 @@ export const InlineSaveEditor = observer(
 								autoFocus={true}
 								moveCursorToEnd={true}
 								aria-label={`Edit ${typeof label === "string" ? label : "content"}`}
+								aria-invalid={isOverLimit}
+								aria-describedby={isOverLimit ? errorId : undefined}
 							/>
+
+							{/* Error message for word limit */}
+							{isOverLimit && (
+								<div
+									id={errorId}
+									role="alert"
+									aria-live="assertive"
+									className="px-4 pt-2 text-sm text-destructive"
+								>
+									Content exceeds word limit of {wordLimit} words
+								</div>
+							)}
 
 							<div className="flex items-center justify-between p-4">
 								<div className="flex items-center gap-2">
@@ -380,7 +439,7 @@ export const InlineSaveEditor = observer(
 											setEditedContent("");
 											setHasChanges(true);
 										}}
-										aria-label="Clear editor content"
+										aria-label="Clear content"
 									>
 										Clear
 									</Button>
@@ -392,7 +451,7 @@ export const InlineSaveEditor = observer(
 										variant="outline"
 										size="sm"
 										onClick={handleCancel}
-										aria-label="Cancel editing"
+										aria-label="Cancel"
 									>
 										Cancel
 									</Button>
@@ -403,6 +462,7 @@ export const InlineSaveEditor = observer(
 											!hasChanges || isOverLimit || updateMutation.isPending
 										}
 										size="sm"
+										aria-label={`Save ${typeof label === "string" ? label : "content"}`}
 									>
 										{updateMutation.isPending ? "Saving..." : "Save"}
 									</Button>
