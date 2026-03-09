@@ -4,11 +4,8 @@ Tests for caretaker serializers.
 Tests the serializers in the caretakers app.
 """
 
-from datetime import timedelta
-
 import pytest
 from django.test import TestCase
-from django.utils import timezone
 
 from caretakers.models import Caretaker
 from caretakers.serializers import CaretakerCreateSerializer, CaretakerSerializer
@@ -51,7 +48,6 @@ class CaretakerSerializerTest(TestCase):
             "caretaker",
             "reason",
             "notes",
-            "end_date",
             "created_at",
             "updated_at",
         }
@@ -82,44 +78,6 @@ class CaretakerSerializerTest(TestCase):
         self.assertIsInstance(data["caretaker"], dict)
         self.assertEqual(data["caretaker"]["id"], self.user2.pk)
         self.assertEqual(data["caretaker"]["email"], "user2@example.com")
-
-    @pytest.mark.unit
-    def test_serializer_handles_null_end_date(self):
-        """Test serializer handles null end_date"""
-        serializer = CaretakerSerializer(self.caretaker)
-        data = serializer.data
-
-        self.assertIsNone(data["end_date"])
-
-    @pytest.mark.integration
-    def test_serializer_handles_end_date(self):
-        """Test serializer handles end_date when present"""
-        # Create unique users for this test to avoid duplicate constraint
-        user3 = User.objects.create_user(
-            username="user3",
-            email="user3@example.com",
-            first_name="User",
-            last_name="Three",
-        )
-        user4 = User.objects.create_user(
-            username="user4",
-            email="user4@example.com",
-            first_name="User",
-            last_name="Four",
-        )
-
-        end_date = timezone.now() + timedelta(days=30)
-        caretaker = Caretaker.objects.create(
-            user=user3,
-            caretaker=user4,
-            reason="Temporary caretaker",
-            end_date=end_date,
-        )
-
-        serializer = CaretakerSerializer(caretaker)
-        data = serializer.data
-
-        self.assertIsNotNone(data["end_date"])
 
     @pytest.mark.integration
     def test_serializer_many_true(self):
@@ -169,23 +127,6 @@ class CaretakerCreateSerializerTest(TestCase):
         self.assertEqual(caretaker.user, self.user1)
         self.assertEqual(caretaker.caretaker, self.user2)
         self.assertEqual(caretaker.reason, "Going on leave")
-
-    @pytest.mark.integration
-    def test_create_serializer_with_end_date(self):
-        """Test create serializer with end_date"""
-        end_date = timezone.now() + timedelta(days=30)
-        data = {
-            "user": self.user1.pk,
-            "caretaker": self.user2.pk,
-            "reason": "Temporary leave",
-            "end_date": end_date,
-        }
-
-        serializer = CaretakerCreateSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-
-        caretaker = serializer.save()
-        self.assertIsNotNone(caretaker.end_date)
 
     @pytest.mark.integration
     def test_create_serializer_with_notes(self):

@@ -77,7 +77,7 @@ class ChatRoomAdmin(admin.ModelAdmin):
 
 
 @admin.register(Comment)
-class Comment(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin):
     list_display = [
         "text",
         "user",

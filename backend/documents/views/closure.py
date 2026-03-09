@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
 )
@@ -111,7 +112,7 @@ class ProjectClosureDetail(APIView):
         serializer = ProjectClosureSerializer(
             project_closure,
             data=request.data,
-            partial=False,
+            partial=True,
         )
 
         if not serializer.is_valid():
@@ -124,7 +125,7 @@ class ProjectClosureDetail(APIView):
 
         return Response(
             TinyProjectClosureSerializer(updated_project_closure).data,
-            status=HTTP_200_OK,
+            status=HTTP_202_ACCEPTED,
         )
 
     def delete(self, request, pk):

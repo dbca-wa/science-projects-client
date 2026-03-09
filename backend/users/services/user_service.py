@@ -7,6 +7,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
@@ -230,18 +231,29 @@ class UserService:
             return False
 
         # Check select_related relationships are loaded
-        # Accessing these should not trigger database queries if properly loaded
         try:
-            # Verify profile relationship
+            # Verify profile relationship (required)
             _ = cached_user.profile
 
-            # Verify work relationship
-            _ = cached_user.work
+            # Verify work relationship (optional - may not exist for external users)
+            # Use hasattr to check if relationship exists without triggering query
+            if hasattr(cached_user, "work"):
+                try:
+                    # If work exists, verify it's loaded
+                    _ = cached_user.work
+                    # If work exists, verify nested business_area
+                    _ = cached_user.work.business_area
+                except ObjectDoesNotExist:
+                    # Work relationship exists but object doesn't exist
+                    # This is incomplete cache data
+                    return False
+            # If work doesn't exist (external user), that's valid
 
-            # Verify nested business_area relationship
-            _ = cached_user.work.business_area
-        except (AttributeError, User.DoesNotExist):
-            # Missing relationships or DoesNotExist means incomplete cache
+        except AttributeError:
+            # Missing required relationships means incomplete cache
+            return False
+        except User.DoesNotExist:
+            # User doesn't exist means incomplete cache
             return False
 
         # Check prefetch_related relationships are loaded

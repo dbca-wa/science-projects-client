@@ -460,6 +460,10 @@ class PDFService:
         # Build base context with paths
         base_dir = settings.BASE_DIR
         context = {
+            # Core objects
+            "document": document,
+            "project": document.project,
+            "business_area": document.project.business_area,
             # CSS and font paths
             "rte_css_path": os.path.join(
                 base_dir, "documents", "assets", "rte_styles.css"
@@ -518,6 +522,7 @@ class PDFService:
             if hasattr(document, "concept_plan_details"):
                 details = document.concept_plan_details.first()
                 if details:
+                    context["details"] = details
                     context["html_data_items"] = {
                         "background": {
                             "title": "Background",
@@ -553,12 +558,16 @@ class PDFService:
             if hasattr(document, "project_plan_details"):
                 details = document.project_plan_details.first()
                 if details:
+                    context["details"] = details
                     context["methodology_image"] = get_methodology_image_path(
                         document.project
                     )
 
                     # Get endorsements
                     endorsements = details.endorsements.first()
+                    context["endorsements"] = (
+                        endorsements  # Add endorsements to context
+                    )
                     context["specimens"] = (
                         endorsements.no_specimens if endorsements else ""
                     )
@@ -613,6 +622,7 @@ class PDFService:
             if hasattr(document, "progress_report_details"):
                 details = document.progress_report_details.first()
                 if details:
+                    context["details"] = details
                     context["financial_year_string"] = (
                         f"{int(details.year-1)}-{int(details.year)}"
                     )
@@ -643,6 +653,7 @@ class PDFService:
             if hasattr(document, "student_report_details"):
                 details = document.student_report_details.first()
                 if details:
+                    context["details"] = details
                     context["financial_year_string"] = (
                         f"{int(details.year-1)}-{int(details.year)}"
                     )
@@ -657,6 +668,7 @@ class PDFService:
             if hasattr(document, "project_closure_details"):
                 details = document.project_closure_details.first()
                 if details:
+                    context["details"] = details
                     context["html_data_items"] = {
                         "reason": {
                             "title": "Reason for Closure",

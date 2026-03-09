@@ -16,9 +16,15 @@ class EndorsementMethodMixin:
     def get_endorsements(self, obj):
         """Get endorsements for this project plan"""
         try:
-            endorsement = Endorsement.objects.select_related("aec_pdf").get(
-                project_plan=obj
+            endorsement = (
+                Endorsement.objects.select_related("aec_pdf")
+                .filter(project_plan=obj)
+                .first()
             )
+
+            if not endorsement:
+                return None
+
             # Check if aec_pdf exists using hasattr to avoid RelatedObjectDoesNotExist
             aec_pdf_data = None
             if hasattr(endorsement, "aec_pdf"):

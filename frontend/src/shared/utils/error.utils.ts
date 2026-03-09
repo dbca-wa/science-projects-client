@@ -69,45 +69,40 @@ export function extractUserFriendlyMessage(
 
 /**
  * Strips HTML tags from a string and limits length
+ * Uses DOMParser for robust HTML handling including incomplete tags
  *
  * @param text - Text that may contain HTML
  * @returns Plain text, max 200 characters
  */
 function stripHtmlAndLimit(text: string): string {
-	// Strip HTML tags
-	const stripped = text.replace(/<[^>]*>/g, "");
+	try {
+		// Parse HTML safely using DOMParser
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(text, "text/html");
 
-	// Decode HTML entities
-	const decoded = decodeHtmlEntities(stripped);
+		// Extract text content (automatically strips all tags including incomplete ones)
+		const stripped = doc.body.textContent || "";
 
-	// Trim whitespace
-	const trimmed = decoded.trim();
+		// Trim whitespace
+		const trimmed = stripped.trim();
 
-	// Limit length
-	if (trimmed.length > 200) {
-		return trimmed.substring(0, 197) + "...";
+		// Limit length
+		if (trimmed.length > 200) {
+			return trimmed.substring(0, 197) + "...";
+		}
+
+		return trimmed;
+	} catch {
+		// Fallback: remove all < characters for safety
+		const stripped = text.replace(/</g, "");
+		const trimmed = stripped.trim();
+
+		if (trimmed.length > 200) {
+			return trimmed.substring(0, 197) + "...";
+		}
+
+		return trimmed;
 	}
-
-	return trimmed;
-}
-
-/**
- * Decodes common HTML entities
- *
- * @param text - Text with HTML entities
- * @returns Decoded text
- */
-function decodeHtmlEntities(text: string): string {
-	const entities: Record<string, string> = {
-		"&amp;": "&",
-		"&lt;": "<",
-		"&gt;": ">",
-		"&quot;": '"',
-		"&#39;": "'",
-		"&nbsp;": " ",
-	};
-
-	return text.replace(/&[^;]+;/g, (entity) => entities[entity] || entity);
 }
 
 /**

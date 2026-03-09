@@ -6,7 +6,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from communications.models import ChatRoom, Comment, DirectMessage, Reaction
+from communications.models import ChatRoom, DirectMessage, Reaction
 from communications.services.communication_service import CommunicationService
 
 User = get_user_model()
@@ -229,8 +229,9 @@ class TestCommentService:
         # Act
         CommunicationService.delete_comment(comment_id, user)
 
-        # Assert
-        assert not Comment.objects.filter(id=comment_id).exists()
+        # Assert - soft delete sets is_removed=True
+        comment.refresh_from_db()
+        assert comment.is_removed is True
 
     @pytest.mark.integration
     def test_delete_comment_by_superuser(self, comment, superuser, db):
@@ -241,8 +242,9 @@ class TestCommentService:
         # Act
         CommunicationService.delete_comment(comment_id, superuser)
 
-        # Assert
-        assert not Comment.objects.filter(id=comment_id).exists()
+        # Assert - soft delete sets is_removed=True
+        comment.refresh_from_db()
+        assert comment.is_removed is True
 
     @pytest.mark.integration
     def test_delete_comment_permission_denied(self, comment, other_user, db):
@@ -289,7 +291,9 @@ class TestReactionService:
         """Test toggling reaction creates new reaction"""
         # Act
         reaction, was_deleted = CommunicationService.toggle_comment_reaction(
-            user_id=user.id, comment_id=comment.id
+            user_id=user.id,
+            comment_id=comment.id,
+            reaction_type=Reaction.ReactionChoices.THUMBUP,
         )
 
         # Assert
@@ -311,7 +315,9 @@ class TestReactionService:
 
         # Act
         reaction, was_deleted = CommunicationService.toggle_comment_reaction(
-            user_id=user.id, comment_id=comment.id
+            user_id=user.id,
+            comment_id=comment.id,
+            reaction_type=Reaction.ReactionChoices.THUMBUP,
         )
 
         # Assert

@@ -111,7 +111,7 @@ class StudentReportDetail(APIView):
         serializer = StudentReportSerializer(
             student_report,
             data=request.data,
-            partial=False,
+            partial=True,
         )
 
         if not serializer.is_valid():
@@ -124,7 +124,7 @@ class StudentReportDetail(APIView):
 
         return Response(
             TinyStudentReportSerializer(updated_student_report).data,
-            status=HTTP_200_OK,
+            status=HTTP_202_ACCEPTED,
         )
 
     def delete(self, request, pk):

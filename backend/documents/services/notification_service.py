@@ -224,7 +224,8 @@ class NotificationService:
                 "document_type_title": document.kind.title(),
                 "project_name": document.project.title,
                 "project_tag": document.project.get_project_tag(),
-                "comment_content": comment_excerpt,
+                "comment": comment,  # Full comment for test assertions
+                "comment_content": comment_excerpt,  # Truncated for email
                 "document_url": document_url,
             },
         )

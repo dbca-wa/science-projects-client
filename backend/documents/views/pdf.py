@@ -46,19 +46,16 @@ class BeginProjectDocGeneration(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        """Start PDF generation for project document"""
+        """Generate and return PDF for project document"""
         document = DocumentService.get_document(pk)
 
         # Mark as in progress
         PDFService.mark_pdf_generation_started(document)
 
-        # Generate PDF and save to database
+        # Generate PDF and return file
         try:
             doc_pdf = PDFService.generate_document_pdf(document)
             PDFService.mark_pdf_generation_complete(document)
-
-            # Return PDF file as download
-            from django.http import FileResponse
 
             return FileResponse(
                 doc_pdf.file,

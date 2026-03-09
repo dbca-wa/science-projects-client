@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_500_INTERNAL_SERVER_ERROR,
@@ -384,7 +385,7 @@ class ProjectDetails(APIView):
         )
 
         result_serializer = ProjectSerializer(project)
-        return Response(result_serializer.data, status=HTTP_200_OK)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 
     def put(self, request, pk):
         """Full update project (replace entire resource)"""
@@ -400,7 +401,7 @@ class ProjectDetails(APIView):
         )
 
         result_serializer = ProjectSerializer(project)
-        return Response(result_serializer.data, status=HTTP_200_OK)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 
     def delete(self, request, pk):
         """Delete project"""

@@ -286,10 +286,10 @@ class TestCommentDeletePermissions:
         assert Comment.objects.filter(is_removed=False).count() == 0  # But not visible
 
     def test_non_author_gets_403_on_delete(self, api_client, project_with_document):
-        """Non-author cannot delete comment even with project access"""
+        """Non-author cannot delete comment even with project access (but superuser can)"""
         project, document = project_with_document
         author = UserFactory()
-        other_user = UserFactory(is_superuser=True)  # Even superuser can't delete
+        other_user = UserFactory(is_superuser=False)  # Regular user can't delete
 
         comment = Comment.objects.create(
             user=author,

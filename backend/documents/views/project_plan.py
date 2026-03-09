@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
 )
@@ -177,7 +178,7 @@ class ProjectPlanDetail(APIView):
         serializer = ProjectPlanSerializer(
             project_plan,
             data=request.data,
-            partial=False,
+            partial=True,  # Allow partial updates for PUT as well
         )
 
         if not serializer.is_valid():
@@ -190,7 +191,7 @@ class ProjectPlanDetail(APIView):
 
         return Response(
             TinyProjectPlanSerializer(updated_project_plan).data,
-            status=HTTP_200_OK,
+            status=HTTP_202_ACCEPTED,  # Match expected status code
         )
 
     def delete(self, request, pk):

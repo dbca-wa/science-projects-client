@@ -1051,23 +1051,30 @@ class TestBeginProjectDocGeneration:
         project_document,
         db,
     ):
-        """Test starting PDF generation - covers lines 54-68"""
+        """Test starting PDF generation - returns file immediately (synchronous)"""
         # Arrange
         api_client.force_authenticate(user=user)
         from django.core.files.base import ContentFile
 
-        mock_generate.return_value = ContentFile(b"PDF content", name="test.pdf")
+        from medias.models import ProjectDocumentPDF
+
+        # Create mock PDF file
+        mock_pdf = ProjectDocumentPDF()
+        mock_pdf.file = ContentFile(b"PDF content", name="test.pdf")
+        mock_generate.return_value = mock_pdf
 
         # Act
         response = api_client.post(
             documents_urls.path("generate_project_document", project_document.id)
         )
 
-        # Assert
-        assert response.status_code in [
-            status.HTTP_202_ACCEPTED,
-            status.HTTP_404_NOT_FOUND,
-        ]
+        # Assert - Should return file immediately (HTTP 200)
+        assert response.status_code == status.HTTP_200_OK
+        # Verify it's a file response
+        assert response.get("Content-Disposition") is not None
+        # Verify generation was marked as started and completed
+        mock_start.assert_called_once()
+        mock_complete.assert_called_once()
 
     @patch("documents.services.pdf_service.PDFService.generate_document_pdf")
     @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")

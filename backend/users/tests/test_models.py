@@ -156,7 +156,6 @@ class TestUserModel:
         Caretaker.objects.create(
             user=user,
             caretaker=caretaker_user,
-            end_date=None,
         )
 
         # Act

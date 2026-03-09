@@ -35,6 +35,32 @@ interface CropControlsProps {
  * CropControls Component
  * Handles all crop-related controls: aspect ratio, rotation, scale
  */
+/**
+ * Validates image URL to prevent XSS attacks
+ * Only allows safe protocols: http, https, blob
+ * Rejects javascript: and malicious data: URIs
+ */
+function isValidImageUrl(url: string): boolean {
+	if (!url) return false;
+
+	try {
+		const parsed = new URL(url, window.location.href);
+
+		// Allow only safe protocols
+		const safeProtocols = ["http:", "https:", "blob:"];
+		if (!safeProtocols.includes(parsed.protocol)) {
+			console.warn(`Rejected unsafe image URL protocol: ${parsed.protocol}`);
+			return false;
+		}
+
+		return true;
+	} catch {
+		// Invalid URL
+		console.warn("Rejected invalid image URL");
+		return false;
+	}
+}
+
 export const CropControls = ({
 	imageUrl,
 	crop,
@@ -54,6 +80,9 @@ export const CropControls = ({
 	imageBounds,
 	canvasDimensions,
 }: CropControlsProps) => {
+	// Validate image URL to prevent XSS
+	const safeImageUrl = isValidImageUrl(imageUrl) ? imageUrl : "";
+
 	return (
 		<div className="space-y-4 min-w-0">
 			{/* Aspect Ratio Buttons */}
@@ -165,7 +194,7 @@ export const CropControls = ({
 					>
 						<img
 							ref={imgRef}
-							src={imageUrl}
+							src={safeImageUrl}
 							alt="Crop preview"
 							crossOrigin="anonymous"
 							style={{
@@ -174,6 +203,7 @@ export const CropControls = ({
 								maxWidth: "100%",
 							}}
 							onLoad={onImageLoad}
+							onError={() => console.error("Failed to load image")}
 						/>
 					</ReactCrop>
 					{/* Bounds overlay - shows actual image area */}

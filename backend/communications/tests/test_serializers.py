@@ -69,7 +69,9 @@ class TestTinyReactionSerializer:
 
         # Assert
         assert data["id"] == reaction_on_message.id
-        assert data["user"] == reaction_on_message.user.id
+        # user is a nested TinyUserSerializer, not just an ID
+        assert "user" in data
+        assert isinstance(data["user"], dict)
         assert data["reaction"] == reaction_on_message.reaction
         assert "direct_message" in data
 
@@ -82,7 +84,9 @@ class TestTinyReactionSerializer:
 
         # Assert
         assert data["id"] == reaction_on_comment.id
-        assert data["user"] == reaction_on_comment.user.id
+        # user is a nested TinyUserSerializer, not just an ID
+        assert "user" in data
+        assert isinstance(data["user"], dict)
         assert data["comment"] == reaction_on_comment.comment.id
         assert data["reaction"] == reaction_on_comment.reaction
 
@@ -100,6 +104,7 @@ class TestTinyReactionSerializer:
             "direct_message",
             "comment",
             "reaction",
+            "created_at",
         }
 
 
@@ -158,9 +163,13 @@ class TestTinyCommentSerializer:
             "user",
             "document",
             "text",
+            "parent_comment",
             "created_at",
             "updated_at",
             "reactions",
+            "mentions",
+            "reply_count",
+            "has_replies",
         }
 
 
@@ -215,6 +224,7 @@ class TestTinyCommentCreateSerializer:
             "user",
             "document",
             "text",
+            "parent_comment",
             "created_at",
             "updated_at",
         }
@@ -598,7 +608,8 @@ class TestReactionCreateSerializer:
         data = serializer.data
 
         # Assert
-        assert set(data.keys()) == {
+        # Note: ReactionCreateSerializer includes all fields from the model
+        expected_fields = {
             "id",
             "user",
             "comment",
@@ -607,3 +618,4 @@ class TestReactionCreateSerializer:
             "created_at",
             "updated_at",
         }
+        assert set(data.keys()) == expected_fields

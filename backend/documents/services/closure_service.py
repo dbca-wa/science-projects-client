@@ -51,7 +51,7 @@ class ClosureService:
                     "intended_outcome", data.get("outcome")
                 )
 
-        project_closure = ProjectClosure.objects.create(**closure_data)
+        ProjectClosure.objects.create(**closure_data)
 
         # Update project status to closure_requested
         project.status = "closure_requested"
@@ -59,7 +59,7 @@ class ClosureService:
 
         settings.LOGGER.info(f"Project {project} status changed to closure_requested")
 
-        return project_closure
+        return document
 
     @staticmethod
     @transaction.atomic

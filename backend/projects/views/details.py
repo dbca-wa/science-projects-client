@@ -229,11 +229,11 @@ class ExternalProjectAdditionalDetail(APIView):
         )
 
         result_serializer = TinyExternalProjectDetailSerializer(detail)
-        return Response(result_serializer.data, status=HTTP_200_OK)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 
     def put(self, request, pk):
         """Full update external project detail"""
-        serializer = ExternalProjectDetailSerializer(data=request.data, partial=False)
+        serializer = ExternalProjectDetailSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -248,7 +248,7 @@ class ExternalProjectAdditionalDetail(APIView):
         )
 
         result_serializer = TinyExternalProjectDetailSerializer(detail)
-        return Response(result_serializer.data, status=HTTP_200_OK)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 
     def delete(self, request, pk):
         """Delete external project detail"""

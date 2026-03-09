@@ -94,7 +94,8 @@ def can_user_delete_comment(user: User, comment: Comment) -> bool:
     Check if user can delete a specific comment.
 
     User can delete if:
-    1. User is the comment author (regardless of current project access)
+    1. User is a superuser OR
+    2. User is the comment author (regardless of current project access)
 
     Args:
         user: The user to check
@@ -106,8 +107,12 @@ def can_user_delete_comment(user: User, comment: Comment) -> bool:
     if not user or not user.is_authenticated:
         return False
 
+    # Superuser can delete any comment
+    if user.is_superuser:
+        return True
+
     if not comment.user:
         return False
 
-    # Only author can delete
+    # Author can delete their own comment
     return comment.user.pk == user.pk

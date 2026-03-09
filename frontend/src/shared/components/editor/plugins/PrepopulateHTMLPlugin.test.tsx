@@ -13,16 +13,8 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { PrepopulateHTMLPlugin } from "./PrepopulateHTMLPlugin";
 import { $getRoot as _$getRoot } from "lexical";
 
-// Mock sanitizeRichText utility
-vi.mock("@/shared/utils/sanitise.utils", () => ({
-	sanitizeRichText: (html: string) => {
-		// Simple mock that removes script tags
-		return html.replace(
-			/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-			""
-		);
-	},
-}));
+// Use actual sanitizeRichText implementation (no mock needed)
+// This ensures tests use the same DOMPurify-based sanitisation as production code
 
 // Minimal Lexical config for testing
 const initialConfig = {

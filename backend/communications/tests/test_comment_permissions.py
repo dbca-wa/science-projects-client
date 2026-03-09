@@ -203,16 +203,16 @@ class TestCanUserDeleteComment:
         assert can_user_delete_comment(comment.user, comment) is True
 
     def test_non_author_cannot_delete(self, comment):
-        """Non-author cannot delete even with permission"""
-        other_user = UserFactory(is_superuser=True)
+        """Non-author (non-superuser) cannot delete"""
+        other_user = UserFactory(is_superuser=False)
 
         assert can_user_delete_comment(other_user, comment) is False
 
-    def test_superuser_non_author_cannot_delete(self, comment):
-        """Superuser who is not author cannot delete"""
+    def test_superuser_non_author_can_delete(self, comment):
+        """Superuser who is not author CAN delete"""
         superuser = UserFactory(is_superuser=True)
 
-        assert can_user_delete_comment(superuser, comment) is False
+        assert can_user_delete_comment(superuser, comment) is True
 
     def test_unauthenticated_user_cannot_delete(self, comment):
         """Unauthenticated user cannot delete"""
@@ -225,13 +225,21 @@ class TestCanUserDeleteComment:
         """None user cannot delete"""
         assert can_user_delete_comment(None, comment) is False
 
-    def test_comment_without_user_cannot_be_deleted(self, comment):
-        """Comment without user cannot be deleted"""
+    def test_comment_without_user_cannot_be_deleted_by_regular_user(self, comment):
+        """Comment without user cannot be deleted by regular user"""
         comment.user = None
         comment.save()
 
-        user = UserFactory(is_superuser=True)
+        user = UserFactory(is_superuser=False)
         assert can_user_delete_comment(user, comment) is False
+
+    def test_comment_without_user_can_be_deleted_by_superuser(self, comment):
+        """Comment without user CAN be deleted by superuser"""
+        comment.user = None
+        comment.save()
+
+        superuser = UserFactory(is_superuser=True)
+        assert can_user_delete_comment(superuser, comment) is True
 
 
 @pytest.mark.django_db
