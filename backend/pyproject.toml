@@ -15,7 +15,7 @@ django-environ = "^0.12.1"
 djangorestframework = "^3.14.0"
 python-dotenv = "^1.0.0"
 python-dateutil = "^2.8.2"
-requests = "^2.31.0"
+requests = "^2.33.0"
 whitenoise = { extras = ["brotli"], version = "^6.6.0" }
 gunicorn = "^25.1.0"
 pandas = "^3.0.0"
