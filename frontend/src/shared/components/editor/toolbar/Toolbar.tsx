@@ -23,6 +23,7 @@ import { OutdentButton } from "./OutdentButton";
 import { AlignmentButton } from "./AlignmentButton";
 import { StrikethroughButton } from "./StrikethroughButton";
 import { TableButton } from "./TableButton";
+import { ToolbarDarkModeContext } from "./ToolbarContext";
 
 export const Toolbar: React.FC<ToolbarProps> = observer(
 	({ mode, disabled = false }) => {
@@ -74,22 +75,23 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		};
 
 		// Define what features are available in each mode
-		const showHeadingSelect =
-			mode === "full" || mode === "profile" || mode === "projectTitle";
-		const disableHeadings = mode === "profile" || mode === "projectTitle"; // Profile/projectTitle mode: heading dropdown visible but H1/H2/H3 disabled
-		const showLists =
-			mode === "full" || mode === "simple" || mode === "profile";
-		const showLinks = mode === "full" || mode === "profile";
+		const isProfileMode = mode === "profile" || mode === "staffProfile";
+		const isStaffProfileMode = mode === "staffProfile";
+
+		const showHeadingSelect = mode === "full" || mode === "projectTitle";
+		const disableHeadings = mode === "projectTitle";
+		const showLists = mode === "full" || mode === "simple" || isProfileMode;
+		const showLinks = mode === "full" || isProfileMode;
 		const showBold =
 			mode === "full" ||
 			mode === "simple" ||
 			mode === "minimal" ||
-			mode === "profile"; // projectTitle excludes bold
-		const showUnderline = mode === "full" || mode === "profile"; // projectTitle excludes underline
+			isProfileMode; // projectTitle excludes bold
+		const showUnderline = mode === "full" || isProfileMode; // projectTitle excludes underline
 		const showSubscriptSuperscript =
-			mode === "full" || mode === "profile" || mode === "projectTitle";
+			mode === "full" || isProfileMode || mode === "projectTitle";
 		const showClearFormatting =
-			mode === "full" || mode === "profile" || mode === "projectTitle";
+			mode === "full" || isProfileMode || mode === "projectTitle";
 		const showIndentOutdent = mode === "full";
 		const showAlignment = mode === "full";
 		const showStrikethrough = mode === "full";
@@ -109,153 +111,181 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		};
 
 		return (
-			<div
-				ref={toolbarRef}
-				className="editor-toolbar"
-				role="toolbar"
-				aria-label="Text formatting"
-				aria-orientation="horizontal"
-				onKeyDown={handleKeyDown}
-			>
-				{/* Undo/Redo buttons - shown in all modes */}
-				<div className="editor-toolbar-group" role="group" aria-label="History">
-					<UndoRedoButtons
-						canUndo={editorStore.state.canUndo}
-						canRedo={editorStore.state.canRedo}
-						onUndo={editorStore.undo}
-						onRedo={editorStore.redo}
-						disabled={disabled}
-					/>
-				</div>
-
-				<div className="editor-toolbar-separator" />
-
-				{/* Format buttons */}
+			<ToolbarDarkModeContext.Provider value={isStaffProfileMode}>
 				<div
-					className="editor-toolbar-group"
-					role="group"
+					ref={toolbarRef}
+					className={`editor-toolbar ${isStaffProfileMode ? "profile-toolbar-dark bg-gray-900 text-white rounded-t-md py-1 px-1 shadow-md" : ""}`}
+					role="toolbar"
 					aria-label="Text formatting"
+					aria-orientation="horizontal"
+					onKeyDown={handleKeyDown}
 				>
-					{showBold && (
-						<FormatButton
-							format="bold"
-							isActive={editorStore.state.isBold}
-							onToggle={() => editorStore.toggleFormat("bold")}
+					{/* Undo/Redo buttons - shown in all modes */}
+					<div
+						className="editor-toolbar-group"
+						role="group"
+						aria-label="History"
+					>
+						<UndoRedoButtons
+							canUndo={editorStore.state.canUndo}
+							canRedo={editorStore.state.canRedo}
+							onUndo={editorStore.undo}
+							onRedo={editorStore.redo}
 							disabled={disabled}
 						/>
-					)}
-					<FormatButton
-						format="italic"
-						isActive={editorStore.state.isItalic}
-						onToggle={() => editorStore.toggleFormat("italic")}
-						disabled={disabled}
-					/>
-					{showUnderline && (
-						<FormatButton
-							format="underline"
-							isActive={editorStore.state.isUnderline}
-							onToggle={() => editorStore.toggleFormat("underline")}
-							disabled={disabled}
-						/>
-					)}
-					{showStrikethrough && (
-						<StrikethroughButton
-							isActive={editorStore.state.isStrikethrough}
-							onToggle={() => editorStore.toggleFormat("strikethrough")}
-							disabled={disabled}
-						/>
-					)}
+					</div>
 
-					{/* Subscript/Superscript buttons */}
-					{showSubscriptSuperscript && (
-						<>
-							<SubscriptButton
-								isActive={editorStore.state.isSubscript}
-								onToggle={() => editorStore.toggleFormat("subscript")}
+					<div className="editor-toolbar-separator" />
+
+					{/* Format buttons */}
+					<div
+						className="editor-toolbar-group"
+						role="group"
+						aria-label="Text formatting"
+					>
+						{showBold && (
+							<FormatButton
+								format="bold"
+								isActive={editorStore.state.isBold}
+								onToggle={() => editorStore.toggleFormat("bold")}
 								disabled={disabled}
 							/>
-							<SuperscriptButton
-								isActive={editorStore.state.isSuperscript}
-								onToggle={() => editorStore.toggleFormat("superscript")}
+						)}
+						<FormatButton
+							format="italic"
+							isActive={editorStore.state.isItalic}
+							onToggle={() => editorStore.toggleFormat("italic")}
+							disabled={disabled}
+						/>
+						{showUnderline && (
+							<FormatButton
+								format="underline"
+								isActive={editorStore.state.isUnderline}
+								onToggle={() => editorStore.toggleFormat("underline")}
+								disabled={disabled}
+							/>
+						)}
+						{showStrikethrough && (
+							<StrikethroughButton
+								isActive={editorStore.state.isStrikethrough}
+								onToggle={() => editorStore.toggleFormat("strikethrough")}
+								disabled={disabled}
+							/>
+						)}
+
+						{/* Subscript/Superscript buttons */}
+						{showSubscriptSuperscript && (
+							<>
+								<SubscriptButton
+									isActive={editorStore.state.isSubscript}
+									onToggle={() => editorStore.toggleFormat("subscript")}
+									disabled={disabled}
+								/>
+								<SuperscriptButton
+									isActive={editorStore.state.isSuperscript}
+									onToggle={() => editorStore.toggleFormat("superscript")}
+									disabled={disabled}
+								/>
+							</>
+						)}
+
+						{/* Clear formatting button */}
+						{showClearFormatting && (
+							<ClearFormattingButton disabled={disabled} />
+						)}
+
+						{/* In profile mode, list + link are in the same group */}
+						{isProfileMode && showLists && (
+							<UnifiedListButton
+								isList={editorStore.state.isList}
+								listType={editorStore.state.listType}
+								onCycleList={editorStore.toggleList}
+								disabled={disabled}
+							/>
+						)}
+						{isProfileMode && showLinks && (
+							<LinkButton
+								isActive={editorStore.state.isLink}
+								disabled={disabled}
+							/>
+						)}
+					</div>
+
+					{/* Separator — only for non-profile modes */}
+					{!isProfileMode &&
+						(showHeadingSelect ||
+							showLists ||
+							showLinks ||
+							showIndentOutdent ||
+							showAlignment) && <div className="editor-toolbar-separator" />}
+
+					{/* Heading dropdown - in profile mode, H1/H2/H3 are disabled */}
+					{showHeadingSelect && (
+						<HeadingSelect
+							blockType={editorStore.state.blockType}
+							onSetBlockType={editorStore.setBlockType}
+							disabled={disabled}
+							disableHeadings={disableHeadings}
+						/>
+					)}
+
+					{/* List button - unified cycling button */}
+					{showLists && !isProfileMode && (
+						<UnifiedListButton
+							isList={editorStore.state.isList}
+							listType={editorStore.state.listType}
+							onCycleList={editorStore.toggleList}
+							disabled={disabled}
+						/>
+					)}
+
+					{/* Indent/Outdent buttons */}
+					{showIndentOutdent && (
+						<>
+							<OutdentButton
+								onOutdent={editorStore.decreaseIndent}
+								canOutdent={editorStore.state.indentLevel > 0}
+								disabled={disabled}
+							/>
+							<IndentButton
+								onIndent={editorStore.increaseIndent}
+								canIndent={
+									editorStore.state.indentLevel < editorStore.state.maxIndent
+								}
 								disabled={disabled}
 							/>
 						</>
 					)}
 
-					{/* Clear formatting button */}
-					{showClearFormatting && <ClearFormattingButton disabled={disabled} />}
+					{/* Alignment button */}
+					{showAlignment && (
+						<AlignmentButton
+							alignment={editorStore.state.textAlignment}
+							onCycleAlignment={cycleAlignment}
+							disabled={disabled}
+						/>
+					)}
+
+					{/* Link and Table buttons */}
+					{((showLinks && !isProfileMode) || showTable) && (
+						<div className="editor-toolbar-separator" />
+					)}
+
+					{showLinks && !isProfileMode && (
+						<LinkButton
+							isActive={editorStore.state.isLink}
+							disabled={disabled}
+						/>
+					)}
+
+					{showTable && (
+						<TableButton
+							onInsertTable={editorStore.insertTable}
+							disabled={disabled}
+						/>
+					)}
 				</div>
-
-				{/* Separator */}
-				{(showHeadingSelect ||
-					showLists ||
-					showLinks ||
-					showIndentOutdent ||
-					showAlignment) && <div className="editor-toolbar-separator" />}
-
-				{/* Heading dropdown - in profile mode, H1/H2/H3 are disabled */}
-				{showHeadingSelect && (
-					<HeadingSelect
-						blockType={editorStore.state.blockType}
-						onSetBlockType={editorStore.setBlockType}
-						disabled={disabled}
-						disableHeadings={disableHeadings}
-					/>
-				)}
-
-				{/* List button - unified cycling button */}
-				{showLists && (
-					<UnifiedListButton
-						isList={editorStore.state.isList}
-						listType={editorStore.state.listType}
-						onCycleList={editorStore.toggleList}
-						disabled={disabled}
-					/>
-				)}
-
-				{/* Indent/Outdent buttons */}
-				{showIndentOutdent && (
-					<>
-						<OutdentButton
-							onOutdent={editorStore.decreaseIndent}
-							canOutdent={editorStore.state.indentLevel > 0}
-							disabled={disabled}
-						/>
-						<IndentButton
-							onIndent={editorStore.increaseIndent}
-							canIndent={
-								editorStore.state.indentLevel < editorStore.state.maxIndent
-							}
-							disabled={disabled}
-						/>
-					</>
-				)}
-
-				{/* Alignment button */}
-				{showAlignment && (
-					<AlignmentButton
-						alignment={editorStore.state.textAlignment}
-						onCycleAlignment={cycleAlignment}
-						disabled={disabled}
-					/>
-				)}
-
-				{/* Link and Table buttons */}
-				{(showLinks || showTable) && (
-					<div className="editor-toolbar-separator" />
-				)}
-
-				{showLinks && (
-					<LinkButton isActive={editorStore.state.isLink} disabled={disabled} />
-				)}
-
-				{showTable && (
-					<TableButton
-						onInsertTable={editorStore.insertTable}
-						disabled={disabled}
-					/>
-				)}
-			</div>
+			</ToolbarDarkModeContext.Provider>
 		);
 	}
 );

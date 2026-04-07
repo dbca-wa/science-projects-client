@@ -13,9 +13,12 @@ import DOMPurify from "dompurify";
 const ALLOWED_TAGS = [
 	// Paragraphs and headings
 	"p",
+	"h1",
 	"h2",
 	"h3",
 	"h4",
+	"h5",
+	"h6",
 	// Lists
 	"ul",
 	"ol",
@@ -26,6 +29,10 @@ const ALLOWED_TAGS = [
 	"strong",
 	"em",
 	"u",
+	"s",
+	"sub",
+	"sup",
+	"span",
 	"br",
 	// Additional semantic tags
 	"blockquote",
@@ -50,6 +57,10 @@ const ALLOWED_ATTR = [
 	"href", // For links
 	"target", // For links
 	"rel", // For links
+	"class", // For editor styling classes (editor-ul1, editor-li-light, etc.)
+	"dir", // For text direction (ltr/rtl)
+	"style", // For inline styles (white-space: pre-wrap, etc.)
+	"value", // For list item numbering
 ];
 
 /**

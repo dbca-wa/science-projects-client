@@ -14,12 +14,12 @@ const MobileFooter = ({ currentYear }: { currentYear: number }) => {
 					<Button
 						variant={"link"}
 						onClick={() =>
-							window.open("https://www.dbca.wa.gov.au/contact", "_blank")
+							window.open("https://www.dbca.wa.gov.au/accessibility", "_blank")
 						}
 						className="bg-transparent text-sm text-slate-200"
 						size="sm"
 					>
-						Contact us
+						Accessibility
 					</Button>
 					<Separator orientation="vertical" className="bg-gray-400" />
 

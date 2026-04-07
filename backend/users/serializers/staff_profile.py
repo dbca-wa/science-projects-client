@@ -130,6 +130,7 @@ class StaffProfileOverviewSerializer(serializers.ModelSerializer):
         model = PublicStaffProfile
         fields = (
             "id",
+            "about",
             "expertise",
             "keywords",
         )

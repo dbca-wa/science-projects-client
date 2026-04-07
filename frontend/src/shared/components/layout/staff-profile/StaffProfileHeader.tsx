@@ -1,4 +1,3 @@
-import { Button } from "@/shared/components/ui/button";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 
@@ -15,16 +14,13 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 				/>
 			</div>
 			{isLoggedIn && (
-				<div className="flex justify-end">
-					<div className="flex w-25 items-center justify-between">
-						<Button
-							variant="link"
-							className="bg-transparent text-lg text-white"
-							asChild
-						>
-							<a href={`${VITE_PRODUCTION_BASE_URL ?? "/"}`}>SPMS</a>
-						</Button>
-					</div>
+				<div className="flex justify-end pr-4">
+					<a
+						href={VITE_PRODUCTION_BASE_URL ?? "/"}
+						className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
+					>
+						SPMS
+					</a>
 				</div>
 			)}
 		</div>
@@ -42,13 +38,12 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 				alt="Department of Biodiversity, Conservation and Attractions"
 			/>
 			{isLoggedIn && (
-				<Button
-					variant="link"
-					className="bg-transparent text-lg text-white"
-					asChild
+				<a
+					href={VITE_PRODUCTION_BASE_URL ?? "/"}
+					className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
 				>
-					<a href={`${VITE_PRODUCTION_BASE_URL ?? "/"}`}>SPMS</a>
-				</Button>
+					SPMS
+				</a>
 			)}
 		</div>
 	);

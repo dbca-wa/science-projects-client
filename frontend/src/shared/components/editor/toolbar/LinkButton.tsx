@@ -6,7 +6,13 @@
  * Receives isActive state from parent Toolbar component.
  */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	useContext,
+} from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
 	$getSelection,
@@ -44,11 +50,13 @@ import { Label } from "@/shared/components/ui/label";
 import { toast } from "sonner";
 import { sanitizeUrl } from "@/shared/utils";
 import type { LinkButtonProps } from "@/shared/types/editor.types";
+import { ToolbarDarkModeContext } from "./ToolbarContext";
 
 export const LinkButton: React.FC<LinkButtonProps> = ({
 	isActive,
 	disabled = false,
 }) => {
+	const isDark = useContext(ToolbarDarkModeContext);
 	const [editor] = useLexicalComposerContext();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -193,7 +201,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({
 								type="button"
 								variant="ghost"
 								size="sm"
-								className={`h-8 ${isActive ? "w-auto px-2 bg-accent" : "w-8 p-0"}`}
+								className={`h-8 ${isActive ? `w-auto px-2 ${isDark ? "bg-gray-200 text-gray-900" : "bg-accent"}` : "w-8 p-0"}`}
 								onClick={handleClick}
 								disabled={disabled}
 								aria-label={isActive ? "Edit Link" : "Insert Link"}

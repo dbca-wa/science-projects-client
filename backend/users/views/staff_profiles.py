@@ -21,7 +21,6 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
-from common.utils import paginate_queryset
 from projects.models import ProjectMember
 from projects.serializers import ProjectDataTableSerializer
 from users.models import PublicStaffProfile
@@ -40,25 +39,188 @@ class StaffProfiles(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        """List staff profiles with pagination"""
-        search = request.query_params.get("search")
-        filters = {
-            "is_active": request.query_params.get("is_active"),
-            "public": request.query_params.get("public"),
-            "business_area": request.query_params.get("business_area"),
-        }
-        filters = {k: v for k, v in filters.items() if v is not None}
+        """
+        List staff profiles with IT Assets filtering (BCS division only).
+        Ported from old backend - fetches IT Assets data, filters to BCS,
+        enriches profiles with position/division/unit/location.
+        """
+        from math import ceil
 
-        profiles = ProfileService.list_staff_profiles(filters=filters, search=search)
-        paginated = paginate_queryset(profiles, request)
+        import requests
+        from django.db.models import Case, CharField, Q, Value, When
+        from django.db.models.functions import Concat
 
-        serializer = TinyStaffProfileSerializer(paginated["items"], many=True)
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+
+        try:
+            page_size = int(request.query_params.get("page_size", 24))
+        except ValueError:
+            page_size = 24
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        search_term = request.query_params.get(
+            "searchTerm"
+        ) or request.query_params.get("search")
+        show_hidden = request.query_params.get("showHidden", "false").lower() == "true"
+
+        # Build base queryset from User (matching old approach)
+        from users.models import User
+
+        base_queryset = (
+            User.objects.filter(is_staff=True)
+            .select_related(
+                "staff_profile",
+                "work",
+                "work__branch",
+                "work__business_area",
+            )
+            .prefetch_related("business_areas_led")
+        )
+
+        if search_term:
+            search_parts = search_term.split()
+            if len(search_parts) >= 2:
+                first_name = search_parts[0]
+                last_name = " ".join(search_parts[1:])
+                users = base_queryset.filter(
+                    Q(first_name__icontains=first_name)
+                    & Q(last_name__icontains=last_name)
+                )
+            else:
+                users = base_queryset.filter(
+                    Q(first_name__icontains=search_term)
+                    | Q(last_name__icontains=search_term)
+                )
+        else:
+            users = base_queryset.all()
+
+        # Handle hidden profile filtering
+        if not request.user.is_authenticated:
+            users = users.exclude(staff_profile__is_hidden=True)
+        elif request.user.is_staff and request.user.is_superuser:
+            if not show_hidden:
+                users = users.exclude(staff_profile__is_hidden=True)
+        else:
+            users = users.exclude(
+                ~Q(id=request.user.id) & Q(staff_profile__is_hidden=True)
+            )
+
+        # Sort alphabetically
+        users = users.annotate(
+            display_name=Case(
+                When(
+                    display_first_name__isnull=False,
+                    display_last_name__isnull=False,
+                    then=Concat(
+                        "display_first_name",
+                        Value(" "),
+                        "display_last_name",
+                    ),
+                ),
+                default=Concat("first_name", Value(" "), "last_name"),
+                output_field=CharField(),
+            )
+        ).order_by("display_name")
+
+        # Fetch IT Assets data
+        try:
+            api_url = settings.IT_ASSETS_URL
+            response = requests.get(
+                api_url,
+                auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+                timeout=30,
+            )
+            if response.status_code == 200:
+                data = response.json()
+                it_asset_data_by_email = {
+                    user_data["email"]: user_data
+                    for user_data in data
+                    if "email" in user_data
+                }
+            else:
+                settings.LOGGER.error(
+                    f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
+                )
+                it_asset_data_by_email = {}
+        except Exception as e:
+            settings.LOGGER.error(f"IT Assets API error: {e}")
+            it_asset_data_by_email = {}
+
+        # Filter to BCS division and enrich with IT Assets data
+        updated_users = []
+        profiles_to_update = []
+
+        for user in users:
+            # Skip users without staff profiles
+            if not hasattr(user, "staff_profile") or user.staff_profile is None:
+                continue
+
+            user_data = it_asset_data_by_email.get(user.email)
+            if user_data:
+                # Update profile IDs if needed
+                if (
+                    user.staff_profile.it_asset_id is None
+                    or user.staff_profile.employee_id is None
+                ):
+                    user.staff_profile.it_asset_id = user_data.get("id")
+                    user.staff_profile.employee_id = user_data.get("employee_id")
+                    profiles_to_update.append(user.staff_profile)
+
+                # Enrich with IT Assets fields
+                user.division = user_data.get("division")
+                user.unit = user_data.get("unit")
+                user.location = user_data.get("location")
+                user.position = user_data.get("title")
+
+                # Filter to BCS division only
+                if user.unit == "Biodiversity and Conservation Science Division":
+                    updated_users.append(user)
+
+        # Batch save profiles that need updating
+        if profiles_to_update:
+            for profile in profiles_to_update:
+                profile.save()
+
+        total_users = len(updated_users)
+        total_pages = ceil(total_users / page_size) if total_users > 0 else 0
+
+        serialized_users = TinyStaffProfileSerializer(
+            [u.staff_profile for u in updated_users[start:end]],
+            many=True,
+            context={"request": request},
+        ).data
+
+        # Enrich serialised data with IT Assets fields from the user objects
+        for i, user in enumerate(updated_users[start:end]):
+            if i < len(serialized_users):
+                serialized_users[i]["division"] = getattr(user, "division", None)
+                serialized_users[i]["unit"] = getattr(user, "unit", None)
+                serialized_users[i]["location"] = getattr(user, "location", None)
+                serialized_users[i]["position"] = getattr(user, "position", None)
+                serialized_users[i]["custom_title"] = (
+                    user.staff_profile.custom_title if user.staff_profile else None
+                )
+                serialized_users[i]["custom_title_on"] = (
+                    user.staff_profile.custom_title_on if user.staff_profile else False
+                )
+
         return Response(
             {
-                "profiles": serializer.data,
-                "total_results": paginated["total_results"],
-                "total_pages": paginated["total_pages"],
-            }
+                "users": serialized_users,
+                "total_results": total_users,
+                "page": page,
+                "total_pages": total_pages,
+                "showing_hidden": (
+                    request.user.is_authenticated
+                    and request.user.is_superuser
+                    and show_hidden
+                ),
+            },
+            status=HTTP_200_OK,
         )
 
     def post(self, request):

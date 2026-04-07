@@ -10,6 +10,7 @@ export type ToolbarMode =
 	| "minimal"
 	| "none"
 	| "profile"
+	| "staffProfile"
 	| "projectTitle"
 	| "projectDescription";
 

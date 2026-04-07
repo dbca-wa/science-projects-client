@@ -31,6 +31,14 @@ const ProjectDetailPage = lazy(
 const EditProjectPage = lazy(() => import("@/pages/projects/EditProjectPage"));
 const ProjectMapPage = lazy(() => import("@/pages/projects/ProjectMapPage"));
 
+// Pages - Staff Profiles (lazy loaded)
+const StaffDirectoryPage = lazy(
+	() => import("@/pages/staff/StaffDirectoryPage")
+);
+const StaffProfileDetailPage = lazy(
+	() => import("@/pages/staff/StaffProfileDetailPage")
+);
+
 /**
  * Route Configuration
  *
@@ -389,12 +397,36 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 ];
 */
 
+/** ---------------- Staff Profiles ---------------- */
+export const STAFF_ROUTES: RouteConfig[] = [
+	{
+		name: "Staff Directory",
+		path: "/staff",
+		iconKey: "staff",
+		tooltipKey: "staff",
+		component: StaffDirectoryPage,
+		requiresAuth: false,
+		showInSidebar: true,
+		section: "Staff",
+		layoutWrapper: "staffProfile",
+	},
+	{
+		name: "Staff Profile",
+		path: "/staff/:staffProfilePk",
+		component: StaffProfileDetailPage,
+		requiresAuth: false,
+		showInSidebar: false,
+		layoutWrapper: "staffProfile",
+	},
+];
+
 /** ---------------- Combined ---------------- */
 export const ALL_ROUTES: RouteConfig[] = [
 	...AUTH_ROUTES,
 	...DASHBOARD_ROUTES,
 	...USER_ROUTES,
 	...PROJECT_ROUTES,
+	...STAFF_ROUTES,
 	// Uncomment as features are implemented:
 	// ...REPORT_ROUTES,
 	// ...ADMIN_ROUTES,
