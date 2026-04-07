@@ -81,7 +81,7 @@ export const CropControls = ({
 	canvasDimensions,
 }: CropControlsProps) => {
 	// Validate image URL to prevent XSS
-	const safeImageUrl = isValidImageUrl(imageUrl) ? imageUrl : "";
+	const isUrlValid = isValidImageUrl(imageUrl);
 
 	return (
 		<div className="space-y-4 min-w-0">
@@ -181,55 +181,59 @@ export const CropControls = ({
 
 			{/* Crop Area */}
 			<div className="flex justify-center items-center bg-muted p-4 rounded-lg min-h-[300px]">
-				<div className="relative">
-					<ReactCrop
-						crop={crop}
-						onChange={(c) => {
-							// Apply constraint in real-time to prevent dragging outside bounds
-							const constrained = constrainCrop(c);
-							setCrop(constrained);
-						}}
-						onComplete={(c) => setCompletedCrop(c)}
-						aspect={aspect}
-					>
-						<img
-							ref={imgRef}
-							src={safeImageUrl}
-							alt="Crop preview"
-							crossOrigin="anonymous"
-							style={{
-								transform: `scale(${scale})`,
-								maxHeight: "50vh",
-								maxWidth: "100%",
+				{isUrlValid ? (
+					<div className="relative">
+						<ReactCrop
+							crop={crop}
+							onChange={(c) => {
+								// Apply constraint in real-time to prevent dragging outside bounds
+								const constrained = constrainCrop(c);
+								setCrop(constrained);
 							}}
-							onLoad={onImageLoad}
-							onError={() => console.error("Failed to load image")}
-						/>
-					</ReactCrop>
-					{/* Bounds overlay - shows actual image area */}
-					{canvasDimensions && (
-						<div
-							style={{
-								position: "absolute",
-								left: imageBounds
-									? `${(imageBounds.x / canvasDimensions.width) * 100}%`
-									: "0%",
-								top: imageBounds
-									? `${(imageBounds.y / canvasDimensions.height) * 100}%`
-									: "0%",
-								width: imageBounds
-									? `${(imageBounds.width / canvasDimensions.width) * 100}%`
-									: "100%",
-								height: imageBounds
-									? `${(imageBounds.height / canvasDimensions.height) * 100}%`
-									: "100%",
-								border: "2px solid rgba(59, 130, 246, 0.5)",
-								pointerEvents: "none",
-								zIndex: 1000,
-							}}
-						/>
-					)}
-				</div>
+							onComplete={(c) => setCompletedCrop(c)}
+							aspect={aspect}
+						>
+							<img
+								ref={imgRef}
+								src={imageUrl}
+								alt="Crop preview"
+								crossOrigin="anonymous"
+								style={{
+									transform: `scale(${scale})`,
+									maxHeight: "50vh",
+									maxWidth: "100%",
+								}}
+								onLoad={onImageLoad}
+								onError={() => console.error("Failed to load image")}
+							/>
+						</ReactCrop>
+						{/* Bounds overlay - shows actual image area */}
+						{canvasDimensions && (
+							<div
+								style={{
+									position: "absolute",
+									left: imageBounds
+										? `${(imageBounds.x / canvasDimensions.width) * 100}%`
+										: "0%",
+									top: imageBounds
+										? `${(imageBounds.y / canvasDimensions.height) * 100}%`
+										: "0%",
+									width: imageBounds
+										? `${(imageBounds.width / canvasDimensions.width) * 100}%`
+										: "100%",
+									height: imageBounds
+										? `${(imageBounds.height / canvasDimensions.height) * 100}%`
+										: "100%",
+									border: "2px solid rgba(59, 130, 246, 0.5)",
+									pointerEvents: "none",
+									zIndex: 1000,
+								}}
+							/>
+						)}
+					</div>
+				) : (
+					<div className="text-destructive">Invalid image URL</div>
+				)}
 			</div>
 
 			{/* Rotation Controls */}
