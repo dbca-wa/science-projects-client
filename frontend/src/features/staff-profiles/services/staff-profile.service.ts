@@ -17,6 +17,7 @@ import type {
 	IEducationEntryFormData,
 	IOverviewUpdateData,
 	IStaffProfileProject,
+	IPublicationResponse,
 } from "../types/staff-profile.types";
 
 // Directory listing
@@ -192,4 +193,13 @@ export const emailStaffMember = async (
 		pk: userPk,
 		...data,
 	});
+};
+
+// Publications (external library)
+export const getPublications = async (
+	employeeId: string
+): Promise<IPublicationResponse> => {
+	return apiClient.get<IPublicationResponse>(
+		STAFF_PROFILE_ENDPOINTS.PUBLICATIONS(employeeId)
+	);
 };

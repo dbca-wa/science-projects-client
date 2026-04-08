@@ -304,7 +304,7 @@ class TestStaffProfileViews:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert "profiles" in response.data
+        assert "users" in response.data
 
     def test_list_staff_profiles_with_search(self, api_client, staff_profile):
         """Test listing staff profiles with search"""
@@ -313,7 +313,7 @@ class TestStaffProfileViews:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert "profiles" in response.data
+        assert "users" in response.data
 
     def test_create_staff_profile(self, api_client, user):
         """Test creating staff profile"""
@@ -731,7 +731,7 @@ class TestStaffProfileAdvancedViews:
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
-        assert "profiles" in response.data
+        assert "users" in response.data
 
     def test_check_staff_profile_exists_true(self, api_client, user, staff_profile):
         """Test checking if staff profile exists - returns true"""

@@ -87,6 +87,7 @@ class StaffProfileHeroSerializer(serializers.ModelSerializer):
             "avatar",
             "work",
             "about",
+            "employee_id",
         )
 
     def get_user(self, obj):

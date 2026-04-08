@@ -36,4 +36,7 @@ export const STAFF_PROFILE_ENDPOINTS = {
 
 	// Admin
 	STAFF_EMAILS: () => "/users/get_staff_profile_emails",
+
+	// Publications (external library)
+	PUBLICATIONS: (employeeId: string) => `/documents/publications/${employeeId}`,
 } as const;

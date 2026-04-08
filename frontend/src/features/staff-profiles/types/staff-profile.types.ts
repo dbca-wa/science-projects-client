@@ -57,6 +57,7 @@ export interface IStaffProfileHeroData {
 		business_area: { id: number; name: string } | null;
 	} | null;
 	about: string | null;
+	employee_id: string | null;
 	it_asset_data: {
 		title: string | null;
 		unit: string | null;
@@ -148,6 +149,10 @@ export interface IStaffProfileProject {
 	title: string;
 	status: string;
 	kind: string;
+	role: string | null;
+	description: string | null;
+	start_date: number | null;
+	end_date: number | null;
 	image: { file: string } | null;
 	business_area: { id: number; name: string } | null;
 }
@@ -172,4 +177,20 @@ export interface IOverviewUpdateData {
 	about?: string;
 	expertise?: string;
 	keyword_tags?: number[];
+}
+
+// Library publication from external API
+export interface ILibraryPublication {
+	title: string;
+	year: string;
+	BiblioText: string;
+	staff_only?: boolean;
+}
+
+export interface ILibraryPublicationResponse {
+	docs: ILibraryPublication[];
+}
+
+export interface IPublicationResponse {
+	libraryData: ILibraryPublicationResponse;
 }

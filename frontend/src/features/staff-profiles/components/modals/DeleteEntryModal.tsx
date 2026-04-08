@@ -1,11 +1,5 @@
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
-} from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
+import ResponsiveModal from "./ResponsiveModal";
 
 interface DeleteEntryModalProps {
 	title: string;
@@ -25,26 +19,22 @@ const DeleteEntryModal = ({
 	isPending,
 }: DeleteEntryModalProps) => {
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-[400px]">
-				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-					<DialogDescription>{description}</DialogDescription>
-				</DialogHeader>
-				<div className="flex justify-end gap-2 mt-4">
-					<Button variant="outline" onClick={() => onOpenChange(false)}>
-						Cancel
-					</Button>
-					<Button
-						variant="destructive"
-						onClick={onConfirm}
-						disabled={isPending}
-					>
-						{isPending ? "Deleting..." : "Delete"}
-					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
+		<ResponsiveModal
+			title={title}
+			open={open}
+			onOpenChange={onOpenChange}
+			maxWidth="sm:max-w-[400px]"
+		>
+			<p className="text-sm text-muted-foreground mb-4">{description}</p>
+			<div className="flex justify-end gap-2">
+				<Button variant="outline" onClick={() => onOpenChange(false)}>
+					Cancel
+				</Button>
+				<Button variant="destructive" onClick={onConfirm} disabled={isPending}>
+					{isPending ? "Deleting..." : "Delete"}
+				</Button>
+			</div>
+		</ResponsiveModal>
 	);
 };
 

@@ -1,10 +1,4 @@
-import { useState } from "react";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/shared/components/ui/dialog";
+import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -13,6 +7,7 @@ import {
 	useUpdateEducationEntry,
 } from "../../hooks/useStaffProfileMutations";
 import type { IEducationEntry } from "../../types/staff-profile.types";
+import ResponsiveModal from "./ResponsiveModal";
 
 interface EducationEntryModalProps {
 	profilePk: number;
@@ -29,11 +24,30 @@ const EducationEntryModal = ({
 }: EducationEntryModalProps) => {
 	const isEdit = !!entry;
 	const [form, setForm] = useState({
-		qualification_name: entry?.qualification_name || "",
-		institution: entry?.institution || "",
-		location: entry?.location || "",
-		end_year: entry?.end_year?.toString() || "",
+		qualification_name: "",
+		institution: "",
+		location: "",
+		end_year: "",
 	});
+
+	// Prepopulate on edit
+	useEffect(() => {
+		if (entry) {
+			setForm({
+				qualification_name: entry.qualification_name || "",
+				institution: entry.institution || "",
+				location: entry.location || "",
+				end_year: entry.end_year?.toString() || "",
+			});
+		} else {
+			setForm({
+				qualification_name: "",
+				institution: "",
+				location: "",
+				end_year: "",
+			});
+		}
+	}, [entry, open]);
 
 	const createMutation = useCreateEducationEntry(profilePk);
 	const updateMutation = useUpdateEducationEntry(profilePk);
@@ -63,64 +77,63 @@ const EducationEntryModal = ({
 		setForm((prev) => ({ ...prev, [field]: value }));
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-[500px]">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit" : "Add"} Education Entry</DialogTitle>
-				</DialogHeader>
-				<div className="space-y-4">
-					<div>
-						<Label htmlFor="qualification_name">Qualification</Label>
-						<Input
-							id="qualification_name"
-							value={form.qualification_name}
-							onChange={(e) => update("qualification_name", e.target.value)}
-						/>
-					</div>
-					<div>
-						<Label htmlFor="institution">Institution</Label>
-						<Input
-							id="institution"
-							value={form.institution}
-							onChange={(e) => update("institution", e.target.value)}
-						/>
-					</div>
-					<div>
-						<Label htmlFor="location">Location</Label>
-						<Input
-							id="location"
-							value={form.location}
-							onChange={(e) => update("location", e.target.value)}
-						/>
-					</div>
-					<div>
-						<Label htmlFor="end_year">Year Completed</Label>
-						<Input
-							id="end_year"
-							type="number"
-							value={form.end_year}
-							onChange={(e) => update("end_year", e.target.value)}
-						/>
-					</div>
+		<ResponsiveModal
+			title={`${isEdit ? "Edit" : "Add"} Qualification`}
+			open={open}
+			onOpenChange={onOpenChange}
+		>
+			<div className="space-y-4">
+				<div>
+					<Label htmlFor="qualification_name">Qualification</Label>
+					<Input
+						id="qualification_name"
+						value={form.qualification_name}
+						onChange={(e) => update("qualification_name", e.target.value)}
+					/>
 				</div>
-				<div className="flex justify-end gap-2 mt-4">
-					<Button variant="outline" onClick={() => onOpenChange(false)}>
-						Cancel
-					</Button>
-					<Button
-						onClick={handleSave}
-						disabled={
-							isPending ||
-							!form.qualification_name ||
-							!form.institution ||
-							!form.end_year
-						}
-					>
-						{isPending ? "Saving..." : "Save"}
-					</Button>
+				<div>
+					<Label htmlFor="institution">Institution</Label>
+					<Input
+						id="institution"
+						value={form.institution}
+						onChange={(e) => update("institution", e.target.value)}
+					/>
 				</div>
-			</DialogContent>
-		</Dialog>
+				<div>
+					<Label htmlFor="location">Location</Label>
+					<Input
+						id="location"
+						value={form.location}
+						onChange={(e) => update("location", e.target.value)}
+					/>
+				</div>
+				<div>
+					<Label htmlFor="end_year">Year Completed</Label>
+					<Input
+						id="end_year"
+						type="number"
+						value={form.end_year}
+						onChange={(e) => update("end_year", e.target.value)}
+					/>
+				</div>
+			</div>
+			<div className="flex justify-end gap-2 mt-4">
+				<Button variant="outline" onClick={() => onOpenChange(false)}>
+					Cancel
+				</Button>
+				<Button
+					onClick={handleSave}
+					disabled={
+						isPending ||
+						!form.qualification_name ||
+						!form.institution ||
+						!form.end_year
+					}
+				>
+					{isPending ? "Saving..." : "Save"}
+				</Button>
+			</div>
+		</ResponsiveModal>
 	);
 };
 

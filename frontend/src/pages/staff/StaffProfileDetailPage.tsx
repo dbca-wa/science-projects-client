@@ -6,7 +6,7 @@ import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
 import StaffHero from "@/features/staff-profiles/components/detail/StaffHero";
 import StaffContentTabs from "@/features/staff-profiles/components/detail/StaffContentTabs";
-import DeleteEntryModal from "@/features/staff-profiles/components/modals/DeleteEntryModal";
+import ResponsiveModal from "@/features/staff-profiles/components/modals/ResponsiveModal";
 import { useToggleVisibility } from "@/features/staff-profiles/hooks/useStaffProfileMutations";
 
 const StaffProfileDetailPage = () => {
@@ -94,16 +94,27 @@ const StaffProfileDetailPage = () => {
 						userId={heroData.user.id}
 						editButton={
 							canEdit ? (
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => setButtonsVisible((v) => !v)}
-									className={`gap-1 ${buttonsVisible ? "bg-green-50 border-green-300 text-green-700" : ""}`}
-									aria-pressed={buttonsVisible}
-								>
-									<Eye className="size-4" />
-									{buttonsVisible ? "Editing" : "Edit"}
-								</Button>
+								<div className="flex items-center gap-2">
+									{buttonsVisible && (
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => setToggleOpen(true)}
+										>
+											{heroData.about ? "Hide" : "Show"} Profile
+										</Button>
+									)}
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setButtonsVisible((v) => !v)}
+										className={`gap-1 ${buttonsVisible ? "bg-green-50 border-green-300 text-green-700" : ""}`}
+										aria-pressed={buttonsVisible}
+									>
+										<Eye className="size-4" />
+										{buttonsVisible ? "Editing" : "Edit"}
+									</Button>
+								</div>
 							) : undefined
 						}
 					/>
@@ -111,23 +122,37 @@ const StaffProfileDetailPage = () => {
 						profilePk={pk}
 						userId={heroData.user.id}
 						canEdit={canEdit && buttonsVisible}
-						employeeId={heroData.user.id}
+						employeeId={heroData.employee_id ?? null}
 					/>
 				</div>
 			</div>
 
-			<DeleteEntryModal
+			<ResponsiveModal
 				title="Toggle Profile Visibility"
-				description="Are you sure you want to change this profile's visibility? This will affect whether it appears in the public directory."
 				open={toggleOpen}
 				onOpenChange={setToggleOpen}
-				onConfirm={() =>
-					toggleVisibility.mutate(undefined, {
-						onSuccess: () => setToggleOpen(false),
-					})
-				}
-				isPending={toggleVisibility.isPending}
-			/>
+				maxWidth="sm:max-w-[400px]"
+			>
+				<p className="text-sm text-muted-foreground mb-4">
+					Are you sure you want to change this profile's visibility? This will
+					affect whether it appears in the public directory.
+				</p>
+				<div className="flex justify-end gap-2">
+					<Button variant="outline" onClick={() => setToggleOpen(false)}>
+						Cancel
+					</Button>
+					<Button
+						onClick={() =>
+							toggleVisibility.mutate(undefined, {
+								onSuccess: () => setToggleOpen(false),
+							})
+						}
+						disabled={toggleVisibility.isPending}
+					>
+						{toggleVisibility.isPending ? "Updating..." : "Confirm"}
+					</Button>
+				</div>
+			</ResponsiveModal>
 		</main>
 	);
 };

@@ -10,7 +10,7 @@ import { ChevronLeft, Mail } from "lucide-react";
 import { useMediaQuery } from "@/shared/hooks/ui/useMediaQuery";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import EmailStaffModal from "../modals/EmailStaffModal";
-import DeleteEntryModal from "../modals/DeleteEntryModal";
+import ResponsiveModal from "../modals/ResponsiveModal";
 
 interface StaffHeroProps {
 	profilePk: number;
@@ -77,18 +77,31 @@ const StaffHero = ({
 				open={emailOpen}
 				onOpenChange={setEmailOpen}
 			/>
-			<DeleteEntryModal
+			<ResponsiveModal
 				title="Toggle Profile Visibility"
-				description="Are you sure you want to change this profile's visibility?"
 				open={toggleOpen}
 				onOpenChange={setToggleOpen}
-				onConfirm={() =>
-					toggleVisibility.mutate(undefined, {
-						onSuccess: () => setToggleOpen(false),
-					})
-				}
-				isPending={toggleVisibility.isPending}
-			/>
+				maxWidth="sm:max-w-[400px]"
+			>
+				<p className="text-sm text-muted-foreground mb-4">
+					Are you sure you want to change this profile's visibility?
+				</p>
+				<div className="flex justify-end gap-2">
+					<Button variant="outline" onClick={() => setToggleOpen(false)}>
+						Cancel
+					</Button>
+					<Button
+						onClick={() =>
+							toggleVisibility.mutate(undefined, {
+								onSuccess: () => setToggleOpen(false),
+							})
+						}
+						disabled={toggleVisibility.isPending}
+					>
+						{toggleVisibility.isPending ? "Updating..." : "Confirm"}
+					</Button>
+				</div>
+			</ResponsiveModal>
 		</>
 	);
 

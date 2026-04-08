@@ -70,7 +70,13 @@ class StaffProfileOverviewDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
+        from rest_framework.exceptions import PermissionDenied
+
         profile = ProfileService.get_staff_profile(pk)
+
+        # Ownership check: only the profile owner or a superuser can edit
+        if request.user.id != profile.user_id and not request.user.is_superuser:
+            raise PermissionDenied("You do not have permission to edit this profile.")
 
         # Update allowed fields
         if "about" in request.data:

@@ -418,6 +418,30 @@ export const STAFF_ROUTES: RouteConfig[] = [
 		showInSidebar: false,
 		layoutWrapper: "staffProfile",
 	},
+	{
+		name: "Staff Profile Projects",
+		path: "/staff/:staffProfilePk/projects",
+		component: StaffProfileDetailPage,
+		requiresAuth: false,
+		showInSidebar: false,
+		layoutWrapper: "staffProfile",
+	},
+	{
+		name: "Staff Profile CV",
+		path: "/staff/:staffProfilePk/background",
+		component: StaffProfileDetailPage,
+		requiresAuth: false,
+		showInSidebar: false,
+		layoutWrapper: "staffProfile",
+	},
+	{
+		name: "Staff Profile Publications",
+		path: "/staff/:staffProfilePk/publications",
+		component: StaffProfileDetailPage,
+		requiresAuth: false,
+		showInSidebar: false,
+		layoutWrapper: "staffProfile",
+	},
 ];
 
 /** ---------------- Combined ---------------- */
