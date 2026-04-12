@@ -73,7 +73,7 @@ const PublicationsSection = ({ employeeId }: PublicationsSectionProps) => {
 };
 
 const processPublicationText = (pub: ILibraryPublication): string => {
-	let text = pub.BiblioText;
+	const text = pub.BiblioText;
 	if (pub.staff_only) {
 		return text.replace(/<a\b[^>]*>.*?<\/a>\s*\.?\s*$/, "");
 	}

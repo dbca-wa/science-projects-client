@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -16,6 +16,13 @@ interface EducationEntryModalProps {
 	onOpenChange: (open: boolean) => void;
 }
 
+const getInitialEducationForm = (entry?: IEducationEntry) => ({
+	qualification_name: entry?.qualification_name || "",
+	institution: entry?.institution || "",
+	location: entry?.location || "",
+	end_year: entry?.end_year?.toString() || "",
+});
+
 const EducationEntryModal = ({
 	profilePk,
 	entry,
@@ -23,31 +30,23 @@ const EducationEntryModal = ({
 	onOpenChange,
 }: EducationEntryModalProps) => {
 	const isEdit = !!entry;
-	const [form, setForm] = useState({
-		qualification_name: "",
-		institution: "",
-		location: "",
-		end_year: "",
-	});
+	const initialForm = useMemo(
+		() => getInitialEducationForm(entry),
+		[entry, open]
+	);
+	const [form, setForm] = useState(initialForm);
 
-	// Prepopulate on edit
-	useEffect(() => {
-		if (entry) {
-			setForm({
-				qualification_name: entry.qualification_name || "",
-				institution: entry.institution || "",
-				location: entry.location || "",
-				end_year: entry.end_year?.toString() || "",
-			});
-		} else {
-			setForm({
-				qualification_name: "",
-				institution: "",
-				location: "",
-				end_year: "",
-			});
-		}
-	}, [entry, open]);
+	// Reset form when initialForm changes (modal opens/entry changes)
+	if (form !== initialForm && !open) {
+		setForm(initialForm);
+	}
+	// Sync form when modal opens with new data
+	const formKey = `${entry?.id ?? "new"}-${open}`;
+	const [prevKey, setPrevKey] = useState(formKey);
+	if (formKey !== prevKey) {
+		setPrevKey(formKey);
+		setForm(initialForm);
+	}
 
 	const createMutation = useCreateEducationEntry(profilePk);
 	const updateMutation = useUpdateEducationEntry(profilePk);

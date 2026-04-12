@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -16,6 +16,14 @@ interface EmploymentEntryModalProps {
 	onOpenChange: (open: boolean) => void;
 }
 
+const getInitialEmploymentForm = (entry?: IEmploymentEntry) => ({
+	position_title: entry?.position_title || "",
+	employer: entry?.employer || "",
+	section: entry?.section || "",
+	start_year: entry?.start_year?.toString() || "",
+	end_year: entry?.end_year?.toString() || "",
+});
+
 const EmploymentEntryModal = ({
 	profilePk,
 	entry,
@@ -23,34 +31,19 @@ const EmploymentEntryModal = ({
 	onOpenChange,
 }: EmploymentEntryModalProps) => {
 	const isEdit = !!entry;
-	const [form, setForm] = useState({
-		position_title: "",
-		employer: "",
-		section: "",
-		start_year: "",
-		end_year: "",
-	});
+	const initialForm = useMemo(
+		() => getInitialEmploymentForm(entry),
+		[entry, open]
+	);
+	const [form, setForm] = useState(initialForm);
 
-	// Prepopulate on edit
-	useEffect(() => {
-		if (entry) {
-			setForm({
-				position_title: entry.position_title || "",
-				employer: entry.employer || "",
-				section: entry.section || "",
-				start_year: entry.start_year?.toString() || "",
-				end_year: entry.end_year?.toString() || "",
-			});
-		} else {
-			setForm({
-				position_title: "",
-				employer: "",
-				section: "",
-				start_year: "",
-				end_year: "",
-			});
-		}
-	}, [entry, open]);
+	// Reset form when modal opens with new/different data
+	const formKey = `${entry?.id ?? "new"}-${open}`;
+	const [prevKey, setPrevKey] = useState(formKey);
+	if (formKey !== prevKey) {
+		setPrevKey(formKey);
+		setForm(initialForm);
+	}
 
 	const createMutation = useCreateEmploymentEntry(profilePk);
 	const updateMutation = useUpdateEmploymentEntry(profilePk);
