@@ -2,7 +2,12 @@ import { useStaffProfileCV } from "../../hooks/useStaffProfileCV";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Separator } from "@/shared/components/ui/separator";
 import { Button } from "@/shared/components/ui/button";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import {
+	Tooltip,
+	TooltipTrigger,
+	TooltipContent,
+} from "@/shared/components/ui/tooltip";
+import { Plus, Pencil, Trash2, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import EmploymentEntryModal from "../modals/EmploymentEntryModal";
 import EducationEntryModal from "../modals/EducationEntryModal";
@@ -70,76 +75,108 @@ const CVSection = ({ profilePk, canEdit }: CVSectionProps) => {
 				<div className="flex w-full items-center justify-between">
 					<p className="text-lg font-semibold text-slate-900">Employment</p>
 					{canEdit && (
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={() => {
-								setEditingEmp(undefined);
-								setEmpModalOpen(true);
-							}}
-							className="gap-1 text-slate-500 hover:text-slate-700"
-						>
-							<Plus className="size-4" />
-							Add
-						</Button>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => {
+										setEditingEmp(undefined);
+										setEmpModalOpen(true);
+									}}
+									className="gap-1 text-slate-500 hover:text-slate-700"
+								>
+									<Plus className="size-4" />
+									Add
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent variant="light">
+								<p>Add employment entry</p>
+							</TooltipContent>
+						</Tooltip>
 					)}
 				</div>
 				<Separator className="mt-2 mb-3 bg-slate-200" />
 				{sortedEmployment.length > 0 ? (
-					<div className="space-y-3">
-						{sortedEmployment.map((entry) => (
-							<div
-								key={entry.id}
-								className="rounded-lg border border-slate-200 bg-white shadow-sm p-4"
-							>
-								<div className="flex items-start justify-between gap-2">
-									<div className="flex-1 min-w-0">
-										<p className="font-semibold text-slate-800">
-											{entry.position_title}
-										</p>
-										{(entry.employer || entry.section) && (
-											<p className="text-sm text-slate-500 mt-0.5">
-												{entry.employer}
-												{entry.section && entry.employer
-													? ` · ${entry.section}`
-													: entry.section}
-											</p>
-										)}
-										<p className="text-xs text-slate-400 mt-1">
-											{entry.start_year === entry.end_year
-												? `${entry.start_year}`
-												: `${entry.start_year} – ${formatYear(entry.end_year)}`}
-										</p>
-									</div>
-									{canEdit && (
-										<div className="flex gap-1 shrink-0">
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-7"
-												onClick={() => {
-													setEditingEmp(entry);
-													setEmpModalOpen(true);
-												}}
-											>
-												<Pencil className="size-3.5 text-slate-400" />
-											</Button>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-7"
-												onClick={() => setDeletingEmpId(entry.id)}
-											>
-												<Trash2 className="size-3.5 text-red-400" />
-											</Button>
-										</div>
+					<div className="relative ml-3">
+						{sortedEmployment.map((entry) => {
+							const isCurrent =
+								!entry.end_year || entry.end_year >= currentYear;
+
+							return (
+								<div key={entry.id} className="relative pl-6 pb-6 last:pb-0">
+									{/* Timeline line — runs full height of each item */}
+									<div className="absolute left-[5px] top-[17px] bottom-0 w-px bg-[#2A6096]/30" />
+									{/* Timeline dot */}
+									{isCurrent ? (
+										<div className="absolute left-0 top-[5px] size-[11px] rounded-full border-2 border-[#01A7B2] bg-[#01A7B2] animate-pulse shadow-[0_0_5px_rgba(1,167,178,0.4)]" />
+									) : (
+										<div className="absolute left-0 top-[5px] size-[11px] rounded-full border-2 border-[#2A6096] bg-[#2A6096]/20" />
 									)}
+									{/* Content */}
+									<div className="flex items-start justify-between gap-2">
+										<div className="flex-1 min-w-0">
+											<p className="font-semibold text-sm text-[#1E5456]">
+												{entry.position_title}
+											</p>
+											{(entry.employer || entry.section) && (
+												<p className="text-sm text-slate-500 mt-0.5">
+													{entry.employer}
+													{entry.section && entry.employer
+														? ` · ${entry.section}`
+														: entry.section}
+												</p>
+											)}
+											<p className="text-xs text-slate-400 mt-0.5">
+												{entry.start_year === entry.end_year
+													? `${entry.start_year}`
+													: `${entry.start_year} – ${formatYear(entry.end_year)}`}
+											</p>
+										</div>
+										{canEdit && (
+											<div className="flex gap-1 shrink-0">
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<Button
+															variant="ghost"
+															size="icon"
+															className="size-7"
+															onClick={() => {
+																setEditingEmp(entry);
+																setEmpModalOpen(true);
+															}}
+														>
+															<Pencil className="size-3.5 text-slate-400" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent variant="light">
+														<p>Edit entry</p>
+													</TooltipContent>
+												</Tooltip>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<Button
+															variant="ghost"
+															size="icon"
+															className="size-7"
+															onClick={() => setDeletingEmpId(entry.id)}
+														>
+															<Trash2 className="size-3.5 text-red-400" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent variant="light">
+														<p>Delete entry</p>
+													</TooltipContent>
+												</Tooltip>
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</div>
 				) : (
-					<p className="text-muted-foreground">No information available.</p>
+					<p className="text-muted-foreground">No information recorded.</p>
 				)}
 			</div>
 
@@ -148,70 +185,95 @@ const CVSection = ({ profilePk, canEdit }: CVSectionProps) => {
 				<div className="flex w-full items-center justify-between">
 					<p className="text-lg font-semibold text-slate-900">Qualifications</p>
 					{canEdit && (
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={() => {
-								setEditingEdu(undefined);
-								setEduModalOpen(true);
-							}}
-							className="gap-1 text-slate-500 hover:text-slate-700"
-						>
-							<Plus className="size-4" />
-							Add
-						</Button>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => {
+										setEditingEdu(undefined);
+										setEduModalOpen(true);
+									}}
+									className="gap-1 text-slate-500 hover:text-slate-700"
+								>
+									<Plus className="size-4" />
+									Add
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent variant="light">
+								<p>Add qualification</p>
+							</TooltipContent>
+						</Tooltip>
 					)}
 				</div>
 				<Separator className="mt-2 mb-3 bg-slate-200" />
 				{sortedEducation.length > 0 ? (
-					<div className="space-y-3">
+					<div className="space-y-2.5">
 						{sortedEducation.map((entry) => (
 							<div
 								key={entry.id}
-								className="rounded-lg border border-slate-200 bg-white shadow-sm p-4"
+								className="flex items-center gap-3 rounded-lg bg-[#2A6096]/5 border border-[#2A6096]/15 px-4 py-3"
 							>
-								<div className="flex items-start justify-between gap-2">
-									<div className="flex-1 min-w-0">
-										<p className="font-semibold text-slate-800">
-											{entry.qualification_name}
-										</p>
-										<p className="text-sm text-slate-500 mt-0.5">
-											{entry.institution}
-											{entry.location ? ` · ${entry.location}` : ""}
-										</p>
-										<p className="text-xs text-slate-400 mt-1">
-											{formatYear(entry.end_year)}
-										</p>
-									</div>
-									{canEdit && (
-										<div className="flex gap-1 shrink-0">
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-7"
-												onClick={() => {
-													setEditingEdu(entry);
-													setEduModalOpen(true);
-												}}
-											>
-												<Pencil className="size-3.5 text-slate-400" />
-											</Button>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-7"
-												onClick={() => setDeletingEduId(entry.id)}
-											>
-												<Trash2 className="size-3.5 text-red-400" />
-											</Button>
-										</div>
-									)}
+								<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#2A6096]/15">
+									<GraduationCap
+										className="size-4 text-[#2A6096]"
+										aria-hidden="true"
+									/>
 								</div>
+								<div className="flex-1 min-w-0">
+									<p className="font-semibold text-sm text-slate-800">
+										{entry.qualification_name}
+									</p>
+									<p className="text-sm text-slate-500 mt-0.5">
+										{entry.institution}
+										{entry.location ? ` · ${entry.location}` : ""}
+									</p>
+								</div>
+								<span className="shrink-0 text-xs font-semibold text-[#2A6096] bg-[#2A6096]/10 px-2 py-0.5 rounded">
+									{formatYear(entry.end_year)}
+								</span>
+								{canEdit && (
+									<div className="flex gap-1 shrink-0">
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="size-7"
+													onClick={() => {
+														setEditingEdu(entry);
+														setEduModalOpen(true);
+													}}
+												>
+													<Pencil className="size-3.5 text-slate-400" />
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent variant="light">
+												<p>Edit qualification</p>
+											</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="size-7"
+													onClick={() => setDeletingEduId(entry.id)}
+												>
+													<Trash2 className="size-3.5 text-red-400" />
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent variant="light">
+												<p>Delete qualification</p>
+											</TooltipContent>
+										</Tooltip>
+									</div>
+								)}
 							</div>
 						))}
 					</div>
 				) : (
-					<p className="text-muted-foreground">No information available.</p>
+					<p className="text-muted-foreground">No information recorded.</p>
 				)}
 			</div>
 

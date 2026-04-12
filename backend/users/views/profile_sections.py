@@ -23,7 +23,7 @@ class StaffProfileHeroDetail(APIView):
         import requests as http_requests
         from django.conf import settings
 
-        profile = ProfileService.get_staff_profile(pk)
+        profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileHeroSerializer(profile)
         data = serializer.data
 
@@ -65,7 +65,7 @@ class StaffProfileOverviewDetail(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
-        profile = ProfileService.get_staff_profile(pk)
+        profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileOverviewSerializer(profile)
         return Response(serializer.data)
 
@@ -101,6 +101,6 @@ class StaffProfileCVDetail(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
-        profile = ProfileService.get_staff_profile(pk)
+        profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileCVSerializer(profile)
         return Response(serializer.data)

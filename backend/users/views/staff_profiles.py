@@ -243,7 +243,7 @@ class StaffProfileDetail(APIView):
 
     def get(self, request, pk):
         """Get staff profile detail"""
-        profile = ProfileService.get_staff_profile(pk)
+        profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileSerializer(profile)
         return Response(serializer.data)
 
@@ -345,6 +345,20 @@ class StaffProfileProjects(APIView):
 
     def get(self, request, pk):
         """Get all projects for a staff profile, excluding hidden ones"""
+        # Check if the user's staff profile is hidden
+        profile = ProfileService.get_staff_profile_by_user(pk)
+        if profile and profile.is_hidden:
+            is_owner = (
+                request.user and not request.user.is_anonymous and request.user.id == pk
+            )
+            is_admin = (
+                request.user
+                and hasattr(request.user, "is_superuser")
+                and request.user.is_superuser
+            )
+            if not is_owner and not is_admin:
+                raise NotFound
+
         try:
             users_memberships = (
                 ProjectMember.objects.filter(user=pk)
@@ -376,7 +390,7 @@ class StaffProfileProjects(APIView):
         serialized_projects = ProjectDataTableSerializer(
             [proj for proj, _ in projects_with_roles],
             many=True,
-            context={"request": request},
+            context={"request": request, "projects_with_roles": projects_with_roles},
         )
 
         return Response(serialized_projects.data, status=HTTP_200_OK)
@@ -395,6 +409,11 @@ class PublicEmailStaffMember(APIView):
 
         try:
             staff_profile = PublicStaffProfile.objects.get(user__pk=pk)
+
+            # Block emailing hidden profiles
+            if staff_profile.is_hidden:
+                return Response({"error": "Staff profile not found"}, status=404)
+
             recipient_name = f"{staff_profile.user.display_first_name} {staff_profile.user.display_last_name}"
 
             # Use public email if available, otherwise use IT asset email

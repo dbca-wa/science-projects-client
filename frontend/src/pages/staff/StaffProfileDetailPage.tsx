@@ -3,11 +3,14 @@ import { useStaffProfileHero } from "@/features/staff-profiles/hooks/useStaffPro
 import { useCurrentUser } from "@/features/auth";
 import { Loader2, ChevronLeft, Eye } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Tooltip,
+	TooltipTrigger,
+	TooltipContent,
+} from "@/shared/components/ui/tooltip";
 import { useState } from "react";
 import StaffHero from "@/features/staff-profiles/components/detail/StaffHero";
 import StaffContentTabs from "@/features/staff-profiles/components/detail/StaffContentTabs";
-import ResponsiveModal from "@/features/staff-profiles/components/modals/ResponsiveModal";
-import { useToggleVisibility } from "@/features/staff-profiles/hooks/useStaffProfileMutations";
 
 const StaffProfileDetailPage = () => {
 	const { staffProfilePk } = useParams<{ staffProfilePk: string }>();
@@ -15,8 +18,6 @@ const StaffProfileDetailPage = () => {
 	const pk = Number(staffProfilePk);
 	const { data: user } = useCurrentUser();
 	const { data: heroData, isLoading, isError } = useStaffProfileHero(pk);
-	const toggleVisibility = useToggleVisibility(pk);
-	const [toggleOpen, setToggleOpen] = useState(false);
 	const [buttonsVisible, setButtonsVisible] = useState(false);
 
 	if (isLoading) {
@@ -95,25 +96,27 @@ const StaffProfileDetailPage = () => {
 						editButton={
 							canEdit ? (
 								<div className="flex items-center gap-2">
-									{buttonsVisible && (
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => setToggleOpen(true)}
-										>
-											{heroData.about ? "Hide" : "Show"} Profile
-										</Button>
-									)}
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => setButtonsVisible((v) => !v)}
-										className={`gap-1 ${buttonsVisible ? "bg-green-50 border-green-300 text-green-700" : ""}`}
-										aria-pressed={buttonsVisible}
-									>
-										<Eye className="size-4" />
-										{buttonsVisible ? "Editing" : "Edit"}
-									</Button>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() => setButtonsVisible((v) => !v)}
+												className={`gap-1 ${buttonsVisible ? "bg-green-50 border-green-300 text-green-700" : ""}`}
+												aria-pressed={buttonsVisible}
+											>
+												<Eye className="size-4" />
+												{buttonsVisible ? "Editing" : "Edit"}
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent variant="light">
+											<p>
+												{buttonsVisible
+													? "Exit edit mode"
+													: "Toggle to make changes"}
+											</p>
+										</TooltipContent>
+									</Tooltip>
 								</div>
 							) : undefined
 						}
@@ -126,33 +129,6 @@ const StaffProfileDetailPage = () => {
 					/>
 				</div>
 			</div>
-
-			<ResponsiveModal
-				title="Toggle Profile Visibility"
-				open={toggleOpen}
-				onOpenChange={setToggleOpen}
-				maxWidth="sm:max-w-[400px]"
-			>
-				<p className="text-sm text-muted-foreground mb-4">
-					Are you sure you want to change this profile's visibility? This will
-					affect whether it appears in the public directory.
-				</p>
-				<div className="flex justify-end gap-2">
-					<Button variant="outline" onClick={() => setToggleOpen(false)}>
-						Cancel
-					</Button>
-					<Button
-						onClick={() =>
-							toggleVisibility.mutate(undefined, {
-								onSuccess: () => setToggleOpen(false),
-							})
-						}
-						disabled={toggleVisibility.isPending}
-					>
-						{toggleVisibility.isPending ? "Updating..." : "Confirm"}
-					</Button>
-				</div>
-			</ResponsiveModal>
 		</main>
 	);
 };

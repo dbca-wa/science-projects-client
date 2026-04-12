@@ -6,13 +6,13 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 	return (
 		<div className="flex h-16.25 w-full flex-row items-center justify-between gap-2 bg-[#2d2f32] p-2 text-white dark:bg-slate-950">
-			<div className="flex justify-start px-8">
+			<a href="/staff" className="flex justify-start px-8 cursor-pointer">
 				<img
 					src={"/logo.svg"}
 					className="w-60 p-6"
-					alt="Department of Biodiversity, Conservation and Attractions"
+					alt="Department of Biodiversity, Conservation and Attractions - Back to Staff Directory"
 				/>
-			</div>
+			</a>
 			{isLoggedIn && (
 				<div className="flex justify-end pr-4">
 					<a
@@ -32,11 +32,13 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 	return (
 		<div className="flex h-16.25 w-full items-center justify-between gap-2 bg-[#2d2f32] p-2 px-5 text-white dark:bg-slate-950">
-			<img
-				src={"/logo.svg"}
-				className="w-47.5 select-none"
-				alt="Department of Biodiversity, Conservation and Attractions"
-			/>
+			<a href="/staff" className="cursor-pointer">
+				<img
+					src={"/logo.svg"}
+					className="w-47.5 select-none"
+					alt="Department of Biodiversity, Conservation and Attractions - Back to Staff Directory"
+				/>
+			</a>
 			{isLoggedIn && (
 				<a
 					href={VITE_PRODUCTION_BASE_URL ?? "/"}

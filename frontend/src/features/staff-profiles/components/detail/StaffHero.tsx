@@ -6,7 +6,12 @@ import { useCurrentUser } from "@/features/auth";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { ChevronLeft, Mail } from "lucide-react";
+import {
+	Tooltip,
+	TooltipTrigger,
+	TooltipContent,
+} from "@/shared/components/ui/tooltip";
+import { ChevronLeft, Mail, EyeOff, Eye } from "lucide-react";
 import { useMediaQuery } from "@/shared/hooks/ui/useMediaQuery";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import EmailStaffModal from "../modals/EmailStaffModal";
@@ -36,7 +41,10 @@ const StaffHero = ({
 	const [imgError, setImgError] = useState(false);
 
 	const isOwner = !!currentUser && currentUser.id === userId;
+	const isAdmin = !!currentUser && currentUser.is_superuser === true;
 	const showEmailButton = !isOwner;
+	const isHidden = data?.is_hidden === true;
+	const showVisibilityControls = isOwner || (isAdmin && !isOwner);
 
 	if (isLoading) {
 		return (
@@ -109,14 +117,21 @@ const StaffHero = ({
 		return (
 			<div className="mb-2">
 				<div className="flex items-center justify-between px-4 py-3">
-					<Button
-						variant="link"
-						className="text-slate-800 gap-1 p-0"
-						onClick={() => navigate("/staff")}
-					>
-						<ChevronLeft className="size-4" />
-						Back
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="link"
+								className="text-[#2A6096] hover:text-[#1d4a73] gap-1.5 p-0 font-medium"
+								onClick={() => navigate("/staff")}
+							>
+								<ChevronLeft className="size-4" />
+								Back
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent variant="light">
+							<p>Return to staff directory</p>
+						</TooltipContent>
+					</Tooltip>
 					{editButton && <div>{editButton}</div>}
 				</div>
 				{avatarUrl && (
@@ -150,14 +165,59 @@ const StaffHero = ({
 				</div>
 				{showEmailButton && (
 					<div className="mt-2 flex justify-center">
-						<Button
-							variant="link"
-							className="text-blue-600 gap-1"
-							onClick={() => setEmailOpen(true)}
-						>
-							<Mail className="size-4" />
-							Email {displayName}
-						</Button>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="link"
+									className="text-blue-600 gap-1"
+									onClick={() => setEmailOpen(true)}
+								>
+									<Mail className="size-4" />
+									Email {displayName}
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent variant="light">
+								<p>Send an email to this person</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
+				)}
+				{showVisibilityControls && (
+					<div className="mt-3 flex flex-col items-center gap-2">
+						{isHidden && (
+							<div className="flex items-center gap-1.5 text-amber-600">
+								<EyeOff className="size-4" aria-hidden="true" />
+								<span className="text-sm font-medium">
+									{isOwner
+										? "Your profile is hidden from the public"
+										: "This profile is hidden from the public"}
+								</span>
+							</div>
+						)}
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="outline"
+									size="sm"
+									className="gap-1.5"
+									onClick={() => setToggleOpen(true)}
+								>
+									{isHidden ? (
+										<Eye className="size-4" aria-hidden="true" />
+									) : (
+										<EyeOff className="size-4" aria-hidden="true" />
+									)}
+									{isHidden ? "Show Profile" : "Hide Profile"}
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent variant="light">
+								<p>
+									{isHidden
+										? "Make profile visible in the public directory"
+										: "Hide profile from the public directory"}
+								</p>
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				)}
 				{modals}
@@ -169,14 +229,21 @@ const StaffHero = ({
 		<div className="mb-2 px-4">
 			<div className="mt-6 flex flex-col">
 				<div className="flex items-center justify-between">
-					<Button
-						variant="link"
-						className="-ml-2 text-slate-800 gap-1 w-fit"
-						onClick={() => navigate("/staff")}
-					>
-						<ChevronLeft className="size-4" />
-						Back to Search
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="link"
+								className="-ml-2 text-[#2A6096] hover:text-[#1d4a73] gap-1.5 w-fit font-medium"
+								onClick={() => navigate("/staff")}
+							>
+								<ChevronLeft className="size-4" />
+								Back to Search
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent variant="light">
+							<p>Return to staff directory</p>
+						</TooltipContent>
+					</Tooltip>
 					{editButton && <div>{editButton}</div>}
 				</div>
 				<div className="mt-4 flex">
@@ -210,14 +277,59 @@ const StaffHero = ({
 						)}
 						{showEmailButton && (
 							<div className="mt-3">
-								<Button
-									variant="link"
-									className="p-0 h-auto text-blue-600 gap-1 -ml-3"
-									onClick={() => setEmailOpen(true)}
-								>
-									<Mail className="size-4" />
-									Email {displayName}
-								</Button>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="link"
+											className="p-0 h-auto text-blue-600 gap-1 -ml-3"
+											onClick={() => setEmailOpen(true)}
+										>
+											<Mail className="size-4" />
+											Email {displayName}
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent variant="light">
+										<p>Send an email to this person</p>
+									</TooltipContent>
+								</Tooltip>
+							</div>
+						)}
+						{showVisibilityControls && (
+							<div className="mt-3 flex items-center gap-3">
+								{isHidden && (
+									<div className="flex items-center gap-1.5 text-amber-600">
+										<EyeOff className="size-4" aria-hidden="true" />
+										<span className="text-sm font-medium">
+											{isOwner
+												? "Your profile is hidden from the public"
+												: "This profile is hidden from the public"}
+										</span>
+									</div>
+								)}
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="outline"
+											size="sm"
+											className="gap-1.5"
+											onClick={() => setToggleOpen(true)}
+										>
+											{isHidden ? (
+												<Eye className="size-4" aria-hidden="true" />
+											) : (
+												<EyeOff className="size-4" aria-hidden="true" />
+											)}
+											{isHidden ? "Show Profile" : "Hide Profile"}
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent variant="light">
+										<p>
+											{isHidden
+												? "Make profile visible in the public directory"
+												: "Hide profile from the public directory"}
+										</p>
+									</TooltipContent>
+								</Tooltip>
 							</div>
 						)}
 					</div>

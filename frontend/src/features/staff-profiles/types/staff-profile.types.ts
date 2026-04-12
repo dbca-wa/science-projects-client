@@ -58,6 +58,7 @@ export interface IStaffProfileHeroData {
 	} | null;
 	about: string | null;
 	employee_id: string | null;
+	is_hidden: boolean;
 	it_asset_data: {
 		title: string | null;
 		unit: string | null;

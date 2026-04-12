@@ -51,7 +51,7 @@ const PublicationsSection = ({ employeeId }: PublicationsSectionProps) => {
 			</p>
 			<Separator className="mt-2 mb-3 bg-slate-200" />
 			{docs.length === 0 ? (
-				<p className="text-muted-foreground">No publications found.</p>
+				<p className="text-muted-foreground">No information recorded.</p>
 			) : (
 				<div className="space-y-6 mt-3">
 					{years.map((year) => (

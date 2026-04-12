@@ -54,7 +54,11 @@ export const useToggleVisibility = (pk: number) => {
 			queryClient.invalidateQueries({
 				queryKey: ["staffProfiles", "detail", pk],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["staffProfiles", "hero", pk],
+			});
 			queryClient.invalidateQueries({ queryKey: ["staffProfiles"] });
+			queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
 		},
 	});
 };
