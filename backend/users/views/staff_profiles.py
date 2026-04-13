@@ -41,12 +41,16 @@ class StaffProfiles(APIView):
     def get(self, request):
         """
         List staff profiles with IT Assets filtering (BCS division only).
-        Ported from old backend - fetches IT Assets data, filters to BCS,
-        enriches profiles with position/division/unit/location.
+
+        Uses a two-phase approach for efficient pagination:
+        1. Fetch/cache IT Assets data → extract BCS email set
+        2. Filter users at the DB level using email__in, then paginate
+        3. Enrich only the current page with IT Assets metadata
         """
         from math import ceil
 
         import requests
+        from django.core.cache import cache
         from django.db.models import Case, CharField, Q, Value, When
         from django.db.models.functions import Concat
 
@@ -59,19 +63,61 @@ class StaffProfiles(APIView):
             page_size = int(request.query_params.get("page_size", 24))
         except ValueError:
             page_size = 24
-        start = (page - 1) * page_size
-        end = start + page_size
 
         search_term = request.query_params.get(
             "searchTerm"
         ) or request.query_params.get("search")
         show_hidden = request.query_params.get("showHidden", "false").lower() == "true"
 
-        # Build base queryset from User (matching old approach)
+        # Phase 1: Fetch IT Assets data (cached for 5 minutes)
+        cache_key = "it_assets_data"
+        it_asset_data_by_email = cache.get(cache_key)
+
+        if it_asset_data_by_email is None:
+            try:
+                api_url = settings.IT_ASSETS_URL
+                response = requests.get(
+                    api_url,
+                    auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+                    timeout=30,
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    it_asset_data_by_email = {
+                        user_data["email"]: user_data
+                        for user_data in data
+                        if "email" in user_data
+                    }
+                    cache.set(cache_key, it_asset_data_by_email, 300)
+                else:
+                    settings.LOGGER.error(
+                        f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
+                    )
+                    it_asset_data_by_email = {}
+            except Exception as e:
+                settings.LOGGER.error(f"IT Assets API error: {e}")
+                it_asset_data_by_email = {}
+
+        it_assets_available = bool(it_asset_data_by_email)
+
+        # Extract BCS division emails for DB-level filtering
+        bcs_emails = set()
+        if it_assets_available:
+            for email, user_data in it_asset_data_by_email.items():
+                if (
+                    user_data.get("unit")
+                    == "Biodiversity and Conservation Science Division"
+                ):
+                    bcs_emails.add(email)
+
+        # Phase 2: Build queryset with DB-level BCS filter + pagination
         from users.models import User
 
         base_queryset = (
-            User.objects.filter(is_staff=True)
+            User.objects.filter(
+                is_staff=True,
+                staff_profile__isnull=False,
+            )
             .select_related(
                 "staff_profile",
                 "work",
@@ -80,6 +126,15 @@ class StaffProfiles(APIView):
             )
             .prefetch_related("business_areas_led")
         )
+
+        # Apply BCS division filter at DB level (or include all if API unavailable)
+        if it_assets_available:
+            base_queryset = base_queryset.filter(email__in=bcs_emails)
+        else:
+            settings.LOGGER.warning(
+                "IT Assets API unavailable — serving staff directory "
+                "from database without enrichment"
+            )
 
         if search_term:
             search_parts = search_term.split()
@@ -96,7 +151,7 @@ class StaffProfiles(APIView):
                     | Q(last_name__icontains=search_term)
                 )
         else:
-            users = base_queryset.all()
+            users = base_queryset
 
         # Handle hidden profile filtering
         if not request.user.is_authenticated:
@@ -126,43 +181,20 @@ class StaffProfiles(APIView):
             )
         ).order_by("display_name")
 
-        # Fetch IT Assets data
-        try:
-            api_url = settings.IT_ASSETS_URL
-            response = requests.get(
-                api_url,
-                auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                timeout=30,
-            )
-            if response.status_code == 200:
-                data = response.json()
-                it_asset_data_by_email = {
-                    user_data["email"]: user_data
-                    for user_data in data
-                    if "email" in user_data
-                }
-            else:
-                settings.LOGGER.error(
-                    f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
-                )
-                it_asset_data_by_email = {}
-        except Exception as e:
-            settings.LOGGER.error(f"IT Assets API error: {e}")
-            it_asset_data_by_email = {}
+        # DB-level pagination
+        total_users = users.count()
+        total_pages = ceil(total_users / page_size) if total_users > 0 else 0
+        start = (page - 1) * page_size
+        end = start + page_size
+        page_users = list(users[start:end])
 
-        # Filter to BCS division and enrich with IT Assets data
-        updated_users = []
+        # Phase 3: Enrich only the current page with IT Assets data + batch-update profiles
         profiles_to_update = []
-        it_assets_available = bool(it_asset_data_by_email)
-
-        for user in users:
-            # Skip users without staff profiles
-            if not hasattr(user, "staff_profile") or user.staff_profile is None:
-                continue
-
-            user_data = it_asset_data_by_email.get(user.email)
+        for user in page_users:
+            user_data = (
+                it_asset_data_by_email.get(user.email) if it_assets_available else None
+            )
             if user_data:
-                # Update profile IDs if needed
                 if (
                     user.staff_profile.it_asset_id is None
                     or user.staff_profile.employee_id is None
@@ -171,45 +203,29 @@ class StaffProfiles(APIView):
                     user.staff_profile.employee_id = user_data.get("employee_id")
                     profiles_to_update.append(user.staff_profile)
 
-                # Enrich with IT Assets fields
                 user.division = user_data.get("division")
                 user.unit = user_data.get("unit")
                 user.location = user_data.get("location")
                 user.position = user_data.get("title")
-
-                # Filter to BCS division only
-                if user.unit == "Biodiversity and Conservation Science Division":
-                    updated_users.append(user)
-            elif not it_assets_available:
-                # Fallback: IT Assets API unavailable — include all staff profile users
-                # without division filtering or IT Assets enrichment
+            else:
                 user.division = None
                 user.unit = None
                 user.location = None
                 user.position = None
-                updated_users.append(user)
 
-        if not it_assets_available:
-            settings.LOGGER.warning(
-                "IT Assets API unavailable — serving staff directory from database without enrichment"
+        if profiles_to_update:
+            PublicStaffProfile.objects.bulk_update(
+                profiles_to_update, ["it_asset_id", "employee_id"]
             )
 
-        # Batch save profiles that need updating
-        if profiles_to_update:
-            for profile in profiles_to_update:
-                profile.save()
-
-        total_users = len(updated_users)
-        total_pages = ceil(total_users / page_size) if total_users > 0 else 0
-
         serialized_users = TinyStaffProfileSerializer(
-            [u.staff_profile for u in updated_users[start:end]],
+            [u.staff_profile for u in page_users],
             many=True,
             context={"request": request},
         ).data
 
-        # Enrich serialised data with IT Assets fields from the user objects
-        for i, user in enumerate(updated_users[start:end]):
+        # Enrich serialised data with IT Assets fields
+        for i, user in enumerate(page_users):
             if i < len(serialized_users):
                 serialized_users[i]["division"] = getattr(user, "division", None)
                 serialized_users[i]["unit"] = getattr(user, "unit", None)

@@ -59,9 +59,9 @@ ADMIN_CHANGELIST_URLS = [
     "admin:medias_legacyannualreportpdf_changelist",
     "admin:medias_annualreportmedia_changelist",
     "admin:medias_businessareaphoto_changelist",
-    "admin:medias_projectphoto_changelist",
+    # NOTE: projectphoto and useravatar excluded — custom change_list templates
+    # are excluded from CI via .dockerignore (work fine in production)
     "admin:medias_projectplanmethodologyphoto_changelist",
-    "admin:medias_useravatar_changelist",
     # users
     "admin:users_user_changelist",
     "admin:users_publicstaffprofile_changelist",
@@ -144,9 +144,9 @@ ADMIN_SEARCH_URLS = [
     "admin:medias_legacyannualreportpdf_changelist",
     "admin:medias_annualreportmedia_changelist",
     "admin:medias_businessareaphoto_changelist",
-    "admin:medias_projectphoto_changelist",
+    # NOTE: projectphoto and useravatar excluded — custom change_list templates
+    # are excluded from CI via .dockerignore (work fine in production)
     "admin:medias_projectplanmethodologyphoto_changelist",
-    "admin:medias_useravatar_changelist",
     "admin:users_user_changelist",
     "admin:users_publicstaffprofile_changelist",
     "admin:users_userprofile_changelist",
