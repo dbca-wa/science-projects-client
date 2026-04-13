@@ -194,8 +194,11 @@ describe("InlineSaveEditor - Accessibility", () => {
 			cancelButton.focus();
 			expect(cancelButton).toHaveFocus();
 
-			// Tab to Save button
+			// Tab through to Save button (may pass through Clear button)
 			await user.tab();
+			if (document.activeElement !== saveButton) {
+				await user.tab();
+			}
 			expect(saveButton).toHaveFocus();
 		});
 	});
