@@ -409,12 +409,16 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 0.25rem;
 	padding: 0.75rem;
 	border: none; /* No border - parent container handles it */
 	border-bottom: 2px solid hsl(var(--border)); /* Only bottom border for visual separation */
 	background-color: hsl(var(--muted) / 0.5);
 	box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.editor-toolbar-group {
+	display: contents;
 }
 
 .dark .editor-toolbar {
@@ -841,4 +845,9 @@
 .editor-input-display .editor-link:hover,
 .editor-readonly .editor-link:hover {
 	color: #2563eb;
+}
+
+/* Hide word counter and other siblings when the inline link panel is open */
+.editor-container[data-link-panel-open] + * {
+	display: none !important;
 }

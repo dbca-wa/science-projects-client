@@ -54,9 +54,9 @@ const ResponsiveModal = ({
 
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
-			<DrawerContent className="p-4">
+			<DrawerContent className="px-2 pb-4">
 				<DrawerDescription className="sr-only">{title}</DrawerDescription>
-				<div className="mx-auto w-full max-w-sm text-slate-800">
+				<div className="w-full text-slate-800">
 					<DrawerHeader>
 						<DrawerTitle className="mb-2 mt-3">{title}</DrawerTitle>
 					</DrawerHeader>

@@ -94,7 +94,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 			mode === "full" || isProfileMode || mode === "projectTitle";
 		const showIndentOutdent = mode === "full";
 		const showAlignment = mode === "full";
-		const showStrikethrough = mode === "full";
+		const showStrikethrough = false; // Disabled for now
+		// const showStrikethrough = mode === "full";
 		const showTable = mode === "full";
 
 		// Cycle through alignment options

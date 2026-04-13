@@ -43,6 +43,9 @@ export interface RichTextEditorProps {
 	"aria-label"?: string;
 	"aria-describedby"?: string;
 	"aria-invalid"?: boolean;
+
+	// Link panel state callback
+	onLinkPanelChange?: (isOpen: boolean) => void;
 }
 
 export interface RichTextDisplayProps {

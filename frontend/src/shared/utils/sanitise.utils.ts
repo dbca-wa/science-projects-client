@@ -143,6 +143,19 @@ export function sanitizeUrl(url: string): string {
 			return "";
 		}
 
+		// For http/https URLs, validate hostname has a TLD (at least one dot)
+		if (urlObj.protocol === "http:" || urlObj.protocol === "https:") {
+			const hostname = urlObj.hostname;
+			if (!hostname.includes(".") || hostname.endsWith(".")) {
+				return "";
+			}
+			// TLD must be at least 2 characters
+			const tld = hostname.split(".").pop() || "";
+			if (tld.length < 2) {
+				return "";
+			}
+		}
+
 		return urlObj.href;
 	} catch {
 		// If URL parsing fails, it's not a valid URL

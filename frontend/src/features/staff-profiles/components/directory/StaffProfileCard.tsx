@@ -59,6 +59,7 @@ const StaffProfileCard = ({ profile }: StaffProfileCardProps) => {
 					navigate(`/staff/${profile.id}`);
 				}}
 				className="p-5 flex-1 cursor-pointer"
+				draggable={false}
 			>
 				{/* Avatar + name row */}
 				<div className="flex items-center gap-3 mb-4">
