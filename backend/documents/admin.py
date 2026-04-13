@@ -177,6 +177,8 @@ def populate_aims_and_context(model_admin, req, selected):
 class AnnualReportAdmin(admin.ModelAdmin):
     list_display = ("pk", "year", "is_published", "pdf_generation_in_progress", "pdf")
 
+    search_fields = ["year"]
+
     ordering = ["year"]
 
 

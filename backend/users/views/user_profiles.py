@@ -157,7 +157,14 @@ class UpdateProfile(APIView):
             # Get or create avatar
             avatar, created = UserAvatar.objects.get_or_create(user=user)
             avatar.file = image_file
-            avatar.save()
+            try:
+                avatar.save()
+            except Exception as e:
+                error_msg = str(e)
+                return Response(
+                    {"error": f"Image upload failed: {error_msg}"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
 
         # Return updated data
         serializer = UpdateProfileSerializer(staff_profile)

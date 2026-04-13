@@ -167,3 +167,19 @@ class AdminTaskAdmin(admin.ModelAdmin):
         "reason",
         "project",
     ]
+
+    search_fields = [
+        "requester__username",
+        "action",
+        "project__title",
+    ]
+
+    list_filter = [
+        "status",
+        "action",
+    ]
+
+    ordering = ["-created_at"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("requester", "project")

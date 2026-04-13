@@ -236,6 +236,7 @@ class ProjectMemberAdmin(admin.ModelAdmin):
     list_display = [
         "user",
         "is_leader",
+        "role",
         "project",
     ]
 
@@ -249,6 +250,8 @@ class ProjectMemberAdmin(admin.ModelAdmin):
         "role",
     ]
 
+    ordering = ["project__title"]
+
     actions = [
         convert_ext_peer_to_consulted,
         convert_ext_collaborator_to_consulted,
@@ -256,114 +259,131 @@ class ProjectMemberAdmin(admin.ModelAdmin):
         report_orphaned_data,
     ]
 
-    @admin.register(ProjectDetail)
-    class ProjectDetailAdmin(admin.ModelAdmin):
-        list_display = [
-            "project",
-            "creator",
-            "modifier",
-            "owner",
-        ]
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("user", "project")
 
-        search_fields = [
-            "project__title",
-        ]
 
-        ordering = ["project__title"]
+@admin.register(ProjectDetail)
+class ProjectDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        "project",
+        "creator",
+        "modifier",
+        "owner",
+    ]
 
-    @admin.register(StudentProjectDetails)
-    class StudentProjectDetailAdmin(admin.ModelAdmin):
-        # kind = ProjectCategorySerializer()
-        list_display = [
-            "project",
-            "level",
-            "organisation",
-        ]
+    search_fields = [
+        "project__title",
+    ]
 
-        search_fields = [
-            "project__title",
-        ]
+    ordering = ["project__title"]
 
-        list_filter = [
-            "level",
-        ]
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("project", "creator", "modifier", "owner")
+        )
 
-        ordering = ["project__title"]
 
-    @admin.action(description="Dupe description on empty")
-    def update_external_description_with_project_description_if_empty(
-        model_admin, req, selected
-    ):
-        if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
-            return
+@admin.register(StudentProjectDetails)
+class StudentProjectDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        "project",
+        "level",
+        "organisation",
+    ]
 
-        updated_count = 0
+    search_fields = [
+        "project__title",
+    ]
 
-        sections_to_populate = [
-            None,
-            "",
-            "<p></p>",
-            '<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;"></span></p>',
-        ]
-        # Update the role for all matching users
-        exts = ExternalProjectDetails.objects.all()
-        for obj in exts:
-            if obj.description in sections_to_populate:
-                # Fetch the related project
-                project_description = obj.project.description
+    list_filter = [
+        "level",
+    ]
 
-                # Update the description field if needed
-                if project_description:
-                    obj.description = project_description
-                    obj.save()
-                    updated_count += 1
-        model_admin.message_user(req, f"Successfully updated {updated_count} projects.")
+    ordering = ["project__title"]
+
+
+@admin.action(description="Dupe description on empty")
+def update_external_description_with_project_description_if_empty(
+    model_admin, req, selected
+):
+    if len(selected) > 1:
+        print("PLEASE SELECT ONLY ONE")
         return
 
-    @admin.action(
-        description="Create ExternalProjectDetails for external projects without details"
-    )
-    def create_external_details_if_missing(model_admin, req, selected):
-        if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
-            return
+    updated_count = 0
 
-        updated_count = 0
-        queryset = Project.objects.filter(
-            kind=Project.CategoryKindChoices.EXTERNAL
-        ).all()
-        # Iterate over the selected projects
-        for project in queryset:
-            # Check if an ExternalProjectDetails instance already exists for this project
-            if not hasattr(project, "external_project_info"):
-                # Create a new ExternalProjectDetails instance
-                ExternalProjectDetails.objects.create(
-                    project=project,
-                )
+    sections_to_populate = [
+        None,
+        "",
+        "<p></p>",
+        '<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;"></span></p>',
+    ]
+    # Update the role for all matching users
+    exts = ExternalProjectDetails.objects.all()
+    for obj in exts:
+        if obj.description in sections_to_populate:
+            # Fetch the related project
+            project_description = obj.project.description
+
+            # Update the description field if needed
+            if project_description:
+                obj.description = project_description
+                obj.save()
                 updated_count += 1
-        model_admin.message_user(req, f"Successfully updated {updated_count} projects.")
+    model_admin.message_user(req, f"Successfully updated {updated_count} projects.")
+    return
 
-    @admin.register(ExternalProjectDetails)
-    class ExternalProjectDetailAdmin(admin.ModelAdmin):
-        list_display = [
-            "pk",
-            "project",
-            "collaboration_with",
-            "budget",
-            "description",
-        ]
 
-        search_fields = [
-            "project__title",
-            "pk",
-        ]
+@admin.action(
+    description="Create ExternalProjectDetails for external projects without details"
+)
+def create_external_details_if_missing(model_admin, req, selected):
+    if len(selected) > 1:
+        print("PLEASE SELECT ONLY ONE")
+        return
 
-        list_filter = [
-            "collaboration_with",
-        ]
+    updated_count = 0
+    queryset = Project.objects.filter(kind=Project.CategoryKindChoices.EXTERNAL).all()
+    # Iterate over the selected projects
+    for project in queryset:
+        # Check if an ExternalProjectDetails instance already exists for this project
+        if not hasattr(project, "external_project_info"):
+            # Create a new ExternalProjectDetails instance
+            ExternalProjectDetails.objects.create(
+                project=project,
+            )
+            updated_count += 1
+    model_admin.message_user(req, f"Successfully updated {updated_count} projects.")
 
-        ordering = ["project__title"]
+
+@admin.register(ExternalProjectDetails)
+class ExternalProjectDetailAdmin(admin.ModelAdmin):
+    list_display = [
+        "pk",
+        "project",
+        "collaboration_with",
+        "budget",
+        "description",
+    ]
+
+    search_fields = [
+        "project__title",
+        "pk",
+    ]
+
+    list_filter = [
+        "collaboration_with",
+    ]
+
+    ordering = ["project__title"]
+
+    actions = [
+        update_external_description_with_project_description_if_empty,
+        create_external_details_if_missing,
+    ]
 
 
 # endregion ==============================================

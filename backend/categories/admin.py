@@ -10,6 +10,8 @@ class ProjectCategoryAdmin(admin.ModelAdmin):
         "kind",
     ]
 
+    search_fields = ["name"]
+
     list_filter = [
         "kind",
     ]

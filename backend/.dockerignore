@@ -1,3 +1,9 @@
+media_audit/
+templates/admin/medias/projectphoto/change_list.html
+templates/admin/medias/useravatar/change_list.html
+medias/management/commands/audit_media_files.py
+
+
 # Git and version control
 .git/
 .github/
