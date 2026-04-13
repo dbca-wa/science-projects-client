@@ -1,16 +1,16 @@
 """
-Redis Cache Configuration for SPMS Backend
+Cache Configuration for SPMS Backend
 
-This module configures application-level caching using Redis and Django's cache framework.
+This module configures application-level caching using Django's cache framework.
+
+Cache backends (in order of preference):
+1. Redis (if REDIS_URL is set and reachable): Shared across all Gunicorn workers
+2. LocMemCache (fallback): Per-process in-memory cache, no infrastructure needed
+3. DummyCache (tests only): No-op cache for test isolation
 
 Note: Organisational Edge proxy (Nginx/Varnish/Fastly) handles HTTP-level caching.
-This Redis cache is for application-level caching of user-specific data that cannot
-be cached at the HTTP level.
-
-Redis is optional:
-- If REDIS_URL is set and Redis is reachable: Caching and throttling enabled
-- If Redis unavailable: Caching and throttling disabled (graceful degradation)
-- Tests always use dummy cache (no Redis required)
+This cache is for application-level caching (e.g., IT Assets API responses) that
+cannot be cached at the HTTP level.
 """
 
 import logging
@@ -24,12 +24,12 @@ REDIS_AVAILABLE = False
 
 def get_cache_config():
     """
-    Get cache configuration - Redis if available, dummy cache otherwise.
+    Get cache configuration based on environment.
 
-    Behavior:
-    - Tests: Always use dummy cache (no Redis needed)
-    - Production/Staging/Development: Use Redis if REDIS_URL set and connectable
-    - If Redis unavailable: Use dummy cache and log clearly
+    Priority:
+    - Tests: Always dummy cache (no caching, test isolation)
+    - Redis available: Shared cache across all workers (best performance)
+    - No Redis: LocMemCache per worker (still caches IT Assets etc.)
 
     Sets global REDIS_AVAILABLE flag for other components (e.g., throttling).
 
@@ -88,7 +88,7 @@ def get_cache_config():
             }
         except Exception as e:
             logger.warning(f"CACHE: Redis connection failed ({redis_url}): {e}")
-            logger.warning("CACHE: Caching DISABLED (Redis unavailable)")
+            logger.warning("CACHE: Falling back to in-memory cache (per-worker)")
             logger.warning("CACHE: Rate limiting DISABLED (Redis unavailable)")
             if environment in ["staging", "production"]:
                 logger.warning(
@@ -98,19 +98,17 @@ def get_cache_config():
             REDIS_AVAILABLE = False
     else:
         logger.info("CACHE: REDIS_URL not set")
-        logger.info("CACHE: Caching DISABLED (no Redis configured)")
+        logger.info("CACHE: Using in-memory cache (per-worker, no Redis needed)")
         logger.info("CACHE: Rate limiting DISABLED (no Redis configured)")
-        if environment in ["staging", "production"]:
-            logger.info(
-                f"CACHE: Redis is recommended for {environment}. "
-                "See documentation for setup instructions."
-            )
         REDIS_AVAILABLE = False
 
-    # Use dummy cache when Redis unavailable
+    # Use in-memory cache when Redis unavailable — still caches within each
+    # Gunicorn worker process (IT Assets API, etc.), just not shared across workers
     return {
         "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "spms-locmem",
+            "TIMEOUT": 300,  # 5 minutes default TTL
         }
     }
 
