@@ -153,6 +153,7 @@ class StaffProfiles(APIView):
         # Filter to BCS division and enrich with IT Assets data
         updated_users = []
         profiles_to_update = []
+        it_assets_available = bool(it_asset_data_by_email)
 
         for user in users:
             # Skip users without staff profiles
@@ -179,6 +180,19 @@ class StaffProfiles(APIView):
                 # Filter to BCS division only
                 if user.unit == "Biodiversity and Conservation Science Division":
                     updated_users.append(user)
+            elif not it_assets_available:
+                # Fallback: IT Assets API unavailable — include all staff profile users
+                # without division filtering or IT Assets enrichment
+                user.division = None
+                user.unit = None
+                user.location = None
+                user.position = None
+                updated_users.append(user)
+
+        if not it_assets_available:
+            settings.LOGGER.warning(
+                "IT Assets API unavailable — serving staff directory from database without enrichment"
+            )
 
         # Batch save profiles that need updating
         if profiles_to_update:

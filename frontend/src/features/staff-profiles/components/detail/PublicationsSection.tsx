@@ -8,7 +8,7 @@ interface PublicationsSectionProps {
 }
 
 const PublicationsSection = ({ employeeId }: PublicationsSectionProps) => {
-	const { data, isLoading } = usePublications(employeeId ?? null);
+	const { data, isLoading, isError } = usePublications(employeeId ?? null);
 
 	if (isLoading) {
 		return (
@@ -16,6 +16,18 @@ const PublicationsSection = ({ employeeId }: PublicationsSectionProps) => {
 				{Array.from({ length: 4 }).map((_, i) => (
 					<Skeleton key={i} className="h-12 w-full" />
 				))}
+			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<div className="w-full p-4">
+				<p className="text-lg font-semibold text-slate-900">Publications</p>
+				<Separator className="mt-2 mb-3 bg-slate-200" />
+				<p className="text-muted-foreground">
+					Unable to load publications at this time. Please try again later.
+				</p>
 			</div>
 		);
 	}

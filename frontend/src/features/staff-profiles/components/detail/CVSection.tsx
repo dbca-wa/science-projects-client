@@ -41,7 +41,7 @@ const CVSection = ({ profilePk, canEdit }: CVSectionProps) => {
 
 	const currentYear = new Date().getFullYear();
 	const formatYear = (value: number | null) => {
-		if (!value || currentYear <= value) return "Present";
+		if (!value || currentYear < value) return "Present";
 		return `${value}`;
 	};
 
@@ -230,7 +230,7 @@ const CVSection = ({ profilePk, canEdit }: CVSectionProps) => {
 									</p>
 								</div>
 								<span className="shrink-0 text-xs font-semibold text-[#2A6096] bg-[#2A6096]/10 px-2 py-0.5 rounded">
-									{formatYear(entry.end_year)}
+									{entry.end_year}
 								</span>
 								{canEdit && (
 									<div className="flex gap-1 shrink-0">
