@@ -17,7 +17,7 @@ import { $isLinkNode } from "@lexical/link";
 import { Link as LinkIcon } from "lucide-react";
 import type { LinkButtonProps } from "@/shared/types/editor.types";
 import { BaseToolbarButton } from "./BaseToolbarButton";
-import { useLinkEditor } from "./LinkEditorContext";
+import { useLinkEditor } from "./link-editor.utils";
 
 export const LinkButton: React.FC<LinkButtonProps> = ({
 	isActive,

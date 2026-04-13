@@ -20,7 +20,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { toast } from "sonner";
 import { sanitizeUrl } from "@/shared/utils";
-import { useLinkEditor } from "./LinkEditorContext";
+import { useLinkEditor } from "./link-editor.utils";
 import { isInsertDisabled } from "./link-editor.utils";
 
 /**

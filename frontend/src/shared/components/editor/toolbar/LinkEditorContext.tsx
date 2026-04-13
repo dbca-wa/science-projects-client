@@ -1,10 +1,4 @@
-import {
-	createContext,
-	useContext,
-	useState,
-	useCallback,
-	type ReactNode,
-} from "react";
+import { createContext, useState, useCallback, type ReactNode } from "react";
 import type { RangeSelection } from "lexical";
 
 interface LinkEditorState {
@@ -107,8 +101,5 @@ export function LinkEditorProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-export function useLinkEditor() {
-	const ctx = useContext(LinkEditorContext);
-	if (!ctx) return null;
-	return ctx;
-}
+// Context exported for use by useLinkEditor hook in link-editor.utils.ts
+export { LinkEditorContext };

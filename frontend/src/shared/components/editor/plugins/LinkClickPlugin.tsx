@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getSelection, $isRangeSelection } from "lexical";
 import { $isLinkNode, $isAutoLinkNode } from "@lexical/link";
-import { useLinkEditor } from "../toolbar/LinkEditorContext";
+import { useLinkEditor } from "../toolbar/link-editor.utils";
 
 export function LinkClickPlugin() {
 	const [editor] = useLexicalComposerContext();

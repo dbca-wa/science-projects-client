@@ -40,7 +40,8 @@ import { RemoveEmptyListItemsPlugin } from "./plugins/RemoveEmptyListItemsPlugin
 import { EditorStoreIntegrationPlugin } from "./plugins/EditorStoreIntegrationPlugin";
 import { MoveCursorToEndPlugin } from "./plugins/MoveCursorToEndPlugin";
 import { Toolbar } from "./toolbar/Toolbar";
-import { LinkEditorProvider, useLinkEditor } from "./toolbar/LinkEditorContext";
+import { LinkEditorProvider } from "./toolbar/LinkEditorContext";
+import { useLinkEditor } from "./toolbar/link-editor.utils";
 import { InlineLinkForm } from "./toolbar/InlineLinkForm";
 import { FloatingLinkToolbar } from "./plugins/FloatingLinkToolbar";
 import { LinkClickPlugin } from "./plugins/LinkClickPlugin";

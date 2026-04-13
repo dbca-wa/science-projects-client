@@ -13,3 +13,12 @@ export function isInsertDisabled(
 	if (!hasSelection && linkText.trim() === "") return true;
 	return false;
 }
+
+import { useContext } from "react";
+import { LinkEditorContext } from "./LinkEditorContext";
+
+export function useLinkEditor() {
+	const ctx = useContext(LinkEditorContext);
+	if (!ctx) return null;
+	return ctx;
+}

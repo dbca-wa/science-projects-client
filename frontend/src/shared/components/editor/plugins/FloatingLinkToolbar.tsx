@@ -25,7 +25,7 @@ import {
 	RemoveFormatting,
 } from "lucide-react";
 import { useEditorStore } from "@/app/stores/store-context";
-import { useLinkEditor } from "../toolbar/LinkEditorContext";
+import { useLinkEditor } from "../toolbar/link-editor.utils";
 
 interface FloatingLinkToolbarProps {
 	showLinks: boolean;
