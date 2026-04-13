@@ -20,36 +20,45 @@ class StaffProfileHeroDetail(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
-        import requests as http_requests
         from django.conf import settings
+        from django.core.cache import cache
 
         profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileHeroSerializer(profile)
         data = serializer.data
 
-        # Enrich with IT Assets data using stored email
+        # Enrich with IT Assets data (cached, shared with list view)
         try:
-            api_url = settings.IT_ASSETS_URL
-            response = http_requests.get(
-                api_url,
-                auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                timeout=30,
-            )
-            if response.status_code == 200:
-                it_assets = response.json()
-                user_email = profile.user.email
-                it_data = next(
-                    (u for u in it_assets if u.get("email") == user_email), None
+            cache_key = "it_assets_data"
+            it_asset_data_by_email = cache.get(cache_key)
+
+            if it_asset_data_by_email is None:
+                import requests as http_requests
+
+                api_url = settings.IT_ASSETS_URL
+                response = http_requests.get(
+                    api_url,
+                    auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+                    timeout=10,
                 )
-                if it_data:
-                    data["it_asset_data"] = {
-                        "title": it_data.get("title"),
-                        "unit": it_data.get("unit"),
-                        "division": it_data.get("division"),
-                        "location": it_data.get("location"),
+                if response.status_code == 200:
+                    raw_data = response.json()
+                    it_asset_data_by_email = {
+                        u["email"]: u for u in raw_data if "email" in u
                     }
+                    cache.set(cache_key, it_asset_data_by_email, 300)
                 else:
-                    data["it_asset_data"] = None
+                    it_asset_data_by_email = {}
+
+            user_email = profile.user.email
+            it_data = it_asset_data_by_email.get(user_email)
+            if it_data:
+                data["it_asset_data"] = {
+                    "title": it_data.get("title"),
+                    "unit": it_data.get("unit"),
+                    "division": it_data.get("division"),
+                    "location": it_data.get("location"),
+                }
             else:
                 data["it_asset_data"] = None
         except Exception as e:
