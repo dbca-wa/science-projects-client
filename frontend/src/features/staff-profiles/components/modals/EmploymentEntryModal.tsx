@@ -49,6 +49,20 @@ const EmploymentEntryModal = ({
 	const updateMutation = useUpdateEmploymentEntry(profilePk);
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
+	const currentYear = new Date().getFullYear();
+	const minYear = currentYear - 100;
+	const maxYear = currentYear + 10;
+
+	const isYearValid = (yearStr: string) => {
+		if (!yearStr) return true; // empty is OK for optional fields
+		const y = parseInt(yearStr, 10);
+		return !isNaN(y) && y >= minYear && y <= maxYear;
+	};
+
+	const startYearValid = isYearValid(form.start_year);
+	const endYearValid = isYearValid(form.end_year);
+	const yearsValid = startYearValid && endYearValid;
+
 	const handleSave = () => {
 		const data = {
 			position_title: form.position_title,
@@ -110,19 +124,33 @@ const EmploymentEntryModal = ({
 						<Input
 							id="start_year"
 							type="number"
+							min={minYear}
+							max={maxYear}
 							value={form.start_year}
 							onChange={(e) => update("start_year", e.target.value)}
 						/>
+						{form.start_year && !startYearValid && (
+							<p className="text-xs text-red-500 mt-1">
+								Year must be between {minYear} and {maxYear}
+							</p>
+						)}
 					</div>
 					<div>
 						<Label htmlFor="end_year">End Year</Label>
 						<Input
 							id="end_year"
 							type="number"
+							min={minYear}
+							max={maxYear}
 							value={form.end_year}
 							onChange={(e) => update("end_year", e.target.value)}
 							placeholder="Blank = current"
 						/>
+						{form.end_year && !endYearValid && (
+							<p className="text-xs text-red-500 mt-1">
+								Year must be between {minYear} and {maxYear}
+							</p>
+						)}
 					</div>
 				</div>
 			</div>
@@ -132,7 +160,9 @@ const EmploymentEntryModal = ({
 				</Button>
 				<Button
 					onClick={handleSave}
-					disabled={isPending || !form.position_title || !form.start_year}
+					disabled={
+						isPending || !form.position_title || !form.start_year || !yearsValid
+					}
 				>
 					{isPending ? "Saving..." : "Save"}
 				</Button>

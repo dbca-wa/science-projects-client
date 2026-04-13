@@ -12,7 +12,8 @@ export type ToolbarMode =
 	| "profile"
 	| "staffProfile"
 	| "projectTitle"
-	| "projectDescription";
+	| "projectDescription"
+	| "progressReport";
 
 export interface RichTextEditorProps {
 	// Content

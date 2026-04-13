@@ -282,6 +282,55 @@ function DialogContent({
 		return () => clearTimeout(timer);
 	}, [shouldAnimate]);
 
+	// Auto-focus first focusable element and trap focus within dialog
+	React.useEffect(() => {
+		if (!contentElement) return;
+
+		const focusableSelector =
+			'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href]';
+
+		// Auto-focus first input or focusable element
+		const timer = setTimeout(() => {
+			const firstInput = contentElement.querySelector<HTMLElement>(
+				"input:not([disabled]), textarea:not([disabled])"
+			);
+			const firstFocusable =
+				firstInput ||
+				contentElement.querySelector<HTMLElement>(focusableSelector);
+			firstFocusable?.focus();
+		}, 50);
+
+		// Focus trap: keep Tab within the dialog
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key !== "Tab") return;
+
+			const focusable =
+				contentElement.querySelectorAll<HTMLElement>(focusableSelector);
+			if (focusable.length === 0) return;
+
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+
+			if (e.shiftKey) {
+				if (document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => {
+			clearTimeout(timer);
+			document.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [contentElement]);
+
 	// Handle scroll indicators
 	React.useEffect(() => {
 		if (!enableScrollIndicators) {

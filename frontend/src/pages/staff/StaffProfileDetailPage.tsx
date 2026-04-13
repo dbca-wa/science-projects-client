@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useStaffProfileHero } from "@/features/staff-profiles/hooks/useStaffProfileHero";
 import { useCurrentUser } from "@/features/auth";
-import { Loader2, ChevronLeft, Eye } from "lucide-react";
+import { Loader2, ChevronLeft, Pencil } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
 	Tooltip,
@@ -105,7 +105,7 @@ const StaffProfileDetailPage = () => {
 												className={`gap-1 ${buttonsVisible ? "bg-green-50 border-green-300 text-green-700" : ""}`}
 												aria-pressed={buttonsVisible}
 											>
-												<Eye className="size-4" />
+												<Pencil className="size-4" />
 												{buttonsVisible ? "Editing" : "Edit"}
 											</Button>
 										</TooltipTrigger>

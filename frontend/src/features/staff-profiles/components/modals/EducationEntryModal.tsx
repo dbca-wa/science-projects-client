@@ -52,6 +52,15 @@ const EducationEntryModal = ({
 	const updateMutation = useUpdateEducationEntry(profilePk);
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
+	const currentYear = new Date().getFullYear();
+	const minYear = currentYear - 100;
+
+	const endYearValid =
+		!form.end_year ||
+		(!isNaN(parseInt(form.end_year, 10)) &&
+			parseInt(form.end_year, 10) >= minYear &&
+			parseInt(form.end_year, 10) <= currentYear);
+
 	const handleSave = () => {
 		const data = {
 			qualification_name: form.qualification_name,
@@ -111,9 +120,16 @@ const EducationEntryModal = ({
 					<Input
 						id="end_year"
 						type="number"
+						min={minYear}
+						max={currentYear}
 						value={form.end_year}
 						onChange={(e) => update("end_year", e.target.value)}
 					/>
+					{form.end_year && !endYearValid && (
+						<p className="text-xs text-red-500 mt-1">
+							Year must be between {minYear} and {currentYear}
+						</p>
+					)}
 				</div>
 			</div>
 			<div className="flex justify-end gap-2 mt-4">
@@ -126,7 +142,8 @@ const EducationEntryModal = ({
 						isPending ||
 						!form.qualification_name ||
 						!form.institution ||
-						!form.end_year
+						!form.end_year ||
+						!endYearValid
 					}
 				>
 					{isPending ? "Saving..." : "Save"}

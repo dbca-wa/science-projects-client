@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -56,15 +56,34 @@ const ResponsiveModal = ({
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			<DrawerContent className="px-2 pb-4">
 				<DrawerDescription className="sr-only">{title}</DrawerDescription>
-				<div className="w-full text-slate-800">
-					<DrawerHeader>
-						<DrawerTitle className="mb-2 mt-3">{title}</DrawerTitle>
-					</DrawerHeader>
-					{children}
-				</div>
+				<DrawerAutoFocus>
+					<div className="w-full text-slate-800">
+						<DrawerHeader>
+							<DrawerTitle className="mb-2 mt-3">{title}</DrawerTitle>
+						</DrawerHeader>
+						{children}
+					</div>
+				</DrawerAutoFocus>
 			</DrawerContent>
 		</Drawer>
 	);
 };
+
+/** Auto-focuses the first input inside the drawer on mount */
+function DrawerAutoFocus({ children }: { children: ReactNode }) {
+	const ref = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			const firstInput = ref.current?.querySelector<HTMLElement>(
+				"input:not([disabled]), textarea:not([disabled])"
+			);
+			firstInput?.focus();
+		}, 100);
+		return () => clearTimeout(timer);
+	}, []);
+
+	return <div ref={ref}>{children}</div>;
+}
 
 export default ResponsiveModal;

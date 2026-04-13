@@ -77,21 +77,30 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		// Define what features are available in each mode
 		const isProfileMode = mode === "profile" || mode === "staffProfile";
 		const isStaffProfileMode = mode === "staffProfile";
+		const isProgressReport = mode === "progressReport";
 
 		const showHeadingSelect = mode === "full" || mode === "projectTitle";
 		const disableHeadings = mode === "projectTitle";
-		const showLists = mode === "full" || mode === "simple" || isProfileMode;
+		const showLists =
+			mode === "full" || mode === "simple" || isProfileMode || isProgressReport;
 		const showLinks = mode === "full" || isProfileMode;
 		const showBold =
 			mode === "full" ||
 			mode === "simple" ||
 			mode === "minimal" ||
-			isProfileMode; // projectTitle excludes bold
-		const showUnderline = mode === "full" || isProfileMode; // projectTitle excludes underline
+			isProfileMode ||
+			isProgressReport;
+		const showUnderline = mode === "full" || isProfileMode || isProgressReport;
 		const showSubscriptSuperscript =
-			mode === "full" || isProfileMode || mode === "projectTitle";
+			mode === "full" ||
+			isProfileMode ||
+			mode === "projectTitle" ||
+			isProgressReport;
 		const showClearFormatting =
-			mode === "full" || isProfileMode || mode === "projectTitle";
+			mode === "full" ||
+			isProfileMode ||
+			mode === "projectTitle" ||
+			isProgressReport;
 		const showIndentOutdent = mode === "full";
 		const showAlignment = mode === "full";
 		const showStrikethrough = false; // Disabled for now

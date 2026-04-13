@@ -20,6 +20,8 @@ import {
 	Bold,
 	Italic,
 	Underline,
+	Subscript,
+	Superscript,
 	RemoveFormatting,
 } from "lucide-react";
 import { useEditorStore } from "@/app/stores/store-context";
@@ -30,7 +32,7 @@ interface FloatingLinkToolbarProps {
 }
 
 const TOOLBAR_HEIGHT = 36;
-const TOOLBAR_GAP = 6;
+const TOOLBAR_GAP = 10;
 
 export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 	const [editor] = useLexicalComposerContext();
@@ -281,6 +283,24 @@ export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 			{/* Separator */}
 			<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
 
+			<button
+				type="button"
+				className={btnClass(editorStore.state.isSubscript)}
+				onClick={() => editorStore.toggleFormat("subscript")}
+				aria-label="Subscript"
+				aria-pressed={editorStore.state.isSubscript}
+			>
+				<Subscript className="h-3.5 w-3.5" />
+			</button>
+			<button
+				type="button"
+				className={btnClass(editorStore.state.isSuperscript)}
+				onClick={() => editorStore.toggleFormat("superscript")}
+				aria-label="Superscript"
+				aria-pressed={editorStore.state.isSuperscript}
+			>
+				<Superscript className="h-3.5 w-3.5" />
+			</button>
 			<button
 				type="button"
 				className={btnClass(false)}
