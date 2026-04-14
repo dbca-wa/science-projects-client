@@ -1,0 +1,18 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+  <li>
+    <a href="{% url 'admin:medias_useravatar_find_corrupt' %}"
+       style="background: #ba6d18;">
+      🔍 Find Corrupt Avatars
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'admin:medias_useravatar_clean_orphans' %}"
+       style="background: #a41515;"
+       onclick="return confirm('This will delete orphaned files from disk. Continue?');">
+      🗑️ Clean Orphaned Files
+    </a>
+  </li>
+  {{ block.super }}
+{% endblock %}
