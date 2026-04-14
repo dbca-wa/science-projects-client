@@ -63,6 +63,7 @@ class StaffProfiles(APIView):
             page_size = int(request.query_params.get("page_size", 24))
         except ValueError:
             page_size = 24
+        page_size = max(1, min(100, page_size))
 
         search_term = request.query_params.get(
             "searchTerm"
@@ -162,7 +163,7 @@ class StaffProfiles(APIView):
         # Handle hidden profile filtering
         if not request.user.is_authenticated:
             users = users.exclude(staff_profile__is_hidden=True)
-        elif request.user.is_staff and request.user.is_superuser:
+        elif request.user.is_superuser:
             if not show_hidden:
                 users = users.exclude(staff_profile__is_hidden=True)
         else:
