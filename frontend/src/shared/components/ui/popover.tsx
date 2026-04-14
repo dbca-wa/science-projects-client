@@ -249,31 +249,6 @@ function PopoverContent({
 		return () => clearTimeout(timer);
 	}, [shouldAnimate, open]); // Reset on open
 
-	// Handle click outside to close
-	React.useEffect(() => {
-		if (!open) return;
-
-		const handleClickOutside = (e: MouseEvent) => {
-			if (
-				contentRef.current &&
-				!contentRef.current.contains(e.target as Node) &&
-				triggerRef.current &&
-				!triggerRef.current.contains(e.target as Node)
-			) {
-				onOpenChange(false);
-			}
-		};
-
-		const timer = setTimeout(() => {
-			document.addEventListener("mousedown", handleClickOutside);
-		}, 0);
-
-		return () => {
-			clearTimeout(timer);
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [open, onOpenChange, triggerRef]);
-
 	// Handle escape key
 	React.useEffect(() => {
 		if (!open) return;
@@ -292,30 +267,43 @@ function PopoverContent({
 	if (!open) return null;
 
 	return createPortal(
-		<div
-			ref={contentRef}
-			data-slot="popover-content"
-			className={cn(
-				"fixed z-[9998] min-w-72 rounded-lg p-4 shadow-md outline-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
-				shouldAnimate &&
-					"transition-opacity transition-transform duration-150 ease-out",
-				shouldAnimate && isOpening && "opacity-0 scale-95",
-				shouldAnimate && isClosing && "opacity-0 scale-95",
-				shouldAnimate && !isOpening && !isClosing && "opacity-100 scale-100",
-				!shouldAnimate && "opacity-100 scale-100",
-				!position && "opacity-0", // Hide while measuring
-				className
+		<>
+			{/* Invisible backdrop to block pointer events from reaching content below */}
+			{!isClosing && (
+				<div
+					className="fixed inset-0 z-[9997]"
+					onMouseDown={(e) => {
+						e.stopPropagation();
+						onOpenChange(false);
+					}}
+				/>
 			)}
-			style={
-				position
-					? { top: `${position.top}px`, left: `${position.left}px` }
-					: { top: "-9999px", left: "-9999px" } // Off-screen while measuring
-			}
-			role="dialog"
-			aria-modal="true"
-		>
-			{children}
-		</div>,
+			<div
+				ref={contentRef}
+				data-slot="popover-content"
+				onMouseDown={(e) => e.stopPropagation()}
+				className={cn(
+					"fixed z-[9998] min-w-72 rounded-lg p-4 shadow-md outline-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 pointer-events-auto cursor-default",
+					shouldAnimate &&
+						"transition-opacity transition-transform duration-150 ease-out",
+					shouldAnimate && isOpening && "opacity-0 scale-95",
+					shouldAnimate && isClosing && "opacity-0 scale-95",
+					shouldAnimate && !isOpening && !isClosing && "opacity-100 scale-100",
+					!shouldAnimate && "opacity-100 scale-100",
+					!position && "opacity-0", // Hide while measuring
+					className
+				)}
+				style={
+					position
+						? { top: `${position.top}px`, left: `${position.left}px` }
+						: { top: "-9999px", left: "-9999px" } // Off-screen while measuring
+				}
+				role="dialog"
+				aria-modal="true"
+			>
+				{children}
+			</div>
+		</>,
 		document.body
 	);
 }

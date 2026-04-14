@@ -119,6 +119,14 @@ export class ApiClientService {
 		let message = "An error occurred";
 		let fieldErrors: Record<string, string[]> | undefined;
 
+		// For 500 errors, always use a generic message (response is often HTML)
+		if (status >= 500) {
+			return {
+				message: "A server error occurred. Please try again later.",
+				status,
+			};
+		}
+
 		if (data) {
 			if (isDjangoDetailError(data)) {
 				message = data.detail;
@@ -128,19 +136,27 @@ export class ApiClientService {
 				fieldErrors = {};
 				const fieldMessages: string[] = [];
 
-				Object.entries(data).forEach(([field, errors]) => {
-					if (errors) {
-						const errorArray = Array.isArray(errors) ? errors : [errors];
-						fieldErrors![field] = errorArray;
-						fieldMessages.push(`${field}: ${errorArray[0]}`);
-					}
-				});
+				// Check for common single-message error keys first
+				if ("error" in data && typeof data.error === "string") {
+					message = data.error;
+				} else {
+					Object.entries(data).forEach(([field, errors]) => {
+						if (errors) {
+							const errorArray = Array.isArray(errors) ? errors : [errors];
+							fieldErrors![field] = errorArray;
+							fieldMessages.push(`${field}: ${errorArray[0]}`);
+						}
+					});
 
-				if (fieldMessages.length > 0) {
-					message = fieldMessages[0];
+					if (fieldMessages.length > 0) {
+						message = fieldMessages[0];
+					}
 				}
 			} else if (typeof data === "string") {
-				message = data;
+				// Only use string data if it's short (not HTML)
+				if (data.length < 200 && !data.includes("<!DOCTYPE")) {
+					message = data;
+				}
 			}
 		}
 

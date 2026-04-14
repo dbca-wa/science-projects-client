@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="{% url 'admin:medias_projectphoto_find_corrupt' %}" class="historylink">
+            Find Corrupt Files
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'admin:medias_projectphoto_clean_orphans' %}" class="deletelink">
+            Clean Orphans
+        </a>
+    </li>
+{% endblock %}

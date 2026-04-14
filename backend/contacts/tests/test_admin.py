@@ -40,7 +40,13 @@ class TestAddressAdmin:
         admin_instance = AddressAdmin(Address, AdminSite())
 
         # Assert
-        assert admin_instance.search_fields == ["street", "branch__name"]
+        assert admin_instance.search_fields == [
+            "street",
+            "branch__name",
+            "agency__name",
+            "city",
+            "state",
+        ]
 
     @pytest.mark.unit
     def test_registered(self, db):
@@ -60,6 +66,7 @@ class TestUserContactAdmin:
 
         # Assert
         assert admin_instance.list_display == [
+            "pk",
             "user",
             "email",
             "phone",
@@ -73,8 +80,9 @@ class TestUserContactAdmin:
 
         # Assert
         assert admin_instance.search_fields == [
-            "user_id__first_name",
-            "user_id__username",
+            "user__first_name",
+            "user__last_name",
+            "user__username",
         ]
 
     @pytest.mark.unit
@@ -104,6 +112,7 @@ class TestBranchContactAdmin:
 
         # Assert
         assert admin_instance.list_display == [
+            "pk",
             "branch",
             "email",
             "phone",
@@ -185,6 +194,7 @@ class TestAgencyContactAdmin:
 
         # Assert
         assert admin_instance.list_display == [
+            "pk",
             "agency",
             "email",
             "phone",

@@ -71,7 +71,7 @@ class PDFService:
 
         except Exception as e:
             settings.LOGGER.error(f"PDF generation failed for document {document}: {e}")
-            raise ValidationError(f"Failed to generate PDF: {e}")
+            raise ValidationError("PDF generation failed. Please try again.")
 
     @staticmethod
     def generate_annual_report_pdf(report, template_name="annual_report.html"):
@@ -106,7 +106,7 @@ class PDFService:
 
         except Exception as e:
             settings.LOGGER.error(f"PDF generation failed for report {report}: {e}")
-            raise ValidationError(f"Failed to generate PDF: {e}")
+            raise ValidationError("PDF generation failed. Please try again.")
 
     @staticmethod
     def _html_to_pdf(html_content):
@@ -153,7 +153,8 @@ class PDFService:
                 )
 
                 if result.returncode != 0:
-                    raise ValidationError(f"Prince XML failed: {result.stderr}")
+                    settings.LOGGER.error(f"Prince XML failed: {result.stderr}")
+                    raise ValidationError("PDF generation failed. Please try again.")
 
                 # Read PDF content
                 with open(pdf_path, "rb") as f:
@@ -171,7 +172,8 @@ class PDFService:
         except subprocess.TimeoutExpired:
             raise ValidationError("PDF generation timed out")
         except Exception as e:
-            raise ValidationError(f"PDF generation error: {e}")
+            settings.LOGGER.error(f"PDF generation error: {e}")
+            raise ValidationError("PDF generation failed. Please try again.")
 
     @staticmethod
     def _build_document_context(document):

@@ -27,6 +27,8 @@ FILE_SIGNATURES = {
     # Images (production use)
     "image/jpeg": [(b"\xff\xd8\xff", 0)],
     "image/png": [(b"\x89PNG\r\n\x1a\n", 0)],
+    "image/webp": [(b"RIFF", 0)],  # RIFF....WEBP (check WEBP at offset 8 below)
+    "image/avif": [(b"\x00\x00\x00", 0)],  # ftyp box (validated further below)
     # Documents (production use)
     "application/pdf": [(b"%PDF-", 0)],
 }
@@ -39,9 +41,14 @@ ALLOWED_MIME_TYPES = {
     # Images (production use)
     "image/jpeg": [".jpg", ".jpeg"],
     "image/png": [".png"],
+    "image/webp": [".webp"],
+    "image/avif": [".avif"],
     # Documents (production use)
     "application/pdf": [".pdf"],
 }
+
+# All allowed image MIME types
+ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"]
 
 
 class FileValidationError(Exception):
@@ -102,9 +109,23 @@ def get_file_mime_type(file_path: str) -> str:
         with open(file_path, "rb") as f:
             header = f.read(32)
 
-        # Check against known signatures
+        # WebP: starts with RIFF....WEBP
+        if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
+            return "image/webp"
+
+        # AVIF: ISO BMFF container with 'ftyp' box containing 'avif' or 'avis'
+        if len(header) >= 12 and header[4:8] == b"ftyp":
+            ftyp_brand = header[8:12]
+            if ftyp_brand in (b"avif", b"avis", b"mif1"):
+                return "image/avif"
+
+        # Check against standard signatures
         for mime_type, signatures in FILE_SIGNATURES.items():
-            if not signatures:  # Skip if no signatures defined
+            # Skip WebP and AVIF (handled above with more specific checks)
+            if mime_type in ("image/webp", "image/avif"):
+                continue
+
+            if not signatures:
                 continue
 
             for magic_bytes, offset in signatures:
@@ -119,7 +140,7 @@ def get_file_mime_type(file_path: str) -> str:
         raise
     except Exception as e:
         logger.error(f"Failed to determine MIME type for {file_path}: {e}")
-        raise FileValidationError(f"Could not determine file type: {e}")
+        raise FileValidationError("Could not determine file type.")
 
 
 def sanitise_filename(filename: str) -> str:
@@ -222,12 +243,17 @@ def validate_file_upload(
             f"Allowed types: {', '.join(ALLOWED_MIME_TYPES.keys())}"
         )
 
-    # 7. Verify extension matches MIME type
+    # 7. Verify extension matches MIME type — auto-correct if mismatched
     expected_extensions = ALLOWED_MIME_TYPES[detected_mime]
     if file_ext not in expected_extensions:
-        raise FileValidationError(
-            f"File extension '{file_ext}' does not match detected file type '{detected_mime}'. "
-            f"Expected one of: {', '.join(expected_extensions)}"
+        # The file content is verified safe via magic bytes, so we can
+        # safely correct the extension to match the actual content type
+        new_ext = expected_extensions[0]
+        stem = Path(sanitised_name).stem
+        sanitised_name = f"{stem}{new_ext}"
+        logger.info(
+            f"Auto-corrected extension: '{file_ext}' -> '{new_ext}' "
+            f"(detected type: {detected_mime})"
         )
 
     logger.info(
@@ -261,9 +287,10 @@ def validate_image_upload(
         file_path, original_filename, max_size
     )
 
-    if mime_type not in ["image/jpeg", "image/png"]:
+    if mime_type not in ALLOWED_IMAGE_TYPES:
         raise FileValidationError(
-            f"File is not a JPEG or PNG image. Detected type: {mime_type}"
+            f"File is not a supported image type. Detected: {mime_type}. "
+            f"Allowed: JPEG, PNG, WebP, AVIF"
         )
 
     return sanitised_name, mime_type

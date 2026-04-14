@@ -32,7 +32,7 @@ BackgroundImage.displayName = "BackgroundImage";
 const ContentBox = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div
-			className={`my-6 min-h-[1000px] rounded-lg py-4 bg-white dark:bg-gray-900/80`}
+			className={`my-6 min-h-[1000px] rounded-lg py-4 bg-white dark:bg-gray-900/90`}
 		>
 			<div className="mx-4 sm:mx-6 md:mx-10 h-full min-h-screen py-4">
 				{children}

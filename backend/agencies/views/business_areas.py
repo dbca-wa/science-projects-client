@@ -103,7 +103,12 @@ class BusinessAreas(APIView):
                     }
                 except ValueError as e:
                     settings.LOGGER.error(f"Error on handling BA image: {e}")
-                    return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {
+                            "error": "Image processing failed. Please try a different file."
+                        },
+                        status=HTTP_400_BAD_REQUEST,
+                    )
 
                 try:
                     BusinessAreaPhoto.objects.create(**image_data)
@@ -113,7 +118,8 @@ class BusinessAreas(APIView):
                     )
                     new_business_area.delete()
                     return Response(
-                        {"error": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR
+                        {"error": "Failed to save image. Please try again."},
+                        status=HTTP_500_INTERNAL_SERVER_ERROR,
                     )
 
                 optimized_ba = BusinessArea.objects.select_related(
@@ -314,7 +320,10 @@ class BusinessAreasUnapprovedDocs(APIView):
             return Response(data=data, status=HTTP_200_OK)
         except Exception as e:
             settings.LOGGER.error(f"{e}")
-            return Response({"msg": e}, HTTP_400_BAD_REQUEST)
+            return Response(
+                {"msg": "Failed to retrieve unapproved documents. Please try again."},
+                HTTP_400_BAD_REQUEST,
+            )
 
 
 class BusinessAreasProblematicProjects(APIView):
@@ -392,7 +401,10 @@ class BusinessAreasProblematicProjects(APIView):
 
         except Exception as e:
             settings.LOGGER.error(f"{e}")
-            return Response({"msg": str(e)}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                {"msg": "Failed to retrieve problematic projects. Please try again."},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
     def post(self, request):
         try:
@@ -452,7 +464,10 @@ class BusinessAreasProblematicProjects(APIView):
 
         except Exception as e:
             settings.LOGGER.error(f"{e}")
-            return Response({"msg": e}, HTTP_400_BAD_REQUEST)
+            return Response(
+                {"msg": "Failed to retrieve problematic projects. Please try again."},
+                HTTP_400_BAD_REQUEST,
+            )
 
 
 class SetBusinessAreaActive(APIView):
@@ -468,4 +483,7 @@ class SetBusinessAreaActive(APIView):
             return Response(serializer.data, HTTP_202_ACCEPTED)
         except Exception as e:
             settings.LOGGER.error(f"Error setting active status of Business Area: {e}")
-            return Response({"error": str(e)}, HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Failed to update business area status. Please try again."},
+                HTTP_400_BAD_REQUEST,
+            )

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { RichTextEditor } from "./RichTextEditor";
 import { WordCounter } from "./WordCounter";
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
@@ -122,6 +122,8 @@ export const FormRichTextEditor = forwardRef<
 		},
 		ref
 	) => {
+		const [linkPanelOpen, setLinkPanelOpen] = useState(false);
+
 		return (
 			<div
 				ref={ref}
@@ -156,10 +158,11 @@ export const FormRichTextEditor = forwardRef<
 					wordLimit={wordLimit}
 					autoFocus={false}
 					className="bg-transparent"
+					onLinkPanelChange={setLinkPanelOpen}
 					{...props}
 				/>
 
-				{showWordCounter && (
+				{showWordCounter && !linkPanelOpen && (
 					<div className="flex items-center justify-between px-4 pb-4 pt-2 border-t border-gray-200 dark:border-gray-700">
 						<WordCounter
 							content={value || ""}

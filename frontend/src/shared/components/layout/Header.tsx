@@ -30,7 +30,7 @@ const HamburgerMenuSheet = observer(
 				<Button
 					variant="default"
 					size="icon"
-					className="bg-gray-600 hover:bg-white hover:text-black text-white"
+					className="bg-gray-600 hover:bg-white/20 text-white"
 					aria-label="Open navigation menu"
 					onClick={() => uiStore.setHamburgerMenuOpen(true)}
 				>

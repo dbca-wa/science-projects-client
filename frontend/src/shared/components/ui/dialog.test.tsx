@@ -74,7 +74,7 @@ describe("Dialog backdrop click behavior", () => {
 		);
 
 		// Find the content wrapper (pointer-events-none wrapper)
-		const wrapper = document.querySelector(".fixed.inset-0.z-50.flex");
+		const wrapper = document.querySelector(".fixed.inset-0.flex");
 		expect(wrapper).toBeTruthy();
 
 		// Click on the wrapper (should pass through due to pointer-events-none)

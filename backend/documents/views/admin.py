@@ -470,7 +470,10 @@ class DocumentSpawner(APIView):
                     project_document = ser.save()
                 except Exception as e:
                     settings.LOGGER.error(msg=f"{e}")
-                    return Response(e, HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"error": "Failed to create document. Please try again."},
+                        HTTP_400_BAD_REQUEST,
+                    )
                 else:
                     project_document.pk
                     if kind == "concept":
@@ -586,7 +589,10 @@ class ReopenProject(APIView):
                 return Response(status=HTTP_204_NO_CONTENT)
             except Exception as e:
                 settings.LOGGER.error(msg=f"{e}")
-                return Response(f"{e}", status=HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Operation failed. Please try again."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
 
 
 class BatchApproveOld(APIView):
@@ -704,7 +710,7 @@ class BatchApproveOld(APIView):
         except Exception as e:
             settings.LOGGER.error(msg=f"{e}")
             return Response(
-                str(e),
+                {"error": "Batch approval failed. Please try again."},
                 HTTP_400_BAD_REQUEST,
             )
         else:

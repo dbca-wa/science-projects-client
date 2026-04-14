@@ -86,6 +86,43 @@ class ProfileService:
             raise NotFound(f"Profile {profile_id} not found")
 
     @staticmethod
+    def get_visible_staff_profile(profile_id, request_user=None):
+        """
+        Get staff profile by ID, enforcing visibility rules.
+
+        Hidden profiles are only accessible to the profile owner or superusers.
+        All other users (including anonymous) receive a 404.
+
+        Args:
+            profile_id: Profile ID
+            request_user: The requesting user (may be AnonymousUser or None)
+
+        Returns:
+            PublicStaffProfile object
+
+        Raises:
+            NotFound: If profile doesn't exist or is hidden and user lacks access
+        """
+        profile = ProfileService.get_staff_profile(profile_id)
+
+        if profile.is_hidden:
+            is_owner = (
+                request_user
+                and hasattr(request_user, "id")
+                and not request_user.is_anonymous
+                and request_user.id == profile.user_id
+            )
+            is_admin = (
+                request_user
+                and hasattr(request_user, "is_superuser")
+                and request_user.is_superuser
+            )
+            if not is_owner and not is_admin:
+                raise NotFound(f"Profile {profile_id} not found")
+
+        return profile
+
+    @staticmethod
     def get_staff_profile_by_user(user_id):
         """
         Get staff profile by user ID

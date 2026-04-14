@@ -53,6 +53,26 @@ const withLayout = (config: RouteConfig, element: ReactNode) => {
 const toRouteObject = (config: RouteConfig, asChild = false): RouteObject => {
 	const Component = config.component;
 
+	// Staff profile routes: Suspense wraps the entire layout so nothing renders until ready
+	if (config.layoutWrapper === "staffProfile") {
+		const secured = withAuth(
+			config,
+			<Component {...(config.componentProps ?? {})} />
+		);
+		const element = (
+			<Suspense fallback={<div className="min-h-screen bg-white" />}>
+				<StaffProfileLayout>{secured}</StaffProfileLayout>
+			</Suspense>
+		);
+		const rawPath = config.path;
+		const path =
+			asChild && rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
+		return asChild && rawPath === "/"
+			? { index: true, element }
+			: { path, element };
+	}
+
+	// All other routes: Suspense wraps just the component, layout renders immediately
 	const element = withLayout(
 		config,
 		<Suspense fallback={<RouteLoader />}>

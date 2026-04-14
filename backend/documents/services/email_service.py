@@ -58,7 +58,7 @@ class EmailService:
             return True
         except Exception as e:
             settings.LOGGER.error(f"Email send failed: {e}")
-            raise EmailSendError(f"Failed to send email: {e}")
+            raise EmailSendError("Failed to send email. Please try again.")
 
     @staticmethod
     def send_document_notification(

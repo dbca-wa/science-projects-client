@@ -1,7 +1,7 @@
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
-import { User, LogOut, BookOpen } from "lucide-react";
+import { User, Globe, LogOut, BookOpen } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleDarkMode } from "./ToggleDarkMode";
 import { useAuthStore } from "@/app/stores/store-context";
@@ -49,7 +49,7 @@ export default function HeaderContent({
 					>
 						<span className="flex items-center gap-3">
 							<User className="text-xl" aria-hidden="true" />
-							<span>My Profile</span>
+							<span>My SPMS Profile</span>
 						</span>
 					</Button>
 					<ToggleDarkMode
@@ -58,6 +58,22 @@ export default function HeaderContent({
 						withBackground
 					/>
 				</div>
+				{authStore.user?.staff_profile_id && (
+					<div className="px-3 mt-1">
+						<Button
+							variant="ghost"
+							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base w-full pl-6"
+							onClick={() =>
+								navigateAndClose(`/staff/${authStore.user!.staff_profile_id}`)
+							}
+						>
+							<span className="flex items-center gap-3">
+								<Globe className="text-xl" aria-hidden="true" />
+								<span>My Public Profile</span>
+							</span>
+						</Button>
+					</div>
+				)}
 			</div>
 
 			{/* Main Navigation - Scrollable */}

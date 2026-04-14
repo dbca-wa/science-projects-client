@@ -87,6 +87,8 @@ class StaffProfileHeroSerializer(serializers.ModelSerializer):
             "avatar",
             "work",
             "about",
+            "employee_id",
+            "is_hidden",
         )
 
     def get_user(self, obj):
@@ -130,6 +132,7 @@ class StaffProfileOverviewSerializer(serializers.ModelSerializer):
         model = PublicStaffProfile
         fields = (
             "id",
+            "about",
             "expertise",
             "keywords",
         )

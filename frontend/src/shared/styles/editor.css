@@ -360,9 +360,42 @@
 }
 
 .editor-readonly .editor-input-display {
-	padding: 0; /* No padding - parent handles it */
+	padding: 0;
 	cursor: default;
 	min-height: auto;
+}
+
+/* Lists in display mode need proper indentation and bullets */
+.editor-input-display ul,
+.editor-readonly .editor-input-display ul {
+	list-style-type: disc;
+	padding-left: 1.5rem;
+	margin: 0.25rem 0;
+}
+.editor-input-display ol,
+.editor-readonly .editor-input-display ol {
+	list-style-type: decimal;
+	padding-left: 1.5rem;
+	margin: 0.25rem 0;
+}
+.editor-input-display ul ul,
+.editor-readonly .editor-input-display ul ul {
+	list-style-type: circle;
+}
+.editor-input-display ul ul ul,
+.editor-readonly .editor-input-display ul ul ul {
+	list-style-type: square;
+}
+
+/* Links in display mode */
+.editor-input-display a,
+.editor-readonly .editor-input-display a {
+	color: #3d87f5;
+	text-decoration: underline;
+}
+.editor-input-display a:hover,
+.editor-readonly .editor-input-display a:hover {
+	color: #2563eb;
 }
 
 /* Clickable display mode - inherit cursor from parent */
@@ -376,12 +409,16 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 0.25rem;
 	padding: 0.75rem;
 	border: none; /* No border - parent container handles it */
 	border-bottom: 2px solid hsl(var(--border)); /* Only bottom border for visual separation */
 	background-color: hsl(var(--muted) / 0.5);
 	box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.editor-toolbar-group {
+	display: contents;
 }
 
 .dark .editor-toolbar {
@@ -757,4 +794,60 @@
 
 .dark .editor-table-action-button:hover {
 	background-color: rgb(75 85 99); /* gray-600 */
+}
+
+/* Legacy editor class support for display mode (old staff profile content) */
+.editor-input-display .editor-nested-list-item,
+.editor-readonly .editor-nested-list-item {
+	list-style-type: none !important;
+}
+.editor-input-display .editor-nested-list-item::marker,
+.editor-readonly .editor-nested-list-item::marker {
+	content: none !important;
+}
+.editor-input-display .editor-nested-list-item::before,
+.editor-input-display .editor-nested-list-item::after,
+.editor-readonly .editor-nested-list-item::before,
+.editor-readonly .editor-nested-list-item::after {
+	display: none !important;
+}
+
+/* Legacy editor list classes — indentation and markers */
+.editor-input-display .editor-ul-light,
+.editor-input-display .editor-ul1 {
+	list-style-type: disc;
+	padding-left: 1.5rem;
+	margin: 0.25rem 0;
+}
+.editor-input-display .editor-ul2 {
+	list-style-type: circle;
+	padding-left: 1.25rem;
+}
+.editor-input-display .editor-ul3 {
+	list-style-type: square;
+	padding-left: 1.25rem;
+}
+.editor-input-display .editor-li-light {
+	font-size: 14px;
+	padding: 0;
+	margin: 0;
+	margin-bottom: 4px;
+	color: #333;
+	list-style-position: outside;
+}
+
+/* Legacy editor link class */
+.editor-input-display .editor-link,
+.editor-readonly .editor-link {
+	color: #3d87f5;
+	text-decoration: underline;
+}
+.editor-input-display .editor-link:hover,
+.editor-readonly .editor-link:hover {
+	color: #2563eb;
+}
+
+/* Hide word counter and other siblings when the inline link panel is open */
+.editor-container[data-link-panel-open] + * {
+	display: none !important;
 }

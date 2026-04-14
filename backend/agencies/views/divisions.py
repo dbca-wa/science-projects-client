@@ -102,8 +102,9 @@ class DivisionEmailList(APIView):
                 user = self.get_user(u)
                 new_user_array.append(user)
             except NotFound as e:
+                settings.LOGGER.error(f"User not found during email list update: {e}")
                 return Response(
-                    {"error": str(e)},
+                    {"error": "One or more users could not be found."},
                     status=HTTP_400_BAD_REQUEST,
                 )
 
@@ -113,4 +114,8 @@ class DivisionEmailList(APIView):
             serializer = TinyDivisionSerializer(division)
             return Response(serializer.data, status=HTTP_202_ACCEPTED)
         except Exception as e:
-            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+            settings.LOGGER.error(f"Error updating division email list: {e}")
+            return Response(
+                {"error": "Failed to update email list. Please try again."},
+                status=HTTP_400_BAD_REQUEST,
+            )

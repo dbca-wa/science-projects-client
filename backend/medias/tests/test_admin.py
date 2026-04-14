@@ -172,7 +172,7 @@ class TestProjectDocumentPDFAdmin:
         admin = ProjectDocumentPDFAdmin(ProjectDocumentPDF, AdminSite())
 
         # Assert
-        assert "project" in admin.search_fields
+        assert "project__title" in admin.search_fields
 
     @pytest.mark.integration
     def test_size_in_mb_with_size(self, project_document_pdf, db):
