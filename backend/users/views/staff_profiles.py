@@ -123,6 +123,7 @@ class StaffProfiles(APIView):
                 "work",
                 "work__branch",
                 "work__business_area",
+                "avatar",
             )
             .prefetch_related("business_areas_led")
         )
@@ -169,12 +170,16 @@ class StaffProfiles(APIView):
                 ~Q(id=request.user.id) & Q(staff_profile__is_hidden=True)
             )
 
-        # Sort alphabetically
+        # Sort alphabetically — check for both null AND empty string on display names
         users = users.annotate(
             display_name=Case(
                 When(
-                    display_first_name__isnull=False,
-                    display_last_name__isnull=False,
+                    condition=(
+                        Q(display_first_name__isnull=False)
+                        & ~Q(display_first_name="")
+                        & Q(display_last_name__isnull=False)
+                        & ~Q(display_last_name="")
+                    ),
                     then=Concat(
                         "display_first_name",
                         Value(" "),
