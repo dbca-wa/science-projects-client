@@ -160,8 +160,9 @@ WORKDIR /usr/src/app/backend
 
 # Create necessary directories and set permissions
 RUN mkdir -p /usr/src/app/backend/staticfiles /usr/src/app/backend/media \
+    /home/spmsuser/.gunicorn \
     && chown -R ${UID}:${GID} /usr/src/app \
-    && chown ${UID}:${GID} /home/spmsuser/.bashrc
+    && chown -R ${UID}:${GID} /home/spmsuser
 
 # Delete non-commercial license of Prince (using configmap)
 RUN rm -f /usr/lib/prince/license/license.dat
