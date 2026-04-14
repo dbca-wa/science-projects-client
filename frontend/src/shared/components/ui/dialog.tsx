@@ -21,6 +21,7 @@ type DialogProps = {
 	onOpenChange: (open: boolean) => void;
 	modal?: boolean;
 	shouldAnimate?: boolean;
+	zIndex?: number;
 };
 
 const DialogContext = React.createContext<{
@@ -28,6 +29,7 @@ const DialogContext = React.createContext<{
 	onOpenChange: (open: boolean) => void;
 	isClosing?: boolean;
 	shouldAnimate: boolean;
+	zIndex: number;
 } | null>(null);
 
 function Dialog({
@@ -36,6 +38,7 @@ function Dialog({
 	onOpenChange,
 	modal: _modal = true,
 	shouldAnimate = true,
+	zIndex = 50,
 }: DialogProps) {
 	const [isVisible, setIsVisible] = React.useState(false);
 	const [isClosing, setIsClosing] = React.useState(false);
@@ -105,7 +108,7 @@ function Dialog({
 
 	return (
 		<DialogContext.Provider
-			value={{ open, onOpenChange, isClosing, shouldAnimate }}
+			value={{ open, onOpenChange, isClosing, shouldAnimate, zIndex }}
 		>
 			{children}
 		</DialogContext.Provider>
@@ -175,7 +178,7 @@ function DialogOverlay() {
 	const context = React.useContext(DialogContext);
 	if (!context) throw new Error("DialogOverlay must be used within a Dialog");
 
-	const { isClosing, shouldAnimate, onOpenChange } = context;
+	const { isClosing, shouldAnimate, onOpenChange, zIndex } = context;
 	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
 	const overlayRef = React.useRef<HTMLDivElement>(null);
 
@@ -201,13 +204,14 @@ function DialogOverlay() {
 			ref={overlayRef}
 			onClick={handleOverlayClick}
 			className={cn(
-				"fixed inset-0 z-50 bg-black/50 overflow-hidden",
+				"fixed inset-0 bg-black/50 overflow-hidden",
 				shouldAnimate && "transition-opacity duration-200",
 				shouldAnimate && isOpening && "opacity-0",
 				shouldAnimate && isClosing && "opacity-0",
 				shouldAnimate && !isOpening && !isClosing && "opacity-100",
 				!shouldAnimate && "opacity-100"
 			)}
+			style={{ zIndex }}
 		/>
 	);
 }
@@ -245,7 +249,7 @@ function DialogContent({
 	const context = React.useContext(DialogContext);
 	if (!context) throw new Error("DialogContent must be used within a Dialog");
 
-	const { onOpenChange, isClosing, shouldAnimate } = context;
+	const { onOpenChange, isClosing, shouldAnimate, zIndex } = context;
 	const [isOpening, setIsOpening] = React.useState(shouldAnimate);
 
 	// Scroll indicator state
@@ -277,6 +281,55 @@ function DialogContent({
 		const timer = setTimeout(() => setIsOpening(false), ANIMATION_OPEN_DELAY);
 		return () => clearTimeout(timer);
 	}, [shouldAnimate]);
+
+	// Auto-focus first focusable element and trap focus within dialog
+	React.useEffect(() => {
+		if (!contentElement) return;
+
+		const focusableSelector =
+			'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href]';
+
+		// Auto-focus first input or focusable element
+		const timer = setTimeout(() => {
+			const firstInput = contentElement.querySelector<HTMLElement>(
+				"input:not([disabled]), textarea:not([disabled])"
+			);
+			const firstFocusable =
+				firstInput ||
+				contentElement.querySelector<HTMLElement>(focusableSelector);
+			firstFocusable?.focus();
+		}, 50);
+
+		// Focus trap: keep Tab within the dialog
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key !== "Tab") return;
+
+			const focusable =
+				contentElement.querySelectorAll<HTMLElement>(focusableSelector);
+			if (focusable.length === 0) return;
+
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+
+			if (e.shiftKey) {
+				if (document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => {
+			clearTimeout(timer);
+			document.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [contentElement]);
 
 	// Handle scroll indicators
 	React.useEffect(() => {
@@ -415,7 +468,10 @@ function DialogContent({
 	return (
 		<DialogPortal data-slot="dialog-portal">
 			<DialogOverlay />
-			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none overflow-y-auto">
+			<div
+				className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none overflow-y-auto"
+				style={{ zIndex }}
+			>
 				<div
 					ref={contentRefCallback}
 					data-slot="dialog-content"

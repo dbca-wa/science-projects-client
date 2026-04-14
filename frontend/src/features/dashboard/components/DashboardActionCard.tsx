@@ -54,10 +54,16 @@ export const DashboardActionCard = ({
 	);
 
 	const cardClasses =
-		"cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700";
+		"cursor-pointer p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-[shadow,border-color] duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600";
+
+	const hoverMotion = {
+		whileHover: { y: -3 },
+		whileTap: { scale: 0.98 },
+	};
+
+	const hoverTransition = { duration: 0.15, ease: "easeOut" as const };
 
 	if (href && !targetPath) {
-		// External link - use existing behavior
 		return (
 			<motion.a
 				href={href}
@@ -65,7 +71,12 @@ export const DashboardActionCard = ({
 				rel="noopener noreferrer"
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, delay }}
+				{...hoverMotion}
+				transition={{
+					opacity: { duration: 0.5, delay },
+					y: hoverTransition,
+					scale: hoverTransition,
+				}}
 				className={cardClasses}
 			>
 				{content}
@@ -79,7 +90,12 @@ export const DashboardActionCard = ({
 			onClick={targetPath ? handleClick : onClick}
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5, delay }}
+			{...hoverMotion}
+			transition={{
+				opacity: { duration: 0.5, delay },
+				y: hoverTransition,
+				scale: hoverTransition,
+			}}
 			className={`${cardClasses} text-left w-full block no-underline`}
 		>
 			{content}

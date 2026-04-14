@@ -919,11 +919,21 @@ ol.editor-ol1 li::after {
 }
 
 .editor-nested-list-item {
-	list-style-type: none;
+	list-style-type: none !important;
 }
 .editor-nested-list-item:before,
 .editor-nested-list-item:after {
-	display: none;
+	display: none !important;
+}
+li.editor-li-light.editor-nested-list-item,
+li.editor-li-dark.editor-nested-list-item {
+	list-style-type: none !important;
+	list-style: none !important;
+}
+li.editor-li-light.editor-nested-list-item::marker,
+li.editor-li-dark.editor-nested-list-item::marker {
+	content: none !important;
+	display: none !important;
 }
 
 /*
@@ -945,3 +955,35 @@ ul.editor-ul3 li {
   color: pink;
   list-style-type: square;
 } */
+
+/* Profile toolbar dark mode — white icons, gray disabled, no black on hover */
+.profile-toolbar-dark button {
+	color: white !important;
+}
+.profile-toolbar-dark button:hover:not(:disabled) {
+	color: white !important;
+	background-color: rgb(55 65 81) !important; /* gray-700 */
+}
+.profile-toolbar-dark button:disabled {
+	color: rgb(107 114 128) !important; /* gray-500 */
+}
+.profile-toolbar-dark button svg {
+	color: inherit !important;
+}
+/* Active toolbar button — default mode (replaces bg-accent) */
+.toolbar-btn-active {
+	background-color: var(--accent) !important;
+}
+
+/* Active toolbar button — profile dark mode */
+.profile-toolbar-dark button.toolbar-btn-active,
+.profile-toolbar-dark button.toolbar-btn-active:hover {
+	background-color: rgb(229 231 235) !important;
+	color: rgb(17 24 39) !important;
+}
+.profile-toolbar-dark button.toolbar-btn-active svg {
+	color: rgb(17 24 39) !important;
+}
+.profile-toolbar-dark .editor-toolbar-separator {
+	background-color: rgb(75 85 99); /* gray-600 */
+}

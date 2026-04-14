@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import "@/shared/styles/main.css";
 import "@/shared/styles/science-staff.css";
 
@@ -9,6 +9,7 @@ import { useMediaQuery } from "@/shared/hooks/ui/useMediaQuery";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
+import { useLocation } from "react-router";
 
 /**
  * ErrorBoundaryWrapper - Isolated component that observes auth state
@@ -29,6 +30,28 @@ ErrorBoundaryWrapper.displayName = "ErrorBoundaryWrapper";
 
 export const StaffProfileLayout = ({ children }: { children: ReactNode }) => {
 	const isDesktop = useMediaQuery(`(min-width: ${BREAKPOINTS.md}px)`);
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const { pathname } = useLocation();
+
+	// Scroll to top on route change
+	useEffect(() => {
+		scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+	}, [pathname]);
+
+	// Force light mode on staff profile pages — remove dark class from <html>
+	// and restore it on unmount so the main app keeps its theme
+	useEffect(() => {
+		const html = document.documentElement;
+		const wasDark = html.classList.contains("dark");
+		if (wasDark) {
+			html.classList.remove("dark");
+		}
+		return () => {
+			if (wasDark) {
+				html.classList.add("dark");
+			}
+		};
+	}, []);
 
 	return (
 		<ErrorBoundaryWrapper>
@@ -36,7 +59,7 @@ export const StaffProfileLayout = ({ children }: { children: ReactNode }) => {
 			<div
 				className="
 						fixed inset-0
-						h-screen w-screen
+						h-screen w-screen max-w-full
 						bg-white
 						overscroll-y-none
 						flex flex-col
@@ -44,25 +67,19 @@ export const StaffProfileLayout = ({ children }: { children: ReactNode }) => {
 			>
 				{/* Scrollable content column with hidden scrollbars */}
 				<div
+					ref={scrollRef}
 					className="
-							relative min-h-full
+							flex flex-col min-h-full
 							overflow-y-scroll scroll-smooth
-							[scrollbar-width:none]
-							[-ms-overflow-style:none]
+							no-scrollbar
 						"
-					style={
-						{
-							// Hide webkit scrollbar
-							"::-webkit-scrollbar": { display: "none" },
-						} as React.CSSProperties
-					}
 				>
 					<StaffProfileHeader isDesktop={isDesktop} />
 
 					<div
 						role="main"
 						className="
-								relative flex min-h-full flex-1 flex-col
+								flex-1
 								overscroll-y-none
 								text-slate-900
 							"

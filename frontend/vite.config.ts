@@ -136,8 +136,8 @@ export default defineConfig({
 		},
 	},
 	plugins: [
-		react(),
-		tailwindcss(),
+		react() as never,
+		tailwindcss() as never,
 		// CSP configuration plugin
 		{
 			name: "html-transform",

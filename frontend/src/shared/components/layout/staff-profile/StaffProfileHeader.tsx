@@ -1,4 +1,3 @@
-import { Button } from "@/shared/components/ui/button";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 
@@ -7,24 +6,21 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 	return (
 		<div className="flex h-16.25 w-full flex-row items-center justify-between gap-2 bg-[#2d2f32] p-2 text-white dark:bg-slate-950">
-			<div className="flex justify-start px-8">
+			<a href="/staff" className="flex justify-start px-8 cursor-pointer">
 				<img
 					src={"/logo.svg"}
 					className="w-60 p-6"
-					alt="Department of Biodiversity, Conservation and Attractions"
+					alt="Department of Biodiversity, Conservation and Attractions - Back to Staff Directory"
 				/>
-			</div>
+			</a>
 			{isLoggedIn && (
-				<div className="flex justify-end">
-					<div className="flex w-25 items-center justify-between">
-						<Button
-							variant="link"
-							className="bg-transparent text-lg text-white"
-							asChild
-						>
-							<a href={`${VITE_PRODUCTION_BASE_URL ?? "/"}`}>SPMS</a>
-						</Button>
-					</div>
+				<div className="flex justify-end pr-4">
+					<a
+						href={VITE_PRODUCTION_BASE_URL ?? "/"}
+						className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
+					>
+						SPMS
+					</a>
 				</div>
 			)}
 		</div>
@@ -36,19 +32,20 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 	return (
 		<div className="flex h-16.25 w-full items-center justify-between gap-2 bg-[#2d2f32] p-2 px-5 text-white dark:bg-slate-950">
-			<img
-				src={"/logo.svg"}
-				className="w-47.5 select-none"
-				alt="Department of Biodiversity, Conservation and Attractions"
-			/>
+			<a href="/staff" className="cursor-pointer">
+				<img
+					src={"/logo.svg"}
+					className="w-47.5 select-none"
+					alt="Department of Biodiversity, Conservation and Attractions - Back to Staff Directory"
+				/>
+			</a>
 			{isLoggedIn && (
-				<Button
-					variant="link"
-					className="bg-transparent text-lg text-white"
-					asChild
+				<a
+					href={VITE_PRODUCTION_BASE_URL ?? "/"}
+					className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
 				>
-					<a href={`${VITE_PRODUCTION_BASE_URL ?? "/"}`}>SPMS</a>
-				</Button>
+					SPMS
+				</a>
 			)}
 		</div>
 	);

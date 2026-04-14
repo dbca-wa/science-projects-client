@@ -159,11 +159,13 @@ function TooltipContent({
 	children,
 	side = "top",
 	sideOffset = 4,
+	variant = "default",
 }: {
 	className?: string;
 	children: React.ReactNode;
 	side?: "top" | "bottom" | "left" | "right";
 	sideOffset?: number;
+	variant?: "default" | "light";
 }) {
 	const context = React.useContext(TooltipContext);
 	if (!context) throw new Error("TooltipContent must be used within a Tooltip");
@@ -250,7 +252,10 @@ function TooltipContent({
 			ref={contentRef}
 			data-slot="tooltip-content"
 			className={cn(
-				"fixed z-[10000] rounded-md px-3 py-1.5 text-xs bg-foreground text-background pointer-events-none",
+				"fixed z-[10000] rounded-md px-3 py-1.5 text-xs pointer-events-none",
+				variant === "light"
+					? "bg-white text-slate-700 shadow-md border border-slate-200"
+					: "bg-foreground text-background",
 				(!position || isOpening) && "opacity-0 scale-95",
 				isClosing && "opacity-0 scale-95",
 				position && !isOpening && !isClosing && "opacity-100 scale-100",

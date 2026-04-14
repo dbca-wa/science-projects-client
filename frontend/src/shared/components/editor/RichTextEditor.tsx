@@ -21,6 +21,7 @@ import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
+import { cn } from "@/shared/lib/utils";
 import { editorTheme } from "./theme";
 import { OnChangePlugin } from "./plugins/OnChangePlugin";
 import { PrepopulateHTMLPlugin } from "./plugins/PrepopulateHTMLPlugin";
@@ -39,6 +40,11 @@ import { RemoveEmptyListItemsPlugin } from "./plugins/RemoveEmptyListItemsPlugin
 import { EditorStoreIntegrationPlugin } from "./plugins/EditorStoreIntegrationPlugin";
 import { MoveCursorToEndPlugin } from "./plugins/MoveCursorToEndPlugin";
 import { Toolbar } from "./toolbar/Toolbar";
+import { LinkEditorProvider } from "./toolbar/LinkEditorContext";
+import { useLinkEditor } from "./toolbar/link-editor.utils";
+import { InlineLinkForm } from "./toolbar/InlineLinkForm";
+import { FloatingLinkToolbar } from "./plugins/FloatingLinkToolbar";
+import { LinkClickPlugin } from "./plugins/LinkClickPlugin";
 import "@/shared/styles/editor.css";
 
 // Plugin to make editor editable on user interaction
@@ -89,6 +95,77 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
 	return null;
 };
 
+/**
+ * Inner wrapper that reads LinkEditorContext to drive the slide animation.
+ * Must be rendered inside LinkEditorProvider so useLinkEditor() returns context.
+ */
+function ContentSliderWrapper({
+	children,
+	linkPanel,
+	containerRef,
+}: {
+	children: React.ReactNode;
+	linkPanel: React.ReactNode;
+	containerRef?: React.RefObject<HTMLDivElement | null>;
+}) {
+	const linkEditor = useLinkEditor();
+	const isOpen = linkEditor?.state.isOpen ?? false;
+
+	// Set data attribute on the editor-container for CSS sibling hiding
+	React.useEffect(() => {
+		const container = containerRef?.current;
+		if (!container) return;
+		if (isOpen) {
+			container.setAttribute("data-link-panel-open", "");
+		} else {
+			container.removeAttribute("data-link-panel-open");
+		}
+	}, [isOpen, containerRef]);
+
+	return (
+		<div className="relative">
+			{/* Editor content — always rendered to preserve Lexical state */}
+			<div
+				className={cn(
+					isOpen && "opacity-0 pointer-events-none h-0 overflow-hidden"
+				)}
+				aria-hidden={isOpen}
+			>
+				{children}
+			</div>
+			{/* Link panel — replaces the editor when open */}
+			{isOpen && <div>{linkPanel}</div>}
+		</div>
+	);
+}
+
+/**
+ * Notifies the parent when the link panel open state changes.
+ */
+function LinkPanelStateNotifier({
+	onChange,
+}: {
+	onChange?: (isOpen: boolean) => void;
+}) {
+	const linkEditor = useLinkEditor();
+	const isOpen = linkEditor?.state.isOpen ?? false;
+
+	React.useEffect(() => {
+		onChange?.(isOpen);
+	}, [isOpen, onChange]);
+
+	return null;
+}
+
+/**
+ * Conditionally renders DragDropPlugin — hidden when the inline link panel is open.
+ */
+function ConditionalDragDrop() {
+	const linkEditor = useLinkEditor();
+	if (linkEditor?.state.isOpen) return null;
+	return <DragDropPlugin />;
+}
+
 export const RichTextEditor = React.forwardRef<
 	HTMLDivElement,
 	RichTextEditorProps
@@ -111,11 +188,12 @@ export const RichTextEditor = React.forwardRef<
 			"aria-label": ariaLabel,
 			"aria-describedby": ariaDescribedby,
 			"aria-invalid": ariaInvalid,
+			onLinkPanelChange,
 		},
 		ref
 	) => {
 		const [_currentContent, setCurrentContent] = useState(value || "");
-
+		const containerRef = React.useRef<HTMLDivElement>(null);
 		const handleError = (error: Error) => {
 			console.error("[RichTextEditor] Lexical error:", error);
 		};
@@ -128,6 +206,8 @@ export const RichTextEditor = React.forwardRef<
 		const shouldBeEditable = !readOnly && !disabled;
 		const shouldStartEditable =
 			shouldBeEditable && (autoFocus || moveCursorToEnd);
+		const showLinks =
+			toolbar === "full" || toolbar === "profile" || toolbar === "staffProfile";
 
 		const initialConfig = {
 			namespace: "RichTextEditor",
@@ -148,72 +228,90 @@ export const RichTextEditor = React.forwardRef<
 
 		return (
 			<div
-				ref={ref}
+				ref={(node) => {
+					containerRef.current = node;
+					if (typeof ref === "function") ref(node);
+					else if (ref)
+						(ref as React.MutableRefObject<HTMLDivElement | null>).current =
+							node;
+				}}
 				className={`editor-container ${readOnly ? "editor-readonly" : ""} ${className}`}
 			>
 				<LexicalComposer initialConfig={initialConfig}>
-					{/* Toolbar - separate from content area */}
-					{!readOnly && toolbar !== "none" && (
-						<Toolbar mode={toolbar} disabled={disabled} />
-					)}
+					<LinkEditorProvider>
+						<LinkPanelStateNotifier onChange={onLinkPanelChange} />
+						{/* Content area — editor swaps with link panel */}
+						<ContentSliderWrapper
+							linkPanel={!readOnly && showLinks ? <InlineLinkForm /> : null}
+							containerRef={containerRef}
+						>
+							{/* Toolbar - slides with editor content */}
+							{!readOnly && toolbar !== "none" && (
+								<Toolbar mode={toolbar} disabled={disabled} />
+							)}
 
-					{/* Content area - with border */}
-					<div className="editor-content-wrapper">
-						<RichTextPlugin
-							contentEditable={
-								<ContentEditable
-									className="editor-input"
-									style={{ minHeight }}
-									role="textbox"
-									aria-label={ariaLabel}
-									aria-describedby={ariaDescribedby}
-									aria-multiline="true"
-									aria-readonly={readOnly}
-									aria-invalid={ariaInvalid}
-									contentEditable={!readOnly && !disabled}
-									// Prevent auto-focus during initialization
-									tabIndex={readOnly ? -1 : 0}
+							<div className="editor-content-wrapper">
+								<RichTextPlugin
+									contentEditable={
+										<ContentEditable
+											className="editor-input"
+											style={{ minHeight }}
+											role="textbox"
+											aria-label={ariaLabel}
+											aria-describedby={ariaDescribedby}
+											aria-multiline="true"
+											aria-readonly={readOnly}
+											aria-invalid={ariaInvalid}
+											contentEditable={!readOnly && !disabled}
+											// Prevent auto-focus during initialisation
+											tabIndex={readOnly ? -1 : 0}
+										/>
+									}
+									placeholder={
+										!readOnly ? (
+											<div className="editor-placeholder" aria-hidden="false">
+												{placeholder}
+											</div>
+										) : null
+									}
+									ErrorBoundary={LexicalErrorBoundary}
 								/>
-							}
-							placeholder={
-								!readOnly ? (
-									<div className="editor-placeholder" aria-hidden="false">
-										{placeholder}
-									</div>
-								) : null
-							}
-							ErrorBoundary={LexicalErrorBoundary}
-						/>
-					</div>
+							</div>
+						</ContentSliderWrapper>
 
-					{/* Word count display removed - now handled by InlineSaveEditor */}
+						{/* Floating toolbar — appears near text selection */}
+						{!readOnly && toolbar !== "none" && (
+							<FloatingLinkToolbar showLinks={showLinks} />
+						)}
 
-					{/* Plugins */}
-					<HistoryPlugin />
-					<ListPlugin />
-					<ListMaxIndentPlugin maxDepth={9} />
-					<RemoveEmptyListItemsPlugin />
-					<LinkPlugin />
-					<AutoLinkPlugin />
-					<TablePlugin hasCellMerge={false} hasCellBackgroundColor={false} />
-					<TabIndentationPlugin />
-					{/* PreventAutoFocusPlugin must come before EditableOnInteractionPlugin */}
-					<PreventAutoFocusPlugin />
-					<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
-					<SubscriptSuperscriptPlugin />
-					<SaveOnCtrlSPlugin onSave={onSave} />
-					<PastePlugin />
-					{!readOnly && <DragDropPlugin />}
-					{autoFocus && <AutoFocusPlugin />}
-					{moveCursorToEnd && <MoveCursorToEndPlugin />}
-					<OnChangePlugin onChange={handleContentChange} />
-					{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
-					<PrepopulateHTMLPlugin html={value} />
-					{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
-					<ControlledValuePlugin value={value} />
-					{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
-					{/* EditorStore integration - must come after other plugins */}
-					<EditorStoreIntegrationPlugin />
+						{/* Plugins */}
+						<HistoryPlugin />
+						<ListPlugin />
+						<ListMaxIndentPlugin maxDepth={9} />
+						<RemoveEmptyListItemsPlugin />
+						<LinkPlugin />
+						<AutoLinkPlugin />
+						{!readOnly && showLinks && <LinkClickPlugin />}
+						<TablePlugin hasCellMerge={false} hasCellBackgroundColor={false} />
+						<TabIndentationPlugin />
+						{/* PreventAutoFocusPlugin must come before EditableOnInteractionPlugin */}
+						<PreventAutoFocusPlugin />
+						<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
+						<SubscriptSuperscriptPlugin />
+						<SaveOnCtrlSPlugin onSave={onSave} />
+						<PastePlugin />
+						{!readOnly && <ConditionalDragDrop />}
+						{autoFocus && <AutoFocusPlugin />}
+						{moveCursorToEnd && <MoveCursorToEndPlugin />}
+						<OnChangePlugin onChange={handleContentChange} />
+						{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
+						<PrepopulateHTMLPlugin html={value} />
+						{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
+						<ControlledValuePlugin value={value} />
+						{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
+						{/* EditorStore integration - must come after other plugins */}
+						<EditorStoreIntegrationPlugin />
+					</LinkEditorProvider>
 				</LexicalComposer>
 			</div>
 		);

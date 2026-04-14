@@ -9,13 +9,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.forms import model_to_dict
 from django.http import HttpResponse
 
-from agencies.serializers import (
-    TinyAgencySerializer,
-    TinyBranchSerializer,
-    TinyBusinessAreaSerializer,
-)
 from projects.models import ProjectMember
-from users.serializers import TinyUserSerializer
 
 # Project Imports --------------------
 from .models import KeywordTag, PublicStaffProfile, User, UserProfile, UserWork
@@ -375,6 +369,7 @@ def delete_unused_tags(model_admin, req, selected):
 @admin.register(KeywordTag)
 class KeywordTagAdmin(admin.ModelAdmin):
     list_display = ("pk", "name")
+    search_fields = ["name"]
     actions = [delete_unused_tags]
 
 
@@ -435,11 +430,26 @@ class CustomUserAdmin(UserAdmin):
         "is_superuser",
     ]
 
+    search_fields = [
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "display_first_name",
+        "display_last_name",
+    ]
+
+    list_filter = [
+        "is_active",
+        "is_staff",
+        "is_superuser",
+    ]
+
 
 @admin.register(PublicStaffProfile)
 class StaffProfileAdmin(admin.ModelAdmin):
-    user = TinyUserSerializer(read_only=True)
     list_display = ["user", "is_hidden", "about", "expertise"]
+    list_filter = ["is_hidden"]
     ordering = ["user"]
     search_fields = [
         "user__display_first_name",  # Search by first name
@@ -459,7 +469,6 @@ class StaffProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    user = TinyUserSerializer(read_only=True)
     list_display = [
         "user",
         "title",
@@ -478,10 +487,6 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(UserWork)
 class UserWorkAdmin(admin.ModelAdmin):
-    agency = TinyAgencySerializer()
-    branch = TinyBranchSerializer()
-    business_area = TinyBusinessAreaSerializer()
-
     list_display = [
         "user",
         "agency",
@@ -504,6 +509,18 @@ class UserWorkAdmin(admin.ModelAdmin):
         "user__display_last_name",
         "branch__name",
     ]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "user",
+                "agency",
+                "branch",
+                "business_area",
+            )
+        )
 
 
 # endregion ===========================================

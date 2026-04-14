@@ -149,6 +149,7 @@ export function ProgressReportsTab({
 							limitCanBePassed={true}
 							showWordLimitInLabel={true}
 							label="Progress"
+							toolbar="progressReport"
 						/>
 					</ProjectSection>
 

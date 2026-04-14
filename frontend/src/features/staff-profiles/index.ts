@@ -1,0 +1,42 @@
+// Types
+export type {
+	IStaffProfileCard,
+	IStaffProfileListResponse,
+	IStaffProfileFull,
+	IStaffProfileHeroData,
+	IStaffOverviewData,
+	IStaffCVData,
+	IKeywordTag,
+	IEmploymentEntry,
+	IEducationEntry,
+	ICheckStaffProfileResponse,
+	IDOIPublication,
+	IStaffProfileProject,
+	IEmploymentEntryFormData,
+	IEducationEntryFormData,
+	IOverviewUpdateData,
+} from "./types/staff-profile.types";
+
+// Services
+export {
+	getStaffProfiles,
+	getStaffProfile,
+	getStaffProfileHero,
+	getStaffProfileOverview,
+	getStaffProfileCV,
+	checkStaffProfile,
+	getMyStaffProfile,
+	getStaffProfileProjects,
+	updateStaffProfileOverview,
+	updateStaffProfileHero,
+	toggleStaffProfileVisibility,
+	getEmploymentEntries,
+	createEmploymentEntry,
+	updateEmploymentEntry,
+	deleteEmploymentEntry,
+	getEducationEntries,
+	createEducationEntry,
+	updateEducationEntry,
+	deleteEducationEntry,
+	emailStaffMember,
+} from "./services/staff-profile.service";

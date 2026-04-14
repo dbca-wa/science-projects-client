@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { Children, useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/features/auth";
 import {
 	useAdminTasks,
@@ -15,7 +15,6 @@ import { useMyProjectsStore } from "@/app/stores/store-context";
 import { observer } from "mobx-react-lite";
 import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
-import { TbWorldWww } from "react-icons/tb";
 import { MdFeedback } from "react-icons/md";
 import { useSearchParams, useNavigate } from "react-router";
 import { DashboardActionCard } from "@/features/dashboard/components/DashboardActionCard";
@@ -27,6 +26,18 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { Loader2, AlertCircle, Search } from "lucide-react";
 import { motion } from "framer-motion";
+
+/** Grid that goes full-width for a single child, 2-col for multiple */
+const ActionCardGrid = ({ children }: { children: React.ReactNode }) => {
+	const count = Children.count(children);
+	return (
+		<div
+			className={`grid gap-4 ${count <= 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}
+		>
+			{children}
+		</div>
+	);
+};
 
 /**
  * Dashboard - Main landing page after authentication
@@ -242,7 +253,7 @@ const Dashboard = observer(() => {
 							<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 								Quick links to related DBCA systems
 							</p>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<ActionCardGrid>
 								<DashboardActionCard
 									icon={<FaDatabase className="w-5 h-5" />}
 									title="Data Catalogue"
@@ -252,15 +263,15 @@ const Dashboard = observer(() => {
 									delay={0.3}
 								/>
 
-								<DashboardActionCard
+								{/* <DashboardActionCard
 									icon={<TbWorldWww className="w-5 h-5" />}
 									title="Scientific Sites Register"
 									description="Browse scientific sites"
 									href="https://scientificsites.dpaw.wa.gov.au/"
 									colorScheme="blue"
 									delay={0.35}
-								/>
-							</div>
+								/> */}
+							</ActionCardGrid>
 						</div>
 
 						{/* Section Divider */}

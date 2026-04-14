@@ -55,7 +55,7 @@ export const SearchControls = ({
 					<span className="sm:hidden">Clear</span>
 					<Badge
 						variant="secondary"
-						className="ml-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+						className="ml-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs"
 					>
 						{filterCount}
 					</Badge>

@@ -83,17 +83,21 @@ class TestProjectPhotoUpload:
             ProjectPhoto.objects.create(file=pdf_file, project=project, uploader=user)
 
     @pytest.mark.integration
-    def test_extension_mismatch_rejected(self, user, project):
-        """Test that extension mismatch is detected."""
+    def test_extension_mismatch_auto_corrected(self, user, project):
+        """Test that extension mismatch is auto-corrected (not rejected)."""
         # Create JPEG with PNG extension
         jpeg_content = b"\xff\xd8\xff\xe0\x00\x10JFIF" + b"\x00" * 100
         fake_file = SimpleUploadedFile(
             "fake.png", jpeg_content, content_type="image/png"
         )
 
-        # Should raise validation error
-        with pytest.raises(FileValidationError):
-            ProjectPhoto.objects.create(file=fake_file, project=project, uploader=user)
+        # Should succeed — validation auto-corrects the extension
+        photo = ProjectPhoto.objects.create(
+            file=fake_file, project=project, uploader=user
+        )
+        assert photo.pk is not None
+        # Extension should have been corrected to .jpg
+        assert photo.file.name.endswith(".jpg")
 
 
 @pytest.mark.django_db
@@ -318,19 +322,21 @@ class TestProjectDocumentPDFUpload:
             )
 
     @pytest.mark.integration
-    def test_extension_mismatch_rejected(self, project, project_document):
-        """Test that extension mismatch is detected."""
+    def test_extension_mismatch_auto_corrected(self, project, project_document):
+        """Test that extension mismatch is auto-corrected (not rejected)."""
         # Create PDF with JPG extension
         pdf_content = b"%PDF-1.4\n" + b"\x00" * 100
         fake_file = SimpleUploadedFile(
             "document.jpg", pdf_content, content_type="image/jpeg"
         )
 
-        # Should raise validation error
-        with pytest.raises(FileValidationError):
-            ProjectDocumentPDF.objects.create(
-                file=fake_file, document=project_document, project=project
-            )
+        # Should succeed — validation auto-corrects the extension
+        pdf = ProjectDocumentPDF.objects.create(
+            file=fake_file, document=project_document, project=project
+        )
+        assert pdf.pk is not None
+        # Extension should have been corrected to .pdf
+        assert pdf.file.name.endswith(".pdf")
 
 
 @pytest.mark.django_db

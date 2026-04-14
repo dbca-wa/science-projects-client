@@ -21,7 +21,6 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
-from common.utils import paginate_queryset
 from projects.models import ProjectMember
 from projects.serializers import ProjectDataTableSerializer
 from users.models import PublicStaffProfile
@@ -40,25 +39,229 @@ class StaffProfiles(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        """List staff profiles with pagination"""
-        search = request.query_params.get("search")
-        filters = {
-            "is_active": request.query_params.get("is_active"),
-            "public": request.query_params.get("public"),
-            "business_area": request.query_params.get("business_area"),
-        }
-        filters = {k: v for k, v in filters.items() if v is not None}
+        """
+        List staff profiles with IT Assets filtering (BCS division only).
 
-        profiles = ProfileService.list_staff_profiles(filters=filters, search=search)
-        paginated = paginate_queryset(profiles, request)
+        Uses a two-phase approach for efficient pagination:
+        1. Fetch/cache IT Assets data → extract BCS email set
+        2. Filter users at the DB level using email__in, then paginate
+        3. Enrich only the current page with IT Assets metadata
+        """
+        from math import ceil
 
-        serializer = TinyStaffProfileSerializer(paginated["items"], many=True)
+        import requests
+        from django.core.cache import cache
+        from django.db.models import Case, CharField, Q, Value, When
+        from django.db.models.functions import Concat
+
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+
+        try:
+            page_size = int(request.query_params.get("page_size", 24))
+        except ValueError:
+            page_size = 24
+
+        search_term = request.query_params.get(
+            "searchTerm"
+        ) or request.query_params.get("search")
+        show_hidden = request.query_params.get("showHidden", "false").lower() == "true"
+
+        # Phase 1: Fetch IT Assets data (cached for 5 minutes)
+        cache_key = "it_assets_data"
+        it_asset_data_by_email = cache.get(cache_key)
+
+        if it_asset_data_by_email is None:
+            try:
+                api_url = settings.IT_ASSETS_URL
+                response = requests.get(
+                    api_url,
+                    auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+                    timeout=30,
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    it_asset_data_by_email = {
+                        user_data["email"]: user_data
+                        for user_data in data
+                        if "email" in user_data
+                    }
+                    cache.set(cache_key, it_asset_data_by_email, 300)
+                else:
+                    settings.LOGGER.error(
+                        f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
+                    )
+                    it_asset_data_by_email = {}
+            except Exception as e:
+                settings.LOGGER.error(f"IT Assets API error: {e}")
+                it_asset_data_by_email = {}
+
+        it_assets_available = bool(it_asset_data_by_email)
+
+        # Extract BCS division emails for DB-level filtering
+        bcs_emails = set()
+        if it_assets_available:
+            for email, user_data in it_asset_data_by_email.items():
+                if (
+                    user_data.get("unit")
+                    == "Biodiversity and Conservation Science Division"
+                ):
+                    bcs_emails.add(email)
+
+        # Phase 2: Build queryset with DB-level BCS filter + pagination
+        from users.models import User
+
+        base_queryset = (
+            User.objects.filter(
+                is_staff=True,
+                staff_profile__isnull=False,
+            )
+            .select_related(
+                "staff_profile",
+                "work",
+                "work__branch",
+                "work__business_area",
+                "avatar",
+            )
+            .prefetch_related("business_areas_led")
+        )
+
+        # Apply BCS division filter at DB level (or include all if API unavailable)
+        if it_assets_available:
+            if not bcs_emails:
+                settings.LOGGER.warning(
+                    "IT Assets API returned data but no BCS division users found. "
+                    "The division name may have changed."
+                )
+            base_queryset = base_queryset.filter(email__in=bcs_emails)
+        else:
+            settings.LOGGER.warning(
+                "IT Assets API unavailable — serving staff directory "
+                "from database without enrichment"
+            )
+
+        if search_term:
+            search_parts = search_term.split()
+            if len(search_parts) >= 2:
+                first_name = search_parts[0]
+                last_name = " ".join(search_parts[1:])
+                users = base_queryset.filter(
+                    Q(first_name__icontains=first_name)
+                    & Q(last_name__icontains=last_name)
+                )
+            else:
+                users = base_queryset.filter(
+                    Q(first_name__icontains=search_term)
+                    | Q(last_name__icontains=search_term)
+                )
+        else:
+            users = base_queryset
+
+        # Handle hidden profile filtering
+        if not request.user.is_authenticated:
+            users = users.exclude(staff_profile__is_hidden=True)
+        elif request.user.is_staff and request.user.is_superuser:
+            if not show_hidden:
+                users = users.exclude(staff_profile__is_hidden=True)
+        else:
+            users = users.exclude(
+                ~Q(id=request.user.id) & Q(staff_profile__is_hidden=True)
+            )
+
+        # Sort alphabetically — check for both null AND empty string on display names
+        users = users.annotate(
+            display_name=Case(
+                When(
+                    condition=(
+                        Q(display_first_name__isnull=False)
+                        & ~Q(display_first_name="")
+                        & Q(display_last_name__isnull=False)
+                        & ~Q(display_last_name="")
+                    ),
+                    then=Concat(
+                        "display_first_name",
+                        Value(" "),
+                        "display_last_name",
+                    ),
+                ),
+                default=Concat("first_name", Value(" "), "last_name"),
+                output_field=CharField(),
+            )
+        ).order_by("display_name")
+
+        # DB-level pagination
+        total_users = users.count()
+        total_pages = ceil(total_users / page_size) if total_users > 0 else 0
+        start = (page - 1) * page_size
+        end = start + page_size
+        page_users = list(users[start:end])
+
+        # Phase 3: Enrich only the current page with IT Assets data + batch-update profiles
+        profiles_to_update = []
+        for user in page_users:
+            user_data = (
+                it_asset_data_by_email.get(user.email) if it_assets_available else None
+            )
+            if user_data:
+                if (
+                    user.staff_profile.it_asset_id is None
+                    or user.staff_profile.employee_id is None
+                ):
+                    user.staff_profile.it_asset_id = user_data.get("id")
+                    user.staff_profile.employee_id = user_data.get("employee_id")
+                    profiles_to_update.append(user.staff_profile)
+
+                user.division = user_data.get("division")
+                user.unit = user_data.get("unit")
+                user.location = user_data.get("location")
+                user.position = user_data.get("title")
+            else:
+                user.division = None
+                user.unit = None
+                user.location = None
+                user.position = None
+
+        if profiles_to_update:
+            PublicStaffProfile.objects.bulk_update(
+                profiles_to_update, ["it_asset_id", "employee_id"]
+            )
+
+        serialized_users = TinyStaffProfileSerializer(
+            [u.staff_profile for u in page_users],
+            many=True,
+            context={"request": request},
+        ).data
+
+        # Enrich serialised data with IT Assets fields
+        for i, user in enumerate(page_users):
+            if i < len(serialized_users):
+                serialized_users[i]["division"] = getattr(user, "division", None)
+                serialized_users[i]["unit"] = getattr(user, "unit", None)
+                serialized_users[i]["location"] = getattr(user, "location", None)
+                serialized_users[i]["position"] = getattr(user, "position", None)
+                serialized_users[i]["custom_title"] = (
+                    user.staff_profile.custom_title if user.staff_profile else None
+                )
+                serialized_users[i]["custom_title_on"] = (
+                    user.staff_profile.custom_title_on if user.staff_profile else False
+                )
+
         return Response(
             {
-                "profiles": serializer.data,
-                "total_results": paginated["total_results"],
-                "total_pages": paginated["total_pages"],
-            }
+                "users": serialized_users,
+                "total_results": total_users,
+                "page": page,
+                "total_pages": total_pages,
+                "it_assets_available": it_assets_available,
+                "showing_hidden": (
+                    request.user.is_authenticated
+                    and request.user.is_superuser
+                    and show_hidden
+                ),
+            },
+            status=HTTP_200_OK,
         )
 
     def post(self, request):
@@ -81,7 +284,7 @@ class StaffProfileDetail(APIView):
 
     def get(self, request, pk):
         """Get staff profile detail"""
-        profile = ProfileService.get_staff_profile(pk)
+        profile = ProfileService.get_visible_staff_profile(pk, request.user)
         serializer = StaffProfileSerializer(profile)
         return Response(serializer.data)
 
@@ -183,6 +386,20 @@ class StaffProfileProjects(APIView):
 
     def get(self, request, pk):
         """Get all projects for a staff profile, excluding hidden ones"""
+        # Check if the user's staff profile is hidden
+        profile = ProfileService.get_staff_profile_by_user(pk)
+        if profile and profile.is_hidden:
+            is_owner = (
+                request.user and not request.user.is_anonymous and request.user.id == pk
+            )
+            is_admin = (
+                request.user
+                and hasattr(request.user, "is_superuser")
+                and request.user.is_superuser
+            )
+            if not is_owner and not is_admin:
+                raise NotFound
+
         try:
             users_memberships = (
                 ProjectMember.objects.filter(user=pk)
@@ -214,7 +431,7 @@ class StaffProfileProjects(APIView):
         serialized_projects = ProjectDataTableSerializer(
             [proj for proj, _ in projects_with_roles],
             many=True,
-            context={"request": request},
+            context={"request": request, "projects_with_roles": projects_with_roles},
         )
 
         return Response(serialized_projects.data, status=HTTP_200_OK)
@@ -233,6 +450,11 @@ class PublicEmailStaffMember(APIView):
 
         try:
             staff_profile = PublicStaffProfile.objects.get(user__pk=pk)
+
+            # Block emailing hidden profiles
+            if staff_profile.is_hidden:
+                return Response({"error": "Staff profile not found"}, status=404)
+
             recipient_name = f"{staff_profile.user.display_first_name} {staff_profile.user.display_last_name}"
 
             # Use public email if available, otherwise use IT asset email

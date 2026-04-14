@@ -10,6 +10,7 @@ import { useUpdateContent } from "@/shared/hooks/queries/useUpdateContent";
 import { CONTENT_TYPE_CONFIGS } from "@/shared/config/content-types.config";
 import { countWords } from "@/shared/utils/word-count.utils";
 import type { ContentType } from "@/shared/types/inline-edit.types";
+import type { ToolbarMode } from "@/shared/types/editor.types";
 
 export interface InlineSaveEditorProps {
 	// Content configuration
@@ -27,6 +28,9 @@ export interface InlineSaveEditorProps {
 	wordLimit?: number;
 	limitCanBePassed?: boolean; // If true, shows "Aim for max of X words", if false shows "Limit: X words"
 	showWordLimitInLabel?: boolean; // Show word limit in label header
+
+	// Editor configuration
+	toolbar?: ToolbarMode;
 
 	// Lifecycle callbacks
 	onEditStart?: () => void;
@@ -57,6 +61,7 @@ export const InlineSaveEditor = observer(
 		wordLimit,
 		limitCanBePassed = false,
 		showWordLimitInLabel = false,
+		toolbar: toolbarProp = "full",
 		onEditStart,
 		onEditEnd,
 		onSaveSuccess,
@@ -401,7 +406,7 @@ export const InlineSaveEditor = observer(
 								onChange={handleContentChange}
 								onSave={handleSave}
 								placeholder={effectivePlaceholder}
-								toolbar="full"
+								toolbar={toolbarProp}
 								wordLimit={wordLimit}
 								limitCanBePassed={limitCanBePassed}
 								className="bg-white"

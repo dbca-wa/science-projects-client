@@ -13,9 +13,12 @@ import DOMPurify from "dompurify";
 const ALLOWED_TAGS = [
 	// Paragraphs and headings
 	"p",
+	"h1",
 	"h2",
 	"h3",
 	"h4",
+	"h5",
+	"h6",
 	// Lists
 	"ul",
 	"ol",
@@ -26,6 +29,10 @@ const ALLOWED_TAGS = [
 	"strong",
 	"em",
 	"u",
+	"s",
+	"sub",
+	"sup",
+	"span",
 	"br",
 	// Additional semantic tags
 	"blockquote",
@@ -50,6 +57,9 @@ const ALLOWED_ATTR = [
 	"href", // For links
 	"target", // For links
 	"rel", // For links
+	"class", // For editor styling classes (editor-ul1, editor-li-light, etc.)
+	"dir", // For text direction (ltr/rtl)
+	"value", // For list item numbering
 ];
 
 /**
@@ -62,6 +72,29 @@ const SANITISE_CONFIG: Parameters<typeof DOMPurify.sanitize>[1] = {
 	ALLOW_UNKNOWN_PROTOCOLS: false,
 	SAFE_FOR_TEMPLATES: true,
 };
+
+// Safe style properties allowed in editor content
+const SAFE_STYLE_PROPERTIES = new Set(["white-space"]);
+
+// Hook to filter style attributes — only allow safe properties
+DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
+	if (data.attrName === "style") {
+		const safeStyles = data.attrValue
+			.split(";")
+			.map((s) => s.trim())
+			.filter((s) => {
+				const prop = s.split(":")[0]?.trim().toLowerCase();
+				return prop && SAFE_STYLE_PROPERTIES.has(prop);
+			})
+			.join("; ");
+		if (safeStyles) {
+			data.attrValue = safeStyles;
+			data.forceKeepAttr = true;
+		} else {
+			data.keepAttr = false;
+		}
+	}
+});
 
 /**
  * Sanitise HTML content to prevent XSS attacks

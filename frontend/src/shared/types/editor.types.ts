@@ -10,8 +10,10 @@ export type ToolbarMode =
 	| "minimal"
 	| "none"
 	| "profile"
+	| "staffProfile"
 	| "projectTitle"
-	| "projectDescription";
+	| "projectDescription"
+	| "progressReport";
 
 export interface RichTextEditorProps {
 	// Content
@@ -42,6 +44,9 @@ export interface RichTextEditorProps {
 	"aria-label"?: string;
 	"aria-describedby"?: string;
 	"aria-invalid"?: boolean;
+
+	// Link panel state callback
+	onLinkPanelChange?: (isOpen: boolean) => void;
 }
 
 export interface RichTextDisplayProps {

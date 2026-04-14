@@ -8,7 +8,7 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
-import { User, LogOut, Moon, Sun, BookOpen } from "lucide-react";
+import { User, Globe, LogOut, Moon, Sun, BookOpen } from "lucide-react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
@@ -89,6 +89,25 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 						<span className="text-sm">My SPMS Profile</span>
 					</div>
 				</button>
+
+				{/* My Public Profile */}
+				{snapshot.userData?.staff_profile_id && (
+					<button
+						ref={registerMenuItem(1)}
+						type="button"
+						onClick={() => {
+							navigate(`/staff/${snapshot.userData!.staff_profile_id}`);
+							onClose();
+						}}
+						className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+						role="menuitem"
+					>
+						<div className="flex gap-2 items-center">
+							<Globe className="h-4 w-4" aria-hidden="true" />
+							<span className="text-sm">My Public Profile</span>
+						</div>
+					</button>
+				)}
 			</div>
 
 			<Separator />
@@ -103,7 +122,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Toggle Dark Mode */}
 				<button
-					ref={registerMenuItem(1)}
+					ref={registerMenuItem(2)}
 					type="button"
 					onClick={() => {
 						uiStore.toggleTheme();
@@ -135,7 +154,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Quick Guide */}
 				<button
-					ref={registerMenuItem(2)}
+					ref={registerMenuItem(3)}
 					type="button"
 					onClick={() => {
 						navigate("/guide");
@@ -152,7 +171,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Data Catalogue */}
 				<button
-					ref={registerMenuItem(3)}
+					ref={registerMenuItem(4)}
 					type="button"
 					onClick={() => {
 						window.open("https://data.bio.wa.gov.au/", "_blank");
@@ -169,7 +188,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Scientific Sites Register */}
 				<button
-					ref={registerMenuItem(4)}
+					ref={registerMenuItem(5)}
 					type="button"
 					onClick={() => {
 						window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
@@ -190,7 +209,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 			{/* Logout Section */}
 			<div className="py-1">
 				<button
-					ref={registerMenuItem(5)}
+					ref={registerMenuItem(6)}
 					type="button"
 					onClick={() => {
 						logout(undefined, {
