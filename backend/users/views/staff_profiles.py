@@ -58,6 +58,7 @@ class StaffProfiles(APIView):
             page = int(request.query_params.get("page", 1))
         except ValueError:
             page = 1
+        page = max(1, page)
 
         try:
             page_size = int(request.query_params.get("page_size", 24))
@@ -95,9 +96,11 @@ class StaffProfiles(APIView):
                         f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
                     )
                     it_asset_data_by_email = {}
+                    cache.set(cache_key, {}, 60)
             except Exception as e:
                 settings.LOGGER.error(f"IT Assets API error: {e}")
                 it_asset_data_by_email = {}
+                cache.set(cache_key, {}, 60)
 
         it_assets_available = bool(it_asset_data_by_email)
 
@@ -210,9 +213,23 @@ class StaffProfiles(APIView):
                     user.staff_profile.it_asset_id is None
                     or user.staff_profile.employee_id is None
                 ):
-                    user.staff_profile.it_asset_id = user_data.get("id")
-                    user.staff_profile.employee_id = user_data.get("employee_id")
-                    profiles_to_update.append(user.staff_profile)
+                    new_it_asset_id = user_data.get("id")
+                    new_employee_id = user_data.get("employee_id")
+                    changed = False
+                    if (
+                        user.staff_profile.it_asset_id is None
+                        and new_it_asset_id is not None
+                    ):
+                        user.staff_profile.it_asset_id = new_it_asset_id
+                        changed = True
+                    if (
+                        user.staff_profile.employee_id is None
+                        and new_employee_id is not None
+                    ):
+                        user.staff_profile.employee_id = new_employee_id
+                        changed = True
+                    if changed:
+                        profiles_to_update.append(user.staff_profile)
 
                 user.division = user_data.get("division")
                 user.unit = user_data.get("unit")
