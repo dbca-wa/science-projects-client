@@ -99,7 +99,10 @@ class AdminSetCaretaker(APIView):
             )
             return Response(status=HTTP_200_OK)
         except Exception as e:
+            settings.LOGGER.error(f"Failed to create caretaker: {e}")
             return Response(
-                {"detail": str(e)},
+                {
+                    "detail": "Failed to create caretaker relationship. Please try again."
+                },
                 status=HTTP_400_BAD_REQUEST,
             )
