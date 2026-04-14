@@ -160,7 +160,6 @@ WORKDIR /usr/src/app/backend
 
 # Create necessary directories and set permissions
 RUN mkdir -p /usr/src/app/backend/staticfiles /usr/src/app/backend/media \
-    /home/spmsuser/.gunicorn \
     && chown -R ${UID}:${GID} /usr/src/app \
     && chown -R ${UID}:${GID} /home/spmsuser
 
@@ -188,4 +187,4 @@ EXPOSE 8000
 ENV TMPDIR=/tmp
 
 # Launch production server
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp"]
+CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp", "--no-control-socket"]
