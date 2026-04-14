@@ -11,7 +11,12 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 from common.models import CommonModel
-from common.utils.file_validation import validate_document_upload, validate_image_upload
+from common.utils.file_validation import (
+    build_hashed_filename,
+    delete_old_file,
+    validate_document_upload,
+    validate_image_upload,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -147,6 +152,53 @@ def _validate_and_save_file(file_field, validator_func, max_size=10 * 1024 * 102
             os.unlink(temp_path)
 
 
+def _apply_content_hash_and_cleanup(instance, file_field_name="file"):
+    """
+    Apply a content hash to the filename and clean up the old file.
+
+    Reads the file content, generates a hashed filename via
+    ``build_hashed_filename``, deletes the previous file via
+    ``delete_old_file``, and replaces the field value with a new
+    ``ContentFile`` carrying the hashed name.
+
+    Call after file validation but before ``super().save()``.
+
+    Args:
+        instance: Model instance with a file field.
+        file_field_name: Name of the file field (default: "file").
+    """
+    file_field = getattr(instance, file_field_name)
+    if not file_field:
+        return
+
+    # Read file content
+    try:
+        file_field.seek(0)
+        content = file_field.read()
+        file_field.seek(0)
+    except (AttributeError, OSError):
+        return
+
+    if not content:
+        return
+
+    original_name = os.path.basename(file_field.name)
+    hashed_name = build_hashed_filename(original_name, content)
+
+    # Delete old file if this is an existing instance
+    if instance.pk:
+        try:
+            old_instance = instance.__class__.objects.get(pk=instance.pk)
+            old_file = getattr(old_instance, file_field_name)
+            if old_file and old_file.name:
+                delete_old_file(old_file, new_file_path=hashed_name)
+        except instance.__class__.DoesNotExist:
+            pass
+
+    # Replace file with content-hashed version
+    file_field.save(hashed_name, ContentFile(content), save=False)
+
+
 # endregion ===========================================================================================================
 
 
@@ -175,6 +227,7 @@ class ProjectDocumentPDF(CommonModel):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
             _validate_and_save_file(self.file, validate_document_upload)
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -231,6 +284,7 @@ class AnnualReportMedia(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -274,6 +328,7 @@ class LegacyAnnualReportPDF(CommonModel):
             _validate_and_save_file(
                 self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -313,6 +368,7 @@ class AnnualReportPDF(CommonModel):  # The latest pdf for a given annual report
             _validate_and_save_file(
                 self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -361,6 +417,7 @@ class AECEndorsementPDF(CommonModel):  # The latest pdf for a given annual repor
             _validate_and_save_file(
                 self.file, validate_document_upload, max_size=PROJECT_PDF_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -397,6 +454,7 @@ class ProjectPhoto(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -439,6 +497,7 @@ class ProjectPlanMethodologyPhoto(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -485,6 +544,7 @@ class BusinessAreaPhoto(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -517,6 +577,7 @@ class AgencyImage(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size
@@ -555,6 +616,7 @@ class UserAvatar(CommonModel):
             _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
             )
+            _apply_content_hash_and_cleanup(self)
 
         if self.file:
             self.size = self.file.size

@@ -11,6 +11,8 @@ from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from rest_framework.exceptions import ValidationError
 
+from common.utils.file_validation import generate_content_hash
+
 
 class PDFService:
     """PDF generation service using Prince XML"""
@@ -42,13 +44,12 @@ class PDFService:
             # Generate PDF using Prince
             pdf_content = PDFService._html_to_pdf(html_content)
 
-            # Create ContentFile
+            # Create ContentFile — the model's save() handles content hashing
+            # and old file cleanup via _apply_content_hash_and_cleanup
             filename = f"{document.project.pk}_{document.kind}_{document.pk}.pdf"
             pdf_file = ContentFile(pdf_content, name=filename)
 
             # Save to ProjectDocumentPDF model
-            from django.core.files.storage import default_storage
-
             from medias.models import ProjectDocumentPDF
 
             try:
@@ -56,9 +57,6 @@ class PDFService:
                 doc_pdf = ProjectDocumentPDF.objects.get(
                     document=document, project=document.project
                 )
-                # Delete old file
-                if doc_pdf.file:
-                    default_storage.delete(doc_pdf.file.path)
                 doc_pdf.file = pdf_file
                 doc_pdf.save()
             except ProjectDocumentPDF.DoesNotExist:
@@ -100,8 +98,9 @@ class PDFService:
             # Generate PDF using Prince
             pdf_content = PDFService._html_to_pdf(html_content)
 
-            # Create ContentFile
-            filename = f"annual_report_{report.year}.pdf"
+            # Create ContentFile with content-hashed filename
+            content_hash = generate_content_hash(pdf_content)
+            filename = f"annual_report_{report.year}_{content_hash}.pdf"
             return ContentFile(pdf_content, name=filename)
 
         except Exception as e:
