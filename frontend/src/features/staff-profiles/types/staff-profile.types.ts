@@ -38,6 +38,7 @@ export interface IStaffProfileListResponse {
 	total_results: number;
 	page: number;
 	total_pages: number;
+	it_assets_available: boolean;
 	showing_hidden: boolean;
 }
 

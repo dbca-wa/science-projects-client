@@ -129,6 +129,11 @@ class StaffProfiles(APIView):
 
         # Apply BCS division filter at DB level (or include all if API unavailable)
         if it_assets_available:
+            if not bcs_emails:
+                settings.LOGGER.warning(
+                    "IT Assets API returned data but no BCS division users found. "
+                    "The division name may have changed."
+                )
             base_queryset = base_queryset.filter(email__in=bcs_emails)
         else:
             settings.LOGGER.warning(
@@ -244,6 +249,7 @@ class StaffProfiles(APIView):
                 "total_results": total_users,
                 "page": page,
                 "total_pages": total_pages,
+                "it_assets_available": it_assets_available,
                 "showing_hidden": (
                     request.user.is_authenticated
                     and request.user.is_superuser

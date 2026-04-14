@@ -150,7 +150,9 @@ const StaffDirectoryPage = () => {
 							{totalResults === 0
 								? searchTerm
 									? `No results for '${searchTerm}'`
-									: "Service is down for maintenance. Please try again later."
+									: data.it_assets_available === false
+										? "The staff directory service is temporarily unavailable. Please try again later."
+										: "No staff profiles found."
 								: totalResults === 1
 									? `Showing 1 result${searchTerm ? ` for '${searchTerm}'` : ""}`
 									: `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, totalResults)} of ${totalResults} results${searchTerm ? ` for '${searchTerm}'` : ""}`}
