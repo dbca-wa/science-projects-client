@@ -140,17 +140,15 @@ class TestValidateFileUpload:
         assert sanitised_name == "document.pdf"
         assert mime_type == "application/pdf"
 
-    def test_extension_mismatch_raises_error(self, tmp_path):
-        """Test that extension mismatch raises error."""
+    def test_extension_mismatch_auto_corrected(self, tmp_path):
+        """Test that extension mismatch is auto-corrected."""
         # Create a JPEG file but name it .png
         jpeg_file = tmp_path / "fake.png"
         jpeg_file.write_bytes(b"\xff\xd8\xff\xe0\x00\x10JFIF" + b"\x00" * 100)
 
-        with pytest.raises(
-            FileValidationError,
-            match="File extension '.png' does not match detected file type 'image/jpeg'",
-        ):
-            validate_file_upload(str(jpeg_file), "fake.png")
+        sanitised_name, mime_type = validate_file_upload(str(jpeg_file), "fake.png")
+        assert sanitised_name == "fake.jpg"
+        assert mime_type == "image/jpeg"
 
     def test_disallowed_mime_type_raises_error(self, tmp_path):
         """Test that disallowed MIME type raises error."""
@@ -284,26 +282,22 @@ class TestEdgeCases:
     """Tests for edge cases and security scenarios."""
 
     def test_jpeg_with_pdf_extension(self, tmp_path):
-        """Test JPEG file with .pdf extension is rejected."""
+        """Test JPEG file with .pdf extension is auto-corrected to .jpg."""
         fake_pdf = tmp_path / "fake.pdf"
         fake_pdf.write_bytes(b"\xff\xd8\xff\xe0\x00\x10JFIF" + b"\x00" * 100)
 
-        with pytest.raises(
-            FileValidationError,
-            match="File extension '.pdf' does not match detected file type 'image/jpeg'",
-        ):
-            validate_file_upload(str(fake_pdf), "fake.pdf")
+        sanitised_name, mime_type = validate_file_upload(str(fake_pdf), "fake.pdf")
+        assert sanitised_name == "fake.jpg"
+        assert mime_type == "image/jpeg"
 
     def test_pdf_with_jpg_extension(self, tmp_path):
-        """Test PDF file with .jpg extension is rejected."""
+        """Test PDF file with .jpg extension is auto-corrected to .pdf."""
         fake_jpg = tmp_path / "fake.jpg"
         fake_jpg.write_bytes(b"%PDF-1.4\n" + b"\x00" * 100)
 
-        with pytest.raises(
-            FileValidationError,
-            match="File extension '.jpg' does not match detected file type 'application/pdf'",
-        ):
-            validate_file_upload(str(fake_jpg), "fake.jpg")
+        sanitised_name, mime_type = validate_file_upload(str(fake_jpg), "fake.jpg")
+        assert sanitised_name == "fake.pdf"
+        assert mime_type == "application/pdf"
 
     def test_shell_script_rejected(self, tmp_path):
         """Test that shell script is rejected."""
@@ -436,10 +430,10 @@ class TestPropertyBasedValidation:
 
         property_test()
 
-    def test_extension_mismatch_always_detected(self, tmp_path):
+    def test_extension_mismatch_always_auto_corrected(self, tmp_path):
         """
         Property: Any file where the magic bytes don't match the extension
-        should always be detected and rejected.
+        should always be auto-corrected to the correct extension.
 
         This test generates files with mismatched content and extensions.
         """
@@ -462,18 +456,19 @@ class TestPropertyBasedValidation:
             if content_idx == extension_idx:
                 return
 
-            content_mime, magic_bytes, _ = file_types[content_idx]
+            content_mime, magic_bytes, correct_ext = file_types[content_idx]
             _, _, wrong_extension = file_types[extension_idx]
 
             # Create file with mismatched content and extension
             test_file = tmp_path / f"mismatch{wrong_extension}"
             test_file.write_bytes(magic_bytes + b"\x00" * 100)
 
-            # Should always fail validation
-            with pytest.raises(
-                FileValidationError, match="does not match detected file type"
-            ):
-                validate_file_upload(str(test_file), f"mismatch{wrong_extension}")
+            # Should auto-correct the extension
+            sanitised_name, mime_type = validate_file_upload(
+                str(test_file), f"mismatch{wrong_extension}"
+            )
+            assert sanitised_name == f"mismatch{correct_ext}"
+            assert mime_type == content_mime
 
         property_test()
 

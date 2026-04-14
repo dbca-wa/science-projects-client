@@ -108,7 +108,7 @@ class TestPDFService:
         mock_subprocess.return_value = Mock(returncode=1, stderr="Prince error")
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="Prince XML failed"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService.generate_document_pdf(concept_plan.document)
 
     @pytest.mark.django_db
@@ -127,7 +127,7 @@ class TestPDFService:
         mock_subprocess.side_effect = TimeoutExpired("prince", 300)
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="timed out"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService.generate_document_pdf(concept_plan.document)
 
     @pytest.mark.django_db
@@ -143,7 +143,7 @@ class TestPDFService:
         mock_render.side_effect = Exception("Template not found")
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="Failed to generate PDF"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService.generate_document_pdf(concept_plan.document)
 
     @pytest.mark.django_db
@@ -211,7 +211,7 @@ class TestPDFService:
         mock_subprocess.return_value = Mock(returncode=1, stderr="Generation failed")
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="Prince XML failed"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService.generate_annual_report_pdf(annual_report)
 
     @pytest.mark.django_db
@@ -424,7 +424,7 @@ class TestPDFService:
         mock_subprocess.return_value = Mock(returncode=1, stderr="Prince error message")
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="Prince XML failed"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService._html_to_pdf(html_content)
 
     @pytest.mark.django_db
@@ -452,7 +452,7 @@ class TestPDFService:
         mock_subprocess.side_effect = Exception("Unexpected error")
 
         # Act & Assert
-        with pytest.raises(ValidationError, match="PDF generation error"):
+        with pytest.raises(ValidationError, match="PDF generation failed"):
             PDFService._html_to_pdf(html_content)
 
 

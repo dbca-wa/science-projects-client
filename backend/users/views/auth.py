@@ -62,4 +62,12 @@ class ChangePassword(APIView):
             UserService.change_password(request.user, old_password, new_password)
             return Response({"ok": "Password changed successfully"})
         except ValidationError as e:
-            return Response({"error": str(e)}, status=400)
+            settings.LOGGER.error(
+                f"Password change failed for user {request.user.pk}: {e}"
+            )
+            return Response(
+                {
+                    "error": "Password change failed. Please check your input and try again."
+                },
+                status=400,
+            )

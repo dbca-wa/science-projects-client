@@ -354,7 +354,9 @@ class NewCycleOpen(APIView):
                         except Exception as e:
                             settings.LOGGER.error(f"Email Error: {e}")
                             return Response(
-                                {"error": str(e)},
+                                {
+                                    "error": "Failed to send notification email. Please try again."
+                                },
                                 status=HTTP_400_BAD_REQUEST,
                             )
                     else:
@@ -390,7 +392,9 @@ class NewCycleOpen(APIView):
                             except Exception as e:
                                 settings.LOGGER.error(f"Email Error: {e}")
                                 return Response(
-                                    {"error": str(e)},
+                                    {
+                                        "error": "Failed to send notification email. Please try again."
+                                    },
                                     status=HTTP_400_BAD_REQUEST,
                                 )
                     processed.append(recipient["pk"])
@@ -507,9 +511,7 @@ class SendBumpEmails(APIView):
                         emails_sent += 1
                     except Exception as email_error:
                         settings.LOGGER.error(f"Email Error: {email_error}")
-                        errors.append(
-                            f"Failed to send email to {user_to_action.email}: {str(email_error)}"
-                        )
+                        errors.append(f"Failed to send email to {user_to_action.email}")
                 else:
                     # Test environment - only send to maintainer
                     maintainer_id = get_current_maintainer_id()
@@ -528,7 +530,7 @@ class SendBumpEmails(APIView):
                         except Exception as email_error:
                             settings.LOGGER.error(f"Email Error: {email_error}")
                             errors.append(
-                                f"Failed to send email to {user_to_action.email}: {str(email_error)}"
+                                f"Failed to send email to {user_to_action.email}"
                             )
                     else:
                         settings.LOGGER.info(
@@ -545,9 +547,7 @@ class SendBumpEmails(APIView):
                 settings.LOGGER.error(
                     f"Unexpected error processing document {doc_data.get('documentId')}: {str(e)}"
                 )
-                errors.append(
-                    f"Error processing document {doc_data.get('documentId')}: {str(e)}"
-                )
+                errors.append(f"Error processing document {doc_data.get('documentId')}")
 
         response_data = {
             "emails_sent": emails_sent,
@@ -867,4 +867,7 @@ class SendMentionNotification(APIView):
 
         except Exception as e:
             settings.LOGGER.error(f"Error sending comment notifications: {str(e)}")
-            return Response({"error": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Failed to send comment notifications. Please try again."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )

@@ -140,7 +140,7 @@ def get_file_mime_type(file_path: str) -> str:
         raise
     except Exception as e:
         logger.error(f"Failed to determine MIME type for {file_path}: {e}")
-        raise FileValidationError(f"Could not determine file type: {e}")
+        raise FileValidationError("Could not determine file type.")
 
 
 def sanitise_filename(filename: str) -> str:

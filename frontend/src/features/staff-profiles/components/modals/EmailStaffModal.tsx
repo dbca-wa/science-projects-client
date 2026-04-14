@@ -4,13 +4,11 @@ import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Label } from "@/shared/components/ui/label";
 import { useEmailStaffMember } from "../../hooks/useStaffProfileMutations";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import ResponsiveModal from "./ResponsiveModal";
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_EMAIL_LENGTH = 254;
-
-const sanitise = (input: string): string =>
-	input.replace(/<[^>]*>/g, "").trim();
 
 interface EmailStaffModalProps {
 	userPk: number;
@@ -46,8 +44,8 @@ const EmailStaffModal = ({
 			{
 				userPk,
 				data: {
-					senderEmail: sanitise(senderEmail),
-					message: sanitise(message),
+					senderEmail: sanitizeInput(senderEmail),
+					message: sanitizeInput(message),
 				},
 			},
 			{

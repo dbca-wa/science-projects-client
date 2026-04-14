@@ -160,9 +160,9 @@ class UpdateProfile(APIView):
             try:
                 avatar.save()
             except Exception as e:
-                error_msg = str(e)
+                settings.LOGGER.error(f"Avatar upload failed for user {user.pk}: {e}")
                 return Response(
-                    {"error": f"Image upload failed: {error_msg}"},
+                    {"error": "Image upload failed. Please try a different file."},
                     status=HTTP_400_BAD_REQUEST,
                 )
 
@@ -224,7 +224,10 @@ class RemoveAvatar(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
         except Exception as e:
-            return Response({"error": str(e)}, status=400)
+            settings.LOGGER.error(f"Failed to remove avatar for user {pk}: {e}")
+            return Response(
+                {"error": "Failed to remove avatar. Please try again."}, status=400
+            )
 
     def delete(self, request, pk):
         """DELETE method for removing avatar"""
@@ -240,7 +243,10 @@ class RemoveAvatar(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
         except Exception as e:
-            return Response({"error": str(e)}, status=400)
+            settings.LOGGER.error(f"Failed to remove avatar for user {pk}: {e}")
+            return Response(
+                {"error": "Failed to remove avatar. Please try again."}, status=400
+            )
 
 
 class UserWorks(APIView):

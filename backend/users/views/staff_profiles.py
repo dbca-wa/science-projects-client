@@ -58,11 +58,13 @@ class StaffProfiles(APIView):
             page = int(request.query_params.get("page", 1))
         except ValueError:
             page = 1
+        page = max(1, page)
 
         try:
             page_size = int(request.query_params.get("page_size", 24))
         except ValueError:
             page_size = 24
+        page_size = max(1, min(100, page_size))
 
         search_term = request.query_params.get(
             "searchTerm"
@@ -94,9 +96,11 @@ class StaffProfiles(APIView):
                         f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
                     )
                     it_asset_data_by_email = {}
+                    cache.set(cache_key, {}, 60)
             except Exception as e:
                 settings.LOGGER.error(f"IT Assets API error: {e}")
                 it_asset_data_by_email = {}
+                cache.set(cache_key, {}, 60)
 
         it_assets_available = bool(it_asset_data_by_email)
 
@@ -162,7 +166,7 @@ class StaffProfiles(APIView):
         # Handle hidden profile filtering
         if not request.user.is_authenticated:
             users = users.exclude(staff_profile__is_hidden=True)
-        elif request.user.is_staff and request.user.is_superuser:
+        elif request.user.is_superuser:
             if not show_hidden:
                 users = users.exclude(staff_profile__is_hidden=True)
         else:
@@ -209,9 +213,23 @@ class StaffProfiles(APIView):
                     user.staff_profile.it_asset_id is None
                     or user.staff_profile.employee_id is None
                 ):
-                    user.staff_profile.it_asset_id = user_data.get("id")
-                    user.staff_profile.employee_id = user_data.get("employee_id")
-                    profiles_to_update.append(user.staff_profile)
+                    new_it_asset_id = user_data.get("id")
+                    new_employee_id = user_data.get("employee_id")
+                    changed = False
+                    if (
+                        user.staff_profile.it_asset_id is None
+                        and new_it_asset_id is not None
+                    ):
+                        user.staff_profile.it_asset_id = new_it_asset_id
+                        changed = True
+                    if (
+                        user.staff_profile.employee_id is None
+                        and new_employee_id is not None
+                    ):
+                        user.staff_profile.employee_id = new_employee_id
+                        changed = True
+                    if changed:
+                        profiles_to_update.append(user.staff_profile)
 
                 user.division = user_data.get("division")
                 user.unit = user_data.get("unit")
@@ -499,7 +517,9 @@ class PublicEmailStaffMember(APIView):
                     settings.LOGGER.error(
                         msg=f"Email Error: {e}\n If this is a 'getaddrinfo' error, you are likely running outside of OIM's datacenters."
                     )
-                    return Response({"error": str(e)}, status=400)
+                    return Response(
+                        {"error": "Failed to send email. Please try again."}, status=400
+                    )
             else:
                 # Development/staging - don't actually send
                 settings.LOGGER.info(msg=f"DEV: Would send email to {recipient_email}")
@@ -511,4 +531,6 @@ class PublicEmailStaffMember(APIView):
             return Response({"error": "Staff profile not found"}, status=404)
         except Exception as e:
             settings.LOGGER.error(msg=f"Error sending email: {e}")
-            return Response({"error": str(e)}, status=400)
+            return Response(
+                {"error": "Failed to send email. Please try again."}, status=400
+            )
