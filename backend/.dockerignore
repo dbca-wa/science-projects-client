@@ -1,6 +1,5 @@
 media_audit/
 
-
 # Git and version control
 .git/
 .github/
