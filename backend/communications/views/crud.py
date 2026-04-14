@@ -260,7 +260,11 @@ class CommentDetail(APIView):
             return Response(result.data, status=HTTP_202_ACCEPTED)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+            logger.error(f"Failed to update comment {pk}: {e}")
+            return Response(
+                {"error": "Failed to update comment. Please try again."},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
     def delete(self, request, pk):
         """Delete comment"""
@@ -281,7 +285,11 @@ class CommentDetail(APIView):
             CommunicationService.delete_comment(pk, request.user)
             return Response(status=HTTP_204_NO_CONTENT)
         except PermissionError as e:
-            return Response({"detail": str(e)}, status=HTTP_403_FORBIDDEN)
+            logger.error(f"Permission error deleting comment {pk}: {e}")
+            return Response(
+                {"detail": "You do not have permission to delete this comment."},
+                status=HTTP_403_FORBIDDEN,
+            )
 
 
 class Reactions(APIView):
@@ -362,7 +370,11 @@ class Reactions(APIView):
             return Response(serializer.data, status=HTTP_201_CREATED)
 
         except Exception as e:
-            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+            logger.error(f"Failed to process reaction: {e}")
+            return Response(
+                {"error": "Failed to process reaction. Please try again."},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class ReactionDetail(APIView):

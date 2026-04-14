@@ -177,7 +177,10 @@ class CaretakerRequestService:
                         end_date.replace("Z", "+00:00")
                     ).date()
                 except (ValueError, AttributeError) as e:
-                    raise ValidationError({"end_date": f"Invalid date format: {e}"})
+                    settings.LOGGER.error(
+                        f"Invalid date format for caretaker request: {e}"
+                    )
+                    raise ValidationError({"end_date": "Invalid date format."})
 
             if end_date < timezone.now().date():
                 raise ValidationError({"end_date": "End date cannot be in the past"})
@@ -310,7 +313,10 @@ class CaretakerRequestService:
                 notes=task.notes,
             )
         except Exception as e:
-            raise ValidationError(f"Failed to create caretaker relationship: {e}")
+            settings.LOGGER.error(f"Failed to create caretaker relationship: {e}")
+            raise ValidationError(
+                "Failed to create caretaker relationship. Please try again."
+            )
 
         # Update task status to FULFILLED (request approved AND caretaker created)
         task.status = AdminTask.TaskStatus.FULFILLED

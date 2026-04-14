@@ -13,7 +13,8 @@ def health_check(request):
 
         connections["default"].cursor()
     except Exception as e:
-        return JsonResponse({"status": "fail", "error": str(e)}, status=500)
+        settings.LOGGER.error(f"Health check failed: {e}")
+        return JsonResponse({"status": "fail"}, status=500)
 
     return JsonResponse({"status": "ok"}, status=200)
 

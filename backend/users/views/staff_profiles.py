@@ -499,7 +499,9 @@ class PublicEmailStaffMember(APIView):
                     settings.LOGGER.error(
                         msg=f"Email Error: {e}\n If this is a 'getaddrinfo' error, you are likely running outside of OIM's datacenters."
                     )
-                    return Response({"error": str(e)}, status=400)
+                    return Response(
+                        {"error": "Failed to send email. Please try again."}, status=400
+                    )
             else:
                 # Development/staging - don't actually send
                 settings.LOGGER.info(msg=f"DEV: Would send email to {recipient_email}")
@@ -511,4 +513,6 @@ class PublicEmailStaffMember(APIView):
             return Response({"error": "Staff profile not found"}, status=404)
         except Exception as e:
             settings.LOGGER.error(msg=f"Error sending email: {e}")
-            return Response({"error": str(e)}, status=400)
+            return Response(
+                {"error": "Failed to send email. Please try again."}, status=400
+            )

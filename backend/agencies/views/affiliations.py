@@ -159,7 +159,7 @@ class AffiliationsMerge(APIView):
                     f"{instances_to_update} could not be updated...{e}"
                 )
                 return Response(
-                    {"message": f"Error! {e}"},
+                    {"message": "Affiliation merge failed. Please try again."},
                     status=HTTP_400_BAD_REQUEST,
                 )
             finally:
@@ -190,6 +190,6 @@ class AffiliationsCleanOrphaned(APIView):
                 f"Error during orphaned affiliation cleanup: {str(e)}"
             )
             return Response(
-                {"message": f"Error during cleanup: {str(e)}"},
+                {"message": "Affiliation cleanup failed. Please try again."},
                 status=HTTP_500_INTERNAL_SERVER_ERROR,
             )

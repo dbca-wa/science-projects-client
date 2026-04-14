@@ -124,13 +124,17 @@ export default defineConfig({
 		sourcemap: false,
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					// Vendor chunks
-					"vendor-react": ["react", "react-dom", "react-router"],
-					"vendor-query": ["@tanstack/react-query"],
-					"vendor-mobx": ["mobx", "mobx-react-lite"],
-					"vendor-ui": ["lucide-react", "sonner", "framer-motion"],
-					"vendor-dompurify": ["dompurify"],
+				manualChunks(id: string) {
+					if (id.includes("node_modules/react-dom")) return "vendor-react";
+					if (id.includes("node_modules/react/")) return "vendor-react";
+					if (id.includes("node_modules/react-router")) return "vendor-react";
+					if (id.includes("node_modules/@tanstack/react-query"))
+						return "vendor-query";
+					if (id.includes("node_modules/mobx")) return "vendor-mobx";
+					if (id.includes("node_modules/lucide-react")) return "vendor-ui";
+					if (id.includes("node_modules/sonner")) return "vendor-ui";
+					if (id.includes("node_modules/framer-motion")) return "vendor-ui";
+					if (id.includes("node_modules/dompurify")) return "vendor-dompurify";
 				},
 			},
 		},

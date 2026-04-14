@@ -80,6 +80,3 @@ public/data/raw/
 # Coverage files (generated)
 coverage.json
 **/coverage.json
-backend/templates/admin/medias/projectphoto/change_list.html
-backend/templates/admin/medias/useravatar/change_list.html
-backend/medias/management/commands/audit_media_files.py

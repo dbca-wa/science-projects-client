@@ -155,19 +155,20 @@ class DBCAMiddleware(MiddlewareMixin):
                     return existing_user
                 else:
                     # This is unlikely but possible if there's a DB issue
-                    raise ParseError(
+                    settings.LOGGER.error(
                         f"User appears to exist but cannot be retrieved: {str(ie)}"
                     )
+                    raise ParseError("Failed to create user account. Please try again.")
             else:
                 # Some other integrity error
                 settings.LOGGER.error(
                     f"Database integrity error creating user: {str(ie)}"
                 )
-                raise ParseError(f"Database error creating user: {str(ie)}")
+                raise ParseError("Failed to create user account. Please try again.")
 
         except Exception as e:
             settings.LOGGER.error(f"Error creating user: {str(e)}")
-            raise ParseError(f"Failed to create user: {str(e)}")
+            raise ParseError("Failed to create user account. Please try again.")
 
     def save_request_meta_to_file(self, meta_data):
         # Create a temporary file using tempfile

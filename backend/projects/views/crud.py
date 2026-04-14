@@ -134,7 +134,8 @@ class Projects(APIView):
                 except Exception as e:
                     settings.LOGGER.error(f"Image upload error: {e}")
                     return Response(
-                        {"error": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR
+                        {"error": "Image upload failed. Please try a different file."},
+                        status=HTTP_500_INTERNAL_SERVER_ERROR,
                     )
 
             # Create project areas

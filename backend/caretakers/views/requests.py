@@ -149,8 +149,9 @@ class CaretakerRequestCreate(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
         except ValidationError as e:
+            settings.LOGGER.error(f"Caretaker request creation error: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "Request could not be processed. Please try again."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -171,18 +172,21 @@ class CaretakerRequestCancel(APIView):
             )
 
         except NotFound as e:
+            settings.LOGGER.error(f"Caretaker request cancel not found: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "Caretaker request not found."},
                 status=HTTP_404_NOT_FOUND,
             )
         except PermissionDenied as e:
+            settings.LOGGER.error(f"Caretaker request cancel permission denied: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "You do not have permission to cancel this request."},
                 status=HTTP_403_FORBIDDEN,
             )
         except ValidationError as e:
+            settings.LOGGER.error(f"Caretaker request cancel validation error: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "Request could not be cancelled. Please try again."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
