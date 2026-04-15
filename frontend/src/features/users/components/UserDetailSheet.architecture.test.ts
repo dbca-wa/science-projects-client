@@ -1,24 +1,16 @@
 /**
- * Bug Condition Exploration Test - Architecture Violation Detection
+ * UserDetailSheet Architecture Tests
  *
- * Property 1: Bug Condition - Cross-Domain Import Violation
- *
- * CRITICAL: This test MUST FAIL on unfixed code
- *
- * This test detects the architectural violation where UserDetailSheet
- * imports from the projects feature, violating the principle that
- * platform features (users) should not depend on domain features (projects).
- *
- * Expected behavior:
- * - BEFORE FIX: Test FAILS (confirms violation exists)
- * - AFTER FIX: Test PASSES (confirms violation is resolved)
+ * Detects architectural violations where UserDetailSheet imports from the
+ * projects feature, violating the principle that platform features (users)
+ * should not depend on domain features (projects).
  */
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-describe("UserDetailSheet Architecture - Bug Condition Exploration", () => {
+describe("UserDetailSheet Architecture", () => {
 	it("should NOT import from projects feature (cross-domain violation)", () => {
 		// Read the UserDetailSheet source file
 		const filePath = join(__dirname, "UserDetailSheet.tsx");

@@ -108,7 +108,7 @@ class QuoteService:
                 Quote.objects.create(**quote_data)
                 created_count += 1
             except Exception as e:
-                errors.append(str(e))
+                errors.append("Failed to create quote")
                 settings.LOGGER.error(msg=f"Error creating quote: {e}")
 
         return {"created": created_count, "errors": errors}

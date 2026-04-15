@@ -13,6 +13,7 @@ Security approach:
 See ADR-008 for detailed rationale.
 """
 
+import hashlib
 import logging
 import os
 import re
@@ -324,3 +325,73 @@ def validate_document_upload(
         raise FileValidationError(f"File is not a PDF. Detected type: {mime_type}")
 
     return sanitised_name, mime_type
+
+
+def generate_content_hash(content: bytes) -> str:
+    """
+    Generate an 8-character hexadecimal hash from file content bytes.
+
+    Uses MD5 truncated to 8 hex characters for cache-busting filenames.
+    Not used for security — only for producing distinct filenames when
+    file content changes.
+
+    Args:
+        content: File content as bytes.
+
+    Returns:
+        8-character hexadecimal string.
+
+    Raises:
+        ValueError: If content is empty (b"").
+    """
+    if not content:
+        raise ValueError("Cannot generate content hash from empty bytes.")
+    return hashlib.md5(content, usedforsecurity=False).hexdigest()[:8]
+
+
+def delete_old_file(file_field, new_file_path: str | None = None) -> None:
+    """
+    Safely delete an old file from storage when it is being replaced.
+
+    Compares the old path against the new path to prevent self-deletion.
+    All exceptions are caught and logged so the caller's save operation
+    is never blocked by a cleanup failure.
+
+    Args:
+        file_field: Django FileField/ImageField holding the old file.
+        new_file_path: Path of the replacement file (optional). When
+            provided, deletion is skipped if old and new paths match.
+    """
+    if not file_field or not file_field.name:
+        return
+
+    old_path = file_field.name
+
+    if new_file_path and os.path.basename(old_path) == os.path.basename(new_file_path):
+        return
+
+    try:
+        file_field.storage.delete(old_path)
+    except FileNotFoundError:
+        logger.warning("Old file not found during cleanup: %s", old_path)
+    except (OSError, PermissionError) as exc:
+        logger.error("Failed to delete old file %s: %s", old_path, exc)
+
+
+def build_hashed_filename(original_name: str, content: bytes) -> str:
+    """
+    Build a filename with a content hash inserted before the extension.
+
+    Example: ``"report.pdf"`` with content producing hash ``a1b2c3d4``
+    becomes ``"report_a1b2c3d4.pdf"``.
+
+    Args:
+        original_name: Original filename (e.g. "photo.jpg").
+        content: File content bytes used to derive the hash.
+
+    Returns:
+        Filename with hash embedded (e.g. "photo_a1b2c3d4.jpg").
+    """
+    content_hash = generate_content_hash(content)
+    path = Path(original_name)
+    return f"{path.stem}_{content_hash}{path.suffix}"

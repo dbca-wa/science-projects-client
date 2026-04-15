@@ -60,7 +60,7 @@
 		"date-fns": "^4.1.0",
 		"dayjs": "^1.11.20",
 		"diff-match-patch": "^1.0.5",
-		"dompurify": "^3.3.3",
+		"dompurify": "^3.4.0",
 		"framer-motion": "^12.38.0",
 		"htmldiff-js": "^1.0.5",
 		"js-cookie": "^3.0.5",

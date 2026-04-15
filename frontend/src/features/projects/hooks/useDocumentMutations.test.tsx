@@ -1,14 +1,7 @@
 /**
- * Document Save Operations - Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline behaviour.
- * These tests ensure that document save operations preserve data integrity.
+ * Document Save Operations Tests
  *
- * Property 2: Preservation - Document Save Operations
- *
- * For all document saves, the following SHALL be preserved:
+ * Verifies document save operations and data integrity:
  * - Data persists to backend correctly
  * - Optimistic updates work (where applicable)
  * - Error handling functions correctly
@@ -44,7 +37,7 @@ vi.mock("react-router", () => ({
 	useNavigate: () => vi.fn(),
 }));
 
-describe("Document Save Operations - Preservation Tests", () => {
+describe("Document Save Operations", () => {
 	let queryClient: QueryClient;
 
 	beforeEach(() => {
@@ -64,9 +57,7 @@ describe("Document Save Operations - Preservation Tests", () => {
 	);
 
 	/**
-	 * Property: For all document saves, progress report creation SHALL persist to backend
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Progress report creation should persist to backend
 	 */
 	it("should successfully create a progress report", async () => {
 		const mockResponse = {
@@ -101,13 +92,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			"Progress report for 2026 created successfully"
 		);
 
-		console.log("✓ Progress report creation persists to backend (preserved)");
+		console.log("✓ Progress report creation persists to backend");
 	});
 
 	/**
-	 * Property: For all document saves, project update SHALL persist to backend
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Project update should persist to backend
 	 */
 	it("should successfully update a project", async () => {
 		const { result } = renderHook(() => useUpdateProject(), { wrapper });
@@ -128,13 +117,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Project update persists to backend (preserved)");
+		console.log("✓ Project update persists to backend");
 	});
 
 	/**
-	 * Property: For all document saves, query invalidation SHALL trigger refetch
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Query invalidation should trigger refetch after progress report creation
 	 */
 	it("should invalidate queries after progress report creation", async () => {
 		const mockResponse = { id: 111, year: 2026, project: 456 };
@@ -158,13 +145,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			queryKey: ["projects", 456],
 		});
 
-		console.log("✓ Query invalidation triggers after save (preserved)");
+		console.log("✓ Query invalidation triggers after save");
 	});
 
 	/**
-	 * Property: For all document saves, project query invalidation SHALL trigger
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Project query invalidation should trigger after update
 	 */
 	it("should invalidate project queries after update", async () => {
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
@@ -193,13 +178,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			queryKey: ["projects"],
 		});
 
-		console.log("✓ Project queries invalidated after update (preserved)");
+		console.log("✓ Project queries invalidated after update");
 	});
 
 	/**
-	 * Property: For all document saves, error handling SHALL function correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Error handling should function correctly for progress report creation
 	 */
 	it("should handle progress report creation errors", async () => {
 		const mockError = new Error("Failed to create progress report");
@@ -221,13 +204,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			"Failed to create progress report"
 		);
 
-		console.log("✓ Progress report creation error handling works (preserved)");
+		console.log("✓ Progress report creation error handling works");
 	});
 
 	/**
-	 * Property: For all document saves, project update error handling SHALL function
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Error handling should function correctly for project updates
 	 */
 	it("should handle project update errors", async () => {
 		const mockError = new Error("Validation failed");
@@ -249,13 +230,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			expect(result.current.isError).toBe(true);
 		});
 
-		console.log("✓ Project update error handling works (preserved)");
+		console.log("✓ Project update error handling works");
 	});
 
 	/**
-	 * Property: For all document saves, loading state SHALL be tracked
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Loading state should be tracked during save operation
 	 */
 	it("should track loading state during save operation", async () => {
 		let resolveCreate: (value: IProgressReport) => void;
@@ -305,13 +284,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Loading state tracked during save (preserved)");
+		console.log("✓ Loading state tracked during save");
 	});
 
 	/**
-	 * Property: For all document saves, partial updates SHALL be supported
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Partial project updates should be supported
 	 */
 	it("should support partial project updates", async () => {
 		const mockResponse = {
@@ -340,13 +317,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Partial updates supported (preserved)");
+		console.log("✓ Partial updates supported");
 	});
 
 	/**
-	 * Property: For all document saves, data integrity SHALL be maintained
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Data integrity should be maintained during save
 	 */
 	it("should maintain data integrity during save", async () => {
 		const inputData = {
@@ -373,13 +348,11 @@ describe("Document Save Operations - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Data integrity maintained during save (preserved)");
+		console.log("✓ Data integrity maintained during save");
 	});
 
 	/**
-	 * Property: For all document saves, year validation SHALL work for progress reports
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Year validation should work for progress reports
 	 */
 	it("should accept valid year for progress report", async () => {
 		const mockResponse = { id: 999, year: 2026, project: 456 };
@@ -402,6 +375,6 @@ describe("Document Save Operations - Preservation Tests", () => {
 			{ year: 2026 }
 		);
 
-		console.log("✓ Year validation works for progress reports (preserved)");
+		console.log("✓ Year validation works for progress reports");
 	});
 });

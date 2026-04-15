@@ -367,7 +367,7 @@ class AdminTasks(APIView):
             settings.LOGGER.error(
                 msg=f"Error in setting project deletion requested: {e}"
             )
-            return e
+            return False
 
     def get(self, req):
         settings.LOGGER.info(msg=f"{req.user} is getting all admin tasks")
@@ -423,7 +423,7 @@ class AdminTasks(APIView):
         except Exception as e:
             settings.LOGGER.error(msg=f"Error in creating task: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "Failed to create task. Please try again."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -448,7 +448,7 @@ class AdminTasks(APIView):
                     msg=f"Error in setting project deletion requested: {res}"
                 )
                 return Response(
-                    f"{res}",
+                    "Failed to process deletion request. Please try again.",
                     status=HTTP_400_BAD_REQUEST,
                 )
         elif data["action"] == AdminTask.ActionTypes.MERGEUSER:

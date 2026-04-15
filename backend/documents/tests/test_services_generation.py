@@ -167,7 +167,8 @@ class TestPDFService:
 
         # Assert
         assert pdf_file is not None
-        assert pdf_file.name == f"annual_report_{annual_report.year}.pdf"
+        assert pdf_file.name.startswith(f"annual_report_{annual_report.year}")
+        assert pdf_file.name.endswith(".pdf")
         mock_render.assert_called_once()
         mock_subprocess.assert_called_once()
 

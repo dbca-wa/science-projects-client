@@ -15,8 +15,6 @@ import { announceToScreenReader } from "@/shared/utils/screen-reader.utils";
  * - Styled consistently with existing MapControls buttons
  * - Proper ARIA labels for accessibility
  * - MobX observer for reactive updates
- *
- * Requirements: 1.1, 1.2, 1.3, 1.5, 1.6
  */
 export const HeatmapToggle = observer(() => {
 	const store = useProjectMapStore();

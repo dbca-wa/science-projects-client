@@ -1,15 +1,10 @@
 /**
- * ProjectClosureTab Bug Condition Exploration Test
+ * ProjectClosureTab Tests
  *
- * CRITICAL: This test MUST FAIL on unfixed code - failure confirms the bug exists.
- * DO NOT attempt to fix the test or the code when it fails.
- *
- * Bug: Reopen project modal is missing - button exists but modal component doesn't.
- *
- * Expected counterexamples:
- * - Reopen button is visible for closed projects
- * - Clicking reopen button does nothing (modal commented out)
- * - ReopenProjectModal component does not exist in codebase
+ * Verifies reopen project modal behaviour:
+ * - Reopen button should be visible for closed projects
+ * - Clicking reopen button should open a confirmation modal
+ * - Modal should contain confirmation checkbox and reason textarea
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -130,11 +125,9 @@ function renderWithProviders(ui: React.ReactElement) {
 	);
 }
 
-describe("ProjectClosureTab - Bug Condition Exploration", () => {
+describe("ProjectClosureTab", () => {
 	/**
-	 * Test 1: Reopen button exists for closed projects
-	 *
-	 * EXPECTED TO PASS: Button should be visible (this part works)
+	 * Test 1: Reopen button should exist for closed projects
 	 */
 	it("should show reopen button for closed projects", () => {
 		renderWithProviders(
@@ -155,9 +148,7 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 	});
 
 	/**
-	 * Test 2: Clicking reopen button does nothing (modal missing)
-	 *
-	 * EXPECTED TO FAIL: Modal should open but doesn't exist
+	 * Test 2: Clicking reopen button should open the modal
 	 */
 	it("should open reopen modal when button is clicked", async () => {
 		const user = userEvent.setup();
@@ -176,28 +167,26 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 		const reopenButton = screen.getByTestId("reopen-project-button");
 		await user.click(reopenButton);
 
-		// BUG CONDITION: Modal should appear but doesn't exist
-		// This assertion SHOULD FAIL on unfixed code
+		// Reopen modal should appear after clicking the button
+		// This assertion verifies the modal is rendered
 		await waitFor(() => {
 			const modal = screen.queryByRole("dialog");
 			expect(modal).toBeInTheDocument();
 		});
 
-		// If we get here without the modal, document the counterexample
+		// If we get here without the modal, log diagnostic info
 		const modal = screen.queryByRole("dialog");
 		if (!modal) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Reopen modal not rendered:");
 			console.log("- Reopen button exists: YES");
 			console.log("- Button is clickable: YES");
 			console.log("- Modal appears after click: NO");
-			console.log("- This confirms the bug: modal component is missing");
+			console.log("- Modal component may be missing");
 		}
 	});
 
 	/**
-	 * Test 3: Modal should have confirmation checkbox
-	 *
-	 * EXPECTED TO FAIL: Modal doesn't exist, so checkbox doesn't exist
+	 * Test 3: Modal should have a confirmation checkbox
 	 */
 	it("should show confirmation checkbox in reopen modal", async () => {
 		const user = userEvent.setup();
@@ -216,7 +205,7 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 		const reopenButton = screen.getByTestId("reopen-project-button");
 		await user.click(reopenButton);
 
-		// BUG CONDITION: Confirmation checkbox should exist but doesn't
+		// Confirmation checkbox should exist in the modal
 		await waitFor(() => {
 			const checkbox = screen.queryByRole("checkbox", {
 				name: /are you sure you want to reopen this project/i,
@@ -226,16 +215,14 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 
 		const checkbox = screen.queryByRole("checkbox");
 		if (!checkbox) {
-			console.log("COUNTEREXAMPLE FOUND:");
-			console.log("- Confirmation checkbox exists: NO");
-			console.log("- This confirms the bug: modal is not implemented");
+			console.log(
+				"Confirmation checkbox not found — modal may not be implemented"
+			);
 		}
 	});
 
 	/**
-	 * Test 4: Modal should have reason textarea
-	 *
-	 * EXPECTED TO FAIL: Modal doesn't exist, so textarea doesn't exist
+	 * Test 4: Modal should have a reason textarea
 	 */
 	it("should show reason textarea in reopen modal", async () => {
 		const user = userEvent.setup();
@@ -254,7 +241,7 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 		const reopenButton = screen.getByTestId("reopen-project-button");
 		await user.click(reopenButton);
 
-		// BUG CONDITION: Reason textarea should exist but doesn't
+		// Reason textarea should exist in the modal
 		await waitFor(() => {
 			const textarea = screen.queryByRole("textbox", {
 				name: /reason/i,
@@ -264,13 +251,9 @@ describe("ProjectClosureTab - Bug Condition Exploration", () => {
 
 		const textarea = screen.queryByRole("textbox");
 		if (textarea) {
-			console.log("COUNTEREXAMPLE FOUND:");
-			console.log("- Reason textarea exists: YES");
-			console.log("- This confirms the bug is fixed: modal is implemented");
+			console.log("Reason textarea found — modal is implemented");
 		} else {
-			console.log("COUNTEREXAMPLE FOUND:");
-			console.log("- Reason textarea exists: NO");
-			console.log("- This confirms the bug: modal is not implemented");
+			console.log("Reason textarea not found — modal may not be implemented");
 		}
 	});
 

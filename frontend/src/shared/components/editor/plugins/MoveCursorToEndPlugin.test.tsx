@@ -1,18 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Test file with complex type issues requiring refactor
 // @ts-nocheck
 /**
- * MoveCursorToEndPlugin Bug Condition Exploration Test
+ * MoveCursorToEndPlugin Tests
  *
- * CRITICAL: This test MUST FAIL on unfixed code - failure confirms the bug exists.
- * DO NOT attempt to fix the test or the code when it fails.
- *
- * Bug: MoveCursorToEndPlugin fails to position cursor at end when editor opens,
- * requiring users to click again before typing.
- *
- * Expected counterexamples:
- * - Cursor is not positioned at end when editor becomes editable
- * - User cannot type immediately without additional click
- * - Plugin executes but cursor position is incorrect
+ * Verifies cursor positioning behaviour when editor opens:
+ * - Cursor should be positioned at end when editor becomes editable
+ * - User should be able to type immediately without additional click
+ * - Plugin should handle both pre-populated and empty content
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -94,7 +88,7 @@ function _isCursorAtEnd(
 	return anchor.offset === textLength && focus.offset === textLength;
 }
 
-describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
+describe("MoveCursorToEndPlugin", () => {
 	let stateHistory: EditorState[] = [];
 
 	beforeEach(() => {
@@ -111,8 +105,6 @@ describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
 
 	/**
 	 * Test 1: Cursor positioning with pre-populated content
-	 *
-	 * EXPECTED TO FAIL: Cursor is NOT at end when editor opens with content
 	 */
 	it("should position cursor at end when editor opens with pre-populated content", async () => {
 		const initialContent =
@@ -142,19 +134,17 @@ describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
 		// Get the final state after plugin execution
 		const finalState = stateHistory[stateHistory.length - 1];
 
-		// BUG CONDITION: Cursor should be at end but likely is NOT
-		// This assertion SHOULD FAIL on unfixed code
+		// Cursor should be positioned at end of content
 		expect(finalState.cursorAtEnd).toBe(true);
 		expect(finalState.hasSelection).toBe(true);
 		expect(finalState.isCollapsed).toBe(true);
 
-		// Document counterexample if test fails
+		// Log diagnostic info if cursor is not at end
 		if (!finalState.cursorAtEnd) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Cursor not positioned at end:");
 			console.log("- Text content:", finalState.textContent);
 			console.log("- Cursor at end:", finalState.cursorAtEnd);
 			console.log("- Selection type:", finalState.selection?.getType());
-			console.log("- This confirms the bug: cursor is NOT positioned at end");
 		}
 	});
 
@@ -192,16 +182,13 @@ describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
 		expect(finalState.isCollapsed).toBe(true);
 
 		if (!finalState.hasSelection) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Cursor not properly positioned:");
 			console.log("- Selection exists:", finalState.hasSelection);
-			console.log("- This confirms the bug: cursor is not properly positioned");
 		}
 	});
 
 	/**
-	 * Test 3: Timing issue - cursor positioning before content loads
-	 *
-	 * EXPECTED TO FAIL: 100ms delay may not be sufficient for content to load
+	 * Test 3: Timing issue — cursor positioning before content loads
 	 */
 	it("should wait for content to load before positioning cursor", async () => {
 		const longContent = "<p>" + "Long content ".repeat(50) + "</p>";
@@ -229,23 +216,19 @@ describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
 
 		const finalState = stateHistory[stateHistory.length - 1];
 
-		// BUG CONDITION: With long content, timing issue is more pronounced
+		// With long content, timing issue may affect cursor positioning
 		expect(finalState.cursorAtEnd).toBe(true);
 
 		if (!finalState.cursorAtEnd) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Cursor not positioned at end with long content:");
 			console.log("- Content length:", finalState.textContent.length);
 			console.log("- Cursor at end:", finalState.cursorAtEnd);
-			console.log(
-				"- This confirms timing issue: content loads but cursor not positioned"
-			);
+			console.log("- Content loaded but cursor not positioned");
 		}
 	});
 
 	/**
-	 * Test 4: User cannot type immediately
-	 *
-	 * EXPECTED TO FAIL: Without proper cursor positioning, typing may not work
+	 * Test 4: User should be able to type immediately
 	 */
 	it("should allow immediate typing without additional click", async () => {
 		const initialContent = "<p>Initial content</p>";
@@ -292,13 +275,13 @@ describe("MoveCursorToEndPlugin - Bug Condition Exploration", () => {
 			});
 		}
 
-		// BUG CONDITION: Text insertion should succeed but may not
+		// Text insertion should succeed without additional user interaction
 		expect(insertSucceeded).toBe(true);
 
 		if (!insertSucceeded) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Text insertion failed:");
 			console.log("- Could not insert text");
-			console.log("- This confirms the bug: user cannot type immediately");
+			console.log("- User cannot type immediately without additional click");
 		}
 	});
 });

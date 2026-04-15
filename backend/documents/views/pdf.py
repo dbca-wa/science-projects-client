@@ -12,6 +12,8 @@ from ..models import AnnualReport
 from ..services.document_service import DocumentService
 from ..services.pdf_service import PDFService
 
+NO_CACHE_HEADERS = "no-cache, no-store, must-revalidate"
+
 
 class DownloadProjectDocument(APIView):
     """Download project document PDF"""
@@ -24,20 +26,24 @@ class DownloadProjectDocument(APIView):
 
         # Check if PDF exists
         if hasattr(document, "pdf") and document.pdf and document.pdf.file:
-            return FileResponse(
+            response = FileResponse(
                 document.pdf.file,
                 as_attachment=True,
                 filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
             )
+            response["Cache-Control"] = NO_CACHE_HEADERS
+            return response
 
         # Generate PDF if not exists
         doc_pdf = PDFService.generate_document_pdf(document)
 
-        return FileResponse(
+        response = FileResponse(
             doc_pdf.file,
             as_attachment=True,
             filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
         )
+        response["Cache-Control"] = NO_CACHE_HEADERS
+        return response
 
 
 class BeginProjectDocGeneration(APIView):
@@ -57,11 +63,13 @@ class BeginProjectDocGeneration(APIView):
             doc_pdf = PDFService.generate_document_pdf(document)
             PDFService.mark_pdf_generation_complete(document)
 
-            return FileResponse(
+            response = FileResponse(
                 doc_pdf.file,
                 as_attachment=True,
                 filename=f"{document.project.pk}_{document.kind}_{document.pk}.pdf",
             )
+            response["Cache-Control"] = NO_CACHE_HEADERS
+            return response
         except Exception:
             PDFService.mark_pdf_generation_complete(document)
             raise
@@ -96,16 +104,20 @@ class DownloadAnnualReport(APIView):
 
         # Check if PDF exists
         if hasattr(report, "pdf") and report.pdf:
-            return FileResponse(
+            response = FileResponse(
                 report.pdf.file,
                 as_attachment=True,
                 filename=f"annual_report_{report.year}.pdf",
             )
+            response["Cache-Control"] = NO_CACHE_HEADERS
+            return response
 
         # Generate PDF if not exists
         pdf_file = PDFService.generate_annual_report_pdf(report)
 
-        return FileResponse(pdf_file, as_attachment=True, filename=pdf_file.name)
+        response = FileResponse(pdf_file, as_attachment=True, filename=pdf_file.name)
+        response["Cache-Control"] = NO_CACHE_HEADERS
+        return response
 
 
 class BeginAnnualReportDocGeneration(APIView):
@@ -136,10 +148,12 @@ class BeginAnnualReportDocGeneration(APIView):
             PDFService.mark_pdf_generation_complete(report)
             raise
 
-        return Response(
+        response = Response(
             {"message": "PDF generation started", "report_id": report.pk},
             status=HTTP_202_ACCEPTED,
         )
+        response["Cache-Control"] = NO_CACHE_HEADERS
+        return response
 
 
 class CancelReportDocGeneration(APIView):

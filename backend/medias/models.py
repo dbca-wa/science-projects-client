@@ -11,7 +11,12 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 from common.models import CommonModel
-from common.utils.file_validation import validate_document_upload, validate_image_upload
+from common.utils.file_validation import (
+    build_hashed_filename,
+    delete_old_file,
+    validate_document_upload,
+    validate_image_upload,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -60,18 +65,25 @@ def _check_file_changed(instance, file_field_name="file"):
 
 def _validate_and_save_file(file_field, validator_func, max_size=10 * 1024 * 1024):
     """
-    Helper function to validate a file before saving.
+    Validate a file and return the sanitised name and content bytes.
+
+    Does NOT write to storage — the caller is responsible for persisting
+    the file via ``_apply_content_hash_and_cleanup``.
 
     Args:
         file_field: Django FileField or ImageField
         validator_func: Validation function (validate_image_upload or validate_document_upload)
         max_size: Maximum file size in bytes
 
+    Returns:
+        tuple[str, bytes]: (sanitised_name, file_content) for new uploads,
+        or (sanitised_name, None) when the file already exists on disk.
+
     Raises:
         FileValidationError: If validation fails
     """
     if not file_field:
-        return
+        return None, None
 
     # Check if this is an uploaded file or an existing FieldFile
     from django.db.models.fields.files import FieldFile
@@ -88,6 +100,7 @@ def _validate_and_save_file(file_field, validator_func, max_size=10 * 1024 * 102
             # File doesn't exist on disk yet or path is invalid
             pass
 
+    file_content = None
     if not temp_is_existing:
         # This is a new upload or file not yet saved
         # Try to get the underlying file object (Django stores it in _file or file attribute)
@@ -128,23 +141,73 @@ def _validate_and_save_file(file_field, validator_func, max_size=10 * 1024 * 102
         # Validate the file
         sanitised_name, mime_type = validator_func(temp_path, file_field.name, max_size)
 
-        # Only need to replace file content if this was a new upload
-        if not temp_is_existing:
-            # Replace file with validated content (and sanitised name if changed)
-            if sanitised_name != file_field.name:
-                logger.info(
-                    f"Filename sanitised: {file_field.name} -> {sanitised_name}"
-                )
-
-            # Replace the file content with what we read earlier
-            file_field.save(sanitised_name, ContentFile(file_content), save=False)
+        if not temp_is_existing and sanitised_name != file_field.name:
+            logger.info(f"Filename sanitised: {file_field.name} -> {sanitised_name}")
 
         logger.info(f"File validation successful: {sanitised_name} ({mime_type})")
+        return sanitised_name, file_content
 
     finally:
         # Clean up temporary file (only if we created one)
         if not temp_is_existing and os.path.exists(temp_path):
             os.unlink(temp_path)
+
+
+def _apply_content_hash_and_cleanup(
+    instance, file_field_name="file", validated_content=None, sanitised_name=None
+):
+    """
+    Apply a content hash to the filename and clean up the old file.
+
+    When ``validated_content`` and ``sanitised_name`` are provided (new
+    upload path), the file is written to storage exactly once using the
+    content-hashed filename — no intermediate file is created.
+
+    When they are ``None`` (existing-file-on-disk path), the content is
+    read from the already-stored file.
+
+    Args:
+        instance: Model instance with a file field.
+        file_field_name: Name of the file field (default: "file").
+        validated_content: Pre-read file bytes from ``_validate_and_save_file``.
+        sanitised_name: Sanitised filename from ``_validate_and_save_file``.
+    """
+    file_field = getattr(instance, file_field_name)
+    if not file_field:
+        return
+
+    if validated_content is not None and sanitised_name is not None:
+        # New upload path — content already in memory, no storage read needed
+        content = validated_content
+        original_name = os.path.basename(sanitised_name)
+    else:
+        # Existing file on disk — read from storage
+        try:
+            file_field.seek(0)
+            content = file_field.read()
+            file_field.seek(0)
+        except (AttributeError, OSError):
+            return
+
+        if not content:
+            return
+
+        original_name = os.path.basename(file_field.name)
+
+    hashed_name = build_hashed_filename(original_name, content)
+
+    # Delete old file if this is an existing instance
+    if instance.pk:
+        try:
+            old_instance = instance.__class__.objects.get(pk=instance.pk)
+            old_file = getattr(old_instance, file_field_name)
+            if old_file and old_file.name:
+                delete_old_file(old_file, new_file_path=hashed_name)
+        except instance.__class__.DoesNotExist:
+            pass
+
+    # Single write to storage with the final content-hashed filename
+    file_field.save(hashed_name, ContentFile(content), save=False)
 
 
 # endregion ===========================================================================================================
@@ -174,7 +237,12 @@ class ProjectDocumentPDF(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(self.file, validate_document_upload)
+            sanitised_name, content = _validate_and_save_file(
+                self.file, validate_document_upload
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
+            )
 
         if self.file:
             self.size = self.file.size
@@ -228,8 +296,11 @@ class AnnualReportMedia(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -271,8 +342,11 @@ class LegacyAnnualReportPDF(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -310,8 +384,11 @@ class AnnualReportPDF(CommonModel):  # The latest pdf for a given annual report
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -358,8 +435,11 @@ class AECEndorsementPDF(CommonModel):  # The latest pdf for a given annual repor
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_document_upload, max_size=PROJECT_PDF_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -394,8 +474,11 @@ class ProjectPhoto(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -436,8 +519,11 @@ class ProjectPlanMethodologyPhoto(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -482,8 +568,11 @@ class BusinessAreaPhoto(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -514,8 +603,11 @@ class AgencyImage(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:
@@ -552,8 +644,11 @@ class UserAvatar(CommonModel):
     def save(self, *args, **kwargs):
         # Validate file if it's new or has changed
         if self.file and _check_file_changed(self):
-            _validate_and_save_file(
+            sanitised_name, content = _validate_and_save_file(
                 self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
             )
 
         if self.file:

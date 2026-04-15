@@ -161,7 +161,7 @@ WORKDIR /usr/src/app/backend
 # Create necessary directories and set permissions
 RUN mkdir -p /usr/src/app/backend/staticfiles /usr/src/app/backend/media \
     && chown -R ${UID}:${GID} /usr/src/app \
-    && chown ${UID}:${GID} /home/spmsuser/.bashrc
+    && chown -R ${UID}:${GID} /home/spmsuser
 
 # Delete non-commercial license of Prince (using configmap)
 RUN rm -f /usr/lib/prince/license/license.dat
@@ -187,4 +187,4 @@ EXPOSE 8000
 ENV TMPDIR=/tmp
 
 # Launch production server
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp"]
+CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp", "--no-control-socket"]

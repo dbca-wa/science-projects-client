@@ -1,14 +1,7 @@
 /**
- * ContentDiff - Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline behaviour.
- * These tests ensure that document history and diff views preserve accuracy.
+ * ContentDiff Tests
  *
- * Property 2: Preservation - Document History and Diff Accuracy
- *
- * For all document diffs, the following SHALL be preserved:
+ * Verifies document history and diff view accuracy:
  * - History displays correctly
  * - Changes are highlighted accurately
  * - Sanitisation preserves safety
@@ -21,15 +14,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { ContentDiff } from "./ContentDiff";
 
-describe("ContentDiff - Preservation Tests", () => {
+describe("ContentDiff", () => {
 	beforeEach(() => {
 		// Clear any previous renders
 	});
 
 	/**
-	 * Property: For all document diffs, additions SHALL be highlighted correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Additions should be highlighted correctly in diff view
 	 */
 	it("should highlight additions in green", async () => {
 		const user = userEvent.setup();
@@ -57,13 +48,11 @@ describe("ContentDiff - Preservation Tests", () => {
 		const container = screen.getByText(/with addition/);
 		expect(container).toBeInTheDocument();
 
-		console.log("✓ Additions highlighted correctly (preserved)");
+		console.log("✓ Additions highlighted correctly");
 	});
 
 	/**
-	 * Property: For all document diffs, deletions SHALL be highlighted correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Deletions should be highlighted correctly in diff view
 	 */
 	it("should highlight deletions in red with strikethrough", async () => {
 		const user = userEvent.setup();
@@ -87,13 +76,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(diffContainer).toBeInTheDocument();
 		});
 
-		console.log("✓ Deletions highlighted correctly (preserved)");
+		console.log("✓ Deletions highlighted correctly");
 	});
 
 	/**
-	 * Property: For all document diffs, preview mode SHALL display current content
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Preview mode should display current content
 	 */
 	it("should display current content in preview mode", async () => {
 		const originalContent = "<p>Old content</p>";
@@ -115,13 +102,11 @@ describe("ContentDiff - Preservation Tests", () => {
 		// Old content should not be visible in preview
 		expect(screen.queryByText("Old content")).not.toBeInTheDocument();
 
-		console.log("✓ Preview mode displays current content (preserved)");
+		console.log("✓ Preview mode displays current content");
 	});
 
 	/**
-	 * Property: For all document diffs, toggle between preview and diff SHALL work
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Toggle between preview and diff views should work
 	 */
 	it("should toggle between preview and diff views", async () => {
 		const user = userEvent.setup();
@@ -158,13 +143,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(screen.getByText("Preview (Current Content)")).toBeInTheDocument();
 		});
 
-		console.log("✓ Toggle between preview and diff works (preserved)");
+		console.log("✓ Toggle between preview and diff works");
 	});
 
 	/**
-	 * Property: For all document diffs, empty content SHALL display message
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Empty content should display a message
 	 */
 	it("should display empty message when content is empty", async () => {
 		const originalContent = "";
@@ -181,13 +164,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(screen.getByText("No content")).toBeInTheDocument();
 		});
 
-		console.log("✓ Empty content displays message (preserved)");
+		console.log("✓ Empty content displays message");
 	});
 
 	/**
-	 * Property: For all document diffs, HTML content SHALL be rendered correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * HTML content should be rendered correctly
 	 */
 	it("should render HTML content correctly", async () => {
 		const originalContent = "<p>Paragraph</p><ul><li>Item 1</li></ul>";
@@ -208,13 +189,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(screen.getByText("Item 2")).toBeInTheDocument();
 		});
 
-		console.log("✓ HTML content rendered correctly (preserved)");
+		console.log("✓ HTML content rendered correctly");
 	});
 
 	/**
-	 * Property: For all document diffs, large content SHALL be truncated
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Large content should be truncated with a message
 	 */
 	it("should truncate large content and show message", async () => {
 		// Create content larger than 10,000 characters
@@ -235,13 +214,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			).toBeInTheDocument();
 		});
 
-		console.log("✓ Large content truncated with message (preserved)");
+		console.log("✓ Large content truncated with message");
 	});
 
 	/**
-	 * Property: For all document diffs, legend SHALL display in diff view
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Legend should display in diff view
 	 */
 	it("should display legend in diff view", async () => {
 		const user = userEvent.setup();
@@ -265,13 +242,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(screen.getByText("Deleted")).toBeInTheDocument();
 		});
 
-		console.log("✓ Legend displays in diff view (preserved)");
+		console.log("✓ Legend displays in diff view");
 	});
 
 	/**
-	 * Property: For all document diffs, no content changes SHALL show no diff
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Identical content should show no diff
 	 */
 	it("should show no diff when content is identical", async () => {
 		const user = userEvent.setup();
@@ -288,13 +263,11 @@ describe("ContentDiff - Preservation Tests", () => {
 			expect(screen.getByText("Same content")).toBeInTheDocument();
 		});
 
-		console.log("✓ Identical content shows no diff (preserved)");
+		console.log("✓ Identical content shows no diff");
 	});
 
 	/**
-	 * Property: For all document diffs, custom className SHALL be applied
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Custom className should be applied to root element
 	 */
 	it("should apply custom className", () => {
 		const { container } = render(
@@ -309,6 +282,6 @@ describe("ContentDiff - Preservation Tests", () => {
 		const rootElement = container.firstChild as HTMLElement;
 		expect(rootElement.className).toContain("custom-class");
 
-		console.log("✓ Custom className applied (preserved)");
+		console.log("✓ Custom className applied");
 	});
 });

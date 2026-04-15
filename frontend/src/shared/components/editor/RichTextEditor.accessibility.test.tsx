@@ -1,14 +1,7 @@
 /**
- * RichTextEditor Accessibility Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline accessibility behaviour.
- * These tests ensure that accessibility features are preserved when bugs are fixed.
+ * RichTextEditor Accessibility Tests
  *
- * Property 2: Preservation - Accessibility Features
- *
- * For all interactive elements, the following SHALL be preserved:
+ * Verifies accessibility features:
  * - Keyboard navigation works (Tab, Enter, Escape)
  * - Screen readers announce correctly
  * - Focus management functions
@@ -24,15 +17,13 @@ import { RichTextEditor } from "./RichTextEditor";
 
 expect.extend(toHaveNoViolations);
 
-describe("RichTextEditor - Accessibility Preservation Tests", () => {
+describe("RichTextEditor - Accessibility", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	/**
-	 * Property: For all RTE instances, axe-core SHALL find no accessibility violations
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * axe-core should find no accessibility violations
 	 */
 	it("should have no accessibility violations (axe-core)", async () => {
 		const { container } = render(
@@ -56,13 +47,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		const results = await axe(container);
 		expect(results).toHaveNoViolations();
 
-		console.log("✓ No accessibility violations found (preserved)");
+		console.log("✓ No accessibility violations found");
 	});
 
 	/**
-	 * Property: For all RTE instances, keyboard navigation SHALL work with Tab key
-	 *
-	 * EXPECTED TO PASS: This is baseline keyboard accessibility that must be preserved
+	 * Tab key navigation should work through toolbar buttons
 	 */
 	it("should support Tab key navigation through toolbar buttons", async () => {
 		const user = userEvent.setup();
@@ -111,13 +100,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 			expect(enabledButtons[1]).toHaveFocus();
 		});
 
-		console.log("✓ Tab key navigation works through toolbar (preserved)");
+		console.log("✓ Tab key navigation works through toolbar");
 	});
 
 	/**
-	 * Property: For all RTE instances, keyboard navigation SHALL work with Enter key
-	 *
-	 * EXPECTED TO PASS: This is baseline keyboard accessibility that must be preserved
+	 * Enter key should activate toolbar buttons
 	 */
 	it("should support Enter key to activate toolbar buttons", async () => {
 		const user = userEvent.setup();
@@ -151,13 +138,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Note: Actual behaviour depends on implementation
 		await new Promise((resolve) => setTimeout(resolve, 500));
 
-		console.log("✓ Enter key activates toolbar buttons (preserved)");
+		console.log("✓ Enter key activates toolbar buttons");
 	});
 
 	/**
-	 * Property: For all RTE instances, keyboard navigation SHALL work with Space key
-	 *
-	 * EXPECTED TO PASS: This is baseline keyboard accessibility that must be preserved
+	 * Space key should activate toolbar buttons
 	 */
 	it("should support Space key to activate toolbar buttons", async () => {
 		const user = userEvent.setup();
@@ -189,13 +174,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Verify button was activated
 		await new Promise((resolve) => setTimeout(resolve, 500));
 
-		console.log("✓ Space key activates toolbar buttons (preserved)");
+		console.log("✓ Space key activates toolbar buttons");
 	});
 
 	/**
-	 * Property: For all RTE instances, editor SHALL be keyboard accessible
-	 *
-	 * EXPECTED TO PASS: This is baseline keyboard accessibility that must be preserved
+	 * Editor should accept keyboard input
 	 */
 	it("should allow typing in editor via keyboard", async () => {
 		const user = userEvent.setup();
@@ -234,13 +217,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 			{ timeout: 2000 }
 		);
 
-		console.log("✓ Editor accepts keyboard input (preserved)");
+		console.log("✓ Editor accepts keyboard input");
 	});
 
 	/**
-	 * Property: For all RTE instances, screen readers SHALL announce editor role
-	 *
-	 * EXPECTED TO PASS: This is baseline screen reader support that must be preserved
+	 * Screen readers should announce the textbox role
 	 */
 	it("should have textbox role for screen readers", async () => {
 		render(
@@ -265,13 +246,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Verify role is set
 		expect(editor).toHaveAttribute("role", "textbox");
 
-		console.log("✓ Textbox role announced to screen readers (preserved)");
+		console.log("✓ Textbox role announced to screen readers");
 	});
 
 	/**
-	 * Property: For all RTE instances, screen readers SHALL announce aria-label
-	 *
-	 * EXPECTED TO PASS: This is baseline screen reader support that must be preserved
+	 * Screen readers should announce the aria-label
 	 */
 	it("should announce aria-label to screen readers", async () => {
 		const ariaLabel = "Project description editor";
@@ -294,13 +273,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Verify aria-label is set
 		expect(editor).toHaveAttribute("aria-label", ariaLabel);
 
-		console.log("✓ aria-label announced to screen readers (preserved)");
+		console.log("✓ aria-label announced to screen readers");
 	});
 
 	/**
-	 * Property: For all RTE instances, toolbar buttons SHALL have accessible names
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * Toolbar buttons should have accessible names
 	 */
 	it("should have accessible names for toolbar buttons", async () => {
 		render(
@@ -334,13 +311,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 			expect(hasAccessibleName).toBeTruthy();
 		});
 
-		console.log("✓ Toolbar buttons have accessible names (preserved)");
+		console.log("✓ Toolbar buttons have accessible names");
 	});
 
 	/**
-	 * Property: For all RTE instances, focus SHALL be visible
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * Focus indicator should be visible
 	 */
 	it("should show visible focus indicator", async () => {
 		const user = userEvent.setup();
@@ -373,13 +348,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Verify it's a button
 		expect(focusedElement?.tagName).toBe("BUTTON");
 
-		console.log("✓ Focus indicator visible (preserved)");
+		console.log("✓ Focus indicator visible");
 	});
 
 	/**
-	 * Property: For all RTE instances, read-only state SHALL be announced
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * Read-only state should be announced to screen readers
 	 */
 	it("should announce read-only state to screen readers", async () => {
 		render(
@@ -405,13 +378,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		// Verify contenteditable is false (indicates read-only)
 		expect(editor).toHaveAttribute("contenteditable", "false");
 
-		console.log("✓ Read-only state announced to screen readers (preserved)");
+		console.log("✓ Read-only state announced to screen readers");
 	});
 
 	/**
-	 * Property: For all RTE instances, disabled state SHALL be announced
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * Disabled state should be announced to screen readers
 	 */
 	it("should announce disabled state to screen readers", async () => {
 		render(
@@ -438,13 +409,11 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 			expect(button).toBeDisabled();
 		});
 
-		console.log("✓ Disabled state announced to screen readers (preserved)");
+		console.log("✓ Disabled state announced to screen readers");
 	});
 
 	/**
-	 * Property: For all RTE instances, placeholder SHALL be accessible
-	 *
-	 * EXPECTED TO PASS: This is baseline accessibility that must be preserved
+	 * Placeholder should be accessible to screen readers
 	 */
 	it("should make placeholder accessible to screen readers", async () => {
 		const placeholderText = "Enter your text here...";
@@ -471,6 +440,6 @@ describe("RichTextEditor - Accessibility Preservation Tests", () => {
 		const placeholder = screen.getByText(placeholderText);
 		expect(placeholder).toBeInTheDocument();
 
-		console.log("✓ Placeholder accessible to screen readers (preserved)");
+		console.log("✓ Placeholder accessible to screen readers");
 	});
 });
