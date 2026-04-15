@@ -1,14 +1,7 @@
 /**
- * Document Action Workflows - Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline behaviour.
- * These tests ensure that working document action workflows are preserved when bugs are fixed.
+ * Document Action Workflows Tests
  *
- * Property 2: Preservation - Existing Document Action Functionality
- *
- * For all working document actions, the following SHALL be preserved:
+ * Verifies document action workflows:
  * - Document mutations succeed (approve, send back, delete)
  * - UI updates correctly after actions
  * - Backend persists changes
@@ -38,7 +31,7 @@ import type { DocumentActionResponse } from "../../services/document.service";
 vi.mock("../../services/document.service");
 vi.mock("sonner");
 
-describe.skip("Document Action Workflows - Preservation Tests", () => {
+describe.skip("Document Action Workflows", () => {
 	let queryClient: QueryClient;
 	let wrapper: React.ComponentType<{ children: React.ReactNode }>;
 
@@ -69,9 +62,7 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 	});
 
 	/**
-	 * Property: For all working document actions, approve action SHALL succeed
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Approve action should succeed
 	 */
 	it("should successfully approve a document", async () => {
 		const mockResponse = createMockResponse("Document approved successfully");
@@ -107,13 +98,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			"Document approved successfully"
 		);
 
-		console.log("✓ Approve action succeeds (preserved)");
+		console.log("✓ Approve action succeeds");
 	});
 
 	/**
-	 * Property: For all working document actions, send back action SHALL succeed
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Send back action should succeed with reason
 	 */
 	it("should successfully send back a document with reason", async () => {
 		const mockResponse = createMockResponse("Document sent back");
@@ -154,13 +143,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 		// Verify success toast
 		expect(toast.success).toHaveBeenCalledWith("Document sent back");
 
-		console.log("✓ Send back action with reason succeeds (preserved)");
+		console.log("✓ Send back action with reason succeeds");
 	});
 
 	/**
-	 * Property: For all working document actions, delete action SHALL succeed
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Delete action should succeed
 	 */
 	it("should successfully delete a document", async () => {
 		const mockResponse = createMockResponse("Document deleted successfully");
@@ -190,13 +177,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 		// Verify success toast
 		expect(toast.success).toHaveBeenCalledWith("Document deleted successfully");
 
-		console.log("✓ Delete action succeeds (preserved)");
+		console.log("✓ Delete action succeeds");
 	});
 
 	/**
-	 * Property: For all working document actions, query invalidation SHALL trigger
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Query invalidation should trigger after document action
 	 */
 	it("should invalidate project query after document action", async () => {
 		const mockResponse = createMockResponse("Action completed");
@@ -228,13 +213,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			queryKey: ["project", projectId],
 		});
 
-		console.log("✓ Query invalidation triggers after action (preserved)");
+		console.log("✓ Query invalidation triggers after action");
 	});
 
 	/**
-	 * Property: For all working document actions, error handling SHALL function
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Error handling should function correctly
 	 */
 	it("should handle document action errors gracefully", async () => {
 		const mockError = new Error("Network error");
@@ -261,13 +244,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 		// Verify error toast
 		expect(toast.error).toHaveBeenCalledWith("Network error");
 
-		console.log("✓ Error handling functions correctly (preserved)");
+		console.log("✓ Error handling functions correctly");
 	});
 
 	/**
-	 * Property: For all working document actions, loading state SHALL be tracked
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Loading state should be tracked during document action
 	 */
 	it("should track loading state during document action", async () => {
 		const mockResponse = createMockResponse("Success");
@@ -310,13 +291,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Loading state tracked correctly (preserved)");
+		console.log("✓ Loading state tracked correctly");
 	});
 
 	/**
-	 * Property: For all working document actions, multiple document types SHALL be supported
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Multiple document types should be supported
 	 */
 	it("should support actions on different document types", async () => {
 		const mockResponse = createMockResponse("Success");
@@ -357,13 +336,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			);
 		}
 
-		console.log("✓ Multiple document types supported (preserved)");
+		console.log("✓ Multiple document types supported");
 	});
 
 	/**
-	 * Property: For all working document actions, action types SHALL be supported
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Different action types should be supported
 	 */
 	it("should support different action types", async () => {
 		const mockResponse = createMockResponse("Success");
@@ -396,13 +373,12 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			);
 		}
 
-		console.log("✓ Different action types supported (preserved)");
+		console.log("✓ Different action types supported");
 	});
 
 	/**
-	 * Property: For all working document actions, optimistic updates SHALL NOT occur
+	 * Server-driven updates should be used (no optimistic updates)
 	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
 	 * Note: Document actions use server-driven updates, not optimistic updates
 	 */
 	it("should wait for server response before updating UI", async () => {
@@ -440,13 +416,11 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		console.log("✓ Server-driven updates (no optimistic updates) (preserved)");
+		console.log("✓ Server-driven updates (no optimistic updates)");
 	});
 
 	/**
-	 * Property: For all working document actions, custom success messages SHALL display
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Custom success messages from server should display
 	 */
 	it("should display custom success messages from server", async () => {
 		const customMessage = "Project plan has been approved by supervisor";
@@ -471,14 +445,14 @@ describe.skip("Document Action Workflows - Preservation Tests", () => {
 		// Verify custom message is displayed
 		expect(toast.success).toHaveBeenCalledWith(customMessage);
 
-		console.log("✓ Custom success messages display (preserved)");
+		console.log("✓ Custom success messages display");
 	});
 });
 
 /**
  * Document Workflow Integration Tests
  *
- * Tests full document workflows including RTE editing, approval flows, and state preservation.
+ * Tests full document workflows including RTE editing, approval flows, and state management.
  *
  * NOTE: These tests have type issues - see note at top of file
  */
@@ -760,13 +734,13 @@ describe.skip("Document Workflow Integration Tests", () => {
 		});
 	});
 
-	describe("Document Tab Navigation with State Preservation", () => {
-		it.skip("should preserve document state when switching tabs", async () => {
+	describe("Document Tab Navigation with State Management", () => {
+		it.skip("should maintain document state when switching tabs", async () => {
 			// SKIPPED: This test uses "update" action which is not a valid DocumentAction type
 			console.log("✓ Test skipped - invalid action");
 		});
 
-		it.skip("should handle year selector state preservation", async () => {
+		it.skip("should handle year selector state management", async () => {
 			// SKIPPED: This test uses "update" action which is not a valid DocumentAction type
 			console.log("✓ Test skipped - invalid action");
 		});

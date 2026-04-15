@@ -1,15 +1,10 @@
 /**
- * InlineSaveEditor Bug Condition Exploration Test
+ * InlineSaveEditor Tests
  *
- * CRITICAL: This test MUST FAIL on unfixed code - failure confirms the bug exists.
- * DO NOT attempt to fix the test or the code when it fails.
- *
- * Bug: Save button not activating after typing in some RTE instances.
- *
- * Expected counterexamples:
- * - User types in RTE but save button remains disabled
- * - onChange callback fires but parent state not updated
- * - hasChanges state not set to true after typing
+ * Verifies save button activation behaviour after typing in RTE instances:
+ * - Save button should enable after content changes
+ * - onChange callback should update parent state
+ * - hasChanges state should reflect content modifications
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -51,7 +46,7 @@ function renderWithProviders(ui: React.ReactElement) {
 	);
 }
 
-describe("InlineSaveEditor - Bug Condition Exploration", () => {
+describe("InlineSaveEditor", () => {
 	let mockStore: {
 		isEditing: ReturnType<typeof vi.fn>;
 	};
@@ -67,7 +62,6 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 	/**
 	 * Test 1: Save button should be disabled initially
 	 *
-	 * EXPECTED TO PASS: Button should be disabled when no changes
 	 * NOTE: Skipped — Lexical table observer incompatible with JSDOM in CI
 	 */
 	it.skip("should have save button disabled initially", async () => {
@@ -98,8 +92,6 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 
 	/**
 	 * Test 2: Save button should activate after typing
-	 *
-	 * EXPECTED TO FAIL: Button may not activate due to onChange not firing
 	 */
 	it("should enable save button after typing in editor", async () => {
 		const user = userEvent.setup();
@@ -142,7 +134,7 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 			() => {
 				const saveButton = screen.getByRole("button", { name: /save/i });
 
-				// BUG CONDITION: Save button should be enabled but may not be
+				// Save button should be enabled after content changes
 				expect(saveButton).not.toBeDisabled();
 			},
 			{ timeout: 2000 }
@@ -151,12 +143,12 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 		const saveButton = screen.getByRole("button", { name: /save/i });
 
 		if (saveButton.hasAttribute("disabled")) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log(
+				"Save button not enabled after typing — onChange may not be triggering state update"
+			);
 			console.log("- User typed in editor: YES");
 			console.log("- Save button enabled: NO");
-			console.log(
-				"- This confirms the bug: onChange not triggering state update"
-			);
+			console.log("- This confirms: onChange not triggering state update");
 		}
 	});
 
@@ -209,23 +201,21 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 			{ timeout: 1000 }
 		);
 
-		// BUG CONDITION: Button should be enabled after typing
+		// Button should be enabled after typing
 		const isEnabled = !saveButton.hasAttribute("disabled");
 		expect(isEnabled).toBe(true);
 
 		if (!isEnabled) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Save button not enabled after content modification:");
 			console.log("- Content was modified: YES");
 			console.log("- onChange callback fired: UNKNOWN");
 			console.log("- Save button enabled: NO");
-			console.log("- This confirms the bug: state not updated after typing");
+			console.log("- State not updated after typing");
 		}
 	});
 
 	/**
 	 * Test 4: hasChanges state should be true after editing
-	 *
-	 * EXPECTED TO FAIL: hasChanges may not update correctly
 	 */
 	it("should detect changes after editing with empty initial content", async () => {
 		const user = userEvent.setup();
@@ -269,11 +259,11 @@ describe("InlineSaveEditor - Bug Condition Exploration", () => {
 		const saveButton = screen.getByRole("button", { name: /save/i });
 
 		if (saveButton.hasAttribute("disabled")) {
-			console.log("COUNTEREXAMPLE FOUND:");
+			console.log("Save button not enabled with empty initial content:");
 			console.log("- Initial content: EMPTY");
 			console.log("- User typed: YES");
 			console.log("- Save button enabled: NO");
-			console.log("- This confirms the bug: empty content case not handled");
+			console.log("- Empty content case not handled");
 		}
 	});
 

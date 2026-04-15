@@ -11,12 +11,12 @@ vi.mock("@/shared/services/api/client.service", () => ({
 	},
 }));
 
-describe("pdf.service - Bug Condition Exploration", () => {
+describe("pdf.service", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	describe("Property 1: Fault Condition - Correct Endpoints for Project Documents", () => {
+	describe("Correct Endpoints for Project Documents", () => {
 		describe("Download Operations", () => {
 			const documentTypes: DocumentType[] = [
 				"concept",

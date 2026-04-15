@@ -1,22 +1,14 @@
 /**
- * RichTextEditor Performance Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline performance.
- * These tests ensure that performance characteristics are preserved when bugs are fixed.
+ * RichTextEditor Performance Tests
  *
- * Property 2: Preservation - Application Performance
- *
- * For all RTE instances, the following performance SHALL be preserved:
+ * Lightweight performance tests verifying:
  * - RTE load times under 500ms
  * - No typing lag
  * - Save operations under 2 seconds
  * - No memory leaks
  * - Efficient re-renders
  *
- * NOTE: These are lightweight performance tests to establish baseline behaviour.
- * They are not comprehensive performance benchmarks.
+ * NOTE: These are not comprehensive performance benchmarks.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -24,15 +16,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { RichTextEditor } from "./RichTextEditor";
 
-describe("RichTextEditor - Performance Preservation Tests", () => {
+describe("RichTextEditor - Performance", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	/**
-	 * Property: For all RTE instances, initial render SHALL complete within 500ms
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Initial render should complete within 500ms
 	 */
 	it("should render within 500ms", async () => {
 		const startTime = performance.now();
@@ -60,13 +50,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Verify render time is under 600ms (CI environments are slower)
 		expect(renderTime).toBeLessThan(600);
 
-		console.log(`✓ RTE rendered in ${renderTime.toFixed(2)}ms (preserved)`);
+		console.log(`✓ RTE rendered in ${renderTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, typing SHALL be responsive (no lag)
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Typing should be responsive with no lag
 	 */
 	it("should handle typing without lag", async () => {
 		const user = userEvent.setup();
@@ -112,13 +100,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Typing should feel responsive (under 1 second for this sentence)
 		expect(typingTime).toBeLessThan(1000);
 
-		console.log(`✓ Typing completed in ${typingTime.toFixed(2)}ms (preserved)`);
+		console.log(`✓ Typing completed in ${typingTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, onChange SHALL fire promptly
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * onChange callback should fire promptly
 	 */
 	it("should fire onChange callback promptly", async () => {
 		const user = userEvent.setup();
@@ -163,13 +149,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// onChange should fire within 500ms
 		expect(callbackTime).toBeLessThan(500);
 
-		console.log(`✓ onChange fired in ${callbackTime.toFixed(2)}ms (preserved)`);
+		console.log(`✓ onChange fired in ${callbackTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, re-renders SHALL be efficient
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Re-renders should be efficient
 	 */
 	it("should handle re-renders efficiently", async () => {
 		const { rerender } = render(
@@ -216,15 +200,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Re-render should be fast (under 200ms)
 		expect(rerenderTime).toBeLessThan(200);
 
-		console.log(
-			`✓ Re-render completed in ${rerenderTime.toFixed(2)}ms (preserved)`
-		);
+		console.log(`✓ Re-render completed in ${rerenderTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, toolbar SHALL render efficiently
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Toolbar should render efficiently
 	 */
 	it("should render toolbar efficiently", async () => {
 		const startTime = performance.now();
@@ -253,15 +233,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Toolbar should render quickly (under 500ms)
 		expect(toolbarRenderTime).toBeLessThan(500);
 
-		console.log(
-			`✓ Toolbar rendered in ${toolbarRenderTime.toFixed(2)}ms (preserved)`
-		);
+		console.log(`✓ Toolbar rendered in ${toolbarRenderTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, content updates SHALL be efficient
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Content updates should be efficient
 	 */
 	it("should update content efficiently", async () => {
 		const user = userEvent.setup();
@@ -307,13 +283,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Content update should be fast (under 500ms)
 		expect(updateTime).toBeLessThan(500);
 
-		console.log(`✓ Content updated in ${updateTime.toFixed(2)}ms (preserved)`);
+		console.log(`✓ Content updated in ${updateTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, large content SHALL render acceptably
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Large content should render in acceptable time
 	 */
 	it("should handle large content efficiently", async () => {
 		// Create large content (1000 words)
@@ -344,15 +318,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Large content should still render in reasonable time (under 1 second)
 		expect(renderTime).toBeLessThan(1000);
 
-		console.log(
-			`✓ Large content rendered in ${renderTime.toFixed(2)}ms (preserved)`
-		);
+		console.log(`✓ Large content rendered in ${renderTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, multiple instances SHALL not degrade performance
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Multiple instances should not degrade performance
 	 */
 	it("should handle multiple instances efficiently", async () => {
 		const startTime = performance.now();
@@ -392,15 +362,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Multiple instances should render in reasonable time (under 1.5 seconds)
 		expect(renderTime).toBeLessThan(1500);
 
-		console.log(
-			`✓ Multiple instances rendered in ${renderTime.toFixed(2)}ms (preserved)`
-		);
+		console.log(`✓ Multiple instances rendered in ${renderTime.toFixed(2)}ms`);
 	});
 
 	/**
-	 * Property: For all RTE instances, cleanup SHALL not cause memory leaks
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Cleanup should not cause memory leaks
 	 */
 	it("should cleanup properly on unmount", async () => {
 		const { unmount } = render(
@@ -427,13 +393,11 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		const editor = screen.queryByRole("textbox");
 		expect(editor).not.toBeInTheDocument();
 
-		console.log("✓ Component cleaned up properly (preserved)");
+		console.log("✓ Component cleaned up properly");
 	});
 
 	/**
-	 * Property: For all RTE instances, disabled state SHALL not impact performance
-	 *
-	 * EXPECTED TO PASS: This is baseline performance that must be preserved
+	 * Disabled state should not impact performance
 	 */
 	it("should render disabled state efficiently", async () => {
 		const startTime = performance.now();
@@ -462,8 +426,6 @@ describe("RichTextEditor - Performance Preservation Tests", () => {
 		// Disabled state should not slow down rendering (under 500ms)
 		expect(renderTime).toBeLessThan(500);
 
-		console.log(
-			`✓ Disabled state rendered in ${renderTime.toFixed(2)}ms (preserved)`
-		);
+		console.log(`✓ Disabled state rendered in ${renderTime.toFixed(2)}ms`);
 	});
 });

@@ -1,12 +1,7 @@
 /**
- * RichTextEditor Preservation Tests
+ * RichTextEditor Tests
  *
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline behaviour.
- * These tests ensure that working RTE functionality is preserved when bugs are fixed.
- *
- * Property 2: Preservation - Existing RTE Functionality
- *
- * For all working RTE instances, the following SHALL be preserved:
+ * Verifies core RTE functionality:
  * - Typing updates content correctly
  * - Formatting applies correctly
  * - Content saves successfully
@@ -19,13 +14,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { RichTextEditor } from "./RichTextEditor";
 
-describe("RichTextEditor - Preservation Tests", () => {
+describe("RichTextEditor", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	/**
-	 * Property: For all working RTE instances, typing SHALL update content
+	 * Typing should update content
 	 *
 	 * SKIPPED: Testing Lexical editor typing in JSDOM is not reliable.
 	 * Manual testing confirms this functionality works correctly.
@@ -78,13 +73,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		);
 		expect(callWithContent![0]).toContain("Hello world");
 
-		console.log("✓ Typing updates content (preserved)");
+		console.log("✓ Typing updates content");
 	});
 
 	/**
-	 * Property: For all working RTE instances, initial content SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Initial HTML content should display correctly
 	 */
 	it("should display initial HTML content correctly", async () => {
 		const initialContent = "<p>Initial content</p>";
@@ -116,13 +109,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 			{ timeout: 2000 }
 		);
 
-		console.log("✓ Initial content displays correctly (preserved)");
+		console.log("✓ Initial content displays correctly");
 	});
 
 	/**
-	 * Property: For all working RTE instances, read-only mode SHALL prevent editing
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Read-only mode should prevent editing
 	 */
 	it("should prevent editing in read-only mode", async () => {
 		const onChangeMock = vi.fn();
@@ -154,13 +145,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		await new Promise((resolve) => setTimeout(resolve, 500));
 		expect(onChangeMock).not.toHaveBeenCalled();
 
-		console.log("✓ Read-only mode prevents editing (preserved)");
+		console.log("✓ Read-only mode prevents editing");
 	});
 
 	/**
-	 * Property: For all working RTE instances, disabled state SHALL prevent interaction
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Disabled state should prevent interaction
 	 */
 	it("should prevent interaction when disabled", async () => {
 		const onChangeMock = vi.fn();
@@ -189,13 +178,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 			expect(button).toBeDisabled();
 		});
 
-		console.log("✓ Disabled state prevents interaction (preserved)");
+		console.log("✓ Disabled state prevents interaction");
 	});
 
 	/**
-	 * Property: For all working RTE instances, toolbar SHALL display when not read-only
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Toolbar should display in editable mode
 	 */
 	it("should display toolbar in editable mode", async () => {
 		render(
@@ -221,13 +208,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		const buttons = screen.getAllByRole("button");
 		expect(buttons.length).toBeGreaterThan(5); // Should have multiple formatting buttons
 
-		console.log("✓ Toolbar displays in editable mode (preserved)");
+		console.log("✓ Toolbar displays in editable mode");
 	});
 
 	/**
-	 * Property: For all working RTE instances, toolbar SHALL NOT display in read-only mode
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Toolbar should be hidden in read-only mode
 	 */
 	it("should hide toolbar in read-only mode", async () => {
 		render(
@@ -252,13 +237,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		const buttons = screen.queryAllByRole("button");
 		expect(buttons.length).toBe(0);
 
-		console.log("✓ Toolbar hidden in read-only mode (preserved)");
+		console.log("✓ Toolbar hidden in read-only mode");
 	});
 
 	/**
-	 * Property: For all working RTE instances, placeholder SHALL display when empty
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Placeholder should display when content is empty
 	 */
 	it("should display placeholder when content is empty", async () => {
 		const placeholderText = "Enter your text here...";
@@ -285,13 +268,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		const placeholder = screen.getByText(placeholderText);
 		expect(placeholder).toBeInTheDocument();
 
-		console.log("✓ Placeholder displays when empty (preserved)");
+		console.log("✓ Placeholder displays when empty");
 	});
 
 	/**
-	 * Property: For all working RTE instances, content SHALL persist across re-renders
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Content should persist across re-renders
 	 */
 	it("should maintain content across re-renders", async () => {
 		const { rerender } = render(
@@ -324,11 +305,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		const editor = screen.getByRole("textbox");
 		expect(editor.textContent).toContain("Initial content");
 
-		console.log("✓ Content persists across re-renders (preserved)");
+		console.log("✓ Content persists across re-renders");
 	});
 
 	/**
-	 * Property: For all working RTE instances, onChange SHALL fire with HTML content
+	 * onChange should fire with HTML content
 	 *
 	 * SKIPPED: Testing Lexical editor typing in JSDOM is not reliable.
 	 * Manual testing confirms this functionality works correctly.
@@ -376,13 +357,11 @@ describe("RichTextEditor - Preservation Tests", () => {
 		);
 		expect(callWithContent![0]).toMatch(/<p>.*Test.*<\/p>/);
 
-		console.log("✓ onChange fires with HTML content (preserved)");
+		console.log("✓ onChange fires with HTML content");
 	});
 
 	/**
-	 * Property: For all working RTE instances, aria-label SHALL be applied
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * aria-label should be applied for accessibility
 	 */
 	it("should apply aria-label for accessibility", async () => {
 		const ariaLabel = "Project description editor";
@@ -399,6 +378,6 @@ describe("RichTextEditor - Preservation Tests", () => {
 			{ timeout: 2000 }
 		);
 
-		console.log("✓ aria-label applied for accessibility (preserved)");
+		console.log("✓ aria-label applied for accessibility");
 	});
 });

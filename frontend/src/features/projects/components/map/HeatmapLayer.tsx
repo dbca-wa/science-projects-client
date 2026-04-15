@@ -82,8 +82,6 @@ function convertProjectsToHeatmapPoints(
  * - Memory leak prevention with proper layer removal
  * - Performance optimized with caching and memoization
  * - Handles large datasets efficiently (1000+ projects)
- *
- * Requirements: 12.1, 12.2, 12.3, 12.5, 14.3, 14.4, 2.1, 2.2, 2.3, 2.4, 7.1, 7.2, 7.5
  */
 export const HeatmapLayer = ({
 	projects,

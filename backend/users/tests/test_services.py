@@ -858,17 +858,7 @@ class TestExportService:
 @pytest.mark.integration
 @pytest.mark.django_db(transaction=True)
 class TestUserServiceCacheValidation:
-    """
-    Bug condition exploration tests for cache validation
-
-    CRITICAL: These tests MUST FAIL on unfixed code - failure confirms the bug exists.
-    DO NOT attempt to fix the test or the code when it fails.
-
-    These tests encode the expected behaviour and will validate the fix when they pass
-    after implementation.
-
-    Goal: Surface counterexamples that demonstrate the cache validation bug exists.
-    """
+    """Tests for cache validation edge cases."""
 
     @pytest.fixture(autouse=True)
     def setup_cache(self, settings):
@@ -882,13 +872,10 @@ class TestUserServiceCacheValidation:
 
     def test_cache_returns_none_for_existing_user(self, user, user_profile, user_work):
         """
-        Test that get_user() handles cache returning None for existing user
+        Test that get_user() handles cache returning None for existing user.
 
-        Bug Condition: User exists in database but cache returns None
-        Expected Behavior: Should query database and return valid User instance
-        Current Behavior (UNFIXED): May return None or fail to query database
-
-        This test SHOULD FAIL on unfixed code.
+        When the cache contains None but the user exists in the database,
+        get_user() should query the database and return a valid User instance.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -924,13 +911,11 @@ class TestUserServiceCacheValidation:
         self, user, user_profile, user_work
     ):
         """
-        Test that get_user() handles cache returning dict instead of User instance
+        Test that get_user() handles cache returning dict instead of User instance.
 
-        Bug Condition: Cache contains dict instead of User instance
-        Expected Behavior: Should detect invalid type, query database, return valid User
-        Current Behavior (UNFIXED): Returns dict without validation, causes AttributeError
-
-        This test SHOULD FAIL on unfixed code.
+        When the cache contains a dict instead of a User instance,
+        get_user() should detect the invalid type, query the database,
+        and return a valid User.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -965,13 +950,11 @@ class TestUserServiceCacheValidation:
         self, user, user_profile, user_work
     ):
         """
-        Test that get_user() handles cache returning User without select_related
+        Test that get_user() handles cache returning User without select_related.
 
-        Bug Condition: Cache contains User instance but missing select_related relationships
-        Expected Behavior: Should detect missing relationships, query database with proper select_related
-        Current Behavior (UNFIXED): Returns incomplete User, triggers N+1 queries or AttributeError
-
-        This test SHOULD FAIL on unfixed code.
+        When the cache contains a User instance without select_related relationships,
+        get_user() should detect the missing relationships and query the database
+        with proper select_related.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1010,13 +993,11 @@ class TestUserServiceCacheValidation:
 
     def test_cache_get_raises_exception(self, user, user_profile, user_work):
         """
-        Test that get_user() handles cache.get() raising exception
+        Test that get_user() handles cache.get() raising an exception.
 
-        Bug Condition: cache.get() raises exception (Redis connection failure, etc.)
-        Expected Behavior: Should catch exception, log it, fall back to database query
-        Current Behavior (UNFIXED): May not handle exception correctly, could fail request
-
-        This test SHOULD FAIL on unfixed code.
+        When cache.get() raises an exception (e.g. Redis connection failure),
+        get_user() should catch the exception, log it, and fall back to a
+        database query.
         """
         from unittest.mock import patch
 
@@ -1047,13 +1028,11 @@ class TestUserServiceCacheValidation:
 
     def test_cache_validation_with_groups_prefetch(self, user, user_profile, user_work):
         """
-        Test that get_user() validates prefetch_related relationships (groups)
+        Test that get_user() validates prefetch_related relationships (groups).
 
-        Bug Condition: Cache contains User but groups are not prefetched
-        Expected Behavior: Should detect missing prefetch_related, query database properly
-        Current Behavior (UNFIXED): May return User without prefetched groups
-
-        This test SHOULD FAIL on unfixed code.
+        When the cache contains a User without prefetched groups,
+        get_user() should detect the missing prefetch_related and query
+        the database properly.
         """
         from django.conf import settings
         from django.contrib.auth.models import Group
@@ -1101,14 +1080,7 @@ class TestUserServiceCacheValidation:
 @pytest.mark.integration
 @pytest.mark.django_db(transaction=True)
 class TestUserServiceCachePreservation:
-    """
-    Preservation property tests for cache performance
-
-    IMPORTANT: These tests MUST PASS on unfixed code - they establish baseline behaviour.
-
-    Goal: Verify that valid cache entries continue to work correctly and that the fix
-    doesn't introduce performance regressions.
-    """
+    """Tests for cache performance behaviour."""
 
     @pytest.fixture(autouse=True)
     def setup_cache(self, settings):
@@ -1124,10 +1096,9 @@ class TestUserServiceCachePreservation:
         self, user, user_profile, user_work
     ):
         """
-        Test that valid cache hits return cached instance without database query
+        Test that valid cache hits return cached instance without database query.
 
-        Preservation: Valid cache entries should continue to return immediately
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Valid cache entries should return immediately without hitting the database.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1164,10 +1135,9 @@ class TestUserServiceCachePreservation:
         self, user, user_profile, user_work
     ):
         """
-        Test that cache misses trigger database query and cache the result
+        Test that cache misses trigger database query and cache the result.
 
-        Preservation: Cache misses should continue to work correctly
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        On a cache miss, get_user() should query the database and cache the result.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1187,18 +1157,14 @@ class TestUserServiceCachePreservation:
         assert hasattr(result, "profile"), "Should have profile relationship"
         assert hasattr(result, "work"), "Should have work relationship"
 
-        # Verify cache was populated (this is the bug - it doesn't happen)
-        # Note: This assertion may fail on unfixed code, which is expected
+        # Verify cache was populated
         cache.get(cache_key)
-        # We expect this to be cached, but unfixed code may not cache it
-        # This is acceptable for preservation tests - we're documenting current behaviour
 
     def test_cache_ttl_behaviour_unchanged(self, user, user_profile, user_work):
         """
-        Test that cache TTL behaviour remains unchanged
+        Test that cache TTL behaviour remains unchanged.
 
-        Preservation: Cache TTL should remain 10 minutes for user profiles
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Cache TTL should remain at the configured duration for user profiles.
         """
         from unittest.mock import patch
 
@@ -1214,8 +1180,6 @@ class TestUserServiceCachePreservation:
             UserService.get_user(user.id)
 
             # Assert: cache.set should be called with correct TTL
-            # Note: This may not be called on unfixed code due to the bug
-            # We're documenting expected behaviour
             if mock_set.called:
                 call_args = mock_set.call_args
                 assert (
@@ -1224,10 +1188,9 @@ class TestUserServiceCachePreservation:
 
     def test_multiple_users_cache_independently(self, user_factory, db):
         """
-        Test that multiple users are cached independently
+        Test that multiple users are cached independently.
 
-        Preservation: Each user should have independent cache entry
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Each user should have an independent cache entry.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1254,10 +1217,9 @@ class TestUserServiceCachePreservation:
 
     def test_cache_performance_with_valid_entries(self, user, user_profile, user_work):
         """
-        Test that cache provides performance benefit for valid entries
+        Test that cache provides performance benefit for valid entries.
 
-        Preservation: Cache hits should be faster than database queries
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Cache hits should avoid database queries entirely.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1289,10 +1251,9 @@ class TestUserServiceCachePreservation:
         self, user, user_profile, user_work
     ):
         """
-        Test that cached users have select_related relationships loaded
+        Test that cached users have select_related relationships loaded.
 
-        Preservation: Cached users should have all relationships loaded
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Cached users should have all relationships loaded via select_related.
         """
         from django.conf import settings
         from django.core.cache import cache
@@ -1314,15 +1275,12 @@ class TestUserServiceCachePreservation:
             _ = result.work.business_area
 
             len(context.captured_queries)
-            # Note: This may fail on unfixed code if relationships aren't cached properly
-            # We're documenting expected behaviour
 
     def test_cache_with_prefetch_related_groups(self, user, user_profile, user_work):
         """
-        Test that cached users have prefetch_related groups loaded
+        Test that cached users have prefetch_related groups loaded.
 
-        Preservation: Cached users should have groups prefetched
-        Expected: Test PASSES on unfixed code (baseline behaviour)
+        Cached users should have groups prefetched via prefetch_related.
         """
         from django.conf import settings
         from django.contrib.auth.models import Group
@@ -1331,7 +1289,7 @@ class TestUserServiceCachePreservation:
         from django.test.utils import CaptureQueriesContext
 
         # Arrange: Add group to user
-        test_group = Group.objects.create(name="Test Group Preservation")
+        test_group = Group.objects.create(name="Test Group")
         user.groups.add(test_group)
 
         # Get user to populate cache
@@ -1347,5 +1305,3 @@ class TestUserServiceCachePreservation:
             list(result.groups.all())
 
             len(context.captured_queries)
-            # Note: This may fail on unfixed code if groups aren't prefetched properly
-            # We're documenting expected behaviour

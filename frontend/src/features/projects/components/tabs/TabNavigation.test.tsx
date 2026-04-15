@@ -1,14 +1,7 @@
 /**
- * Tab Navigation - Preservation Tests
- */
-
-/**
- * CRITICAL: These tests MUST PASS on unfixed code - they capture baseline behaviour.
- * These tests ensure that tab navigation and state preservation work correctly.
+ * Tab Navigation Tests
  *
- * Property 2: Preservation - Tab Navigation and State Management
- *
- * For all tab switches, the following SHALL be preserved:
+ * Verifies tab navigation and state management:
  * - State is maintained across tab switches
  * - Content displays correctly in each tab
  * - No data is lost when switching tabs
@@ -78,7 +71,7 @@ vi.mock("@/features/projects/hooks/useComments", () => ({
 	}),
 }));
 
-describe("Tab Navigation - Preservation Tests", () => {
+describe("Tab Navigation", () => {
 	let queryClient: QueryClient;
 
 	const mockProjectData = {
@@ -166,9 +159,7 @@ describe("Tab Navigation - Preservation Tests", () => {
 	};
 
 	/**
-	 * Property: For all tab switches, overview tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Overview tab should display correctly
 	 */
 	it("should display overview tab content correctly", async () => {
 		renderWithRouter("overview");
@@ -179,13 +170,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Overview tab displays correctly (preserved)");
+		console.log("✓ Overview tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, concept plan tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Concept plan tab should display correctly
 	 */
 	it("should display concept plan tab when available", async () => {
 		renderWithRouter("concept");
@@ -196,13 +185,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Concept plan tab displays correctly (preserved)");
+		console.log("✓ Concept plan tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, project plan tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Project plan tab should display correctly
 	 */
 	it("should display project plan tab when available", async () => {
 		renderWithRouter("project");
@@ -213,13 +200,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Project plan tab displays correctly (preserved)");
+		console.log("✓ Project plan tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, progress reports tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Progress reports tab should display correctly
 	 */
 	it("should display progress reports tab when available", async () => {
 		renderWithRouter("progress");
@@ -230,13 +215,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Progress reports tab displays correctly (preserved)");
+		console.log("✓ Progress reports tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, student reports tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Student reports tab should display correctly
 	 */
 	it("should display student reports tab when available", async () => {
 		renderWithRouter("student");
@@ -247,13 +230,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Student reports tab displays correctly (preserved)");
+		console.log("✓ Student reports tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, closure tab SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Closure tab should display correctly
 	 */
 	it("should display project closure tab when available", async () => {
 		renderWithRouter("closure");
@@ -264,13 +245,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Project closure tab displays correctly (preserved)");
+		console.log("✓ Project closure tab displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, only available tabs SHALL be shown
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Only available tabs should be shown
 	 */
 	it("should only show tabs for available documents", async () => {
 		// Mock project with only overview and concept plan
@@ -302,13 +281,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(screen.queryByText("Project Closure")).not.toBeInTheDocument();
 		});
 
-		console.log("✓ Only available tabs shown (preserved)");
+		console.log("✓ Only available tabs shown");
 	});
 
 	/**
-	 * Property: For all tab switches, tab selection SHALL be maintained
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Tab selection should be maintained
 	 */
 	it("should maintain selected tab state", async () => {
 		const { rerender } = renderWithRouter("concept");
@@ -338,13 +315,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(tabs.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Tab selection maintained (preserved)");
+		console.log("✓ Tab selection maintained");
 	});
 
 	/**
-	 * Property: For all tab switches, project data SHALL be available to all tabs
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Project data should be available to all tabs
 	 */
 	it("should provide project data to all tabs", async () => {
 		renderWithRouter("overview");
@@ -355,13 +330,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(titles.length).toBeGreaterThan(0);
 		});
 
-		console.log("✓ Project data available to all tabs (preserved)");
+		console.log("✓ Project data available to all tabs");
 	});
 
 	/**
-	 * Property: For all tab switches, loading state SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Loading state should display correctly
 	 */
 	it("should display loading state while fetching project", async () => {
 		vi.mocked(useProjectHook.useProject).mockReturnValue({
@@ -375,13 +348,11 @@ describe("Tab Navigation - Preservation Tests", () => {
 		// Loading spinner should be visible
 		expect(screen.getByText("Loading project...")).toBeInTheDocument();
 
-		console.log("✓ Loading state displays correctly (preserved)");
+		console.log("✓ Loading state displays correctly");
 	});
 
 	/**
-	 * Property: For all tab switches, error state SHALL display correctly
-	 *
-	 * EXPECTED TO PASS: This is baseline behaviour that must be preserved
+	 * Error state should display correctly
 	 */
 	it("should display error state when project not found", async () => {
 		vi.mocked(useProjectHook.useProject).mockReturnValue({
@@ -397,6 +368,6 @@ describe("Tab Navigation - Preservation Tests", () => {
 			expect(screen.getByText(/does not exist/i)).toBeInTheDocument();
 		});
 
-		console.log("✓ Error state displays correctly (preserved)");
+		console.log("✓ Error state displays correctly");
 	});
 });

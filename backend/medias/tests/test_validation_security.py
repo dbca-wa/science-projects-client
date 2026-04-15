@@ -35,7 +35,10 @@ class TestFileValidationOnUpdate:
         )
 
         # Mock the validation function to track if it's called
-        with patch("medias.models._validate_and_save_file") as mock_validate:
+        with patch(
+            "medias.models._validate_and_save_file",
+            return_value=("new_test_image.jpg", b"new image content"),
+        ) as mock_validate:
             # Update the file
             photo.file = new_image
             photo.save()
@@ -63,7 +66,10 @@ class TestFileValidationOnUpdate:
         )
 
         # Mock the validation function to track if it's called
-        with patch("medias.models._validate_and_save_file") as mock_validate:
+        with patch(
+            "medias.models._validate_and_save_file",
+            return_value=("new_test.pdf", b"new pdf content"),
+        ) as mock_validate:
             # Update the file
             pdf.file = new_pdf
             pdf.save()
@@ -97,7 +103,10 @@ class TestFileValidationOnUpdate:
     def test_validation_runs_on_creation(self, project, user, mock_image, db):
         """Test validation runs on new instance creation"""
         # Mock the validation function
-        with patch("medias.models._validate_and_save_file") as mock_validate:
+        with patch(
+            "medias.models._validate_and_save_file",
+            return_value=("test_image.jpg", b"image content"),
+        ) as mock_validate:
             # Create new photo
             ProjectPhoto.objects.create(
                 file=mock_image,
