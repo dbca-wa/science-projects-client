@@ -31,6 +31,31 @@ const ProjectDetailPage = lazy(
 const EditProjectPage = lazy(() => import("@/pages/projects/EditProjectPage"));
 const ProjectMapPage = lazy(() => import("@/pages/projects/ProjectMapPage"));
 
+// Pages - Reports (lazy loaded)
+const PublishedReportsPage = lazy(
+	() => import("@/pages/reports/PublishedReportsPage")
+);
+const LatestReportPage = lazy(() => import("@/pages/reports/LatestReportPage"));
+const BusinessAreaLeadPage = lazy(
+	() => import("@/pages/reports/BusinessAreaLeadPage")
+);
+
+// Pages - Admin (lazy loaded)
+const BranchesPage = lazy(() => import("@/pages/admin/BranchesPage"));
+const AddressesPage = lazy(() => import("@/pages/admin/AddressesPage"));
+const AffiliationsPage = lazy(() => import("@/pages/admin/AffiliationsPage"));
+const BusinessAreasPage = lazy(() => import("@/pages/admin/BusinessAreasPage"));
+const DivisionsPage = lazy(() => import("@/pages/admin/DivisionsPage"));
+const LocationsPage = lazy(() => import("@/pages/admin/LocationsPage"));
+const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
+const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
+const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
+const BatchApproveOldPage = lazy(
+	() => import("@/pages/admin/BatchApproveOldPage")
+);
+const BatchApprovePage = lazy(() => import("@/pages/admin/BatchApprovePage"));
+const NewCyclePage = lazy(() => import("@/pages/admin/NewCyclePage"));
+
 // Pages - Staff Profiles (lazy loaded)
 const StaffDirectoryPage = lazy(
 	() => import("@/pages/staff/StaffDirectoryPage")
@@ -349,53 +374,191 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 	},
 ];
 
-/** ---------------- Reports (NOT YET IMPLEMENTED) ---------------- */
-// Uncomment when reports feature is implemented
-/*
+/** ---------------- Reports ---------------- */
 export const REPORT_ROUTES: RouteConfig[] = [
 	{
-		name: "Reports",
+		name: "Published Reports",
 		path: "/reports",
 		iconKey: "reports",
 		tooltipKey: "reports",
-		component: ReportListPage,
+		component: PublishedReportsPage,
 		requiresAuth: true,
-		showInSidebar: true,
+		showInSidebar: false,
 		section: "ARAR",
 		layoutWrapper: "content",
 	},
 	{
-		name: "Current Report",
+		name: "Latest Report",
 		path: "/reports/current",
 		iconKey: "reports",
-		component: CurrentReportPage,
+		component: LatestReportPage,
 		requiresAuth: true,
 		requiresAdmin: true,
-		showInSidebar: true,
+		showInSidebar: false,
 		section: "ARAR",
 		layoutWrapper: "content",
 	},
-];
-*/
-
-/** ---------------- Admin (NOT YET IMPLEMENTED) ---------------- */
-// Uncomment when admin features are implemented
-/*
-export const ADMIN_ROUTES: RouteConfig[] = [
 	{
-		name: "Admin",
-		path: "/admin",
-		iconKey: "admin",
-		tooltipKey: "admin",
-		component: AdminDashboard,
+		name: "Latest Report - Media",
+		path: "/reports/current/media",
+		component: LatestReportPage,
+		componentProps: { selectedTab: "media" },
 		requiresAuth: true,
 		requiresAdmin: true,
-		showInSidebar: true,
-		section: "Admin",
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Latest Report - Pending",
+		path: "/reports/current/pending",
+		component: LatestReportPage,
+		componentProps: { selectedTab: "pending" },
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Latest Report - Approved",
+		path: "/reports/current/approved",
+		component: LatestReportPage,
+		componentProps: { selectedTab: "approved" },
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Latest Report - Print Preview",
+		path: "/reports/current/preview",
+		component: LatestReportPage,
+		componentProps: { selectedTab: "preview" },
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "My Business Areas",
+		path: "/reports/business-areas",
+		component: BusinessAreaLeadPage,
+		requiresAuth: true,
+		showInSidebar: false,
 		layoutWrapper: "content",
 	},
 ];
-*/
+
+/** ---------------- Admin ---------------- */
+export const ADMIN_ROUTES: RouteConfig[] = [
+	{
+		name: "Data Lists",
+		path: "/admin/data",
+		component: DataListsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Addresses",
+		path: "/admin/addresses",
+		component: AddressesPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Affiliations",
+		path: "/admin/affiliations",
+		component: AffiliationsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Branches",
+		path: "/admin/branches",
+		component: BranchesPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Business Areas",
+		path: "/admin/business-areas",
+		component: BusinessAreasPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Divisions",
+		path: "/admin/divisions",
+		component: DivisionsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Locations",
+		path: "/admin/locations",
+		component: LocationsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Report Info",
+		path: "/admin/reports",
+		component: ReportInfoPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Services",
+		path: "/admin/services",
+		component: ServicesPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Batch Approve Old Reports",
+		path: "/admin/batch-approve-old",
+		component: BatchApproveOldPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Batch Approve Reports",
+		path: "/admin/batch-approve",
+		component: BatchApprovePage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Open New Cycle",
+		path: "/admin/new-cycle",
+		component: NewCyclePage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+];
 
 /** ---------------- Staff Profiles ---------------- */
 export const STAFF_ROUTES: RouteConfig[] = [
@@ -451,9 +614,8 @@ export const ALL_ROUTES: RouteConfig[] = [
 	...USER_ROUTES,
 	...PROJECT_ROUTES,
 	...STAFF_ROUTES,
-	// Uncomment as features are implemented:
-	// ...REPORT_ROUTES,
-	// ...ADMIN_ROUTES,
+	...REPORT_ROUTES,
+	...ADMIN_ROUTES,
 ];
 
 /** Flatten helper (kept as-is) */

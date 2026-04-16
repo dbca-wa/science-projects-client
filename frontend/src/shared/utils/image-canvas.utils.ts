@@ -64,6 +64,10 @@ export const generateCroppedImage = async (
 	ctx.imageSmoothingQuality = "high";
 	ctx.imageSmoothingEnabled = true;
 
+	// Fill with white so transparent PNGs don't render with black backgrounds
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(0, 0, finalWidth, finalHeight);
+
 	ctx.save();
 
 	// Move to center of canvas

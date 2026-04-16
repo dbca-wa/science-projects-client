@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { ProjectTypeCard } from "@/features/projects/components/cards/ProjectTypeCard";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import {
 	FlaskConical,
 	Briefcase,
@@ -67,6 +68,7 @@ const PROJECT_TYPES = [
 ];
 
 export default function ProjectCreatePage() {
+	useDocumentTitle("Create Project");
 	const navigate = useNavigate();
 
 	const handleTypeSelect = (kind: string) => {

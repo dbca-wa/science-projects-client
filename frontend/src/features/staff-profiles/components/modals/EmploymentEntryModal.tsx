@@ -31,10 +31,7 @@ const EmploymentEntryModal = ({
 	onOpenChange,
 }: EmploymentEntryModalProps) => {
 	const isEdit = !!entry;
-	const initialForm = useMemo(
-		() => getInitialEmploymentForm(entry),
-		[entry, open]
-	);
+	const initialForm = useMemo(() => getInitialEmploymentForm(entry), [entry]);
 	const [form, setForm] = useState(initialForm);
 
 	// Reset form when modal opens with new/different data

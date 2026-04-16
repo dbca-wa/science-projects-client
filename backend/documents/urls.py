@@ -20,6 +20,7 @@ urlpatterns = [
     path("reports/withPDF", views.GetWithPDFs.as_view()),
     path("reports/legacyPDF", views.GetLegacyPDFs.as_view()),
     path("reports/pdf/<int:pk>", views.GetReportPDF.as_view()),
+    path("reports/pdf/<int:pk>/status", views.GetReportPDFStatus.as_view()),
     path("reports/completed", views.GetCompletedReports.as_view()),
     # PR Population
     path("get_previous_reports_data", views.GetPreviousReportsData.as_view()),
@@ -31,6 +32,10 @@ urlpatterns = [
     # Annual Report Gen ========================================================
     path(
         "reports/<int:pk>/generate_pdf", views.BeginAnnualReportDocGeneration.as_view()
+    ),
+    path(
+        "reports/<int:pk>/generation-progress",
+        views.GenerationProgressSSE.as_view(),
     ),
     path(
         "reports/<int:pk>/cancel_doc_gen",

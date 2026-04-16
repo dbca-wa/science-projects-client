@@ -3,12 +3,15 @@ Annual report views
 """
 
 import json
+import time
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Max, Q
+from django.http import StreamingHttpResponse
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -34,6 +37,7 @@ from ..serializers import (
     StudentReportSerializer,
     TinyAnnualReportSerializer,
 )
+from ..services.annual_report_service import AnnualReportGenerationService
 
 
 class Reports(APIView):
@@ -259,6 +263,38 @@ class GetReportPDF(APIView):
         return Response(serialized_data, status=HTTP_200_OK)
 
 
+class GetReportPDFStatus(APIView):
+    """Lightweight endpoint returning PDF metadata without the base64 data"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            report = AnnualReport.objects.get(pk=pk)
+        except AnnualReport.DoesNotExist:
+            raise NotFound
+
+        try:
+            pdf_obj = AnnualReportPDF.objects.get(report=pk)
+            has_pdf = True
+            file_path = pdf_obj.file.url if pdf_obj.file else None
+        except AnnualReportPDF.DoesNotExist:
+            has_pdf = False
+            file_path = None
+
+        return Response(
+            {
+                "has_pdf": has_pdf,
+                "file": file_path,
+                "report": {
+                    "id": report.pk,
+                    "pdf_generation_in_progress": report.pdf_generation_in_progress,
+                },
+            },
+            status=HTTP_200_OK,
+        )
+
+
 class GetWithPDFs(APIView):
     """Get annual reports with PDFs"""
 
@@ -307,20 +343,76 @@ class GetCompletedReports(APIView):
             return Response([], status=HTTP_200_OK)
 
 
-class BeginAnnualReportDocGeneration(APIView):
-    """Begin annual report document generation"""
+class EventStreamRenderer(BaseRenderer):
+    """Renderer that accepts text/event-stream for SSE endpoints."""
+
+    media_type = "text/event-stream"
+    format = "text"
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return data
+
+
+class GenerationProgressSSE(APIView):
+    """SSE endpoint streaming annual report generation progress"""
 
     permission_classes = [IsAuthenticated]
+    renderer_classes = [EventStreamRenderer]
 
-    def post(self, request, pk):
+    def get(self, request, pk):
+        """Stream generation progress as Server-Sent Events"""
         try:
             AnnualReport.objects.get(pk=pk)
         except AnnualReport.DoesNotExist:
-            raise NotFound
+            raise NotFound(f"Annual report {pk} not found")
 
-        # Placeholder for PDF generation logic
-        # This will be implemented when PDF service is fully integrated
-        return Response({"status": "generation_started"}, status=HTTP_200_OK)
+        response = StreamingHttpResponse(
+            self._sse_generator(pk),
+            content_type="text/event-stream",
+        )
+        response["Cache-Control"] = "no-cache"
+        response["X-Accel-Buffering"] = "no"
+        return response
+
+    def _sse_generator(self, report_pk):
+        """Generator yielding SSE-formatted progress events."""
+        # Initial check — yield idle if no generation active
+        progress = AnnualReportGenerationService.get_progress(report_pk)
+        if progress is None:
+            try:
+                report = AnnualReport.objects.get(pk=report_pk)
+                if not report.pdf_generation_in_progress:
+                    yield self._format_sse({"status": "idle"})
+                    return
+            except AnnualReport.DoesNotExist:
+                yield self._format_sse({"status": "idle"})
+                return
+
+        # Polling loop
+        while True:
+            progress = AnnualReportGenerationService.get_progress(report_pk)
+            if progress:
+                yield self._format_sse(progress)
+                if progress.get("status") in ("completed", "error"):
+                    AnnualReportGenerationService.clear_progress(report_pk)
+                    return
+            else:
+                # No progress data — check if generation is still flagged
+                try:
+                    report = AnnualReport.objects.get(pk=report_pk)
+                    if not report.pdf_generation_in_progress:
+                        yield self._format_sse({"status": "idle"})
+                        AnnualReportGenerationService.clear_progress(report_pk)
+                        return
+                except AnnualReport.DoesNotExist:
+                    yield self._format_sse({"status": "idle"})
+                    return
+            time.sleep(1)
+
+    @staticmethod
+    def _format_sse(data: dict) -> str:
+        """Format a dict as an SSE data line."""
+        return f"data: {json.dumps(data)}\n\n"
 
 
 class LatestYearsProgressReports(APIView):

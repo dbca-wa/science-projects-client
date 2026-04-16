@@ -3,7 +3,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path, re_path
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.static import serve
+
+
+# Exempt annual report PDF files from X-Frame-Options so the
+# PrintPreviewTab iframe can load them cross-origin during development.
+@xframe_options_exempt
+def serve_embeddable(request, path, document_root=None):
+    return serve(request, path, document_root=document_root)
 
 
 def health_check(request):
@@ -37,6 +45,12 @@ urlpatterns = [
     path("api/v1/categories/", include("categories.urls")),
     path("api/v1/adminoptions/", include("adminoptions.urls")),
     path("api/v1/caretakers/", include("caretakers.urls")),
+    # Annual report PDFs — exempt from X-Frame-Options for iframe preview
+    re_path(
+        r"^files/annual_reports/pdfs/(?P<path>.*)$",
+        serve_embeddable,
+        {"document_root": settings.MEDIA_ROOT + "/annual_reports/pdfs"},
+    ),
     re_path(r"^files/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(
     settings.MEDIA_URL,

@@ -399,8 +399,7 @@
 }
 
 /* Clickable display mode - inherit cursor from parent */
-.editor-readonly.editor-clickable .editor-input-display,
-.editor-readonly.editor-clickable .editor-input-display * {
+.editor-readonly.editor-clickable .editor-input-display {
 	cursor: inherit !important;
 }
 
@@ -850,4 +849,111 @@
 /* Hide word counter and other siblings when the inline link panel is open */
 .editor-container[data-link-panel-open] + * {
 	display: none !important;
+}
+
+/* ================================================================
+   Legacy theme class overrides for dark mode compatibility
+
+   The old Lexical editor stored HTML with theme-specific classes
+   (e.g. editor-p-light, editor-bold-dark). These had hardcoded
+   colours that don't adapt to theme changes. We override them all
+   to use inherit so text colour follows the current theme.
+   ================================================================ */
+
+.editor-input-display .editor-p-light,
+.editor-input-display .editor-p-dark,
+.editor-readonly .editor-p-light,
+.editor-readonly .editor-p-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-bold-light,
+.editor-input-display .editor-bold-dark,
+.editor-readonly .editor-bold-light,
+.editor-readonly .editor-bold-dark {
+	color: inherit;
+	font-weight: bold;
+}
+
+.editor-input-display .editor-italics-light,
+.editor-input-display .editor-italics-dark,
+.editor-readonly .editor-italics-light,
+.editor-readonly .editor-italics-dark {
+	color: inherit;
+	font-style: italic;
+}
+
+.editor-input-display .editor-underline-light,
+.editor-input-display .editor-underline-dark,
+.editor-readonly .editor-underline-light,
+.editor-readonly .editor-underline-dark {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.editor-input-display .editor-h1-light,
+.editor-input-display .editor-h1-dark,
+.editor-readonly .editor-h1-light,
+.editor-readonly .editor-h1-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-h2-light,
+.editor-input-display .editor-h2-dark,
+.editor-readonly .editor-h2-light,
+.editor-readonly .editor-h2-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-h3-light,
+.editor-input-display .editor-h3-dark,
+.editor-readonly .editor-h3-light,
+.editor-readonly .editor-h3-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-li-light,
+.editor-input-display .editor-li-dark,
+.editor-readonly .editor-li-light,
+.editor-readonly .editor-li-dark {
+	color: inherit;
+	font-size: 14px;
+	padding: 0;
+}
+
+.editor-input-display .editor-ul-light,
+.editor-input-display .editor-ul-dark,
+.editor-readonly .editor-ul-light,
+.editor-readonly .editor-ul-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-ol-light,
+.editor-input-display .editor-ol-dark,
+.editor-readonly .editor-ol-light,
+.editor-readonly .editor-ol-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-textStrikethrough-light,
+.editor-input-display .editor-textStrikethrough-dark,
+.editor-readonly .editor-textStrikethrough-light,
+.editor-readonly .editor-textStrikethrough-dark {
+	color: inherit;
+	text-decoration: line-through;
+}
+
+.editor-input-display .editor-textSubscript-light,
+.editor-input-display .editor-textSubscript-dark,
+.editor-readonly .editor-textSubscript-light,
+.editor-readonly .editor-textSubscript-dark {
+	color: inherit;
+}
+
+.editor-input-display .editor-textUnderlineStrikethrough-light,
+.editor-input-display .editor-textUnderlineStrikethrough-dark,
+.editor-readonly .editor-textUnderlineStrikethrough-light,
+.editor-readonly .editor-textUnderlineStrikethrough-dark {
+	color: inherit;
+	text-decoration: underline line-through;
 }

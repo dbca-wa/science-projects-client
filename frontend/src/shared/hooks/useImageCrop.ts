@@ -131,10 +131,10 @@ export const useImageCrop = (
 ): UseImageCropReturn => {
 	const [crop, setCrop] = useState<Crop>({
 		unit: "%",
-		width: 50,
-		height: 50,
-		x: 25,
-		y: 25,
+		width: 90,
+		height: 90,
+		x: 5,
+		y: 5,
 	});
 	const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
 	const [scale, setScale] = useState(1);
@@ -279,11 +279,11 @@ export const useImageCrop = (
 
 			if (targetAspect > imageAspect) {
 				// Crop is wider than image - fit to width
-				cropWidth = imageWidth * 0.9; // 90% of image width
+				cropWidth = imageWidth * 1.0;
 				cropHeight = cropWidth / targetAspect;
 			} else {
 				// Crop is taller than image - fit to height
-				cropHeight = imageHeight * 0.9; // 90% of image height
+				cropHeight = imageHeight * 1.0;
 				cropWidth = cropHeight * targetAspect;
 			}
 

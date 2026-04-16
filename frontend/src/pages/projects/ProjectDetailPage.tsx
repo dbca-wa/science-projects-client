@@ -5,6 +5,8 @@ import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { useCaretakerPermissions } from "@/features/caretakers/hooks/useCaretakerPermissions";
 import { useCurrentUser } from "@/features/auth";
 import { isCaretakerOfAdmin } from "@/features/projects/utils/caretaker-admin.utils";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import type { IUserData } from "@/shared/types/user.types";
 import {
 	Tabs,
@@ -17,7 +19,6 @@ import { NavigationButton } from "@/shared/components/navigation/NavigationButto
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, ArrowLeft, Mail, Loader2 } from "lucide-react";
-import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import {
 	Select,
 	SelectContent,
@@ -47,6 +48,12 @@ export default function ProjectDetailPage({
 	const { data, isLoading, error, isFetching } = useProject(id);
 	const { fireConfetti } = useConfetti();
 	const [hasShownConfetti, setHasShownConfetti] = useState(false);
+
+	// Dynamic document title based on project name
+	const projectTitle = data?.project?.title
+		? sanitizeInput(data.project.title)
+		: "Project";
+	useDocumentTitle(projectTitle);
 
 	// Debug logging
 	console.log("[ProjectDetailPage] Render:", {

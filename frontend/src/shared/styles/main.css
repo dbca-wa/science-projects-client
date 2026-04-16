@@ -324,6 +324,49 @@
 	}
 }
 
+/* PDF generation progress bar */
+@keyframes progress-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+@keyframes progress-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 6px rgba(59, 130, 246, 0.3),
+			0 0 12px rgba(99, 102, 241, 0.15);
+	}
+	50% {
+		box-shadow:
+			0 0 10px rgba(59, 130, 246, 0.5),
+			0 0 20px rgba(99, 102, 241, 0.25);
+	}
+}
+
+.progress-bar-fill {
+	background: linear-gradient(
+		100deg,
+		#2563eb 0%,
+		#3b82f6 20%,
+		#4f7df5 35%,
+		#6390f4 50%,
+		#4f7df5 65%,
+		#3b82f6 80%,
+		#2563eb 100%
+	);
+	background-size: 200% 100%;
+	animation:
+		progress-shimmer 5s ease-in-out infinite,
+		progress-glow 3s ease-in-out infinite;
+	transition: width 700ms cubic-bezier(0.4, 0, 0.2, 1);
+	border-radius: 9999px;
+}
+
 /* Leaflet Map Styles */
 
 /* Disable map dragging on control elements */
@@ -506,4 +549,64 @@
 .leaflet-container *:focus {
 	outline: none !important;
 	box-shadow: none !important;
+}
+
+/* Generation button — rotating border glow on hover, press spring effect */
+@keyframes border-rotate {
+	0% {
+		--border-angle: 0deg;
+	}
+	100% {
+		--border-angle: 360deg;
+	}
+}
+
+@property --border-angle {
+	syntax: "<angle>";
+	initial-value: 0deg;
+	inherits: false;
+}
+
+.gen-btn {
+	position: relative;
+	z-index: 0;
+	border: 2px solid transparent;
+	background:
+		linear-gradient(var(--gen-btn-bg), var(--gen-btn-bg)) padding-box,
+		conic-gradient(
+				from var(--border-angle),
+				#2563eb,
+				#6390f4,
+				#8b5cf6,
+				#6390f4,
+				#2563eb
+			)
+			border-box;
+	transition:
+		transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+		color 200ms ease;
+	--gen-btn-bg: #1f2937;
+}
+
+.gen-btn:hover {
+	animation: border-rotate 3s linear infinite;
+	--gen-btn-bg: rgba(255, 255, 255, 0.85);
+}
+
+/* Press spring: shrink on mousedown */
+.gen-btn:active {
+	transform: scale(0.93);
+}
+
+.dark .gen-btn {
+	--gen-btn-bg: #1f2937;
+}
+
+.dark .gen-btn:hover {
+	--gen-btn-bg: rgba(17, 24, 39, 0.85);
+}
+
+/* Press spring: shrink on mousedown, overshoot on release */
+.gen-btn:active {
+	transform: scale(0.93);
 }

@@ -4,6 +4,8 @@ Progress report serializers
 
 from rest_framework import serializers
 
+from common.utils.mixins import TeamMemberMixin
+
 from ..models import ProgressReport
 from .base import TinyProjectDocumentSerializer
 
@@ -27,10 +29,11 @@ class TinyProgressReportSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProgressReportSerializer(serializers.ModelSerializer):
+class ProgressReportSerializer(TeamMemberMixin, serializers.ModelSerializer):
     """Standard progress report serializer"""
 
     document = TinyProjectDocumentSerializer(read_only=True)
+    team_members = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgressReport

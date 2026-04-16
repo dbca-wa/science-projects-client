@@ -107,6 +107,7 @@ export function UnifiedDocumentActionModal({
 		},
 	});
 
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const sendEmail = watch("sendEmail");
 
 	// Get modal content based on action and stage

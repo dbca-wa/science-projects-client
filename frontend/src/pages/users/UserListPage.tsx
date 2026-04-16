@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import {
 	UserSearchBar,
@@ -35,6 +36,7 @@ import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
  * Main page for browsing and searching users with detail sheet
  */
 const UserListPage = observer(() => {
+	useDocumentTitle("Users");
 	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const userSearchStore = useUserSearchStore();

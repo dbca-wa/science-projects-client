@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { ExternalUserForm } from "@/features/users/components/ExternalUserForm";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 
 /**
  * UserCreatePage
@@ -13,6 +14,7 @@ import { PageTransition } from "@/shared/components/PageTransition";
  * - Breadcrumb navigation
  */
 const UserCreatePage = () => {
+	useDocumentTitle("Add User");
 	const navigate = useNavigate();
 
 	const handleCancel = () => {

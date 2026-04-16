@@ -5,6 +5,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
+import { FileText, Archive, Briefcase } from "lucide-react";
 import { Navitar } from "./Navitar";
 import { Button } from "@/shared/components/ui/button";
 import { NavigationDropdownMenu } from "@/shared/components/navigation/NavigationDropdownMenu";
@@ -14,6 +15,8 @@ import { useWindowSize } from "@/shared/hooks/useWindowSize";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import HeaderContent from "./HeaderContent";
+import { ManageDropdownContent } from "./ManageDropdownContent";
+import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
 
 /**
  * HamburgerMenuSheet - Mobile navigation menu
@@ -69,12 +72,18 @@ export const Header = observer(() => {
 	// Controlled dropdown state
 	const [projectsOpen, setProjectsOpen] = useState(false);
 	const [usersOpen, setUsersOpen] = useState(false);
+	const [reportsOpen, setReportsOpen] = useState(false);
+	const [manageOpen, setManageOpen] = useState(false);
 	const [navitarOpen, setNavitarOpen] = useState(false);
+
+	const { data: myBusinessAreas } = useMyBusinessAreas();
 
 	// Close other menus when one opens
 	useEffect(() => {
 		if (projectsOpen) {
 			setUsersOpen(false);
+			setReportsOpen(false);
+			setManageOpen(false);
 			setNavitarOpen(false);
 		}
 	}, [projectsOpen]);
@@ -82,14 +91,36 @@ export const Header = observer(() => {
 	useEffect(() => {
 		if (usersOpen) {
 			setProjectsOpen(false);
+			setReportsOpen(false);
+			setManageOpen(false);
 			setNavitarOpen(false);
 		}
 	}, [usersOpen]);
 
 	useEffect(() => {
+		if (reportsOpen) {
+			setProjectsOpen(false);
+			setUsersOpen(false);
+			setManageOpen(false);
+			setNavitarOpen(false);
+		}
+	}, [reportsOpen]);
+
+	useEffect(() => {
+		if (manageOpen) {
+			setProjectsOpen(false);
+			setUsersOpen(false);
+			setReportsOpen(false);
+			setNavitarOpen(false);
+		}
+	}, [manageOpen]);
+
+	useEffect(() => {
 		if (navitarOpen) {
 			setProjectsOpen(false);
 			setUsersOpen(false);
+			setReportsOpen(false);
+			setManageOpen(false);
 		}
 	}, [navitarOpen]);
 
@@ -226,63 +257,60 @@ export const Header = observer(() => {
 									/>
 								</NavigationDropdownMenu>
 
-								{/* Reports Menu - COMMENTED OUT: Not yet implemented */}
-								{/*
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-                    >
-                      Reports
-                      <IoCaretDown className="ml-1 h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-                    <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                      Annual Research Activity Report
-                    </DropdownMenuLabel>
-                    <NavigationDropdownMenuItem
-                      targetPath="/reports"
-                      className="hover:bg-gray-100 cursor-pointer select-none"
-                    >
-                      <CgViewList className="mr-2 size-4" />
-                      Published Reports
-                    </NavigationDropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                */}
+								{/* Reports Menu */}
+								<NavigationDropdownMenu
+									label="Reports"
+									open={reportsOpen}
+									onOpenChange={setReportsOpen}
+								>
+									<NavigationDropdownMenuContent
+										label="Annual Report"
+										items={[
+											{
+												targetPath: "/reports/current",
+												icon: (
+													<FileText className="size-4" aria-hidden="true" />
+												),
+												label: "Latest Report",
+											},
+											{
+												targetPath: "/reports",
+												icon: <Archive className="size-4" aria-hidden="true" />,
+												label: "Published Reports",
+											},
+											...(myBusinessAreas && myBusinessAreas.length > 0
+												? [
+														{
+															targetPath: "/reports/business-areas",
+															icon: (
+																<Briefcase
+																	className="size-4"
+																	aria-hidden="true"
+																/>
+															),
+															label: "My Business Areas",
+														},
+													]
+												: []),
+										]}
+										onClose={() => setReportsOpen(false)}
+									/>
+								</NavigationDropdownMenu>
 
-								{/* Admin Menu - COMMENTED OUT: Not yet implemented */}
-								{/*
-                {isSuperuser && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-                      >
-                        Admin
-                        <IoCaretDown className="ml-1 h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-white text-gray-900 border-gray-200">
-                      <DropdownMenuLabel className="text-center text-xs text-gray-500">
-                        Manage
-                      </DropdownMenuLabel>
-                      <NavigationDropdownMenuItem
-                        targetPath="/admin"
-                        className="hover:bg-gray-100 cursor-pointer select-none"
-                      >
-                        <RiAdminFill className="mr-2 size-4" />
-                        Admin Dashboard
-                      </NavigationDropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+								{/* Manage Menu — superuser only */}
+								{authStore.isSuperuser && (
+									<NavigationDropdownMenu
+										label="Manage"
+										open={manageOpen}
+										onOpenChange={setManageOpen}
+									>
+										<ManageDropdownContent
+											onClose={() => setManageOpen(false)}
+										/>
+									</NavigationDropdownMenu>
+								)}
 
-
-                {/* Guide Button - COMMENTED OUT: Page not yet created */}
+								{/* Guide Button — page not yet created */}
 								{/*
                 <Button
                   variant="ghost"

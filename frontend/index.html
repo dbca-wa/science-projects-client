@@ -16,8 +16,8 @@
         img-src 'self' data: blob: http: https:;
         font-src 'self' data:;
         connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://*.ingest.us.sentry.io;
-        frame-src 'none';
-        object-src 'none';
+        frame-src 'self' blob: http://localhost:8000 http://127.0.0.1:8000;
+        object-src 'self' blob: http://localhost:8000 http://127.0.0.1:8000;
         base-uri 'self';
         form-action 'self';
       "
