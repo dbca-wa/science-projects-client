@@ -1224,22 +1224,27 @@ class TestDownloadAnnualReport:
     def test_download_annual_report_with_existing_pdf(
         self, api_client, user, annual_report, db
     ):
-        """Test downloading annual report with existing PDF - covers lines 102-108"""
+        """Test downloading annual report with existing PDF"""
         # Arrange
         api_client.force_authenticate(user=user)
 
-        # Mock the annual report to have a PDF attribute
         from unittest.mock import Mock, patch
 
         from django.core.files.base import ContentFile
 
-        with patch("documents.models.AnnualReport.objects.get") as mock_get:
+        with patch("documents.views.pdf.AnnualReport.objects") as mock_qs:
             mock_report = Mock()
             mock_report.pk = annual_report.pk
             mock_report.year = annual_report.year
-            mock_report.pdf = Mock()
-            mock_report.pdf.file = ContentFile(b"Existing PDF", name="existing.pdf")
-            mock_get.return_value = mock_report
+            mock_report.division = Mock()
+            mock_report.division.slug = "BCS"
+            mock_pdf = Mock()
+            mock_pdf.published_file = ContentFile(
+                b"Published PDF", name="published.pdf"
+            )
+            mock_pdf.draft_file = None
+            mock_report.pdf = mock_pdf
+            mock_qs.select_related.return_value.get.return_value = mock_report
 
             # Act
             response = api_client.get(

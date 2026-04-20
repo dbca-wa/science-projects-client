@@ -47,9 +47,9 @@ urlpatterns = [
     path("api/v1/caretakers/", include("caretakers.urls")),
     # Annual report PDFs — exempt from X-Frame-Options for iframe preview
     re_path(
-        r"^files/annual_reports/pdfs/(?P<path>.*)$",
+        r"^files/annual_reports/(?P<path>.*)$",
         serve_embeddable,
-        {"document_root": settings.MEDIA_ROOT + "/annual_reports/pdfs"},
+        {"document_root": settings.MEDIA_ROOT + "/annual_reports"},
     ),
     re_path(r"^files/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(

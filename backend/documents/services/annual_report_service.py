@@ -21,17 +21,32 @@ from django.template.loader import render_to_string
 
 
 class AnnualReportGenerationService:
-    """Orchestrates annual report PDF generation with progress tracking."""
+    """Orchestrates annual report PDF generation with progress tracking.
 
-    # In-memory progress state: {report_pk: {phase, phase_label, percentage, ...}}
-    _progress: dict[int, dict] = {}
+    Progress is stored in the database (AnnualReport.pdf_generation_progress)
+    so it is accessible across all Gunicorn workers and Kubernetes pods.
+    """
 
     # region Progress Management ================================================
 
     @classmethod
     def get_progress(cls, report_pk: int) -> dict | None:
         """Get current progress for a report. Returns None if no generation active."""
-        return cls._progress.get(report_pk)
+        from ..models import AnnualReport
+
+        try:
+            progress = (
+                AnnualReport.objects.filter(pk=report_pk)
+                .values_list("pdf_generation_progress", flat=True)
+                .first()
+            )
+            if progress:
+                return progress
+        except Exception as e:
+            settings.LOGGER.warning(
+                f"Failed to read generation progress for report {report_pk}: {e}"
+            )
+        return None
 
     @classmethod
     def set_progress(
@@ -44,14 +59,17 @@ class AnnualReportGenerationService:
         generation_kind: str = "all",
         error_message: str = "",
     ) -> None:
-        """Update progress state for a report."""
-        existing = cls._progress.get(report_pk)
+        """Update progress state for a report in the database."""
+        from ..models import AnnualReport
+
+        # Preserve started_at from existing progress
+        existing = cls.get_progress(report_pk)
         started_at = (
             existing["started_at"]
             if existing and "started_at" in existing
             else time.time()
         )
-        cls._progress[report_pk] = {
+        progress_data = {
             "phase": phase,
             "phase_label": phase_label,
             "percentage": percentage,
@@ -60,11 +78,16 @@ class AnnualReportGenerationService:
             "error_message": error_message,
             "started_at": started_at,
         }
+        AnnualReport.objects.filter(pk=report_pk).update(
+            pdf_generation_progress=progress_data
+        )
 
     @classmethod
     def clear_progress(cls, report_pk: int) -> None:
         """Remove progress state after generation completes."""
-        cls._progress.pop(report_pk, None)
+        from ..models import AnnualReport
+
+        AnnualReport.objects.filter(pk=report_pk).update(pdf_generation_progress={})
 
     # endregion =================================================================
 
@@ -152,9 +175,10 @@ class AnnualReportGenerationService:
             OptimisedStudentReportAnnualReportSerializer,
         )
 
-        base_filter = Q(report=report) & Q(
-            project__business_area__division__name="Biodiversity and Conservation Science"
-        )
+        # Filter by the report's division (or all if no division set)
+        base_filter = Q(report=report)
+        if report.division:
+            base_filter &= Q(project__business_area__division=report.division)
 
         # Add approval filter when generating approved-only
         student_filter = base_filter
@@ -302,9 +326,9 @@ class AnnualReportGenerationService:
         """
         from projects.models import Project, ProjectMember
 
-        base_query = Q(kind__in=[Project.CategoryKindChoices.EXTERNAL]) & Q(
-            business_area__division__name="Biodiversity and Conservation Science"
-        )
+        base_query = Q(kind__in=[Project.CategoryKindChoices.EXTERNAL])
+        if report.division:
+            base_query &= Q(business_area__division=report.division)
 
         if genkind == "approved":
             base_query &= Q(status="active")
@@ -525,6 +549,23 @@ class AnnualReportGenerationService:
             or generic_chapter_image,
         }
 
+        # Chapter images for each section — fall back to generic if not uploaded
+        research_chapter_image = (
+            get_media_file_path("research") or generic_chapter_image
+        )
+        partnerships_chapter_image = (
+            get_media_file_path("partnerships") or generic_chapter_image
+        )
+        collaborations_chapter_image = (
+            get_media_file_path("collaborations") or generic_chapter_image
+        )
+        student_projects_chapter_image = (
+            get_media_file_path("student_projects") or generic_chapter_image
+        )
+        publications_chapter_image = (
+            get_media_file_path("publications") or generic_chapter_image
+        )
+
         # Server URL for resolving media URLs in the template
         server_url = (
             "http://127.0.0.1:8000"
@@ -555,6 +596,11 @@ class AnnualReportGenerationService:
             "dbca_cropped_image_path": dbca_cropped_image_path,
             "server_url": server_url,
             "generic_chapter_image_path": generic_chapter_image,
+            "research_chapter_image": research_chapter_image,
+            "partnerships_chapter_image": partnerships_chapter_image,
+            "collaborations_chapter_image": collaborations_chapter_image,
+            "student_projects_chapter_image": student_projects_chapter_image,
+            "publications_chapter_image": publications_chapter_image,
             "no_image_path": no_image_path,
             "time_generated": time_generated,
             "population_time": "",  # Set by caller after context build

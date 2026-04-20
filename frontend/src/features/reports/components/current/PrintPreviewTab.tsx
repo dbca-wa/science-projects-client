@@ -41,7 +41,9 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 	const [publishModalOpen, setPublishModalOpen] = useState(false);
 
 	const isGenerating = pdfData?.report?.pdf_generation_in_progress ?? false;
-	const canPublish = !!pdfData?.has_draft && authStore.isSuperuser;
+	const canPublish =
+		!!pdfData?.has_draft &&
+		(authStore.isSuperuser || !!authStore.user?.is_key_stakeholder);
 
 	// SSE progress state
 	const [progressData, setProgressData] = useState<IProgressEvent | null>(null);

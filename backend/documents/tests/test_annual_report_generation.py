@@ -24,10 +24,8 @@ SSE_URL = "/api/v1/documents/reports/{pk}/generation-progress"
 
 @pytest.fixture(autouse=True)
 def _clean_progress():
-    """Ensure the in-memory progress dict is clean before and after each test."""
-    AnnualReportGenerationService._progress.clear()
+    """Ensure progress is clean before and after each test."""
     yield
-    AnnualReportGenerationService._progress.clear()
 
 
 # ===========================================================================
@@ -94,59 +92,64 @@ class TestLockManagement:
 
 
 class TestProgressTracking:
-    """Tests for in-memory progress state management."""
+    """Tests for database-backed progress state management."""
 
+    @pytest.mark.django_db
     @pytest.mark.unit
-    def test_set_progress_stores_data(self):
-        """set_progress should store data in the _progress dict."""
+    def test_set_progress_stores_data(self, annual_report):
+        """set_progress should store data in the database."""
         AnnualReportGenerationService.set_progress(
-            report_pk=1,
+            report_pk=annual_report.pk,
             phase="media_fetch",
             phase_label="Fetching media assets...",
             percentage=10,
             generation_kind="all",
         )
 
-        stored = AnnualReportGenerationService._progress[1]
+        annual_report.refresh_from_db()
+        stored = annual_report.pdf_generation_progress
         assert stored["phase"] == "media_fetch"
         assert stored["phase_label"] == "Fetching media assets..."
         assert stored["percentage"] == 10
         assert stored["generation_kind"] == "all"
         assert stored["status"] == "in_progress"
 
+    @pytest.mark.django_db
     @pytest.mark.unit
-    def test_get_progress_returns_stored_data(self):
+    def test_get_progress_returns_stored_data(self, annual_report):
         """get_progress should return the stored dict for a report."""
         AnnualReportGenerationService.set_progress(
-            report_pk=42,
+            report_pk=annual_report.pk,
             phase="sorting",
             phase_label="Sorting...",
             percentage=45,
         )
 
-        result = AnnualReportGenerationService.get_progress(42)
+        result = AnnualReportGenerationService.get_progress(annual_report.pk)
         assert result is not None
         assert result["phase"] == "sorting"
         assert result["percentage"] == 45
 
+    @pytest.mark.django_db
     @pytest.mark.unit
-    def test_get_progress_returns_none_when_absent(self):
+    def test_get_progress_returns_none_when_absent(self, annual_report):
         """get_progress should return None when no progress exists."""
-        result = AnnualReportGenerationService.get_progress(999)
+        result = AnnualReportGenerationService.get_progress(annual_report.pk)
         assert result is None
 
+    @pytest.mark.django_db
     @pytest.mark.unit
-    def test_clear_progress_removes_entry(self):
-        """clear_progress should remove the entry from _progress."""
+    def test_clear_progress_removes_entry(self, annual_report):
+        """clear_progress should remove the entry from the database."""
         AnnualReportGenerationService.set_progress(
-            report_pk=7,
+            report_pk=annual_report.pk,
             phase="done",
             phase_label="Done",
             percentage=100,
         )
-        AnnualReportGenerationService.clear_progress(7)
+        AnnualReportGenerationService.clear_progress(annual_report.pk)
 
-        assert AnnualReportGenerationService.get_progress(7) is None
+        assert AnnualReportGenerationService.get_progress(annual_report.pk) is None
 
 
 # ===========================================================================

@@ -116,6 +116,12 @@ class AnnualReport(CommonModel):
 
     pdf_generation_in_progress = models.BooleanField(default=False)
 
+    pdf_generation_progress = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Progress data for PDF generation (phase, percentage, etc.)",
+    )
+
     is_published = models.BooleanField(
         default=False,
     )
