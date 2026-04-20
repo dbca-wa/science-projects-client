@@ -1282,73 +1282,71 @@ class TestDownloadAnnualReport:
 class TestBeginAnnualReportDocGeneration:
     """Tests for begin annual report PDF generation endpoint"""
 
-    @patch("documents.services.pdf_service.PDFService.generate_annual_report_pdf")
-    @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
-    @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @patch(
+        "documents.views.pdf.AnnualReportGenerationService.acquire_generation_lock",
+        return_value=True,
+    )
+    @patch("documents.views.pdf.AnnualReportGenerationService.generate")
     @pytest.mark.integration
     def test_begin_annual_report_generation(
         self,
-        mock_complete,
-        mock_start,
         mock_generate,
+        mock_lock,
         api_client,
         user,
         annual_report,
         db,
     ):
-        """Test starting annual report PDF generation - covers lines 127-151"""
+        """Test starting annual report PDF generation"""
         # Arrange
         api_client.force_authenticate(user=user)
-        from django.core.files.base import ContentFile
 
-        mock_generate.return_value = ContentFile(b"PDF content", name="report.pdf")
-
-        # Act
+        # Act — view requires genkind in request body
         response = api_client.post(
-            documents_urls.path("reports", annual_report.id, "generate_pdf")
+            documents_urls.path("reports", annual_report.id, "generate_pdf"),
+            {"genkind": "all"},
+            format="json",
         )
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        assert response.data["message"] == "PDF generation started"
         assert response.data["report_id"] == annual_report.id
 
         # Verify service methods were called
-        mock_start.assert_called_once_with(annual_report)
-        mock_generate.assert_called_once_with(annual_report)
-        mock_complete.assert_called_once_with(annual_report)
+        mock_lock.assert_called_once_with(annual_report.id)
 
-    @patch("documents.services.pdf_service.PDFService.generate_annual_report_pdf")
-    @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_started")
-    @patch("documents.services.pdf_service.PDFService.mark_pdf_generation_complete")
+    @patch(
+        "documents.views.pdf.AnnualReportGenerationService.acquire_generation_lock",
+        return_value=True,
+    )
+    @patch("documents.views.pdf.AnnualReportGenerationService.generate")
     @pytest.mark.integration
     def test_begin_annual_report_generation_with_exception(
         self,
-        mock_complete,
-        mock_start,
         mock_generate,
+        mock_lock,
         api_client,
         user,
         annual_report,
         db,
     ):
-        """Test annual report generation with exception - ensures cleanup is called"""
+        """Test annual report generation — generation runs in a thread so
+        exceptions inside generate() do not propagate to the view.
+        The view itself should still return 202."""
         # Arrange
         api_client.force_authenticate(user=user)
         mock_generate.side_effect = Exception("PDF generation failed")
 
-        # Act - the view catches the exception and re-raises it
-        # The exception will propagate through the test client
-        with pytest.raises(Exception, match="PDF generation failed"):
-            api_client.post(
-                documents_urls.path("reports", annual_report.id, "generate_pdf")
-            )
+        # Act
+        response = api_client.post(
+            documents_urls.path("reports", annual_report.id, "generate_pdf"),
+            {"genkind": "all"},
+            format="json",
+        )
 
-        # Assert - verify cleanup was called even though exception was raised
-        mock_start.assert_called_once_with(annual_report)
-        mock_generate.assert_called_once_with(annual_report)
-        # This is the critical assertion - mark_pdf_generation_complete should be called in the except block
-        mock_complete.assert_called_once_with(annual_report)
+        # Assert — the thread is started; the view returns 202 regardless
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        mock_lock.assert_called_once_with(annual_report.id)
 
     @pytest.mark.integration
     def test_begin_annual_report_generation_not_found(self, api_client, user, db):
@@ -1385,12 +1383,9 @@ class TestBeginAnnualReportDocGeneration:
 class TestCancelReportDocGeneration:
     """Tests for cancel annual report PDF generation endpoint"""
 
-    @patch("documents.services.pdf_service.PDFService.cancel_pdf_generation")
     @pytest.mark.integration
-    def test_cancel_report_generation(
-        self, mock_cancel, api_client, user, annual_report, db
-    ):
-        """Test cancelling annual report PDF generation - covers lines 165-171"""
+    def test_cancel_report_generation(self, api_client, user, annual_report, db):
+        """Test cancelling annual report PDF generation"""
         # Arrange
         api_client.force_authenticate(user=user)
 
@@ -1399,10 +1394,8 @@ class TestCancelReportDocGeneration:
             documents_urls.path("reports", annual_report.id, "cancel_doc_gen")
         )
 
-        # Assert
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
-        if response.status_code == status.HTTP_200_OK:
-            mock_cancel.assert_called_once()
+        # Assert — no generation in progress so returns 200
+        assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.integration
     def test_cancel_report_generation_not_found(self, api_client, user, db):

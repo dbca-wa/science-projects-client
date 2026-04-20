@@ -158,8 +158,10 @@ class AnnualReportGenerationService:
 
         # Add approval filter when generating approved-only
         student_filter = base_filter
+        progress_filter = base_filter
         if genkind == "approved":
             student_filter &= Q(document__status="approved")
+            progress_filter &= Q(document__status="approved")
 
         # Student reports
         active_sr_docs = (
@@ -186,7 +188,7 @@ class AnnualReportGenerationService:
 
         # Progress reports — regular + project 1127 (special case)
         regular_pr_docs = (
-            ProgressReport.objects.filter(base_filter)
+            ProgressReport.objects.filter(progress_filter)
             .exclude(project__business_area__division__name__isnull=True)
             .select_related(
                 "document",
@@ -208,8 +210,11 @@ class AnnualReportGenerationService:
         )
 
         # Project 1127 reports (without business_area division requirement)
+        project_1127_filter = Q(report=report) & Q(project__pk=1127)
+        if genkind == "approved":
+            project_1127_filter &= Q(document__status="approved")
         project_1127_pr_docs = (
-            ProgressReport.objects.filter(Q(report=report) & Q(project__pk=1127))
+            ProgressReport.objects.filter(project_1127_filter)
             .select_related(
                 "document",
                 "project",

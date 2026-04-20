@@ -50,7 +50,7 @@ class Reports(APIView):
     def get(self, request):
         """List annual reports, optionally filtered by division slug"""
         settings.LOGGER.info(f"{request.user} is viewing reports")
-        queryset = AnnualReport.objects.all()
+        queryset = AnnualReport.objects.select_related("division").all()
 
         division_slug = request.query_params.get("division")
         if division_slug:
@@ -135,7 +135,7 @@ class ReportDetail(APIView):
     def get(self, request, pk):
         """Get annual report by ID"""
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             raise NotFound
 
@@ -145,7 +145,7 @@ class ReportDetail(APIView):
     def put(self, request, pk):
         """Update annual report"""
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             raise NotFound
 
@@ -197,7 +197,9 @@ class GetLatestReportYear(APIView):
         latest_year = AnnualReport.objects.aggregate(Max("year"))["year__max"]
 
         if latest_year is not None:
-            latest_report = AnnualReport.objects.get(year=latest_year)
+            latest_report = AnnualReport.objects.select_related("division").get(
+                year=latest_year
+            )
             serializer = AnnualReportSerializer(
                 latest_report,
                 context={"request": request},
@@ -286,7 +288,8 @@ class GetWithoutPDFs(APIView):
 
     def get(self, request):
         reports_drafts_only = (
-            AnnualReport.objects.filter(
+            AnnualReport.objects.select_related("division")
+            .filter(
                 pdf__draft_file__isnull=False,
             )
             .exclude(
@@ -373,7 +376,7 @@ class PublishReportPDF(APIView):
 
     def post(self, request, pk):
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             raise NotFound(f"Annual report {pk} not found")
 
@@ -423,9 +426,13 @@ class GetWithPDFs(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        reports_with_pdfs = AnnualReport.objects.filter(
-            pdf__published_file__isnull=False,
-        ).exclude(pdf__published_file="")
+        reports_with_pdfs = (
+            AnnualReport.objects.select_related("division")
+            .filter(
+                pdf__published_file__isnull=False,
+            )
+            .exclude(pdf__published_file="")
+        )
         serializer = TinyAnnualReportSerializer(
             reports_with_pdfs,
             context={"request": request},
@@ -455,7 +462,11 @@ class GetCompletedReports(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        completed_reports = AnnualReport.objects.filter(is_published=True).all()
+        completed_reports = (
+            AnnualReport.objects.select_related("division")
+            .filter(is_published=True)
+            .all()
+        )
         if completed_reports:
             serializer = AnnualReportSerializer(
                 completed_reports,
@@ -549,11 +560,17 @@ class LatestYearsProgressReports(APIView):
 
         if report_id:
             try:
-                target_report = AnnualReport.objects.get(pk=report_id)
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
+                )
             except AnnualReport.DoesNotExist:
                 return Response(status=HTTP_404_NOT_FOUND)
         else:
-            target_report = AnnualReport.objects.order_by("-year").first()
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
 
         if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
@@ -583,11 +600,17 @@ class LatestYearsStudentReports(APIView):
 
         if report_id:
             try:
-                target_report = AnnualReport.objects.get(pk=report_id)
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
+                )
             except AnnualReport.DoesNotExist:
                 return Response(status=HTTP_404_NOT_FOUND)
         else:
-            target_report = AnnualReport.objects.order_by("-year").first()
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
 
         if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
@@ -617,11 +640,17 @@ class LatestYearsInactiveReports(APIView):
 
         if report_id:
             try:
-                target_report = AnnualReport.objects.get(pk=report_id)
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
+                )
             except AnnualReport.DoesNotExist:
                 return Response(status=HTTP_404_NOT_FOUND)
         else:
-            target_report = AnnualReport.objects.order_by("-year").first()
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
 
         if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
@@ -665,7 +694,7 @@ class FullLatestReport(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        queryset = AnnualReport.objects.all()
+        queryset = AnnualReport.objects.select_related("division").all()
 
         # Filter by division slug if provided
         division_slug = request.query_params.get("division")

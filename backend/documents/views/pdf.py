@@ -105,7 +105,7 @@ class DownloadAnnualReport(APIView):
     def get(self, request, pk):
         """Download annual report PDF"""
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             from rest_framework.exceptions import NotFound
 
