@@ -73,9 +73,7 @@ export const ServiceForm = ({
 
 	const handleDirectorChange = (pk: number | null) => {
 		setDirectorPk(pk);
-		if (pk !== null) {
-			setValue("director", pk, { shouldValidate: true });
-		}
+		setValue("director", pk as number, { shouldValidate: true });
 	};
 
 	const onSubmit = (data: ServiceFormData) => {

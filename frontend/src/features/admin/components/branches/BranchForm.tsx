@@ -31,7 +31,7 @@ interface BranchFormProps {
 	branch?: IBranch;
 }
 
-export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
+export const BranchForm = ({ open, onOpenChange, branch }: BranchFormProps) => {
 	const isEditing = !!branch;
 	const createMutation = useCreateBranch();
 	const updateMutation = useUpdateBranch();
@@ -69,9 +69,7 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 
 	const handleManagerChange = (pk: number | null) => {
 		setManagerPk(pk);
-		if (pk !== null) {
-			setValue("manager", pk, { shouldValidate: true });
-		}
+		setValue("manager", pk as number, { shouldValidate: true });
 	};
 
 	const onSubmit = (data: BranchFormData) => {
@@ -153,4 +151,4 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 			</SheetContent>
 		</Sheet>
 	);
-}
+};
