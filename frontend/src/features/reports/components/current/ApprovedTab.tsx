@@ -26,8 +26,7 @@ const ApprovedTab = observer(function ApprovedTab({
 	reportId,
 }: ApprovedTabProps) {
 	const authStore = useAuthStore();
-	const canEdit = authStore.isSuperuser;
-
+	const canEdit = authStore.isSuperuser || !!authStore.user?.is_key_stakeholder;
 	const {
 		data: progressReports,
 		isLoading: progressLoading,

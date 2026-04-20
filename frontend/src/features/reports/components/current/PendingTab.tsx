@@ -21,8 +21,7 @@ interface PendingTabProps {
 
 const PendingTab = observer(function PendingTab({ reportId }: PendingTabProps) {
 	const authStore = useAuthStore();
-	const canEdit = authStore.isSuperuser;
-
+	const canEdit = authStore.isSuperuser || !!authStore.user?.is_key_stakeholder;
 	const {
 		data: inactiveData,
 		isLoading,

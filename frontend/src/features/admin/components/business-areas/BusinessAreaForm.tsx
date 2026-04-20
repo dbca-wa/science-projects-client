@@ -284,7 +284,7 @@ export function BusinessAreaForm({
 								isRequired={false}
 								setUserFunction={handleLeaderChange}
 								preselectedUserPk={leaderPk ?? undefined}
-								isEditable={isEditing}
+								isEditable
 								label="Leader"
 								placeholder="Search for a user"
 								helperText="The leader of the business area (optional)."
@@ -298,7 +298,7 @@ export function BusinessAreaForm({
 								isRequired={false}
 								setUserFunction={handleFinanceAdminChange}
 								preselectedUserPk={financeAdminPk ?? undefined}
-								isEditable={isEditing}
+								isEditable
 								label="Finance Admin"
 								placeholder="Search for a user"
 								helperText="The finance administrator (optional)."
@@ -312,7 +312,7 @@ export function BusinessAreaForm({
 								isRequired={false}
 								setUserFunction={handleDataCustodianChange}
 								preselectedUserPk={dataCustodianPk ?? undefined}
-								isEditable={isEditing}
+								isEditable
 								label="Data Custodian"
 								placeholder="Search for a user"
 								helperText="The data custodian (optional)."

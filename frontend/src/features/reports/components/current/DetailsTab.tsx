@@ -44,8 +44,7 @@ const REPORT_SECTIONS: Array<{
  */
 export default function DetailsTab({ report }: { report: IAnnualReport }) {
 	const authStore = useAuthStore();
-	const canEdit = authStore.isSuperuser;
-
+	const canEdit = authStore.isSuperuser || !!authStore.user?.is_key_stakeholder;
 	return (
 		<div className="space-y-6 py-4">
 			{REPORT_SECTIONS.map((section) => (

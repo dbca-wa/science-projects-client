@@ -31,7 +31,11 @@ interface ServiceFormProps {
 	service?: IDepartmentalService;
 }
 
-export function ServiceForm({ open, onOpenChange, service }: ServiceFormProps) {
+export const ServiceForm = ({
+	open,
+	onOpenChange,
+	service,
+}: ServiceFormProps) => {
 	const isEditing = !!service;
 	const createMutation = useCreateService();
 	const updateMutation = useUpdateService();
@@ -126,7 +130,7 @@ export function ServiceForm({ open, onOpenChange, service }: ServiceFormProps) {
 							isRequired
 							setUserFunction={handleDirectorChange}
 							preselectedUserPk={directorPk ?? undefined}
-							isEditable={isEditing}
+							isEditable
 							label="Executive Director"
 							placeholder="Search for a user"
 							helperText="The executive director of the service."
@@ -153,4 +157,4 @@ export function ServiceForm({ open, onOpenChange, service }: ServiceFormProps) {
 			</SheetContent>
 		</Sheet>
 	);
-}
+};

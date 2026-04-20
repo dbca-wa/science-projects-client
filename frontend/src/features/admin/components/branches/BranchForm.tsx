@@ -126,7 +126,7 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 							isRequired
 							setUserFunction={handleManagerChange}
 							preselectedUserPk={managerPk ?? undefined}
-							isEditable={isEditing}
+							isEditable
 							label="Manager"
 							placeholder="Search for a user"
 							helperText="The manager of the branch."

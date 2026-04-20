@@ -168,7 +168,7 @@ export function DivisionForm({
 							isRequired={false}
 							setUserFunction={handleDirectorChange}
 							preselectedUserPk={directorPk ?? undefined}
-							isEditable={isEditing}
+							isEditable
 							label="Director"
 							placeholder="Search for a user"
 							helperText="The director of the division (optional)."
@@ -181,7 +181,7 @@ export function DivisionForm({
 							isRequired={false}
 							setUserFunction={handleApproverChange}
 							preselectedUserPk={approverPk ?? undefined}
-							isEditable={isEditing}
+							isEditable
 							label="Approver"
 							placeholder="Search for a user"
 							helperText="The approver for the division (optional)."
