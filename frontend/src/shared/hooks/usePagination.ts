@@ -35,6 +35,7 @@ export function usePagination<T>({
 
 	// Reset to page 1 when dependencies change (e.g., filters)
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setCurrentPage(1);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, resetDeps);
@@ -87,6 +88,7 @@ export function usePagination<T>({
 	// Auto-adjust if current page exceeds total pages after data changes
 	useEffect(() => {
 		if (currentPage > totalPages && totalPages > 0) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setCurrentPage(totalPages);
 		}
 	}, [currentPage, totalPages]);

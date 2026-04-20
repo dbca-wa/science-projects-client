@@ -2,6 +2,7 @@
 Documents services
 """
 
+from .annual_report_service import AnnualReportGenerationService
 from .approval_service import ApprovalService
 from .closure_service import ClosureService
 from .concept_plan_service import ConceptPlanService
@@ -13,6 +14,7 @@ from .progress_report_service import ProgressReportService
 from .project_plan_service import ProjectPlanService
 
 __all__ = [
+    "AnnualReportGenerationService",
     "EmailService",
     "EmailSendError",
     "NotificationService",

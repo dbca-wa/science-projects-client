@@ -46,6 +46,7 @@ function Popover({
 	// Handle open/close with animation
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsVisible(true);
 			setIsClosing(false);
 		} else if (isVisible && !isClosing) {
@@ -109,7 +110,6 @@ function PopoverTrigger({
 				onClick?: (e: React.MouseEvent) => void;
 				ref?: React.Ref<HTMLElement>;
 			}>,
-			// eslint-disable-next-line react-hooks/refs
 			{
 				onClick: handleClick,
 				ref: triggerRef,
@@ -242,6 +242,7 @@ function PopoverContent({
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsOpening(false);
 			return;
 		}

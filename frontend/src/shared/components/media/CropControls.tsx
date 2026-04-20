@@ -25,7 +25,7 @@ interface CropControlsProps {
 	resetTransforms: () => void;
 	onImageLoad: (e: React.SyntheticEvent<HTMLImageElement>) => void;
 	imgRef: React.RefObject<HTMLImageElement | null>;
-	variant: "avatar" | "project" | "banner" | "default";
+	variant: "avatar" | "project" | "banner" | "report" | "default";
 	constrainCrop: (crop: Crop) => Crop;
 	imageBounds: { width: number; height: number; x: number; y: number } | null;
 	canvasDimensions: { width: number; height: number } | null;
@@ -100,6 +100,14 @@ export const CropControls = ({
 					<Button type="button" variant="default" size="sm" disabled>
 						<Square className="mr-2 size-4" />
 						1:1 (Fixed)
+					</Button>
+				)}
+
+				{/* Report variant: Show locked aspect ratio */}
+				{variant === "report" && (
+					<Button type="button" variant="default" size="sm" disabled>
+						<RectangleHorizontal className="mr-2 size-4" />
+						Fixed Aspect
 					</Button>
 				)}
 

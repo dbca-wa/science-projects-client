@@ -3,7 +3,10 @@ import { Badge } from "../ui/badge";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type { IProjectData } from "@/shared/types/project.types";
 import { formatDetailedDateTime } from "@/shared/utils/date.utils";
-import { getDocumentTypeIdLabel } from "@/shared/utils/document.utils";
+import {
+	getDocumentTypeIdLabel,
+	getDocumentStatusLabel,
+} from "@/shared/utils/document.utils";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { UserLink } from "@/shared/components/user";
 import { ProjectTag } from "@/features/projects/components/badges/ProjectTag";
@@ -23,31 +26,19 @@ interface DetailRowProps {
 
 function DetailRow({ label, children }: DetailRowProps) {
 	return (
-		<div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-			<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+		<div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-start">
+			<span className="text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">
 				{label}
 			</span>
-			<div className="text-sm">{children}</div>
+			<div className="text-sm min-w-0">{children}</div>
 		</div>
 	);
 }
 
 function DocumentStatusBadge({ status }: { status: string }) {
-	// Map status to display label - matching original implementation
-	const statusLabels: Record<string, string> = {
-		draft: "Draft",
-		new: "New Document",
-		revising: "Revising",
-		inreview: "Review Requested",
-		inapproval: "Approval Requested",
-		approved: "Approved",
-		pending_approval: "Pending Approval",
-		requires_revision: "Requires Revision",
-	};
+	const label = getDocumentStatusLabel(status);
 
-	const label = statusLabels[status] || status;
-
-	// Use appropriate color based on status
+	// Use appropriate colour based on status
 	let colorClass = "bg-gray-600 text-white";
 	if (status === "approved") {
 		colorClass = "bg-green-600 text-white";

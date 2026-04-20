@@ -6,47 +6,52 @@ import type { DocumentAction } from "@/shared/components/documents/UnifiedDocume
 /**
  * Document API Service
  *
- * Handles all document-related API calls (submit, approve, recall, send back, reopen, delete).
+ * Handles all document-related API calls (approve, recall, send back, delete).
+ * Routes each action to the correct backend endpoint with the expected payload.
  */
 
 export interface DocumentActionRequest {
 	action: DocumentAction;
-	comment?: string;
+	stage: number; // 1 = project_lead, 2 = business_area_lead, 3 = directorate
+	documentPk: number;
 	reason?: string;
+	// TODO: Email logic to be implemented later
 	send_email: boolean;
 }
 
-export interface DocumentActionResponse {
-	success: boolean;
-	message: string;
-	document: {
-		id: number;
-		project_lead_approval_granted: boolean;
-		business_area_lead_approval_granted: boolean;
-		directorate_approval_granted: boolean;
-	};
-}
-
 /**
- * Perform a document action (submit, approve, recall, send_back, reopen)
+ * Perform a document action (approve, recall, send_back)
+ *
+ * Routes to the correct backend endpoint based on the action type.
+ * The backend expects { stage, documentPk, reason? } in the request body.
  */
 export const performDocumentAction = async (
-	documentType: DocumentType,
+	_documentType: DocumentType,
 	documentId: number,
 	data: DocumentActionRequest
-): Promise<DocumentActionResponse> => {
-	return apiClient.post<DocumentActionResponse>(
-		DOCUMENT_ENDPOINTS.ACTION(documentType, documentId),
-		data
-	);
+): Promise<Record<string, unknown>> => {
+	const endpointMap: Record<string, string> = {
+		approve: DOCUMENT_ENDPOINTS.APPROVE,
+		recall: DOCUMENT_ENDPOINTS.RECALL,
+		send_back: DOCUMENT_ENDPOINTS.SEND_BACK,
+	};
+
+	const endpoint = endpointMap[data.action];
+	if (!endpoint) throw new Error(`Unknown action: ${data.action}`);
+
+	return apiClient.post<Record<string, unknown>>(endpoint, {
+		stage: data.stage,
+		documentPk: documentId,
+		reason: data.reason,
+		// TODO: Email logic to be implemented later
+	});
 };
 
 /**
  * Delete a document
  */
 export const deleteDocument = async (
-	// @ts-expect-error - Parameter kept for API consistency
-	documentType: DocumentType, // Parameter kept for API consistency, but all types use same endpoint
+	_documentType: DocumentType,
 	documentId: number
 ): Promise<{ success: boolean; message: string }> => {
 	// All document types use the same endpoint: documents/projectdocuments/{id}

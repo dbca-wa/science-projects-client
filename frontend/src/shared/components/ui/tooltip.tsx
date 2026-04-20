@@ -47,6 +47,7 @@ function Tooltip({
 	// Handle open/close with animation
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsVisible(true);
 			setIsClosing(false);
 		} else if (isVisible && !isClosing) {
@@ -123,7 +124,6 @@ function TooltipTrigger({
 	if (asChild && React.isValidElement(children)) {
 		// Clone the child and add our event handlers and ref
 		const childProps = children.props as Record<string, unknown>;
-		// eslint-disable-next-line react-hooks/refs
 		return React.cloneElement(children, {
 			...childProps,
 			ref: elementRef,
@@ -181,6 +181,7 @@ function TooltipContent({
 	// Calculate position BEFORE showing (prevents flash)
 	React.useEffect(() => {
 		if (!open || !triggerElement) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- positioning lifecycle
 			setPosition(null);
 			return;
 		}

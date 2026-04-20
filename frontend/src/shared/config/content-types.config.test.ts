@@ -75,6 +75,13 @@ describe("CONTENT_TYPE_CONFIGS", () => {
 				"project-closure-data-location",
 				"project-closure-hardcopy-location",
 				"project-closure-backup-location",
+				// Annual Report fields
+				"annual-report-dm",
+				"annual-report-dm-sign",
+				"annual-report-service-delivery-intro",
+				"annual-report-research-intro",
+				"annual-report-student-intro",
+				"annual-report-publications",
 			];
 
 			const actualTypes = Object.keys(CONTENT_TYPE_CONFIGS);

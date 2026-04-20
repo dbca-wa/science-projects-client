@@ -2,12 +2,12 @@
  * Document API Endpoints
  *
  * Endpoint definitions for document-related API calls.
+ * Maps to backend routes: documents/actions/approve, documents/actions/recall, documents/actions/send_back
  */
 
-import type { DocumentType } from "@/shared/utils/document.utils";
-
 export const DOCUMENT_ENDPOINTS = {
-	ACTION: (documentType: DocumentType, documentId: number) =>
-		`documents/${documentType}/${documentId}/action`,
+	APPROVE: "documents/actions/approve",
+	RECALL: "documents/actions/recall",
+	SEND_BACK: "documents/actions/send_back",
 	DELETE: (documentId: number) => `documents/projectdocuments/${documentId}`,
 } as const;

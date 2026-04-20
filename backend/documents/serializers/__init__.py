@@ -2,6 +2,12 @@
 Documents serializers
 """
 
+# Annual report PDF generation serializers
+from .annual_report import (
+    OptimisedProgressReportAnnualReportSerializer,
+    OptimisedStudentReportAnnualReportSerializer,
+)
+
 # Base serializers
 from .base import (
     AnnualReportCreateSerializer,
@@ -122,4 +128,7 @@ __all__ = [
     "PublicationDocSerializer",
     "LibraryPublicationResponseSerializer",
     "PublicationResponseSerializer",
+    # Annual report PDF generation
+    "OptimisedProgressReportAnnualReportSerializer",
+    "OptimisedStudentReportAnnualReportSerializer",
 ]

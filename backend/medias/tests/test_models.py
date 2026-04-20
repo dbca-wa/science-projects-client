@@ -136,7 +136,7 @@ class TestAnnualReportPDF:
     def test_create_annual_report_pdf(self, annual_report, user, mock_file, db):
         """Test creating annual report PDF"""
         pdf = AnnualReportPDF.objects.create(
-            file=mock_file,
+            draft_file=mock_file,
             report=annual_report,
             creator=user,
         )
@@ -159,7 +159,7 @@ class TestAnnualReportPDF:
     ):
         """Test size field is auto-calculated on save"""
         pdf = AnnualReportPDF(
-            file=mock_file,
+            draft_file=mock_file,
             report=annual_report,
             creator=user,
         )

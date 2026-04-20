@@ -238,7 +238,8 @@ class TestAnnualReportPDFSerializers:
         data = serializer.data
 
         assert data["id"] == annual_report_pdf.id
-        assert "file" in data
+        assert "draft_file" in data
+        assert "published_file" in data
         assert data["report"]["id"] == annual_report_pdf.report.id
         assert data["report"]["year"] == annual_report_pdf.report.year
 

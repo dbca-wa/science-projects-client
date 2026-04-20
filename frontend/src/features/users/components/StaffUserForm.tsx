@@ -67,6 +67,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 		},
 	});
 
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const firstName = form.watch("firstName");
 	const lastName = form.watch("lastName");
 	const email = form.watch("email");

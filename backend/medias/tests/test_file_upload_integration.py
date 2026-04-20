@@ -352,12 +352,12 @@ class TestAnnualReportPDFUpload:
             "annual_report.pdf", pdf_content, content_type="application/pdf"
         )
 
-        # Create AnnualReportPDF
+        # Create AnnualReportPDF — uses draft_file (save() calculates size from it)
         pdf = AnnualReportPDF.objects.create(
-            file=pdf_file, report=annual_report, creator=user
+            draft_file=pdf_file, report=annual_report, creator=user
         )
 
-        assert pdf.file is not None
+        assert pdf.draft_file is not None
         assert pdf.size > 0
 
     @pytest.mark.integration
@@ -372,7 +372,7 @@ class TestAnnualReportPDFUpload:
         # Should raise validation error
         with pytest.raises(FileValidationError):
             AnnualReportPDF.objects.create(
-                file=invalid_file, report=annual_report, creator=user
+                draft_file=invalid_file, report=annual_report, creator=user
             )
 
 
@@ -442,5 +442,5 @@ class TestFileSizeValidation:
         # Should raise validation error
         with pytest.raises(FileValidationError, match="exceeds maximum"):
             AnnualReportPDF.objects.create(
-                file=large_file, report=annual_report, creator=user
+                draft_file=large_file, report=annual_report, creator=user
             )

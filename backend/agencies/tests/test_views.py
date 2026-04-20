@@ -677,6 +677,66 @@ class TestBusinessAreaDetail:
         assert not BusinessArea.objects.filter(id=business_area_id).exists()
 
 
+class TestHandleBaImage:
+    """Tests for handle_ba_image dict detection"""
+
+    def test_dict_input_returns_file_value(self):
+        """Dict payload (existing image data) returns the file path"""
+        from agencies.views.business_areas import BusinessAreas
+
+        view = BusinessAreas()
+        result = view.handle_ba_image({"id": 1, "file": "business_areas/photo.jpg"})
+        assert result == "business_areas/photo.jpg"
+
+    def test_dict_input_missing_file_key_returns_none(self):
+        """Dict without a file key returns None"""
+        from agencies.views.business_areas import BusinessAreas
+
+        view = BusinessAreas()
+        result = view.handle_ba_image({"id": 1})
+        assert result is None
+
+    def test_string_input_returns_as_is(self):
+        """String input (URL or path) is returned unchanged"""
+        from agencies.views.business_areas import BusinessAreas
+
+        view = BusinessAreas()
+        result = view.handle_ba_image("business_areas/photo.jpg")
+        assert result == "business_areas/photo.jpg"
+
+    def test_none_input_returns_none(self):
+        """None input returns None"""
+        from agencies.views.business_areas import BusinessAreas
+
+        view = BusinessAreas()
+        result = view.handle_ba_image(None)
+        assert result is None
+
+    def test_detail_view_dict_input_returns_file_value(self):
+        """BusinessAreaDetail dict payload returns the file path"""
+        from agencies.views.business_areas import BusinessAreaDetail
+
+        view = BusinessAreaDetail()
+        result = view.handle_ba_image({"id": 2, "file": "business_areas/banner.png"})
+        assert result == "business_areas/banner.png"
+
+    def test_detail_view_string_input_returns_as_is(self):
+        """BusinessAreaDetail string input returns unchanged"""
+        from agencies.views.business_areas import BusinessAreaDetail
+
+        view = BusinessAreaDetail()
+        result = view.handle_ba_image("business_areas/banner.png")
+        assert result == "business_areas/banner.png"
+
+    def test_detail_view_none_input_returns_none(self):
+        """BusinessAreaDetail None input returns None"""
+        from agencies.views.business_areas import BusinessAreaDetail
+
+        view = BusinessAreaDetail()
+        result = view.handle_ba_image(None)
+        assert result is None
+
+
 class TestMyBusinessAreas:
     """Tests for MyBusinessAreas view"""
 

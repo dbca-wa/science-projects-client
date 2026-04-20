@@ -2,7 +2,7 @@
 
 import ast
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import get_user_model
 from django.db.models import Max
@@ -173,13 +173,44 @@ def populate_aims_and_context(model_admin, req, selected):
 
 
 # region Admin ========================================================================================================
+@admin.action(description="Set division to BCS for reports without a division")
+def set_division_to_bcs(model_admin, request, queryset):
+    from agencies.models import Division
+
+    try:
+        bcs = Division.objects.get(slug="BCS")
+        updated = queryset.filter(division__isnull=True).update(division=bcs)
+        model_admin.message_user(
+            request,
+            f"Updated {updated} report(s) to BCS division.",
+            messages.SUCCESS,
+        )
+    except Division.DoesNotExist:
+        model_admin.message_user(
+            request,
+            "BCS division not found. Please create it first.",
+            messages.ERROR,
+        )
+
+
 @admin.register(AnnualReport)
 class AnnualReportAdmin(admin.ModelAdmin):
-    list_display = ("pk", "year", "is_published", "pdf_generation_in_progress", "pdf")
+    list_display = (
+        "pk",
+        "year",
+        "division",
+        "is_published",
+        "pdf_generation_in_progress",
+        "pdf",
+    )
 
     search_fields = ["year"]
 
     ordering = ["year"]
+
+    actions = [set_division_to_bcs]
+
+    list_filter = ["division"]
 
 
 @admin.register(ProjectDocument)

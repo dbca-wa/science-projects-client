@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { FullMapContainer } from "@/features/projects/components/map/FullMapContainer";
 import { MapFilters } from "@/features/projects/components/map/MapFilters";
@@ -27,6 +28,7 @@ import L from "leaflet";
  * - Accessibility and keyboard navigation
  */
 const ProjectMapPage = observer(() => {
+	useDocumentTitle("Project Map");
 	const store = useProjectMapStore();
 	const [, setSearchParams] = useSearchParams();
 	const filterButtonRef = useRef<HTMLDivElement>(null);

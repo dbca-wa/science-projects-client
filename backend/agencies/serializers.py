@@ -63,6 +63,8 @@ class DirectorateEmailListSerializer(serializers.Serializer):
 class TinyDivisionSerializer(serializers.ModelSerializer):
 
     directorate_email_list = serializers.SerializerMethodField()
+    key_stakeholder = serializers.SerializerMethodField()
+    approvers = serializers.SerializerMethodField()
 
     class Meta:
         model = Division
@@ -73,6 +75,8 @@ class TinyDivisionSerializer(serializers.ModelSerializer):
             "director",
             "approver",
             "directorate_email_list",
+            "key_stakeholder",
+            "approvers",
         )
 
     def get_directorate_email_list(self, obj):
@@ -83,6 +87,26 @@ class TinyDivisionSerializer(serializers.ModelSerializer):
                 "name": f"{user.display_first_name} {user.display_last_name}",
             }
             for user in obj.directorate_email_list.all()
+        ]
+
+    def get_key_stakeholder(self, obj):
+        user = obj.key_stakeholder
+        if user is None:
+            return None
+        return {
+            "id": user.pk,
+            "email": user.email,
+            "name": f"{user.display_first_name} {user.display_last_name}",
+        }
+
+    def get_approvers(self, obj):
+        return [
+            {
+                "id": user.pk,
+                "email": user.email,
+                "name": f"{user.display_first_name} {user.display_last_name}",
+            }
+            for user in obj.approvers.all()
         ]
 
 
@@ -179,7 +203,17 @@ class AgencySerializer(serializers.ModelSerializer):
 # region Branch Serializers ====================================================================================================
 
 
+class BranchManagerSerializer(serializers.ModelSerializer):
+    """Lightweight user serialiser for branch manager display"""
+
+    class Meta:
+        model = User
+        fields = ("id", "display_first_name", "display_last_name", "email")
+
+
 class TinyBranchSerializer(serializers.ModelSerializer):
+    manager = BranchManagerSerializer(read_only=True)
+
     class Meta:
         model = Branch
         fields = [
@@ -266,6 +300,18 @@ class BusinessAreaSerializer(serializers.ModelSerializer):
         model = BusinessArea
         fields = "__all__"
 
+    def validate_leader(self, value):
+        if value is None:
+            return value
+        existing = BusinessArea.objects.filter(leader=value)
+        if self.instance:
+            existing = existing.exclude(pk=self.instance.pk)
+        if existing.exists():
+            raise serializers.ValidationError(
+                "This user is already the leader of another business area."
+            )
+        return value
+
 
 class BusinessAreaNameViewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -290,6 +336,9 @@ class TinyBusinessAreaSerializer(serializers.ModelSerializer):
     # Use the direct OneToOne relationship with medias app
     image = BusinessAreaImageSerializer(read_only=True)
     division = TinyDivisionSerializer(read_only=True)
+    leader = BranchManagerSerializer(read_only=True)
+    finance_admin = BranchManagerSerializer(read_only=True)
+    data_custodian = BranchManagerSerializer(read_only=True)
 
     class Meta:
         model = BusinessArea

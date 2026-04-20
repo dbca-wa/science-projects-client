@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { useStaffProfiles } from "@/features/staff-profiles/hooks/useStaffProfiles";
 import { useCurrentUser } from "@/features/auth";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -11,6 +12,7 @@ import StaffProfileCard from "@/features/staff-profiles/components/directory/Sta
 const PAGE_SIZE = 24;
 
 const StaffDirectoryPage = () => {
+	useDocumentTitle("Staff Directory");
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { data: user } = useCurrentUser();
 

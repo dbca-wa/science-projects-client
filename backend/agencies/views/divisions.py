@@ -94,28 +94,75 @@ class DivisionEmailList(APIView):
 
     def post(self, request, pk):
         division = AgencyService.get_division(pk)
-        users_array = request.data.get("usersList", [])
 
-        new_user_array = []
-        for u in users_array:
+        # Handle directorate email list (existing behaviour)
+        if "usersList" in request.data:
+            users_array = request.data.get("usersList", [])
+            new_user_array = []
+            for u in users_array:
+                try:
+                    user = self.get_user(u)
+                    new_user_array.append(user)
+                except NotFound as e:
+                    settings.LOGGER.error(
+                        f"User not found during email list update: {e}"
+                    )
+                    return Response(
+                        {"error": "One or more users could not be found."},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
             try:
-                user = self.get_user(u)
-                new_user_array.append(user)
-            except NotFound as e:
-                settings.LOGGER.error(f"User not found during email list update: {e}")
+                division.directorate_email_list.set(new_user_array)
+            except Exception as e:
+                settings.LOGGER.error(f"Error updating division email list: {e}")
                 return Response(
-                    {"error": "One or more users could not be found."},
+                    {"error": "Failed to update email list. Please try again."},
                     status=HTTP_400_BAD_REQUEST,
                 )
 
-        try:
-            division.directorate_email_list.set(new_user_array)
-            division = Division.objects.get(pk=pk)
-            serializer = TinyDivisionSerializer(division)
-            return Response(serializer.data, status=HTTP_202_ACCEPTED)
-        except Exception as e:
-            settings.LOGGER.error(f"Error updating division email list: {e}")
-            return Response(
-                {"error": "Failed to update email list. Please try again."},
-                status=HTTP_400_BAD_REQUEST,
-            )
+        # Handle key stakeholder update
+        if "keyStakeholder" in request.data:
+            ks_id = request.data.get("keyStakeholder")
+            if ks_id is None:
+                division.key_stakeholder = None
+                division.save()
+            else:
+                try:
+                    user = self.get_user(ks_id)
+                except NotFound:
+                    return Response(
+                        {"error": "Key stakeholder user could not be found."},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+                if not user.is_staff:
+                    return Response(
+                        {"error": "Only internal staff users can be key stakeholders."},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+                division.key_stakeholder = user
+                division.save()
+
+        # Handle approvers update
+        if "approversList" in request.data:
+            approvers_ids = request.data.get("approversList", [])
+            new_approvers = []
+            for uid in approvers_ids:
+                try:
+                    user = self.get_user(uid)
+                except NotFound:
+                    return Response(
+                        {"error": "One or more approver users could not be found."},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+                if not user.is_staff:
+                    return Response(
+                        {"error": "Only internal staff users can be approvers."},
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+                new_approvers.append(user)
+            division.approvers.set(new_approvers)
+
+        # Re-fetch and return the updated division
+        division = Division.objects.get(pk=pk)
+        serializer = TinyDivisionSerializer(division)
+        return Response(serializer.data, status=HTTP_202_ACCEPTED)

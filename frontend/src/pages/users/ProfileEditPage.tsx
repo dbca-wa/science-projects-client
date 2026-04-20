@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/features/auth/hooks/useAuth";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { handleProfileUpdate } from "@/features/users/utils/profile-update.utils";
 import { ImageUpload } from "@/shared/components/media";
 import { FormRichTextEditor } from "@/shared/components/editor";
@@ -47,6 +48,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const ProfileEditPage = observer(() => {
+	useDocumentTitle("Edit Profile");
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { data: user, isLoading } = useCurrentUser();

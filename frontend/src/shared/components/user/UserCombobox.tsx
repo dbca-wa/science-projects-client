@@ -102,9 +102,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 		// Search function wrapper
 		const searchUsers = async (searchTerm: string): Promise<IUserData[]> => {
 			const result = await getUsersBasedOnSearchTerm(searchTerm, 1, {
-				onlyStaff: onlyInternal,
-				onlyExternal: false,
-				onlySuperuser: false,
+				roleFilter: onlyInternal ? "staff" : "all",
 				ignoreArray: excludeUserIds,
 			});
 			return result.users.slice(0, maxResults);

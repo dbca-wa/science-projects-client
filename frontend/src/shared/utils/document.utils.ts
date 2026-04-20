@@ -111,3 +111,29 @@ export function formatDocumentId(document: IMainDoc): string {
 	const typeId = getDocumentTypeId(document.kind as DocumentType);
 	return `${document.id} (${typeId})`;
 }
+
+/**
+ * Document status display labels
+ *
+ * Maps backend status values to human-readable labels.
+ */
+const DOCUMENT_STATUS_LABELS: Record<string, string> = {
+	draft: "Draft",
+	new: "New Document",
+	revising: "Revising",
+	inreview: "Review Requested",
+	inapproval: "Approval Requested",
+	approved: "Approved",
+	pending_approval: "Pending Approval",
+	requires_revision: "Requires Revision",
+};
+
+/**
+ * Get display label for a document status
+ *
+ * @param status - Backend status value (e.g. "inreview", "revising")
+ * @returns Human-readable status label
+ */
+export function getDocumentStatusLabel(status: string): string {
+	return DOCUMENT_STATUS_LABELS[status] ?? status;
+}

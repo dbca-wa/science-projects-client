@@ -43,7 +43,12 @@ const CSP_CONFIG = {
 		imgSrc: ["'self'", "data:", "blob:", "http:", "https:"],
 		fontSrc: ["'self'", "data:"],
 		connectSrc: ["'self'", "http://localhost:8000", "http://127.0.0.1:8000"],
-		frameSrc: ["'none'"],
+		frameSrc: [
+			"'self'",
+			"blob:",
+			"http://localhost:8000",
+			"http://127.0.0.1:8000",
+		],
 		objectSrc: ["'none'"],
 		baseUri: ["'self'"],
 		formAction: ["'self'"],
@@ -57,7 +62,7 @@ const CSP_CONFIG = {
 		imgSrc: ["'self'", "data:", "blob:", "https:"],
 		fontSrc: ["'self'", "data:"],
 		connectSrc: ["'self'", "https://*.ingest.us.sentry.io"], // Allow Sentry error reporting
-		frameSrc: ["'none'"],
+		frameSrc: ["'self'", "blob:"],
 		objectSrc: ["'none'"],
 		baseUri: ["'self'"],
 		formAction: ["'self'"],

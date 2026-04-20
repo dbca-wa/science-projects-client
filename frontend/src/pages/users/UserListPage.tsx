@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router";
 import { observer } from "mobx-react-lite";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import {
 	UserSearchBar,
@@ -17,6 +18,7 @@ import { NavigationButton } from "@/shared/components/navigation/NavigationButto
 import { SearchControls } from "@/shared/components/SearchControls";
 import { useAuthStore, useUserSearchStore } from "@/app/stores/store-context";
 import { useSearchStoreInit } from "@/shared/hooks/useSearchStoreInit";
+import type { RoleFilter } from "@/app/stores/derived/user-search.store";
 import { PageTransition } from "@/shared/components/PageTransition";
 import {
 	Select,
@@ -25,8 +27,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
 
@@ -35,6 +35,7 @@ import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
  * Main page for browsing and searching users with detail sheet
  */
 const UserListPage = observer(() => {
+	useDocumentTitle("Users");
 	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const userSearchStore = useUserSearchStore();
@@ -51,10 +52,7 @@ const UserListPage = observer(() => {
 		store: userSearchStore,
 		storageKey: "userSearchState",
 		urlParamMapping: {
-			staff: (v) => v === "true",
-			external: (v) => v === "true",
-			superuser: (v) => v === "true",
-			baLead: (v) => v === "true",
+			roleFilter: (v) => v as RoleFilter,
 			businessArea: (v) => Number(v),
 		},
 	});
@@ -315,111 +313,45 @@ const UserListPage = observer(() => {
 											</div>
 										</div>
 
-										{/* Row 2: Filter Checkboxes (left) and Remember Search (right) */}
+										{/* Row 2: Role Filter (left) and Remember Search (right) */}
 										<div className="flex flex-row gap-4 items-start">
-											{/* Filter Checkboxes - left side, row 2 */}
+											{/* Role Filter Dropdown - left side, row 2 */}
 											<div className="flex-1">
-												<div className="flex flex-wrap gap-x-5 gap-y-2">
-													<div className="flex items-center space-x-2">
-														<Checkbox
-															id="external-filter-desktop"
-															checked={
-																userSearchStore.state.filters.onlyExternal
-															}
-															onCheckedChange={() => {
-																handleFiltersChange({
-																	...userSearchStore.state.filters,
-																	onlyExternal:
-																		!userSearchStore.state.filters.onlyExternal,
-																	onlyStaff: false,
-																	onlySuperuser: false,
-																	onlyBALead: false,
-																});
-															}}
-														/>
-														<Label
-															htmlFor="external-filter-desktop"
-															className="text-sm font-normal cursor-pointer whitespace-nowrap"
-														>
+												<Select
+													value={
+														userSearchStore.state.filters.roleFilter || "all"
+													}
+													onValueChange={(value) => {
+														handleFiltersChange({
+															...userSearchStore.state.filters,
+															roleFilter: value as RoleFilter,
+														});
+													}}
+												>
+													<SelectTrigger
+														className="w-full !h-10 text-sm rounded-md"
+														aria-label="Filter by user role"
+													>
+														<SelectValue placeholder="All Users" />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="all">All Users</SelectItem>
+														<SelectItem value="external">
 															Only External
-														</Label>
-													</div>
-
-													<div className="flex items-center space-x-2">
-														<Checkbox
-															id="staff-filter-desktop"
-															checked={userSearchStore.state.filters.onlyStaff}
-															onCheckedChange={() => {
-																handleFiltersChange({
-																	...userSearchStore.state.filters,
-																	onlyStaff:
-																		!userSearchStore.state.filters.onlyStaff,
-																	onlyExternal: false,
-																	onlySuperuser: false,
-																	onlyBALead: false,
-																});
-															}}
-															className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
-														/>
-														<Label
-															htmlFor="staff-filter-desktop"
-															className="text-sm font-normal cursor-pointer whitespace-nowrap"
-														>
-															Only Staff
-														</Label>
-													</div>
-
-													<div className="flex items-center space-x-2">
-														<Checkbox
-															id="ba-lead-filter-desktop"
-															checked={userSearchStore.state.filters.onlyBALead}
-															onCheckedChange={() => {
-																handleFiltersChange({
-																	...userSearchStore.state.filters,
-																	onlyBALead:
-																		!userSearchStore.state.filters.onlyBALead,
-																	onlyExternal: false,
-																	onlyStaff: false,
-																	onlySuperuser: false,
-																});
-															}}
-															className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-500"
-														/>
-														<Label
-															htmlFor="ba-lead-filter-desktop"
-															className="text-sm font-normal cursor-pointer whitespace-nowrap"
-														>
+														</SelectItem>
+														<SelectItem value="staff">Only Staff</SelectItem>
+														<SelectItem value="ba_lead">
 															Only BA Lead
-														</Label>
-													</div>
-
-													<div className="flex items-center space-x-2">
-														<Checkbox
-															id="superuser-filter-desktop"
-															checked={
-																userSearchStore.state.filters.onlySuperuser
-															}
-															onCheckedChange={() => {
-																handleFiltersChange({
-																	...userSearchStore.state.filters,
-																	onlySuperuser:
-																		!userSearchStore.state.filters
-																			.onlySuperuser,
-																	onlyExternal: false,
-																	onlyStaff: false,
-																	onlyBALead: false,
-																});
-															}}
-															className="data-[state=checked]:bg-blue-600 data-[state-checked]:border-blue-500"
-														/>
-														<Label
-															htmlFor="superuser-filter-desktop"
-															className="text-sm font-normal cursor-pointer whitespace-nowrap"
-														>
-															Only Admin
-														</Label>
-													</div>
-												</div>
+														</SelectItem>
+														<SelectItem value="approver">
+															Only Approver
+														</SelectItem>
+														<SelectItem value="key_stakeholder">
+															Only Key Stakeholder
+														</SelectItem>
+														<SelectItem value="admin">Only Admin</SelectItem>
+													</SelectContent>
+												</Select>
 											</div>
 
 											{/* Remember Search Controls - right side, row 2 */}

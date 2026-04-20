@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useStaffProfileHero } from "@/features/staff-profiles/hooks/useStaffProfileHero";
 import { useCurrentUser } from "@/features/auth";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Loader2, ChevronLeft, Pencil } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -19,6 +20,12 @@ const StaffProfileDetailPage = () => {
 	const { data: user } = useCurrentUser();
 	const { data: heroData, isLoading, isError } = useStaffProfileHero(pk);
 	const [buttonsVisible, setButtonsVisible] = useState(false);
+
+	// Dynamic title based on staff member name
+	const staffName = heroData?.user
+		? `${heroData.user.first_name || ""} ${heroData.user.last_name || ""}`.trim()
+		: "";
+	useDocumentTitle(staffName || "Staff Profile");
 
 	if (isLoading) {
 		return (

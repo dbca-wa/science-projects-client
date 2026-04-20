@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
 	downloadPdf,
@@ -50,22 +50,32 @@ export const useDownloadPdf = () => {
  * @param documentId - ID of the document
  */
 export const useGeneratePdf = () => {
+	const queryClient = useQueryClient();
+
 	return useMutation({
 		mutationFn: async ({
 			documentType,
 			documentId,
 			filename,
+			projectId,
 		}: {
 			documentType: DocumentType;
 			documentId: number;
 			filename: string;
+			projectId?: number;
 		}) => {
 			const blob = await generatePdf(documentType, documentId);
 			triggerBlobDownload(blob, filename);
-			return { success: true };
+			return { success: true, projectId };
 		},
-		onSuccess: () => {
+		onSuccess: (_data, variables) => {
 			toast.success("PDF generated and downloaded successfully");
+			// Invalidate project detail so document.pdf updates and download button becomes active
+			if (variables.projectId) {
+				queryClient.invalidateQueries({
+					queryKey: ["projects", "detail", variables.projectId],
+				});
+			}
 		},
 		onError: (error: Error) => {
 			const message = extractUserFriendlyMessage(

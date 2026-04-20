@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Download, FileText, Trash2 } from "lucide-react";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type {
@@ -583,28 +584,49 @@ export function DocumentActionsSection({
 							<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
 								PDF
 							</h3>
-							<div className="space-y-2">
-								{document.pdf && onDownloadPdf && (
-									<Button
-										onClick={onDownloadPdf}
-										variant="outline"
-										className="w-full"
-										size="sm"
-									>
-										<Download className="mr-2 h-4 w-4" aria-hidden="true" />
-										Download PDF
-									</Button>
-								)}
+							<div className="flex items-center gap-2">
 								{canGeneratePdf && onGeneratePdf && (
-									<Button
-										onClick={onGeneratePdf}
-										variant="outline"
-										className="w-full"
-										size="sm"
-									>
-										<FileText className="mr-2 h-4 w-4" aria-hidden="true" />
-										Generate New PDF
-									</Button>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												onClick={onGeneratePdf}
+												variant="outline"
+												className="flex-1"
+												size="sm"
+											>
+												<FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+												Generate New
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent>Generate a new PDF version</TooltipContent>
+									</Tooltip>
+								)}
+								{onDownloadPdf && (
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<Button
+												onClick={document.pdf ? onDownloadPdf : undefined}
+												variant="outline"
+												size="icon"
+												aria-disabled={!document.pdf}
+												className={`size-9 shrink-0 ${
+													document.pdf
+														? "cursor-pointer bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/40"
+														: "cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200 opacity-50 dark:bg-gray-800 dark:text-gray-600 dark:border-gray-700"
+												}`}
+												aria-label={
+													document.pdf
+														? "Download last generated PDF"
+														: "No PDF available"
+												}
+											>
+												<Download className="h-4 w-4" aria-hidden="true" />
+											</Button>
+										</TooltipTrigger>
+										<TooltipContent>
+											{document.pdf ? "Download latest" : "No PDF available"}
+										</TooltipContent>
+									</Tooltip>
 								)}
 							</div>
 						</div>

@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { ProfileSection } from "@/features/users/components/ProfileSection";
 import { MembershipSection } from "@/features/users/components/MembershipSection";
@@ -33,6 +34,8 @@ const UserDetailPage = observer(() => {
 	const { data: user, isLoading, error } = useUserDetail(userId);
 
 	const displayName = user ? getUserDisplayName(user) : "";
+
+	useDocumentTitle(displayName ? `${displayName}` : "User Details");
 
 	// Manual breadcrumbs for dynamic user name
 	const manualBreadcrumbs = [

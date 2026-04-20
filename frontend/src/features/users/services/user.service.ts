@@ -28,20 +28,21 @@ export const getUsersBasedOnSearchTerm = async (
 		url += `&search=${encodeURIComponent(searchTerm)}`;
 	}
 
-	if (filters.onlyExternal) {
-		url += "&only_external=true";
-	}
-
-	if (filters.onlyStaff) {
-		url += "&only_staff=true";
-	}
-
-	if (filters.onlySuperuser) {
-		url += "&only_superuser=true";
-	}
-
-	if (filters.onlyBALead) {
-		url += "&only_ba_lead=true";
+	// Map roleFilter to the appropriate backend query param
+	const roleFilter = filters.roleFilter;
+	if (roleFilter && roleFilter !== "all") {
+		const roleParamMap: Record<string, string> = {
+			external: "only_external=true",
+			staff: "only_staff=true",
+			ba_lead: "only_ba_lead=true",
+			approver: "approver=true",
+			key_stakeholder: "only_key_stakeholder=true",
+			admin: "only_superuser=true",
+		};
+		const param = roleParamMap[roleFilter];
+		if (param) {
+			url += `&${param}`;
+		}
 	}
 
 	if (filters.businessArea) {

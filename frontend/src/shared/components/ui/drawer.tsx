@@ -45,6 +45,7 @@ function Drawer({
 	// Handle open/close with animation
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- animation lifecycle
 			setIsVisible(true);
 			setIsClosing(false);
 		} else if (isVisible && !isClosing) {
@@ -116,6 +117,7 @@ function DrawerOverlay() {
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsOpening(false);
 			return;
 		}
@@ -151,6 +153,7 @@ function DrawerContent({
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsOpening(false);
 			return;
 		}
