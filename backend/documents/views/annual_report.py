@@ -80,24 +80,37 @@ class Reports(APIView):
                 {"error": "Year must be a valid number."}, status=HTTP_400_BAD_REQUEST
             )
 
-        # Non-superusers can only create reports for divisions they are key_stakeholder of
-        if not request.user.is_superuser and division_id:
+        # Normalise division_id: treat 0, empty string, None as "no division"
+        if division_id:
+            try:
+                division_id = int(division_id)
+                if division_id <= 0:
+                    division_id = None
+            except (ValueError, TypeError):
+                division_id = None
+        else:
+            division_id = None
+
+        # Validate division exists if provided
+        if division_id:
             from agencies.models import Division
 
-            try:
-                division = Division.objects.get(pk=division_id)
-            except Division.DoesNotExist:
+            if not Division.objects.filter(pk=division_id).exists():
                 return Response(
                     {"error": "Division not found."},
                     status=HTTP_400_BAD_REQUEST,
                 )
-            if division.key_stakeholder != request.user:
-                return Response(
-                    {
-                        "error": "You can only create reports for divisions you are the key stakeholder of."
-                    },
-                    status=HTTP_400_BAD_REQUEST,
-                )
+
+            # Non-superusers can only create reports for divisions they are key_stakeholder of
+            if not request.user.is_superuser:
+                division = Division.objects.get(pk=division_id)
+                if division.key_stakeholder != request.user:
+                    return Response(
+                        {
+                            "error": "You can only create reports for divisions you are the key stakeholder of."
+                        },
+                        status=HTTP_400_BAD_REQUEST,
+                    )
 
         # Validate year+division uniqueness
         existing = AnnualReport.objects.filter(year=year)
