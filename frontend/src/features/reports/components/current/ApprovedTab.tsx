@@ -17,7 +17,14 @@ import ReportProjectCard from "./ReportProjectCard";
 /**
  * Approved tab — approved/active student and progress reports.
  */
-const ApprovedTab = observer(function ApprovedTab() {
+
+interface ApprovedTabProps {
+	reportId: number;
+}
+
+const ApprovedTab = observer(function ApprovedTab({
+	reportId,
+}: ApprovedTabProps) {
 	const authStore = useAuthStore();
 	const canEdit = authStore.isSuperuser;
 
@@ -25,12 +32,12 @@ const ApprovedTab = observer(function ApprovedTab() {
 		data: progressReports,
 		isLoading: progressLoading,
 		error: progressError,
-	} = useLatestProgressReports();
+	} = useLatestProgressReports(reportId);
 	const {
 		data: studentReports,
 		isLoading: studentLoading,
 		error: studentError,
-	} = useLatestStudentReports();
+	} = useLatestStudentReports(reportId);
 
 	const isLoading = progressLoading || studentLoading;
 	const error = progressError || studentError;

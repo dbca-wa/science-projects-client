@@ -10,6 +10,7 @@ vi.mock("@/features/reports/hooks/useReports", () => ({
 	useReportPDF: vi.fn(),
 	useGenerateReportPDF: vi.fn(),
 	useCancelReportPDFGen: vi.fn(),
+	usePublishReportPDF: vi.fn(),
 }));
 
 vi.mock("@/features/reports/hooks/useSSE", () => ({
@@ -40,11 +41,20 @@ vi.mock("sonner", () => ({
 	},
 }));
 
+vi.mock("@/app/stores/store-context", () => ({
+	useAuthStore: vi.fn(() => ({ isSuperuser: false, user: { id: 1 } })),
+}));
+
+vi.mock("../modals/PublishConfirmModal", () => ({
+	PublishConfirmModal: () => null,
+}));
+
 // Import mocked modules for per-test configuration
 import {
 	useReportPDF,
 	useGenerateReportPDF,
 	useCancelReportPDFGen,
+	usePublishReportPDF,
 } from "@/features/reports/hooks/useReports";
 import { useSSE } from "@/features/reports/hooks/useSSE";
 
@@ -53,6 +63,7 @@ import { useSSE } from "@/features/reports/hooks/useSSE";
 const mockUseReportPDF = vi.mocked(useReportPDF);
 const mockUseGenerateReportPDF = vi.mocked(useGenerateReportPDF);
 const mockUseCancelReportPDFGen = vi.mocked(useCancelReportPDFGen);
+const mockUsePublishReportPDF = vi.mocked(usePublishReportPDF);
 const mockUseSSE = vi.mocked(useSSE);
 
 /** Minimal mock report for all tests */
@@ -60,7 +71,7 @@ const mockReport: IAnnualReport = {
 	id: 1,
 	year: 2023,
 	creator: null,
-	modifier: null,
+	division: null,
 	dm: null,
 	dm_sign: null,
 	service_delivery_intro: null,
@@ -102,6 +113,10 @@ function setupMocks(pdfStatus: {
 		makeMutationMock() as unknown as ReturnType<typeof useCancelReportPDFGen>
 	);
 
+	mockUsePublishReportPDF.mockReturnValue(
+		makeMutationMock() as unknown as ReturnType<typeof usePublishReportPDF>
+	);
+
 	mockUseSSE.mockReturnValue({ isConnected: false, close: vi.fn() });
 }
 
@@ -115,8 +130,10 @@ describe("PrintPreviewTab", () => {
 	it("renders generate buttons in idle state", () => {
 		setupMocks({
 			data: {
-				has_pdf: false,
-				file: null,
+				has_draft: false,
+				has_published: false,
+				draft_file: null,
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: false },
 			},
 		});
@@ -124,45 +141,48 @@ describe("PrintPreviewTab", () => {
 		render(<PrintPreviewTab report={mockReport} />);
 
 		expect(
-			screen.getByRole("button", { name: /generate new/i })
+			screen.getByRole("button", { name: /generate approved/i })
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("button", { name: /include unapproved/i })
+			screen.getByRole("button", { name: /generate all/i })
 		).toBeInTheDocument();
 	});
 
 	it("disables buttons during generation", () => {
 		setupMocks({
 			data: {
-				has_pdf: false,
-				file: null,
+				has_draft: false,
+				has_published: false,
+				draft_file: null,
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: true },
 			},
 		});
 
 		render(<PrintPreviewTab report={mockReport} />);
 
+		// During generation, the generate buttons are replaced by a cancel button
 		expect(
-			screen.getByRole("button", { name: /generate new/i })
-		).toBeDisabled();
-		expect(
-			screen.getByRole("button", { name: /include unapproved/i })
-		).toBeDisabled();
+			screen.queryByRole("button", { name: /generate approved/i })
+		).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
 	});
 
 	it("shows progress display during generation", () => {
 		setupMocks({
 			data: {
-				has_pdf: false,
-				file: null,
+				has_draft: false,
+				has_published: false,
+				draft_file: null,
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: true },
 			},
 		});
 
 		render(<PrintPreviewTab report={mockReport} />);
 
-		// Progress bar should be visible (the progressbar role comes from the Progress component)
-		expect(screen.getByRole("progressbar")).toBeInTheDocument();
+		// Progress percentage should be visible
+		expect(screen.getByText("0%")).toBeInTheDocument();
 		// Default phase label when no SSE data yet
 		expect(screen.getByText(/starting generation/i)).toBeInTheDocument();
 		// Cancel button should be visible
@@ -172,8 +192,10 @@ describe("PrintPreviewTab", () => {
 	it("shows iframe when PDF is available", () => {
 		setupMocks({
 			data: {
-				has_pdf: true,
-				file: "/files/annual_reports/pdfs/report.pdf",
+				has_draft: true,
+				has_published: false,
+				draft_file: "/files/annual_reports/pdfs/report.pdf",
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: false },
 			},
 		});
@@ -192,8 +214,10 @@ describe("PrintPreviewTab", () => {
 	it("shows fallback message when no PDF exists", () => {
 		setupMocks({
 			data: {
-				has_pdf: false,
-				file: null,
+				has_draft: false,
+				has_published: false,
+				draft_file: null,
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: false },
 			},
 		});
@@ -203,35 +227,35 @@ describe("PrintPreviewTab", () => {
 		expect(screen.getByText(/no pdf available/i)).toBeInTheDocument();
 	});
 
-	it("shows download button when PDF is available", () => {
+	it("shows open-in-new-tab button when PDF is available", () => {
 		setupMocks({
 			data: {
-				has_pdf: true,
-				file: "/files/annual_reports/pdfs/report.pdf",
+				has_draft: true,
+				has_published: false,
+				draft_file: "/files/annual_reports/pdfs/report.pdf",
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: false },
 			},
 		});
 
 		render(<PrintPreviewTab report={mockReport} />);
 
-		expect(
-			screen.getByRole("button", { name: /download pdf/i })
-		).toBeInTheDocument();
+		expect(screen.getByTitle(/open pdf in new tab/i)).toBeInTheDocument();
 	});
 
-	it("hides download button when no PDF is available", () => {
+	it("hides open-in-new-tab button when no PDF is available", () => {
 		setupMocks({
 			data: {
-				has_pdf: false,
-				file: null,
+				has_draft: false,
+				has_published: false,
+				draft_file: null,
+				published_file: null,
 				report: { id: 1, pdf_generation_in_progress: false },
 			},
 		});
 
 		render(<PrintPreviewTab report={mockReport} />);
 
-		expect(
-			screen.queryByRole("button", { name: /download pdf/i })
-		).not.toBeInTheDocument();
+		expect(screen.queryByTitle(/open pdf in new tab/i)).not.toBeInTheDocument();
 	});
 });

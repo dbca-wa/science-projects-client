@@ -14,11 +14,20 @@ import ReportProjectCard from "./ReportProjectCard";
 /**
  * Pending tab — unapproved student and progress reports in accordion sections.
  */
-const PendingTab = observer(function PendingTab() {
+
+interface PendingTabProps {
+	reportId: number;
+}
+
+const PendingTab = observer(function PendingTab({ reportId }: PendingTabProps) {
 	const authStore = useAuthStore();
 	const canEdit = authStore.isSuperuser;
 
-	const { data: inactiveData, isLoading, error } = useLatestInactiveReports();
+	const {
+		data: inactiveData,
+		isLoading,
+		error,
+	} = useLatestInactiveReports(reportId);
 
 	if (isLoading) {
 		return (

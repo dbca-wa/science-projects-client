@@ -47,6 +47,7 @@ function Dialog({
 	// Handle open/close with animation
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- animation lifecycle
 			setIsVisible(true);
 			setIsClosing(false);
 		} else if (isVisible && !isClosing) {
@@ -147,6 +148,7 @@ function DialogPortal({ children }: { children: React.ReactNode }) {
 	const [mounted, setMounted] = React.useState(false);
 
 	React.useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- mount lifecycle
 		setMounted(true);
 		return () => setMounted(false);
 	}, []);
@@ -184,6 +186,7 @@ function DialogOverlay() {
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- animation lifecycle
 			setIsOpening(false);
 			return;
 		}
@@ -275,6 +278,7 @@ function DialogContent({
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- animation lifecycle
 			setIsOpening(false);
 			return;
 		}

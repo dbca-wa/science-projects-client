@@ -4,6 +4,8 @@ import { Button } from "@/shared/components/ui/button";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
 import { AffiliationForm } from "./AffiliationForm";
+import { AffiliationCleanDialog } from "./AffiliationCleanDialog";
+import { AffiliationMergeDialog } from "./AffiliationMergeDialog";
 import {
 	useAffiliations,
 	useDeleteAffiliation,
@@ -26,6 +28,8 @@ export function AffiliationList() {
 		IAffiliation | undefined
 	>();
 	const [deleteTarget, setDeleteTarget] = useState<IAffiliation | null>(null);
+	const [cleanDialogOpen, setCleanDialogOpen] = useState(false);
+	const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
 
 	const filtered = sortAlphabetically(
 		filterByName(affiliations, searchTerm, (a) => a.name),
@@ -59,6 +63,24 @@ export function AffiliationList() {
 				searchValue={searchTerm}
 				onSearchChange={setSearchTerm}
 				onAddClick={handleAdd}
+				extraActions={
+					<>
+						<Button
+							variant="outline"
+							onClick={() => setCleanDialogOpen(true)}
+							className="bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
+						>
+							Clean
+						</Button>
+						<Button
+							variant="outline"
+							onClick={() => setMergeDialogOpen(true)}
+							className="bg-orange-600 text-white hover:bg-orange-700 hover:text-white"
+						>
+							Merge
+						</Button>
+					</>
+				}
 				columns={columns}
 				data={filtered}
 				isLoading={isLoading}
@@ -104,6 +126,16 @@ export function AffiliationList() {
 				entityName="affiliation"
 				onConfirm={handleDeleteConfirm}
 				isPending={deleteMutation.isPending}
+			/>
+
+			<AffiliationCleanDialog
+				open={cleanDialogOpen}
+				onOpenChange={setCleanDialogOpen}
+			/>
+
+			<AffiliationMergeDialog
+				open={mergeDialogOpen}
+				onOpenChange={setMergeDialogOpen}
 			/>
 		</>
 	);

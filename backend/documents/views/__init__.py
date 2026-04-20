@@ -28,6 +28,7 @@ from .annual_report import (  # BeginAnnualReportDocGeneration,  # Removed dupli
     LatestYearsInactiveReports,
     LatestYearsProgressReports,
     LatestYearsStudentReports,
+    PublishReportPDF,
     ReportDetail,
     Reports,
 )
@@ -182,6 +183,7 @@ __all__ = [
     "LatestYearsInactiveReports",
     "FullLatestReport",
     "GenerationProgressSSE",
+    "PublishReportPDF",
     # Notification
     "NewCycleOpen",
     "SendBumpEmails",

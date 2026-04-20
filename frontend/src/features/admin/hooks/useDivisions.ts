@@ -5,6 +5,8 @@ import {
 	createDivision,
 	updateDivision,
 	deleteDivision,
+	updateDivisionKeyStakeholder,
+	updateDivisionApprovers,
 } from "../services/admin.service";
 import type { IDivisionForm } from "../types/admin.types";
 
@@ -69,6 +71,54 @@ export const useDeleteDivision = () => {
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to delete division");
+		},
+	});
+};
+
+/**
+ * Update the key stakeholder for a division
+ */
+export const useUpdateKeyStakeholder = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			divisionId,
+			userId,
+		}: {
+			divisionId: number;
+			userId: number | null;
+		}) => updateDivisionKeyStakeholder(divisionId, userId),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["divisions"] });
+			toast.success("Key stakeholder updated successfully");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to update key stakeholder");
+		},
+	});
+};
+
+/**
+ * Update the approvers list for a division
+ */
+export const useUpdateApprovers = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			divisionId,
+			userIds,
+		}: {
+			divisionId: number;
+			userIds: number[];
+		}) => updateDivisionApprovers(divisionId, userIds),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["divisions"] });
+			toast.success("Approvers updated successfully");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to update approvers");
 		},
 	});
 };

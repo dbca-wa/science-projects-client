@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
+import { UserIdCell } from "../shared/UserIdCell";
 import { ServiceForm } from "./ServiceForm";
 import { useServices, useDeleteService } from "../../hooks/useServices";
 import { filterByName, sortAlphabetically } from "../../utils/crud.utils";
@@ -71,7 +72,7 @@ export function ServiceList() {
 					<tr key={service.id} className="border-b last:border-b-0">
 						<td className="px-4 py-3">{service.name}</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{service.director ?? "—"}
+							<UserIdCell userId={service.director} />
 						</td>
 						<td className="px-4 py-3 text-right">
 							<div className="flex justify-end gap-1">

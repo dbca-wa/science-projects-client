@@ -44,7 +44,7 @@ interface DocumentActionsSectionWithModalsProps {
 	creator?: IUserData | null;
 }
 
-type DocumentAction = "submit" | "approve" | "recall" | "send_back" | "reopen";
+type DocumentAction = "approve" | "recall" | "send_back" | "reopen";
 
 export function DocumentActionsSectionWithModals({
 	document,
@@ -80,7 +80,7 @@ export function DocumentActionsSectionWithModals({
 
 	// Action handlers
 	const handleSubmit = () => {
-		setCurrentAction("submit");
+		setCurrentAction("approve");
 		setActionModalOpen(true);
 	};
 
@@ -124,7 +124,15 @@ export function DocumentActionsSectionWithModals({
 			documentType,
 			documentId: document.id,
 			filename,
+			projectId: project.id,
 		});
+	};
+
+	// Stage mapping: approval stage string → backend stage number
+	const STAGE_MAP: Record<string, number> = {
+		project_lead: 1,
+		business_area_lead: 2,
+		directorate: 3,
 	};
 
 	// Modal submit handlers
@@ -135,13 +143,17 @@ export function DocumentActionsSectionWithModals({
 	}) => {
 		if (!currentAction) return;
 
+		const currentStage = getCurrentApprovalStage(document);
+
 		documentActionMutation.mutate(
 			{
 				documentId: document.id,
 				data: {
 					action: currentAction,
-					comment: data.comment,
+					stage: STAGE_MAP[currentStage] ?? 1,
+					documentPk: document.id,
 					reason: data.reason,
+					// TODO: Email logic to be implemented later
 					send_email: data.sendEmail,
 				},
 			},

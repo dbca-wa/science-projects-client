@@ -61,8 +61,40 @@ export const updateBusinessArea = async (
 	);
 };
 
+/** Create a business area using FormData (for image file uploads) */
+export const createBusinessAreaFormData = async (
+	formData: FormData
+): Promise<IBusinessArea> => {
+	return apiClient.post<IBusinessArea>(
+		ADMIN_ENDPOINTS.BUSINESS_AREAS,
+		formData,
+		{
+			headers: { "Content-Type": "multipart/form-data" },
+		}
+	);
+};
+
+/** Update a business area using FormData (for image file uploads) */
+export const updateBusinessAreaFormData = async (
+	id: number,
+	formData: FormData
+): Promise<IBusinessArea> => {
+	return apiClient.put<IBusinessArea>(
+		ADMIN_ENDPOINTS.BUSINESS_AREA_DETAIL(id),
+		formData,
+		{ headers: { "Content-Type": "multipart/form-data" } }
+	);
+};
+
 export const deleteBusinessArea = async (id: number): Promise<void> => {
 	return apiClient.delete(ADMIN_ENDPOINTS.BUSINESS_AREA_DETAIL(id));
+};
+
+/** Fetch a single business area by ID (uses the full BusinessAreaSerializer) */
+export const getBusinessAreaDetail = async (
+	id: number
+): Promise<IBusinessArea> => {
+	return apiClient.get<IBusinessArea>(ADMIN_ENDPOINTS.BUSINESS_AREA_DETAIL(id));
 };
 
 // Affiliations
@@ -90,6 +122,21 @@ export const deleteAffiliation = async (id: number): Promise<void> => {
 	return apiClient.delete(ADMIN_ENDPOINTS.AFFILIATION_DETAIL(id));
 };
 
+// Affiliation merge and clean operations
+export const mergeAffiliations = async (data: {
+	primaryAffiliation: { pk: number };
+	secondaryAffiliations: { pk: number }[];
+}): Promise<{ message: string }> => {
+	return apiClient.post(ADMIN_ENDPOINTS.AFFILIATION_MERGE, data);
+};
+
+export const cleanOrphanedAffiliations = async (): Promise<{
+	message: string;
+	deleted_count: number;
+}> => {
+	return apiClient.post(ADMIN_ENDPOINTS.AFFILIATION_CLEAN);
+};
+
 // Divisions
 export const getDivisions = async (): Promise<IDivision[]> => {
 	return apiClient.get<IDivision[]>(ADMIN_ENDPOINTS.DIVISIONS);
@@ -110,6 +157,28 @@ export const updateDivision = async (
 
 export const deleteDivision = async (id: number): Promise<void> => {
 	return apiClient.delete(ADMIN_ENDPOINTS.DIVISION_DETAIL(id));
+};
+
+/** Update the key stakeholder for a division */
+export const updateDivisionKeyStakeholder = async (
+	divisionId: number,
+	userId: number | null
+): Promise<IDivision> => {
+	return apiClient.post<IDivision>(
+		ADMIN_ENDPOINTS.DIVISION_EMAIL_LIST(divisionId),
+		{ keyStakeholder: userId }
+	);
+};
+
+/** Update the approvers list for a division */
+export const updateDivisionApprovers = async (
+	divisionId: number,
+	userIds: number[]
+): Promise<IDivision> => {
+	return apiClient.post<IDivision>(
+		ADMIN_ENDPOINTS.DIVISION_EMAIL_LIST(divisionId),
+		{ approversList: userIds }
+	);
 };
 
 // Services
@@ -187,9 +256,10 @@ export const getReportInfos = async (): Promise<IAnnualReport[]> => {
 	return apiClient.get<IAnnualReport[]>(ADMIN_ENDPOINTS.REPORTS);
 };
 
-export const createReportInfo = async (
-	data: IReportInfoForm
-): Promise<IAnnualReport> => {
+export const createReportInfo = async (data: {
+	year: number;
+	division: number;
+}): Promise<IAnnualReport> => {
 	return apiClient.post<IAnnualReport>(ADMIN_ENDPOINTS.REPORTS, data);
 };
 
@@ -205,14 +275,20 @@ export const deleteReportInfo = async (id: number): Promise<void> => {
 };
 
 // Admin actions
-export const batchApprove = async (): Promise<void> => {
-	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE);
+export const batchApprove = async (divisionSlug?: string): Promise<void> => {
+	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE, {
+		division: divisionSlug,
+	});
 };
 
-export const batchApproveOld = async (): Promise<void> => {
-	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE_OLD);
+export const batchApproveOld = async (divisionSlug?: string): Promise<void> => {
+	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE_OLD, {
+		division: divisionSlug,
+	});
 };
 
-export const openNewCycle = async (): Promise<void> => {
-	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE);
+export const openNewCycle = async (divisionSlug?: string): Promise<void> => {
+	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE, {
+		division: divisionSlug,
+	});
 };

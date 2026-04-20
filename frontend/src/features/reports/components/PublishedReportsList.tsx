@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router";
 import {
 	usePublishedReports,
 	useLegacyReports,
@@ -24,8 +25,16 @@ import {
 	TabsContent,
 } from "@/shared/components/ui/tabs";
 import type { IAnnualReportPDF } from "@/features/reports/types/report.types";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useAuthStore } from "@/app/stores/store-context";
+import { useDivisions } from "@/features/admin/hooks/useDivisions";
 
 /** Format a year into "FY {prevYear}-{reportYear}" (e.g. 2025 → "FY 24-25") */
 function formatFY(year: number): string {
@@ -44,6 +53,7 @@ interface ReportCardProps {
 	reportId: number;
 	isPublished: boolean;
 	isLegacy: boolean;
+	divisionSlug: string | null;
 	onUpdate: (data: UpdateModalData) => void;
 }
 
@@ -56,6 +66,7 @@ function ReportCard({
 	reportId,
 	isPublished,
 	isLegacy,
+	divisionSlug,
 	onUpdate,
 }: ReportCardProps) {
 	return (
@@ -74,6 +85,7 @@ function ReportCard({
 					aria-hidden="true"
 				/>
 				<span className="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+					{divisionSlug ? `${divisionSlug} ` : ""}
 					{formatFY(year)}
 				</span>
 				<span className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -117,6 +129,8 @@ interface ReportItem {
 	reportId: number;
 	isPublished: boolean;
 	isLegacy: boolean;
+	divisionId: number | null;
+	divisionSlug: string | null;
 }
 
 /** Grid of report cards */
@@ -151,6 +165,7 @@ function ReportGrid({
 					reportId={report.reportId}
 					isPublished={report.isPublished}
 					isLegacy={report.isLegacy}
+					divisionSlug={report.divisionSlug}
 					onUpdate={onUpdate}
 				/>
 			))}
@@ -162,14 +177,24 @@ function ReportGrid({
  * Fetches and displays annual report PDFs in a tabbed layout
  * with Annual Reports, Legacy PDFs, and Unpublished tabs.
  */
-export const PublishedReportsList = observer(function PublishedReportsList() {
+export const PublishedReportsList = observer(function PublishedReportsList({
+	selectedTab = "official",
+}: {
+	selectedTab?: "official" | "drafts" | "legacy";
+}) {
+	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const isSuperuser = authStore.isSuperuser;
 
 	const [addOfficialOpen, setAddOfficialOpen] = useState(false);
 	const [addLegacyOpen, setAddLegacyOpen] = useState(false);
+	const [selectedDivision, setSelectedDivision] = useState<number | "all">(
+		"all"
+	);
 	const [updateModalData, setUpdateModalData] =
 		useState<UpdateModalData | null>(null);
+
+	const { data: divisions } = useDivisions();
 
 	const {
 		data: publishedReports,
@@ -215,12 +240,26 @@ export const PublishedReportsList = observer(function PublishedReportsList() {
 		.filter((r) => {
 			const report = r as unknown as Record<string, unknown>;
 			const pdf = report.pdf as Record<string, unknown> | null | undefined;
-			return !!pdf && typeof pdf === "object" && "file" in pdf && !!pdf.file;
+			if (!pdf || typeof pdf !== "object") return false;
+			return (
+				("published_file" in pdf && !!pdf.published_file) ||
+				("draft_file" in pdf && !!pdf.draft_file)
+			);
 		})
 		.map((r) => {
 			const report = r as unknown as Record<string, unknown>;
-			const pdf = report.pdf as { id: number; file: string };
-			const fileUrl = getImageUrl(pdf.file) ?? pdf.file;
+			const pdf = report.pdf as {
+				id: number;
+				published_file: string | null;
+				draft_file: string | null;
+			};
+			const division = report.division as {
+				id: number;
+				name: string;
+				slug?: string;
+			} | null;
+			const fileForCard = pdf.published_file || pdf.draft_file || "";
+			const fileUrl = getImageUrl(fileForCard) ?? fileForCard;
 			return {
 				id: pdf.id,
 				year: (report.year as number) ?? 0,
@@ -229,11 +268,17 @@ export const PublishedReportsList = observer(function PublishedReportsList() {
 				pdfId: pdf.id,
 				reportId: (report.id as number) ?? 0,
 				isLegacy: false,
+				divisionId: division?.id ?? null,
+				divisionSlug: division?.slug ?? null,
+				hasPublishedFile: !!pdf.published_file,
+				hasDraftFile: !!pdf.draft_file,
 			};
 		});
 
-	const official = allWithPDFs.filter((r) => r.isPublished);
-	const unpublished = allWithPDFs.filter((r) => !r.isPublished);
+	const official = allWithPDFs.filter((r) => r.hasPublishedFile);
+	const unpublished = allWithPDFs.filter(
+		(r) => r.hasDraftFile && !r.hasPublishedFile
+	);
 
 	/* Legacy reports have `file` directly on the object */
 	const legacyWithFiles = legacy
@@ -246,21 +291,50 @@ export const PublishedReportsList = observer(function PublishedReportsList() {
 			reportId: r.report,
 			isPublished: false,
 			isLegacy: true,
+			divisionId: null,
+			divisionSlug: null,
 		}));
+
+	/* Apply division filter across all tabs */
+	const filterByDivision = (items: ReportItem[]) =>
+		selectedDivision === "all"
+			? items
+			: items.filter((r) => r.divisionId === selectedDivision);
+
+	const filteredOfficial = filterByDivision(official);
+	const filteredUnpublished = filterByDivision(unpublished);
+	const filteredLegacy = filterByDivision(legacyWithFiles);
 
 	const handleUpdate = (data: UpdateModalData) => setUpdateModalData(data);
 
 	return (
-		<Tabs defaultValue="official">
-			<TabsList className="w-full justify-start">
-				<TabsTrigger value="official">Official</TabsTrigger>
-				<TabsTrigger value="unpublished">Unpublished</TabsTrigger>
-				<TabsTrigger value="legacy">Legacy</TabsTrigger>
-			</TabsList>
-
-			<TabsContent value="official">
-				{isSuperuser && (
-					<div className="mb-4 flex justify-end">
+		<>
+			<div className="mb-4 flex items-center justify-between">
+				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+					Published Reports
+				</h1>
+				<div className="flex items-center gap-3">
+					<Select
+						value={
+							selectedDivision === "all" ? "all" : selectedDivision.toString()
+						}
+						onValueChange={(v) =>
+							setSelectedDivision(v === "all" ? "all" : Number(v))
+						}
+					>
+						<SelectTrigger className="w-48" aria-label="Filter by division">
+							<SelectValue placeholder="All Divisions" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All Divisions</SelectItem>
+							{divisions?.map((d) => (
+								<SelectItem key={d.id} value={d.id.toString()}>
+									{d.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					{isSuperuser && selectedTab === "official" && (
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button
@@ -276,26 +350,8 @@ export const PublishedReportsList = observer(function PublishedReportsList() {
 								Upload a finalised annual report PDF and mark it as published
 							</TooltipContent>
 						</Tooltip>
-					</div>
-				)}
-				<ReportGrid
-					reports={official}
-					isSuperuser={isSuperuser}
-					onUpdate={handleUpdate}
-				/>
-			</TabsContent>
-
-			<TabsContent value="unpublished">
-				<ReportGrid
-					reports={unpublished}
-					isSuperuser={isSuperuser}
-					onUpdate={handleUpdate}
-				/>
-			</TabsContent>
-
-			<TabsContent value="legacy">
-				{isSuperuser && (
-					<div className="mb-4 flex justify-end">
+					)}
+					{isSuperuser && selectedTab === "legacy" && (
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button
@@ -312,38 +368,76 @@ export const PublishedReportsList = observer(function PublishedReportsList() {
 								use
 							</TooltipContent>
 						</Tooltip>
-					</div>
+					)}
+				</div>
+			</div>
+
+			<Tabs
+				value={selectedTab}
+				onValueChange={(value) => {
+					const routes: Record<string, string> = {
+						official: "/reports",
+						drafts: "/reports/drafts",
+						legacy: "/reports/legacy",
+					};
+					void navigate(routes[value] ?? "/reports");
+				}}
+			>
+				<TabsList className="w-full justify-start">
+					<TabsTrigger value="official">Official</TabsTrigger>
+					<TabsTrigger value="drafts">Drafts</TabsTrigger>
+					<TabsTrigger value="legacy">Legacy</TabsTrigger>
+				</TabsList>
+
+				<TabsContent value="official">
+					<ReportGrid
+						reports={filteredOfficial}
+						isSuperuser={isSuperuser}
+						onUpdate={handleUpdate}
+					/>
+				</TabsContent>
+
+				<TabsContent value="drafts">
+					<ReportGrid
+						reports={filteredUnpublished}
+						isSuperuser={isSuperuser}
+						onUpdate={handleUpdate}
+					/>
+				</TabsContent>
+
+				<TabsContent value="legacy">
+					<ReportGrid
+						reports={filteredLegacy}
+						isSuperuser={isSuperuser}
+						onUpdate={handleUpdate}
+					/>
+				</TabsContent>
+
+				{/* Upload modals */}
+				<AddOfficialPDFModal
+					isOpen={addOfficialOpen}
+					onClose={() => setAddOfficialOpen(false)}
+					defaultDivisionId={selectedDivision}
+				/>
+				<AddLegacyPDFModal
+					isOpen={addLegacyOpen}
+					onClose={() => setAddLegacyOpen(false)}
+					existingYears={legacyWithFiles.map((r) => r.year)}
+				/>
+
+				{/* Update modal */}
+				{updateModalData && (
+					<UpdateReportPDFModal
+						isOpen
+						onClose={() => setUpdateModalData(null)}
+						pdfId={updateModalData.pdfId}
+						reportId={updateModalData.reportId}
+						year={updateModalData.year}
+						isPublished={updateModalData.isPublished}
+						isLegacy={updateModalData.isLegacy}
+					/>
 				)}
-				<ReportGrid
-					reports={legacyWithFiles}
-					isSuperuser={isSuperuser}
-					onUpdate={handleUpdate}
-				/>
-			</TabsContent>
-
-			{/* Upload modals */}
-			<AddOfficialPDFModal
-				isOpen={addOfficialOpen}
-				onClose={() => setAddOfficialOpen(false)}
-			/>
-			<AddLegacyPDFModal
-				isOpen={addLegacyOpen}
-				onClose={() => setAddLegacyOpen(false)}
-				existingYears={legacyWithFiles.map((r) => r.year)}
-			/>
-
-			{/* Update modal */}
-			{updateModalData && (
-				<UpdateReportPDFModal
-					isOpen
-					onClose={() => setUpdateModalData(null)}
-					pdfId={updateModalData.pdfId}
-					reportId={updateModalData.reportId}
-					year={updateModalData.year}
-					isPublished={updateModalData.isPublished}
-					isLegacy={updateModalData.isLegacy}
-				/>
-			)}
-		</Tabs>
+			</Tabs>
+		</>
 	);
 });

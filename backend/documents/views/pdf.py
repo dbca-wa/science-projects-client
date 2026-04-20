@@ -111,18 +111,23 @@ class DownloadAnnualReport(APIView):
 
             raise NotFound(f"Annual report {pk} not found")
 
-        # Check if PDF exists
+        # Check if PDF exists — prefer published, fall back to draft
         if hasattr(report, "pdf") and report.pdf:
-            fy_start = str(report.year - 1)[-2:]
-            fy_end = str(report.year)[-2:]
-            download_name = f"BCS Annual Report FY {fy_start}-{fy_end}.pdf"
-            response = FileResponse(
-                report.pdf.file,
-                as_attachment=True,
-                filename=download_name,
-            )
-            response["Cache-Control"] = NO_CACHE_HEADERS
-            return response
+            pdf_obj = report.pdf
+            # Serve published file if available, otherwise draft
+            serve_file = pdf_obj.published_file or pdf_obj.draft_file
+            if serve_file:
+                fy_start = str(report.year - 1)[-2:]
+                fy_end = str(report.year)[-2:]
+                slug = report.division.slug if report.division else "SPMS"
+                download_name = f"{slug} Annual Report FY {fy_start}-{fy_end}.pdf"
+                response = FileResponse(
+                    serve_file,
+                    as_attachment=True,
+                    filename=download_name,
+                )
+                response["Cache-Control"] = NO_CACHE_HEADERS
+                return response
 
         # Generate PDF if not exists
         pdf_file = PDFService.generate_annual_report_pdf(report)

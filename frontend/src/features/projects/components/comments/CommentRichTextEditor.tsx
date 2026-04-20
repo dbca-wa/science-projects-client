@@ -141,27 +141,6 @@ const EditorContent = ({
 		}
 	}, [autoFocus, editor]);
 
-	// Debug: Log container width changes
-	useEffect(() => {
-		if (!containerRef.current) return;
-
-		console.log("[CommentRichTextEditor] Setting up ResizeObserver");
-
-		const resizeObserver = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				const width = entry.contentRect.width;
-				console.log("[CommentRichTextEditor] Container width changed:", width);
-			}
-		});
-
-		resizeObserver.observe(containerRef.current);
-
-		return () => {
-			console.log("[CommentRichTextEditor] Cleaning up ResizeObserver");
-			resizeObserver.disconnect();
-		};
-	}, []);
-
 	// Handle editor state changes
 	const handleChange = useCallback(() => {
 		// Generate HTML from editor state

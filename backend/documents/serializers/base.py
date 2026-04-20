@@ -48,6 +48,19 @@ class ProjectDocumentSerializer(serializers.ModelSerializer):
 
     project = TinyProjectSerializer(read_only=True)
     pdf = ProjectDocumentPDFSerializer(read_only=True)
+    report_year = serializers.SerializerMethodField()
+
+    def get_report_year(self, obj):
+        """Get the annual report year for progress/student reports, or None."""
+        if obj.kind == "progressreport":
+            detail = obj.progress_report_details.select_related("report").first()
+            if detail and detail.report:
+                return detail.report.year
+        elif obj.kind == "studentreport":
+            detail = obj.student_report_details.select_related("report").first()
+            if detail and detail.report:
+                return detail.report.year
+        return None
 
     class Meta:
         model = ProjectDocument
@@ -65,6 +78,7 @@ class ProjectDocumentSerializer(serializers.ModelSerializer):
             "directorate_approval_granted",
             "pdf",
             "pdf_generation_in_progress",
+            "report_year",
         ]
 
 
@@ -93,6 +107,15 @@ class TinyAnnualReportSerializer(serializers.ModelSerializer):
     """Minimal annual report serializer"""
 
     pdf = TinyAnnualReportPDFSerializer(read_only=True)
+    division = serializers.SerializerMethodField()
+
+    def get_division(self, obj):
+        if obj.division is None:
+            return None
+        return {
+            "id": obj.division.pk,
+            "name": obj.division.name,
+        }
 
     class Meta:
         model = AnnualReport
@@ -105,6 +128,7 @@ class TinyAnnualReportSerializer(serializers.ModelSerializer):
             "pdf",
             "pdf_generation_in_progress",
             "is_published",
+            "division",
         ]
 
 
@@ -122,6 +146,16 @@ class MiniAnnualReportSerializer(serializers.ModelSerializer):
 
 class AnnualReportSerializer(serializers.ModelSerializer):
     """Standard annual report serializer"""
+
+    division = serializers.SerializerMethodField()
+
+    def get_division(self, obj):
+        if obj.division is None:
+            return None
+        return {
+            "id": obj.division.pk,
+            "name": obj.division.name,
+        }
 
     class Meta:
         model = AnnualReport

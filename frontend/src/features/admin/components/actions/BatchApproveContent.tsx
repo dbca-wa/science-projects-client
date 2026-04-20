@@ -2,11 +2,17 @@ import { CheckSquare, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useBatchApprove } from "../../hooks/useAdminActions";
 
+interface BatchApproveContentProps {
+	divisionSlug?: string;
+}
+
 /**
  * Content for the Batch Approve Reports page.
  * Triggers batch approval of current year reports.
  */
-export function BatchApproveContent() {
+export function BatchApproveContent({
+	divisionSlug,
+}: BatchApproveContentProps) {
 	const { mutate, isPending } = useBatchApprove();
 
 	return (
@@ -27,7 +33,7 @@ export function BatchApproveContent() {
 				</div>
 				<div className="mt-6 flex justify-end">
 					<Button
-						onClick={() => mutate()}
+						onClick={() => mutate(divisionSlug)}
 						disabled={isPending}
 						variant="default"
 					>

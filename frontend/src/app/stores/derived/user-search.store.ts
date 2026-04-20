@@ -2,11 +2,17 @@ import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { logger } from "@/shared/services/logger.service";
 import { makeObservable, computed, action } from "mobx";
 
+export type RoleFilter =
+	| "all"
+	| "external"
+	| "staff"
+	| "ba_lead"
+	| "approver"
+	| "key_stakeholder"
+	| "admin";
+
 export interface UserSearchFilters {
-	onlyExternal?: boolean;
-	onlyStaff?: boolean;
-	onlySuperuser?: boolean;
-	onlyBALead?: boolean;
+	roleFilter?: RoleFilter;
 	businessArea?: string | number;
 }
 
@@ -21,10 +27,7 @@ interface UserSearchStoreState extends BaseStoreState {
 const STORAGE_KEY = "userSearchState";
 
 const DEFAULT_FILTERS: UserSearchFilters = {
-	onlyExternal: false,
-	onlyStaff: false,
-	onlySuperuser: false,
-	onlyBALead: false,
+	roleFilter: "all",
 	businessArea: undefined,
 };
 
@@ -183,10 +186,8 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 	 */
 	get hasActiveFilters(): boolean {
 		return (
-			this.state.filters.onlyExternal ||
-			this.state.filters.onlyStaff ||
-			this.state.filters.onlySuperuser ||
-			this.state.filters.onlyBALead ||
+			(this.state.filters.roleFilter !== undefined &&
+				this.state.filters.roleFilter !== "all") ||
 			this.state.filters.businessArea !== undefined ||
 			this.state.searchTerm.length > 0
 		);
@@ -198,10 +199,11 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 	get filterCount(): number {
 		let count = 0;
 		if (this.state.searchTerm.length > 0) count++;
-		if (this.state.filters.onlyExternal) count++;
-		if (this.state.filters.onlyStaff) count++;
-		if (this.state.filters.onlySuperuser) count++;
-		if (this.state.filters.onlyBALead) count++;
+		if (
+			this.state.filters.roleFilter &&
+			this.state.filters.roleFilter !== "all"
+		)
+			count++;
 		if (this.state.filters.businessArea !== undefined) count++;
 		return count;
 	}
@@ -218,18 +220,13 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 		if (this.state.currentPage > 1) {
 			params.set("page", this.state.currentPage.toString());
 		}
-		if (this.state.filters.onlyStaff) {
-			params.set("staff", "true");
+
+		// Map roleFilter to the appropriate URL param
+		const roleFilter = this.state.filters.roleFilter;
+		if (roleFilter && roleFilter !== "all") {
+			params.set("roleFilter", roleFilter);
 		}
-		if (this.state.filters.onlyExternal) {
-			params.set("external", "true");
-		}
-		if (this.state.filters.onlySuperuser) {
-			params.set("superuser", "true");
-		}
-		if (this.state.filters.onlyBALead) {
-			params.set("baLead", "true");
-		}
+
 		if (this.state.filters.businessArea) {
 			params.set("businessArea", this.state.filters.businessArea.toString());
 		}
@@ -276,21 +273,34 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 			// Validate and restore filters
 			if (typeof data.filters === "object" && data.filters !== null) {
 				const filters = data.filters as Record<string, unknown>;
+
+				// Handle migration from old boolean filters to new roleFilter
+				let roleFilter: RoleFilter = "all";
+				if (typeof filters.roleFilter === "string") {
+					const validRoles: RoleFilter[] = [
+						"all",
+						"external",
+						"staff",
+						"ba_lead",
+						"approver",
+						"key_stakeholder",
+						"admin",
+					];
+					roleFilter = validRoles.includes(filters.roleFilter as RoleFilter)
+						? (filters.roleFilter as RoleFilter)
+						: "all";
+				} else if (filters.onlyExternal === true) {
+					roleFilter = "external";
+				} else if (filters.onlyStaff === true) {
+					roleFilter = "staff";
+				} else if (filters.onlySuperuser === true) {
+					roleFilter = "admin";
+				} else if (filters.onlyBALead === true) {
+					roleFilter = "ba_lead";
+				}
+
 				this.state.filters = {
-					onlyExternal:
-						typeof filters.onlyExternal === "boolean"
-							? filters.onlyExternal
-							: false,
-					onlyStaff:
-						typeof filters.onlyStaff === "boolean" ? filters.onlyStaff : false,
-					onlySuperuser:
-						typeof filters.onlySuperuser === "boolean"
-							? filters.onlySuperuser
-							: false,
-					onlyBALead:
-						typeof filters.onlyBALead === "boolean"
-							? filters.onlyBALead
-							: false,
+					roleFilter,
 					businessArea:
 						filters.businessArea !== undefined
 							? (filters.businessArea as string | number)

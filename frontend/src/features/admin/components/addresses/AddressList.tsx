@@ -37,8 +37,15 @@ export function AddressList() {
 		return map;
 	}, [branches]);
 
-	const getBranchName = (address: IAddress): string =>
-		(address.branch != null ? branchMap.get(address.branch) : undefined) ?? "—";
+	// Extract branch name directly from the nested branch object returned by the API
+	const getBranchName = (address: IAddress): string => {
+		const branch = address.branch;
+		if (branch == null) return "—";
+		// The list endpoint returns branch as a nested object via TinyBranchSerializer
+		if (typeof branch === "object") return branch.name;
+		// Fallback: if branch is a plain ID, look it up in the branchMap
+		return branchMap.get(branch) ?? "—";
+	};
 
 	const filtered = sortAlphabetically(
 		filterByName(addresses, searchTerm, getBranchName),

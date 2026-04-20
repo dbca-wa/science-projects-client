@@ -889,29 +889,34 @@ class AnnualReportGenerationService:
             phase_start = time.perf_counter()
 
             # Build a human-friendly filename for the PDF.
-            # e.g. year 2025 → "BCS_Annual_Report_FY_24-25.pdf"
+            # e.g. year 2025, division BCS → "BCS_Annual_Report_FY_24-25.pdf"
             fy_start = str(report.year - 1)[-2:]
             fy_end = str(report.year)[-2:]
-            pdf_filename = f"BCS_Annual_Report_FY_{fy_start}-{fy_end}.pdf"
+            division_slug = report.division.slug if report.division else "SPMS"
+            pdf_filename = (
+                f"{division_slug}_Annual_Report_FY_{fy_start}-{fy_end}_DRAFT.pdf"
+            )
             file_content = ContentFile(pdf_content, name=pdf_filename)
 
             from medias.models import AnnualReportPDF
 
             doc_pdf, created = AnnualReportPDF.objects.get_or_create(
                 report=report,
-                defaults={"file": file_content, "creator": user},
+                defaults={"draft_file": file_content, "creator": user},
             )
 
             if not created:
-                # Delete old file from storage before saving new one
-                if doc_pdf.file:
+                # Delete old draft file from storage before saving new one
+                if doc_pdf.draft_file:
                     try:
-                        old_path = doc_pdf.file.name
+                        old_path = doc_pdf.draft_file.name
                         if old_path and default_storage.exists(old_path):
                             default_storage.delete(old_path)
                     except Exception as e:
-                        settings.LOGGER.warning(f"Could not delete old PDF file: {e}")
-                doc_pdf.file = file_content
+                        settings.LOGGER.warning(
+                            f"Could not delete old draft PDF file: {e}"
+                        )
+                doc_pdf.draft_file = file_content
                 doc_pdf.creator = user
                 doc_pdf.save()
 

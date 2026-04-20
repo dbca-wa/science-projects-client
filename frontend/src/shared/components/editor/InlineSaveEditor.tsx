@@ -175,10 +175,20 @@ export const InlineSaveEditor = observer(
 			}, 0);
 		}, [contentType, entityId, savedContent, onCancel, onEditEnd]);
 
-		// Handle content change
+		// Handle content change — use normalised text comparison to avoid
+		// false positives from Lexical re-serialising the same content differently
+		const normaliseForComparison = (html: string) =>
+			html
+				.replace(/<[^>]*>/g, "")
+				.replace(/\s+/g, " ")
+				.trim();
+
 		const handleContentChange = (newContent: string) => {
 			setEditedContent(newContent);
-			setHasChanges(newContent !== savedContent);
+			setHasChanges(
+				normaliseForComparison(newContent) !==
+					normaliseForComparison(savedContent)
+			);
 
 			// Update current content in store (updates immediately for change detection)
 			inlineEditStore.updateCurrentContent(contentType, entityId, newContent);

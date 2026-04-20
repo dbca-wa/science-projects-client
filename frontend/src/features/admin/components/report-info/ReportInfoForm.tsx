@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,239 +14,402 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { Textarea } from "@/shared/components/ui/textarea";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import {
 	useCreateReportInfo,
 	useUpdateReportInfo,
 } from "../../hooks/useReportInfo";
+import { useDivisions } from "../../hooks/useDivisions";
+import { useReportsForDivision } from "@/features/reports/hooks/useReports";
 import type { IAnnualReport } from "@/features/reports/types/report.types";
 
-const reportInfoSchema = z.object({
+const CURRENT_YEAR = new Date().getFullYear();
+
+/* ── Schemas ── */
+const createReportSchema = z.object({
 	year: z.coerce
 		.number({ error: "Year is required" })
 		.int()
-		.min(2000, "Year must be 2000 or later"),
-	date_open: z.string().min(1, "Date open is required"),
-	date_closed: z.string().min(1, "Date closed is required"),
-	dm: z.string().optional().default(""),
-	service_delivery_intro: z.string().optional().default(""),
-	research_intro: z.string().optional().default(""),
-	student_intro: z.string().optional().default(""),
-	publications: z.string().optional().default(""),
+		.min(2013, "Year must be 2013 or later")
+		.max(CURRENT_YEAR, `Year cannot be in the future (max ${CURRENT_YEAR})`),
+	division: z.coerce
+		.number({ error: "Division is required" })
+		.min(1, "Division is required"),
 });
 
-type ReportInfoFormData = z.infer<typeof reportInfoSchema>;
+type CreateReportFormData = z.infer<typeof createReportSchema>;
+
+const editReportSchema = z.object({
+	year: z.coerce
+		.number({ error: "Year is required" })
+		.int()
+		.min(2013, "Year must be 2013 or later")
+		.max(CURRENT_YEAR, `Year cannot be in the future (max ${CURRENT_YEAR})`),
+	division: z.coerce.number().min(1, "Division is required"),
+});
+
+type EditReportFormData = z.infer<typeof editReportSchema>;
 
 interface ReportInfoFormProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	report?: IAnnualReport;
+	defaultDivisionSlug?: string;
+	lockDivision?: boolean;
 }
 
-export function ReportInfoForm({
+export const ReportInfoForm = ({
 	open,
 	onOpenChange,
 	report,
-}: ReportInfoFormProps) {
+	defaultDivisionSlug,
+	lockDivision,
+}: ReportInfoFormProps) => {
 	const isEditing = !!report;
+
+	return isEditing ? (
+		<EditReportInfoForm
+			open={open}
+			onOpenChange={onOpenChange}
+			report={report}
+			lockDivision={lockDivision}
+		/>
+	) : (
+		<CreateReportInfoForm
+			open={open}
+			onOpenChange={onOpenChange}
+			defaultDivisionSlug={defaultDivisionSlug}
+			lockDivision={lockDivision}
+		/>
+	);
+};
+
+/* ── Create mode form ── */
+const CreateReportInfoForm = ({
+	open,
+	onOpenChange,
+	defaultDivisionSlug,
+	lockDivision,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	defaultDivisionSlug?: string;
+	lockDivision?: boolean;
+}) => {
 	const createMutation = useCreateReportInfo();
-	const updateMutation = useUpdateReportInfo();
-	const isPending = createMutation.isPending || updateMutation.isPending;
+	const { data: divisions } = useDivisions();
+	const [backendError, setBackendError] = useState<string | null>(null);
+	const [divisionValue, setDivisionValue] = useState<string>("");
 
 	const {
 		register,
 		handleSubmit,
 		reset,
-		formState: { errors },
-	} = useForm<ReportInfoFormData>({
-		resolver: zodResolver(reportInfoSchema) as never,
-		defaultValues: getDefaults(report),
+		setValue,
+		watch,
+		formState: { errors, isValid },
+	} = useForm<CreateReportFormData>({
+		resolver: zodResolver(createReportSchema) as never,
+		mode: "onChange",
+		defaultValues: { year: CURRENT_YEAR, division: 0 },
 	});
 
+	// eslint-disable-next-line react-hooks/incompatible-library
+	const watchedYear = watch("year");
+
+	// Resolve the default division ID from slug
+	const defaultDivId = useMemo(() => {
+		if (!defaultDivisionSlug || !divisions) return undefined;
+		return divisions.find((d) => d.slug === defaultDivisionSlug)?.id;
+	}, [defaultDivisionSlug, divisions]);
+
+	// Resolve the selected division slug for fetching existing years
+	const selectedDivSlug = useMemo(() => {
+		if (!divisions || !divisionValue) return undefined;
+		return divisions.find((d) => d.id === Number(divisionValue))?.slug;
+	}, [divisions, divisionValue]);
+
+	// Fetch existing reports for the selected division to check year conflicts
+	const { data: existingReports = [] } = useReportsForDivision(selectedDivSlug);
+	const existingYears = useMemo(
+		() => existingReports.map((r) => r.year),
+		[existingReports]
+	);
+
+	// Check if the entered year already exists for this division
+	const yearConflict = useMemo(() => {
+		const y = Number(watchedYear);
+		if (!y || isNaN(y)) return false;
+		return existingYears.includes(y);
+	}, [watchedYear, existingYears]);
+
+	// Pre-select division from slug when modal opens
 	useEffect(() => {
 		if (open) {
-			reset(getDefaults(report));
+			setBackendError(null);
+			const divId = defaultDivId ?? 0;
+			reset({ year: CURRENT_YEAR, division: divId });
+			setDivisionValue(divId ? String(divId) : "");
 		}
-	}, [open, report, reset]);
+	}, [open, defaultDivId, reset]);
 
-	const onSubmit = (data: ReportInfoFormData) => {
-		const payload = {
-			year: data.year,
-			date_open: data.date_open,
-			date_closed: data.date_closed,
-			dm: data.dm || undefined,
-			service_delivery_intro: data.service_delivery_intro || undefined,
-			research_intro: data.research_intro || undefined,
-			student_intro: data.student_intro || undefined,
-			publications: data.publications || undefined,
-		};
-
-		if (isEditing && report) {
-			updateMutation.mutate(
-				{ id: report.id, data: payload },
-				{ onSuccess: () => onOpenChange(false) }
-			);
-		} else {
-			createMutation.mutate(payload, {
-				onSuccess: () => onOpenChange(false),
-			});
-		}
+	const handleDivisionChange = (val: string) => {
+		if (lockDivision) return;
+		setDivisionValue(val);
+		setValue("division", Number(val), { shouldValidate: true });
 	};
+
+	const onSubmit = (data: CreateReportFormData) => {
+		if (yearConflict) return;
+		setBackendError(null);
+		createMutation.mutate(
+			{ year: data.year, division: data.division },
+			{
+				onSuccess: () => onOpenChange(false),
+				onError: (error: Error) => setBackendError(error.message),
+			}
+		);
+	};
+
+	const isDisabled = createMutation.isPending || !isValid || yearConflict;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-2xl" enableScrollIndicators>
+			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>
-						{isEditing ? "Edit Report Info" : "Create Report Info"}
-					</DialogTitle>
+					<DialogTitle>Create Report Info</DialogTitle>
 					<DialogDescription>
-						{isEditing
-							? "Update the annual report configuration below."
-							: "Fill in the details to create a new annual report record."}
+						Select a year and division to create a new annual report record.
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="max-h-[60vh] overflow-y-auto px-1" data-scrollable>
-					<form
-						id="report-info-form"
-						onSubmit={handleSubmit(onSubmit as never)}
-						className="space-y-6 py-4"
-					>
-						{/* Year */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-year">
-								Year <span className="text-destructive">*</span>
-							</Label>
-							<Input
-								id="ri-year"
-								type="number"
-								autoComplete="off"
-								placeholder="e.g. 2025"
-								{...register("year")}
-							/>
-							{errors.year && (
-								<p className="text-sm text-destructive">
-									{errors.year.message}
-								</p>
-							)}
-						</div>
+				<form
+					id="create-report-form"
+					onSubmit={handleSubmit(onSubmit as never)}
+					className="space-y-6 py-4"
+				>
+					{backendError && (
+						<p className="text-sm text-destructive">{backendError}</p>
+					)}
 
-						{/* Date Open */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-date-open">
-								Date Open <span className="text-destructive">*</span>
-							</Label>
-							<Input id="ri-date-open" type="date" {...register("date_open")} />
-							{errors.date_open && (
-								<p className="text-sm text-destructive">
-									{errors.date_open.message}
-								</p>
-							)}
-						</div>
+					{/* Year */}
+					<div className="space-y-2">
+						<Label htmlFor="cri-year">
+							Year <span className="text-destructive">*</span>
+						</Label>
+						<Input
+							id="cri-year"
+							type="number"
+							autoComplete="off"
+							placeholder="e.g. 2025"
+							{...register("year")}
+						/>
+						<p className="text-xs text-muted-foreground">
+							The year for the report. e.g. type 2023 for financial year
+							2022-2023. Submissions open 1 July and close 30 June of the report
+							year by default.
+						</p>
+						{errors.year && (
+							<p className="text-sm text-destructive">{errors.year.message}</p>
+						)}
+						{yearConflict && !errors.year && (
+							<p className="text-sm text-destructive">
+								A report for this year already exists for the selected division.
+							</p>
+						)}
+					</div>
 
-						{/* Date Closed */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-date-closed">
-								Date Closed <span className="text-destructive">*</span>
-							</Label>
-							<Input
-								id="ri-date-closed"
-								type="date"
-								{...register("date_closed")}
-							/>
-							{errors.date_closed && (
-								<p className="text-sm text-destructive">
-									{errors.date_closed.message}
-								</p>
-							)}
-						</div>
-
-						{/* DM */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-dm">DM</Label>
-							<Textarea
-								id="ri-dm"
-								placeholder="Director's message content"
-								rows={3}
-								{...register("dm")}
-							/>
-						</div>
-
-						{/* Service Delivery Intro */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-service-delivery">
-								Service Delivery Intro
-							</Label>
-							<Textarea
-								id="ri-service-delivery"
-								placeholder="Service delivery introduction content"
-								rows={3}
-								{...register("service_delivery_intro")}
-							/>
-						</div>
-
-						{/* Research Intro */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-research">Research Intro</Label>
-							<Textarea
-								id="ri-research"
-								placeholder="Research introduction content"
-								rows={3}
-								{...register("research_intro")}
-							/>
-						</div>
-
-						{/* Student Intro */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-student">Student Intro</Label>
-							<Textarea
-								id="ri-student"
-								placeholder="Student introduction content"
-								rows={3}
-								{...register("student_intro")}
-							/>
-						</div>
-
-						{/* Publications */}
-						<div className="space-y-2">
-							<Label htmlFor="ri-publications">Publications</Label>
-							<Textarea
-								id="ri-publications"
-								placeholder="Publications content"
-								rows={3}
-								{...register("publications")}
-							/>
-						</div>
-					</form>
-				</div>
+					{/* Division */}
+					<div className="space-y-2">
+						<Label htmlFor="cri-division">
+							Division <span className="text-destructive">*</span>
+						</Label>
+						<Select
+							value={divisionValue}
+							onValueChange={handleDivisionChange}
+							disabled={lockDivision}
+						>
+							<SelectTrigger id="cri-division" className="w-full">
+								<SelectValue placeholder="Select a division" />
+							</SelectTrigger>
+							<SelectContent>
+								{divisions?.map((div) => (
+									<SelectItem key={div.id} value={String(div.id)}>
+										{div.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{lockDivision && (
+							<p className="text-xs text-muted-foreground">
+								Division is locked to the currently selected division.
+							</p>
+						)}
+						{errors.division && (
+							<p className="text-sm text-destructive">
+								{errors.division.message}
+							</p>
+						)}
+					</div>
+				</form>
 
 				<DialogFooter>
 					<Button
 						type="submit"
-						form="report-info-form"
-						disabled={isPending}
+						form="create-report-form"
+						disabled={isDisabled}
 						className="w-full sm:w-auto"
 					>
-						{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-						{isEditing ? "Update" : "Create"}
+						{createMutation.isPending && (
+							<Loader2 className="mr-2 size-4 animate-spin" />
+						)}
+						Create
 					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
-}
+};
 
-/** Extract default form values from an existing report */
-function getDefaults(report?: IAnnualReport): ReportInfoFormData {
-	return {
-		year: report?.year ?? (new Date().getFullYear() as number),
-		date_open: report?.date_open ?? "",
-		date_closed: report?.date_closed ?? "",
-		dm: report?.dm ?? "",
-		service_delivery_intro: report?.service_delivery_intro ?? "",
-		research_intro: report?.research_intro ?? "",
-		student_intro: report?.student_intro ?? "",
-		publications: report?.publications ?? "",
+/* ── Edit mode form (year + division only) ── */
+const EditReportInfoForm = ({
+	open,
+	onOpenChange,
+	report,
+	lockDivision,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	report: IAnnualReport;
+	lockDivision?: boolean;
+}) => {
+	const updateMutation = useUpdateReportInfo();
+	const { data: divisions } = useDivisions();
+	const [divisionValue, setDivisionValue] = useState<string>("");
+
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setValue,
+		formState: { errors, isValid },
+	} = useForm<EditReportFormData>({
+		resolver: zodResolver(editReportSchema) as never,
+		mode: "onChange",
+		defaultValues: {
+			year: report.year,
+			division: report.division?.id ?? 0,
+		},
+	});
+
+	useEffect(() => {
+		if (open) {
+			const divId = report.division?.id ?? 0;
+			reset({ year: report.year, division: divId });
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- sync from props
+			setDivisionValue(divId ? String(divId) : "");
+		}
+	}, [open, report, reset]);
+
+	const handleDivisionChange = (val: string) => {
+		if (lockDivision) return;
+		setDivisionValue(val);
+		setValue("division", Number(val), { shouldValidate: true });
 	};
-}
+
+	const onSubmit = (data: EditReportFormData) => {
+		updateMutation.mutate(
+			{ id: report.id, data: { year: data.year, division: data.division } },
+			{ onSuccess: () => onOpenChange(false) }
+		);
+	};
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>Edit Report Info</DialogTitle>
+					<DialogDescription>
+						Update the year and division for this annual report.
+					</DialogDescription>
+				</DialogHeader>
+
+				<form
+					id="edit-report-form"
+					onSubmit={handleSubmit(onSubmit as never)}
+					className="space-y-6 py-4"
+				>
+					{/* Year */}
+					<div className="space-y-2">
+						<Label htmlFor="eri-year">
+							Year <span className="text-destructive">*</span>
+						</Label>
+						<Input
+							id="eri-year"
+							type="number"
+							autoComplete="off"
+							placeholder="e.g. 2025"
+							{...register("year")}
+						/>
+						{errors.year && (
+							<p className="text-sm text-destructive">{errors.year.message}</p>
+						)}
+					</div>
+
+					{/* Division */}
+					<div className="space-y-2">
+						<Label htmlFor="eri-division">
+							Division <span className="text-destructive">*</span>
+						</Label>
+						<Select
+							value={divisionValue}
+							onValueChange={handleDivisionChange}
+							disabled={lockDivision}
+						>
+							<SelectTrigger id="eri-division" className="w-full">
+								<SelectValue placeholder="Select a division" />
+							</SelectTrigger>
+							<SelectContent>
+								{divisions?.map((div) => (
+									<SelectItem key={div.id} value={String(div.id)}>
+										{div.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{lockDivision && (
+							<p className="text-xs text-muted-foreground">
+								Division is locked to the currently selected division.
+							</p>
+						)}
+						{errors.division && (
+							<p className="text-sm text-destructive">
+								{errors.division.message}
+							</p>
+						)}
+					</div>
+				</form>
+
+				<DialogFooter>
+					<Button
+						type="submit"
+						form="edit-report-form"
+						disabled={updateMutation.isPending || !isValid}
+						className="w-full sm:w-auto"
+					>
+						{updateMutation.isPending && (
+							<Loader2 className="mr-2 size-4 animate-spin" />
+						)}
+						Update
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+};

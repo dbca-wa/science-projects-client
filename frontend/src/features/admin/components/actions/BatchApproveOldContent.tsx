@@ -2,11 +2,17 @@ import { CheckSquare, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useBatchApproveOld } from "../../hooks/useAdminActions";
 
+interface BatchApproveOldContentProps {
+	divisionSlug?: string;
+}
+
 /**
  * Content for the Batch Approve Old Reports page.
  * Triggers batch approval of older (previous year) reports.
  */
-export function BatchApproveOldContent() {
+export function BatchApproveOldContent({
+	divisionSlug,
+}: BatchApproveOldContentProps) {
 	const { mutate, isPending } = useBatchApproveOld();
 
 	return (
@@ -27,7 +33,7 @@ export function BatchApproveOldContent() {
 				</div>
 				<div className="mt-6 flex justify-end">
 					<Button
-						onClick={() => mutate()}
+						onClick={() => mutate(divisionSlug)}
 						disabled={isPending}
 						variant="default"
 					>

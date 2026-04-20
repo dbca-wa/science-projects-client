@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
+import { UserIdCell } from "../shared/UserIdCell";
 import { DivisionForm } from "./DivisionForm";
 import { useDivisions, useDeleteDivision } from "../../hooks/useDivisions";
 import { filterByName, sortAlphabetically } from "../../utils/crud.utils";
@@ -76,10 +77,10 @@ export function DivisionList() {
 						<td className="px-4 py-3">{division.name}</td>
 						<td className="hidden px-4 py-3 md:table-cell">{division.slug}</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{division.director ?? "—"}
+							<UserIdCell userId={division.director} />
 						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{division.approver ?? "—"}
+							<UserIdCell userId={division.approver} />
 						</td>
 						<td className="px-4 py-3 text-right">
 							<div className="flex justify-end gap-1">

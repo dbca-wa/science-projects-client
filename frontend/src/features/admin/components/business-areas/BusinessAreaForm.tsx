@@ -80,10 +80,28 @@ export function BusinessAreaForm({
 	useEffect(() => {
 		if (open) {
 			reset(getDefaults(businessArea));
-			// eslint-disable-next-line react-hooks/set-state-in-effect
-			setLeaderPk(businessArea?.leader ?? null);
-			setFinanceAdminPk(businessArea?.finance_admin ?? null);
-			setDataCustodianPk(businessArea?.data_custodian ?? null);
+			const leaderVal =
+				businessArea?.leader != null
+					? typeof businessArea.leader === "object"
+						? businessArea.leader.id
+						: businessArea.leader
+					: null;
+			const faVal =
+				businessArea?.finance_admin != null
+					? typeof businessArea.finance_admin === "object"
+						? businessArea.finance_admin.id
+						: businessArea.finance_admin
+					: null;
+			const dcVal =
+				businessArea?.data_custodian != null
+					? typeof businessArea.data_custodian === "object"
+						? businessArea.data_custodian.id
+						: businessArea.data_custodian
+					: null;
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- sync from props
+			setLeaderPk(leaderVal);
+			setFinanceAdminPk(faVal);
+			setDataCustodianPk(dcVal);
 			setImageFile(null);
 		}
 	}, [open, businessArea, reset]);
@@ -328,14 +346,33 @@ function getDefaults(ba?: IBusinessArea): BusinessAreaFormData {
 				: ba.division
 			: (undefined as unknown as number);
 
+	const leaderVal =
+		ba?.leader != null
+			? typeof ba.leader === "object"
+				? ba.leader.id
+				: ba.leader
+			: null;
+	const faVal =
+		ba?.finance_admin != null
+			? typeof ba.finance_admin === "object"
+				? ba.finance_admin.id
+				: ba.finance_admin
+			: null;
+	const dcVal =
+		ba?.data_custodian != null
+			? typeof ba.data_custodian === "object"
+				? ba.data_custodian.id
+				: ba.data_custodian
+			: null;
+
 	return {
 		division: divisionId,
 		name: ba?.name ?? "",
 		focus: ba?.focus ?? "",
 		introduction: ba?.introduction ?? "",
 		image: undefined,
-		leader: ba?.leader ?? null,
-		finance_admin: ba?.finance_admin ?? null,
-		data_custodian: ba?.data_custodian ?? null,
+		leader: leaderVal,
+		finance_admin: faVal,
+		data_custodian: dcVal,
 	};
 }

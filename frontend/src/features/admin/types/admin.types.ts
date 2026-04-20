@@ -51,8 +51,9 @@ export interface IServiceForm {
 
 export interface IReportInfoForm {
 	year: number;
-	date_open: string;
-	date_closed: string;
+	division?: number;
+	date_open?: string;
+	date_closed?: string;
 	dm?: string;
 	dm_sign?: string;
 	service_delivery_intro?: string;

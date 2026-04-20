@@ -2,7 +2,11 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Navigate, createBrowserRouter, type RouteObject } from "react-router";
 
-import { AdminRoute, ProtectedRoute } from "./guards/auth.guard";
+import {
+	AdminRoute,
+	AdminOrKeyStakeholderRoute,
+	ProtectedRoute,
+} from "./guards/auth.guard";
 
 import {
 	ALL_PROTECTED_ROUTES,
@@ -18,6 +22,9 @@ import { StaffProfileLayout } from "@/shared/components/layout/staff-profile/Sta
 
 /** ---------- Auth wrapper ---------- */
 const withAuth = (config: RouteConfig, element: ReactNode) => {
+	if (config.requiresKeyStakeholder) {
+		return <AdminOrKeyStakeholderRoute>{element}</AdminOrKeyStakeholderRoute>;
+	}
 	if (config.requiresAdmin) {
 		return <AdminRoute>{element}</AdminRoute>;
 	}

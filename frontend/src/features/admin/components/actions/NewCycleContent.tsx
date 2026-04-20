@@ -2,11 +2,15 @@ import { RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useOpenNewCycle } from "../../hooks/useAdminActions";
 
+interface NewCycleContentProps {
+	divisionSlug?: string;
+}
+
 /**
  * Content for the Open New Cycle page.
  * Triggers creation of a new annual reporting cycle.
  */
-export function NewCycleContent() {
+export function NewCycleContent({ divisionSlug }: NewCycleContentProps) {
 	const { mutate, isPending } = useOpenNewCycle();
 
 	return (
@@ -27,7 +31,7 @@ export function NewCycleContent() {
 				</div>
 				<div className="mt-6 flex justify-end">
 					<Button
-						onClick={() => mutate()}
+						onClick={() => mutate(divisionSlug)}
 						disabled={isPending}
 						variant="default"
 					>

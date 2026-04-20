@@ -51,7 +51,7 @@ export function useSSE({
 			return;
 		}
 
-		// Reset connection state at start
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- SSE connection lifecycle
 		setIsConnected(false);
 
 		const es = new EventSource(url, { withCredentials: true });

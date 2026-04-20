@@ -38,7 +38,7 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
 	const [managerPk, setManagerPk] = useState<number | null>(
-		branch?.manager ?? null
+		branch?.manager?.id ?? null
 	);
 
 	const {
@@ -51,7 +51,7 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 		resolver: zodResolver(branchSchema),
 		defaultValues: {
 			name: branch?.name ?? "",
-			manager: branch?.manager ?? undefined,
+			manager: branch?.manager?.id ?? undefined,
 		},
 	});
 
@@ -60,10 +60,10 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 		if (open) {
 			reset({
 				name: branch?.name ?? "",
-				manager: branch?.manager ?? undefined,
+				manager: branch?.manager?.id ?? undefined,
 			});
 			// eslint-disable-next-line react-hooks/set-state-in-effect
-			setManagerPk(branch?.manager ?? null);
+			setManagerPk(branch?.manager?.id ?? null);
 		}
 	}, [open, branch, reset]);
 
@@ -91,7 +91,7 @@ export function BranchForm({ open, onOpenChange, branch }: BranchFormProps) {
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent className="sm:max-w-lg">
+			<SheetContent className="sm:max-w-2xl">
 				<SheetHeader>
 					<SheetTitle>{isEditing ? "Edit Branch" : "Add Branch"}</SheetTitle>
 					<SheetDescription>

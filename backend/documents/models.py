@@ -43,6 +43,15 @@ class AnnualReport(CommonModel):
         null=True,
     )
 
+    division = models.ForeignKey(
+        "agencies.Division",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="annual_reports",
+        help_text="The division this annual report belongs to.",
+    )
+
     year = models.PositiveIntegerField(
         verbose_name="Report Year",
         help_text=(
@@ -95,10 +104,14 @@ class AnnualReport(CommonModel):
     )
 
     date_open = models.DateField(
+        blank=True,
+        null=True,
         help_text="The date at which submissions are opened for this report",
     )
 
     date_closed = models.DateField(
+        blank=True,
+        null=True,
         help_text="The date at which submissions are closed for this report",
     )
 

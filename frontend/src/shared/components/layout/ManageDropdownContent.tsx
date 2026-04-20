@@ -1,8 +1,9 @@
-import { useRef, useEffect, type ReactNode } from "react";
+import { useRef, useEffect, useMemo, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { hasModifierKey } from "@/shared/utils/navigation.utils";
 import { cn } from "@/shared/lib/utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
+import { useAuthStore } from "@/app/stores/store-context";
 import {
 	List,
 	MapPin,
@@ -15,10 +16,12 @@ import {
 	CheckSquare,
 	RefreshCw,
 	FileText,
+	Mail,
 } from "lucide-react";
 
 interface ManageDropdownContentProps {
 	onClose: () => void;
+	isKeyStakeholder: boolean;
 }
 
 interface MenuSection {
@@ -38,6 +41,11 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				targetPath: "/admin/data",
 				icon: <Database className="size-4" aria-hidden="true" />,
 				label: "Data Lists",
+			},
+			{
+				targetPath: "/admin/emails",
+				icon: <Mail className="size-4" aria-hidden="true" />,
+				label: "Email",
 			},
 		],
 	},
@@ -111,11 +119,38 @@ const MANAGE_SECTIONS: MenuSection[] = [
 /**
  * Manage dropdown content with grouped sections for admin navigation.
  * Follows the same keyboard navigation pattern as NavigationDropdownMenuContent.
+ * Conditionally shows AR Actions and Report Info based on user role.
  */
-export function ManageDropdownContent({ onClose }: ManageDropdownContentProps) {
+export function ManageDropdownContent({
+	onClose,
+	isKeyStakeholder,
+}: ManageDropdownContentProps) {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const menuRef = useRef<HTMLDivElement>(null);
+	const authStore = useAuthStore();
+
+	const canAccessAR = authStore.isSuperuser || isKeyStakeholder;
+
+	// Filter sections based on user permissions
+	const filteredSections = useMemo(() => {
+		return MANAGE_SECTIONS.map((section) => {
+			// AR Actions section: only visible to superusers or key stakeholders
+			if (section.label === "AR Actions") {
+				return canAccessAR ? section : null;
+			}
+			// CRUD section: hide Report Info unless superuser or key stakeholder
+			if (section.label === "CRUD" && !canAccessAR) {
+				return {
+					...section,
+					items: section.items.filter(
+						(item) => item.targetPath !== "/admin/reports"
+					),
+				};
+			}
+			return section;
+		}).filter((s): s is MenuSection => s !== null);
+	}, [canAccessAR]);
 
 	const { handleKeyDown, registerMenuItem, focusFirstItem } =
 		useMenuKeyboardNavigation(onClose);
@@ -155,7 +190,7 @@ export function ManageDropdownContent({ onClose }: ManageDropdownContentProps) {
 	// Pre-compute flat index for each item for keyboard navigation
 	const itemIndexMap = new Map<string, number>();
 	let idx = 0;
-	for (const section of MANAGE_SECTIONS) {
+	for (const section of filteredSections) {
 		for (const item of section.items) {
 			itemIndexMap.set(item.targetPath, idx++);
 		}
@@ -167,12 +202,13 @@ export function ManageDropdownContent({ onClose }: ManageDropdownContentProps) {
 			className="flex flex-col max-h-[70vh] overflow-y-auto"
 			onKeyDown={handleKeyDown}
 		>
-			{MANAGE_SECTIONS.map((section, sectionIdx) => (
+			{filteredSections.map((section, sectionIdx) => (
 				<div key={section.label}>
 					{/* Divider before AR Actions section */}
-					{sectionIdx === MANAGE_SECTIONS.length - 1 && (
-						<div className="my-1 border-t border-gray-200 dark:border-gray-700" />
-					)}
+					{sectionIdx === filteredSections.length - 1 &&
+						filteredSections.length > 1 && (
+							<div className="my-1 border-t border-gray-200 dark:border-gray-700" />
+						)}
 
 					<div className="px-4 py-2">
 						<span className="text-xs font-semibold text-gray-500 dark:text-gray-400">

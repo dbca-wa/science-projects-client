@@ -5,6 +5,7 @@ import {
 	ExternalLink,
 	FileCheck,
 	FileStack,
+	Upload,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -14,6 +15,7 @@ import {
 	useReportPDF,
 	useGenerateReportPDF,
 	useCancelReportPDFGen,
+	usePublishReportPDF,
 } from "@/features/reports/hooks/useReports";
 import { useSSE } from "@/features/reports/hooks/useSSE";
 import { getSSEUrl } from "@/features/reports/services/report.service";
@@ -21,6 +23,8 @@ import type {
 	IAnnualReport,
 	IProgressEvent,
 } from "@/features/reports/types/report.types";
+import { PublishConfirmModal } from "../modals/PublishConfirmModal";
+import { useAuthStore } from "@/app/stores/store-context";
 
 /**
  * Print Preview tab — PDF generation with SSE progress,
@@ -28,11 +32,16 @@ import type {
  */
 export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 	const queryClient = useQueryClient();
+	const authStore = useAuthStore();
 	const { data: pdfData, isLoading, refetch } = useReportPDF(report.id);
 	const generatePDF = useGenerateReportPDF();
 	const cancelGen = useCancelReportPDFGen();
+	const publishPDF = usePublishReportPDF();
+
+	const [publishModalOpen, setPublishModalOpen] = useState(false);
 
 	const isGenerating = pdfData?.report?.pdf_generation_in_progress ?? false;
+	const canPublish = !!pdfData?.has_draft && authStore.isSuperuser;
 
 	// SSE progress state
 	const [progressData, setProgressData] = useState<IProgressEvent | null>(null);
@@ -138,9 +147,15 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 		setIframeError(true);
 	}, []);
 
-	// Use the direct server file URL for iframe
-	const fileUrl = pdfData?.file ? getImageUrl(pdfData.file) : null;
-	const hasPDF = !!fileUrl && !!pdfData?.has_pdf;
+	const handlePublish = useCallback(() => {
+		publishPDF.mutate(report.id, {
+			onSuccess: () => setPublishModalOpen(false),
+		});
+	}, [publishPDF, report.id]);
+
+	// Use the direct server file URL for iframe (show draft for preview)
+	const fileUrl = pdfData?.draft_file ? getImageUrl(pdfData.draft_file) : null;
+	const hasPDF = !!fileUrl && !!pdfData?.has_draft;
 
 	// Derive display values from SSE progress or defaults
 	const percentage = activeProgress?.percentage ?? 0;
@@ -189,6 +204,18 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 							<FileStack className="h-4 w-4" />
 							Generate All
 						</Button>
+						{canPublish && (
+							<Button
+								size="sm"
+								variant="outline"
+								className="cursor-pointer gap-1.5 border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-950"
+								disabled={isPending || publishPDF.isPending}
+								onClick={() => setPublishModalOpen(true)}
+							>
+								<Upload className="h-4 w-4" />
+								Publish
+							</Button>
+						)}
 						{hasPDF && fileUrl && (
 							<Button
 								size="icon"
@@ -273,6 +300,13 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 					</div>
 				)}
 			</div>
+
+			<PublishConfirmModal
+				isOpen={publishModalOpen}
+				onClose={() => setPublishModalOpen(false)}
+				onConfirm={handlePublish}
+				isPending={publishPDF.isPending}
+			/>
 		</div>
 	);
 }

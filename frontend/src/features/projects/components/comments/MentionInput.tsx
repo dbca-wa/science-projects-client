@@ -115,6 +115,7 @@ export const MentionInput = ({
 	// Update mention match when value or cursor changes
 	useEffect(() => {
 		const newMatch = detectMentionPattern();
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- sync from derived state
 		setMentionMatch(newMatch);
 		if (newMatch) {
 			setSelectedIndex(0);

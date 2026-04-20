@@ -1,10 +1,19 @@
 import { useState, useMemo } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
+import { UserIdCell } from "../shared/UserIdCell";
 import { ReportInfoForm } from "./ReportInfoForm";
 import { useReportInfo, useDeleteReportInfo } from "../../hooks/useReportInfo";
+import { useDivisions } from "../../hooks/useDivisions";
 import { filterByName } from "../../utils/crud.utils";
 import type { IAnnualReport } from "@/features/reports/types/report.types";
 
@@ -16,8 +25,8 @@ const columns = [
 		className: "hidden md:table-cell",
 	},
 	{
-		header: "Modifier",
-		accessor: "modifier",
+		header: "Division",
+		accessor: "division",
 		className: "hidden md:table-cell",
 	},
 	{ header: "Change", accessor: "actions", className: "text-right" },
@@ -25,18 +34,25 @@ const columns = [
 
 export function ReportInfoList() {
 	const { data: reports = [], isLoading, error } = useReportInfo();
+	const { data: divisions } = useDivisions();
 	const deleteMutation = useDeleteReportInfo();
 
 	const [searchTerm, setSearchTerm] = useState("");
+	const [selectedDivision, setSelectedDivision] = useState<number | "all">(
+		"all"
+	);
 	const [formOpen, setFormOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState<IAnnualReport | undefined>();
 	const [deleteTarget, setDeleteTarget] = useState<IAnnualReport | null>(null);
 
-	// Filter by year (convert to string for search) then sort by year descending
+	// Filter by year search, then by division, then sort descending
 	const filtered = useMemo(() => {
-		const matched = filterByName(reports, searchTerm, (r) => String(r.year));
+		let matched = filterByName(reports, searchTerm, (r) => String(r.year));
+		if (selectedDivision !== "all") {
+			matched = matched.filter((r) => r.division?.id === selectedDivision);
+		}
 		return [...matched].sort((a, b) => b.year - a.year);
-	}, [reports, searchTerm]);
+	}, [reports, searchTerm, selectedDivision]);
 
 	const handleAdd = () => {
 		setEditingItem(undefined);
@@ -58,6 +74,29 @@ export function ReportInfoList() {
 
 	return (
 		<>
+			<div className="mb-4 flex items-center gap-2">
+				<Select
+					value={
+						selectedDivision === "all" ? "all" : selectedDivision.toString()
+					}
+					onValueChange={(v) =>
+						setSelectedDivision(v === "all" ? "all" : Number(v))
+					}
+				>
+					<SelectTrigger className="w-[200px]" aria-label="Filter by division">
+						<SelectValue placeholder="All Divisions" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All Divisions</SelectItem>
+						{divisions?.map((d) => (
+							<SelectItem key={d.id} value={d.id.toString()}>
+								{d.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
+
 			<CrudListLayout<IAnnualReport>
 				title="Report Info"
 				itemCount={filtered.length}
@@ -74,10 +113,10 @@ export function ReportInfoList() {
 					<tr key={report.id} className="border-b last:border-b-0">
 						<td className="px-4 py-3 font-medium">{report.year}</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{report.creator ?? "—"}
+							<UserIdCell userId={report.creator} />
 						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{report.modifier ?? "—"}
+							{report.division?.name ?? "—"}
 						</td>
 						<td className="px-4 py-3 text-right">
 							<div className="flex justify-end gap-1">

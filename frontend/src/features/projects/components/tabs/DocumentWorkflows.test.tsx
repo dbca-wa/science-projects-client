@@ -25,7 +25,6 @@ import {
 import * as documentActionService from "../../services/document.service";
 import { toast } from "sonner";
 import { toCompactDocumentType } from "@/shared/utils/document.utils";
-import type { DocumentActionResponse } from "../../services/document.service";
 
 // Mock services
 vi.mock("../../services/document.service");
@@ -50,7 +49,7 @@ describe.skip("Document Action Workflows", () => {
 	});
 
 	// Helper to create proper mock response
-	const createMockResponse = (message: string): DocumentActionResponse => ({
+	const createMockResponse = (message: string): Record<string, unknown> => ({
 		success: true,
 		message,
 		document: {
@@ -78,7 +77,7 @@ describe.skip("Document Action Workflows", () => {
 		// Perform approve action
 		result.current.mutate({
 			documentId: 456,
-			data: { action: "approve", send_email: true },
+			data: { action: "approve", stage: 1, documentPk: 456, send_email: true },
 		});
 
 		// Wait for mutation to complete
@@ -120,6 +119,8 @@ describe.skip("Document Action Workflows", () => {
 			documentId: 789,
 			data: {
 				action: "send_back",
+				stage: 1,
+				documentPk: 789,
 				send_email: true,
 				reason: "Please revise the methodology section",
 			},
@@ -150,10 +151,10 @@ describe.skip("Document Action Workflows", () => {
 	 * Delete action should succeed
 	 */
 	it("should successfully delete a document", async () => {
-		const mockResponse = createMockResponse("Document deleted successfully");
-		vi.mocked(documentActionService.deleteDocument).mockResolvedValue(
-			mockResponse
-		);
+		vi.mocked(documentActionService.deleteDocument).mockResolvedValue({
+			success: true,
+			message: "Document deleted successfully",
+		});
 
 		const { result } = renderHook(
 			() => useDeleteDocument(toCompactDocumentType("student_report"), 123),
@@ -200,7 +201,7 @@ describe.skip("Document Action Workflows", () => {
 		// Perform action
 		result.current.mutate({
 			documentId: 111,
-			data: { action: "submit", send_email: true },
+			data: { action: "submit", stage: 1, documentPk: 111, send_email: true },
 		});
 
 		// Wait for mutation to complete
@@ -233,7 +234,7 @@ describe.skip("Document Action Workflows", () => {
 		// Perform action that will fail
 		result.current.mutate({
 			documentId: 222,
-			data: { action: "approve", send_email: true },
+			data: { action: "approve", stage: 1, documentPk: 222, send_email: true },
 		});
 
 		// Wait for mutation to fail
@@ -253,9 +254,8 @@ describe.skip("Document Action Workflows", () => {
 	it("should track loading state during document action", async () => {
 		const mockResponse = createMockResponse("Success");
 
-		// Create a promise we can control
-		let resolveAction: (value: DocumentActionResponse) => void;
-		const actionPromise = new Promise<DocumentActionResponse>((resolve) => {
+		let resolveAction: (value: Record<string, unknown>) => void;
+		const actionPromise = new Promise<Record<string, unknown>>((resolve) => {
 			resolveAction = resolve;
 		});
 
@@ -274,7 +274,7 @@ describe.skip("Document Action Workflows", () => {
 		// Perform action
 		result.current.mutate({
 			documentId: 333,
-			data: { action: "recall", send_email: true },
+			data: { action: "recall", stage: 1, documentPk: 333, send_email: true },
 		});
 
 		// Should be loading
@@ -321,7 +321,7 @@ describe.skip("Document Action Workflows", () => {
 
 			result.current.mutate({
 				documentId: 444,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 444, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -358,7 +358,7 @@ describe.skip("Document Action Workflows", () => {
 
 			result.current.mutate({
 				documentId: 555,
-				data: { action, send_email: true },
+				data: { action, stage: 1, documentPk: 555, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -382,8 +382,8 @@ describe.skip("Document Action Workflows", () => {
 	 * Note: Document actions use server-driven updates, not optimistic updates
 	 */
 	it("should wait for server response before updating UI", async () => {
-		let resolveAction: (value: DocumentActionResponse) => void;
-		const actionPromise = new Promise<DocumentActionResponse>((resolve) => {
+		let resolveAction: (value: Record<string, unknown>) => void;
+		const actionPromise = new Promise<Record<string, unknown>>((resolve) => {
 			resolveAction = resolve;
 		});
 
@@ -399,7 +399,7 @@ describe.skip("Document Action Workflows", () => {
 		// Perform action
 		result.current.mutate({
 			documentId: 666,
-			data: { action: "approve", send_email: true },
+			data: { action: "approve", stage: 1, documentPk: 666, send_email: true },
 		});
 
 		// Should be pending, not success
@@ -435,7 +435,7 @@ describe.skip("Document Action Workflows", () => {
 
 		result.current.mutate({
 			documentId: 777,
-			data: { action: "approve", send_email: true },
+			data: { action: "approve", stage: 1, documentPk: 777, send_email: true },
 		});
 
 		await waitFor(() => {
@@ -476,7 +476,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 	});
 
 	// Helper to create proper mock response
-	const createMockResponse = (message: string): DocumentActionResponse => ({
+	const createMockResponse = (message: string): Record<string, unknown> => ({
 		success: true,
 		message,
 		document: {
@@ -516,7 +516,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 1: Submit for approval
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -526,7 +526,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 2: Approve by supervisor
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "approve", send_email: true },
+				data: { action: "approve", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -559,7 +559,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 1: Submit for approval
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -573,6 +573,8 @@ describe.skip("Document Workflow Integration Tests", () => {
 				documentId: 1,
 				data: {
 					action: "send_back",
+					stage: 1,
+					documentPk: 1,
 					send_email: true,
 					reason: sendBackReason,
 				},
@@ -595,7 +597,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 3: Revise and resubmit
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -619,7 +621,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 1: Submit for approval
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -629,7 +631,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 2: Recall before approval
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "recall", send_email: true },
+				data: { action: "recall", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -639,7 +641,7 @@ describe.skip("Document Workflow Integration Tests", () => {
 			// Step 3: Edit and resubmit
 			result.current.mutate({
 				documentId: 1,
-				data: { action: "submit", send_email: true },
+				data: { action: "submit", stage: 1, documentPk: 1, send_email: true },
 			});
 
 			await waitFor(() => {
@@ -669,6 +671,8 @@ describe.skip("Document Workflow Integration Tests", () => {
 				documentId: 1,
 				data: {
 					action: "reopen",
+					stage: 1,
+					documentPk: 1,
 					send_email: true,
 					reason: reopenReason,
 				},
@@ -720,6 +724,8 @@ describe.skip("Document Workflow Integration Tests", () => {
 					documentId: 1,
 					data: {
 						action: "reopen",
+						stage: 1,
+						documentPk: 1,
 						send_email: true,
 						reason: reopenReason,
 					},

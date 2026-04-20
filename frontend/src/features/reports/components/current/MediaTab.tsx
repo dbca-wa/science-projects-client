@@ -33,7 +33,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { useLatestReportMedia } from "@/features/reports/hooks/useReports";
+import { useReportMedia } from "@/features/reports/hooks/useReports";
 import {
 	uploadReportMedia,
 	deleteReportMedia,
@@ -697,7 +697,7 @@ function ReportMediaCard({
 /* ------------------------------------------------------------------ */
 
 export default function MediaTab({ report }: { report: IAnnualReport }) {
-	const { data: mediaItems, isLoading, error } = useLatestReportMedia();
+	const { data: mediaItems, isLoading, error } = useReportMedia(report.id);
 
 	if (isLoading) {
 		return (

@@ -19,6 +19,8 @@ interface CrudListLayoutProps<T> {
 	onSearchChange: (value: string) => void;
 	onAddClick: () => void;
 	addButtonLabel?: string;
+	/** Additional action buttons rendered alongside the Add button */
+	extraActions?: ReactNode;
 	columns: ColumnDef[];
 	data: T[];
 	renderRow: (item: T) => ReactNode;
@@ -35,6 +37,7 @@ export function CrudListLayout<T>({
 	onSearchChange,
 	onAddClick,
 	addButtonLabel,
+	extraActions,
 	columns,
 	data,
 	renderRow,
@@ -49,6 +52,7 @@ export function CrudListLayout<T>({
 				itemCount={itemCount}
 				onAddClick={onAddClick}
 				addButtonLabel={addButtonLabel}
+				extraActions={extraActions}
 			/>
 
 			<CrudSearchInput

@@ -5,14 +5,17 @@ import {
 	getLegacyReports,
 	getLatestYear,
 	getLatestReport,
+	getReportDetail,
 	getLatestProgressReports,
 	getLatestStudentReports,
 	getLatestInactiveReports,
 	getLatestReportMedia,
+	getReportMedia,
 	approveReport,
 	getReportPDFStatus,
 	generateReportPDF,
 	cancelReportPDFGen,
+	publishReportPDF,
 	getReportsWithoutPDF,
 	addReportPDF,
 	addLegacyPDF,
@@ -21,6 +24,7 @@ import {
 	deleteReportPDFFile,
 	deleteLegacyPDFFile,
 	toggleReportPublished,
+	getReportsForDivision,
 } from "../services/report.service";
 
 /**
@@ -54,43 +58,78 @@ export const useLatestYear = () =>
 	});
 
 /**
- * Fetch the latest annual report with associated data
+ * Fetch the latest annual report, optionally filtered by division slug.
+ * Returns null (not an error) when no report exists for the division.
  */
-export const useLatestReport = () =>
+export const useLatestReport = (divisionSlug?: string) =>
 	useQuery({
-		queryKey: ["reports", "latest"],
-		queryFn: getLatestReport,
+		queryKey: ["reports", "latest", divisionSlug ?? "all"],
+		queryFn: () => getLatestReport(divisionSlug),
+		staleTime: 5 * 60_000,
+		retry: (failureCount, error) => {
+			// Don't retry on 404 — it means no report exists for this division
+			if (
+				error &&
+				"status" in error &&
+				(error as { status: number }).status === 404
+			)
+				return false;
+			return failureCount < 3;
+		},
+	});
+
+/**
+ * Fetch all reports for a specific division, sorted by year descending.
+ */
+export const useReportsForDivision = (divisionSlug?: string) =>
+	useQuery({
+		queryKey: ["reports", "list", divisionSlug ?? "all"],
+		queryFn: () => getReportsForDivision(divisionSlug),
 		staleTime: 5 * 60_000,
 	});
 
 /**
- * Fetch latest active progress reports
+ * Fetch a specific annual report by ID (full detail with all fields)
  */
-export const useLatestProgressReports = () =>
+export const useReportDetail = (reportId?: number) =>
 	useQuery({
-		queryKey: ["reports", "progress"],
-		queryFn: getLatestProgressReports,
+		queryKey: ["reports", "detail", reportId],
+		queryFn: () => getReportDetail(reportId!),
+		enabled: !!reportId,
 		staleTime: 5 * 60_000,
 	});
 
 /**
- * Fetch latest active student reports
+ * Fetch active progress reports, optionally scoped to a specific annual report
  */
-export const useLatestStudentReports = () =>
+export const useLatestProgressReports = (reportId?: number) =>
 	useQuery({
-		queryKey: ["reports", "students"],
-		queryFn: getLatestStudentReports,
+		queryKey: ["reports", "progress", reportId ?? "latest"],
+		queryFn: () => getLatestProgressReports(reportId),
 		staleTime: 5 * 60_000,
+		enabled: !!reportId,
 	});
 
 /**
- * Fetch latest inactive reports (both student and progress)
+ * Fetch active student reports, optionally scoped to a specific annual report
  */
-export const useLatestInactiveReports = () =>
+export const useLatestStudentReports = (reportId?: number) =>
 	useQuery({
-		queryKey: ["reports", "inactive"],
-		queryFn: getLatestInactiveReports,
+		queryKey: ["reports", "students", reportId ?? "latest"],
+		queryFn: () => getLatestStudentReports(reportId),
 		staleTime: 5 * 60_000,
+		enabled: !!reportId,
+	});
+
+/**
+ * Fetch inactive reports (both student and progress), optionally scoped to a specific annual report
+ */
+export const useLatestInactiveReports = (reportId?: number) =>
+	useQuery({
+		queryKey: ["reports", "inactive", reportId ?? "latest"],
+		queryFn: () => getLatestInactiveReports(reportId),
+		staleTime: 5 * 60_000,
+		enabled: !!reportId,
 	});
 
 /**
@@ -100,6 +139,17 @@ export const useLatestReportMedia = () =>
 	useQuery({
 		queryKey: ["reports", "media"],
 		queryFn: getLatestReportMedia,
+		staleTime: 5 * 60_000,
+	});
+
+/**
+ * Fetch media items for a specific annual report by ID
+ */
+export const useReportMedia = (reportId?: number) =>
+	useQuery({
+		queryKey: ["reports", "media", reportId],
+		queryFn: () => getReportMedia(reportId!),
+		enabled: !!reportId,
 		staleTime: 5 * 60_000,
 	});
 
@@ -182,6 +232,26 @@ export const useCancelReportPDFGen = () => {
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to cancel generation");
+		},
+	});
+};
+
+/**
+ * Publish a draft PDF — promotes draft to published
+ */
+export const usePublishReportPDF = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (pk: number) => publishReportPDF(pk),
+		onSuccess: async (_data, pk) => {
+			toast.success("PDF published successfully");
+			await queryClient.invalidateQueries({ queryKey: ["reports", "pdf", pk] });
+			await queryClient.invalidateQueries({
+				queryKey: ["reports", "published"],
+			});
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to publish PDF");
 		},
 	});
 };

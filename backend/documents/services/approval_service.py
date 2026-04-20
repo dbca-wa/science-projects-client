@@ -7,7 +7,6 @@ from django.db import transaction
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from ..models import ProjectDocument
-from .notification_service import NotificationService
 
 
 class ApprovalService:
@@ -38,8 +37,8 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.INAPPROVAL
         document.save()
 
-        # Notify approvers
-        NotificationService.notify_document_ready(document, requester)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_ready(document, requester)
 
     @staticmethod
     @transaction.atomic
@@ -63,8 +62,8 @@ class ApprovalService:
         document.project_lead_approval_granted = True
         document.save()
 
-        # Notify next approver
-        NotificationService.notify_document_ready(document, approver)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_ready(document, approver)
 
     @staticmethod
     @transaction.atomic
@@ -93,8 +92,8 @@ class ApprovalService:
         document.business_area_lead_approval_granted = True
         document.save()
 
-        # Notify next approver
-        NotificationService.notify_document_ready(document, approver)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_ready(document, approver)
 
     @staticmethod
     @transaction.atomic
@@ -128,15 +127,19 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.APPROVED
         document.save()
 
-        # Notify document approved
-        NotificationService.notify_document_approved(document, approver)
-        NotificationService.notify_document_approved_directorate(document, approver)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_approved(document, approver)
+        # NotificationService.notify_document_approved_directorate(document, approver)
 
     @staticmethod
     @transaction.atomic
     def send_back(document, sender, reason):
         """
         Send document back for revision
+
+        Resets approval flags based on the current stage:
+        - Stage 2 (BA lead sends back): resets project_lead and business_area_lead
+        - Stage 3 (directorate sends back): resets business_area_lead and directorate
 
         Args:
             document: ProjectDocument instance
@@ -145,11 +148,27 @@ class ApprovalService:
         """
         settings.LOGGER.info(f"{sender} is sending back document {document}: {reason}")
 
+        # Determine current stage and reset appropriate flags
+        # Stage 3 (directorate pending): BA lead granted, directorate not yet granted
+        # Send back to stage 2: reset BA lead only, keep project lead
+        if (
+            document.business_area_lead_approval_granted
+            and not document.directorate_approval_granted
+        ):
+            document.business_area_lead_approval_granted = False
+        # Stage 2 (BA lead pending): project lead granted, BA lead not yet granted
+        # Send back to stage 1: reset project lead
+        elif (
+            document.project_lead_approval_granted
+            and not document.business_area_lead_approval_granted
+        ):
+            document.project_lead_approval_granted = False
+
         document.status = ProjectDocument.StatusChoices.REVISING
         document.save()
 
-        # Notify document sent back
-        NotificationService.notify_document_sent_back(document, sender, reason)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_sent_back(document, sender, reason)
 
     @staticmethod
     @transaction.atomic
@@ -171,8 +190,8 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.REVISING
         document.save()
 
-        # Notify document recalled
-        NotificationService.notify_document_recalled(document, recaller, reason)
+        # TODO: Email logic to be implemented later
+        # NotificationService.notify_document_recalled(document, recaller, reason)
 
     @staticmethod
     @transaction.atomic
@@ -218,39 +237,47 @@ class ApprovalService:
     @staticmethod
     def _can_approve_stage_one(document, user):
         """Check if user can approve at stage 1"""
-        # User must be project lead
+        if user.is_superuser:
+            return True
         return document.project.members.filter(user=user, is_leader=True).exists()
 
     @staticmethod
     def _can_approve_stage_two(document, user):
         """Check if user can approve at stage 2"""
-        # User must be business area leader
+        if user.is_superuser:
+            return True
         return document.project.business_area.leader == user
 
     @staticmethod
     def _can_approve_stage_three(document, user):
-        """Check if user can approve at stage 3"""
-        # User must be director
+        """Check if user can approve at stage 3 (directorate)"""
+        if user.is_superuser:
+            return True
         if not document.project.business_area.division:
             return False
-        return document.project.business_area.division.director == user
+        division = document.project.business_area.division
+        # Director can approve
+        if division.director == user:
+            return True
+        # Key stakeholder can approve
+        if division.key_stakeholder == user:
+            return True
+        # Approvers can approve
+        if division.approvers.filter(pk=user.pk).exists():
+            return True
+        return False
 
     @staticmethod
     def get_approval_stage(document):
         """
-        Get current approval stage for document
+        Get current approval stage for document based on approval boolean flags.
 
         Args:
             document: ProjectDocument instance
 
         Returns:
-            int: Current stage (0=not in approval, 1-3=stage number, 4=approved)
+            int: Current stage (1-3=stage number, 4=approved)
         """
-        if document.status != ProjectDocument.StatusChoices.INAPPROVAL:
-            if document.status == ProjectDocument.StatusChoices.APPROVED:
-                return 4
-            return 0
-
         if not document.project_lead_approval_granted:
             return 1
         elif not document.business_area_lead_approval_granted:
@@ -281,8 +308,14 @@ class ApprovalService:
             # Get business area leader
             return document.project.business_area.leader
         elif stage == 3:
-            # Get director
+            # Get key stakeholder, first approver, or director
             if document.project.business_area.division:
-                return document.project.business_area.division.director
+                division = document.project.business_area.division
+                if division.key_stakeholder:
+                    return division.key_stakeholder
+                first_approver = division.approvers.first()
+                if first_approver:
+                    return first_approver
+                return division.director
 
         return None

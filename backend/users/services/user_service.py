@@ -171,6 +171,21 @@ class UserService:
             ).distinct()
             queryset = queryset.filter(id__in=ba_leader_ids)
 
+        # Approver filter (users who are key_stakeholder or approver of any division)
+        approver = filters.get("approver")
+        if approver and approver.lower() == "true":
+            pass
+
+            queryset = queryset.filter(
+                Q(divisions_key_stakeholder__isnull=False)
+                | Q(divisions_approver__isnull=False)
+            )
+
+        # Key stakeholder filter (users who are key_stakeholder of any division)
+        only_key_stakeholder = filters.get("only_key_stakeholder")
+        if only_key_stakeholder and only_key_stakeholder.lower() == "true":
+            queryset = queryset.filter(divisions_key_stakeholder__isnull=False)
+
         # Business area filter
         business_area = filters.get("business_area") or filters.get("businessArea")
         if business_area:

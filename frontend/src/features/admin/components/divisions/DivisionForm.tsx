@@ -54,6 +54,7 @@ export function DivisionForm({
 		register,
 		handleSubmit,
 		setValue,
+		watch,
 		reset,
 		formState: { errors },
 	} = useForm<DivisionFormData>({
@@ -75,7 +76,6 @@ export function DivisionForm({
 				director: division?.director ?? null,
 				approver: division?.approver ?? null,
 			});
-			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setDirectorPk(division?.director ?? null);
 			setApproverPk(division?.approver ?? null);
 		}
@@ -111,9 +111,14 @@ export function DivisionForm({
 		}
 	};
 
+	// eslint-disable-next-line react-hooks/incompatible-library
+	const nameValue = watch("name");
+	const slugValue = watch("slug");
+	const canSubmit = !isPending && !!nameValue?.trim() && !!slugValue?.trim();
+
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent className="sm:max-w-lg">
+			<SheetContent className="sm:max-w-2xl">
 				<SheetHeader>
 					<SheetTitle>
 						{isEditing ? "Edit Division" : "Add Division"}
@@ -188,7 +193,7 @@ export function DivisionForm({
 					<Button
 						type="submit"
 						form="division-form"
-						disabled={isPending}
+						disabled={!canSubmit}
 						className="w-full"
 					>
 						{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}

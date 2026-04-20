@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { FaUserPlus, FaMapMarkedAlt } from "react-icons/fa";
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
-import { FileText, Archive, Briefcase } from "lucide-react";
+import { FileText, Archive, Briefcase, Building } from "lucide-react";
 import { Navitar } from "./Navitar";
 import { Button } from "@/shared/components/ui/button";
 import { NavigationDropdownMenu } from "@/shared/components/navigation/NavigationDropdownMenu";
@@ -17,6 +17,11 @@ import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import HeaderContent from "./HeaderContent";
 import { ManageDropdownContent } from "./ManageDropdownContent";
 import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
+import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useCurrentUser } from "@/features/auth";
+
+/** Division slugs that grant AR admin access to key stakeholders */
+const AR_ENABLED_DIVISION_SLUGS = ["BCS"];
 
 /**
  * HamburgerMenuSheet - Mobile navigation menu
@@ -77,6 +82,18 @@ export const Header = observer(() => {
 	const [navitarOpen, setNavitarOpen] = useState(false);
 
 	const { data: myBusinessAreas } = useMyBusinessAreas();
+
+	const { data: currentUser } = useCurrentUser();
+	const { data: divisions } = useDivisions();
+
+	const isKeyStakeholder = useMemo(() => {
+		if (!currentUser || !divisions) return false;
+		return divisions.some(
+			(d) =>
+				AR_ENABLED_DIVISION_SLUGS.includes(d.slug) &&
+				d.key_stakeholder?.id === currentUser.id
+		);
+	}, [currentUser, divisions]);
 
 	// Close other menus when one opens
 	useEffect(() => {
@@ -267,28 +284,43 @@ export const Header = observer(() => {
 										label="Annual Report"
 										items={[
 											{
-												targetPath: "/reports/current",
+												targetPath: "/reports/details",
 												icon: (
 													<FileText className="size-4" aria-hidden="true" />
 												),
-												label: "Latest Report",
+												label: "Report Details",
 											},
 											{
 												targetPath: "/reports",
 												icon: <Archive className="size-4" aria-hidden="true" />,
 												label: "Published Reports",
 											},
-											...(myBusinessAreas && myBusinessAreas.length > 0
+											...((myBusinessAreas && myBusinessAreas.length > 0) ||
+											authStore.isSuperuser
 												? [
 														{
-															targetPath: "/reports/business-areas",
+															targetPath: "/reports/business-area",
 															icon: (
 																<Briefcase
 																	className="size-4"
 																	aria-hidden="true"
 																/>
 															),
-															label: "My Business Areas",
+															label: "My Business Area",
+														},
+													]
+												: []),
+											...(authStore.isSuperuser || isKeyStakeholder
+												? [
+														{
+															targetPath: "/reports/my-division",
+															icon: (
+																<Building
+																	className="size-4"
+																	aria-hidden="true"
+																/>
+															),
+															label: "My Division",
 														},
 													]
 												: []),
@@ -297,8 +329,8 @@ export const Header = observer(() => {
 									/>
 								</NavigationDropdownMenu>
 
-								{/* Manage Menu — superuser only */}
-								{authStore.isSuperuser && (
+								{/* Manage Menu — superuser or key stakeholder */}
+								{(authStore.isSuperuser || isKeyStakeholder) && (
 									<NavigationDropdownMenu
 										label="Manage"
 										open={manageOpen}
@@ -306,6 +338,7 @@ export const Header = observer(() => {
 									>
 										<ManageDropdownContent
 											onClose={() => setManageOpen(false)}
+											isKeyStakeholder={isKeyStakeholder}
 										/>
 									</NavigationDropdownMenu>
 								)}

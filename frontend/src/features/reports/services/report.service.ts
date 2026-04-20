@@ -33,10 +33,15 @@ export const getLatestYear = async (): Promise<IAnnualReport> => {
 };
 
 /**
- * Fetch the full latest annual report
+ * Fetch the full latest annual report, optionally filtered by division slug
  */
-export const getLatestReport = async (): Promise<IAnnualReport> => {
-	return apiClient.get<IAnnualReport>(REPORT_ENDPOINTS.LATEST_REPORT);
+export const getLatestReport = async (
+	divisionSlug?: string
+): Promise<IAnnualReport> => {
+	const endpoint = divisionSlug
+		? `${REPORT_ENDPOINTS.LATEST_REPORT}?division=${divisionSlug}`
+		: REPORT_ENDPOINTS.LATEST_REPORT;
+	return apiClient.get<IAnnualReport>(endpoint);
 };
 
 /**
@@ -54,36 +59,40 @@ export const getMyBusinessAreas = async (): Promise<IBusinessArea[]> => {
 };
 
 /**
- * Fetch latest active progress reports
+ * Fetch active progress reports, optionally scoped to a specific annual report
  */
-export const getLatestProgressReports = async (): Promise<
-	IARProgressReport[]
-> => {
-	return apiClient.get<IARProgressReport[]>(
-		REPORT_ENDPOINTS.LATEST_PROGRESS_REPORTS
-	);
+export const getLatestProgressReports = async (
+	reportId?: number
+): Promise<IARProgressReport[]> => {
+	const endpoint = reportId
+		? `${REPORT_ENDPOINTS.LATEST_PROGRESS_REPORTS}?report_id=${reportId}`
+		: REPORT_ENDPOINTS.LATEST_PROGRESS_REPORTS;
+	return apiClient.get<IARProgressReport[]>(endpoint);
 };
 
 /**
- * Fetch latest active student reports
+ * Fetch active student reports, optionally scoped to a specific annual report
  */
-export const getLatestStudentReports = async (): Promise<
-	IARStudentReport[]
-> => {
-	return apiClient.get<IARStudentReport[]>(
-		REPORT_ENDPOINTS.LATEST_STUDENT_REPORTS
-	);
+export const getLatestStudentReports = async (
+	reportId?: number
+): Promise<IARStudentReport[]> => {
+	const endpoint = reportId
+		? `${REPORT_ENDPOINTS.LATEST_STUDENT_REPORTS}?report_id=${reportId}`
+		: REPORT_ENDPOINTS.LATEST_STUDENT_REPORTS;
+	return apiClient.get<IARStudentReport[]>(endpoint);
 };
 
 /**
- * Fetch latest inactive reports (both student and progress)
+ * Fetch inactive reports (both student and progress), optionally scoped to a specific annual report
  */
-export const getLatestInactiveReports =
-	async (): Promise<IInactiveReportsResponse> => {
-		return apiClient.get<IInactiveReportsResponse>(
-			REPORT_ENDPOINTS.LATEST_INACTIVE_REPORTS
-		);
-	};
+export const getLatestInactiveReports = async (
+	reportId?: number
+): Promise<IInactiveReportsResponse> => {
+	const endpoint = reportId
+		? `${REPORT_ENDPOINTS.LATEST_INACTIVE_REPORTS}?report_id=${reportId}`
+		: REPORT_ENDPOINTS.LATEST_INACTIVE_REPORTS;
+	return apiClient.get<IInactiveReportsResponse>(endpoint);
+};
 
 /**
  * Update a single field on an annual report via partial PUT
@@ -111,6 +120,17 @@ export interface IReportMedia {
  */
 export const getLatestReportMedia = async (): Promise<IReportMedia[]> => {
 	return apiClient.get<IReportMedia[]>(REPORT_ENDPOINTS.LATEST_REPORT_MEDIA);
+};
+
+/**
+ * Fetch media items for a specific annual report by ID
+ */
+export const getReportMedia = async (
+	reportId: number
+): Promise<IReportMedia[]> => {
+	return apiClient.get<IReportMedia[]>(
+		REPORT_ENDPOINTS.REPORT_MEDIA_UPLOAD(reportId)
+	);
 };
 
 /**
@@ -147,8 +167,10 @@ export const deleteReportMedia = async (
 
 /** Lightweight PDF status (no base64 data) */
 export interface IReportPDFStatus {
-	has_pdf: boolean;
-	file: string | null;
+	has_draft: boolean;
+	has_published: boolean;
+	draft_file: string | null;
+	published_file: string | null;
 	report: {
 		id: number;
 		pdf_generation_in_progress: boolean;
@@ -169,7 +191,8 @@ export const getReportPDFStatus = async (
 /** PDF data returned when fetching a generated report PDF */
 export interface IReportPDFData {
 	pdf_data: string; // base64-encoded PDF
-	file: string; // relative path for download
+	draft_file: string | null;
+	published_file: string | null;
 	report: {
 		id: number;
 		pdf_generation_in_progress: boolean;
@@ -230,12 +253,19 @@ export const getSSEUrl = (pk: number): string => {
 	return `${base}/${REPORT_ENDPOINTS.GENERATION_PROGRESS(pk)}`;
 };
 
+/**
+ * Publish a draft PDF — promotes draft_file to published_file
+ */
+export const publishReportPDF = async (pk: number): Promise<void> => {
+	await apiClient.post(REPORT_ENDPOINTS.PUBLISH_PDF(pk));
+};
+
 /** Fetch reports that don't have a PDF yet (for the Add Official dropdown) */
 export const getReportsWithoutPDF = async (): Promise<IAnnualReport[]> => {
 	return apiClient.get<IAnnualReport[]>(REPORT_ENDPOINTS.REPORTS_WITHOUT_PDF);
 };
 
-/** Upload a PDF file for an existing report (Add Official) */
+/** Upload a PDF file for an existing report (Add Official — saves to published_file) */
 export const addReportPDF = async (
 	reportId: number,
 	file: File
@@ -290,6 +320,18 @@ export const deleteReportPDFFile = async (pdfId: number): Promise<void> => {
 /** Delete a legacy report PDF */
 export const deleteLegacyPDFFile = async (pdfId: number): Promise<void> => {
 	await apiClient.delete(REPORT_ENDPOINTS.UPDATE_LEGACY_PDF(pdfId));
+};
+
+/**
+ * Fetch reports for a specific division (or all if no slug provided)
+ */
+export const getReportsForDivision = async (
+	divisionSlug?: string
+): Promise<IAnnualReport[]> => {
+	const endpoint = divisionSlug
+		? `${REPORT_ENDPOINTS.REPORTS_LIST}?division=${divisionSlug}`
+		: REPORT_ENDPOINTS.REPORTS_LIST;
+	return apiClient.get<IAnnualReport[]>(endpoint);
 };
 
 /** Toggle the is_published flag on an annual report */

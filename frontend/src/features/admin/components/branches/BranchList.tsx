@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { UserLink } from "@/shared/components/user";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
 import { BranchForm } from "./BranchForm";
@@ -61,9 +63,24 @@ export function BranchList() {
 				error={error}
 				renderRow={(branch) => (
 					<tr key={branch.id} className="border-b last:border-b-0">
-						<td className="px-4 py-3">{branch.name}</td>
+						<td className="px-4 py-3">
+							<button
+								type="button"
+								className="text-blue-600 hover:underline cursor-pointer"
+								onClick={() => handleEdit(branch)}
+							>
+								{branch.name}
+							</button>
+						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{branch.manager ?? "—"}
+							{branch.manager ? (
+								<UserLink
+									userId={branch.manager.id}
+									displayName={getUserDisplayName(branch.manager)}
+								/>
+							) : (
+								"—"
+							)}
 						</td>
 						<td className="px-4 py-3 text-right">
 							<div className="flex justify-end gap-1">

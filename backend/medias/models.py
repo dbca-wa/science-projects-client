@@ -363,11 +363,32 @@ class LegacyAnnualReportPDF(CommonModel):
 
 class AnnualReportPDF(CommonModel):  # The latest pdf for a given annual report
     """
-    PDF for Report Media
+    PDF for Report Media — draft/published separation.
+
+    ``draft_file`` holds the latest generated PDF.
+    ``published_file`` holds the official published PDF.
+    The deprecated ``file`` field is retained temporarily for migration.
     """
 
-    file = models.FileField(upload_to="annual_reports/pdfs/", null=True, blank=True)
-    size = models.PositiveIntegerField(default=0)  # New size field
+    draft_file = models.FileField(
+        upload_to="annual_reports/drafts/",
+        null=True,
+        blank=True,
+        help_text="Latest generated draft PDF",
+    )
+    published_file = models.FileField(
+        upload_to="annual_reports/published/",
+        null=True,
+        blank=True,
+        help_text="Official published PDF",
+    )
+    file = models.FileField(
+        upload_to="annual_reports/pdfs/",
+        null=True,
+        blank=True,
+        help_text="Legacy single-file field, superseded by draft_file and published_file",
+    )
+    size = models.PositiveIntegerField(default=0)
     report = models.OneToOneField(
         "documents.AnnualReport",
         on_delete=models.CASCADE,
@@ -382,17 +403,41 @@ class AnnualReportPDF(CommonModel):  # The latest pdf for a given annual report
     )
 
     def save(self, *args, **kwargs):
-        # Validate file if it's new or has changed
-        if self.file and _check_file_changed(self):
+        # Validate draft_file if changed
+        if self.draft_file and _check_file_changed(self, file_field_name="draft_file"):
             sanitised_name, content = _validate_and_save_file(
-                self.file, validate_document_upload, max_size=ANNUAL_REPORT_PDF_MAX_SIZE
+                self.draft_file,
+                validate_document_upload,
+                max_size=ANNUAL_REPORT_PDF_MAX_SIZE,
             )
             _apply_content_hash_and_cleanup(
-                self, validated_content=content, sanitised_name=sanitised_name
+                self,
+                validated_content=content,
+                sanitised_name=sanitised_name,
+                file_field_name="draft_file",
             )
 
-        if self.file:
-            self.size = self.file.size
+        # Validate published_file if changed
+        if self.published_file and _check_file_changed(
+            self, file_field_name="published_file"
+        ):
+            sanitised_name, content = _validate_and_save_file(
+                self.published_file,
+                validate_document_upload,
+                max_size=ANNUAL_REPORT_PDF_MAX_SIZE,
+            )
+            _apply_content_hash_and_cleanup(
+                self,
+                validated_content=content,
+                sanitised_name=sanitised_name,
+                file_field_name="published_file",
+            )
+
+        # Track size from published file, falling back to draft
+        if self.published_file:
+            self.size = self.published_file.size
+        elif self.draft_file:
+            self.size = self.draft_file.size
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:

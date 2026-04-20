@@ -11,6 +11,14 @@ import {
 	SheetDescription,
 	SheetFooter,
 } from "@/shared/components/ui/sheet";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+	DialogFooter,
+} from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -46,6 +54,7 @@ export function AffiliationForm({
 		register,
 		handleSubmit,
 		reset,
+		watch,
 		formState: { errors },
 	} = useForm<AffiliationFormData>({
 		resolver: zodResolver(affiliationSchema),
@@ -54,7 +63,10 @@ export function AffiliationForm({
 		},
 	});
 
-	// Reset form when affiliation changes or sheet opens
+	// eslint-disable-next-line react-hooks/incompatible-library
+	const nameValue = watch("name");
+
+	// Reset form when affiliation changes or dialog/sheet opens
 	useEffect(() => {
 		if (open) {
 			reset({
@@ -78,51 +90,70 @@ export function AffiliationForm({
 		}
 	};
 
+	const formContent = (
+		<form
+			id="affiliation-form"
+			onSubmit={handleSubmit(onSubmit)}
+			className="space-y-6"
+		>
+			<div className="space-y-2">
+				<Label htmlFor="affiliation-name">Name</Label>
+				<Input
+					id="affiliation-name"
+					autoFocus
+					autoComplete="off"
+					placeholder="Enter affiliation name"
+					{...register("name")}
+				/>
+				{errors.name && (
+					<p className="text-sm text-destructive">{errors.name.message}</p>
+				)}
+			</div>
+		</form>
+	);
+
+	const submitButton = (
+		<Button
+			type="submit"
+			form="affiliation-form"
+			disabled={isPending || !nameValue?.trim()}
+			className="w-full"
+		>
+			{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+			{isEditing ? "Update" : "Create"}
+		</Button>
+	);
+
+	// Edit mode uses a Dialog (single field, more appropriate)
+	if (isEditing) {
+		return (
+			<Dialog open={open} onOpenChange={onOpenChange}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Edit Affiliation</DialogTitle>
+						<DialogDescription>
+							Update the affiliation details below.
+						</DialogDescription>
+					</DialogHeader>
+					{formContent}
+					<DialogFooter>{submitButton}</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
+	// Add mode uses a Sheet (consistent with other admin CRUDs)
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent className="sm:max-w-lg">
 				<SheetHeader>
-					<SheetTitle>
-						{isEditing ? "Edit Affiliation" : "Add Affiliation"}
-					</SheetTitle>
+					<SheetTitle>Add Affiliation</SheetTitle>
 					<SheetDescription>
-						{isEditing
-							? "Update the affiliation details below."
-							: "Fill in the details to create a new affiliation."}
+						Fill in the details to create a new affiliation.
 					</SheetDescription>
 				</SheetHeader>
-
-				<form
-					id="affiliation-form"
-					onSubmit={handleSubmit(onSubmit)}
-					className="space-y-6 px-4 py-4"
-				>
-					<div className="space-y-2">
-						<Label htmlFor="affiliation-name">Name</Label>
-						<Input
-							id="affiliation-name"
-							autoFocus
-							autoComplete="off"
-							placeholder="Enter affiliation name"
-							{...register("name")}
-						/>
-						{errors.name && (
-							<p className="text-sm text-destructive">{errors.name.message}</p>
-						)}
-					</div>
-				</form>
-
-				<SheetFooter className="px-4">
-					<Button
-						type="submit"
-						form="affiliation-form"
-						disabled={isPending}
-						className="w-full"
-					>
-						{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-						{isEditing ? "Update" : "Create"}
-					</Button>
-				</SheetFooter>
+				<div className="px-4 py-4">{formContent}</div>
+				<SheetFooter className="px-4">{submitButton}</SheetFooter>
 			</SheetContent>
 		</Sheet>
 	);

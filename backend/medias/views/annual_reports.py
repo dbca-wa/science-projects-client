@@ -50,7 +50,7 @@ class AnnualReportPDFs(APIView):
         file = request.FILES.get("file")
         report_id = request.data.get("report")
         data = {
-            "file": file,
+            "published_file": file,
             "report": report_id,
             "creator": request.user.pk,
         }

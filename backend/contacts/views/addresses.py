@@ -52,7 +52,8 @@ class AddressDetail(APIView):
 
     def put(self, request, pk):
         """Update address"""
-        serializer = AddressSerializer(data=request.data, partial=True)
+        address = ContactService.get_address(pk)
+        serializer = AddressSerializer(address, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 

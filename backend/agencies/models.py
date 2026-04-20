@@ -200,6 +200,20 @@ class Division(CommonModel):
         related_name="email_lists",
         help_text="Users who should receive email communications for this division",
     )
+    key_stakeholder = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="divisions_key_stakeholder",
+        help_text="The single key stakeholder for this division. Has document approval AND AR admin privileges.",
+    )
+    approvers = models.ManyToManyField(
+        "users.User",
+        blank=True,
+        related_name="divisions_approver",
+        help_text="Users who can approve documents at the directorate stage for this division's business areas.",
+    )
 
     def __str__(self) -> str:
         return f"{self.name}"

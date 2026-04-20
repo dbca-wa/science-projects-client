@@ -2,15 +2,15 @@ export interface IAnnualReport {
 	id: number;
 	year: number;
 	creator: number | null;
-	modifier: number | null;
+	division: { id: number; name: string } | null;
 	dm: string | null;
 	dm_sign: string | null;
 	service_delivery_intro: string | null;
 	research_intro: string | null;
 	student_intro: string | null;
 	publications: string | null;
-	date_open: string;
-	date_closed: string;
+	date_open: string | null;
+	date_closed: string | null;
 	pdf_generation_in_progress: boolean;
 	is_published: boolean;
 	created_at: string;
@@ -60,7 +60,6 @@ export interface IARProgressReport {
 			business_area?: { name: string } | null;
 		};
 		creator: number | null;
-		modifier: number | null;
 	};
 	report: number;
 	project: number;
@@ -92,7 +91,6 @@ export interface IARStudentReport {
 			business_area?: { name: string } | null;
 		};
 		creator: number | null;
-		modifier: number | null;
 	};
 	report: number;
 	project: number;

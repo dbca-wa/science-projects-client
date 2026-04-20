@@ -28,12 +28,16 @@ export const REPORT_ENDPOINTS = {
 	GENERATE_PDF: (pk: number) => `documents/reports/${pk}/generate_pdf`,
 	CANCEL_PDF_GEN: (pk: number) => `documents/reports/${pk}/cancel_doc_gen`,
 
+	// Publish draft → published
+	PUBLISH_PDF: (pk: number) => `documents/reports/${pk}/publish`,
+
 	// SSE progress stream
 	GENERATION_PROGRESS: (pk: number) =>
 		`documents/reports/${pk}/generation-progress`,
 
 	// Reports without a PDF (for Add Official dropdown)
 	REPORTS_WITHOUT_PDF: "documents/reports/withoutPDF",
+	REPORTS_LIST: "documents/reports",
 
 	// Upload endpoints
 	ADD_REPORT_PDF: "medias/report_pdfs",

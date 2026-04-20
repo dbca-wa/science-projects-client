@@ -26,7 +26,10 @@ export function ProjectStatusBadge({
 	>["variant"];
 
 	return (
-		<Badge className={cn(className)} variant={variant}>
+		<Badge
+			className={cn("shrink truncate max-w-full", className)}
+			variant={variant}
+		>
 			{displayText}
 		</Badge>
 	);

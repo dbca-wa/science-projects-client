@@ -44,7 +44,12 @@ export const createMockUser = (overrides?: Partial<IUserData>): IUserData => ({
 		id: 1,
 		name: "Test Branch",
 		agency: 1,
-		manager: 1,
+		manager: {
+			id: 1,
+			display_first_name: "Test",
+			display_last_name: "Manager",
+			email: "manager@example.com",
+		},
 	},
 	affiliation: {
 		id: 1,

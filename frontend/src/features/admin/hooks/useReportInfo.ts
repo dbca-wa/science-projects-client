@@ -19,7 +19,7 @@ export const useReportInfo = () =>
 	});
 
 /**
- * Create a new report info record
+ * Create a new report info record (year + division only)
  */
 export const useCreateReportInfo = () => {
 	const queryClient = useQueryClient();
@@ -28,6 +28,7 @@ export const useCreateReportInfo = () => {
 		mutationFn: createReportInfo,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
+			await queryClient.invalidateQueries({ queryKey: ["reports"] });
 			toast.success("Report info created successfully");
 		},
 		onError: (error: Error) => {

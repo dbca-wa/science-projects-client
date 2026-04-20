@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,7 +21,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { useCreateAddress, useUpdateAddress } from "../../hooks/useAddresses";
+import {
+	useAddresses,
+	useCreateAddress,
+	useUpdateAddress,
+} from "../../hooks/useAddresses";
 import { useBranches } from "../../hooks/useBranches";
 import type { IAddress } from "../../types/admin.types";
 
@@ -37,6 +41,13 @@ const addressSchema = z.object({
 
 type AddressFormData = z.infer<typeof addressSchema>;
 
+/** Extract the branch ID whether it's a plain number or a nested object */
+function getBranchId(branch: IAddress["branch"]): number | undefined {
+	if (branch == null) return undefined;
+	if (typeof branch === "object") return branch.id;
+	return branch;
+}
+
 interface AddressFormProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -49,6 +60,25 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 	const updateMutation = useUpdateAddress();
 	const isPending = createMutation.isPending || updateMutation.isPending;
 	const { data: branches = [] } = useBranches();
+	const { data: addresses = [] } = useAddresses();
+
+	// Extract the branch ID from the address (handles nested object from API)
+	const addressBranchId = getBranchId(address?.branch);
+
+	// Determine which branch IDs are already assigned to other addresses
+	const assignedBranchIds = useMemo(() => {
+		return new Set(
+			addresses
+				.filter((a) => !isEditing || a.id !== address?.id)
+				.map((a) => getBranchId(a.branch))
+				.filter((id): id is number => id != null)
+		);
+	}, [addresses, isEditing, address]);
+
+	// Sort branches alphabetically; show all branches in both modes
+	const sortedBranches = useMemo(() => {
+		return [...branches].sort((a, b) => a.name.localeCompare(b.name));
+	}, [branches]);
 
 	const {
 		register,
@@ -60,7 +90,7 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 	} = useForm<AddressFormData>({
 		resolver: zodResolver(addressSchema),
 		defaultValues: {
-			branch: address?.branch ?? undefined,
+			branch: addressBranchId,
 			street: address?.street ?? "",
 			zipcode: address?.zipcode ?? "",
 			city: address?.city ?? "",
@@ -77,7 +107,7 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 	useEffect(() => {
 		if (open) {
 			reset({
-				branch: address?.branch ?? undefined,
+				branch: addressBranchId,
 				street: address?.street ?? "",
 				zipcode: address?.zipcode ?? "",
 				city: address?.city ?? "",
@@ -86,7 +116,7 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 				pobox: address?.pobox ?? "",
 			});
 		}
-	}, [open, address, reset]);
+	}, [open, address, addressBranchId, reset]);
 
 	const handleBranchChange = (value: string) => {
 		setValue("branch", Number(value), { shouldValidate: true });
@@ -140,15 +170,24 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 							}
 							onValueChange={handleBranchChange}
 						>
-							<SelectTrigger id="address-branch">
+							<SelectTrigger id="address-branch" className="w-full">
 								<SelectValue placeholder="Select a branch" />
 							</SelectTrigger>
 							<SelectContent>
-								{branches.map((b) => (
-									<SelectItem key={b.id} value={String(b.id)}>
-										{b.name}
-									</SelectItem>
-								))}
+								{sortedBranches.map((b) => {
+									const isAssigned = assignedBranchIds.has(b.id);
+									return (
+										<SelectItem
+											key={b.id}
+											value={String(b.id)}
+											disabled={isAssigned}
+											className={isAssigned ? "opacity-50" : ""}
+										>
+											{b.name}
+											{isAssigned ? " (already assigned)" : ""}
+										</SelectItem>
+									);
+								})}
 							</SelectContent>
 						</Select>
 						{errors.branch && (
@@ -252,7 +291,7 @@ export function AddressForm({ open, onOpenChange, address }: AddressFormProps) {
 					<Button
 						type="submit"
 						form="address-form"
-						disabled={isPending}
+						disabled={isPending || selectedBranch == null}
 						className="w-full"
 					>
 						{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}

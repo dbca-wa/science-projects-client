@@ -39,17 +39,28 @@ const LatestReportPage = lazy(() => import("@/pages/reports/LatestReportPage"));
 const BusinessAreaLeadPage = lazy(
 	() => import("@/pages/reports/BusinessAreaLeadPage")
 );
+const BusinessAreaEditLeadPage = lazy(
+	() => import("@/pages/reports/BusinessAreaEditPage")
+);
+const MyDivisionPage = lazy(() => import("@/pages/reports/MyDivisionPage"));
 
 // Pages - Admin (lazy loaded)
 const BranchesPage = lazy(() => import("@/pages/admin/BranchesPage"));
 const AddressesPage = lazy(() => import("@/pages/admin/AddressesPage"));
 const AffiliationsPage = lazy(() => import("@/pages/admin/AffiliationsPage"));
 const BusinessAreasPage = lazy(() => import("@/pages/admin/BusinessAreasPage"));
+const BusinessAreaAddPage = lazy(
+	() => import("@/pages/admin/BusinessAreaAddPage")
+);
+const BusinessAreaEditPage = lazy(
+	() => import("@/pages/admin/BusinessAreaEditPage")
+);
 const DivisionsPage = lazy(() => import("@/pages/admin/DivisionsPage"));
 const LocationsPage = lazy(() => import("@/pages/admin/LocationsPage"));
 const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
+const EmailsPage = lazy(() => import("@/pages/admin/EmailsPage"));
 const BatchApproveOldPage = lazy(
 	() => import("@/pages/admin/BatchApproveOldPage")
 );
@@ -79,6 +90,7 @@ export interface RouteConfig {
 	component: ComponentType<any>; // eslint-disable-line
 	requiresAuth: boolean;
 	requiresAdmin?: boolean;
+	requiresKeyStakeholder?: boolean;
 
 	// UI
 	showInSidebar?: boolean;
@@ -382,14 +394,37 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		iconKey: "reports",
 		tooltipKey: "reports",
 		component: PublishedReportsPage,
+		componentProps: { selectedTab: "official" },
 		requiresAuth: true,
 		showInSidebar: false,
 		section: "ARAR",
 		layoutWrapper: "content",
 	},
 	{
-		name: "Latest Report",
-		path: "/reports/current",
+		name: "Published Reports - Drafts",
+		path: "/reports/drafts",
+		iconKey: "reports",
+		component: PublishedReportsPage,
+		componentProps: { selectedTab: "drafts" },
+		requiresAuth: true,
+		showInSidebar: false,
+		section: "ARAR",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Published Reports - Legacy",
+		path: "/reports/legacy",
+		iconKey: "reports",
+		component: PublishedReportsPage,
+		componentProps: { selectedTab: "legacy" },
+		requiresAuth: true,
+		showInSidebar: false,
+		section: "ARAR",
+		layoutWrapper: "content",
+	},
+	{
+		name: "Report Details",
+		path: "/reports/details",
 		iconKey: "reports",
 		component: LatestReportPage,
 		requiresAuth: true,
@@ -399,8 +434,8 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Latest Report - Media",
-		path: "/reports/current/media",
+		name: "Report Details - Media",
+		path: "/reports/details/media",
 		component: LatestReportPage,
 		componentProps: { selectedTab: "media" },
 		requiresAuth: true,
@@ -409,8 +444,8 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Latest Report - Pending",
-		path: "/reports/current/pending",
+		name: "Report Details - Pending",
+		path: "/reports/details/pending",
 		component: LatestReportPage,
 		componentProps: { selectedTab: "pending" },
 		requiresAuth: true,
@@ -419,8 +454,8 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Latest Report - Approved",
-		path: "/reports/current/approved",
+		name: "Report Details - Approved",
+		path: "/reports/details/approved",
 		component: LatestReportPage,
 		componentProps: { selectedTab: "approved" },
 		requiresAuth: true,
@@ -429,8 +464,8 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Latest Report - Print Preview",
-		path: "/reports/current/preview",
+		name: "Report Details - Print Preview",
+		path: "/reports/details/preview",
 		component: LatestReportPage,
 		componentProps: { selectedTab: "preview" },
 		requiresAuth: true,
@@ -439,10 +474,46 @@ export const REPORT_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "My Business Areas",
-		path: "/reports/business-areas",
+		name: "My Business Area - Problematic",
+		path: "/reports/business-area/problematic",
+		component: BusinessAreaLeadPage,
+		componentProps: { selectedTab: "problematic" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "My Business Area - Unapproved",
+		path: "/reports/business-area/unapproved",
+		component: BusinessAreaLeadPage,
+		componentProps: { selectedTab: "unapproved" },
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Edit My Business Area",
+		path: "/reports/business-area/edit",
+		component: BusinessAreaEditLeadPage,
+		requiresAuth: true,
+		requiresAdmin: false,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "My Business Area",
+		path: "/reports/business-area",
 		component: BusinessAreaLeadPage,
 		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "My Division",
+		path: "/reports/my-division",
+		component: MyDivisionPage,
+		requiresAuth: true,
+		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
@@ -454,6 +525,15 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		name: "Data Lists",
 		path: "/admin/data",
 		component: DataListsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Email",
+		path: "/admin/emails",
+		component: EmailsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,
@@ -481,6 +561,24 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		name: "Branches",
 		path: "/admin/branches",
 		component: BranchesPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Add Business Area",
+		path: "/admin/business-areas/add",
+		component: BusinessAreaAddPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Edit Business Area",
+		path: "/admin/business-areas/:id/edit",
+		component: BusinessAreaEditPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,
@@ -518,7 +616,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		path: "/admin/reports",
 		component: ReportInfoPage,
 		requiresAuth: true,
-		requiresAdmin: true,
+		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
@@ -536,7 +634,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		path: "/admin/batch-approve-old",
 		component: BatchApproveOldPage,
 		requiresAuth: true,
-		requiresAdmin: true,
+		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
@@ -545,7 +643,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		path: "/admin/batch-approve",
 		component: BatchApprovePage,
 		requiresAuth: true,
-		requiresAdmin: true,
+		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
@@ -554,7 +652,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		path: "/admin/new-cycle",
 		component: NewCyclePage,
 		requiresAuth: true,
-		requiresAdmin: true,
+		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},

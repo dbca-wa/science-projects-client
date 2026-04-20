@@ -1,15 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { UserLink } from "@/shared/components/user";
+import { useUserDetail } from "@/features/users/hooks";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
-import { BusinessAreaForm } from "./BusinessAreaForm";
 import {
 	useBusinessAreas,
 	useDeleteBusinessArea,
 } from "../../hooks/useBusinessAreas";
 import { filterByName, sortAlphabetically } from "../../utils/crud.utils";
 import type { IBusinessArea } from "../../types/admin.types";
+import type { IBusinessAreaUser } from "@/shared/types/org.types";
 import { getImageUrl } from "@/shared/utils/image.utils";
 
 const columns = [
@@ -33,13 +37,33 @@ const columns = [
 	{ header: "Change", accessor: "actions", className: "text-right" },
 ];
 
+/** Type guard to check if a user field is a resolved user object */
+function isUserObject(
+	value: IBusinessAreaUser | number | null | undefined
+): value is IBusinessAreaUser {
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof value === "object" &&
+		"id" in value
+	);
+}
+
+/** Renders a UserLink for a user ID by fetching user data */
+function UserIdLink({ userId }: { userId: number }) {
+	const { data: user } = useUserDetail(userId);
+
+	if (!user) return <span className="text-muted-foreground">Loading...</span>;
+
+	return <UserLink userId={userId} displayName={getUserDisplayName(user)} />;
+}
+
 export function BusinessAreaList() {
+	const navigate = useNavigate();
 	const { data: businessAreas = [], isLoading, error } = useBusinessAreas();
 	const deleteMutation = useDeleteBusinessArea();
 
 	const [searchTerm, setSearchTerm] = useState("");
-	const [formOpen, setFormOpen] = useState(false);
-	const [editingItem, setEditingItem] = useState<IBusinessArea | undefined>();
 	const [deleteTarget, setDeleteTarget] = useState<IBusinessArea | null>(null);
 
 	const filtered = sortAlphabetically(
@@ -48,13 +72,11 @@ export function BusinessAreaList() {
 	);
 
 	const handleAdd = () => {
-		setEditingItem(undefined);
-		setFormOpen(true);
+		navigate("/admin/business-areas/add");
 	};
 
 	const handleEdit = (item: IBusinessArea) => {
-		setEditingItem(item);
-		setFormOpen(true);
+		navigate(`/admin/business-areas/${item.id}/edit`);
 	};
 
 	const handleDeleteConfirm = () => {
@@ -73,6 +95,21 @@ export function BusinessAreaList() {
 			return getImageUrl(ba.image) ?? null;
 		}
 		return null;
+	};
+
+	/** Render a user field as a clickable UserLink or "—" fallback */
+	const renderUserLink = (
+		user: IBusinessAreaUser | number | null | undefined
+	) => {
+		if (isUserObject(user)) {
+			const name = getUserDisplayName(user);
+			if (!name) return "—";
+			return <UserLink userId={user.id} displayName={name} />;
+		}
+		if (typeof user === "number") {
+			return <UserIdLink userId={user} />;
+		}
+		return "—";
 	};
 
 	return (
@@ -105,13 +142,13 @@ export function BusinessAreaList() {
 						</td>
 						<td className="px-4 py-3">{ba.name}</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{ba.leader ?? "—"}
+							{renderUserLink(ba.leader)}
 						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{ba.finance_admin ?? "—"}
+							{renderUserLink(ba.finance_admin)}
 						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
-							{ba.data_custodian ?? "—"}
+							{renderUserLink(ba.data_custodian)}
 						</td>
 						<td className="px-4 py-3 text-right">
 							<div className="flex justify-end gap-1">
@@ -135,12 +172,6 @@ export function BusinessAreaList() {
 						</td>
 					</tr>
 				)}
-			/>
-
-			<BusinessAreaForm
-				open={formOpen}
-				onOpenChange={setFormOpen}
-				businessArea={editingItem}
 			/>
 
 			<DeleteConfirmDialog

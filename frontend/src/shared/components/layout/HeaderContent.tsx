@@ -17,12 +17,15 @@ import {
 	List,
 	CheckSquare,
 	RefreshCw,
+	Mail,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleDarkMode } from "./ToggleDarkMode";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
 import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
+import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useCurrentUser } from "@/features/auth";
 
 interface HeaderContentProps {
 	handleNavigation: (path: string) => void;
@@ -40,6 +43,13 @@ export default function HeaderContent({
 	const authStore = useAuthStore();
 	const { mutate: logout } = useLogout();
 	const { data: myBusinessAreas } = useMyBusinessAreas();
+	const { data: currentUser } = useCurrentUser();
+	const { data: divisions } = useDivisions();
+
+	const isKeyStakeholder = !!(
+		currentUser &&
+		divisions?.some((d) => d.key_stakeholder?.id === currentUser.id)
+	);
 
 	const navigateAndClose = (path: string) => {
 		onClose(); // Trigger close animation
@@ -181,11 +191,11 @@ export default function HeaderContent({
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/reports/current")}
+							onClick={() => navigateAndClose("/reports/details")}
 						>
 							<span className="flex items-center gap-3">
 								<FileText className="text-xl" aria-hidden="true" />
-								<span>Latest Report</span>
+								<span>Report Details</span>
 							</span>
 						</Button>
 						<Button
@@ -198,15 +208,28 @@ export default function HeaderContent({
 								<span>Published Reports</span>
 							</span>
 						</Button>
-						{myBusinessAreas && myBusinessAreas.length > 0 && (
+						{((myBusinessAreas && myBusinessAreas.length > 0) ||
+							authStore.isSuperuser) && (
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/reports/business-areas")}
+								onClick={() => navigateAndClose("/reports/business-area")}
 							>
 								<span className="flex items-center gap-3">
 									<Briefcase className="text-xl" aria-hidden="true" />
-									<span>My Business Areas</span>
+									<span>My Business Area</span>
+								</span>
+							</Button>
+						)}
+						{(authStore.isSuperuser || isKeyStakeholder) && (
+							<Button
+								variant="ghost"
+								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+								onClick={() => navigateAndClose("/reports/my-division")}
+							>
+								<span className="flex items-center gap-3">
+									<Building className="text-xl" aria-hidden="true" />
+									<span>My Division</span>
 								</span>
 							</Button>
 						)}
@@ -231,6 +254,16 @@ export default function HeaderContent({
 								<span className="flex items-center gap-3">
 									<Database className="text-xl" aria-hidden="true" />
 									<span>Data Lists</span>
+								</span>
+							</Button>
+							<Button
+								variant="ghost"
+								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+								onClick={() => navigateAndClose("/admin/emails")}
+							>
+								<span className="flex items-center gap-3">
+									<Mail className="text-xl" aria-hidden="true" />
+									<span>Email</span>
 								</span>
 							</Button>
 

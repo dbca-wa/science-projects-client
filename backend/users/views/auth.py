@@ -3,6 +3,9 @@ Authentication views
 """
 
 from django.conf import settings
+from django.middleware.csrf import get_token
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -12,10 +15,16 @@ from rest_framework.views import APIView
 from users.services import UserService
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class Login(APIView):
-    """User login"""
+    """User login — CSRF exempt since users may not have a token before authenticating"""
 
     permission_classes = [AllowAny]
+
+    def get(self, request):
+        """Return a fresh CSRF token cookie for the login form"""
+        get_token(request)
+        return Response({"ok": "CSRF cookie set"})
 
     def post(self, request):
         username = request.data.get("username")

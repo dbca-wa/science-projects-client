@@ -21,34 +21,46 @@ import {
 	useReportsWithoutPDF,
 	useAddReportPDF,
 } from "@/features/reports/hooks/useReports";
+import { useDivisions } from "@/features/admin/hooks/useDivisions";
 
 interface AddOfficialPDFModalProps {
 	isOpen: boolean;
 	onClose: () => void;
+	defaultDivisionId?: number | "all";
 }
 
 /** Modal for uploading a finalised PDF to an existing annual report */
 export function AddOfficialPDFModal({
 	isOpen,
 	onClose,
+	defaultDivisionId,
 }: AddOfficialPDFModalProps) {
+	const [selectedDivision, setSelectedDivision] = useState<string>(
+		defaultDivisionId && defaultDivisionId !== "all"
+			? String(defaultDivisionId)
+			: ""
+	);
 	const [selectedReportId, setSelectedReportId] = useState<string>("");
 	const [file, setFile] = useState<File | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
+	const { data: divisions } = useDivisions();
 	const { data: reportsWithoutPDF, isLoading: reportsLoading } =
 		useReportsWithoutPDF();
 	const addPDFMutation = useAddReportPDF();
+
+	// Filter reports by selected division
+	const filteredReports = reportsWithoutPDF?.filter((r) => {
+		if (!selectedDivision) return true;
+		const div = r.division as { id: number } | null;
+		return div?.id === Number(selectedDivision);
+	});
 
 	const handleSubmit = () => {
 		if (!selectedReportId || !file) return;
 		addPDFMutation.mutate(
 			{ reportId: Number(selectedReportId), file },
-			{
-				onSuccess: () => {
-					resetAndClose();
-				},
-			}
+			{ onSuccess: () => resetAndClose() }
 		);
 	};
 
@@ -67,12 +79,35 @@ export function AddOfficialPDFModal({
 				<DialogHeader>
 					<DialogTitle>Add Official PDF</DialogTitle>
 					<DialogDescription>
-						Upload a finalised PDF for an annual report. This will mark it as an
-						official published report.
+						Upload a finalised PDF for an annual report. This will be saved as
+						the official published version.
 					</DialogDescription>
 				</DialogHeader>
 
 				<div className="mt-4 space-y-4">
+					{/* Division selector */}
+					<div className="space-y-2">
+						<Label htmlFor="division-select">Division</Label>
+						<Select
+							value={selectedDivision}
+							onValueChange={(v) => {
+								setSelectedDivision(v);
+								setSelectedReportId("");
+							}}
+						>
+							<SelectTrigger id="division-select" className="w-full">
+								<SelectValue placeholder="Select a division" />
+							</SelectTrigger>
+							<SelectContent>
+								{divisions?.map((d) => (
+									<SelectItem key={d.id} value={String(d.id)}>
+										{d.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+
 					{/* Report year selector */}
 					<div className="space-y-2">
 						<Label htmlFor="report-select">Report Year</Label>
@@ -90,7 +125,7 @@ export function AddOfficialPDFModal({
 									<SelectValue placeholder="Select a report year" />
 								</SelectTrigger>
 								<SelectContent>
-									{reportsWithoutPDF?.map((report) => (
+									{filteredReports?.map((report) => (
 										<SelectItem key={report.id} value={String(report.id)}>
 											{report.year}
 										</SelectItem>
