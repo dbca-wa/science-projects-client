@@ -8,7 +8,7 @@ from datetime import date
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Max, Q
+from django.db.models import Q
 from django.http import StreamingHttpResponse
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
@@ -194,12 +194,11 @@ class GetLatestReportYear(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        latest_year = AnnualReport.objects.aggregate(Max("year"))["year__max"]
+        latest_report = (
+            AnnualReport.objects.select_related("division").order_by("-year").first()
+        )
 
-        if latest_year is not None:
-            latest_report = AnnualReport.objects.select_related("division").get(
-                year=latest_year
-            )
+        if latest_report is not None:
             serializer = AnnualReportSerializer(
                 latest_report,
                 context={"request": request},
