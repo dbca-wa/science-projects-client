@@ -111,12 +111,16 @@ class AnnualReportGenerationService:
 
     @classmethod
     def release_generation_lock(cls, report_pk: int) -> None:
-        """Release the generation flag. Called in finally blocks."""
+        """Release the generation flag atomically.
+
+        Only releases if the flag is still True — prevents a cancelled thread
+        from revoking a lock acquired by a newer generation thread.
+        """
         from ..models import AnnualReport
 
-        AnnualReport.objects.filter(pk=report_pk).update(
-            pdf_generation_in_progress=False
-        )
+        AnnualReport.objects.filter(
+            pk=report_pk, pdf_generation_in_progress=True
+        ).update(pdf_generation_in_progress=False)
 
     # endregion =================================================================
 
