@@ -258,7 +258,30 @@ describe("canApproveAtStage", () => {
 		const user = createMockUser({
 			affiliation: { id: 1, name: "Directorate", slug: "directorate" },
 		});
-		const project = createMockProject();
+		const project = createMockProject({
+			business_area: {
+				id: 1,
+				name: "BCS",
+				slug: "bcs",
+				is_active: true,
+				focus: "",
+				introduction: "",
+				image: null,
+				division: {
+					id: 1,
+					name: "Biodiversity and Conservation Science",
+					slug: "bcs",
+					director: 99,
+					approver: 99,
+					key_stakeholder: {
+						id: user.id,
+						name: "Test User",
+						email: "test@dbca.wa.gov.au",
+					},
+					approvers: [],
+				},
+			},
+		});
 		const doc = createMockDocument({
 			projectLead: true,
 			businessAreaLead: true,

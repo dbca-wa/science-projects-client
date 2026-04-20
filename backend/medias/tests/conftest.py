@@ -48,7 +48,7 @@ def annual_report_media(db, annual_report, user, mock_image):
 def annual_report_pdf(db, annual_report, user, mock_file):
     """Provide annual report PDF"""
     return AnnualReportPDF.objects.create(
-        file=mock_file,
+        draft_file=mock_file,
         report=annual_report,
         creator=user,
     )
