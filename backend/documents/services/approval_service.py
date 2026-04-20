@@ -149,9 +149,16 @@ class ApprovalService:
         settings.LOGGER.info(f"{sender} is sending back document {document}: {reason}")
 
         # Determine current stage and reset appropriate flags
+        # Fully approved: all flags granted — reset directorate to send back to stage 3
+        if (
+            document.project_lead_approval_granted
+            and document.business_area_lead_approval_granted
+            and document.directorate_approval_granted
+        ):
+            document.directorate_approval_granted = False
         # Stage 3 (directorate pending): BA lead granted, directorate not yet granted
         # Send back to stage 2: reset BA lead only, keep project lead
-        if (
+        elif (
             document.business_area_lead_approval_granted
             and not document.directorate_approval_granted
         ):

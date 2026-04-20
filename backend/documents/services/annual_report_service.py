@@ -626,20 +626,19 @@ class AnnualReportGenerationService:
         """
         from ..models import AnnualReport
 
-        # Close stale DB connection so the thread gets a fresh one
-        connection.close()
-
         timings = {}
         total_start = time.perf_counter()
 
-        settings.LOGGER.info(
-            f"Starting PDF generation for report {report_pk} (genkind={genkind})"
-        )
-
-        # Clear any stale progress from a previous generation
-        cls.clear_progress(report_pk)
-
         try:
+            # Close stale DB connection so the thread gets a fresh one
+            connection.close()
+
+            settings.LOGGER.info(
+                f"Starting PDF generation for report {report_pk} (genkind={genkind})"
+            )
+
+            # Clear any stale progress from a previous generation
+            cls.clear_progress(report_pk)
             # ── Phase 1: Media Fetch ──────────────────────────────────────
             cls.set_progress(
                 report_pk,
