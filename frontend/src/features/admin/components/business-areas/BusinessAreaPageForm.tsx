@@ -595,7 +595,7 @@ export function BusinessAreaPageForm({
 							setValue("leader", pk, { shouldValidate: true });
 						}}
 						preselectedUserPk={leaderPk ?? undefined}
-						isEditable={isEditing}
+						isEditable
 						excludeUserIds={excludedLeaderIds}
 						label="Leader"
 						placeholder="Search for a user"
@@ -613,7 +613,7 @@ export function BusinessAreaPageForm({
 							setValue("finance_admin", pk, { shouldValidate: true });
 						}}
 						preselectedUserPk={financeAdminPk ?? undefined}
-						isEditable={isEditing}
+						isEditable
 						label="Finance Admin"
 						placeholder="Search for a user"
 						helperText="The finance administrator (optional)."
@@ -630,7 +630,7 @@ export function BusinessAreaPageForm({
 							setValue("data_custodian", pk, { shouldValidate: true });
 						}}
 						preselectedUserPk={dataCustodianPk ?? undefined}
-						isEditable={isEditing}
+						isEditable
 						label="Data Custodian"
 						placeholder="Search for a user"
 						helperText="The data custodian (optional)."

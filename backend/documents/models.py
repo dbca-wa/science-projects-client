@@ -57,7 +57,6 @@ class AnnualReport(CommonModel):
         help_text=(
             "The publication year of this report with four digits, e.g. 2014 for the ARAR 2013-2014"
         ),
-        unique=True,
         validators=[MinValueValidator(2013)],
     )
 
@@ -140,6 +139,12 @@ class AnnualReport(CommonModel):
     class Meta:
         verbose_name = "Annual Report"
         verbose_name_plural = "Annual Reports"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["year", "division"],
+                name="unique_annual_report_per_year_per_division",
+            ),
+        ]
 
 
 # endregion ==================================

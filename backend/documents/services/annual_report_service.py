@@ -635,14 +635,20 @@ class AnnualReportGenerationService:
             )
             phase_start = time.perf_counter()
 
-            report = AnnualReport.objects.only(
-                "pk",
-                "year",
-                "dm",
-                "dm_sign",
-                "service_delivery_intro",
-                "publications",
-            ).get(pk=report_pk)
+            report = (
+                AnnualReport.objects.select_related("division")
+                .only(
+                    "pk",
+                    "year",
+                    "dm",
+                    "dm_sign",
+                    "service_delivery_intro",
+                    "publications",
+                    "division_id",
+                    "division__slug",
+                )
+                .get(pk=report_pk)
+            )
 
             participating_reports = cls.get_reports_by_genkind(report, genkind)
             participating_externals = cls.get_external_projects(report, genkind)
