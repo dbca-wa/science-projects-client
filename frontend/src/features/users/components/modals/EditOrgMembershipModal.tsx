@@ -187,7 +187,7 @@ export const EditOrgMembershipModal = observer(
 															key={ba.id}
 															value={ba.id?.toString() || "0"}
 														>
-															{ba.name}
+															{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
 														</SelectItem>
 													))}
 												</SelectContent>

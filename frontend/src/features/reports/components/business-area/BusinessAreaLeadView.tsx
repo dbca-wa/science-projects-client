@@ -217,7 +217,7 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h1 className="text-2xl font-bold">My Business Area</h1>
 					<p className="text-muted-foreground mt-1">
@@ -233,13 +233,13 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 							navigate("/reports/business-area", { replace: true });
 						}}
 					>
-						<SelectTrigger className="w-[250px]">
+						<SelectTrigger className="w-full sm:w-[250px]">
 							<SelectValue placeholder="Select business area" />
 						</SelectTrigger>
 						<SelectContent>
 							{businessAreas.map((ba) => (
 								<SelectItem key={ba.id} value={ba.id!.toString()}>
-									{ba.name}
+									{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
 								</SelectItem>
 							))}
 						</SelectContent>

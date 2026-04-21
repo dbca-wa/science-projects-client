@@ -309,11 +309,11 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 
 	return (
 		<>
-			<div className="mb-4 flex items-center justify-between">
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 					Published Reports
 				</h1>
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
 					<Select
 						value={
 							selectedDivision === "all" ? "all" : selectedDivision.toString()
@@ -322,7 +322,10 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 							setSelectedDivision(v === "all" ? "all" : Number(v))
 						}
 					>
-						<SelectTrigger className="w-48" aria-label="Filter by division">
+						<SelectTrigger
+							className="w-full sm:w-48"
+							aria-label="Filter by division"
+						>
 							<SelectValue placeholder="All Divisions" />
 						</SelectTrigger>
 						<SelectContent>

@@ -19,14 +19,14 @@ export function CrudHeader({
 	extraActions,
 }: CrudHeaderProps) {
 	return (
-		<div className="flex items-center justify-between">
+		<div className="flex items-center justify-between gap-3">
 			<h1 className="text-2xl font-bold tracking-tight">
 				{title}{" "}
 				<span className="text-muted-foreground text-lg font-normal">
 					({itemCount})
 				</span>
 			</h1>
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-2 shrink-0">
 				{extraActions}
 				<Button
 					onClick={onAddClick}

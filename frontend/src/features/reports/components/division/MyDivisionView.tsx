@@ -101,11 +101,11 @@ export const MyDivisionView = observer(function MyDivisionView() {
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 					{pageTitle}
 				</h1>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 shrink-0">
 					{availableDivisions.length > 1 && (
 						<Select
 							value={selectedSlug ?? ""}
@@ -114,7 +114,7 @@ export const MyDivisionView = observer(function MyDivisionView() {
 								setSelectedYear(null);
 							}}
 						>
-							<SelectTrigger className="w-[140px]">
+							<SelectTrigger className="w-[120px]">
 								<SelectValue placeholder="Select division" />
 							</SelectTrigger>
 							<SelectContent>
@@ -131,7 +131,7 @@ export const MyDivisionView = observer(function MyDivisionView() {
 							value={selectedYear?.toString() ?? ""}
 							onValueChange={(v) => setSelectedYear(Number(v))}
 						>
-							<SelectTrigger className="w-[140px]">
+							<SelectTrigger className="w-[120px]">
 								<SelectValue placeholder="Select year" />
 							</SelectTrigger>
 							<SelectContent>
@@ -281,19 +281,19 @@ const ActionCard = ({
 	};
 
 	return (
-		<div className="rounded-lg border bg-card p-5 space-y-3">
+		<div className="flex flex-col rounded-lg border bg-card p-5 h-full">
 			<div className="flex items-center gap-3">
 				{icon}
 				<h3 className="font-semibold text-gray-900 dark:text-gray-100">
 					{title}
 				</h3>
 			</div>
-			<p className="text-sm text-muted-foreground">{description}</p>
+			<p className="mt-3 text-sm text-muted-foreground flex-1">{description}</p>
 			<Button
 				onClick={handleClick}
 				disabled={isPending}
 				variant="default"
-				className="w-full"
+				className="mt-3 w-full"
 			>
 				{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
 				{buttonLabel}

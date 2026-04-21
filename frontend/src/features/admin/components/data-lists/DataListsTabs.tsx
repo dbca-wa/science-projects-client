@@ -5,6 +5,13 @@ import {
 	TabsTrigger,
 	TabsContent,
 } from "@/shared/components/ui/tabs";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import { UnapprovedDocsTab } from "./UnapprovedDocsTab";
 import { ProblematicProjectsTab } from "./ProblematicProjectsTab";
 import { EmailListTab } from "./EmailListTab";
@@ -12,11 +19,23 @@ import { StaffProfileListTab } from "./StaffProfileListTab";
 import { StaffUsersTab } from "./StaffUsersTab";
 
 const TAB_CONFIG = [
-	{ value: "unapproved-docs", label: "Unapproved Docs" },
-	{ value: "problematic-projects", label: "Problematic Projects" },
-	{ value: "email-list", label: "Email List" },
-	{ value: "staff-profiles", label: "Staff Profile List" },
-	{ value: "staff-users", label: "Staff Users" },
+	{
+		value: "unapproved-docs",
+		label: "Unapproved Docs",
+		shortLabel: "Unapproved",
+	},
+	{
+		value: "problematic-projects",
+		label: "Problematic Projects",
+		shortLabel: "Problematic",
+	},
+	{ value: "email-list", label: "Email List", shortLabel: "Email List" },
+	{
+		value: "staff-profiles",
+		label: "Staff Profile List",
+		shortLabel: "Profiles",
+	},
+	{ value: "staff-users", label: "Staff Users", shortLabel: "Staff Users" },
 ] as const;
 
 type TabValue = (typeof TAB_CONFIG)[number]["value"];
@@ -25,7 +44,7 @@ type TabValue = (typeof TAB_CONFIG)[number]["value"];
  * Tabbed interface for admin data lists.
  * Tabs are lazily loaded on first visit and retained to avoid re-fetching.
  */
-export function DataListsTabs() {
+export const DataListsTabs = () => {
 	const [activeTab, setActiveTab] = useState<TabValue>("unapproved-docs");
 	const [loadedTabs, setLoadedTabs] = useState(
 		new Set<TabValue>(["unapproved-docs"])
@@ -44,13 +63,31 @@ export function DataListsTabs() {
 
 	return (
 		<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-			<TabsList className="w-full flex flex-wrap">
+			{/* Desktop tabs */}
+			<TabsList className="hidden w-full justify-start md:inline-flex">
 				{TAB_CONFIG.map((tab) => (
 					<TabsTrigger key={tab.value} value={tab.value}>
-						{tab.label}
+						<span className="lg:hidden">{tab.shortLabel}</span>
+						<span className="hidden lg:inline">{tab.label}</span>
 					</TabsTrigger>
 				))}
 			</TabsList>
+
+			{/* Mobile dropdown */}
+			<div className="md:hidden">
+				<Select value={activeTab} onValueChange={handleTabChange}>
+					<SelectTrigger className="w-full">
+						<SelectValue placeholder="Select a tab" />
+					</SelectTrigger>
+					<SelectContent>
+						{TAB_CONFIG.map((tab) => (
+							<SelectItem key={tab.value} value={tab.value}>
+								{tab.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
 
 			<TabsContent value="unapproved-docs">
 				{loadedTabs.has("unapproved-docs") && <UnapprovedDocsTab />}
@@ -69,4 +106,4 @@ export function DataListsTabs() {
 			</TabsContent>
 		</Tabs>
 	);
-}
+};

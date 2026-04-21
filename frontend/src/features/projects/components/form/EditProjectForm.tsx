@@ -452,7 +452,9 @@ export const EditProjectForm = observer(function EditProjectForm({
 														if (!ba.id) return null;
 														return (
 															<SelectItem key={ba.id} value={ba.id.toString()}>
-																{ba.name}
+																{ba.is_active
+																	? ba.name
+																	: `[INACTIVE] ${ba.name}`}
 															</SelectItem>
 														);
 													})}

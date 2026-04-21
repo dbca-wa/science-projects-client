@@ -173,12 +173,12 @@ const LatestReportPage = observer(function LatestReportPage({
 	if (!report) {
 		return (
 			<div className="space-y-6">
-				<div className="flex items-center justify-between">
+				<div className="flex flex-wrap items-center justify-between gap-3">
 					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 						{selectedDivisionSlug} Annual Report
 					</h1>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 shrink-0">
 						{divisions && divisions.length > 0 && (
 							<Select
 								value={selectedDivisionSlug}
@@ -186,7 +186,7 @@ const LatestReportPage = observer(function LatestReportPage({
 									reportDetailsStore.setDivisionSlug(slug)
 								}
 							>
-								<SelectTrigger className="w-[200px]">
+								<SelectTrigger className="w-[120px]">
 									<SelectValue placeholder="Select division" />
 								</SelectTrigger>
 								<SelectContent>
@@ -247,18 +247,18 @@ const LatestReportPage = observer(function LatestReportPage({
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 					{selectedDivisionSlug} Annual Report ({fyString})
 				</h1>
 
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 shrink-0">
 					{divisions && divisions.length > 0 && (
 						<Select
 							value={selectedDivisionSlug}
 							onValueChange={(slug) => reportDetailsStore.setDivisionSlug(slug)}
 						>
-							<SelectTrigger className="w-[200px]">
+							<SelectTrigger className="w-[120px]">
 								<SelectValue placeholder="Select division" />
 							</SelectTrigger>
 							<SelectContent>
@@ -275,7 +275,7 @@ const LatestReportPage = observer(function LatestReportPage({
 							value={selectedYear?.toString() ?? ""}
 							onValueChange={(v) => reportDetailsStore.setYear(Number(v))}
 						>
-							<SelectTrigger className="w-[140px]">
+							<SelectTrigger className="w-[120px]">
 								<SelectValue placeholder="Select year" />
 							</SelectTrigger>
 							<SelectContent>
