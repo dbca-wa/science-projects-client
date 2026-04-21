@@ -67,8 +67,8 @@ export const DataListsTabs = () => {
 			<TabsList className="hidden w-full justify-start md:inline-flex">
 				{TAB_CONFIG.map((tab) => (
 					<TabsTrigger key={tab.value} value={tab.value}>
-						<span className="lg:hidden">{tab.shortLabel}</span>
-						<span className="hidden lg:inline">{tab.label}</span>
+						<span className="xl:hidden">{tab.shortLabel}</span>
+						<span className="hidden xl:inline">{tab.label}</span>
 					</TabsTrigger>
 				))}
 			</TabsList>
