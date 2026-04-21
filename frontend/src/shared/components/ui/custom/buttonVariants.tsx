@@ -16,15 +16,15 @@ export const buttonVariants = cva(
 				ghost:
 					"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
 				link: "text-primary underline-offset-4 hover:underline",
-				// Action button variants - prominent but refined design
+				// Action button variants - clean, borderless design
 				"action-green":
-					"bg-green-600 text-white border-2 border-green-700 hover:bg-green-700 hover:border-green-800 font-semibold shadow-md hover:shadow-lg transition-all dark:bg-green-700 dark:border-green-800 dark:hover:bg-green-800 dark:hover:border-green-900",
+					"bg-green-600 text-white hover:bg-green-700 font-semibold shadow-sm hover:shadow-md transition-all dark:bg-green-700 dark:hover:bg-green-800",
 				"action-blue":
-					"bg-blue-600 text-white border-2 border-blue-700 hover:bg-blue-700 hover:border-blue-800 font-semibold shadow-md hover:shadow-lg transition-all dark:bg-blue-700 dark:border-blue-800 dark:hover:bg-blue-800 dark:hover:border-blue-900",
+					"bg-blue-600 text-white hover:bg-blue-700 font-semibold shadow-sm hover:shadow-md transition-all dark:bg-blue-700 dark:hover:bg-blue-800",
 				"action-orange":
-					"bg-orange-600 text-white border-2 border-orange-700 hover:bg-orange-700 hover:border-orange-800 font-semibold shadow-md hover:shadow-lg transition-all dark:bg-orange-700 dark:border-orange-800 dark:hover:bg-orange-800 dark:hover:border-orange-900",
+					"bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm hover:shadow-md transition-all dark:bg-orange-700 dark:hover:bg-orange-800",
 				"action-red":
-					"bg-red-600 text-white border-2 border-red-700 hover:bg-red-700 hover:border-red-800 font-semibold shadow-md hover:shadow-lg transition-all dark:bg-red-700 dark:border-red-800 dark:hover:bg-red-800 dark:hover:border-red-900",
+					"bg-red-600 text-white hover:bg-red-700 font-semibold shadow-sm hover:shadow-md transition-all dark:bg-red-700 dark:hover:bg-red-800",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",

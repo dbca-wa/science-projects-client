@@ -76,6 +76,17 @@ class NewCycleOpen(APIView):
                 status=HTTP_404_NOT_FOUND,
             )
 
+        # Optionally scope to a specific division
+        division_slug = request.data.get("division")
+        if division_slug:
+            division_report = (
+                AnnualReport.objects.filter(division__slug=division_slug)
+                .order_by("-year")
+                .first()
+            )
+            if division_report:
+                last_report = division_report
+
         # Get eligible science/core function projects
         if should_update:
             eligible_projects = Project.objects.filter(
@@ -116,6 +127,15 @@ class NewCycleOpen(APIView):
         eligible_student_projects = eligible_student_projects.exclude(
             documents__student_report_details__report__year=last_report.year
         )
+
+        # Filter by division if specified
+        if division_slug and last_report.division:
+            eligible_projects = eligible_projects.filter(
+                business_area__division=last_report.division
+            )
+            eligible_student_projects = eligible_student_projects.filter(
+                business_area__division=last_report.division
+            )
 
         # Combine querysets
         all_eligible_projects = eligible_projects | eligible_student_projects
@@ -310,6 +330,8 @@ class NewCycleOpen(APIView):
             # Get business area leaders
             recipients_list = []
             bas = BusinessArea.objects.all()
+            if division_slug and last_report.division:
+                bas = bas.filter(division=last_report.division)
             for ba in bas:
                 ba_lead = ba.leader
                 if ba_lead and ba_lead.is_active and ba_lead.is_staff:

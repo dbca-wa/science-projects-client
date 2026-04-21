@@ -183,10 +183,22 @@ export function isUserAtApprovalStage(
 			return false;
 
 		case "directorate":
-			// Check if user is directorate member (affiliation is "Directorate")
-			if ("affiliation" in user && user.affiliation) {
-				const affiliation = user.affiliation;
-				return affiliation.slug === "directorate";
+			// Check if user is the division's key_stakeholder or an approver
+			if (project.business_area?.division) {
+				const division = project.business_area.division;
+				if (typeof division === "object" && division !== null) {
+					// Key stakeholder can approve
+					if (
+						division.key_stakeholder &&
+						division.key_stakeholder.id === user.id
+					) {
+						return true;
+					}
+					// Approvers can approve
+					if (division.approvers?.some((a) => a.id === user.id)) {
+						return true;
+					}
+				}
 			}
 			return false;
 

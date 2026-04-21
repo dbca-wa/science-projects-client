@@ -187,7 +187,8 @@ class AnnualReportPDFAdmin(admin.ModelAdmin):
     list_display = [
         "pk",
         "report",
-        "file",
+        "draft_file",
+        "published_file",
         "size_in_mb",
         "creator",
     ]
@@ -213,21 +214,61 @@ class AnnualReportPDFAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("report", "creator")
 
-    actions = ["recalculate_photo_sizes"]
+    actions = ["recalculate_photo_sizes", "verify_pdf_field_assignments"]
 
-    @admin.action(description="Recalculate photo sizes")
+    @admin.action(description="Recalculate file sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
             print("PLEASE SELECT ONLY ONE")
             return
         updated_count = 0
-        all_photos = AnnualReportPDF.objects.all()  # Get all ProjectPhoto instances
+        all_photos = AnnualReportPDF.objects.all()
         for photo in all_photos:
-            if photo.file:
-                photo.size = photo.file.size
+            target = photo.published_file or photo.draft_file
+            if target:
+                photo.size = target.size
                 photo.save()
                 updated_count += 1
-        self.message_user(request, f"Successfully updated {updated_count} photos.")
+        self.message_user(request, f"Successfully updated {updated_count} records.")
+
+    @admin.action(description="Verify PDF field assignments")
+    def verify_pdf_field_assignments(self, request, selected):
+        """Report counts and verify physical files exist at referenced paths."""
+        import os
+
+        from django.conf import settings
+
+        all_pdfs = AnnualReportPDF.objects.select_related("report").all()
+        has_draft = 0
+        has_published = 0
+        missing_files = []
+
+        for pdf in all_pdfs:
+            if pdf.draft_file:
+                has_draft += 1
+                path = os.path.join(settings.MEDIA_ROOT, pdf.draft_file.name)
+                if not os.path.exists(path):
+                    missing_files.append(
+                        f"pk={pdf.pk} draft_file: {pdf.draft_file.name}"
+                    )
+            if pdf.published_file:
+                has_published += 1
+                path = os.path.join(settings.MEDIA_ROOT, pdf.published_file.name)
+                if not os.path.exists(path):
+                    missing_files.append(
+                        f"pk={pdf.pk} published_file: {pdf.published_file.name}"
+                    )
+
+        msg = (
+            f"Draft: {has_draft}, Published: {has_published}, "
+            f"Total: {all_pdfs.count()}"
+        )
+        if missing_files:
+            msg += f" | Missing files: {len(missing_files)} — {', '.join(missing_files[:5])}"
+        else:
+            msg += " | All physical files verified."
+
+        self.message_user(request, msg)
 
 
 @admin.register(LegacyAnnualReportPDF)

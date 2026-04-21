@@ -110,8 +110,12 @@ export const useCaretakerPermissions = () => {
 		(businessArea: IBusinessArea | undefined): boolean => {
 			if (!businessArea?.leader) return false;
 
-			// leader is a number (user ID)
-			return canActForUser(businessArea.leader);
+			// leader can be a number or an IBusinessAreaUser object
+			const leaderId =
+				typeof businessArea.leader === "object"
+					? businessArea.leader.id
+					: businessArea.leader;
+			return canActForUser(leaderId);
 		},
 		[canActForUser]
 	);

@@ -3,12 +3,16 @@ Annual report views
 """
 
 import json
+import time
+from datetime import date
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Max, Q
+from django.db.models import Q
+from django.http import StreamingHttpResponse
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -16,6 +20,7 @@ from rest_framework.status import (
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 )
 from rest_framework.views import APIView
@@ -34,6 +39,7 @@ from ..serializers import (
     StudentReportSerializer,
     TinyAnnualReportSerializer,
 )
+from ..services.annual_report_service import AnnualReportGenerationService
 
 
 class Reports(APIView):
@@ -42,26 +48,93 @@ class Reports(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """List annual reports"""
+        """List annual reports, optionally filtered by division slug"""
         settings.LOGGER.info(f"{request.user} is viewing reports")
-        all_reports = AnnualReport.objects.all()
+        queryset = AnnualReport.objects.select_related("division").all()
+
+        division_slug = request.query_params.get("division")
+        if division_slug:
+            queryset = queryset.filter(division__slug=division_slug)
+
         serializer = TinyAnnualReportSerializer(
-            all_reports,
+            queryset.order_by("-year"),
             many=True,
             context={"request": request},
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
     def post(self, request):
-        """Create annual report"""
+        """Create annual report — requires year and division only"""
         settings.LOGGER.info(f"{request.user} is creating a report")
-        serializer = AnnualReportSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            settings.LOGGER.error(f"{serializer.errors}")
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        year = request.data.get("year")
+        division_id = request.data.get("division")
 
-        report = serializer.save()
+        if not year:
+            return Response({"error": "Year is required."}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            year = int(year)
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Year must be a valid number."}, status=HTTP_400_BAD_REQUEST
+            )
+
+        # Normalise division_id: treat 0, empty string, None as "no division"
+        if division_id:
+            try:
+                division_id = int(division_id)
+                if division_id <= 0:
+                    division_id = None
+            except (ValueError, TypeError):
+                division_id = None
+        else:
+            division_id = None
+
+        # Validate division exists if provided
+        if division_id:
+            from agencies.models import Division
+
+            if not Division.objects.filter(pk=division_id).exists():
+                return Response(
+                    {"error": "Division not found."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+            # Non-superusers can only create reports for divisions they are key_stakeholder of
+            if not request.user.is_superuser:
+                division = Division.objects.get(pk=division_id)
+                if division.key_stakeholder != request.user:
+                    return Response(
+                        {
+                            "error": "You can only create reports for divisions you are the key stakeholder of."
+                        },
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+
+        # Validate year+division uniqueness
+        existing = AnnualReport.objects.filter(year=year)
+        if division_id:
+            existing = existing.filter(division_id=division_id)
+        else:
+            existing = existing.filter(division__isnull=True)
+
+        if existing.exists():
+            return Response(
+                {
+                    "error": f"An annual report for year {year} already exists for this division."
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        report = AnnualReport.objects.create(
+            year=year,
+            division_id=division_id,
+            creator=request.user,
+            date_open=date(year - 1, 7, 1),
+            date_closed=date(year, 6, 30),
+        )
+
         return Response(
             TinyAnnualReportSerializer(report).data, status=HTTP_201_CREATED
         )
@@ -75,7 +148,7 @@ class ReportDetail(APIView):
     def get(self, request, pk):
         """Get annual report by ID"""
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             raise NotFound
 
@@ -85,7 +158,7 @@ class ReportDetail(APIView):
     def put(self, request, pk):
         """Update annual report"""
         try:
-            report = AnnualReport.objects.get(pk=pk)
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
             raise NotFound
 
@@ -134,10 +207,11 @@ class GetLatestReportYear(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        latest_year = AnnualReport.objects.aggregate(Max("year"))["year__max"]
+        latest_report = (
+            AnnualReport.objects.select_related("division").order_by("-year").first()
+        )
 
-        if latest_year is not None:
-            latest_report = AnnualReport.objects.get(year=latest_year)
+        if latest_report is not None:
             serializer = AnnualReportSerializer(
                 latest_report,
                 context={"request": request},
@@ -220,26 +294,34 @@ class GetAvailableReportYearsForProgressReport(APIView):
 
 
 class GetWithoutPDFs(APIView):
-    """Get annual reports without PDFs"""
+    """Get annual reports with draft PDFs but no published PDF (Drafts tab)"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        reports_without_pdfs = AnnualReport.objects.exclude(pdf__isnull=False)
-
-        if reports_without_pdfs:
-            serializer = TinyAnnualReportSerializer(
-                reports_without_pdfs,
-                context={"request": request},
-                many=True,
+        reports_drafts_only = (
+            AnnualReport.objects.select_related("division")
+            .filter(
+                pdf__draft_file__isnull=False,
             )
-            return Response(serializer.data, status=HTTP_200_OK)
-        else:
-            return Response([], status=HTTP_200_OK)
+            .exclude(
+                pdf__draft_file="",
+            )
+            .filter(
+                Q(pdf__published_file__isnull=True) | Q(pdf__published_file=""),
+            )
+        )
+
+        serializer = TinyAnnualReportSerializer(
+            reports_drafts_only,
+            context={"request": request},
+            many=True,
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class GetReportPDF(APIView):
-    """Get annual report PDF"""
+    """Get annual report PDF data (reads from draft_file for preview)"""
 
     permission_classes = [IsAuthenticated]
 
@@ -251,7 +333,7 @@ class GetReportPDF(APIView):
 
         serializer = AnnualReportPDFSerializer(report_pdf_obj)
 
-        # Convert serialized data to dictionary
+        # Convert serialised data to dictionary
         serialized_data = json.loads(json.dumps(serializer.data, cls=DjangoJSONEncoder))
 
         # Include PDF data in response
@@ -259,13 +341,110 @@ class GetReportPDF(APIView):
         return Response(serialized_data, status=HTTP_200_OK)
 
 
+class GetReportPDFStatus(APIView):
+    """Lightweight endpoint returning PDF metadata without the base64 data"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            report = AnnualReport.objects.get(pk=pk)
+        except AnnualReport.DoesNotExist:
+            raise NotFound
+
+        try:
+            pdf_obj = AnnualReportPDF.objects.get(report=pk)
+            has_draft = bool(pdf_obj.draft_file)
+            has_published = bool(pdf_obj.published_file)
+            draft_url = pdf_obj.draft_file.url if pdf_obj.draft_file else None
+            published_url = (
+                pdf_obj.published_file.url if pdf_obj.published_file else None
+            )
+        except AnnualReportPDF.DoesNotExist:
+            has_draft = False
+            has_published = False
+            draft_url = None
+            published_url = None
+
+        return Response(
+            {
+                "has_draft": has_draft,
+                "has_published": has_published,
+                "draft_file": draft_url,
+                "published_file": published_url,
+                "report": {
+                    "id": report.pk,
+                    "pdf_generation_in_progress": report.pdf_generation_in_progress,
+                },
+            },
+            status=HTTP_200_OK,
+        )
+
+
+class PublishReportPDF(APIView):
+    """Promote draft PDF to published for an annual report."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            report = AnnualReport.objects.select_related("division").get(pk=pk)
+        except AnnualReport.DoesNotExist:
+            raise NotFound(f"Annual report {pk} not found")
+
+        # Permission: superuser or key stakeholder of the report's division
+        if not request.user.is_superuser:
+            if (
+                not report.division
+                or not hasattr(report.division, "key_stakeholder")
+                or report.division.key_stakeholder != request.user
+            ):
+                return Response(
+                    {"error": "Permission denied"}, status=HTTP_403_FORBIDDEN
+                )
+
+        try:
+            pdf = report.pdf
+        except AnnualReportPDF.DoesNotExist:
+            return Response(
+                {"error": "No PDF record for this report"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        if not pdf.draft_file:
+            return Response(
+                {"error": "No draft PDF to publish"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        # Copy draft content to published with a clean filename (no _DRAFT suffix)
+        from django.core.files.base import ContentFile
+
+        draft_content = pdf.draft_file.read()
+        published_name = (
+            pdf.draft_file.name.replace("_DRAFT", "")
+            .replace("drafts/", "published/")
+            .split("/")[-1]  # Just the filename
+        )
+        pdf.published_file.save(published_name, ContentFile(draft_content))
+
+        report.is_published = True
+        report.save(update_fields=["is_published"])
+
+        return Response({"status": "published"}, status=HTTP_200_OK)
+
+
 class GetWithPDFs(APIView):
-    """Get annual reports with PDFs"""
+    """Get annual reports with published PDFs (Official tab)"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        reports_with_pdfs = AnnualReport.objects.exclude(pdf__isnull=True)
+        reports_with_pdfs = (
+            AnnualReport.objects.select_related("division")
+            .filter(
+                pdf__published_file__isnull=False,
+            )
+            .exclude(pdf__published_file="")
+        )
         serializer = TinyAnnualReportSerializer(
             reports_with_pdfs,
             context={"request": request},
@@ -295,7 +474,11 @@ class GetCompletedReports(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        completed_reports = AnnualReport.objects.filter(is_published=True).all()
+        completed_reports = (
+            AnnualReport.objects.select_related("division")
+            .filter(is_published=True)
+            .all()
+        )
         if completed_reports:
             serializer = AnnualReportSerializer(
                 completed_reports,
@@ -307,129 +490,214 @@ class GetCompletedReports(APIView):
             return Response([], status=HTTP_200_OK)
 
 
-class BeginAnnualReportDocGeneration(APIView):
-    """Begin annual report document generation"""
+class EventStreamRenderer(BaseRenderer):
+    """Renderer that accepts text/event-stream for SSE endpoints."""
+
+    media_type = "text/event-stream"
+    format = "text"
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return data
+
+
+class GenerationProgressSSE(APIView):
+    """SSE endpoint streaming annual report generation progress"""
 
     permission_classes = [IsAuthenticated]
+    renderer_classes = [EventStreamRenderer]
 
-    def post(self, request, pk):
+    def get(self, request, pk):
+        """Stream generation progress as Server-Sent Events"""
         try:
             AnnualReport.objects.get(pk=pk)
         except AnnualReport.DoesNotExist:
-            raise NotFound
+            raise NotFound(f"Annual report {pk} not found")
 
-        # Placeholder for PDF generation logic
-        # This will be implemented when PDF service is fully integrated
-        return Response({"status": "generation_started"}, status=HTTP_200_OK)
+        response = StreamingHttpResponse(
+            self._sse_generator(pk),
+            content_type="text/event-stream",
+        )
+        response["Cache-Control"] = "no-cache"
+        response["X-Accel-Buffering"] = "no"
+        return response
+
+    def _sse_generator(self, report_pk):
+        """Generator yielding SSE-formatted progress events."""
+        # Initial check — yield idle if no generation active
+        progress = AnnualReportGenerationService.get_progress(report_pk)
+        if progress is None:
+            try:
+                report = AnnualReport.objects.get(pk=report_pk)
+                if not report.pdf_generation_in_progress:
+                    yield self._format_sse({"status": "idle"})
+                    return
+            except AnnualReport.DoesNotExist:
+                yield self._format_sse({"status": "idle"})
+                return
+
+        # Polling loop
+        while True:
+            progress = AnnualReportGenerationService.get_progress(report_pk)
+            if progress:
+                yield self._format_sse(progress)
+                if progress.get("status") in ("completed", "error"):
+                    AnnualReportGenerationService.clear_progress(report_pk)
+                    return
+            else:
+                # No progress data — check if generation is still flagged
+                try:
+                    report = AnnualReport.objects.get(pk=report_pk)
+                    if not report.pdf_generation_in_progress:
+                        yield self._format_sse({"status": "idle"})
+                        AnnualReportGenerationService.clear_progress(report_pk)
+                        return
+                except AnnualReport.DoesNotExist:
+                    yield self._format_sse({"status": "idle"})
+                    return
+            time.sleep(1)
+
+    @staticmethod
+    def _format_sse(data: dict) -> str:
+        """Format a dict as an SSE data line."""
+        return f"data: {json.dumps(data)}\n\n"
 
 
 class LatestYearsProgressReports(APIView):
-    """Get latest year's approved progress reports"""
+    """Get approved progress reports for a specific annual report"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        settings.LOGGER.info("Getting Approved Progress Reports for current year")
+        report_id = request.query_params.get("report_id")
 
-        # Get the latest year's report
-        latest_report = AnnualReport.objects.order_by("-year").first()
-        if latest_report:
-            # Get progress report documents for approved projects
-            active_docs = ProgressReport.objects.filter(
-                Q(report=latest_report)
-                & Q(document__status="approved")
-                & Q(
-                    project__business_area__division__name="Biodiversity and Conservation Science"
+        if report_id:
+            try:
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
                 )
-            ).exclude(Q(project__business_area__division__name__isnull=True))
-
-            serializer = ProgressReportSerializer(
-                active_docs, many=True, context={"request": request}
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
+            except AnnualReport.DoesNotExist:
+                return Response(status=HTTP_404_NOT_FOUND)
         else:
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
+
+        if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
+
+        # Filter by the report's division if it has one
+        active_docs = ProgressReport.objects.filter(
+            Q(report=target_report) & Q(document__status="approved")
+        )
+        if target_report.division:
+            active_docs = active_docs.filter(
+                project__business_area__division=target_report.division
+            )
+
+        serializer = ProgressReportSerializer(
+            active_docs, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class LatestYearsStudentReports(APIView):
-    """Get latest year's approved student reports"""
+    """Get approved student reports for a specific annual report"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        settings.LOGGER.info("Getting Approved Student Reports for current year")
+        report_id = request.query_params.get("report_id")
 
-        # Get the latest year's report
-        latest_report = AnnualReport.objects.order_by("-year").first()
-        if latest_report:
-            # Get student report documents for approved projects
-            active_docs = StudentReport.objects.filter(
-                Q(report=latest_report)
-                & Q(document__status="approved")
-                & Q(
-                    project__business_area__division__name="Biodiversity and Conservation Science"
+        if report_id:
+            try:
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
                 )
-            ).exclude(Q(project__business_area__division__name__isnull=True))
-
-            serializer = StudentReportSerializer(
-                active_docs, many=True, context={"request": request}
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
+            except AnnualReport.DoesNotExist:
+                return Response(status=HTTP_404_NOT_FOUND)
         else:
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
+
+        if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
+
+        # Filter by the report's division if it has one
+        active_docs = StudentReport.objects.filter(
+            Q(report=target_report) & Q(document__status="approved")
+        )
+        if target_report.division:
+            active_docs = active_docs.filter(
+                project__business_area__division=target_report.division
+            )
+
+        serializer = StudentReportSerializer(
+            active_docs, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class LatestYearsInactiveReports(APIView):
-    """Get latest year's inactive (non-approved) reports"""
+    """Get inactive (non-approved) reports for a specific annual report"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Get the latest year's report
-        latest_report = AnnualReport.objects.order_by("-year").first()
-        if latest_report:
-            # Get non-approved student reports
-            inactive_srs = (
-                StudentReport.objects.filter(
-                    Q(report=latest_report)
-                    & Q(
-                        project__business_area__division__name="Biodiversity and Conservation Science"
-                    )
+        report_id = request.query_params.get("report_id")
+
+        if report_id:
+            try:
+                target_report = AnnualReport.objects.select_related("division").get(
+                    pk=report_id
                 )
-                .exclude(document__status__in=["approved"])
-                .exclude(Q(project__business_area__division__name__isnull=True))
-                .all()
-            )
-
-            # Get non-approved progress reports
-            inactive_prs = (
-                ProgressReport.objects.filter(
-                    Q(report=latest_report)
-                    & Q(
-                        project__business_area__division__name="Biodiversity and Conservation Science"
-                    )
-                )
-                .exclude(document__status__in=["approved"])
-                .exclude(Q(project__business_area__division__name__isnull=True))
-                .all()
-            )
-
-            sr_serializer = StudentReportSerializer(
-                inactive_srs, many=True, context={"request": request}
-            )
-            pr_serializer = ProgressReportSerializer(
-                inactive_prs, many=True, context={"request": request}
-            )
-
-            return Response(
-                {
-                    "student_reports": sr_serializer.data,
-                    "progress_reports": pr_serializer.data,
-                },
-                status=HTTP_200_OK,
-            )
+            except AnnualReport.DoesNotExist:
+                return Response(status=HTTP_404_NOT_FOUND)
         else:
+            target_report = (
+                AnnualReport.objects.select_related("division")
+                .order_by("-year")
+                .first()
+            )
+
+        if not target_report:
             return Response(status=HTTP_404_NOT_FOUND)
+
+        # Base querysets scoped to the target report
+        sr_qs = StudentReport.objects.filter(Q(report=target_report)).exclude(
+            document__status__in=["approved"]
+        )
+        pr_qs = ProgressReport.objects.filter(Q(report=target_report)).exclude(
+            document__status__in=["approved"]
+        )
+
+        # Filter by the report's division if it has one
+        if target_report.division:
+            sr_qs = sr_qs.filter(
+                project__business_area__division=target_report.division
+            )
+            pr_qs = pr_qs.filter(
+                project__business_area__division=target_report.division
+            )
+
+        sr_serializer = StudentReportSerializer(
+            sr_qs, many=True, context={"request": request}
+        )
+        pr_serializer = ProgressReportSerializer(
+            pr_qs, many=True, context={"request": request}
+        )
+
+        return Response(
+            {
+                "student_reports": sr_serializer.data,
+                "progress_reports": pr_serializer.data,
+            },
+            status=HTTP_200_OK,
+        )
 
 
 class FullLatestReport(APIView):
@@ -438,7 +706,14 @@ class FullLatestReport(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        latest_report = AnnualReport.objects.order_by("-year").first()
+        queryset = AnnualReport.objects.select_related("division").all()
+
+        # Filter by division slug if provided
+        division_slug = request.query_params.get("division")
+        if division_slug:
+            queryset = queryset.filter(division__slug=division_slug)
+
+        latest_report = queryset.order_by("-year").first()
         if latest_report:
             serializer = AnnualReportSerializer(
                 latest_report,

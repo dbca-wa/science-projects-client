@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { StaffUserForm } from "@/features/users/components/StaffUserForm";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 
 /**
  * UserCreateStaffPage
@@ -13,6 +14,7 @@ import { PageTransition } from "@/shared/components/PageTransition";
  * - Breadcrumb navigation
  */
 const UserCreateStaffPage = () => {
+	useDocumentTitle("Add DBCA User");
 	const navigate = useNavigate();
 
 	const handleCancel = () => {

@@ -43,12 +43,20 @@ class AnnualReport(CommonModel):
         null=True,
     )
 
+    division = models.ForeignKey(
+        "agencies.Division",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="annual_reports",
+        help_text="The division this annual report belongs to.",
+    )
+
     year = models.PositiveIntegerField(
         verbose_name="Report Year",
         help_text=(
             "The publication year of this report with four digits, e.g. 2014 for the ARAR 2013-2014"
         ),
-        unique=True,
         validators=[MinValueValidator(2013)],
     )
 
@@ -95,14 +103,24 @@ class AnnualReport(CommonModel):
     )
 
     date_open = models.DateField(
+        blank=True,
+        null=True,
         help_text="The date at which submissions are opened for this report",
     )
 
     date_closed = models.DateField(
+        blank=True,
+        null=True,
         help_text="The date at which submissions are closed for this report",
     )
 
     pdf_generation_in_progress = models.BooleanField(default=False)
+
+    pdf_generation_progress = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Progress data for PDF generation (phase, percentage, etc.)",
+    )
 
     is_published = models.BooleanField(
         default=False,
@@ -127,6 +145,12 @@ class AnnualReport(CommonModel):
     class Meta:
         verbose_name = "Annual Report"
         verbose_name_plural = "Annual Reports"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["year", "division"],
+                name="unique_annual_report_per_year_per_division",
+            ),
+        ]
 
 
 # endregion ==================================

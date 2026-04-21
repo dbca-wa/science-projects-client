@@ -5,6 +5,7 @@ import { useProject } from "@/features/projects/hooks/useProject";
 import { useUpdateProject } from "@/features/projects/hooks/useUpdateProject";
 import { useCurrentUser } from "@/features/auth";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { canEditProject } from "@/features/projects/utils/permissions";
 import { EditProjectForm } from "@/features/projects/components/form/EditProjectForm";
 import type { EditProjectFormData } from "@/features/projects/types/project.types";
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 import { PageTransition } from "@/shared/components/PageTransition";
 
 const EditProjectPage = observer(() => {
+	useDocumentTitle("Edit Project");
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const { data, isLoading, error } = useProject(id);

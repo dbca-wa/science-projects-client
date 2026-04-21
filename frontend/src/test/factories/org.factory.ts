@@ -20,7 +20,12 @@ export const createMockBranch = (overrides?: Partial<IBranch>): IBranch => ({
 	id: 1,
 	name: "Test Branch",
 	agency: 1,
-	manager: 1,
+	manager: {
+		id: 1,
+		display_first_name: "Test",
+		display_last_name: "Manager",
+		email: "manager@example.com",
+	},
 	...overrides,
 });
 

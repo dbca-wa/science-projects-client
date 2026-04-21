@@ -41,10 +41,7 @@ vi.mock("@/app/stores/store-context", () => ({
 		state: {
 			searchTerm: "",
 			filters: {
-				onlyExternal: false,
-				onlyStaff: false,
-				onlySuperuser: false,
-				onlyBALead: false,
+				roleFilter: "all",
 				businessArea: undefined,
 			},
 			currentPage: 1,

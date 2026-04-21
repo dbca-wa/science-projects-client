@@ -23,7 +23,11 @@ interface AdjustImageModalProps {
 	onCropComplete: (croppedFile: File) => void;
 	fileName?: string;
 	defaultAspect?: number;
-	variant?: "avatar" | "project" | "banner" | "default";
+	variant?: "avatar" | "project" | "banner" | "report" | "default";
+	/** Label for report media previews (e.g. "Service Delivery Structure") */
+	reportSectionLabel?: string;
+	/** Preview layout type for report media */
+	reportPreviewType?: "chapter" | "banner-full" | "banner-cropped" | "chart";
 }
 
 /**
@@ -39,6 +43,8 @@ export const AdjustImageModal = ({
 	fileName = "cropped-image.jpg",
 	defaultAspect = 1,
 	variant = "default",
+	reportSectionLabel,
+	reportPreviewType,
 }: AdjustImageModalProps) => {
 	const imgRef = useRef<HTMLImageElement>(null);
 	const previewSectionRef = useRef<HTMLDivElement>(null);
@@ -146,6 +152,8 @@ export const AdjustImageModal = ({
 							variant={variant}
 							previewUrls={previewUrls}
 							completedCrop={!!cropState.completedCrop}
+							reportSectionLabel={reportSectionLabel}
+							reportPreviewType={reportPreviewType}
 						/>
 					</div>
 				</div>

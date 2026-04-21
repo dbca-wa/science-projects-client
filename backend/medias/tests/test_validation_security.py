@@ -50,13 +50,13 @@ class TestFileValidationOnUpdate:
     @pytest.mark.integration
     def test_validation_runs_on_pdf_update(self, annual_report, user, mock_file, db):
         """Test validation runs when PDF file is changed on existing instance"""
-        # Create initial PDF
+        # Create initial PDF using draft_file (the active validated field)
         pdf = AnnualReportPDF.objects.create(
-            file=mock_file,
+            draft_file=mock_file,
             report=annual_report,
             creator=user,
         )
-        pdf.file.name
+        pdf.draft_file.name
 
         # Create a new PDF file
         new_pdf = SimpleUploadedFile(
@@ -70,8 +70,8 @@ class TestFileValidationOnUpdate:
             "medias.models._validate_and_save_file",
             return_value=("new_test.pdf", b"new pdf content"),
         ) as mock_validate:
-            # Update the file
-            pdf.file = new_pdf
+            # Update the draft_file
+            pdf.draft_file = new_pdf
             pdf.save()
 
             # Verify validation was called (security fix working)
@@ -215,7 +215,7 @@ class TestFileSizeLimits:
         ):
             with pytest.raises(FileValidationError, match="File size exceeds 100 MB"):
                 AnnualReportPDF.objects.create(
-                    file=large_pdf,
+                    draft_file=large_pdf,
                     report=annual_report,
                     creator=user,
                 )

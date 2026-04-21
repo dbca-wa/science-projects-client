@@ -174,7 +174,12 @@ class TestTinyBranchSerializer:
         assert serializer.data["id"] == branch.id
         assert serializer.data["name"] == branch.name
         assert serializer.data["agency"] == branch.agency.id
-        assert serializer.data["manager"] == branch.manager.id
+        # Manager is now a nested user object
+        manager_data = serializer.data["manager"]
+        assert manager_data["id"] == branch.manager.id
+        assert "display_first_name" in manager_data
+        assert "display_last_name" in manager_data
+        assert "email" in manager_data
 
 
 class TestMiniBranchSerializer:
@@ -231,6 +236,66 @@ class TestBusinessAreaSerializer:
         assert ba.name == "New BA"
         assert ba.agency == agency
 
+    @pytest.mark.integration
+    def test_validate_leader_rejects_duplicate(
+        self, business_area, agency, division, db
+    ):
+        """Test that a user who already leads a BA cannot lead another"""
+        # Arrange — business_area fixture already has a leader
+        data = {
+            "agency": agency.id,
+            "name": "Second BA",
+            "slug": "second-ba",
+            "division": division.id,
+            "leader": business_area.leader.id,
+        }
+
+        # Act
+        serializer = BusinessAreaSerializer(data=data)
+
+        # Assert
+        assert not serializer.is_valid()
+        assert "leader" in serializer.errors
+        assert (
+            "This user is already the leader of another business area."
+            in serializer.errors["leader"]
+        )
+
+    @pytest.mark.integration
+    def test_validate_leader_allows_current_ba_leader_on_update(
+        self, business_area, db
+    ):
+        """Test that the current BA's leader is allowed when updating that BA"""
+        # Arrange
+        data = {
+            "name": "Updated Name",
+            "leader": business_area.leader.id,
+        }
+
+        # Act
+        serializer = BusinessAreaSerializer(business_area, data=data, partial=True)
+
+        # Assert
+        assert serializer.is_valid()
+
+    @pytest.mark.integration
+    def test_validate_leader_allows_null(self, agency, division, db):
+        """Test that a null leader is accepted"""
+        # Arrange
+        data = {
+            "agency": agency.id,
+            "name": "No Leader BA",
+            "slug": "no-leader-ba",
+            "division": division.id,
+            "leader": None,
+        }
+
+        # Act
+        serializer = BusinessAreaSerializer(data=data)
+
+        # Assert
+        assert serializer.is_valid()
+
 
 class TestTinyBusinessAreaSerializer:
     """Tests for TinyBusinessAreaSerializer"""
@@ -245,7 +310,15 @@ class TestTinyBusinessAreaSerializer:
         assert serializer.data["id"] == business_area.id
         assert serializer.data["name"] == business_area.name
         assert serializer.data["slug"] == business_area.slug
-        assert serializer.data["leader"] == business_area.leader.id
+        leader_data = serializer.data["leader"]
+        assert leader_data["id"] == business_area.leader.id
+        assert (
+            leader_data["display_first_name"] == business_area.leader.display_first_name
+        )
+        assert (
+            leader_data["display_last_name"] == business_area.leader.display_last_name
+        )
+        assert leader_data["email"] == business_area.leader.email
         assert "division" in serializer.data
 
 

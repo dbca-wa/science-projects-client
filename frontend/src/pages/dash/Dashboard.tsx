@@ -1,5 +1,6 @@
 import { Children, useState, useEffect, useRef } from "react";
 import { useCurrentUser } from "@/features/auth";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import {
 	useAdminTasks,
 	useEndorsementTasks,
@@ -43,6 +44,7 @@ const ActionCardGrid = ({ children }: { children: React.ReactNode }) => {
  * Dashboard - Main landing page after authentication
  */
 const Dashboard = observer(() => {
+	useDocumentTitle("Dashboard");
 	const { data: user, isLoading } = useCurrentUser();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();

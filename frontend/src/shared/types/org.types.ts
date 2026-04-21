@@ -21,12 +21,18 @@ export interface IAffiliation {
 
 // BRANCH ============================================================================
 
+export interface IBranchManager {
+	id: number;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	email: string;
+}
+
 export interface IBranch {
 	id: number;
-
 	agency: number;
 	name: string;
-	manager: number;
+	manager: IBranchManager | null;
 }
 
 // SERVICE ============================================================================
@@ -54,6 +60,14 @@ export interface IBusinessAreaUpdate {
 	data_custodian?: number;
 }
 
+/** Lightweight user object returned by TinyBusinessAreaSerializer */
+export interface IBusinessAreaUser {
+	id: number;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	email: string;
+}
+
 export interface IBusinessArea {
 	agency?: number;
 	id?: number;
@@ -64,10 +78,10 @@ export interface IBusinessArea {
 	focus: string;
 	introduction: string;
 	image: BusinessAreaImage | string | null;
-	leader?: number;
+	leader?: IBusinessAreaUser | number | null;
 	caretaker?: number;
-	finance_admin?: number;
-	data_custodian?: number;
+	finance_admin?: IBusinessAreaUser | number | null;
+	data_custodian?: IBusinessAreaUser | number | null;
 	project_count?: number;
 }
 
@@ -101,14 +115,28 @@ export interface IDivision {
 	director: number;
 	approver: number;
 	directorate_email_list?: IEmailListUser[];
+	key_stakeholder: IEmailListUser | null;
+	approvers: IEmailListUser[];
 }
 
 // ADDRESS ============================================================================
 
+/**
+ * Nested branch object returned by TinyAddressSerializer.
+ * The address list endpoint returns branch as a nested object,
+ * while the form sends branch as a plain ID.
+ */
+export interface IAddressBranch {
+	id: number;
+	name: string;
+	agency: number;
+	manager: IBranchManager | null;
+}
+
 export interface IAddress {
 	id: number;
-	agency?: number;
-	branch?: number;
+	agency?: number | IAgency | null;
+	branch?: number | IAddressBranch | null;
 	street: string;
 	suburb?: string;
 	city: string;

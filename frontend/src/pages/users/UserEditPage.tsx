@@ -6,6 +6,7 @@ import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { UserEditForm } from "@/features/users/components/UserEditForm";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 
 /**
  * UserEditPage
@@ -18,6 +19,7 @@ import { PageTransition } from "@/shared/components/PageTransition";
  * - Loading and error states
  */
 const UserEditPage = () => {
+	useDocumentTitle("Edit User");
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const userId = Number(id);

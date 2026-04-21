@@ -15,17 +15,20 @@ from .admin import (  # ProjectDocumentComments,  # TODO: Comment model not yet 
 # Annual report views
 from .annual_report import (  # BeginAnnualReportDocGeneration,  # Removed duplicate - use the one from pdf.py
     FullLatestReport,
+    GenerationProgressSSE,
     GetAvailableReportYearsForProgressReport,
     GetAvailableReportYearsForStudentReport,
     GetCompletedReports,
     GetLatestReportYear,
     GetLegacyPDFs,
     GetReportPDF,
+    GetReportPDFStatus,
     GetWithoutPDFs,
     GetWithPDFs,
     LatestYearsInactiveReports,
     LatestYearsProgressReports,
     LatestYearsStudentReports,
+    PublishReportPDF,
     ReportDetail,
     Reports,
 )
@@ -170,6 +173,7 @@ __all__ = [
     "GetAvailableReportYearsForProgressReport",
     "GetWithoutPDFs",
     "GetReportPDF",
+    "GetReportPDFStatus",
     "GetWithPDFs",
     "GetLegacyPDFs",
     "GetCompletedReports",
@@ -178,6 +182,8 @@ __all__ = [
     "LatestYearsStudentReports",
     "LatestYearsInactiveReports",
     "FullLatestReport",
+    "GenerationProgressSSE",
+    "PublishReportPDF",
     # Notification
     "NewCycleOpen",
     "SendBumpEmails",

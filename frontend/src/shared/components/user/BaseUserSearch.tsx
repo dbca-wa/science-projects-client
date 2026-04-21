@@ -132,9 +132,7 @@ export const BaseUserSearch = forwardRef<
 			],
 			queryFn: () =>
 				getUsersBasedOnSearchTerm(debouncedSearchTerm, 1, {
-					onlyStaff: onlyInternal,
-					onlyExternal: false,
-					onlySuperuser: false,
+					roleFilter: onlyInternal ? "staff" : "all",
 					ignoreArray: excludeUserIds,
 				}),
 			enabled: debouncedSearchTerm.trim().length > 0,

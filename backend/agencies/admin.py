@@ -774,6 +774,8 @@ class DivisionAdmin(admin.ModelAdmin):
         "name",
         "approver",
         "director",
+        "key_stakeholder",
+        "approvers_count",
     ]
 
     list_filter = [
@@ -782,8 +784,12 @@ class DivisionAdmin(admin.ModelAdmin):
     ]
 
     search_fields = ["name"]
-
     ordering = ["name"]
+
+    def approvers_count(self, obj):
+        return obj.approvers.count()
+
+    approvers_count.short_description = "Approvers"
 
 
 @admin.register(DepartmentalService)

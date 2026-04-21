@@ -32,6 +32,9 @@ export interface IUserData {
 	businessAreas?: IBusinessArea[];
 	business_areas_led?: number[] | IBusinessArea[];
 	name?: string;
+	// Key stakeholder / approver role flags (from TinyUserSerializer)
+	is_key_stakeholder?: boolean;
+	is_approver?: boolean;
 	// Extended profile fields (from ProfilePageSerializer)
 	phone?: string;
 	fax?: string;
@@ -85,6 +88,9 @@ export interface IUserMe {
 	branches?: IBranch[];
 	businessAreas?: IBusinessArea[];
 	business_areas_led: IBusinessArea[];
+	// Key stakeholder / approver role flags
+	is_key_stakeholder?: boolean;
+	is_approver?: boolean;
 }
 
 export interface IMemberUserDetails extends IUserData {
@@ -201,8 +207,6 @@ export interface ICaretakerPermissions {
 // ============================================================================
 
 export interface IUserSearchFilters {
-	onlyExternal?: boolean;
-	onlyStaff?: boolean;
-	onlySuperuser?: boolean;
+	roleFilter?: string;
 	businessArea?: string | number;
 }

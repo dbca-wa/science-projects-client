@@ -9,6 +9,8 @@ import { CreateProjectWizardStore } from "./derived/create-project-wizard.store"
 import { EditProjectStore } from "./derived/edit-project.store";
 import { ProjectMapStore } from "./derived/project-map.store";
 import { MyProjectsStore } from "./derived/my-projects.store";
+import { UnapprovedDocsFilterStore } from "./derived/unapproved-docs-filter.store";
+import { ReportDetailsStore } from "./derived/report-details.store";
 
 /**
  * Root store that combines all MobX stores
@@ -24,6 +26,8 @@ class RootStore {
 	editProjectStore: EditProjectStore;
 	projectMapStore: ProjectMapStore;
 	myProjectsStore: MyProjectsStore;
+	unapprovedDocsFilterStore: UnapprovedDocsFilterStore;
+	reportDetailsStore: ReportDetailsStore;
 
 	constructor() {
 		this.authStore = new AuthStore();
@@ -36,6 +40,8 @@ class RootStore {
 		this.editProjectStore = new EditProjectStore();
 		this.projectMapStore = new ProjectMapStore();
 		this.myProjectsStore = new MyProjectsStore();
+		this.unapprovedDocsFilterStore = new UnapprovedDocsFilterStore();
+		this.reportDetailsStore = new ReportDetailsStore();
 	}
 }
 
@@ -68,3 +74,6 @@ export const useCreateProjectWizardStore = () =>
 export const useEditProjectStore = () => useStore().editProjectStore;
 export const useProjectMapStore = () => useStore().projectMapStore;
 export const useMyProjectsStore = () => useStore().myProjectsStore;
+export const useUnapprovedDocsFilterStore = () =>
+	useStore().unapprovedDocsFilterStore;
+export const useReportDetailsStore = () => useStore().reportDetailsStore;

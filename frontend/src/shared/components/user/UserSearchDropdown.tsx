@@ -32,6 +32,7 @@ interface IUserSearchDropdown {
 	hideCannotFind?: boolean;
 	placeholderColor?: string;
 	showIcon?: boolean;
+	excludeUserIds?: number[];
 }
 
 export const UserSearchDropdown = forwardRef<
@@ -56,6 +57,7 @@ export const UserSearchDropdown = forwardRef<
 			hideCannotFind,
 			placeholderColor,
 			showIcon = false,
+			excludeUserIds,
 		},
 		ref
 	) => {
@@ -85,6 +87,7 @@ export const UserSearchDropdown = forwardRef<
 				onSelect={handleSelect}
 				onlyInternal={onlyInternal}
 				preselectedUserPk={preselectedUserPk}
+				excludeUserIds={excludeUserIds}
 				label={label}
 				placeholder={placeholder}
 				helperText={helperText}

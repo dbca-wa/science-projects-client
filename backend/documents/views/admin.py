@@ -621,6 +621,17 @@ class BatchApproveOld(APIView):
                 status=HTTP_404_NOT_FOUND,
             )
 
+        # Optionally scope to a specific division
+        division_slug = request.data.get("division")
+        if division_slug:
+            division_report = (
+                AnnualReport.objects.filter(division__slug=division_slug)
+                .order_by("-year")
+                .first()
+            )
+            if division_report:
+                last_report = division_report
+
         # Get relevant documents with optimized queries using select_related and prefetch_related
         relevant_docs = (
             ProjectDocument.objects.filter(
@@ -638,6 +649,12 @@ class BatchApproveOld(APIView):
                 "progress_report_details",
             )
         )
+
+        # Filter by division if specified
+        if division_slug and last_report.division:
+            relevant_docs = relevant_docs.filter(
+                project__business_area__division=last_report.division
+            )
 
         try:
             # Collect documents and projects that need updating

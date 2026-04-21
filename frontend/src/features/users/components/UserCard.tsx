@@ -40,28 +40,28 @@ export const UserCard = ({
 			? `${displayName.substring(0, 30)}...`
 			: displayName;
 
-	// Get role/status text and color
+	// Get role/status text and colour based on hierarchy:
+	// Admin > Key Stakeholder > Approver > BA Lead > Staff > External
 	const getRoleInfo = (): { text: string; colorClass: string } => {
-		// Check if user is a BA Lead (has business_areas_led array with items)
-		// Handle both ID array format and object array format
 		const isBALead =
 			user.business_areas_led && user.business_areas_led.length > 0;
 
 		if (user.is_superuser) {
-			const text = user.role === "Executive" ? "Executive" : "Admin";
-			const textWithBA = isBALead ? `${text} (BA Lead)` : text;
-			const colorClass =
-				user.role === "Executive" ? "text-orange-600" : "text-blue-600";
-			return { text: textWithBA, colorClass };
-		} else if (user.is_staff) {
-			const text = isBALead ? "Staff (BA Lead)" : "Staff";
-			const colorClass = "text-green-600";
-			return { text, colorClass };
-		} else {
-			const text = "External User";
-			const colorClass = "text-gray-500";
-			return { text, colorClass };
+			return { text: "Admin", colorClass: "text-blue-600" };
 		}
+		if ("is_key_stakeholder" in user && user.is_key_stakeholder) {
+			return { text: "Key Stakeholder", colorClass: "text-purple-600" };
+		}
+		if ("is_approver" in user && user.is_approver) {
+			return { text: "Approver", colorClass: "text-indigo-600" };
+		}
+		if (isBALead) {
+			return { text: "BA Lead", colorClass: "text-orange-600" };
+		}
+		if (user.is_staff) {
+			return { text: "Staff", colorClass: "text-green-600" };
+		}
+		return { text: "External", colorClass: "text-gray-500" };
 	};
 
 	const roleInfo = getRoleInfo();

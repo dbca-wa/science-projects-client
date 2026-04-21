@@ -1,5 +1,3 @@
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -10,6 +8,7 @@ import {
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { observer } from "mobx-react-lite";
 import type { UserSearchFilters } from "../types/user.types";
+import type { RoleFilter } from "@/app/stores/derived/user-search.store";
 
 interface FilterPanelProps {
 	filters: UserSearchFilters;
@@ -18,31 +17,18 @@ interface FilterPanelProps {
 
 /**
  * UserFilterPanel component
- * Business area dropdown and user type filters for the users list page
+ * Business area dropdown and role filter dropdown for the users list page
  */
 export const UserFilterPanel = observer(
 	({ filters, onFiltersChange }: FilterPanelProps) => {
 		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 			useBusinessAreas();
 
-		const handleToggleFilter = (key: keyof UserSearchFilters) => {
-			// Only one of staff/external/superuser/baLead can be active at a time
-			// Clicking a checkbox will turn off the others automatically
-			if (
-				key === "onlyStaff" ||
-				key === "onlyExternal" ||
-				key === "onlySuperuser" ||
-				key === "onlyBALead"
-			) {
-				onFiltersChange({
-					...filters,
-					onlyStaff: key === "onlyStaff" ? !filters.onlyStaff : false,
-					onlyExternal: key === "onlyExternal" ? !filters.onlyExternal : false,
-					onlySuperuser:
-						key === "onlySuperuser" ? !filters.onlySuperuser : false,
-					onlyBALead: key === "onlyBALead" ? !filters.onlyBALead : false,
-				});
-			}
+		const handleRoleFilterChange = (value: string) => {
+			onFiltersChange({
+				...filters,
+				roleFilter: value as RoleFilter,
+			});
 		};
 
 		const handleBusinessAreaChange = (value: string) => {
@@ -76,7 +62,7 @@ export const UserFilterPanel = observer(
 
 		return (
 			<div className="flex flex-col gap-3 w-full">
-				{/* Business Area Dropdown - Full width on its own row */}
+				{/* Business Area Dropdown */}
 				<Select
 					value={filters.businessArea?.toString() || "All"}
 					onValueChange={handleBusinessAreaChange}
@@ -99,67 +85,29 @@ export const UserFilterPanel = observer(
 					</SelectContent>
 				</Select>
 
-				{/* Filter Checkboxes - Separate row with wrapping for mobile */}
-				<div className="flex flex-wrap gap-x-5 gap-y-2 w-full">
-					<div className="flex items-center space-x-2">
-						<Checkbox
-							id="external-filter"
-							checked={filters.onlyExternal}
-							onCheckedChange={() => handleToggleFilter("onlyExternal")}
-						/>
-						<Label
-							htmlFor="external-filter"
-							className="text-sm font-normal cursor-pointer whitespace-nowrap"
-						>
-							Only External
-						</Label>
-					</div>
-
-					<div className="flex items-center space-x-2">
-						<Checkbox
-							id="staff-filter"
-							checked={filters.onlyStaff}
-							onCheckedChange={() => handleToggleFilter("onlyStaff")}
-							className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
-						/>
-						<Label
-							htmlFor="staff-filter"
-							className="text-sm font-normal cursor-pointer whitespace-nowrap"
-						>
-							Only Staff
-						</Label>
-					</div>
-
-					<div className="flex items-center space-x-2">
-						<Checkbox
-							id="ba-lead-filter"
-							checked={filters.onlyBALead}
-							onCheckedChange={() => handleToggleFilter("onlyBALead")}
-							className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-500"
-						/>
-						<Label
-							htmlFor="ba-lead-filter"
-							className="text-sm font-normal cursor-pointer whitespace-nowrap"
-						>
-							Only BA Lead
-						</Label>
-					</div>
-
-					<div className="flex items-center space-x-2">
-						<Checkbox
-							id="superuser-filter"
-							checked={filters.onlySuperuser}
-							onCheckedChange={() => handleToggleFilter("onlySuperuser")}
-							className="data-[state=checked]:bg-blue-600 data-[state-checked]:border-blue-500"
-						/>
-						<Label
-							htmlFor="superuser-filter"
-							className="text-sm font-normal cursor-pointer whitespace-nowrap"
-						>
-							Only Admin
-						</Label>
-					</div>
-				</div>
+				{/* Role Filter Dropdown */}
+				<Select
+					value={filters.roleFilter || "all"}
+					onValueChange={handleRoleFilterChange}
+				>
+					<SelectTrigger
+						className="w-full !h-10 text-sm rounded-md"
+						aria-label="Filter by user role"
+					>
+						<SelectValue placeholder="All Users" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All Users</SelectItem>
+						<SelectItem value="external">Only External</SelectItem>
+						<SelectItem value="staff">Only Staff</SelectItem>
+						<SelectItem value="ba_lead">Only BA Lead</SelectItem>
+						<SelectItem value="approver">Only Approver</SelectItem>
+						<SelectItem value="key_stakeholder">
+							Only Key Stakeholder
+						</SelectItem>
+						<SelectItem value="admin">Only Admin</SelectItem>
+					</SelectContent>
+				</Select>
 			</div>
 		);
 	}

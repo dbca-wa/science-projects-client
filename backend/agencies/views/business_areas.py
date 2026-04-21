@@ -20,6 +20,7 @@ from rest_framework.views import APIView
 
 from documents.models import ProjectDocument
 from documents.serializers import ProjectDocumentSerializer
+from documents.services.approval_service import ApprovalService
 from medias.models import BusinessAreaPhoto
 from projects.models import Project, ProjectMember
 from projects.serializers import ProblematicProjectSerializer
@@ -43,6 +44,8 @@ class BusinessAreas(APIView):
 
     def handle_ba_image(self, image):
         """Handle business area image upload"""
+        if isinstance(image, dict):
+            return image.get("file")
         if isinstance(image, str):
             return image
         elif image is not None:
@@ -142,6 +145,8 @@ class BusinessAreaDetail(APIView):
 
     def handle_ba_image(self, image):
         """Handle business area image upload"""
+        if isinstance(image, dict):
+            return image.get("file")
         if isinstance(image, str):
             return image
         elif image is not None:
@@ -163,7 +168,7 @@ class BusinessAreaDetail(APIView):
 
     def get(self, request, pk):
         ba = AgencyService.get_business_area(pk)
-        serializer = BusinessAreaSerializer(ba)
+        serializer = TinyBusinessAreaSerializer(ba)
         return Response(serializer.data, status=HTTP_200_OK)
 
     def put(self, request, pk):
@@ -253,7 +258,11 @@ class MyBusinessAreas(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        business_areas = BusinessArea.objects.filter(leader=request.user.pk)
+        business_areas = BusinessArea.objects.filter(
+            leader=request.user.pk
+        ).select_related(
+            "division", "image", "leader", "finance_admin", "data_custodian"
+        )
         serializer = TinyBusinessAreaSerializer(business_areas, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -264,7 +273,7 @@ class BusinessAreasUnapprovedDocs(APIView):
     def get_unapproved_docs_for_ba(self, pk):
         try:
             docs = ProjectDocument.objects.filter(
-                project__business_area=pk, project_lead_approval_granted=False
+                project__business_area=pk, directorate_approval_granted=False
             ).distinct()
         except ProjectDocument.DoesNotExist:
             raise NotFound
@@ -298,9 +307,34 @@ class BusinessAreasUnapprovedDocs(APIView):
                 serializer = ProjectDocumentSerializer(processed_unapproved, many=True)
                 serializer2 = ProjectDocumentSerializer(unlinked_docs, many=True)
 
+                # Enrich linked docs with waiting_on information
+                stage_role_map = {
+                    1: "Project Lead",
+                    2: "Business Area Lead",
+                    3: "Directorate",
+                }
+                serialized_linked = serializer.data
+                for doc_data, doc_obj in zip(serialized_linked, processed_unapproved):
+                    stage = ApprovalService.get_approval_stage(doc_obj)
+                    approver = ApprovalService.get_next_approver(doc_obj)
+                    if approver:
+                        doc_data["waiting_on"] = {
+                            "id": approver.pk,
+                            "display_first_name": approver.display_first_name,
+                            "display_last_name": approver.display_last_name,
+                            "role": stage_role_map.get(stage, "Unknown"),
+                        }
+                    else:
+                        doc_data["waiting_on"] = None
+
+                # Unlinked docs lack proper approval data
+                serialized_unlinked = serializer2.data
+                for doc_data in serialized_unlinked:
+                    doc_data["waiting_on"] = None
+
                 data[ba_pk] = {
-                    "linked": serializer.data,
-                    "unlinked": serializer2.data,
+                    "linked": serialized_linked,
+                    "unlinked": serialized_unlinked,
                 }
 
                 if data[ba_pk]["linked"]:
@@ -342,6 +376,50 @@ class BusinessAreasProblematicProjects(APIView):
             return Project.objects.none()
         return projects
 
+    @staticmethod
+    def _categorise_projects(projects):
+        """Categorise projects by problem type.
+
+        Safely handles orphaned ProjectMember rows where the related
+        user no longer exists (RelatedObjectDoesNotExist).
+        """
+        memberless = []
+        no_leader = []
+        multiple_leaders = []
+        externally_led = []
+
+        for p in projects:
+            members = p.members.all()
+            leader_tag_count = 0
+            external_leader = False
+
+            for mem in members:
+                try:
+                    user = mem.user
+                except Exception:  # nosec B112
+                    continue
+                if mem.role == ProjectMember.RoleChoices.SUPERVISING:
+                    leader_tag_count += 1
+                if mem.is_leader is True and user.is_staff is False:
+                    external_leader = True
+
+            if len(members) < 1:
+                memberless.append(p)
+            else:
+                if external_leader:
+                    externally_led.append(p)
+                if leader_tag_count == 0:
+                    no_leader.append(p)
+                elif leader_tag_count > 1:
+                    multiple_leaders.append(p)
+
+        return {
+            "no_members": memberless,
+            "no_leader": no_leader,
+            "external_leader": externally_led,
+            "multiple_leads": multiple_leaders,
+        }
+
     def get(self, request):
         try:
             business_area_id = request.query_params.get("business_area_id")
@@ -356,45 +434,11 @@ class BusinessAreasProblematicProjects(APIView):
             )
 
             all_projects = self.get_projects_in_ba_array([business_area_id])
-            memberless_projects = []
-            no_leader_tag_projects = []
-            multiple_leader_tag_projects = []
-            externally_led_projects = []
-
-            for p in all_projects:
-                members = p.members.all()
-                leader_tag_count = 0
-                external_leader = False
-
-                for mem in members:
-                    if mem.role == ProjectMember.RoleChoices.SUPERVISING:
-                        leader_tag_count += 1
-                    if mem.is_leader is True and mem.user.is_staff is False:
-                        external_leader = True
-
-                if len(members) < 1:
-                    memberless_projects.append(p)
-                else:
-                    if external_leader:
-                        externally_led_projects.append(p)
-                    if leader_tag_count == 0:
-                        no_leader_tag_projects.append(p)
-                    elif leader_tag_count > 1:
-                        multiple_leader_tag_projects.append(p)
+            categorised = self._categorise_projects(all_projects)
 
             data = {
-                "no_members": ProblematicProjectSerializer(
-                    memberless_projects, many=True
-                ).data,
-                "no_leader": ProblematicProjectSerializer(
-                    no_leader_tag_projects, many=True
-                ).data,
-                "external_leader": ProblematicProjectSerializer(
-                    externally_led_projects, many=True
-                ).data,
-                "multiple_leads": ProblematicProjectSerializer(
-                    multiple_leader_tag_projects, many=True
-                ).data,
+                key: ProblematicProjectSerializer(projects, many=True).data
+                for key, projects in categorised.items()
             }
 
             return Response(data=data, status=HTTP_200_OK)
@@ -419,45 +463,11 @@ class BusinessAreasProblematicProjects(APIView):
                     business_area=ba_pk
                 ).prefetch_related("members", "members__user")
 
-                memberless_projects = []
-                no_leader_tag_projects = []
-                multiple_leader_tag_projects = []
-                externally_led_projects = []
-
-                for p in projects_in_ba:
-                    members = p.members.all()
-                    leader_tag_count = 0
-                    external_leader = False
-
-                    for mem in members:
-                        if mem.role == ProjectMember.RoleChoices.SUPERVISING:
-                            leader_tag_count += 1
-                        if mem.is_leader is True and mem.user.is_staff is False:
-                            external_leader = True
-
-                    if len(members) < 1:
-                        memberless_projects.append(p)
-                    else:
-                        if external_leader:
-                            externally_led_projects.append(p)
-                        if leader_tag_count == 0:
-                            no_leader_tag_projects.append(p)
-                        elif leader_tag_count > 1:
-                            multiple_leader_tag_projects.append(p)
+                categorised = self._categorise_projects(projects_in_ba)
 
                 data[ba_pk] = {
-                    "no_members": ProblematicProjectSerializer(
-                        memberless_projects, many=True
-                    ).data,
-                    "no_leader": ProblematicProjectSerializer(
-                        no_leader_tag_projects, many=True
-                    ).data,
-                    "external_leader": ProblematicProjectSerializer(
-                        externally_led_projects, many=True
-                    ).data,
-                    "multiple_leads": ProblematicProjectSerializer(
-                        multiple_leader_tag_projects, many=True
-                    ).data,
+                    key: ProblematicProjectSerializer(projects, many=True).data
+                    for key, projects in categorised.items()
                 }
 
             return Response(data=data, status=HTTP_200_OK)

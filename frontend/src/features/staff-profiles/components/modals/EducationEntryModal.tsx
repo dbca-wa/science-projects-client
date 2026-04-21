@@ -30,10 +30,7 @@ const EducationEntryModal = ({
 	onOpenChange,
 }: EducationEntryModalProps) => {
 	const isEdit = !!entry;
-	const initialForm = useMemo(
-		() => getInitialEducationForm(entry),
-		[entry, open]
-	);
+	const initialForm = useMemo(() => getInitialEducationForm(entry), [entry]);
 	const [form, setForm] = useState(initialForm);
 
 	// Reset form when initialForm changes (modal opens/entry changes)

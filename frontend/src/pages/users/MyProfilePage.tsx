@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useCurrentUser } from "@/features/auth";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import {
 	PersonalInformationCard,
 	ProfileSection,
@@ -44,6 +45,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
  * Supports direct URL navigation to tabs via /users/me/caretaker
  */
 const MyProfilePage = observer(() => {
+	useDocumentTitle("My Profile");
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { width } = useWindowSize();

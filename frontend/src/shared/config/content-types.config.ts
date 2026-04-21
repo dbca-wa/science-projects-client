@@ -12,6 +12,7 @@ import {
 	updateStudentReportField,
 	updateProjectClosureField,
 } from "@/features/projects/services/project.service";
+import { updateAnnualReportField } from "@/features/reports/services/report.service";
 
 /**
  * Central registry mapping content types to their configurations
@@ -551,5 +552,96 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		},
 		defaultPlaceholder: "Location of electronic project data...",
 		defaultEmptyMessage: "No backup location provided",
+	},
+
+	// ===== ANNUAL REPORT FIELDS =====
+	"annual-report-dm": {
+		fieldName: "dm",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "dm", content);
+		},
+		defaultPlaceholder: "Enter the Director's Message...",
+		defaultEmptyMessage: "No Director's Message provided",
+	},
+
+	"annual-report-dm-sign": {
+		fieldName: "dm_sign",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "dm_sign", content);
+		},
+		defaultPlaceholder: "Enter the Director's Message signature...",
+		defaultEmptyMessage: "No signature provided",
+	},
+
+	"annual-report-service-delivery-intro": {
+		fieldName: "service_delivery_intro",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "service_delivery_intro", content);
+		},
+		defaultPlaceholder: "Enter the Service Delivery introduction...",
+		defaultEmptyMessage: "No Service Delivery introduction provided",
+	},
+
+	"annual-report-research-intro": {
+		fieldName: "research_intro",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "research_intro", content);
+		},
+		defaultPlaceholder: "Enter the Research introduction...",
+		defaultEmptyMessage: "No Research introduction provided",
+	},
+
+	"annual-report-student-intro": {
+		fieldName: "student_intro",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "student_intro", content);
+		},
+		defaultPlaceholder: "Enter the Student introduction...",
+		defaultEmptyMessage: "No Student introduction provided",
+	},
+
+	"annual-report-publications": {
+		fieldName: "publications",
+		queryKey: (_id: number) => ["reports", "latest"],
+		invalidateKeys: (_id: number) => [
+			["reports", "latest"],
+			["reports", "latest-year"],
+			["report-info"],
+		],
+		updateFn: async (id: number, content: string) => {
+			await updateAnnualReportField(id, "publications", content);
+		},
+		defaultPlaceholder: "Enter the Publications content...",
+		defaultEmptyMessage: "No Publications content provided",
 	},
 };

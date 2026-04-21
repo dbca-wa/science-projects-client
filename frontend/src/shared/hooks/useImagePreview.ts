@@ -23,7 +23,7 @@ export const useImagePreview = (
 	imgRef: RefObject<HTMLImageElement | null>,
 	scale: number,
 	rotate: number,
-	variant: "avatar" | "project" | "banner" | "default"
+	variant: "avatar" | "project" | "banner" | "report" | "default"
 ): PreviewUrls => {
 	const [previewUrls, setPreviewUrls] = useState<PreviewUrls>({
 		avatar: null,

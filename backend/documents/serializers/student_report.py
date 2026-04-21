@@ -4,6 +4,8 @@ Student report serializers
 
 from rest_framework import serializers
 
+from common.utils.mixins import TeamMemberMixin
+
 from ..models import StudentReport
 from .base import TinyProjectDocumentSerializer
 
@@ -23,10 +25,11 @@ class TinyStudentReportSerializer(serializers.ModelSerializer):
         ]
 
 
-class StudentReportSerializer(serializers.ModelSerializer):
+class StudentReportSerializer(TeamMemberMixin, serializers.ModelSerializer):
     """Standard student report serializer"""
 
     document = TinyProjectDocumentSerializer(read_only=True)
+    team_members = serializers.SerializerMethodField()
 
     class Meta:
         model = StudentReport

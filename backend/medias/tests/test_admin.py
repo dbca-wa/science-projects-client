@@ -263,7 +263,8 @@ class TestAnnualReportPDFAdmin:
         # Assert
         assert "pk" in admin.list_display
         assert "report" in admin.list_display
-        assert "file" in admin.list_display
+        assert "draft_file" in admin.list_display
+        assert "published_file" in admin.list_display
         assert "size_in_mb" in admin.list_display
         assert "creator" in admin.list_display
 

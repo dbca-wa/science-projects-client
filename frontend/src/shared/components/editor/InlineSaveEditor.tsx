@@ -41,6 +41,9 @@ export interface InlineSaveEditorProps {
 
 	// Styling
 	className?: string;
+
+	// Compact mode — smaller label, no background/border on header (for report cards)
+	compact?: boolean;
 }
 
 /**
@@ -68,6 +71,7 @@ export const InlineSaveEditor = observer(
 		onSaveError,
 		onCancel,
 		className = "",
+		compact = false,
 	}: InlineSaveEditorProps) => {
 		const config = CONTENT_TYPE_CONFIGS[contentType];
 
@@ -171,18 +175,31 @@ export const InlineSaveEditor = observer(
 			}, 0);
 		}, [contentType, entityId, savedContent, onCancel, onEditEnd]);
 
-		// Handle content change
+		// Handle content change — use normalised text comparison to avoid
+		// false positives from Lexical re-serialising the same content differently
+		const normaliseForComparison = (html: string) =>
+			html
+				.replace(/<[^>]*>/g, "")
+				.replace(/\s+/g, " ")
+				.trim();
+
 		const handleContentChange = (newContent: string) => {
 			setEditedContent(newContent);
-			setHasChanges(newContent !== savedContent);
+			setHasChanges(
+				normaliseForComparison(newContent) !==
+					normaliseForComparison(savedContent)
+			);
 
 			// Update current content in store (updates immediately for change detection)
 			inlineEditStore.updateCurrentContent(contentType, entityId, newContent);
 		};
 
 		// Update saved content when initialContent changes (from query refetch)
+		// Only update if the content actually changed to avoid unnecessary re-renders
 		useEffect(() => {
-			setSavedContent(initialContent);
+			setSavedContent((prev) =>
+				prev === initialContent ? prev : initialContent
+			);
 		}, [initialContent]);
 
 		// Update edited content when entering edit mode
@@ -294,15 +311,17 @@ export const InlineSaveEditor = observer(
 		const renderLabel = () => {
 			if (!label) return null;
 
-			// If label is a ReactNode (with icons), render as-is
 			if (typeof label !== "string") {
 				return label;
 			}
 
-			// For string labels, apply default styling
 			return (
 				<div className="flex items-center gap-2">
-					<span className="text-xl font-semibold">{label}</span>
+					<span
+						className={compact ? "text-lg font-bold" : "text-xl font-semibold"}
+					>
+						{label}
+					</span>
 					{showWordLimitInLabel && wordLimit && (
 						<span className="text-xs text-muted-foreground">
 							(max {wordLimit} words)
@@ -328,10 +347,10 @@ export const InlineSaveEditor = observer(
 					// View mode - Clickable container with hover effect
 					<div
 						ref={editButtonRef}
-						className={`bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden ${
-							canEdit
-								? "cursor-pointer transition-all hover:border-blue-300 dark:hover:border-blue-600"
-								: ""
+						className={`rounded-lg overflow-hidden ${
+							compact
+								? `border border-transparent bg-transparent transition-all ${canEdit ? "cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm hover:bg-white dark:hover:bg-gray-900/50" : ""}`
+								: `bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 shadow-sm ${canEdit ? "cursor-pointer transition-all hover:border-blue-300 dark:hover:border-blue-600" : ""}`
 						}`}
 						onClick={canEdit ? handleEditClick : undefined}
 						onMouseEnter={() => canEdit && setIsHovered(true)}
@@ -352,7 +371,13 @@ export const InlineSaveEditor = observer(
 					>
 						{/* Header section with label and click-to-edit badge */}
 						{label && (
-							<div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+							<div
+								className={`flex items-center justify-between ${
+									compact
+										? "px-6 pt-4 pb-1"
+										: "px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+								}`}
+							>
 								<div>{renderLabel()}</div>
 								{canEdit && <ClickToEditBadge isVisible={isHovered} />}
 							</div>
@@ -388,7 +413,13 @@ export const InlineSaveEditor = observer(
 					>
 						{/* Header section with label */}
 						{label && (
-							<div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+							<div
+								className={`flex items-center justify-between ${
+									compact
+										? "px-6 pt-4 pb-1"
+										: "px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+								}`}
+							>
 								<div>{renderLabel()}</div>
 							</div>
 						)}

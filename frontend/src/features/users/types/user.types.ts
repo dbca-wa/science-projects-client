@@ -1,4 +1,5 @@
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
+import type { RoleFilter } from "@/app/stores/derived/user-search.store";
 
 // ============================================================================
 // USER FORM DATA (Feature-specific)
@@ -25,10 +26,7 @@ export interface UserSearchParams {
 }
 
 export interface UserSearchFilters {
-	onlyExternal?: boolean;
-	onlyStaff?: boolean;
-	onlySuperuser?: boolean;
-	onlyBALead?: boolean;
+	roleFilter?: RoleFilter;
 	businessArea?: string | number;
 	ignoreArray?: number[];
 }

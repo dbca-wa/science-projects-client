@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { observer } from "mobx-react-lite";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { ProjectFilters, ProjectList } from "@/features/projects/components";
 import { Pagination } from "@/shared/components/Pagination";
@@ -23,6 +24,7 @@ import { PageTransition } from "@/shared/components/PageTransition";
  * Main page for browsing and searching projects
  */
 const ProjectListPage = observer(() => {
+	useDocumentTitle("Projects");
 	const authStore = useAuthStore();
 	const projectSearchStore = useProjectSearchStore();
 	const [, setSearchParams] = useSearchParams();

@@ -107,6 +107,7 @@ export function UnifiedDocumentActionModal({
 		},
 	});
 
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const sendEmail = watch("sendEmail");
 
 	// Get modal content based on action and stage
@@ -148,6 +149,9 @@ export function UnifiedDocumentActionModal({
 			case "recall":
 				return "Recall your approval and return the document to the previous stage.";
 			case "send_back":
+				if (currentStage === "directorate") {
+					return "Send this document back to the Business Area Lead for revisions.";
+				}
 				return "Send this document back to the Project Lead for revisions.";
 			case "reopen":
 				return "Reopen this project by removing the project closure document.";
@@ -204,6 +208,9 @@ export function UnifiedDocumentActionModal({
 			case "recall":
 				return "Send email notification to Project Lead";
 			case "send_back":
+				if (currentStage === "directorate") {
+					return "Send email notification to Business Area Lead";
+				}
 				return "Send email notification to Project Lead";
 			case "reopen":
 				return "Send email notification to team members";
@@ -298,8 +305,9 @@ export function UnifiedDocumentActionModal({
 						<Alert variant="destructive">
 							<AlertTriangle className="h-4 w-4" />
 							<AlertDescription>
-								This will send the document back to the Project Lead for
-								revisions. All subsequent approvals will be reset.
+								{currentStage === "directorate"
+									? "This will send the document back to the Business Area Lead for revisions."
+									: "This will send the document back to the Project Lead for revisions. All subsequent approvals will be reset."}
 							</AlertDescription>
 						</Alert>
 					)}

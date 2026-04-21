@@ -79,6 +79,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		const isStaffProfileMode = mode === "staffProfile";
 		const isProgressReport = mode === "progressReport";
 
+		const isBusinessArea = mode === "businessArea";
+
 		const showHeadingSelect = mode === "full" || mode === "projectTitle";
 		const disableHeadings = mode === "projectTitle";
 		const showLists =
@@ -88,19 +90,23 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 			mode === "full" ||
 			mode === "simple" ||
 			mode === "minimal" ||
+			isBusinessArea ||
 			isProfileMode ||
 			isProgressReport;
-		const showUnderline = mode === "full" || isProfileMode || isProgressReport;
+		const showUnderline =
+			mode === "full" || isProfileMode || isProgressReport || isBusinessArea;
 		const showSubscriptSuperscript =
 			mode === "full" ||
 			isProfileMode ||
 			mode === "projectTitle" ||
-			isProgressReport;
+			isProgressReport ||
+			isBusinessArea;
 		const showClearFormatting =
 			mode === "full" ||
 			isProfileMode ||
 			mode === "projectTitle" ||
-			isProgressReport;
+			isProgressReport ||
+			isBusinessArea;
 		const showIndentOutdent = mode === "full";
 		const showAlignment = mode === "full";
 		const showStrikethrough = false; // Disabled for now

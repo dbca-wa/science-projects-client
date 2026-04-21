@@ -7,12 +7,16 @@ import { AUTH_ENDPOINTS } from "./auth.endpoints";
 import type { IUserMe } from "@/shared/types/user.types";
 
 /**
- * Login with username and password
+ * Login with username and password.
+ * Fetches a fresh CSRF cookie first (in case the session was cleared).
  */
 export const logInOrdinary = async ({
 	username,
 	password,
 }: LoginFormData): Promise<IUsernameLoginSuccess> => {
+	// Ensure a CSRF cookie exists before POSTing
+	await apiClient.get(AUTH_ENDPOINTS.LOGIN);
+
 	const response = await apiClient.post<IUsernameLoginSuccess>(
 		AUTH_ENDPOINTS.LOGIN,
 		{ username, password }

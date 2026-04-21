@@ -190,17 +190,17 @@ describe("InlineSaveEditor - Accessibility", () => {
 			const cancelButton = screen.getByRole("button", { name: /^cancel$/i });
 			const saveButton = screen.getByRole("button", { name: /save/i });
 
-			// Verify both buttons exist and are focusable
+			// Verify both buttons exist
 			expect(cancelButton).toBeInTheDocument();
 			expect(saveButton).toBeInTheDocument();
 
-			// Verify Cancel is focusable
+			// Verify Cancel is focusable (always enabled)
 			cancelButton.focus();
 			expect(cancelButton).toHaveFocus();
 
-			// Verify Save is focusable
-			saveButton.focus();
-			expect(saveButton).toHaveFocus();
+			// Save button is disabled initially (no content changes), so it cannot receive focus.
+			// Verify it exists and is disabled — focusability is tested implicitly when enabled.
+			expect(saveButton).toBeDisabled();
 		});
 	});
 

@@ -104,6 +104,7 @@ export const ImageUpload = ({
 	// Generate preview for File objects - keep it synchronous to avoid flash
 	useEffect(() => {
 		if (!value || !isFile(value)) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- sync from prop
 			setFilePreview(null);
 			return;
 		}

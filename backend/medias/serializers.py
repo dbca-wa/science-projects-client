@@ -175,7 +175,8 @@ class TinyAnnualReportPDFSerializer(ModelSerializer):
         model = AnnualReportPDF
         fields = [
             "id",
-            "file",
+            "draft_file",
+            "published_file",
             "report",
         ]
 
@@ -215,7 +216,14 @@ class AnnualReportPDFCreateSerializer(ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        # When uploading via Add Official, save directly to published_file
+        file_data = validated_data.pop("published_file", None)
+        if not file_data:
+            file_data = validated_data.pop("draft_file", None)
         arp = AnnualReportPDF.objects.create(**validated_data)
+        if file_data:
+            arp.published_file = file_data
+            arp.save()
         return arp
 
 
@@ -249,9 +257,11 @@ class AnnualReportPDFSerializer(ModelSerializer):
         return None
 
     def get_pdf_data(self, obj):
-        if obj.file:
+        # Read from draft_file for preview purposes
+        target = obj.draft_file or obj.published_file
+        if target:
             try:
-                with open(obj.file.path, "rb") as file:
+                with open(target.path, "rb") as file:
                     pdf_data = file.read()
                     return base64.b64encode(pdf_data).decode("utf-8")
             except FileNotFoundError:

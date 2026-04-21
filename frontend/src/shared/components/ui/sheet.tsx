@@ -39,6 +39,7 @@ function Sheet({
 	// Handle open/close with animation
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsVisible(true);
 			setIsClosing(false);
 		} else if (isVisible && !isClosing) {
@@ -121,6 +122,7 @@ function SheetOverlay() {
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsOpening(false);
 			return;
 		}
@@ -161,6 +163,7 @@ function SheetContent({
 
 	React.useEffect(() => {
 		if (!shouldAnimate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsOpening(false);
 			return;
 		}

@@ -1,6 +1,7 @@
 import {
 	forwardRef,
 	useEffect,
+	useId,
 	useImperativeHandle,
 	useRef,
 	useState,
@@ -81,16 +82,14 @@ export const BaseCombobox = forwardRef(
 		const [isCreating, setIsCreating] = useState(false);
 
 		// Generate unique IDs for accessibility
-		const inputId = useRef(
-			`combobox-input-${Math.random().toString(36).substr(2, 9)}`
-		).current;
-		const helperTextId = useRef(
-			`combobox-helper-${Math.random().toString(36).substr(2, 9)}`
-		).current;
+		const uniqueId = useId();
+		const inputId = `combobox-input-${uniqueId}`;
+		const helperTextId = `combobox-helper-${uniqueId}`;
 
 		// Debounce search term
 		const debouncedSearchTerm = useDebouncedValue(searchTerm, debounceMs);
 
+		// Fetch items based on debounced search term
 		// Fetch items based on debounced search term
 		useEffect(() => {
 			if (debouncedSearchTerm.trim().length >= minSearchLength) {
@@ -103,6 +102,7 @@ export const BaseCombobox = forwardRef(
 						setFilteredItems([]);
 					});
 			} else {
+				// eslint-disable-next-line react-hooks/set-state-in-effect -- clear results when below min length
 				setFilteredItems([]);
 			}
 		}, [debouncedSearchTerm, searchFn, maxResults, minSearchLength]);
