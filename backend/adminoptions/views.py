@@ -644,9 +644,9 @@ class ApproveTask(APIView):
                 {"error": str(e.detail)},
                 status=HTTP_404_NOT_FOUND,
             )
-        except ValueError as e:
+        except ValueError:
             return Response(
-                {"error": str(e)},
+                {"error": "Operation failed. Please check the request and try again."},
                 status=HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
@@ -850,7 +850,10 @@ class SendTestEmail(APIView):
             return Response(response_data)
         except Exception as e:
             settings.LOGGER.error(f"Failed to send test email: {e}", exc_info=True)
-            return Response({"error": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Failed to send test email. Please try again."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class SendAllTestEmails(APIView):
@@ -1142,8 +1145,10 @@ class SendAllTestEmails(APIView):
 
             try:
                 html_content = render_to_string(template_file, context)
-            except Exception as e:
-                results.append({"template": tmpl["name"], "error": str(e)})
+            except Exception:
+                results.append(
+                    {"template": tmpl["name"], "error": "Failed to render template"}
+                )
                 continue
 
             subject = f"[TEST] {tmpl['subject']}"
@@ -1199,7 +1204,7 @@ class SendAllTestEmails(APIView):
         return Response(
             {
                 "message": f"Rendered {len(results)} email templates",
-                "preview_dir": preview_dir,
+                "preview_dir": "email_previews",
                 "results": results,
             }
         )
@@ -1231,9 +1236,9 @@ class RespondToCaretakerRequest(APIView):
                 {"error": "You are not authorized to respond to this request"},
                 status=HTTP_401_UNAUTHORIZED,
             )
-        except ValueError as e:
+        except ValueError:
             return Response(
-                {"error": str(e)},
+                {"error": "Invalid action. Please use 'approve' or 'reject'."},
                 status=HTTP_400_BAD_REQUEST,
             )
         except Exception as e:

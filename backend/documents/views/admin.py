@@ -451,7 +451,7 @@ class ReopenProject(APIView):
                     msg=f"Error reopening project {pk}: {e}", exc_info=True
                 )
                 return Response(
-                    {"error": f"Failed to reopen project: {str(e)}"},
+                    {"error": "Operation failed. Please try again."},
                     status=HTTP_400_BAD_REQUEST,
                 )
 
@@ -585,7 +585,7 @@ class BatchApproveOld(APIView):
         except Exception as e:
             settings.LOGGER.error(msg=f"Batch approval failed: {e}", exc_info=True)
             return Response(
-                {"error": f"Batch approval failed: {str(e)}"},
+                {"error": "Batch approval failed. Please try again."},
                 HTTP_400_BAD_REQUEST,
             )
         else:
@@ -725,7 +725,7 @@ class BatchApproveCurrent(APIView):
                 msg=f"Batch approval (current) failed: {e}", exc_info=True
             )
             return Response(
-                {"error": f"Batch approval failed: {str(e)}"},
+                {"error": "Batch approval failed. Please try again."},
                 HTTP_400_BAD_REQUEST,
             )
 

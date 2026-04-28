@@ -125,16 +125,17 @@ def send_email_with_embedded_image(
             # Insert banner after <body> tag or at the start of content
             if "<body" in html_content:
                 html_content = html_content.replace("<body>", f"<body>{test_banner}", 1)
-                # Handle body with attributes
+                # Handle body with attributes (e.g. <body style="...">)
                 if test_banner not in html_content:
-                    import re
-
-                    html_content = re.sub(
-                        r"(<body[^>]*>)",
-                        rf"\1{test_banner}",
-                        html_content,
-                        count=1,
-                    )
+                    body_start = html_content.find("<body")
+                    if body_start != -1:
+                        body_close = html_content.find(">", body_start)
+                        if body_close != -1:
+                            html_content = (
+                                html_content[: body_close + 1]
+                                + test_banner
+                                + html_content[body_close + 1 :]
+                            )
             else:
                 html_content = test_banner + html_content
             settings.LOGGER.info(
