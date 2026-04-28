@@ -1,8 +1,10 @@
 # region IMPORTS ====================================================================================================
 
 
+import os
+
 from django.conf import settings
-from django.db import transaction
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -15,6 +17,8 @@ from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
+    HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR,
 )
 from rest_framework.views import APIView
 
@@ -29,10 +33,9 @@ from adminoptions.serializers import (
     GuideSectionCreateUpdateSerializer,
     GuideSectionSerializer,
 )
+from adminoptions.services import AdminTaskService
 from caretakers.models import Caretaker
-from communications.models import Comment
-from documents.models import ProjectDocument
-from projects.models import Project, ProjectMember
+from projects.models import Project
 from users.models import User
 
 # endregion  =================================================================================================
@@ -145,8 +148,8 @@ class AdminControlsDetail(APIView):
 
         if ser.is_valid():
             updated_admin_options = ser.save()
-            print(req.data)
-            print(updated_admin_options)
+            settings.LOGGER.info(msg=f"Admin controls updated: {req.data}")
+            settings.LOGGER.info(msg=f"Updated admin options: {updated_admin_options}")
             return Response(
                 AdminOptionsSerializer(updated_admin_options).data,
                 status=HTTP_202_ACCEPTED,
@@ -177,8 +180,10 @@ class AdminControlsGuideContentUpdate(APIView):
         field_key = req.data.get("field_key")
         content = req.data.get("content")
 
-        print(f"Received update request for field_key: {field_key}")
-        print(f"Content length: {len(content) if content else 'None'}")
+        settings.LOGGER.info(msg=f"Received update request for field_key: {field_key}")
+        settings.LOGGER.info(
+            msg=f"Content length: {len(content) if content else 'None'}"
+        )
 
         if field_key and content is not None:
             # Initialise guide_content if it doesn't exist or is None
@@ -205,8 +210,8 @@ class AdminControlsGuideContentUpdate(APIView):
                 if refreshed.guide_content
                 else None
             )
-            print(
-                f"Saved content length for {field_key}: {len(saved_content) if saved_content else 'None'}"
+            settings.LOGGER.info(
+                msg=f"Saved content length for {field_key}: {len(saved_content) if saved_content else 'None'}"
             )
 
             settings.LOGGER.info(
@@ -214,8 +219,8 @@ class AdminControlsGuideContentUpdate(APIView):
             )
             return Response({"status": "content updated"}, status=HTTP_200_OK)
 
-        print(
-            f"Missing data: field_key={field_key}, content={'Present' if content else 'Missing'}"
+        settings.LOGGER.info(
+            msg=f"Missing data: field_key={field_key}, content={'Present' if content else 'Missing'}"
         )
         return Response(
             {"error": "field_key and content are required"}, status=HTTP_400_BAD_REQUEST
@@ -224,10 +229,42 @@ class AdminControlsGuideContentUpdate(APIView):
 
 # Add new viewsets for GuideSection and ContentField
 class GuideSectionViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing guide sections"""
+    """ViewSet for managing guide sections.
 
-    queryset = GuideSection.objects.all().order_by("order")
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    Read access is available to all authenticated users, filtered by role.
+    Write operations (create, update, delete) require admin privileges.
+    """
+
+    def get_queryset(self):
+        """Filter sections based on the requesting user's role."""
+        user = self.request.user
+        qs = GuideSection.objects.all().order_by("order")
+
+        # Superusers see everything
+        if user.is_superuser:
+            return qs
+
+        allowed_roles = ["all"]
+
+        # Business area leads can see BA lead content
+        if hasattr(user, "business_areas_led") and user.business_areas_led.exists():
+            allowed_roles.append("business_area_lead")
+
+        # Key stakeholders can see KS content and BA lead content
+        if (
+            hasattr(user, "divisions_key_stakeholder")
+            and user.divisions_key_stakeholder.exists()
+        ):
+            allowed_roles.append("key_stakeholder")
+            if "business_area_lead" not in allowed_roles:
+                allowed_roles.append("business_area_lead")
+
+        return qs.filter(required_role__in=allowed_roles)
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsAdminUser()]
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
@@ -288,11 +325,19 @@ class GuideSectionViewSet(viewsets.ModelViewSet):
 
 
 class ContentFieldViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing content fields within guide sections"""
+    """ViewSet for managing content fields within guide sections.
+
+    Read access is available to all authenticated users.
+    Write operations require admin privileges.
+    """
 
     queryset = ContentField.objects.all()
     serializer_class = ContentFieldSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsAdminUser()]
 
     def perform_create(self, serializer):
         field = serializer.save()
@@ -365,7 +410,8 @@ class AdminTasks(APIView):
             return True
         except Exception as e:
             settings.LOGGER.error(
-                msg=f"Error in setting project deletion requested: {e}"
+                msg=f"Error in setting project deletion requested: {e}",
+                exc_info=True,
             )
             return False
 
@@ -421,7 +467,7 @@ class AdminTasks(APIView):
                     raise ValueError("Reason must be set to delete project")
 
         except Exception as e:
-            settings.LOGGER.error(msg=f"Error in creating task: {e}")
+            settings.LOGGER.error(msg=f"Error in creating task: {e}", exc_info=True)
             return Response(
                 {"error": "Failed to create task. Please try again."},
                 status=HTTP_400_BAD_REQUEST,
@@ -504,14 +550,15 @@ class AdminTasks(APIView):
 
 
 class PendingTasks(APIView):
+    """Returns pending admin tasks — shares queryset with AdminTasks.get()."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, req):
         settings.LOGGER.info(msg=f"{req.user} is getting all pending admin tasks")
-        # Get all pending tasks
-        all = AdminTask.objects.filter(status=AdminTask.TaskStatus.PENDING)
+        pending_tasks = AdminTask.objects.filter(status=AdminTask.TaskStatus.PENDING)
         ser = AdminTaskSerializer(
-            all,
+            pending_tasks,
             many=True,
         )
         return Response(
@@ -538,59 +585,11 @@ class CheckPendingCaretakerRequestForUser(APIView):
         )
 
 
-class GetPendingCaretakerRequestsForUser(APIView):
-    """
-    Get all pending caretaker requests for a specific user
-    Returns requests where someone wants THIS user to become THEIR caretaker
-    (i.e., where THIS user is in the secondary_users array)
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, req):
-        user_id = req.query_params.get("user_id")
-
-        if not user_id:
-            return Response(
-                {"error": "user_id query parameter is required"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        settings.LOGGER.info(
-            msg=f"{req.user} is getting pending caretaker requests for user {user_id}"
-        )
-
-        # Get all pending caretaker requests where THIS user is being asked to be the caretaker
-        # The user_id should be in the secondary_users array
-        pending_requests = AdminTask.objects.filter(
-            action=AdminTask.ActionTypes.SETCARETAKER,
-            status=AdminTask.TaskStatus.PENDING,
-            secondary_users__contains=[
-                int(user_id)
-            ],  # User is in the secondary_users array
-        )
-
-        # Serialize the requests
-        serializer = AdminTaskSerializer(pending_requests, many=True)
-
-        return Response(
-            serializer.data,
-            status=HTTP_200_OK,
-        )
-
-
 class AdminTaskDetail(APIView):
     permission_classes = [IsAuthenticated]
 
-    def go(self, pk):
-        try:
-            obj = AdminTask.objects.get(pk=pk)
-        except AdminTask.DoesNotExist:
-            raise NotFound
-        return obj
-
     def get(self, req, pk):
-        admin_task = self.go(pk)
+        admin_task = AdminTaskService.get_task(pk)
         ser = AdminTaskSerializer(admin_task)
         return Response(
             ser.data,
@@ -598,7 +597,7 @@ class AdminTaskDetail(APIView):
         )
 
     def delete(self, req, pk):
-        admin_task = self.go(pk)
+        admin_task = AdminTaskService.get_task(pk)
         settings.LOGGER.info(msg=f"{req.user} is deleting admin_task {admin_task}")
         admin_task.delete()
         return Response(
@@ -606,7 +605,7 @@ class AdminTaskDetail(APIView):
         )
 
     def put(self, req, pk):
-        admin_task = self.go(pk)
+        admin_task = AdminTaskService.get_task(pk)
         settings.LOGGER.info(msg=f"{req.user} is updating {admin_task}")
         ser = AdminTaskSerializer(
             admin_task,
@@ -635,222 +634,43 @@ class AdminTaskDetail(APIView):
 class ApproveTask(APIView):
     permission_classes = [IsAdminUser]
 
-    def go(self, pk):
-        try:
-            obj = AdminTask.objects.get(pk=pk)
-        except AdminTask.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_user(self, pk):
-        try:
-            obj = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_memberships(self, user):
-        try:
-            obj = ProjectMember.objects.filter(user=user)
-        except ProjectMember.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_projects(self, user):
-        try:
-            obj = Project.objects.filter(members__user=user)
-        except Project.DoesNotExist:
-            raise NotFound
-        return obj
-
     def post(self, req, pk):
-        task = self.go(pk)
-        settings.LOGGER.info(msg=f"{req.user} is approving task {task}")
-
-        # Approve the task
-        task.status = AdminTask.TaskStatus.APPROVED
-        task.save()
-
-        # Run related functionality
-        with transaction.atomic():
-            try:
-                if task.action == AdminTask.ActionTypes.DELETEPROJECT:
-                    if task.project is None:
-                        raise ValueError("Project must be set to delete")
-                    task.notes = f"Project deletion approved - {task.project.title}"
-                    task.project.delete()
-                    task.project = None
-                    # This will delete all related documents and memberships
-                elif task.action == AdminTask.ActionTypes.MERGEUSER:
-                    if (
-                        task.primary_user is None
-                        or task.secondary_users is None
-                        or len(task.secondary_users) < 1
-                    ):
-                        raise ValueError(
-                            "Primary and single secondary users must be set to merge"
-                        )
-                    # Get the primary user
-                    user_to_merge_into = self.get_user(task.primary_user.pk)
-                    # Get the secondary user/s
-                    users_to_merge = [self.get_user(u) for u in task.secondary_users]
-                    primary_is_staff = user_to_merge_into.is_staff
-                    for merging_user in users_to_merge:
-                        # ========= HANDLE THE PROJECT MEMBERSHIPS =========
-                        # Merge the users projects and memberships into the primary user
-                        for membership in self.get_memberships(merging_user):
-                            # First check if a membership already exists for the primary user
-                            existing_membership = ProjectMember.objects.filter(
-                                project=membership.project, user=user_to_merge_into
-                            ).exists()
-                            if existing_membership:
-                                # If it does and they are leader, retain the leader status
-                                if (
-                                    membership.role
-                                    == ProjectMember.RoleChoices.SUPERVISING
-                                    or existing_membership.role
-                                    == ProjectMember.RoleChoices.SUPERVISING
-                                ):
-                                    existing_membership.role = (
-                                        ProjectMember.RoleChoices.SUPERVISING
-                                    )
-                                else:
-                                    if primary_is_staff:
-                                        if membership.role in [
-                                            ProjectMember.RoleChoices.RESEARCH,
-                                            ProjectMember.RoleChoices.TECHNICAL,
-                                        ]:
-                                            existing_membership.role = membership.role
-                                    else:
-                                        if membership.role in [
-                                            ProjectMember.RoleChoices.EXTERNALCOL,
-                                            ProjectMember.RoleChoices.EXTERNALPEER,
-                                            ProjectMember.RoleChoices.ACADEMICSUPER,
-                                            ProjectMember.RoleChoices.STUDENT,
-                                            ProjectMember.RoleChoices.CONSULTED,
-                                            ProjectMember.RoleChoices.GROUP,
-                                        ]:
-                                            existing_membership.role = membership.role
-                                # Save the existing membership
-                                existing_membership.save()
-                                # Remove the old membership
-                                membership.delete()
-                            # If no existing membership with the same user, change the secondary users membership to the primary user
-                            else:
-                                membership.user = user_to_merge_into
-                                # Ensure that the role is appropriate for the primary user
-                                if primary_is_staff:
-                                    if membership.role in [
-                                        ProjectMember.RoleChoices.RESEARCH,
-                                        ProjectMember.RoleChoices.TECHNICAL,
-                                    ]:
-                                        membership.role = membership.role
-                                else:
-                                    if membership.role in [
-                                        ProjectMember.RoleChoices.EXTERNALCOL,
-                                        ProjectMember.RoleChoices.EXTERNALPEER,
-                                        ProjectMember.RoleChoices.ACADEMICSUPER,
-                                        ProjectMember.RoleChoices.STUDENT,
-                                        ProjectMember.RoleChoices.CONSULTED,
-                                        ProjectMember.RoleChoices.GROUP,
-                                    ]:
-                                        membership.role = membership.role
-                                membership.save()
-
-                        # ========= HANDLE DOCUMENTS AND COMMENTS =========
-                        # Update documents created by merging user
-                        user_created_documents = ProjectDocument.objects.filter(
-                            creator=merging_user
-                        )
-                        user_created_documents.update(creator=user_to_merge_into)
-
-                        # Update documents modified by merging user
-                        user_modified_documents = ProjectDocument.objects.filter(
-                            modifier=merging_user
-                        )
-                        user_modified_documents.update(modifier=user_to_merge_into)
-
-                        # Update comments by merging user
-                        user_comments = Comment.objects.filter(user=merging_user)
-                        user_comments.update(user=user_to_merge_into)
-
-                        # ========= HANDLE DELETION =========
-                        # Delete the user
-                        merging_user.delete()
-
-                elif task.action == AdminTask.ActionTypes.SETCARETAKER:
-                    # Set the caretaker
-                    # Get the primary user
-                    user_who_needs_caretaker = self.get_user(task.primary_user.pk)
-                    # Get the caretaker
-                    caretaker = self.get_user(task.secondary_users[0])
-                    # Create the caretaker
-                    Caretaker.objects.create(
-                        user=user_who_needs_caretaker,
-                        caretaker=caretaker,
-                        reason=task.reason,
-                        notes=task.notes,
-                    )
-                else:
-                    raise ValueError("Task action not recognised")
-
-            except Exception as e:
-                settings.LOGGER.error(msg=f"Error in fulfilling task: {e}")
-                return Response(
-                    status=HTTP_400_BAD_REQUEST,
-                )
-
-            # Fulfill the task
-            task.status = AdminTask.TaskStatus.FULFILLED
-            task.save()
-
+        settings.LOGGER.info(f"{req.user} is approving admin task (pk={pk})")
+        task = AdminTaskService.get_task(pk)
+        try:
+            AdminTaskService.approve_task(task, req.user)
+        except NotFound as e:
             return Response(
-                status=HTTP_202_ACCEPTED,
+                {"error": str(e.detail)},
+                status=HTTP_404_NOT_FOUND,
             )
+        except ValueError as e:
+            return Response(
+                {"error": str(e)},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            settings.LOGGER.error(
+                msg=f"Unexpected error fulfilling task {pk}: {e}", exc_info=True
+            )
+            return Response(
+                {"error": "An unexpected error occurred while fulfilling the task."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(
+            status=HTTP_202_ACCEPTED,
+        )
 
 
 class RejectTask(APIView):
 
     permission_classes = [IsAdminUser]
 
-    def go(self, pk):
-        try:
-            obj = AdminTask.objects.get(pk=pk)
-        except AdminTask.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_user(self, pk):
-        try:
-            obj = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise NotFound
-        return obj
-
     def post(self, req, pk):
-        task = self.go(pk)
-        settings.LOGGER.info(msg=f"{req.user} is rejecting task {task}")
-
-        # Reject the task
-        task.status = AdminTask.TaskStatus.REJECTED
-        task.save()
-
-        # Handle based on type of task
-        if task.action == AdminTask.ActionTypes.DELETEPROJECT:
-            # If a project deletion is rejected, the project deletion is cancelled
-            task.project.deletion_requested = False
-            task.project.save()
-            # Potentially extend to send emails of rejection
-
-        if task.action == AdminTask.ActionTypes.SETCARETAKER:
-            # If a caretaker request is rejected, the caretaker request is cancelled, no additional action is required
-            # Potentially extend to send emails of rejection
-            pass
-
-        if task.action == AdminTask.ActionTypes.MERGEUSER:
-            # If a user merge is rejected, the merge is cancelled
-            # Potentially extend to send emails of rejection
-            pass
+        settings.LOGGER.info(f"{req.user} is rejecting admin task (pk={pk})")
+        task = AdminTaskService.get_task(pk)
+        AdminTaskService.reject_task(task, req.user)
 
         return Response(
             status=HTTP_202_ACCEPTED,
@@ -861,41 +681,10 @@ class CancelTask(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def go(self, pk):
-        try:
-            obj = AdminTask.objects.get(pk=pk)
-        except AdminTask.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_user(self, pk):
-        try:
-            obj = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise NotFound
-        return obj
-
     def post(self, req, pk):
-        task = self.go(pk)
-        settings.LOGGER.info(msg=f"{req.user} is cancelling request for task {task}")
-
-        # Cancel the task
-        task.status = AdminTask.TaskStatus.CANCELLED
-        task.save()
-
-        # Handle based on type of task
-        if task.action == AdminTask.ActionTypes.DELETEPROJECT:
-            # If a project deletion is cancelled, the project deletion is cancelled
-            task.project.deletion_requested = False
-            task.project.save()
-
-        if task.action == AdminTask.ActionTypes.MERGEUSER:
-            # If a user merge is cancelled, the merge is cancelled
-            pass
-
-        if task.action == AdminTask.ActionTypes.SETCARETAKER:
-            # If a caretaker request is cancelled, the caretaker request is cancelled
-            pass
+        settings.LOGGER.info(f"{req.user} is cancelling admin task (pk={pk})")
+        task = AdminTaskService.get_task(pk)
+        AdminTaskService.cancel_task(task, req.user)
 
         return Response(
             status=HTTP_202_ACCEPTED,
@@ -915,12 +704,6 @@ class MergeUsers(APIView):
     """
 
     permission_classes = [IsAdminUser]
-
-    def get_user(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise NotFound
 
     def post(self, req):
         settings.LOGGER.info(msg=f"{req.user} is merging users")
@@ -947,97 +730,479 @@ class MergeUsers(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        primary_user = self.get_user(primary_user_id)
-        secondary_users = User.objects.filter(pk__in=secondary_user_ids)
-        print({"primaryUser": primary_user, "secondaryUsers": secondary_users})
+        primary_user = AdminTaskService.get_user(primary_user_id)
+        secondary_users = list(User.objects.filter(pk__in=secondary_user_ids))
+        settings.LOGGER.info(
+            msg=f"Merging users: primaryUser={primary_user}, secondaryUsers={secondary_users}"
+        )
 
-        with transaction.atomic():
-
-            for u in secondary_users:
-                # Inherit the projects of the secondary user
-                user_projects = ProjectMember.objects.filter(user=u)
-                user_projects.update(user=primary_user)
-
-                # Inherit the roles of the secondary user
-                for project in user_projects:
-                    # Handle if the primary user is also in the project
-                    primary_user_in_project = ProjectMember.objects.filter(
-                        project=project.project, user=primary_user
-                    ).exists()
-                    if primary_user_in_project:
-                        # If the primary user is also in the project and they have a higher role, do not overwrite their role, otherwise overwrite
-                        primary_users_membership = ProjectMember.objects.get(
-                            project=project.project, user=primary_user
-                        )
-
-                        # First check if they are leading the project, if so, retain the primary user role
-                        if (
-                            primary_users_membership.role
-                            in [
-                                ProjectMember.RoleChoices.SUPERVISING,
-                            ]
-                            and primary_user.is_staff
-                        ):
-                            primary_users_membership.role = (
-                                primary_users_membership.role
-                            )
-                        # If not leading, set to the secondary user role
-                        elif (
-                            project.role
-                            in [
-                                ProjectMember.RoleChoices.SUPERVISING,
-                                ProjectMember.RoleChoices.RESEARCH,
-                                ProjectMember.RoleChoices.TECHNICAL,
-                            ]
-                            and primary_user.is_staff
-                        ):
-                            primary_users_membership.role = project.role
-
-                    # Handle if the primary user is not in the project
-                    else:
-                        # If staff, must have staff role
-                        if primary_user.is_staff:
-                            if project.role in [
-                                ProjectMember.RoleChoices.SUPERVISING,
-                                ProjectMember.RoleChoices.RESEARCH,
-                                ProjectMember.RoleChoices.TECHNICAL,
-                            ]:
-                                project.role = project.role
-                            else:
-                                project.role = ProjectMember.RoleChoices.RESEARCH
-                        # If not staff, cannot have staff roles
-                        else:
-                            if project.role in [
-                                ProjectMember.RoleChoices.EXTERNALCOL,
-                                ProjectMember.RoleChoices.EXTERNALPEER,
-                                ProjectMember.RoleChoices.ACADEMICSUPER,
-                                ProjectMember.RoleChoices.STUDENT,
-                                ProjectMember.RoleChoices.CONSULTED,
-                                ProjectMember.RoleChoices.GROUP,
-                            ]:
-                                project.role = project.role
-                            else:
-                                project.role = ProjectMember.RoleChoices.EXTERNALCOL
-                    project.save()
-
-                # Inherit the documents of the secondary user
-                user_created_documents = ProjectDocument.objects.filter(creator=u)
-                user_created_documents.update(creator=primary_user)
-                user_modified_documents = ProjectDocument.objects.filter(modifier=u)
-                user_modified_documents.update(modifier=primary_user)
-
-                # Inherit the comments of the secondary user
-                user_comments = Comment.objects.filter(user=u)
-                user_comments.update(user=primary_user)
-
-                # Delete the user (associated fields will cascade delete on deletion of the user)
-                u.delete()
+        AdminTaskService.merge_users(primary_user, secondary_users)
 
         return Response(status=HTTP_200_OK)
 
 
 # NOTE: AdminSetCaretaker and SetCaretaker views removed - duplicates of caretakers app functionality
 # Use /api/v1/caretakers/admin-set/ instead
+
+
+class SendTestEmail(APIView):
+    """Send a test email to verify email configuration with CID-attached inline images."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, req):
+        from email.mime.image import MIMEImage
+
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts or not admin_opts.email_test_user:
+            return Response(
+                {"error": "Email testing mode must be enabled with a test user set"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        test_user = admin_opts.email_test_user
+        try:
+            # Build template context
+            context = {
+                "recipient_name": (
+                    f"{test_user.display_first_name} {test_user.display_last_name}"
+                ),
+                "test_timestamp": timezone.now().strftime("%d %B %Y, %I:%M %p"),
+                "logo_url": True,  # Truthy so the {% if logo_url %} block renders
+                "site_url": settings.SITE_URL,
+                "site_name": "SPMS",
+            }
+
+            html_content = render_to_string(
+                "./email_templates/test_email.html", context
+            )
+
+            subject = "[TEST] SPMS Test Email — CID Inline Image"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to_email = [test_user.email]
+
+            # Build the email with CID-attached logo
+            msg = EmailMultiAlternatives(
+                subject,
+                "Please view this email in an HTML-compatible email client.",
+                from_email,
+                to_email,
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.mixed_subtype = "related"  # Required for CID inline images
+
+            # Attach the DBCA logo as an inline image
+            logo_path = os.path.join(
+                settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
+            )
+            if os.path.exists(logo_path):
+                with open(logo_path, "rb") as f:
+                    logo_img = MIMEImage(f.read(), _subtype="png")
+                    logo_img.add_header("Content-ID", "<dbca-logo>")
+                    logo_img.add_header(
+                        "Content-Disposition", "inline", filename="dbca.png"
+                    )
+                    msg.attach(logo_img)
+            else:
+                settings.LOGGER.warning(f"DBCA logo not found at {logo_path}")
+
+            msg.send()
+
+            # Save preview files for local visual testing
+            preview_path = None
+            eml_path = None
+            if settings.DEBUG:
+                import base64 as b64mod
+
+                # HTML preview with base64-inlined image (for browser)
+                preview_html = html_content
+                if os.path.exists(logo_path):
+                    with open(logo_path, "rb") as f:
+                        logo_bytes = f.read()
+                        img_b64 = b64mod.b64encode(logo_bytes).decode("utf-8")
+                    preview_html = preview_html.replace(
+                        'src="cid:dbca-logo"',
+                        f'src="data:image/png;base64,{img_b64}"',
+                    )
+                preview_path = os.path.join(
+                    settings.BASE_DIR, "test_email_preview.html"
+                )
+                with open(preview_path, "w") as f:
+                    f.write(preview_html)
+
+                # EML file with CID attachment (for mail client)
+                eml_path = os.path.join(settings.BASE_DIR, "test_email_preview.eml")
+                with open(eml_path, "wb") as f:
+                    f.write(msg.message().as_bytes())
+
+                settings.LOGGER.info(
+                    f"Email previews saved: {preview_path}, {eml_path}"
+                )
+
+            settings.LOGGER.info(f"{req.user} sent test email to {test_user.email}")
+
+            response_data = {"message": f"Test email sent to {test_user.email}"}
+            if preview_path:
+                response_data["preview_file"] = preview_path
+            return Response(response_data)
+        except Exception as e:
+            settings.LOGGER.error(f"Failed to send test email: {e}", exc_info=True)
+            return Response({"error": str(e)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SendAllTestEmails(APIView):
+    """Render and send all email templates with sample data for visual review."""
+
+    permission_classes = [IsAdminUser]
+
+    # All production templates with sample context data
+    TEMPLATES = [
+        {
+            "name": "document_approved_email",
+            "subject": "Concept Plan Approved",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Team Member",
+                "actioning_user_name": "Jane Approver",
+                "actioning_user_email": "approver@dbca.wa.gov.au",
+                "document_type_title": "Concept Plan",
+                "document_type": "concept",
+                "plain_project_name": "Fauna Survey 2026",
+                "project_id": 42,
+                "document_url": "",
+                "stage": 2,
+                "email_subject": "Concept Plan Approved",
+            },
+        },
+        {
+            "name": "document_approved_directorate_email",
+            "subject": "Concept Plan Approved by Directorate",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Director",
+                "actioning_user_name": "Director Smith",
+                "actioning_user_email": "director@dbca.wa.gov.au",
+                "document_type_title": "Concept Plan",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "email_subject": "Concept Plan Approved by Directorate",
+            },
+        },
+        {
+            "name": "document_recalled_email",
+            "subject": "Progress Report Recalled",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Business Area Leader",
+                "actioning_user_name": "John Recaller",
+                "actioning_user_email": "recaller@dbca.wa.gov.au",
+                "document_type_title": "Progress Report",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "feedback_html": "<p>Needs additional data before resubmission. Will update the methodology section and resubmit.</p>",
+                "email_subject": "Progress Report Recalled",
+            },
+        },
+        {
+            "name": "document_sent_back_email",
+            "subject": "Project Plan Sent Back",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Project Lead",
+                "actioning_user_name": "Sarah Reviewer",
+                "actioning_user_email": "reviewer@dbca.wa.gov.au",
+                "document_type_title": "Project Plan",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "feedback_html": "<p>Please revise the budget section and add more detail to the timeline.</p>",
+                "email_subject": "Project Plan Sent Back",
+            },
+        },
+        {
+            "name": "document_ready_email",
+            "subject": "Student Report Ready for Review",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Business Area Leader",
+                "actioning_user_name": "Alex Submitter",
+                "actioning_user_email": "submitter@dbca.wa.gov.au",
+                "document_type_title": "Student Report",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "email_subject": "Student Report Ready for Review",
+            },
+        },
+        {
+            "name": "feedback_received_email",
+            "subject": "Feedback on Concept Plan",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Team Member",
+                "actioning_user_name": "Mike Feedback",
+                "actioning_user_email": "feedback@dbca.wa.gov.au",
+                "document_type_title": "Concept Plan",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "feedback_text": "The methodology section could use more detail on sampling approach.",
+                "email_subject": "Feedback on Concept Plan",
+            },
+        },
+        {
+            "name": "review_document_email",
+            "subject": "Review Requested: Project Plan",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Approver",
+                "actioning_user_name": "Lisa Requester",
+                "actioning_user_email": "requester@dbca.wa.gov.au",
+                "document_type_title": "Project Plan",
+                "plain_project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "email_subject": "Review Requested: Project Plan",
+            },
+        },
+        {
+            "name": "bump_email",
+            "subject": "SPMS: Action Required - Fauna Survey 2026",
+            "context": {
+                "recipient_name": "Test User",
+                "recipient_email": "test@dbca.wa.gov.au",
+                "actioning_user_name": "Admin User",
+                "actioning_user_email": "admin@dbca.wa.gov.au",
+                "project_title": "Fauna Survey 2026",
+                "project_id": 42,
+                "document_kind": "Progress Report",
+                "document_kind_raw": "progressreport",
+                "action_capacity": "Approver",
+                "document_url": "",
+                "email_subject": "SPMS: Action Required - Fauna Survey 2026",
+            },
+        },
+        {
+            "name": "document_comment_mention",
+            "subject": "SPMS: You were mentioned in a comment",
+            "context": {
+                "recipient_name": "Test User",
+                "commenter_name": "Jane Smith",
+                "document_type_title": "Concept Plan",
+                "project_tag": "SP-042",
+                "project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "comment_content": "Hey, can you review the budget section?",
+                "is_mention": True,
+            },
+        },
+        {
+            "name": "new_comment_email",
+            "subject": "SPMS: New comment on Concept Plan (SP-042)",
+            "context": {
+                "recipient_name": "Test User",
+                "commenter_name": "Jane Smith",
+                "document_type_title": "Concept Plan",
+                "project_tag": "SP-042",
+                "project_name": "Fauna Survey 2026",
+                "document_url": "",
+                "comment_content": "I have updated the methodology section as discussed.",
+            },
+        },
+        {
+            "name": "new_cycle_open_email",
+            "subject": "SPMS: New Reporting Cycle Open",
+            "context": {
+                "recipient_name": "Test User",
+                "actioning_user_name": "Admin User",
+                "actioning_user_email": "admin@dbca.wa.gov.au",
+                "financial_year_string": "2025-2026",
+                "division_name": "Biodiversity and Conservation Science",
+                "email_subject": "SPMS: New Reporting Cycle Open",
+            },
+        },
+        {
+            "name": "project_closed_email",
+            "subject": "Project Closed: Fauna Survey 2026",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Team Member",
+                "actioning_user_name": "Admin Closer",
+                "actioning_user_email": "closer@dbca.wa.gov.au",
+                "project_url": "",
+                "email_subject": "Project Closed: Fauna Survey 2026",
+            },
+        },
+        {
+            "name": "project_reopened_email",
+            "subject": "Project Reopened: Fauna Survey 2026",
+            "context": {
+                "recipient_name": "Test User",
+                "user_kind": "Team Member",
+                "actioning_user_name": "Admin Reopener",
+                "actioning_user_email": "reopener@dbca.wa.gov.au",
+                "project_url": "",
+                "email_subject": "Project Reopened: Fauna Survey 2026",
+            },
+        },
+        {
+            "name": "spms_link_email",
+            "subject": "You have been invited to SPMS",
+            "context": {
+                "actioning_user_name": "Admin Inviter",
+                "actioning_user_email": "inviter@dbca.wa.gov.au",
+                "invite_link": "",
+                "email_subject": "You have been invited to SPMS",
+            },
+        },
+    ]
+
+    def post(self, req):
+        import base64 as b64mod
+        from email.mime.image import MIMEImage
+
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts or not admin_opts.email_test_user:
+            return Response(
+                {"error": "Email testing mode must be enabled with a test user set"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        test_user = admin_opts.email_test_user
+
+        # Optional user overrides for realistic test emails
+        recipient_user_id = req.data.get("recipient_user_id")
+        actioner_user_id = req.data.get("actioner_user_id")
+
+        recipient_override = None
+        actioner_override = None
+
+        if recipient_user_id:
+            try:
+                recipient_override = User.objects.get(pk=recipient_user_id)
+            except User.DoesNotExist:
+                pass
+
+        if actioner_user_id:
+            try:
+                actioner_override = User.objects.get(pk=actioner_user_id)
+            except User.DoesNotExist:
+                pass
+
+        logo_path = os.path.join(
+            settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
+        )
+
+        # Read logo once for all emails
+        logo_data = None
+        logo_b64 = None
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as f:
+                logo_data = f.read()
+                logo_b64 = b64mod.b64encode(logo_data).decode("utf-8")
+
+        # Create preview directory
+        preview_dir = os.path.join(settings.BASE_DIR, "email_previews")
+        os.makedirs(preview_dir, exist_ok=True)
+
+        base_context = {
+            "logo_url": True,
+            "site_url": settings.SITE_URL,
+            "site_name": "SPMS",
+        }
+
+        results = []
+        for tmpl in self.TEMPLATES:
+            template_file = f"./email_templates/{tmpl['name']}.html"
+            context = {**base_context, **tmpl["context"]}
+
+            # Apply user overrides if provided
+            if recipient_override:
+                r_name = f"{recipient_override.display_first_name} {recipient_override.display_last_name}"
+                context["recipient_name"] = r_name
+                if "recipient_email" in context:
+                    context["recipient_email"] = recipient_override.email
+
+            if actioner_override:
+                a_name = f"{actioner_override.display_first_name} {actioner_override.display_last_name}"
+                a_email = actioner_override.email
+                for key in ("actioning_user_name", "commenter_name"):
+                    if key in context:
+                        context[key] = a_name
+                for key in ("actioning_user_email",):
+                    if key in context:
+                        context[key] = a_email
+
+            # Fill in empty URLs with site_url
+            for url_key in ("document_url", "project_url", "invite_link"):
+                if url_key in context and not context[url_key]:
+                    context[url_key] = settings.SITE_URL
+
+            try:
+                html_content = render_to_string(template_file, context)
+            except Exception as e:
+                results.append({"template": tmpl["name"], "error": str(e)})
+                continue
+
+            subject = f"[TEST] {tmpl['subject']}"
+
+            # Build email message with CID
+            msg = EmailMultiAlternatives(
+                subject,
+                "Please view this email in an HTML-compatible email client.",
+                settings.DEFAULT_FROM_EMAIL,
+                [test_user.email],
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.mixed_subtype = "related"
+
+            if logo_data:
+                logo_img = MIMEImage(logo_data, _subtype="png")
+                logo_img.add_header("Content-ID", "<dbca-logo>")
+                logo_img.add_header(
+                    "Content-Disposition", "inline", filename="dbca.png"
+                )
+                msg.attach(logo_img)
+
+            # Send the email
+            try:
+                msg.send()
+            except Exception as e:
+                settings.LOGGER.warning(f"Failed to send {tmpl['name']}: {e}")
+
+            # Save HTML preview (base64 inlined image)
+            if settings.DEBUG and logo_b64:
+                preview_html = html_content.replace(
+                    'src="cid:dbca-logo"',
+                    f'src="data:image/png;base64,{logo_b64}"',
+                )
+            else:
+                preview_html = html_content
+
+            html_path = os.path.join(preview_dir, f"{tmpl['name']}.html")
+            with open(html_path, "w") as f:
+                f.write(preview_html)
+
+            # Save EML preview
+            eml_path = os.path.join(preview_dir, f"{tmpl['name']}.eml")
+            with open(eml_path, "wb") as f:
+                f.write(msg.message().as_bytes())
+
+            results.append({"template": tmpl["name"], "status": "ok"})
+
+        settings.LOGGER.info(
+            f"{req.user} sent all test emails ({len(results)} templates)"
+        )
+
+        return Response(
+            {
+                "message": f"Rendered {len(results)} email templates",
+                "preview_dir": preview_dir,
+                "results": results,
+            }
+        )
 
 
 class RespondToCaretakerRequest(APIView):
@@ -1048,103 +1213,40 @@ class RespondToCaretakerRequest(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get_task(self, pk):
-        try:
-            obj = AdminTask.objects.get(pk=pk)
-        except AdminTask.DoesNotExist:
-            raise NotFound
-        return obj
-
-    def get_user(self, pk):
-        try:
-            obj = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise NotFound
-        return obj
-
     def post(self, req, pk):
         """
         Approve or reject a caretaker request.
         Body: { "action": "approve" | "reject" }
         """
-        task = self.get_task(pk)
+        settings.LOGGER.info(f"{req.user} is responding to caretaker request (pk={pk})")
+        task = AdminTaskService.get_task(pk)
         action = req.data.get("action")
 
-        # Validate that the task is a caretaker request
-        if task.action != AdminTask.ActionTypes.SETCARETAKER:
-            return Response(
-                {"error": "This endpoint only handles caretaker requests"},
-                status=HTTP_400_BAD_REQUEST,
+        try:
+            result = AdminTaskService.respond_to_caretaker_request(
+                task, action, req.user
             )
-
-        # Validate that the task is pending
-        if task.status != AdminTask.TaskStatus.PENDING:
-            return Response(
-                {"error": "This request has already been processed"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        # Validate that the current user is the requested caretaker
-        if req.user.pk not in task.secondary_users:
+        except PermissionError:
             return Response(
                 {"error": "You are not authorized to respond to this request"},
                 status=HTTP_401_UNAUTHORIZED,
             )
-
-        # Validate action
-        if action not in ["approve", "reject"]:
+        except ValueError as e:
             return Response(
-                {"error": "Action must be 'approve' or 'reject'"},
+                {"error": str(e)},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            settings.LOGGER.error(msg=f"Error in fulfilling task: {e}", exc_info=True)
+            return Response(
+                {"error": "Failed to create caretaker relationship"},
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        settings.LOGGER.info(msg=f"{req.user} is {action}ing caretaker request {task}")
-
-        if action == "approve":
-            # Approve and fulfill the task
-            task.status = AdminTask.TaskStatus.APPROVED
-            task.save()
-
-            with transaction.atomic():
-                try:
-                    # Get the primary user (who needs a caretaker)
-                    user_who_needs_caretaker = self.get_user(task.primary_user.pk)
-                    # Get the caretaker (current user)
-                    caretaker = self.get_user(task.secondary_users[0])
-
-                    # Create the caretaker relationship
-                    Caretaker.objects.create(
-                        user=user_who_needs_caretaker,
-                        caretaker=caretaker,
-                        reason=task.reason,
-                        notes=task.notes,
-                    )
-
-                    # Fulfill the task
-                    task.status = AdminTask.TaskStatus.FULFILLED
-                    task.save()
-
-                    return Response(
-                        {"message": "Caretaker request approved successfully"},
-                        status=HTTP_202_ACCEPTED,
-                    )
-
-                except Exception as e:
-                    settings.LOGGER.error(msg=f"Error in fulfilling task: {e}")
-                    return Response(
-                        {"error": "Failed to create caretaker relationship"},
-                        status=HTTP_400_BAD_REQUEST,
-                    )
-
-        else:  # action == "reject"
-            # Reject the task
-            task.status = AdminTask.TaskStatus.REJECTED
-            task.save()
-
-            return Response(
-                {"message": "Caretaker request rejected successfully"},
-                status=HTTP_202_ACCEPTED,
-            )
+        return Response(
+            result,
+            status=HTTP_202_ACCEPTED,
+        )
 
 
 # endregion  =================================================================================================

@@ -86,7 +86,7 @@ export interface ListButtonProps {
 
 export interface UnifiedListButtonProps {
 	isList: boolean;
-	listType: "bullet" | "number" | null;
+	listType: "bullet" | "number" | "check" | null;
 	onCycleList: () => void;
 	disabled?: boolean;
 }

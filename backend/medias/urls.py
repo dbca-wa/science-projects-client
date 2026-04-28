@@ -32,4 +32,7 @@ urlpatterns = [
     # User Avatars
     path("user_avatars", views.UserAvatars.as_view()),
     path("user_avatars/<int:pk>", views.UserAvatarDetail.as_view()),
+    # Editor Images (for rich text editor content)
+    path("editor_images", views.EditorImages.as_view()),
+    path("editor_images/<int:pk>", views.EditorImageDetail.as_view()),
 ]

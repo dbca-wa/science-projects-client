@@ -150,6 +150,7 @@ class UpdateProgressReport(APIView):
 
     def post(self, request):
         """Update a specific section of the progress report"""
+        settings.LOGGER.info(f"{request.user} is updating progress report data")
         try:
             report = ProgressReport.objects.filter(
                 document=int(request.data["main_document_id"])

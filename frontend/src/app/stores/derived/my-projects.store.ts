@@ -72,7 +72,7 @@ export class MyProjectsStore extends BaseStore<MyProjectsStoreState> {
 	 */
 	async initialise() {
 		this.state.initialised = true;
-		logger.info("MyProjects store initialized");
+		logger.info("MyProjects store initialised");
 	}
 
 	/**

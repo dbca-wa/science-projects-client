@@ -2,7 +2,7 @@
  * DataTableRow Component
  *
  * Individual row component for DataTable with responsive layout.
- * Uses CSS classes for responsive behavior instead of JS-based detection.
+ * Uses CSS classes for responsive behaviour instead of JS-based detection.
  */
 
 import type { ColumnDef, DataTableTheme } from "./types";

@@ -1,0 +1,21 @@
+{% comment %}
+Email comment/feedback box partial — renders a styled quote box with blue background.
+
+Required context:
+  - comment_label: heading text (e.g. "Comment:", "Feedback:")
+  - comment_text: the content to display
+{% endcomment %}
+{% if comment_text %}
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top: 28px; margin-bottom: 28px;">
+  <tbody>
+    <tr>
+      <td style="padding: 24px; background-color: #eff6ff; border-radius: 12px;">
+        <p style="font-size: 16px; font-weight: 700; color: #1e40af; margin: 0 0 8px 0; letter-spacing: -0.3px;">{{ comment_label }}</p>
+        <div style="font-size: 14px; line-height: 22px; color: #4b5563; font-style: italic; padding: 12px; background-color: #ffffff; border-radius: 8px; border-left: 3px solid #2563eb;">
+          "{{ comment_text }}"
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{% endif %}

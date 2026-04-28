@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { useState, useRef, useCallback } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
 	Loader2,
@@ -35,9 +34,9 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { useReportMedia } from "@/features/reports/hooks/useReports";
 import {
-	uploadReportMedia,
-	deleteReportMedia,
-} from "@/features/reports/services/report.service";
+	useUploadReportMedia,
+	useDeleteReportMedia,
+} from "@/features/reports/hooks/useReportMedia";
 import type { IReportMedia } from "@/features/reports/services/report.service";
 import type { IAnnualReport } from "@/features/reports/types/report.types";
 import { compressImage } from "@/shared/utils/image-compression.utils";
@@ -52,7 +51,7 @@ const SECTION_TITLES: Record<string, string> = {
 	service_delivery: "Service Delivery Chapter Image",
 	research: "Research Chapter Image",
 	partnerships: "Partnerships Chapter Image",
-	collaborations: "Collaborations Chapter Image",
+	// collaborations: not used in the annual report template
 	student_projects: "Student Projects Chapter Image",
 	publications: "Publications Chapter Image",
 } as const;
@@ -85,11 +84,7 @@ const SECTION_CONFIG: Record<
 		cropAspect: 210 / 78,
 		chapterTitle: "External Partnerships",
 	},
-	collaborations: {
-		preview: "chapter",
-		cropAspect: 210 / 78,
-		chapterTitle: "External Partnerships",
-	},
+	// collaborations: not used in the annual report template
 	student_projects: {
 		preview: "chapter",
 		cropAspect: 210 / 78,
@@ -321,7 +316,6 @@ function ReportMediaCard({
 	currentMedia,
 	reportPk,
 }: ReportMediaCardProps) {
-	const queryClient = useQueryClient();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [imgError, setImgError] = useState(false);
 	const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -333,33 +327,18 @@ function ReportMediaCard({
 	const [originalFileName, setOriginalFileName] = useState("image.jpg");
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-	const uploadMutation = useMutation({
-		mutationFn: (file: File) => uploadReportMedia(reportPk, section, file),
-		onSuccess: async () => {
+	const uploadMutation = useUploadReportMedia(reportPk, section, {
+		onSuccess: () => {
 			setImgError(false);
-			// Refetch first, THEN clear preview so there's no flash of empty state
-			await queryClient.invalidateQueries({ queryKey: ["reports", "media"] });
 			if (previewUrl) URL.revokeObjectURL(previewUrl);
 			setPreviewUrl(null);
-			toast.success("Image uploaded");
 		},
-		onError: (error: Error) => {
+		onError: () => {
 			setPreviewUrl(null);
-			toast.error(error.message || "Failed to upload image");
 		},
 	});
 
-	const deleteMutation = useMutation({
-		mutationFn: () => deleteReportMedia(reportPk, section),
-		onSuccess: async () => {
-			setImgError(false);
-			await queryClient.invalidateQueries({ queryKey: ["reports", "media"] });
-			toast.success("Image deleted");
-		},
-		onError: (error: Error) => {
-			toast.error(error.message || "Failed to delete image");
-		},
-	});
+	const deleteMutation = useDeleteReportMedia(reportPk, section);
 
 	const handleFile = async (file: File) => {
 		if (

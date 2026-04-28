@@ -27,11 +27,7 @@ export const useReactions = (commentId: number | undefined) => {
 	return useQuery({
 		queryKey: reactionKeys.list(commentId as number),
 		queryFn: async () => {
-			console.log(
-				`[useReactions] Fetching reactions for comment ${commentId}...`
-			);
 			const result = await getReactions(commentId as number);
-			console.log(`[useReactions] Fetched ${result.length} reactions`);
 			return result;
 		},
 		staleTime: 30_000, // 30 seconds for dynamic data
@@ -58,10 +54,6 @@ export const useToggleReaction = (commentId: number) => {
 
 		// Optimistic update
 		onMutate: async (reactionType) => {
-			console.log(
-				`[useToggleReaction] Optimistically updating reaction ${reactionType} for comment ${commentId}`
-			);
-
 			// Cancel outgoing refetches
 			await queryClient.cancelQueries({
 				queryKey: reactionKeys.list(commentId),
@@ -90,15 +82,9 @@ export const useToggleReaction = (commentId: number) => {
 
 					if (existingReactionIndex >= 0) {
 						// Remove THIS reaction (user clicked their own reaction)
-						console.log(
-							`[useToggleReaction] Removing reaction ${reactionType}`
-						);
 						return old.filter((_, i) => i !== existingReactionIndex);
 					} else if (userHasAnyReaction) {
 						// Replace existing reaction with new one (one-reaction-per-user)
-						console.log(
-							`[useToggleReaction] Replacing existing reaction with ${reactionType}`
-						);
 						return old.map((r) =>
 							r.user.id === currentUser.id
 								? {
@@ -110,7 +96,6 @@ export const useToggleReaction = (commentId: number) => {
 						);
 					} else {
 						// Add new reaction (user has no reactions yet)
-						console.log(`[useToggleReaction] Adding reaction ${reactionType}`);
 						return [
 							...old,
 							{
@@ -145,9 +130,6 @@ export const useToggleReaction = (commentId: number) => {
 
 		// Refetch on success
 		onSuccess: () => {
-			console.log(
-				`[useToggleReaction] Successfully toggled reaction, invalidating queries`
-			);
 			queryClient.invalidateQueries({
 				queryKey: reactionKeys.list(commentId),
 			});

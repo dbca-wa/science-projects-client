@@ -706,3 +706,50 @@ class UserAvatar(CommonModel):
 
 
 # endregion ===========================================================================================================
+
+
+# region EDITOR IMAGES ======================================================================================================
+
+
+class EditorImage(CommonModel):
+    """
+    Generic image storage for rich text editor content.
+
+    Images uploaded via the RTE are stored here and referenced by URL
+    in the HTML content. This avoids bloating text fields with base64 data
+    and enables proper caching, CDN delivery, and orphan cleanup.
+    """
+
+    file = models.ImageField(upload_to="editor/", blank=True, null=True)
+    uploader = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="editor_images_uploaded",
+    )
+    size = models.PositiveIntegerField(default=0)
+    alt_text = models.CharField(max_length=500, blank=True, default="")
+
+    def save(self, *args, **kwargs):
+        if self.file and _check_file_changed(self):
+            sanitised_name, content = _validate_and_save_file(
+                self.file, validate_image_upload, max_size=IMAGE_MAX_SIZE
+            )
+            _apply_content_hash_and_cleanup(
+                self, validated_content=content, sanitised_name=sanitised_name
+            )
+
+        if self.file:
+            self.size = self.file.size
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"Editor Image ({self.alt_text or 'untitled'})"
+
+    class Meta:
+        verbose_name = "Editor Image"
+        verbose_name_plural = "Editor Images"
+
+
+# endregion ===========================================================================================================

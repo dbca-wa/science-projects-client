@@ -37,8 +37,8 @@ interface CropControlsProps {
  */
 /**
  * Validates image URL to prevent XSS attacks
- * Only allows safe protocols: http, https, blob
- * Rejects javascript: and malicious data: URIs
+ * Only allows safe protocols: http, https, blob, data
+ * Rejects javascript: and other malicious URIs
  */
 function isValidImageUrl(url: string): boolean {
 	if (!url) return false;
@@ -47,7 +47,7 @@ function isValidImageUrl(url: string): boolean {
 		const parsed = new URL(url, window.location.href);
 
 		// Allow only safe protocols
-		const safeProtocols = ["http:", "https:", "blob:"];
+		const safeProtocols = ["http:", "https:", "blob:", "data:"];
 		if (!safeProtocols.includes(parsed.protocol)) {
 			console.warn(`Rejected unsafe image URL protocol: ${parsed.protocol}`);
 			return false;

@@ -73,7 +73,7 @@ export const UserEditForm = ({
 	const { data: branches, isLoading: isLoadingBranches } = useBranches();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	// Initialize form
+	// Initialise form
 	const form = useForm<UserEditFormData>({
 		resolver: zodResolver(userEditSchema),
 		defaultValues: {

@@ -1,0 +1,27 @@
+{% comment %}
+Email header partial — renders the DBCA logo and a dynamic title.
+
+Required context:
+  - logo_url: truthy value to show the logo (actual image via CID attachment)
+  - email_title: the heading text displayed below the logo
+{% endcomment %}
+{% if logo_url %}
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="padding-top: 32px;">
+  <tbody>
+    <tr>
+      <td align="center" style="text-align: center">
+        <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
+          <tr>
+            <td align="center">
+              <img alt="DBCA Logo" width="180" height="180" src="cid:dbca-logo" style="display: block; outline: none; border: none; text-decoration: none; width: 180px; height: 180px;" />
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{% endif %}
+<h1 style="color: #1f2937; font-size: 28px; font-weight: 700; text-align: center; padding: 0; margin-top: 16px; margin-bottom: 24px; margin-left: 0; margin-right: 0; letter-spacing: -0.5px;">
+  {{ email_title }}
+</h1>

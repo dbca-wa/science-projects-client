@@ -14,7 +14,7 @@ interface NavigationButtonProps extends VariantProps<typeof buttonVariants> {
 /**
  * NavigationButton - Enhanced button component with Ctrl+Click support
  *
- * Uses <a> tag with href to enable natural browser Ctrl+Click behavior
+ * Uses <a> tag with href to enable natural browser Ctrl+Click behaviour
  * while intercepting standard clicks for React Router navigation.
  */
 export const NavigationButton = forwardRef<

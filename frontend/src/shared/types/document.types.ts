@@ -159,14 +159,6 @@ export interface IProjectClosure {
 	backup_location: string | null;
 }
 
-// Define the union type
-// type IProjectDocument =
-// 	| IConceptPlan
-// 	| IProjectPlan
-// 	| IProgressReport
-// 	| IStudentReport
-// 	| IProjectClosure;
-
 export interface IProjectDocuments {
 	concept_plan: IConceptPlan | null;
 	project_plan: IProjectPlan | null;
@@ -261,5 +253,40 @@ export interface IAnnualReportPDFObject {
 		id: number;
 		pdf_generation_in_progress: boolean;
 		year: number;
+	};
+}
+
+// PENDING ACTION DOCUMENT (used by dashboard and caretakers) ===================================
+
+/**
+ * Project document requiring user action.
+ * Represents documents like concept plans, project plans, progress reports, etc.
+ * Used by both dashboard and caretakers features for task displays.
+ */
+export interface IProjectDocument {
+	id: number;
+	kind:
+		| "concept"
+		| "projectplan"
+		| "progressreport"
+		| "studentreport"
+		| "projectclosure";
+	status: string;
+	project: {
+		id: number;
+		title: string;
+		kind: string;
+		year: number;
+		number: number;
+	};
+	project_lead_approval_granted: boolean;
+	business_area_lead_approval_granted: boolean;
+	directorate_approval_granted: boolean;
+	for_user?: {
+		id: number;
+		display_first_name: string;
+		display_last_name: string;
+		email: string;
+		image: string | null;
 	};
 }

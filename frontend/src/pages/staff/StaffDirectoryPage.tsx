@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { useStaffProfiles } from "@/features/staff-profiles/hooks/useStaffProfiles";
 import { useCurrentUser } from "@/features/auth";
@@ -13,6 +13,28 @@ const PAGE_SIZE = 24;
 
 const StaffDirectoryPage = () => {
 	useDocumentTitle("Staff Directory");
+
+	// Inject CollectionPage schema JSON-LD for search engine structured data
+	useEffect(() => {
+		const script = document.createElement("script");
+		script.type = "application/ld+json";
+		script.textContent = JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "CollectionPage",
+			name: "BCS Staff Directory",
+			description:
+				"Staff directory for the Biodiversity and Conservation Science Division, Department of Biodiversity, Conservation and Attractions.",
+			url: window.location.href,
+			isPartOf: {
+				"@type": "WebSite",
+				name: "Science Project Management System",
+			},
+		});
+		document.head.appendChild(script);
+		return () => {
+			document.head.removeChild(script);
+		};
+	}, []);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const { data: user } = useCurrentUser();
 

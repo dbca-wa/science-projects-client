@@ -30,8 +30,6 @@ export const useSuspendProject = () => {
 		mutationFn: suspendProject,
 		onSuccess: async (_, variables) => {
 			const action = variables.suspend ? "suspended" : "unsuspended";
-			console.log(`[useSuspendProject] Mutation succeeded - ${action}`);
-			console.log(`[useSuspendProject] projectId:`, variables.projectId);
 
 			toast.success(`Project has been ${action}`);
 
@@ -47,8 +45,6 @@ export const useSuspendProject = () => {
 					);
 				},
 			});
-
-			console.log(`[useSuspendProject] Query invalidation complete`);
 		},
 		onError: (error: Error, variables) => {
 			const action = variables.suspend ? "suspend" : "unsuspend";

@@ -1,7 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-	getDivisions,
 	createDivision,
 	updateDivision,
 	deleteDivision,
@@ -10,15 +9,8 @@ import {
 } from "../services/admin.service";
 import type { IDivisionForm } from "../types/admin.types";
 
-/**
- * Fetch all divisions
- */
-export const useDivisions = () =>
-	useQuery({
-		queryKey: ["divisions"],
-		queryFn: getDivisions,
-		staleTime: 10 * 60_000,
-	});
+// Re-export from shared for backward compatibility
+export { useDivisions } from "@/shared/hooks/queries/useDivisions";
 
 /**
  * Create a new division

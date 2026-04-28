@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useState, useEffect, useRef } from "react";
 import { useApproveCaretakerTask } from "../hooks/useApproveCaretakerTask";
 import { useRejectCaretakerTask } from "../hooks/useRejectCaretakerTask";
-import { useAdminTasks } from "@/features/dashboard/hooks/useDashboardTasks";
+import { useAdminTasks } from "@/shared/hooks/queries/useAdminTasks";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {
@@ -26,8 +26,8 @@ import {
 import { AlertCircle, X, Check, XCircle, Loader2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { formatCaretakerReason } from "@/features/dashboard/utils/dashboard.utils";
-import type { IAdminTask } from "@/features/dashboard/types/admin-tasks.types";
+import { formatCaretakerReason } from "@/shared/utils/caretaker.utils";
+import type { IAdminTask } from "@/shared/types/admin.types";
 
 interface CaretakerApprovalModalProps {
 	taskId: number | null;

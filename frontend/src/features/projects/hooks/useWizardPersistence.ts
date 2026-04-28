@@ -236,7 +236,7 @@ export const useWizardPersistence = () => {
 	 * Save draft when wizard state changes
 	 */
 	useEffect(() => {
-		// Only save if wizard has been initialized with a project kind
+		// Only save if wizard has been initialised with a project kind
 		if (wizardStore.state.projectKind) {
 			saveDraft();
 		}

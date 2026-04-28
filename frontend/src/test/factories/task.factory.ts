@@ -1,7 +1,5 @@
-import type {
-	IProjectDocument,
-	IEndorsement,
-} from "@/features/dashboard/types/dashboard.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
+import type { IEndorsement } from "@/features/dashboard/types/dashboard.types";
 
 /**
  * Create a mock document task for testing

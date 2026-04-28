@@ -23,7 +23,7 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import type { IProjectDocument } from "@/features/dashboard/types/dashboard.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
 import {
 	combineProjectLevelTasks,
 	sortTasksByLevel,
@@ -32,8 +32,8 @@ import {
 	getDocumentKindTitle,
 	extractPlainTextTitle,
 	type IDocumentTaskWithLevel,
-} from "@/features/dashboard/utils/document-tasks.utils";
-import { TASK_LEVEL_CONFIG } from "@/features/dashboard/constants/document-tasks.constants";
+} from "@/shared/utils/document-tasks.utils";
+import { TASK_LEVEL_CONFIG } from "@/shared/constants/document-tasks.constants";
 
 interface CaretakerDocumentsDataTableProps {
 	teamTasks: IProjectDocument[];

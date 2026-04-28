@@ -9,7 +9,7 @@ import {
 	TooltipTrigger,
 	TooltipContent,
 } from "@/shared/components/ui/tooltip";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StaffHero from "@/features/staff-profiles/components/detail/StaffHero";
 import StaffContentTabs from "@/features/staff-profiles/components/detail/StaffContentTabs";
 
@@ -26,6 +26,36 @@ const StaffProfileDetailPage = () => {
 		? `${heroData.user.first_name || ""} ${heroData.user.last_name || ""}`.trim()
 		: "";
 	useDocumentTitle(staffName || "Staff Profile");
+
+	const canEdit =
+		!!user &&
+		!!heroData?.user &&
+		(user.id === heroData.user.id || user.is_superuser === true);
+
+	// Inject Person schema JSON-LD for search engine structured data
+	useEffect(() => {
+		if (!heroData?.user) return;
+
+		const script = document.createElement("script");
+		script.type = "application/ld+json";
+		script.textContent = JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "Person",
+			name: `${heroData.user.first_name} ${heroData.user.last_name}`.trim(),
+			jobTitle: heroData.it_asset_data?.title ?? undefined,
+			description: heroData.about ?? undefined,
+			worksFor: {
+				"@type": "Organization",
+				name: "Department of Biodiversity, Conservation and Attractions",
+				url: "https://www.dbca.wa.gov.au/",
+			},
+			url: window.location.href,
+		});
+		document.head.appendChild(script);
+		return () => {
+			document.head.removeChild(script);
+		};
+	}, [heroData]);
 
 	if (isLoading) {
 		return (
@@ -84,9 +114,6 @@ const StaffProfileDetailPage = () => {
 			</main>
 		);
 	}
-
-	const canEdit =
-		!!user && (user.id === heroData.user.id || user.is_superuser === true);
 
 	return (
 		<main

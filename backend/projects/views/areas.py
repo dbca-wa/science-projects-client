@@ -29,6 +29,7 @@ class ProjectAreas(APIView):
 
     def post(self, request):
         """Create project area"""
+        settings.LOGGER.info(f"{request.user} is creating project area")
         serializer = ProjectAreaSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -54,6 +55,7 @@ class ProjectAreaDetail(APIView):
 
     def put(self, request, pk):
         """Update project area"""
+        settings.LOGGER.info(f"{request.user} is updating project area (pk={pk})")
         serializer = ProjectAreaSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -69,6 +71,7 @@ class ProjectAreaDetail(APIView):
 
     def delete(self, request, pk):
         """Delete project area"""
+        settings.LOGGER.warning(f"{request.user} is deleting project area (pk={pk})")
         AreaService.delete_project_area(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 

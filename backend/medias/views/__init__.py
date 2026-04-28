@@ -14,6 +14,7 @@ from .annual_reports import (
     LegacyAnnualReportPDFs,
 )
 from .avatars import UserAvatarDetail, UserAvatars
+from .editor_images import EditorImageDetail, EditorImages
 from .photos import (
     AgencyPhotoDetail,
     AgencyPhotos,
@@ -51,4 +52,7 @@ __all__ = [
     # Avatars
     "UserAvatars",
     "UserAvatarDetail",
+    # Editor images
+    "EditorImages",
+    "EditorImageDetail",
 ]

@@ -18,14 +18,15 @@ import { formatAuthors } from "../../utils/authors/authors.utils";
 import { formatYearRange } from "../../utils/year.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { Info, Building2, Calendar, Layers } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/features/auth";
+import { canEditProject } from "@/shared/utils/project-permissions.utils";
 import { checkTeamManagementPermissions } from "../../utils/permissions/team-permissions.utils";
 import { ProjectTeamSection } from "../team/ProjectTeamSection";
 import { ExternalProjectSections } from "../overview/ExternalProjectSections";
 import { StudentProjectSections } from "../overview/StudentProjectSections";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCancelDeletionRequest } from "../../hooks/useCancelDeletionRequest";
 import { CreateStudentReportModal } from "../modals/CreateStudentReportModal";
 import { CreateProgressReportModal } from "../modals/CreateProgressReportModal";
 import { ProjectSuspensionModal } from "../modals/ProjectSuspensionModal";
@@ -34,7 +35,6 @@ import { ReopenProjectModal } from "../modals/ReopenProjectModal";
 import { SetProjectStatusModal } from "../modals/SetProjectStatusModal";
 import { DeleteProjectModal } from "../modals/DeleteProjectModal";
 import { RequestDeleteProjectModal } from "../modals/RequestDeleteProjectModal";
-import { apiClient } from "@/shared/services/api/client.service";
 
 interface OverviewTabProps {
 	project: IProjectData;
@@ -58,9 +58,6 @@ export function OverviewTab({
 				.canManageTeam
 		: false;
 
-	// Query client for invalidation
-	const queryClient = useQueryClient();
-
 	// Modal state management
 	const [isCreateStudentReportOpen, setIsCreateStudentReportOpen] =
 		useState(false);
@@ -74,36 +71,11 @@ export function OverviewTab({
 	const [isRequestDeleteModalOpen, setIsRequestDeleteModalOpen] =
 		useState(false);
 
-	// Debug logging
-	useEffect(() => {
-		console.log("=== PROJECT DATA ===");
-		console.log("Project:", project);
-		console.log("Members:", members);
-		console.log("Details:", _details);
-		console.log("Project Kind:", project.kind);
-		console.log("Is External:", project.kind === "external");
-		console.log("External Details:", _details?.external);
-
-		// Debug members structure
-		if (members && members.length > 0) {
-			console.log("First member structure:", {
-				display_first_name: members[0].user.display_first_name,
-				display_last_name: members[0].user.display_last_name,
-				first_name: members[0].user.first_name,
-				last_name: members[0].user.last_name,
-				position: members[0].position,
-			});
-		}
-
-		console.log("===================");
-	}, [project, members, _details]);
-
 	// Sanitise title to remove HTML tags (including bold)
 	const plainTextTitle = sanitizeInput(project.title);
 
 	// Format authors from team members
 	const authorsDisplay = formatAuthors(members || []);
-	console.log("Authors Display:", authorsDisplay);
 
 	// Format year range
 	const yearDisplay = formatYearRange(project.start_date, project.end_date);
@@ -115,30 +87,10 @@ export function OverviewTab({
 			? (_details.external as IExternalProjectDetails)
 			: null;
 
-	// TODO: Calculate edit permissions using canEditProject utility
-	const canEdit = true; // Temporarily true to see the button
+	const canEdit = canEditProject(currentUser ?? null, project);
 
-	// Cancel deletion request mutation
-	const cancelDeletionRequestMutation = useMutation({
-		mutationFn: async (taskId: number) => {
-			const response = await apiClient.post(
-				`/api/v1/admin-tasks/${taskId}/cancel`
-			);
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			return (response as any).data;
-		},
-		onSuccess: () => {
-			toast.success("Deletion request cancelled");
-			setTimeout(() => {
-				queryClient.invalidateQueries({ queryKey: ["projects", project.id] });
-				queryClient.invalidateQueries({ queryKey: ["pendingAdminTasks"] });
-			}, 350);
-		},
-		onError: (error: Error) => {
-			console.error("Failed to cancel deletion request:", error);
-			toast.error(error.message || "Could not cancel deletion request");
-		},
-	});
+	// Cancel deletion request hook
+	const cancelDeletionRequestMutation = useCancelDeletionRequest(project.id);
 
 	// Modal handlers
 	const handleCreateStudentReport = () => setIsCreateStudentReportOpen(true);

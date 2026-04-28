@@ -14,7 +14,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, X } from "lucide-react";
-import { useUserDetail } from "@/features/users/hooks/useUserDetail";
+import { useUserDetail } from "@/shared/hooks/queries/useUserDetail";
 import {
 	UserSheetHeader,
 	UserSheetOrganisationSection,

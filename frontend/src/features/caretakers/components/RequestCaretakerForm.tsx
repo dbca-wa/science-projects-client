@@ -165,9 +165,6 @@ export const RequestCaretakerForm = ({
 		// Sanitise form data before submission
 		const sanitisedData = sanitiseFormData(data, ["notes"]);
 
-		console.log("Submitting caretaker request with data:", sanitisedData);
-		console.log("Approve as admin:", approveAsAdmin);
-
 		requestCaretakerMutation.mutate(
 			{
 				user_id: userId,
@@ -180,8 +177,7 @@ export const RequestCaretakerForm = ({
 				approve_immediately: approveAsAdmin, // Send flag to backend
 			},
 			{
-				onSuccess: (response) => {
-					console.log("Request created successfully. Response:", response);
+				onSuccess: () => {
 					setShowConfirmDialog(false);
 
 					// Invalidate queries to refresh the UI

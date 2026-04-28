@@ -31,6 +31,9 @@ class DownloadProjectDocument(APIView):
 
     def get(self, request, pk):
         """Download project document PDF"""
+        settings.LOGGER.info(
+            f"{request.user} is downloading project document (pk={pk})"
+        )
         document = DocumentService.get_document(pk)
 
         # Check if PDF exists
@@ -62,6 +65,9 @@ class BeginProjectDocGeneration(APIView):
 
     def post(self, request, pk):
         """Generate and return PDF for project document"""
+        settings.LOGGER.info(
+            f"{request.user} is generating project document PDF (pk={pk})"
+        )
         document = DocumentService.get_document(pk)
 
         # Mark as in progress
@@ -91,6 +97,9 @@ class CancelProjectDocGeneration(APIView):
 
     def post(self, request, pk):
         """Cancel PDF generation"""
+        settings.LOGGER.info(
+            f"{request.user} is cancelling project doc generation (pk={pk})"
+        )
         document = DocumentService.get_document(pk)
         PDFService.cancel_pdf_generation(document)
 
@@ -104,6 +113,7 @@ class DownloadAnnualReport(APIView):
 
     def get(self, request, pk):
         """Download annual report PDF"""
+        settings.LOGGER.info(f"{request.user} is downloading annual report (pk={pk})")
         try:
             report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:
@@ -144,6 +154,9 @@ class BeginAnnualReportDocGeneration(APIView):
 
     def post(self, request, pk):
         """Start PDF generation for annual report"""
+        settings.LOGGER.info(
+            f"{request.user} is generating annual report PDF (pk={pk})"
+        )
         try:
             AnnualReport.objects.get(pk=pk)
         except AnnualReport.DoesNotExist:
@@ -189,6 +202,9 @@ class CancelReportDocGeneration(APIView):
 
     def post(self, request, pk):
         """Cancel PDF generation using atomic flag update"""
+        settings.LOGGER.info(
+            f"{request.user} is cancelling report doc generation (pk={pk})"
+        )
         try:
             AnnualReport.objects.get(pk=pk)
         except AnnualReport.DoesNotExist:

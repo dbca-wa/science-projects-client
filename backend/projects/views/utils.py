@@ -83,6 +83,9 @@ class ToggleUserProfileVisibilityForProject(APIView):
 
     def post(self, request, pk):
         """Toggle visibility"""
+        settings.LOGGER.info(
+            f"{request.user} is toggling profile visibility for project (pk={pk})"
+        )
         project = ProjectService.toggle_user_profile_visibility(pk, request.user)
         serializer = TinyProjectSerializer(project)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)

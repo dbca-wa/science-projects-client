@@ -1,21 +1,5 @@
-export interface IAnnualReport {
-	id: number;
-	year: number;
-	creator: number | null;
-	division: { id: number; name: string } | null;
-	dm: string | null;
-	dm_sign: string | null;
-	service_delivery_intro: string | null;
-	research_intro: string | null;
-	student_intro: string | null;
-	publications: string | null;
-	date_open: string | null;
-	date_closed: string | null;
-	pdf_generation_in_progress: boolean;
-	is_published: boolean;
-	created_at: string;
-	updated_at: string;
-}
+// Re-export from shared for backward compatibility
+export type { IAnnualReport } from "@/shared/types/report.types";
 
 export interface IAnnualReportPDF {
 	id: number;
@@ -49,6 +33,9 @@ export interface IARProgressReport {
 	document: {
 		id: number;
 		status: string;
+		project_lead_approval_granted: boolean;
+		business_area_lead_approval_granted: boolean;
+		directorate_approval_granted: boolean;
 		project: {
 			id: number;
 			title: string;
@@ -80,6 +67,9 @@ export interface IARStudentReport {
 	document: {
 		id: number;
 		status: string;
+		project_lead_approval_granted: boolean;
+		business_area_lead_approval_granted: boolean;
+		directorate_approval_granted: boolean;
 		project: {
 			id: number;
 			title: string;

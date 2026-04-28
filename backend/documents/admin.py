@@ -2,6 +2,7 @@
 
 import ast
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import get_user_model
@@ -67,7 +68,10 @@ class CustomPublicationAdmin(admin.ModelAdmin):
 )
 def provide_final_approval_for_docs_if_next_exist(model_admin, req, selected):
     if len(selected) != 1:
-        print("PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS")
+        settings.LOGGER.info(msg="Batch process requires exactly one item selected")
+        model_admin.message_user(
+            req, "Please select only one item to begin this batch process."
+        )
         return
     try:
         # Get docs of each type that do not have corresponding data on the model they refer to
@@ -95,18 +99,25 @@ def provide_final_approval_for_docs_if_next_exist(model_admin, req, selected):
                 doc.business_area_lead_approval_granted = True
                 doc.directorate_approval_granted = True
                 doc_approval_update_count += 1
-        print(
-            f"Provided full approvals for docs! {doc_approval_update_count}/{doc_process_count} documents didn't have full approval, but the next doc type existed."
+        settings.LOGGER.info(
+            msg=f"Provided full approvals for docs! {doc_approval_update_count}/{doc_process_count} documents didn't have full approval, but the next doc type existed."
+        )
+        model_admin.message_user(
+            req,
+            f"Provided full approvals for {doc_approval_update_count}/{doc_process_count} documents.",
         )
     except Exception as e:
-        print(e)
+        settings.LOGGER.error(msg=f"Error providing final approval for docs: {e}")
     return
 
 
 @admin.action(description="Delete unlinked docs")
 def delete_unlinked_docs(model_admin, req, selected):
     if len(selected) != 1:
-        print("PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS")
+        settings.LOGGER.info(msg="Batch process requires exactly one item selected")
+        model_admin.message_user(
+            req, "Please select only one item to begin this batch process."
+        )
         return
 
     try:
@@ -119,18 +130,25 @@ def delete_unlinked_docs(model_admin, req, selected):
             if doc.has_project_document_data() is False:
                 doc.delete()
                 doc_deletion_count += 1
-        print(
-            f"Deleted empty docs! {doc_deletion_count}/{doc_process_count} documents were empty."
+        settings.LOGGER.info(
+            msg=f"Deleted empty docs! {doc_deletion_count}/{doc_process_count} documents were empty."
+        )
+        model_admin.message_user(
+            req,
+            f"Deleted {doc_deletion_count}/{doc_process_count} empty documents.",
         )
     except Exception as e:
-        print(e)
+        settings.LOGGER.error(msg=f"Error deleting unlinked docs: {e}")
     return
 
 
 @admin.action(description="(latest year) Populate Aims and Context")
 def populate_aims_and_context(model_admin, req, selected):
     if len(selected) != 1:
-        print("PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS")
+        settings.LOGGER.info(msg="Batch process requires exactly one item selected")
+        model_admin.message_user(
+            req, "Please select only one item to begin this batch process."
+        )
         return
 
     try:
@@ -164,7 +182,7 @@ def populate_aims_and_context(model_admin, req, selected):
             f"Successfully populated aims and context for {updated_count} progress reports.",
         )
     except Exception as e:
-        print(f"ERROR: {e}")
+        settings.LOGGER.error(msg=f"Error populating aims and context: {e}")
 
     return
 

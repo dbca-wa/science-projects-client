@@ -158,10 +158,10 @@ export const mapAnnouncements = {
 
 /**
  * Hook to set up screen reader announcements
- * Call this in the main map component to initialize
+ * Call this in the main map component to initialise
  */
 export function useScreenReaderAnnouncements() {
-	// Initialize the live region on mount
+	// Initialise the live region on mount
 	useEffect(() => {
 		getLiveRegion();
 	}, []);

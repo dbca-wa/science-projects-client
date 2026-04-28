@@ -63,6 +63,25 @@ files/
 spms_media_data
 extracted_table_data
 
+# Generated email preview files (from email testing)
+test_email_preview.html
+test_email_preview.eml
+email_previews/
+
+# Media directories (user uploads)
+media/
+uploads/
+dumped_media/
+
+# Large binary files
+*.pdf
+
+# Coverage files
+coverage.json
+
+# License files
+license.dat
+
 # Deployment configs
 publish-ghcr.yaml
 render.yaml

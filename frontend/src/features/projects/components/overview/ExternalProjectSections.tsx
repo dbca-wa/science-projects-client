@@ -8,15 +8,6 @@ interface ExternalProjectSectionsProps {
 export function ExternalProjectSections({
 	externalDetails,
 }: ExternalProjectSectionsProps) {
-	// Debug logging
-	console.log("=== ExternalProjectSections Debug ===");
-	console.log("External details:", externalDetails);
-	console.log("Budget:", externalDetails.budget);
-	console.log("Collaboration with:", externalDetails.collaboration_with);
-	console.log("Has budget?", !!externalDetails.budget);
-	console.log("Has collaboration_with?", !!externalDetails.collaboration_with);
-	console.log("====================================");
-
 	return (
 		<>
 			{/* Budget Section */}

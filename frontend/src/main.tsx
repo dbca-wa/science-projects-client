@@ -1,4 +1,4 @@
-// Sentry - Initialize FIRST before any other code
+// Sentry - Initialise FIRST before any other code
 import { initSentry } from "./app/sentry";
 initSentry();
 
@@ -6,7 +6,6 @@ initSentry();
 import { RouterProvider } from "react-router";
 import "./shared/styles/main.css";
 import { StoreProvider } from "./app/stores/root.store";
-import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { rootStore } from "./app/stores/store-context";
 
@@ -63,11 +62,9 @@ const initialiseApp = async () => {
 		<ErrorBoundary>
 			<StoreProvider>
 				<QueryClientProvider client={queryClient}>
-					<HelmetProvider>
-						<RouterProvider router={router} />
-						<Toaster position="top-right" richColors />
-						{import.meta.env.DEV && <ReactQueryDevtools />}
-					</HelmetProvider>
+					<RouterProvider router={router} />
+					<Toaster position="top-right" richColors />
+					{import.meta.env.DEV && <ReactQueryDevtools />}
 				</QueryClientProvider>
 			</StoreProvider>
 		</ErrorBoundary>

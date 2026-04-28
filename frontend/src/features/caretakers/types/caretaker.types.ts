@@ -1,42 +1,15 @@
+import type {
+	IAdminTask,
+	ISecondaryUserData,
+} from "@/shared/types/admin.types";
 import type { IUserData } from "@/shared/types/user.types";
+
+// Re-export shared types for backward compatibility
+export type { IAdminTask, ISecondaryUserData };
 
 // ============================================================================
 // CARETAKER TYPES
 // ============================================================================
-
-/**
- * Simple user data for secondary_users in AdminTask
- * Matches SecondaryUserSerializer from backend
- */
-export interface ISecondaryUserData {
-	id: number;
-	display_first_name: string | null;
-	display_last_name: string | null;
-	email: string;
-	image?: {
-		file: string;
-	} | null;
-}
-
-/**
- * Admin Task for caretaker requests
- * Represents a pending, approved, or rejected caretaker request
- * Matches AdminTaskSerializer from backend
- */
-export interface IAdminTask {
-	id: number;
-	action: "setcaretaker" | "mergeuser" | "deleteproject";
-	status: "pending" | "approved" | "fulfilled" | "cancelled" | "rejected";
-	requester: IUserData;
-	primary_user: ISecondaryUserData;
-	secondary_users: ISecondaryUserData[];
-	reason: string;
-	start_date?: string;
-	end_date?: string;
-	notes?: string;
-	created_at: string;
-	updated_at: string;
-}
 
 /**
  * Active caretaker assignment
@@ -82,17 +55,10 @@ export interface ICaretakee {
 }
 
 /**
- * Payload for requesting a caretaker
- * Used when submitting caretaker request form
+ * Payload for requesting a caretaker.
+ * Re-exported from shared for backward compatibility.
  */
-export interface ICaretakerRequest {
-	user_id: number;
-	caretaker_id: number;
-	reason: "leave" | "resignation" | "other";
-	end_date?: string;
-	notes?: string;
-	approve_immediately?: boolean; // Admin can approve immediately
-}
+export type { ICaretakerRequest } from "@/shared/types/caretaker.types";
 
 // ============================================================================
 // FORM TYPES

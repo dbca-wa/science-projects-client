@@ -29,24 +29,11 @@ export function ProjectSuspensionModal({
 	const actionTitle = isSuspended ? "Unsuspend" : "Suspend";
 
 	const handleSubmit = async () => {
-		console.log(
-			`[ProjectSuspensionModal] Submit clicked - ${action}ing project ${projectId}`
-		);
-		console.log(`[ProjectSuspensionModal] Current status: ${currentStatus}`);
-		console.log(
-			`[ProjectSuspensionModal] Will set suspend to: ${!isSuspended}`
-		);
-
 		try {
-			console.log(`[ProjectSuspensionModal] Calling mutateAsync...`);
 			await suspendMutation.mutateAsync({
 				projectId,
 				suspend: !isSuspended,
 			});
-			console.log(
-				`[ProjectSuspensionModal] mutateAsync completed successfully`
-			);
-			console.log(`[ProjectSuspensionModal] Closing modal...`);
 			onClose();
 		} catch (error) {
 			console.error(`[ProjectSuspensionModal] Mutation failed:`, error);

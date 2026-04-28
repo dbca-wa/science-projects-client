@@ -3,7 +3,8 @@ Documents views
 """
 
 # Admin views
-from .admin import (  # ProjectDocumentComments,  # TODO: Comment model not yet implemented
+from .admin import (
+    BatchApproveCurrent,
     BatchApproveOld,
     DocumentSpawner,
     FinalDocApproval,
@@ -35,16 +36,10 @@ from .annual_report import (  # BeginAnnualReportDocGeneration,  # Removed dupli
 
 # Approval views
 from .approval import (
-    ApproveStageOne,
-    ApproveStageThree,
-    ApproveStageTwo,
     BatchApprove,
     DocApproval,
     DocRecall,
     DocSendBack,
-    RecallDocument,
-    RequestApproval,
-    SendBack,
 )
 
 # Closure views
@@ -70,7 +65,9 @@ from .endorsement import (
 
 # Notification views
 from .notifications import (
+    BumpPreview,
     NewCycleOpen,
+    SendBumpAll,
     SendBumpEmails,
     SendMentionNotification,
     UserPublications,
@@ -114,12 +111,6 @@ __all__ = [
     "DocApproval",
     "DocRecall",
     "DocSendBack",
-    "RequestApproval",
-    "ApproveStageOne",
-    "ApproveStageTwo",
-    "ApproveStageThree",
-    "SendBack",
-    "RecallDocument",
     "BatchApprove",
     # PDF
     "DownloadProjectDocument",
@@ -159,11 +150,11 @@ __all__ = [
     "CustomPublicationDetail",
     # Admin
     "ProjectDocsPendingMyActionAllStages",
-    # 'ProjectDocumentComments',  # TODO: Comment model not yet implemented
     "DocumentSpawner",
     "GetPreviousReportsData",
     "ReopenProject",
     "BatchApproveOld",
+    "BatchApproveCurrent",
     "FinalDocApproval",
     # Annual report
     "Reports",
@@ -187,6 +178,8 @@ __all__ = [
     # Notification
     "NewCycleOpen",
     "SendBumpEmails",
+    "SendBumpAll",
+    "BumpPreview",
     "UserPublications",
     "SendMentionNotification",
 ]

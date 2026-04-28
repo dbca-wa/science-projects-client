@@ -2,6 +2,7 @@
 Admin operation views
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
@@ -17,6 +18,7 @@ class ToggleUserActive(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
+        settings.LOGGER.info(f"{request.user} is toggling user active status (pk={pk})")
         user = UserService.toggle_active(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=HTTP_200_OK)
@@ -28,6 +30,7 @@ class SwitchAdmin(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
+        settings.LOGGER.info(f"{request.user} is toggling user admin status (pk={pk})")
         user = UserService.switch_admin(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=HTTP_200_OK)

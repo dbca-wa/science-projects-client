@@ -2,6 +2,7 @@
 Document CRUD views - Base document operations
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -53,6 +54,7 @@ class ProjectDocuments(APIView):
 
     def post(self, request):
         """Create a new project document"""
+        settings.LOGGER.info(f"{request.user} is creating project document")
         serializer = ProjectDocumentCreateSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -99,6 +101,7 @@ class ProjectDocumentDetail(APIView):
 
     def put(self, request, pk):
         """Update project document"""
+        settings.LOGGER.info(f"{request.user} is updating project document (pk={pk})")
         serializer = ProjectDocumentUpdateSerializer(data=request.data, partial=True)
 
         if not serializer.is_valid():
@@ -115,6 +118,9 @@ class ProjectDocumentDetail(APIView):
 
     def delete(self, request, pk):
         """Delete project document"""
+        settings.LOGGER.warning(
+            f"{request.user} is deleting project document (pk={pk})"
+        )
         DocumentService.delete_document(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 

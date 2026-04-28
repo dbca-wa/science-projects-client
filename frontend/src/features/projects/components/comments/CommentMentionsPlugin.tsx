@@ -64,16 +64,6 @@ export const CommentMentionsPlugin = ({
 	const showDropdown =
 		queryString !== null && queryString.length > 0 && filteredUsers.length > 0;
 
-	// Log dropdown state changes
-	useEffect(() => {
-		console.log("🎯 Dropdown state:", {
-			showDropdown,
-			queryString,
-			filteredUsersCount: filteredUsers.length,
-			selectedIndex,
-		});
-	}, [showDropdown, queryString, filteredUsers.length, selectedIndex]);
-
 	// Reset selected index when query changes (not results)
 	useEffect(() => {
 		if (queryString !== null) {
@@ -107,30 +97,18 @@ export const CommentMentionsPlugin = ({
 	// Insert mention node
 	const insertMention = useCallback(
 		(member: IUserData, shouldCloseDropdown = true) => {
-			console.log(
-				"🔵 insertMention called for:",
-				member.display_first_name,
-				member.display_last_name
-			);
-			console.log("🔵 shouldCloseDropdown:", shouldCloseDropdown);
-			console.log("🔵 isInserting flag:", isInserting);
-
 			// Prevent duplicate insertions
 			if (isInserting) {
-				console.log("⚠️ Blocked duplicate insertion!");
 				return;
 			}
 			setIsInserting(true);
-			console.log("✅ Setting isInserting = true");
 
 			// Use editor.update with discrete: true to make it synchronous
 			editor.update(
 				() => {
-					console.log("📝 Starting editor.update() [SYNCHRONOUS]");
 					const selection = $getSelection();
 
 					if (!$isRangeSelection(selection)) {
-						console.log("❌ Not a range selection");
 						return;
 					}
 
@@ -138,30 +116,22 @@ export const CommentMentionsPlugin = ({
 					const anchorNode = anchor.getNode();
 
 					if (!$isTextNode(anchorNode)) {
-						console.log("❌ Anchor node is not a text node");
 						return;
 					}
 
 					const textContent = anchorNode.getTextContent();
-					console.log("📄 Text content:", textContent);
-					console.log("📍 Cursor offset:", anchor.offset);
 
 					const match = checkForMentionMatch(
 						textContent.slice(0, anchor.offset)
 					);
 
 					if (!match) {
-						console.log("❌ No mention match found");
 						return;
 					}
-
-					console.log("✅ Match found:", match);
 
 					// Calculate position to replace
 					const startOffset = match.leadOffset;
 					const endOffset = anchor.offset;
-
-					console.log("📍 Replacing from", startOffset, "to", endOffset);
 
 					// Create mention node
 					const mentionNode = $createMentionNode(
@@ -170,14 +140,10 @@ export const CommentMentionsPlugin = ({
 						member.email
 					);
 
-					console.log("✅ Created mention node");
-
 					// Split text node and insert mention
 					if (startOffset === 0) {
-						console.log("🔄 Replacing entire node");
 						anchorNode.replace(mentionNode);
 					} else {
-						console.log("🔄 Splitting text node");
 						const [, targetNode] = anchorNode.splitText(startOffset, endOffset);
 						targetNode.replace(mentionNode);
 					}
@@ -189,25 +155,16 @@ export const CommentMentionsPlugin = ({
 					// Select the end of the space node to position cursor after it
 					const spaceEnd = spaceNode.getTextContentSize();
 					spaceNode.select(spaceEnd, spaceEnd);
-
-					console.log("✅ Added space and positioned cursor at end of space");
-					console.log("📝 Editor.update() complete [SYNCHRONOUS]");
 				},
 				{ discrete: true }
 			); // Make update synchronous
 
 			// Only close dropdown if requested (mouse clicks close immediately, keyboard waits)
 			if (shouldCloseDropdown) {
-				console.log("🔒 Closing dropdown immediately (mouse click)");
 				setQueryString(null);
-			} else {
-				console.log(
-					"⏸️ NOT closing dropdown yet (keyboard - will close after handlers run)"
-				);
 			}
 
 			setIsInserting(false);
-			console.log("✅ Reset isInserting = false");
 		},
 		[editor, checkForMentionMatch, isInserting]
 	);
@@ -217,8 +174,6 @@ export const CommentMentionsPlugin = ({
 		if (!showDropdown) return;
 
 		const handleArrowDown = (event: KeyboardEvent | null) => {
-			console.log("⬇️ Arrow Down pressed");
-
 			// Prevent default to stop cursor movement in editor
 			if (event) {
 				event.preventDefault();
@@ -232,8 +187,6 @@ export const CommentMentionsPlugin = ({
 		};
 
 		const handleArrowUp = (event: KeyboardEvent | null) => {
-			console.log("⬆️ Arrow Up pressed");
-
 			// Prevent default to stop cursor movement in editor
 			if (event) {
 				event.preventDefault();
@@ -245,18 +198,9 @@ export const CommentMentionsPlugin = ({
 		};
 
 		const handleEnter = (event: KeyboardEvent | null) => {
-			console.log("⏎ Enter key pressed in Lexical handler");
-			console.log("⏎ Selected index:", selectedIndex);
-			console.log("⏎ Selected user:", filteredUsers[selectedIndex]);
-
 			if (filteredUsers[selectedIndex]) {
-				console.log(
-					"⏎ Calling insertMention from Enter handler (shouldCloseDropdown=false)"
-				);
-
 				// CRITICAL: Prevent default Enter behavior to stop paragraph creation
 				if (event) {
-					console.log("⏎ Preventing default Enter behavior");
 					event.preventDefault();
 					event.stopPropagation();
 				}
@@ -266,41 +210,32 @@ export const CommentMentionsPlugin = ({
 
 				// Close dropdown after a microtask to ensure handlers have run
 				queueMicrotask(() => {
-					console.log("⏎ Microtask: Now closing dropdown");
 					setQueryString(null);
 				});
 
-				console.log("⏎ Returning true to stop propagation");
 				// Returning true stops Lexical from processing Enter further
 				return true;
 			}
-			console.log("⏎ No user selected, returning false");
 			return false;
 		};
 
 		// Also intercept INSERT_PARAGRAPH_COMMAND to prevent paragraph creation
 		const handleInsertParagraph = () => {
-			console.log("📄 INSERT_PARAGRAPH_COMMAND intercepted - blocking it");
 			// Return true to prevent paragraph insertion when dropdown is open
 			return true;
 		};
 
 		const handleTab = (event: KeyboardEvent | null) => {
-			console.log("⇥ Tab key pressed");
-
 			// Prevent default Tab behavior (focus change)
 			if (event) {
-				console.log("⇥ Preventing default Tab behavior");
 				event.preventDefault();
 				event.stopPropagation();
 			}
 
 			// Tab navigates dropdown: Shift+Tab goes up, Tab goes down
 			if (event?.shiftKey) {
-				console.log("⇥ Shift+Tab: Moving selection up");
 				setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
 			} else {
-				console.log("⇥ Tab: Moving selection down");
 				setSelectedIndex((prev) =>
 					prev < filteredUsers.length - 1 ? prev + 1 : prev
 				);
@@ -310,7 +245,6 @@ export const CommentMentionsPlugin = ({
 		};
 
 		const handleEscape = () => {
-			console.log("⎋ Escape pressed - closing dropdown");
 			setQueryString(null);
 			return true;
 		};
@@ -467,19 +401,13 @@ const MentionDropdown = ({
 									"bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
 							)}
 							onClick={() => {
-								console.log(
-									"🖱️ Button onClick fired for:",
-									member.display_first_name
-								);
 								onSelect(member);
 							}}
 							onMouseEnter={() => onHover(index)}
 							onKeyDown={(e) => {
-								console.log("⌨️ Button onKeyDown:", e.key);
 								// Prevent button's default Enter/Space behavior
 								// since we handle it in the Lexical command handler
 								if (e.key === "Enter" || e.key === " ") {
-									console.log("⌨️ Preventing default for", e.key);
 									e.preventDefault();
 								}
 							}}

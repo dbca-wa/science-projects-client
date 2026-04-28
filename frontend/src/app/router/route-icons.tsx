@@ -29,7 +29,6 @@ export const ROUTE_ICONS = {
 export const ROUTE_TOOLTIPS = {
 	dashboard: <p>View your dashboard</p>,
 	patchNotes: <p>View patch notes and updates</p>,
-	howTo: <p>How-to guides</p>,
 	guide: <p>User guide and documentation</p>,
 	myBusinessArea: <p>Manage your business area</p>,
 	projects: <p>Browse and manage projects</p>,

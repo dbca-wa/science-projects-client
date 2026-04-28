@@ -18,12 +18,7 @@ export const useProject = (projectId: number | string | undefined) => {
 	return useQuery({
 		queryKey: projectKeys.detail(normalizedId as number),
 		queryFn: async () => {
-			console.log(`[useProject] Fetching project ${normalizedId}...`);
 			const result = await getProjectById(normalizedId as number | string);
-			console.log(
-				`[useProject] Fetched project ${normalizedId}, status:`,
-				result.project.status
-			);
 			return result;
 		},
 		staleTime: 5 * 60_000, // 5 minutes

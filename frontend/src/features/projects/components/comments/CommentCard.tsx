@@ -26,6 +26,7 @@ import {
 import { formatRelativeTime } from "@/shared/utils/date.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 import { CommentRichTextDisplay } from "./CommentRichTextDisplay";
 import { CommentRichTextEditor } from "./CommentRichTextEditor";
 import { ReactionPicker } from "./ReactionPicker";
@@ -94,12 +95,7 @@ export const CommentCard = ({
 	const [isSaving, setIsSaving] = useState(false);
 
 	// Validation for edited text
-	const stripHtml = (htmlString: string) => {
-		const tmp = document.createElement("div");
-		tmp.innerHTML = htmlString;
-		return tmp.textContent || tmp.innerText || "";
-	};
-	const isEditedTextEmpty = stripHtml(editedText).trim().length === 0;
+	const isEditedTextEmpty = extractTextFromHTML(editedText).trim().length === 0;
 	const cardRef = useRef<HTMLDivElement>(null);
 
 	// Fetch reactions for this comment

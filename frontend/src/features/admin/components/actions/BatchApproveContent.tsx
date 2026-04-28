@@ -25,9 +25,12 @@ export function BatchApproveContent({
 							Batch Approve Reports
 						</h2>
 						<p className="text-sm text-gray-600 dark:text-gray-400">
-							This action will approve all outstanding reports for the current
-							reporting year. Use this when all reports have been reviewed and
-							are ready for bulk approval.
+							This action will approve all outstanding progress and student
+							reports at stage 3 (awaiting final/directorate approval) for the
+							selected division and current reporting year.
+						</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							No notification emails are sent for batch-approved reports.
 						</p>
 					</div>
 				</div>

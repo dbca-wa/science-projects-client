@@ -46,7 +46,7 @@ const ExternalDetailsStep = observer(() => {
 		IAffiliation[]
 	>([]);
 
-	// If external details is null, initialize it
+	// If external details is null, initialise it
 	if (!formData) {
 		wizardStore.setExternalDetails({
 			collaboration_with: "",

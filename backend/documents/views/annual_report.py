@@ -387,6 +387,7 @@ class PublishReportPDF(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        settings.LOGGER.info(f"{request.user} is publishing report PDF (pk={pk})")
         try:
             report = AnnualReport.objects.select_related("division").get(pk=pk)
         except AnnualReport.DoesNotExist:

@@ -16,12 +16,14 @@ export const USER_ENDPOINTS = {
 
 	// User validation
 	CHECK_EMAIL_EXISTS: "users/check-email-exists",
+	CHECK_NAME_EXISTS: "users/check-name-exists",
 
 	// Admin actions
 	TOGGLE_ADMIN: (userId: number | string) => `users/${userId}/admin`,
 	TOGGLE_ACTIVE: (userId: number | string) => `users/${userId}/toggleactive`,
 	DELETE: (userId: number | string) => `users/${userId}`,
 	REQUEST_MERGE: "adminoptions/tasks",
+	INVITE: "users/invite",
 
 	// Staff profile
 	TOGGLE_STAFF_PROFILE_VISIBILITY: (staffProfileId: number | string) =>

@@ -61,7 +61,7 @@ CURRENT_DOMAINS = DOMAINS.get(ENVIRONMENT)
 
 # Site URL configuration
 if DEBUG:
-    SITE_URL = CURRENT_DOMAINS["main"]
+    SITE_URL = f"http://{CURRENT_DOMAINS['main']}"
     INSTANCE_URL = "http://127.0.0.1:8000/"
 else:
     SITE_URL = f"https://{CURRENT_DOMAINS['main']}"
@@ -113,8 +113,26 @@ STORAGES = {
 # endregion ========================================================================================
 
 # region Email Config =========================================================
+# Email backend — auto-selects based on MANDRILL_API_KEY presence:
+# - If MANDRILL_API_KEY is set: uses Mandrill (Mailchimp Transactional)
+# - If not set: falls back to SMTP relay (internal mail-relay.lan.fyi)
+# - Can be overridden entirely via EMAIL_BACKEND env var
+_mandrill_key = env("MANDRILL_API_KEY", default="")
+if env("EMAIL_BACKEND", default=""):
+    EMAIL_BACKEND = env("EMAIL_BACKEND")
+elif _mandrill_key:
+    EMAIL_BACKEND = "anymail.backends.mandrill.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+ANYMAIL = {
+    "MANDRILL_API_KEY": _mandrill_key,
+}
+
+# SMTP relay config (used when Mandrill is not configured)
 EMAIL_HOST = env("EMAIL_HOST", default="mail-relay.lan.fyi")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 ENVELOPE_EMAIL_RECIPIENTS = [env("SPMS_MAINTAINER_EMAIL")]
 ENVELOPE_USE_HTML_EMAIL = True
@@ -245,6 +263,7 @@ SYSTEM_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
+    "anymail",
 ]
 
 
@@ -312,7 +331,7 @@ from config.cache_settings import (  # noqa: E402, F401
 # endregion ========================================================================================
 
 # region Logs and Tracking =======================================================================
-# Initialize logger early for use in configuration
+# Initialise logger early for use in configuration
 LOGGER = logging.getLogger(__name__)
 
 # endregion ========================================================================================
@@ -353,7 +372,7 @@ else:
 # endregion ========================================================================================
 
 # region Sentry Configuration =====================================================
-# Initialize Sentry only if SENTRY_URL is provided (optional)
+# Initialise Sentry only if SENTRY_URL is provided (optional)
 SENTRY_URL = env("SENTRY_URL", default=None)
 if ENVIRONMENT != "development" and SENTRY_URL:
     try:

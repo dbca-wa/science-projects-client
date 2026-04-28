@@ -8,10 +8,8 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import type { IAdminTask } from "../types/admin-tasks.types";
-import {
-	formatDeletionReason,
-	extractTextFromHTML,
-} from "../utils/dashboard.utils";
+import { formatDeletionReason } from "../utils/dashboard.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 import { format } from "date-fns";
 import { LINK_COLOR } from "@/shared/constants/colors";
 

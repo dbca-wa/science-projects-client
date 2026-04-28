@@ -59,7 +59,7 @@ class DBCAMiddleware(MiddlewareMixin):
                     user.save()
                     return user
 
-                # Initialize IT Assets variables with defaults
+                # Initialise IT Assets variables with defaults
                 it_asset_id = None
                 employee_id = None
 
@@ -179,7 +179,7 @@ class DBCAMiddleware(MiddlewareMixin):
             temp_file.flush()  # Ensure data is written to the file
             temp_file_path = temp_file.name  # Store the file path for later reference
 
-        print(f"WRITING META DATA TO TEMP FILE: {temp_file_path}")
+        settings.LOGGER.info(msg=f"Writing meta data to temp file: {temp_file_path}")
 
     def __call__(self, request):
         # First check if there is a staff user in the request, return if there is not

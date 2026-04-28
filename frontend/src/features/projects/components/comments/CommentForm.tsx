@@ -4,6 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import { CommentRichTextEditor } from "./CommentRichTextEditor";
 import { toast } from "sonner";
 import type { IUserMe } from "@/shared/types/user.types";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 
 interface CommentFormProps {
 	onSubmit: (html: string, mentionedUserIds?: number[]) => Promise<void>;
@@ -46,14 +47,9 @@ export const CommentForm = ({
 
 	const maxLength = 1500;
 	// Strip HTML tags for accurate character count
-	const stripHtml = (htmlString: string) => {
-		const tmp = document.createElement("div");
-		tmp.innerHTML = htmlString;
-		return tmp.textContent || tmp.innerText || "";
-	};
-	const characterCount = stripHtml(html).length;
+	const characterCount = extractTextFromHTML(html).length;
 	const isOverLimit = characterCount > maxLength;
-	const isEmpty = stripHtml(html).trim().length === 0;
+	const isEmpty = extractTextFromHTML(html).trim().length === 0;
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();

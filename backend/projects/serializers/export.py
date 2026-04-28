@@ -2,6 +2,7 @@
 Project export serializers (for annual reports and data tables)
 """
 
+from django.conf import settings
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from agencies.serializers import TinyBusinessAreaSerializer
@@ -36,9 +37,8 @@ class ARExternalProjectSerializer(ProjectTeamMemberMixin, ModelSerializer):
             ext = project.external_project_info
             return ext.collaboration_with
         except Exception:
-            print(
-                "\nEXCEPTION (NO PARTNERS):",
-                extract_text_content(project.title),
+            settings.LOGGER.info(
+                msg=f"No partners for project: {extract_text_content(project.title)}"
             )
             return ""
 
@@ -47,9 +47,8 @@ class ARExternalProjectSerializer(ProjectTeamMemberMixin, ModelSerializer):
             ext = project.external_project_info
             return ext.budget
         except Exception:
-            print(
-                "\nEXCEPTION (NO FUNDING):",
-                extract_text_content(project.title),
+            settings.LOGGER.info(
+                msg=f"No funding for project: {extract_text_content(project.title)}"
             )
             return ""
 

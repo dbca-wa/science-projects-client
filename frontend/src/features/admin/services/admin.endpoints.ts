@@ -32,11 +32,16 @@ export const ADMIN_ENDPOINTS = {
 	REPORT_DETAIL: (id: number) => `documents/reports/${id}`,
 
 	// Admin actions
-	BATCH_APPROVE: "documents/batchapprove",
+	BATCH_APPROVE: "documents/batchapprovecurrent",
 	BATCH_APPROVE_OLD: "documents/batchapproveold",
 	OPEN_NEW_CYCLE: "documents/opennewcycle",
 
 	// Data lists
 	UNAPPROVED_DOCS: "agencies/business_areas/unapproved_docs",
 	PROBLEMATIC_PROJECTS: "agencies/business_areas/problematic_projects",
+
+	// Admin options (email testing settings)
+	ADMIN_OPTIONS_DETAIL: (pk: number) => `adminoptions/${pk}`,
+	SEND_TEST_EMAIL: "adminoptions/send-test-email",
+	SEND_ALL_TEST_EMAILS: "adminoptions/send-all-test-emails",
 } as const;

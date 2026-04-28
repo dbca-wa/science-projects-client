@@ -2,6 +2,7 @@
 User CRUD views
 """
 
+from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -42,6 +43,7 @@ class Users(APIView):
 
     def post(self, request):
         """Create new user"""
+        settings.LOGGER.info(f"{request.user} is creating user")
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -64,6 +66,7 @@ class UserDetail(APIView):
 
     def put(self, request, pk):
         """Update user"""
+        settings.LOGGER.info(f"{request.user} is updating user (pk={pk})")
         serializer = UserSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -74,6 +77,7 @@ class UserDetail(APIView):
 
     def delete(self, request, pk):
         """Delete user"""
+        settings.LOGGER.warning(f"{request.user} is deleting user (pk={pk})")
         UserService.delete_user(pk)
         return Response(status=HTTP_204_NO_CONTENT)
 

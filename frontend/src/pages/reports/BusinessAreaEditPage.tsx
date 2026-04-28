@@ -1,6 +1,6 @@
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
-import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
+import { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
 import { BusinessAreaEditForm } from "@/features/reports/components/business-area/BusinessAreaEditForm";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 

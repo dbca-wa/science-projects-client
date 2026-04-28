@@ -1,7 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toggleStaffProfileVisibility } from "../../services/user.service";
-import { authKeys } from "@/features/auth/hooks/useAuth";
+import { useToggleStaffProfileVisibility } from "../../hooks/useUserMutations";
 import type { IUserMe } from "@/shared/types/user.types";
 import {
 	Dialog,
@@ -34,17 +32,8 @@ export const ToggleStaffProfileVisibilityModal = observer(
 		user,
 		onSuccess,
 	}: ToggleStaffProfileVisibilityModalProps) => {
-		const queryClient = useQueryClient();
-
-		const toggleMutation = useMutation({
-			mutationFn: () => toggleStaffProfileVisibility(user.staff_profile_id!),
-			onSuccess: async () => {
-				// Reset queries to force immediate refetch (ignores staleTime)
-				await queryClient.resetQueries({
-					queryKey: authKeys.user(),
-					exact: true,
-				});
-
+		const toggleMutation = useToggleStaffProfileVisibility({
+			onSuccess: () => {
 				const newStatus = !user.staff_profile_hidden;
 				toast.success(
 					`Staff profile ${newStatus ? "hidden" : "visible"} successfully`
@@ -52,15 +41,10 @@ export const ToggleStaffProfileVisibilityModal = observer(
 				onSuccess();
 				onClose();
 			},
-			onError: (error: Error) => {
-				const message =
-					error.message || "Failed to toggle staff profile visibility";
-				toast.error(message);
-			},
 		});
 
 		const handleToggle = () => {
-			toggleMutation.mutate();
+			toggleMutation.mutate(user.staff_profile_id!);
 		};
 
 		const isHidden = user.staff_profile_hidden;

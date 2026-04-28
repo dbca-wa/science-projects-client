@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
@@ -16,11 +16,11 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Loader2, AlertCircle, Mail } from "lucide-react";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { useCreateExternalUser } from "../hooks/useCreateExternalUser";
+import { useUserExistenceCheck } from "../hooks/useUserExistenceCheck";
 import {
 	externalUserCreateSchema,
 	type ExternalUserCreateFormData,
 } from "../schemas/externalUserCreate.schema";
-import { apiClient } from "@/shared/services/api/client.service";
 import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
@@ -40,12 +40,6 @@ export const ExternalUserForm = ({
 	const navigate = useNavigate();
 	const createMutation = useCreateExternalUser();
 
-	// Duplicate checking states
-	const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-	const [emailExists, setEmailExists] = useState(false);
-	const [isCheckingName, setIsCheckingName] = useState(false);
-	const [nameExists, setNameExists] = useState(false);
-
 	const form = useForm<ExternalUserCreateFormData>({
 		resolver: zodResolver(externalUserCreateSchema),
 		mode: "onBlur",
@@ -64,70 +58,21 @@ export const ExternalUserForm = ({
 	const email = form.watch("email");
 	const confirmEmail = form.watch("confirmEmail");
 
-	// Debounced name checking
-	useEffect(() => {
-		const isFirstNameValid =
-			firstName.length >= 2 && /^[A-Za-z\- ]+$/.test(firstName);
-		const isLastNameValid =
-			lastName.length >= 2 && /^[A-Za-z\- ]+$/.test(lastName);
+	// Stable email validator for external users (must NOT be @dbca.wa.gov.au)
+	const emailValidator = useCallback(
+		(e: string) => !e.endsWith("@dbca.wa.gov.au"),
+		[]
+	);
 
-		if (isFirstNameValid && isLastNameValid) {
-			setIsCheckingName(true);
-			const timer = setTimeout(async () => {
-				try {
-					const response = await apiClient.post<{ exists: boolean }>(
-						"users/check-name-exists",
-						{
-							first_name: firstName,
-							last_name: lastName,
-						}
-					);
-					setNameExists(response.exists);
-				} catch (error) {
-					console.error("Error checking name:", error);
-				} finally {
-					setIsCheckingName(false);
-				}
-			}, 500);
-
-			return () => clearTimeout(timer);
-		} else {
-			setIsCheckingName(false);
-			setNameExists(false);
-		}
-	}, [firstName, lastName]);
-
-	// Debounced email checking
-	useEffect(() => {
-		const emailsMatch = email === confirmEmail;
-		const isValidEmail =
-			email.length >= 5 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-		const isNotDbcaEmail = !email.endsWith("@dbca.wa.gov.au");
-
-		if (emailsMatch && isValidEmail && isNotDbcaEmail) {
-			setIsCheckingEmail(true);
-			const timer = setTimeout(async () => {
-				try {
-					const response = await apiClient.post<{ exists: boolean }>(
-						"users/check-email-exists",
-						{
-							email,
-						}
-					);
-					setEmailExists(response.exists);
-				} catch (error) {
-					console.error("Error checking email:", error);
-				} finally {
-					setIsCheckingEmail(false);
-				}
-			}, 500);
-
-			return () => clearTimeout(timer);
-		} else {
-			setIsCheckingEmail(false);
-			setEmailExists(false);
-		}
-	}, [email, confirmEmail]);
+	// Debounced duplicate checking via shared hook
+	const { isCheckingName, nameExists, isCheckingEmail, emailExists } =
+		useUserExistenceCheck({
+			firstName,
+			lastName,
+			email,
+			confirmEmail,
+			emailValidator,
+		});
 
 	// Warn user about unsaved changes
 	useEffect(() => {

@@ -53,18 +53,8 @@ export const CommentThread = ({
 		(reply) => reply.id === highlightedCommentId
 	);
 
-	// Initialize expanded state - auto-expand if a reply is highlighted
+	// Initialise expanded state - auto-expand if a reply is highlighted
 	const [isExpanded, setIsExpanded] = useState(hasHighlightedReply || false);
-
-	// Debug logging
-	console.log("CommentThread Debug:", {
-		commentId: comment.id,
-		hasReplies,
-		replyCount: comment.reply_count,
-		repliesArray: comment.replies,
-		repliesLength: comment.replies?.length,
-		isExpanded,
-	});
 
 	return (
 		<div className="space-y-4">

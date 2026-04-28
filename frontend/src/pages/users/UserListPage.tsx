@@ -46,7 +46,7 @@ const UserListPage = observer(() => {
 	const selectedUserId = params.id ? Number(params.id) : null;
 	const isSheetOpen = !!selectedUserId;
 
-	// Initialize from URL params and localStorage
+	// Initialise from URL params and localStorage
 	// TypeScript infers TFilters = UserSearchFilters from userSearchStore
 	useSearchStoreInit({
 		store: userSearchStore,
@@ -58,7 +58,7 @@ const UserListPage = observer(() => {
 	});
 
 	// Fetch users with search and filters from store
-	// Add enabled flag to prevent premature fetching during initialization
+	// Add enabled flag to prevent premature fetching during initialisation
 	const { data, isLoading, error, refetch } = useUserSearch({
 		searchTerm: userSearchStore.state.searchTerm,
 		filters: userSearchStore.state.filters,

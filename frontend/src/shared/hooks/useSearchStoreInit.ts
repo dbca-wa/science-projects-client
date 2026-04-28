@@ -27,7 +27,7 @@ interface UseSearchStoreInitOptions<TFilters = Record<string, unknown>> {
 }
 
 /**
- * Shared hook for initializing search stores from localStorage and URL params
+ * Shared hook for initialising search stores from localStorage and URL params
  *
  * @template TFilters - The filter type specific to the store (inferred from store parameter)
  *

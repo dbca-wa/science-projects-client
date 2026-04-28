@@ -2,6 +2,7 @@
 Document approval workflow views
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_202_ACCEPTED, HTTP_400_BAD_REQUEST
@@ -26,6 +27,7 @@ class DocApproval(APIView):
         # Validate request data
         stage = request.data.get("stage")
         document_pk = request.data.get("documentPk")
+        settings.LOGGER.info(f"{request.user} is approving document at stage {stage}")
 
         if not stage or not document_pk:
             return Response(
@@ -71,10 +73,12 @@ class DocRecall(APIView):
 
     def post(self, request):
         """Recall document"""
+        settings.LOGGER.info(f"{request.user} is recalling document")
         # Validate request data
         stage = request.data.get("stage")
         document_pk = request.data.get("documentPk")
         reason = request.data.get("reason", "")
+        feedback_html = request.data.get("feedbackHTML", "")
 
         if not stage or not document_pk:
             return Response(
@@ -86,7 +90,7 @@ class DocRecall(APIView):
         document = DocumentService.get_document(document_pk)
 
         # Delegate to service
-        ApprovalService.recall(document, request.user, reason)
+        ApprovalService.recall(document, request.user, reason, feedback_html)
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)
@@ -104,10 +108,12 @@ class DocSendBack(APIView):
 
     def post(self, request):
         """Send document back for revision"""
+        settings.LOGGER.info(f"{request.user} is sending document back")
         # Validate request data
         stage = request.data.get("stage")
         document_pk = request.data.get("documentPk")
         reason = request.data.get("reason", "")
+        feedback_html = request.data.get("feedbackHTML", "")
 
         if not stage or not document_pk:
             return Response(
@@ -119,115 +125,11 @@ class DocSendBack(APIView):
         document = DocumentService.get_document(document_pk)
 
         # Delegate to service
-        ApprovalService.send_back(document, request.user, reason)
+        ApprovalService.send_back(document, request.user, reason, feedback_html)
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)
-
-
-class RequestApproval(APIView):
-    """Request approval for document"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Request approval for document"""
-        document = DocumentService.get_document(pk)
-
-        # Delegate to service
-        ApprovalService.request_approval(document, request.user)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class ApproveStageOne(APIView):
-    """Approve document at stage 1 (project lead)"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Approve document at stage 1"""
-        document = DocumentService.get_document(pk)
-
-        # Delegate to service
-        ApprovalService.approve_stage_one(document, request.user)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class ApproveStageTwo(APIView):
-    """Approve document at stage 2 (business area lead)"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Approve document at stage 2"""
-        document = DocumentService.get_document(pk)
-
-        # Delegate to service
-        ApprovalService.approve_stage_two(document, request.user)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class ApproveStageThree(APIView):
-    """Approve document at stage 3 (directorate)"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Approve document at stage 3 (final approval)"""
-        document = DocumentService.get_document(pk)
-
-        # Delegate to service
-        ApprovalService.approve_stage_three(document, request.user)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class SendBack(APIView):
-    """Send document back for revision"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Send document back for revision"""
-        document = DocumentService.get_document(pk)
-        reason = request.data.get("reason", "")
-
-        # Delegate to service
-        ApprovalService.send_back(document, request.user, reason)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class RecallDocument(APIView):
-    """Recall document from approval process"""
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        """Recall document"""
-        document = DocumentService.get_document(pk)
-        reason = request.data.get("reason", "")
-
-        # Delegate to service
-        ApprovalService.recall(document, request.user, reason)
-
-        # Serialize and return
-        serializer = ProjectDocumentSerializer(document)
-        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class BatchApprove(APIView):
@@ -237,6 +139,7 @@ class BatchApprove(APIView):
 
     def post(self, request):
         """Batch approve documents"""
+        settings.LOGGER.warning(f"{request.user} is batch approving documents")
         document_ids = request.data.get("document_ids", [])
         stage = request.data.get("stage")
 

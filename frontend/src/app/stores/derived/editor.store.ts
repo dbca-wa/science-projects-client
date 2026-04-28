@@ -23,6 +23,7 @@ import {
 	$isListItemNode,
 	INSERT_ORDERED_LIST_COMMAND,
 	INSERT_UNORDERED_LIST_COMMAND,
+	INSERT_CHECK_LIST_COMMAND,
 } from "@lexical/list";
 import {
 	$isHeadingNode,
@@ -52,7 +53,7 @@ interface EditorStoreState extends BaseStoreState {
 	isNumberedList: boolean;
 	isBulletList: boolean;
 	isList: boolean;
-	listType: "bullet" | "number" | null;
+	listType: "bullet" | "number" | "check" | null;
 	isLink: boolean;
 	indentLevel: number;
 	maxIndent: number;
@@ -67,7 +68,7 @@ export type TextFormatType =
 	| "subscript"
 	| "superscript";
 
-export type ListType = "bullet" | "number";
+export type ListType = "bullet" | "number" | "check";
 export type BlockType = EditorStoreState["blockType"];
 export type TextAlignment = "left" | "center" | "right" | "justify";
 
@@ -362,7 +363,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 				} else {
 					// Check for lists by traversing up from anchor node
 					let isList = false;
-					let listType: "bullet" | "number" | null = null;
+					let listType: "bullet" | "number" | "check" | null = null;
 					let currentNode = anchorNode;
 
 					// Traverse up the tree to find list item
@@ -372,7 +373,12 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 							const listParent = currentNode.getParent();
 							if ($isListNode(listParent)) {
 								const lexicalListType = listParent.getListType();
-								listType = lexicalListType === "number" ? "number" : "bullet";
+								listType =
+									lexicalListType === "number"
+										? "number"
+										: lexicalListType === "check"
+											? "check"
+											: "bullet";
 							}
 							break;
 						}
@@ -441,7 +447,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	};
 
 	/**
-	 * Cycle through list types: none → bullet → numbered → none
+	 * Cycle through list types: none → bullet → numbered → checklist → none
 	 */
 	toggleList = () => {
 		if (!this.lexicalEditor) return;
@@ -459,7 +465,10 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 				undefined
 			);
 		} else if (this.state.listType === "number") {
-			// In numbered list, remove list (back to paragraph)
+			// In numbered list, switch to checklist
+			this.lexicalEditor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
+		} else {
+			// In checklist (or other), remove list (back to paragraph)
 			this.lexicalEditor.update(() => {
 				const selection = $getSelection();
 				if ($isRangeSelection(selection)) {

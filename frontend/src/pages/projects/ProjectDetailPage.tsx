@@ -45,7 +45,7 @@ export default function ProjectDetailPage({
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { data, isLoading, error, isFetching } = useProject(id);
+	const { data, isLoading, error } = useProject(id);
 	const { fireConfetti } = useConfetti();
 	const [hasShownConfetti, setHasShownConfetti] = useState(false);
 
@@ -54,16 +54,6 @@ export default function ProjectDetailPage({
 		? sanitizeInput(data.project.title)
 		: "Project";
 	useDocumentTitle(projectTitle);
-
-	// Debug logging
-	console.log("[ProjectDetailPage] Render:", {
-		isLoading,
-		isFetching,
-		hasData: !!data,
-		hasProject: !!data?.project,
-		hasError: !!error,
-		projectStatus: data?.project?.status,
-	});
 
 	// ALWAYS call these hooks - they must be called unconditionally
 	const { data: currentUser } = useCurrentUser();
@@ -145,7 +135,6 @@ export default function ProjectDetailPage({
 	// NOW we can do early returns - all hooks have been called
 	// Only show loading on INITIAL load, not on background refetch
 	if (isLoading && !data) {
-		console.log("[ProjectDetailPage] Returning loading screen");
 		return (
 			<div className="flex items-center justify-center min-h-[400px]">
 				<div className="text-center space-y-4">
@@ -159,7 +148,6 @@ export default function ProjectDetailPage({
 	}
 
 	if (error || !data || !data.project) {
-		console.log("[ProjectDetailPage] Returning error screen");
 		return (
 			<div className="flex min-h-[60vh] items-center justify-center">
 				<div className="max-w-2xl space-y-6 text-center">
@@ -199,8 +187,6 @@ export default function ProjectDetailPage({
 			</div>
 		);
 	}
-
-	console.log("[ProjectDetailPage] Rendering main content");
 
 	// Safe to destructure now
 	const { project, documents, details, members } = data;

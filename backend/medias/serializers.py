@@ -12,6 +12,7 @@ from .models import (
     AnnualReportMedia,
     AnnualReportPDF,
     BusinessAreaPhoto,
+    EditorImage,
     LegacyAnnualReportPDF,
     ProjectDocumentPDF,
     ProjectPhoto,
@@ -538,6 +539,29 @@ class StaffProfileAvatarSerializer(ModelSerializer):
             return {
                 "id": user.id,
             }
+
+
+# endregion  ===================================
+
+
+# region Editor Image Serializers ===================================
+
+
+class EditorImageSerializer(ModelSerializer):
+    """Read serialiser for editor images — returns the file URL."""
+
+    class Meta:
+        model = EditorImage
+        fields = ["id", "file", "alt_text", "size", "created_at"]
+        read_only_fields = ["id", "size", "created_at"]
+
+
+class EditorImageCreateSerializer(ModelSerializer):
+    """Create serialiser for editor images — accepts file upload."""
+
+    class Meta:
+        model = EditorImage
+        fields = ["file", "alt_text"]
 
 
 # endregion  ===================================

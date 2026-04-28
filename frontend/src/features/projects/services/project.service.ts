@@ -262,105 +262,17 @@ export const getMyProjects = async (): Promise<IProjectData[]> => {
 
 // ============================================================================
 // PROJECT DOCUMENT UPDATES
+// Re-exported from shared for backward compatibility.
+// The canonical implementations live in shared/services/content-update.service.ts.
 // ============================================================================
 
-/**
- * Update project description
- */
-export const updateProjectDescription = async (
-	id: number | string,
-	description: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.DETAIL(id), { description });
-};
-
-/**
- * Update external project details field
- */
-export const updateExternalProjectField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.EXTERNAL_DETAIL(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update concept plan field
- */
-export const updateConceptPlanField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.CONCEPT_PLAN(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update project plan field
- */
-export const updateProjectPlanField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_PLAN(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update project plan endorsement field
- */
-export const updateProjectPlanEndorsementField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_PLAN_ENDORSEMENT(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update progress report field
- */
-export const updateProgressReportField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.PROGRESS_REPORT(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update student report field
- */
-export const updateStudentReportField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.STUDENT_REPORT(id), {
-		[field]: content,
-	});
-};
-
-/**
- * Update project closure field
- */
-export const updateProjectClosureField = async (
-	id: number | string,
-	field: string,
-	content: string
-): Promise<void> => {
-	await apiClient.patch(PROJECT_ENDPOINTS.PROJECT_CLOSURE(id), {
-		[field]: content,
-	});
-};
+export {
+	updateProjectDescription,
+	updateExternalProjectField,
+	updateConceptPlanField,
+	updateProjectPlanField,
+	updateProjectPlanEndorsementField,
+	updateProgressReportField,
+	updateStudentReportField,
+	updateProjectClosureField,
+} from "@/shared/services/content-update.service";

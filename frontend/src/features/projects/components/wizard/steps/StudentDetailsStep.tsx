@@ -42,7 +42,7 @@ const StudentDetailsStep = observer(() => {
 	const [selectedAffiliation, setSelectedAffiliation] =
 		useState<IAffiliation | null>(null);
 
-	// If student details is null, initialize it
+	// If student details is null, initialise it
 	if (!formData) {
 		wizardStore.setStudentDetails({
 			organisation: "",

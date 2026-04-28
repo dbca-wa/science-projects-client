@@ -37,8 +37,22 @@ class ContentField(CommonModel):
 class GuideSection(models.Model):
     """Model to store guide section configs"""
 
+    class RequiredRole(models.TextChoices):
+        ALL = "all", "All Users"
+        ADMIN = "admin", "Admin Only"
+        BUSINESS_AREA_LEAD = "business_area_lead", "Business Area Lead"
+        KEY_STAKEHOLDER = "key_stakeholder", "Key Stakeholder"
+
     id = models.CharField(max_length=100, primary_key=True)
     title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    icon = models.CharField(max_length=50, default="book-open")
+    required_role = models.CharField(
+        max_length=50,
+        choices=RequiredRole.choices,
+        default=RequiredRole.ALL,
+        help_text="Minimum role required to view this section",
+    )
     order = models.IntegerField(default=0)
     show_divider_after = models.BooleanField(default=False)
     category = models.CharField(max_length=255, blank=True, null=True)
@@ -72,6 +86,19 @@ class AdminOptions(CommonModel):
         null=True,
         blank=True,
         related_name="admin",
+    )
+
+    email_testing_mode = models.BooleanField(
+        default=False,
+        help_text="When enabled, all emails are redirected to the designated test user",
+    )
+    email_test_user = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="email_test_admin",
+        help_text="Superuser who receives all emails when testing mode is enabled",
     )
 
     guide_content = models.JSONField(

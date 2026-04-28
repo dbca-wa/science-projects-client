@@ -14,7 +14,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useReportsForDivision } from "@/features/reports/hooks/useReports";
@@ -102,61 +102,76 @@ export const MyDivisionView = observer(function MyDivisionView() {
 	return (
 		<div className="space-y-6">
 			<div className="flex flex-wrap items-center justify-between gap-3">
-				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+				<h1 className="w-full min-w-0 text-2xl font-bold text-gray-900 dark:text-gray-100 min-[1230px]:w-auto">
 					{pageTitle}
 				</h1>
-				<div className="flex items-center gap-2 shrink-0">
-					{availableDivisions.length > 1 && (
-						<Select
-							value={selectedSlug ?? ""}
-							onValueChange={(slug) => {
-								setSelectedSlug(slug);
-								setSelectedYear(null);
-							}}
-						>
-							<SelectTrigger className="w-[120px]">
-								<SelectValue placeholder="Select division" />
-							</SelectTrigger>
-							<SelectContent>
-								{availableDivisions.map((d) => (
-									<SelectItem key={d.id} value={d.slug}>
-										{d.slug}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
-					{availableYears.length > 0 && (
-						<Select
-							value={selectedYear?.toString() ?? ""}
-							onValueChange={(v) => setSelectedYear(Number(v))}
-						>
-							<SelectTrigger className="w-[120px]">
-								<SelectValue placeholder="Select year" />
-							</SelectTrigger>
-							<SelectContent>
-								{availableYears.map((y) => (
-									<SelectItem key={y} value={y.toString()}>
-										FY {String(y - 1).slice(2)}-{String(y).slice(2)}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
+				<div className="flex flex-1 flex-col gap-2">
+					<div className="flex flex-wrap items-center gap-2">
+						{availableDivisions.length > 1 && (
+							<Select
+								value={selectedSlug ?? ""}
+								onValueChange={(slug) => {
+									setSelectedSlug(slug);
+									setSelectedYear(null);
+								}}
+							>
+								<SelectTrigger className="min-w-[120px] flex-1">
+									<SelectValue placeholder="Select division" />
+								</SelectTrigger>
+								<SelectContent>
+									{availableDivisions.map((d) => (
+										<SelectItem key={d.id} value={d.slug}>
+											{d.slug}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						)}
+						{availableYears.length > 0 && (
+							<Select
+								value={selectedYear?.toString() ?? ""}
+								onValueChange={(v) => setSelectedYear(Number(v))}
+							>
+								<SelectTrigger className="min-w-[120px] flex-1">
+									<SelectValue placeholder="Select year" />
+								</SelectTrigger>
+								<SelectContent>
+									{availableYears.map((y) => (
+										<SelectItem key={y} value={y.toString()}>
+											FY {String(y - 1).slice(2)}-{String(y).slice(2)}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						)}
+						{/* Square icon button — visible on sm+ */}
+						{selectedSlug && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										size="icon"
+										className="hidden sm:inline-flex bg-green-600 hover:bg-green-500 text-white shrink-0"
+										onClick={() => setCreateModalOpen(true)}
+										aria-label="Create New Annual Report"
+									>
+										<Plus className="size-4" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>Create New Annual Report</TooltipContent>
+							</Tooltip>
+						)}
+					</div>
+					{/* Full-width labelled button — visible on mobile only */}
 					{selectedSlug && (
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									size="icon"
-									className="bg-green-600 hover:bg-green-500 text-white"
-									onClick={() => setCreateModalOpen(true)}
-									aria-label="Create New Annual Report"
-								>
-									<Plus className="size-4" />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>Create New Annual Report</TooltipContent>
-						</Tooltip>
+						<Button
+							className="w-full bg-green-600 hover:bg-green-500 text-white sm:hidden"
+							onClick={() => setCreateModalOpen(true)}
+							aria-label="Create New Annual Report"
+						>
+							<Plus className="size-4 mr-1.5" />
+							<span className="xs:hidden">New Report</span>
+							<span className="hidden xs:inline">New Annual Report</span>
+						</Button>
 					)}
 				</div>
 			</div>
@@ -223,45 +238,67 @@ const ARActionCards = ({
 	const fyString = `FY ${String(year - 1).slice(2)}-${String(year).slice(2)}`;
 
 	return (
-		<div className="grid gap-4 md:grid-cols-3">
-			<ActionCard
-				title="Open New Cycle"
-				description={`Create progress and student reports for ${divisionName} (${fyString}).`}
-				icon={<RefreshCw className="size-6 text-orange-600" />}
-				buttonLabel="Open New Cycle"
-				isPending={newCycleMutation.isPending}
-				onAction={() => newCycleMutation.mutate(divisionSlug)}
-				confirmMessage={`This will open a new reporting cycle for ${divisionName} (${fyString}). Continue?`}
-			/>
-			<ActionCard
-				title="Batch Approve"
-				description={`Approve all outstanding reports for ${divisionName} (${fyString}).`}
-				icon={<CheckSquare className="size-6 text-green-600" />}
-				buttonLabel="Batch Approve"
-				isPending={batchApproveMutation.isPending}
-				onAction={() => batchApproveMutation.mutate(divisionSlug)}
-				confirmMessage={`This will batch approve all current reports for ${divisionName} (${fyString}). Continue?`}
-			/>
-			<ActionCard
-				title="Batch Approve Old"
-				description={`Approve all outstanding reports from previous years for ${divisionName}.`}
-				icon={<CheckSquare className="size-6 text-blue-600" />}
-				buttonLabel="Batch Approve Old"
-				isPending={batchApproveOldMutation.isPending}
-				onAction={() => batchApproveOldMutation.mutate(divisionSlug)}
-				confirmMessage={`This will batch approve all older reports for ${divisionName}. Continue?`}
-			/>
+		<div className="space-y-4">
+			{/* Batch approve cards */}
+			<div className="grid gap-4 md:grid-cols-2">
+				<ActionCard
+					title="Batch Approve"
+					description={`Approve all outstanding reports for ${divisionName} (${fyString}).`}
+					icon={<CheckSquare className="size-6 text-green-500" />}
+					isPending={batchApproveMutation.isPending}
+					onAction={() => batchApproveMutation.mutate(divisionSlug)}
+					confirmMessage={`This will batch approve all current reports for ${divisionName} (${fyString}). Continue?`}
+				/>
+				<ActionCard
+					title="Batch Approve Old"
+					description={`Approve all outstanding reports from previous years for ${divisionName}.`}
+					icon={<CheckSquare className="size-6 text-blue-500" />}
+					isPending={batchApproveOldMutation.isPending}
+					onAction={() => batchApproveOldMutation.mutate(divisionSlug)}
+					confirmMessage={`This will batch approve all older reports for ${divisionName}. Continue?`}
+				/>
+			</div>
+
+			{/* Open New Cycle — prominent full-width clickable card */}
+			<button
+				type="button"
+				className="action-card action-card-primary flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-5 sm:p-6 md:py-12"
+				disabled={newCycleMutation.isPending}
+				onClick={() => {
+					if (
+						window.confirm(
+							`This will open a new reporting cycle for ${divisionName} (${fyString}). Continue?`
+						)
+					) {
+						newCycleMutation.mutate(divisionSlug);
+					}
+				}}
+			>
+				<div className="rounded-full bg-blue-50 dark:bg-blue-950/50 p-3 mb-3 sm:mb-0 shrink-0">
+					<RefreshCw className="size-7 text-blue-600 dark:text-blue-400" />
+				</div>
+				<div className="flex-1">
+					<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+						Open New Cycle
+					</h3>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Create progress and student reports for {divisionName} ({fyString}).
+					</p>
+				</div>
+				{newCycleMutation.isPending && (
+					<Loader2 className="mt-3 sm:mt-0 size-5 animate-spin text-muted-foreground shrink-0" />
+				)}
+			</button>
 		</div>
 	);
 };
 
-/** Single action card with confirmation */
+/** Single action card — the entire card is clickable */
 // eslint-disable-next-line react-refresh/only-export-components
 const ActionCard = ({
 	title,
 	description,
 	icon,
-	buttonLabel,
 	isPending,
 	onAction,
 	confirmMessage,
@@ -269,7 +306,6 @@ const ActionCard = ({
 	title: string;
 	description: string;
 	icon: React.ReactNode;
-	buttonLabel: string;
 	isPending: boolean;
 	onAction: () => void;
 	confirmMessage: string;
@@ -281,23 +317,24 @@ const ActionCard = ({
 	};
 
 	return (
-		<div className="flex flex-col rounded-lg border bg-card p-5 h-full">
-			<div className="flex items-center gap-3">
+		<button
+			type="button"
+			className="action-card flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-4"
+			disabled={isPending}
+			onClick={handleClick}
+		>
+			<div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 shrink-0 mb-3 sm:mb-0">
 				{icon}
+			</div>
+			<div className="flex-1 min-w-0">
 				<h3 className="font-semibold text-gray-900 dark:text-gray-100">
 					{title}
 				</h3>
+				<p className="mt-1 text-sm text-muted-foreground">{description}</p>
 			</div>
-			<p className="mt-3 text-sm text-muted-foreground flex-1">{description}</p>
-			<Button
-				onClick={handleClick}
-				disabled={isPending}
-				variant="default"
-				className="mt-3 w-full"
-			>
-				{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-				{buttonLabel}
-			</Button>
-		</div>
+			{isPending && (
+				<Loader2 className="mt-3 sm:mt-0 size-5 animate-spin text-muted-foreground shrink-0" />
+			)}
+		</button>
 	);
 };

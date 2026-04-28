@@ -3,7 +3,6 @@ Staff profile views
 """
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import (
@@ -284,6 +283,7 @@ class StaffProfiles(APIView):
 
     def post(self, request):
         """Create staff profile"""
+        settings.LOGGER.info(f"{request.user} is creating staff profile")
         serializer = StaffProfileCreationSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -308,6 +308,7 @@ class StaffProfileDetail(APIView):
 
     def put(self, request, pk):
         """Update staff profile"""
+        settings.LOGGER.info(f"{request.user} is updating staff profile (pk={pk})")
         serializer = StaffProfileSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -318,6 +319,7 @@ class StaffProfileDetail(APIView):
 
     def delete(self, request, pk):
         """Delete staff profile"""
+        settings.LOGGER.warning(f"{request.user} is deleting staff profile (pk={pk})")
         ProfileService.delete_staff_profile(pk)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -341,6 +343,9 @@ class TogglePublicVisibility(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        settings.LOGGER.info(
+            f"{request.user} is toggling staff profile visibility (pk={pk})"
+        )
         profile = ProfileService.toggle_visibility(pk)
         serializer = StaffProfileSerializer(profile)
         return Response(serializer.data, status=HTTP_200_OK)
@@ -504,13 +509,13 @@ class PublicEmailStaffMember(APIView):
 
             if settings.ENVIRONMENT == "production":
                 try:
-                    send_mail(
-                        "Staff Profile Message",
-                        template_content,
-                        from_email,
-                        to_email,
-                        fail_silently=False,
-                        html_message=template_content,
+                    from config.helpers import send_email_with_embedded_image
+
+                    send_email_with_embedded_image(
+                        recipient_email=to_email,
+                        subject="Staff Profile Message",
+                        html_content=template_content,
+                        from_email=from_email,
                     )
                     return Response({"ok": "Email sent"}, status=HTTP_200_OK)
                 except Exception as e:
