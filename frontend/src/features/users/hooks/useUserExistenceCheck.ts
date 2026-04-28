@@ -54,10 +54,14 @@ export function useUserExistenceCheck({
 			}, 500);
 
 			return () => clearTimeout(timer);
-		} else {
+		}
+
+		// Reset when inputs are invalid (use timeout to avoid synchronous setState in effect)
+		const resetTimer = setTimeout(() => {
 			setIsCheckingName(false);
 			setNameExists(false);
-		}
+		}, 0);
+		return () => clearTimeout(resetTimer);
 	}, [firstName, lastName]);
 
 	// Debounced email checking
@@ -83,10 +87,14 @@ export function useUserExistenceCheck({
 			}, 500);
 
 			return () => clearTimeout(timer);
-		} else {
+		}
+
+		// Reset when inputs are invalid
+		const resetTimer = setTimeout(() => {
 			setIsCheckingEmail(false);
 			setEmailExists(false);
-		}
+		}, 0);
+		return () => clearTimeout(resetTimer);
 	}, [email, confirmEmail, emailValidator]);
 
 	return { isCheckingName, nameExists, isCheckingEmail, emailExists };

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState, useMemo } from "react";
+import { useState, useMemo, createElement } from "react";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import {
@@ -80,7 +80,11 @@ const SectionEditor = ({
 	const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
 	const [fieldContent, setFieldContent] = useState("");
 
-	const Icon = useMemo(() => getIconComponent(section.icon), [section.icon]);
+	const iconElement = useMemo(
+		() =>
+			createElement(getIconComponent(section.icon), { className: "h-5 w-5" }),
+		[section.icon]
+	);
 
 	const handleSaveTitle = () => {
 		if (title.trim() && title !== section.title) {
@@ -188,7 +192,7 @@ const SectionEditor = ({
 							className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-400"
 							title="Click to change icon"
 						>
-							<Icon className="h-5 w-5" />
+							{iconElement}
 						</button>
 					)}
 

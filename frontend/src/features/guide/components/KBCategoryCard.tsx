@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, createElement } from "react";
 import { useNavigate } from "react-router";
 import {
 	Card,
@@ -22,7 +22,11 @@ interface KBCategoryCardProps {
 
 export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 	const navigate = useNavigate();
-	const Icon = useMemo(() => getIconComponent(section.icon), [section.icon]);
+	const iconElement = useMemo(
+		() =>
+			createElement(getIconComponent(section.icon), { className: "h-5 w-5" }),
+		[section.icon]
+	);
 	const articleCount = section.content_fields.length;
 	const roleLabel = ROLE_LABELS[section.required_role];
 
@@ -43,7 +47,7 @@ export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 			<CardHeader className="space-y-3">
 				<div className="flex items-start justify-between">
 					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-400 dark:group-hover:bg-blue-900">
-						<Icon className="h-5 w-5" />
+						{iconElement}
 					</div>
 					<div className="flex items-center gap-1.5">
 						{roleLabel && (
