@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState, useCallback } from "react";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";

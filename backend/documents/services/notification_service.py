@@ -59,20 +59,14 @@ class NotificationService:
         )
 
     @staticmethod
-    def notify_document_recalled(document, recaller, reason, feedback_html=""):
+    def notify_document_recalled(document, recaller, feedback_html=""):
         """
         Notify the correct next-step recipient when a document is recalled.
-
-        Routing:
-        - Project lead recalls → BA lead gets email
-        - BA lead recalls → directorate key stakeholder/approvers (deduplicated)
-        - Directorate recalls → BA lead gets email
 
         Args:
             document: Recalled document instance
             recaller: User who recalled the document
-            reason: Reason for recall
-            feedback_html: Optional rich text feedback HTML
+            feedback_html: Optional rich text HTML feedback (rendered in email)
         """
         recipients = NotificationService._get_recall_recipients(document, recaller)
         if not recipients:
@@ -88,25 +82,19 @@ class NotificationService:
             actioning_user=recaller,
             additional_context={
                 "email_subject": f"{document.kind.title()} Recalled",
-                "recall_reason": reason,
                 "feedback_html": feedback_html,
             },
         )
 
     @staticmethod
-    def notify_document_sent_back(document, sender, reason, feedback_html=""):
+    def notify_document_sent_back(document, sender, feedback_html=""):
         """
         Notify the correct next-step recipient when a document is sent back.
-
-        Routing:
-        - Directorate sends back → BA lead gets email
-        - BA lead sends back → project lead gets email
 
         Args:
             document: Document instance
             sender: User who sent back the document
-            reason: Reason for sending back
-            feedback_html: Optional rich text feedback HTML
+            feedback_html: Optional rich text HTML feedback (rendered in email)
         """
         recipient = NotificationService._get_sent_back_recipient(document)
         if not recipient:
@@ -122,7 +110,6 @@ class NotificationService:
             actioning_user=sender,
             additional_context={
                 "email_subject": f"{document.kind.title()} Sent Back",
-                "sent_back_reason": reason,
                 "feedback_html": feedback_html,
             },
         )

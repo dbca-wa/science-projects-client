@@ -225,11 +225,9 @@ class TestDeleteUnlinkedDocs:
         request = Mock()
         selected = [project_document, project_document]  # Multiple selections
 
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             delete_unlinked_docs(admin, request, selected)
-            mock_print.assert_called_once_with(
-                "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
-            )
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_delete_unlinked_docs_deletes_empty_docs(self, project_with_lead, db):
@@ -261,10 +259,10 @@ class TestDeleteUnlinkedDocs:
 
         initial_count = ProjectDocument.objects.count()
 
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             delete_unlinked_docs(admin, request, selected)
             # Should print deletion summary
-            assert mock_print.called
+            assert mock_message.called
             # Empty doc should be deleted
             assert ProjectDocument.objects.count() < initial_count
             # Doc with data should still exist
@@ -281,11 +279,9 @@ class TestProvideFinalApprovalForDocsIfNextExist:
         request = Mock()
         selected = [project_document, project_document]
 
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             provide_final_approval_for_docs_if_next_exist(admin, request, selected)
-            mock_print.assert_called_once_with(
-                "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
-            )
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_action_approves_concept_when_project_plan_exists(
@@ -310,9 +306,9 @@ class TestProvideFinalApprovalForDocsIfNextExist:
         request = Mock()
         selected = [concept_doc]
 
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             provide_final_approval_for_docs_if_next_exist(admin, request, selected)
-            assert mock_print.called
+            assert mock_message.called
 
             # Verify concept doc was approved
             concept_doc.refresh_from_db()
@@ -330,11 +326,9 @@ class TestPopulateAimsAndContext:
         request = Mock()
         selected = [progress_report, progress_report]
 
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             populate_aims_and_context(admin, request, selected)
-            mock_print.assert_called_once_with(
-                "PLEASE SELECT ONLY ONE ITEM TO BEGIN, THIS IS A BATCH PROCESS"
-            )
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_action_populates_from_previous_year(self, project_with_lead, db):

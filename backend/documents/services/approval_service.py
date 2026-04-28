@@ -169,7 +169,7 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def send_back(document, sender, reason, feedback_html=""):
+    def send_back(document, sender, feedback_html=""):
         """
         Send document back for revision
 
@@ -180,10 +180,9 @@ class ApprovalService:
         Args:
             document: ProjectDocument instance
             sender: User sending back the document
-            reason: Reason for sending back
-            feedback_html: Optional rich text feedback HTML
+            feedback_html: Optional rich text HTML feedback (shown in email)
         """
-        settings.LOGGER.info(f"{sender} is sending back document {document}: {reason}")
+        settings.LOGGER.info(f"{sender} is sending back document {document}")
 
         # Sanitise feedback HTML
         feedback_html = sanitise_feedback_html(feedback_html)
@@ -216,7 +215,7 @@ class ApprovalService:
 
         try:
             NotificationService.notify_document_sent_back(
-                document, sender, reason, feedback_html
+                document, sender, feedback_html
             )
         except Exception as e:
             settings.LOGGER.error(
@@ -225,17 +224,16 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def recall(document, recaller, reason, feedback_html=""):
+    def recall(document, recaller, feedback_html=""):
         """
         Recall document from approval process
 
         Args:
             document: ProjectDocument instance
             recaller: User recalling the document
-            reason: Reason for recall
-            feedback_html: Optional rich text feedback HTML
+            feedback_html: Optional rich text HTML feedback (shown in email)
         """
-        settings.LOGGER.info(f"{recaller} is recalling document {document}: {reason}")
+        settings.LOGGER.info(f"{recaller} is recalling document {document}")
 
         # Sanitise feedback HTML
         feedback_html = sanitise_feedback_html(feedback_html)
@@ -249,7 +247,7 @@ class ApprovalService:
 
         try:
             NotificationService.notify_document_recalled(
-                document, recaller, reason, feedback_html
+                document, recaller, feedback_html
             )
         except Exception as e:
             settings.LOGGER.error(

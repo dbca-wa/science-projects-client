@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
 	Card,
@@ -21,7 +22,7 @@ interface KBCategoryCardProps {
 
 export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 	const navigate = useNavigate();
-	const Icon = getIconComponent(section.icon);
+	const Icon = useMemo(() => getIconComponent(section.icon), [section.icon]);
 	const articleCount = section.content_fields.length;
 	const roleLabel = ROLE_LABELS[section.required_role];
 

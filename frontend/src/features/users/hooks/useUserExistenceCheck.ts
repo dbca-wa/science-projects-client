@@ -41,8 +41,8 @@ export function useUserExistenceCheck({
 			lastName.length >= 2 && /^[A-Za-z\- ]+$/.test(lastName);
 
 		if (isFirstNameValid && isLastNameValid) {
-			setIsCheckingName(true);
 			const timer = setTimeout(async () => {
+				setIsCheckingName(true);
 				try {
 					const exists = await checkNameExists(firstName, lastName);
 					setNameExists(exists);
@@ -70,8 +70,8 @@ export function useUserExistenceCheck({
 			: true;
 
 		if (emailsMatch && isValidEmail && passesCustomValidation) {
-			setIsCheckingEmail(true);
 			const timer = setTimeout(async () => {
+				setIsCheckingEmail(true);
 				try {
 					const exists = await checkEmailExists(email);
 					setEmailExists(exists);

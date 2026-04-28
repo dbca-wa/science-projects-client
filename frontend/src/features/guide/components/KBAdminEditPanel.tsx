@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { useState, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import {
@@ -79,7 +80,7 @@ const SectionEditor = ({
 	const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
 	const [fieldContent, setFieldContent] = useState("");
 
-	const Icon = getIconComponent(section.icon);
+	const Icon = useMemo(() => getIconComponent(section.icon), [section.icon]);
 
 	const handleSaveTitle = () => {
 		if (title.trim() && title !== section.title) {

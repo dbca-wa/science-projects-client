@@ -77,8 +77,10 @@ class DocRecall(APIView):
         # Validate request data
         stage = request.data.get("stage")
         document_pk = request.data.get("documentPk")
-        reason = request.data.get("reason", "")
-        feedback_html = request.data.get("feedbackHTML", "")
+        # Single rich text field serves as both reason and email feedback
+        feedback_html = request.data.get("feedbackHTML", "") or request.data.get(
+            "reason", ""
+        )
 
         if not stage or not document_pk:
             return Response(
@@ -90,7 +92,7 @@ class DocRecall(APIView):
         document = DocumentService.get_document(document_pk)
 
         # Delegate to service
-        ApprovalService.recall(document, request.user, reason, feedback_html)
+        ApprovalService.recall(document, request.user, feedback_html)
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)
@@ -112,8 +114,10 @@ class DocSendBack(APIView):
         # Validate request data
         stage = request.data.get("stage")
         document_pk = request.data.get("documentPk")
-        reason = request.data.get("reason", "")
-        feedback_html = request.data.get("feedbackHTML", "")
+        # Single rich text field serves as both reason and email feedback
+        feedback_html = request.data.get("feedbackHTML", "") or request.data.get(
+            "reason", ""
+        )
 
         if not stage or not document_pk:
             return Response(
@@ -125,7 +129,7 @@ class DocSendBack(APIView):
         document = DocumentService.get_document(document_pk)
 
         # Delegate to service
-        ApprovalService.send_back(document, request.user, reason, feedback_html)
+        ApprovalService.send_back(document, request.user, feedback_html)
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)

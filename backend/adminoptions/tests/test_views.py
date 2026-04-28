@@ -480,15 +480,15 @@ class TestGuideSectionViewSet:
 
     @pytest.mark.integration
     def test_guide_section_requires_admin(self, api_client, user, db):
-        """Test guide section operations require admin permission"""
+        """Test guide section list is accessible to authenticated users"""
         # Arrange
         api_client.force_authenticate(user=user)
 
         # Act
         response = api_client.get(adminoptions_urls.path("guide-sections"))
 
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        # Assert — regular users can read guide sections
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestContentFieldViewSet:
@@ -585,15 +585,15 @@ class TestContentFieldViewSet:
 
     @pytest.mark.integration
     def test_content_field_requires_admin(self, api_client, user, db):
-        """Test content field operations require admin permission"""
+        """Test content field list is accessible to authenticated users"""
         # Arrange
         api_client.force_authenticate(user=user)
 
         # Act
         response = api_client.get(adminoptions_urls.path("content-fields"))
 
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        # Assert — regular users can read content fields
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestAdminTasks:

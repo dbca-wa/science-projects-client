@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Switch } from "@/shared/components/ui/switch";
 import { Label } from "@/shared/components/ui/label";
@@ -23,13 +23,14 @@ const EmailTestingPage = () => {
 	const [testUserId, setTestUserId] = useState<number | null>(null);
 	const [recipientUserId, setRecipientUserId] = useState<number | null>(null);
 	const [actionerUserId, setActionerUserId] = useState<number | null>(null);
+	const [hasInitialised, setHasInitialised] = useState(false);
 
-	useEffect(() => {
-		if (settings) {
-			setTestingMode(settings.email_testing_mode);
-			setTestUserId(settings.email_test_user?.id ?? null);
-		}
-	}, [settings]);
+	// Sync local state from server settings on first load
+	if (settings && !hasInitialised) {
+		setTestingMode(settings.email_testing_mode);
+		setTestUserId(settings.email_test_user?.id ?? null);
+		setHasInitialised(true);
+	}
 
 	const hasChanges =
 		settings &&

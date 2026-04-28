@@ -787,7 +787,7 @@ class TestARExternalProjectSerializer:
 
     @pytest.mark.integration
     def test_get_partners_without_external_info(
-        self, project_with_lead, project_lead, db, capsys
+        self, project_with_lead, project_lead, db
     ):
         """Test get_partners returns empty string when no external info"""
         # Arrange
@@ -808,9 +808,6 @@ class TestARExternalProjectSerializer:
 
         # Assert
         assert data["partners"] == ""
-        # Verify exception was caught and printed
-        captured = capsys.readouterr()
-        assert "EXCEPTION (NO PARTNERS):" in captured.out
 
     @pytest.mark.integration
     def test_get_funding_with_external_info(self, project_with_lead, project_lead, db):
@@ -844,7 +841,7 @@ class TestARExternalProjectSerializer:
 
     @pytest.mark.integration
     def test_get_funding_without_external_info(
-        self, project_with_lead, project_lead, db, capsys
+        self, project_with_lead, project_lead, db
     ):
         """Test get_funding returns empty string when no external info"""
         # Arrange
@@ -865,9 +862,6 @@ class TestARExternalProjectSerializer:
 
         # Assert
         assert data["funding"] == ""
-        # Verify exception was caught and printed
-        captured = capsys.readouterr()
-        assert "EXCEPTION (NO FUNDING):" in captured.out
 
     @pytest.mark.integration
     def test_get_partners_method_directly(self, project_with_lead, db):
@@ -912,7 +906,7 @@ class TestARExternalProjectSerializer:
         assert result == "$75,000"
 
     @pytest.mark.integration
-    def test_get_partners_method_no_info(self, project_with_lead, db, capsys):
+    def test_get_partners_method_no_info(self, project_with_lead, db):
         """Test get_partners method returns empty string when no external info"""
         # Arrange
         serializer = ARExternalProjectSerializer()
@@ -922,11 +916,9 @@ class TestARExternalProjectSerializer:
 
         # Assert
         assert result == ""
-        captured = capsys.readouterr()
-        assert "EXCEPTION (NO PARTNERS):" in captured.out
 
     @pytest.mark.integration
-    def test_get_funding_method_no_info(self, project_with_lead, db, capsys):
+    def test_get_funding_method_no_info(self, project_with_lead, db):
         """Test get_funding method returns empty string when no external info"""
         # Arrange
         serializer = ARExternalProjectSerializer()
@@ -936,8 +928,6 @@ class TestARExternalProjectSerializer:
 
         # Assert
         assert result == ""
-        captured = capsys.readouterr()
-        assert "EXCEPTION (NO FUNDING):" in captured.out
 
 
 class TestTinyStudentProjectARSerializer:
