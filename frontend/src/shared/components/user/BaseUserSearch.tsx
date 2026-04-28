@@ -13,8 +13,10 @@ import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
 import { User } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
-import { getUsersBasedOnSearchTerm } from "@/features/users/services/user.service";
-import { getFullUser } from "@/features/users/services/user.service";
+import {
+	getUsersBasedOnSearchTerm,
+	getFullUser,
+} from "@/shared/services/user.service";
 import type { IUserData } from "@/shared/types/user.types";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 

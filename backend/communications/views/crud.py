@@ -4,6 +4,7 @@ Communication CRUD views
 
 import logging
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -51,6 +52,7 @@ class ChatRooms(APIView):
 
     def post(self, request):
         """Create new chat room"""
+        settings.LOGGER.info(f"{request.user} is creating chat room")
         serializer = ChatRoomSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -75,6 +77,7 @@ class ChatRoomDetail(APIView):
 
     def put(self, request, pk):
         """Update chat room"""
+        settings.LOGGER.info(f"{request.user} is updating chat room (pk={pk})")
         serializer = ChatRoomSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -87,6 +90,7 @@ class ChatRoomDetail(APIView):
 
     def delete(self, request, pk):
         """Delete chat room"""
+        settings.LOGGER.warning(f"{request.user} is deleting chat room (pk={pk})")
         CommunicationService.delete_chat_room(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -104,6 +108,7 @@ class DirectMessages(APIView):
 
     def post(self, request):
         """Create new direct message"""
+        settings.LOGGER.info(f"{request.user} is sending direct message")
         serializer = DirectMessageCreateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -128,6 +133,7 @@ class DirectMessageDetail(APIView):
 
     def put(self, request, pk):
         """Update direct message"""
+        settings.LOGGER.info(f"{request.user} is updating direct message (pk={pk})")
         serializer = DirectMessageSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -140,6 +146,7 @@ class DirectMessageDetail(APIView):
 
     def delete(self, request, pk):
         """Delete direct message"""
+        settings.LOGGER.warning(f"{request.user} is deleting direct message (pk={pk})")
         CommunicationService.delete_direct_message(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -174,6 +181,7 @@ class Comments(APIView):
 
     def post(self, request):
         """Create new comment"""
+        settings.LOGGER.info(f"{request.user} is creating comment")
         serializer = CommentCreateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -233,6 +241,7 @@ class CommentDetail(APIView):
 
     def put(self, request, pk):
         """Update comment"""
+        settings.LOGGER.info(f"{request.user} is updating comment (pk={pk})")
         serializer = CommentSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -268,6 +277,7 @@ class CommentDetail(APIView):
 
     def delete(self, request, pk):
         """Delete comment"""
+        settings.LOGGER.warning(f"{request.user} is deleting comment (pk={pk})")
         try:
             comment = CommunicationService.get_comment(pk)
 
@@ -316,6 +326,7 @@ class Reactions(APIView):
 
     def post(self, request):
         """Toggle reaction on comment"""
+        settings.LOGGER.info(f"{request.user} is creating reaction")
         comment_id = request.data.get("comment")
         reaction_type = request.data.get("reaction")
 
@@ -390,6 +401,7 @@ class ReactionDetail(APIView):
 
     def put(self, request, pk):
         """Update reaction"""
+        settings.LOGGER.info(f"{request.user} is updating reaction (pk={pk})")
         serializer = ReactionSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -402,5 +414,6 @@ class ReactionDetail(APIView):
 
     def delete(self, request, pk):
         """Delete reaction"""
+        settings.LOGGER.warning(f"{request.user} is deleting reaction (pk={pk})")
         CommunicationService.delete_reaction(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)

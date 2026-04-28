@@ -1,5 +1,5 @@
 import { ProjectImage } from "./ProjectImage";
-import { ProjectTag } from "../badges/ProjectTag";
+import { ProjectTag } from "@/shared/components/badges/ProjectTag";
 import { ProjectStatusOverlay } from "../ProjectStatusOverlay";
 import type { IProjectData } from "@/shared/types/project.types";
 import { cn } from "@/shared/lib/utils";

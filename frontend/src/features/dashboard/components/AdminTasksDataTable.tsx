@@ -9,10 +9,8 @@ import { useNavigate } from "react-router";
 import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { format } from "date-fns";
 import type { IAdminTask } from "../types/admin-tasks.types";
-import {
-	buildAdminTaskDetails,
-	extractTextFromHTML,
-} from "../utils/dashboard.utils";
+import { buildAdminTaskDetails } from "../utils/dashboard.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface AdminTasksDataTableProps {

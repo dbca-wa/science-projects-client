@@ -6,7 +6,7 @@ import {
 	useReportsForDivision,
 	useReportDetail,
 } from "@/features/reports/hooks/useReports";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import {
 	useAuthStore,
@@ -343,7 +343,10 @@ const LatestReportPage = observer(function LatestReportPage({
 				</TabsContent>
 				<TabsContent value="pending">
 					<Suspense fallback={<TabSpinner />}>
-						<PendingTab reportId={report.id} />
+						<PendingTab
+							reportId={report.id}
+							divisionSlug={selectedDivisionSlug}
+						/>
 					</Suspense>
 				</TabsContent>
 				<TabsContent value="approved">

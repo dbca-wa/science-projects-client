@@ -65,8 +65,6 @@ export function getCompressionWorkerUrl(): string | null {
 		// Create and cache the blob URL
 		workerBlobUrl = URL.createObjectURL(blob);
 
-		console.log("Created compression worker blob URL:", workerBlobUrl);
-
 		return workerBlobUrl;
 	} catch (error) {
 		console.error("Failed to create compression worker blob URL:", error);
@@ -100,7 +98,6 @@ export function revokeWorkerUrl(url: string): void {
 		// Clear cached URL if it matches
 		if (workerBlobUrl === url) {
 			workerBlobUrl = null;
-			console.log("Revoked compression worker blob URL");
 		}
 	} catch (error) {
 		console.error("Failed to revoke worker blob URL:", error);

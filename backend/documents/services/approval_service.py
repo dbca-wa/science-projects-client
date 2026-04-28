@@ -7,6 +7,8 @@ from django.db import transaction
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from ..models import ProjectDocument
+from ..utils.helpers import sanitise_feedback_html
+from .notification_service import NotificationService
 
 
 class ApprovalService:
@@ -37,8 +39,12 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.INAPPROVAL
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_ready(document, requester)
+        try:
+            NotificationService.notify_document_ready(document, requester)
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send approval request notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic
@@ -62,8 +68,12 @@ class ApprovalService:
         document.project_lead_approval_granted = True
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_ready(document, approver)
+        try:
+            NotificationService.notify_document_approved(document, approver)
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send stage 1 approval notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic
@@ -92,8 +102,12 @@ class ApprovalService:
         document.business_area_lead_approval_granted = True
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_ready(document, approver)
+        try:
+            NotificationService.notify_document_approved(document, approver)
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send stage 2 approval notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic
@@ -127,13 +141,35 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.APPROVED
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_approved(document, approver)
-        # NotificationService.notify_document_approved_directorate(document, approver)
+        # Only set project to active if no approved closure exists
+        # (a project with an approved closure should remain in its current terminal state)
+        has_approved_closure = ProjectDocument.objects.filter(
+            project=document.project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTCLOSURE,
+            status=ProjectDocument.StatusChoices.APPROVED,
+        ).exists()
+
+        if not has_approved_closure:
+            document.project.status = "active"
+            document.project.save()
+
+        try:
+            NotificationService.notify_document_approved(document, approver)
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send stage 3 approval notification: {e}", exc_info=True
+            )
+
+        try:
+            NotificationService.notify_document_approved_directorate(document, approver)
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send directorate approval notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic
-    def send_back(document, sender, reason):
+    def send_back(document, sender, feedback_html=""):
         """
         Send document back for revision
 
@@ -144,9 +180,12 @@ class ApprovalService:
         Args:
             document: ProjectDocument instance
             sender: User sending back the document
-            reason: Reason for sending back
+            feedback_html: Optional rich text HTML feedback (shown in email)
         """
-        settings.LOGGER.info(f"{sender} is sending back document {document}: {reason}")
+        settings.LOGGER.info(f"{sender} is sending back document {document}")
+
+        # Sanitise feedback HTML
+        feedback_html = sanitise_feedback_html(feedback_html)
 
         # Determine current stage and reset appropriate flags
         # Fully approved: all flags granted — reset directorate to send back to stage 3
@@ -174,21 +213,30 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.REVISING
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_sent_back(document, sender, reason)
+        try:
+            NotificationService.notify_document_sent_back(
+                document, sender, feedback_html
+            )
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send document sent back notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic
-    def recall(document, recaller, reason):
+    def recall(document, recaller, feedback_html=""):
         """
         Recall document from approval process
 
         Args:
             document: ProjectDocument instance
             recaller: User recalling the document
-            reason: Reason for recall
+            feedback_html: Optional rich text HTML feedback (shown in email)
         """
-        settings.LOGGER.info(f"{recaller} is recalling document {document}: {reason}")
+        settings.LOGGER.info(f"{recaller} is recalling document {document}")
+
+        # Sanitise feedback HTML
+        feedback_html = sanitise_feedback_html(feedback_html)
 
         # Reset approval flags
         document.project_lead_approval_granted = False
@@ -197,8 +245,14 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.REVISING
         document.save()
 
-        # TODO: Email logic to be implemented later
-        # NotificationService.notify_document_recalled(document, recaller, reason)
+        try:
+            NotificationService.notify_document_recalled(
+                document, recaller, feedback_html
+            )
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send document recalled notification: {e}", exc_info=True
+            )
 
     @staticmethod
     @transaction.atomic

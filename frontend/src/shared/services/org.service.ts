@@ -3,6 +3,7 @@ import type {
 	IBusinessArea,
 	IBranch,
 	IAffiliation,
+	IDivision,
 } from "@/shared/types/org.types";
 
 /**
@@ -11,6 +12,7 @@ import type {
 const ORG_ENDPOINTS = {
 	BUSINESS_AREAS: {
 		LIST: "agencies/business_areas",
+		MINE: "agencies/business_areas/mine",
 	},
 	BRANCHES: {
 		LIST: "agencies/branches",
@@ -20,6 +22,9 @@ const ORG_ENDPOINTS = {
 	},
 	AGENCIES: {
 		LIST: "agencies/list",
+	},
+	DIVISIONS: {
+		LIST: "agencies/divisions",
 	},
 } as const;
 
@@ -45,4 +50,19 @@ export const getAllBranches = async (): Promise<IBranch[]> => {
  */
 export const getAllAffiliations = async (): Promise<IAffiliation[]> => {
 	return apiClient.get<IAffiliation[]>(ORG_ENDPOINTS.AFFILIATIONS.LIST);
+};
+
+/**
+ * Get all divisions
+ * @returns Array of all divisions
+ */
+export const getDivisions = async (): Promise<IDivision[]> => {
+	return apiClient.get<IDivision[]>(ORG_ENDPOINTS.DIVISIONS.LIST);
+};
+
+/**
+ * Fetch business areas where the current user is the leader
+ */
+export const getMyBusinessAreas = async (): Promise<IBusinessArea[]> => {
+	return apiClient.get<IBusinessArea[]>(ORG_ENDPOINTS.BUSINESS_AREAS.MINE);
 };

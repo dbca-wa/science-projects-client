@@ -1,0 +1,24 @@
+# Ensure binary files are not modified by git line-ending conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.webp binary
+*.tif binary
+*.tiff binary
+*.bmp binary
+*.eot binary
+*.otf binary
+
+# SVG is XML text but should not have line endings normalised
+# (can break rendering if CRLF is injected)
+*.svg text eol=lf
+
+# Lock files should be committed exactly as generated
+bun.lock -diff
+poetry.lock -diff

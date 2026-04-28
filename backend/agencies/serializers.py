@@ -1,4 +1,5 @@
 # region IMPORTS ====================================================================================================
+from django.conf import settings
 from rest_framework import serializers
 
 from contacts.models import Address
@@ -281,6 +282,10 @@ class MiniBASerializer(serializers.ModelSerializer):
             # since we want to show the total scope of the BA
             return obj.project_set.count()
         except Exception:
+            settings.LOGGER.warning(
+                f"Failed to count projects for business area pk={obj.pk}",
+                exc_info=True,
+            )
             return 0
 
     def get_division(self, obj):

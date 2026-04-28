@@ -17,7 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import type { IProjectDocument } from "@/features/dashboard/types/dashboard.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
 import {
 	sortTasksByLevel,
 	sortTasksByDocumentKind,
@@ -25,8 +25,8 @@ import {
 	getDocumentKindTitle,
 	extractPlainTextTitle,
 	type IDocumentTaskWithLevel,
-} from "@/features/dashboard/utils/document-tasks.utils";
-import { TASK_LEVEL_CONFIG } from "@/features/dashboard/constants/document-tasks.constants";
+} from "@/shared/utils/document-tasks.utils";
+import { TASK_LEVEL_CONFIG } from "@/shared/constants/document-tasks.constants";
 import { CaretakeeCell } from "./CaretakeeCell";
 
 interface CaretakerDocumentTasksDataTableProps {

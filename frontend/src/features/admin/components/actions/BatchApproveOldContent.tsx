@@ -25,9 +25,13 @@ export function BatchApproveOldContent({
 							Batch Approve Old Reports
 						</h2>
 						<p className="text-sm text-gray-600 dark:text-gray-400">
-							This action will approve all outstanding reports from previous
-							reporting years. Use this to clean up reports that were not
-							individually approved before the cycle closed.
+							This action will approve all outstanding progress and student
+							reports from <strong>previous</strong> financial years — i.e.
+							years before the currently selected reporting year. Reports from
+							the current year are not affected.
+						</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							No notification emails are sent for batch-approved old reports.
 						</p>
 					</div>
 				</div>

@@ -2,9 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateMembership } from "../../services/user.service";
-import { authKeys } from "@/features/auth/hooks/useAuth";
+import { useUpdateMembership } from "../../hooks/useUserMutations";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
@@ -33,7 +31,6 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { Button } from "@/shared/components/ui/button";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const membershipSchema = z.object({
@@ -53,7 +50,6 @@ interface EditOrgMembershipModalProps {
 
 export const EditOrgMembershipModal = observer(
 	({ isOpen, onClose, user, onSuccess }: EditOrgMembershipModalProps) => {
-		const queryClient = useQueryClient();
 		const { data: branches, isLoading: branchesLoading } = useBranches();
 		const { data: businessAreas, isLoading: businessAreasLoading } =
 			useBusinessAreas();
@@ -67,23 +63,10 @@ export const EditOrgMembershipModal = observer(
 			},
 		});
 
-		const updateMutation = useMutation({
-			mutationFn: (data: MembershipFormData) =>
-				updateMembership(user.id!, data),
-			onSuccess: async () => {
-				// Reset queries to force immediate refetch (ignores staleTime)
-				await queryClient.resetQueries({
-					queryKey: authKeys.user(),
-					exact: true,
-				});
-
-				toast.success("Membership updated successfully");
+		const updateMutation = useUpdateMembership(user.id!, {
+			onSuccess: () => {
 				onSuccess();
 				onClose();
-			},
-			onError: (error: Error) => {
-				const message = error.message || "Failed to update membership";
-				toast.error(message);
 			},
 		});
 

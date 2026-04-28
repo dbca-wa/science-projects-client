@@ -21,11 +21,6 @@ export const useDeleteProject = () => {
 	return useMutation({
 		mutationFn: deleteProject,
 		onSuccess: async (_, projectId) => {
-			console.log(
-				"[useDeleteProject] Mutation succeeded, invalidating queries for project:",
-				projectId
-			);
-
 			// Invalidate project detail query
 			await queryClient.invalidateQueries({
 				predicate: (query) => {
@@ -45,10 +40,6 @@ export const useDeleteProject = () => {
 					return resource === "projects" && type === "list";
 				},
 			});
-
-			console.log(
-				"[useDeleteProject] Query invalidation complete, navigating to projects list"
-			);
 
 			toast.success("Project deleted");
 			navigate("/projects");

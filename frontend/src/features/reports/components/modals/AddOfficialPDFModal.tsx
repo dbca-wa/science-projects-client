@@ -21,7 +21,7 @@ import {
 	useReportsWithoutPDF,
 	useAddReportPDF,
 } from "@/features/reports/hooks/useReports";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 
 interface AddOfficialPDFModalProps {
 	isOpen: boolean;

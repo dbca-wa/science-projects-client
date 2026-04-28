@@ -168,6 +168,7 @@ class UpdateStudentReport(APIView):
 
     def post(self, request):
         """Update student report progress_report field"""
+        settings.LOGGER.info(f"{request.user} is updating student report data")
         try:
             report = StudentReport.objects.filter(
                 document=int(request.data["main_document_id"])

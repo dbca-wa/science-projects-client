@@ -64,23 +64,10 @@ urlpatterns = [
     path("projectclosures", views.ProjectClosures.as_view()),
     path("projectclosures/<int:pk>", views.ProjectClosureDetail.as_view()),
     # Project Documents Secondary ========================================================
-    # path("projectdocuments/<int:pk>/comments", views.ProjectDocumentComments.as_view()),  # TODO: Comment model not implemented
     path(
         "projectdocuments/pendingmyaction",
         views.ProjectDocsPendingMyActionAllStages.as_view(),
     ),
-    # path(
-    #     "projectdocuments/pendingmyaction/stage1",
-    #     views.ProjectDocsPendingMyActionStageOne.as_view(),  # TODO: Not yet implemented
-    # ),
-    # path(
-    #     "projectdocuments/pendingmyaction/stage2",
-    #     views.ProjectDocsPendingMyActionStageTwo.as_view(),  # TODO: Not yet implemented
-    # ),
-    # path(
-    #     "projectdocuments/pendingmyaction/stage3",
-    #     views.ProjectDocsPendingMyActionStageThree.as_view(),  # TODO: Not yet implemented
-    # ),
     path("projectplans/endorsements", views.Endorsements.as_view()),
     path(
         "projectplans/endorsements/<int:pk>",
@@ -111,22 +98,20 @@ urlpatterns = [
         "generate_project_document/<int:pk>", views.BeginProjectDocGeneration.as_view()
     ),
     path("cancel_doc_gen/<int:pk>", views.CancelProjectDocGeneration.as_view()),
-    # EMAILS (Testing) ========================================================
-    # path("spms_link_email", views.SPMSInviteEmail.as_view()),  # TODO: Not yet implemented
-    # path("new_cycle_email", views.NewCycleOpenEmail.as_view()),  # TODO: Not yet implemented
-    # path("get_project_lead_emails", views.GetProjectLeadEmail.as_view()),  # TODO: Not yet implemented
     # ACTIONS (Sends emails) ========================================================
     path("sendbumpemails", views.SendBumpEmails.as_view()),
+    path("sendbumpall", views.SendBumpAll.as_view()),
+    path("bumppreview", views.BumpPreview.as_view()),
     path("opennewcycle", views.NewCycleOpen.as_view()),
     path("batchapprove", views.BatchApprove.as_view()),
     path("batchapproveold", views.BatchApproveOld.as_view()),
+    path("batchapprovecurrent", views.BatchApproveCurrent.as_view()),
     path("projectclosures/reopen/<int:pk>", views.ReopenProject.as_view()),
     # Actions (Project Docs - Sends emails) ========================================================
     path("notifications/mentions", views.SendMentionNotification.as_view()),
     path("actions/approve", views.DocApproval.as_view(), name="document-approve"),
     path("actions/recall", views.DocRecall.as_view(), name="document-recall"),
     path("actions/send_back", views.DocSendBack.as_view(), name="document-send-back"),
-    # path("actions/reopen", views.DocReopenProject.as_view(), name="document-reopen"),  # TODO: Not yet implemented
     # Helper ========================================================
     path("downloadProjectDocument/<int:pk>", views.DownloadProjectDocument.as_view()),
     # Publications ========================================================

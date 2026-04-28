@@ -14,10 +14,7 @@ export const Footer = () => {
 
 	return (
 		<footer className="flex justify-center bottom-0 w-full text-white/60 bg-gray-900 py-4 select-none">
-			<div
-				className="text-xs text-center cursor-pointer"
-				onClick={() => console.log(VERSION)}
-			>
+			<div className="text-xs text-center cursor-pointer">
 				<a
 					href="https://github.com/dbca-wa/science-projects-client"
 					target="_blank"

@@ -1,4 +1,4 @@
-import type { IProjectDocument } from "@/features/dashboard/types/dashboard.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
 
 /**
  * Response from caretaker tasks API

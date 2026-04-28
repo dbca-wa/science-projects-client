@@ -337,7 +337,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	setProjectKind = (kind: ProjectKind) => {
 		this.state.projectKind = kind;
 
-		// Initialize conditional form data based on project kind
+		// Initialise conditional form data based on project kind
 		if (kind === "external") {
 			this.state.formData.externalDetails = {
 				collaboration_with: "",

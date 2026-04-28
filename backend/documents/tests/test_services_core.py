@@ -518,7 +518,7 @@ class TestApprovalService:
         )
 
         # Act
-        ApprovalService.recall(concept_plan.document, user, "Need to make changes")
+        ApprovalService.recall(concept_plan.document, user)
 
         # Assert
         concept_plan.document.refresh_from_db()

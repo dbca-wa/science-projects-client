@@ -65,6 +65,17 @@ export const BecomeCaretakerRequest = ({
 	// The current user (viewing this) is in secondary_users as the requested caretaker
 	const userNeedingCaretaker = request.primary_user;
 
+	if (!userNeedingCaretaker) {
+		return (
+			<Alert variant="destructive">
+				<Info className="h-4 w-4" />
+				<AlertDescription>
+					Error: User data not found in request.
+				</AlertDescription>
+			</Alert>
+		);
+	}
+
 	const getUserName = () => {
 		const firstName = userNeedingCaretaker.display_first_name;
 		const lastName = userNeedingCaretaker.display_last_name;
@@ -153,7 +164,7 @@ export const BecomeCaretakerRequest = ({
 								Reason
 							</h4>
 							<p className="text-sm">
-								{getCaretakerReasonLabel(request.reason)}
+								{getCaretakerReasonLabel(request.reason ?? "")}
 							</p>
 						</div>
 

@@ -14,7 +14,7 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import type { IProjectDocument } from "@/features/dashboard/types/dashboard.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
 import {
 	addTaskLevelMetadata,
 	sortTasksByDocumentKind,
@@ -22,7 +22,7 @@ import {
 	getDocumentKindTitle,
 	extractPlainTextTitle,
 	type IDocumentTaskWithLevel,
-} from "@/features/dashboard/utils/document-tasks.utils";
+} from "@/shared/utils/document-tasks.utils";
 
 interface CaretakerDirectorateDocumentsDataTableProps {
 	tasks: IProjectDocument[];

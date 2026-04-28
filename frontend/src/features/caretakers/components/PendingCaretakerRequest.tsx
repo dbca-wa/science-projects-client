@@ -64,23 +64,12 @@ export const PendingCaretakerRequest = ({
 	const caretakerId = request.secondary_users?.[0]?.id;
 	const requesterId = request.requester?.id;
 
-	// Debug logging
-	console.log("PendingCaretakerRequest Debug:", {
-		currentUserId: currentUser?.id,
-		caretakerId,
-		requesterId,
-		primaryUserId: userNeedingCaretaker?.id,
-		request,
-	});
-
 	// Outgoing: I am the requester (I made this request)
 	const isOutgoingRequest = currentUser?.id === requesterId;
 
 	// Incoming: Someone else made this request and I'm the caretaker being asked
 	const isIncomingRequest =
 		currentUser?.id === caretakerId && currentUser?.id !== requesterId;
-
-	console.log("Request Type:", { isIncomingRequest, isOutgoingRequest });
 
 	if (!userNeedingCaretaker) {
 		return (
@@ -203,7 +192,7 @@ export const PendingCaretakerRequest = ({
 								Reason
 							</h4>
 							<p className="text-sm">
-								{getCaretakerReasonLabel(request.reason)}
+								{getCaretakerReasonLabel(request.reason ?? "")}
 							</p>
 						</div>
 

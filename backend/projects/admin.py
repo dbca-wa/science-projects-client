@@ -1,5 +1,6 @@
 # region IMPORTS ==============================================
 
+from django.conf import settings
 from django.contrib import admin
 
 from locations.models import Area
@@ -22,7 +23,8 @@ from .models import (
 @admin.action(description="Convert EXT Peer to Consulted")
 def convert_ext_peer_to_consulted(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     roles_to_convert = [
@@ -39,7 +41,8 @@ def convert_ext_peer_to_consulted(model_admin, req, selected):
 @admin.action(description="Convert EXT Collaborator to Consulted")
 def convert_ext_collaborator_to_consulted(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     roles_to_convert = [
@@ -310,7 +313,8 @@ def update_external_description_with_project_description_if_empty(
     model_admin, req, selected
 ):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     updated_count = 0
@@ -342,7 +346,8 @@ def update_external_description_with_project_description_if_empty(
 )
 def create_external_details_if_missing(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     updated_count = 0

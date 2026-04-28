@@ -23,6 +23,7 @@ import { OutdentButton } from "./OutdentButton";
 import { AlignmentButton } from "./AlignmentButton";
 import { StrikethroughButton } from "./StrikethroughButton";
 import { TableButton } from "./TableButton";
+import { ImageButton } from "./ImageButton";
 import { ToolbarDarkModeContext } from "./ToolbarContext";
 
 export const Toolbar: React.FC<ToolbarProps> = observer(
@@ -112,6 +113,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		const showStrikethrough = false; // Disabled for now
 		// const showStrikethrough = mode === "full";
 		const showTable = mode === "full";
+		const showImage = mode === "full";
 
 		// Cycle through alignment options
 		const cycleAlignment = () => {
@@ -300,6 +302,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 							disabled={disabled}
 						/>
 					)}
+
+					{showImage && <ImageButton disabled={disabled} />}
 				</div>
 			</ToolbarDarkModeContext.Provider>
 		);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
@@ -22,13 +22,13 @@ import {
 } from "@/shared/components/ui/select";
 import { Loader2, AlertCircle, Mail, AlertTriangle } from "lucide-react";
 import { useCreateStaffUser } from "../hooks/useCreateStaffUser";
+import { useUserExistenceCheck } from "../hooks/useUserExistenceCheck";
 import {
 	staffUserCreateSchema,
 	type StaffUserCreateFormData,
 } from "../schemas/staffUserCreate.schema";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
-import { apiClient } from "@/shared/services/api/client.service";
 import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
@@ -47,12 +47,6 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
 	const { data: branches, isLoading: isLoadingBranches } = useBranches();
-
-	// Duplicate checking states
-	const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-	const [emailExists, setEmailExists] = useState(false);
-	const [isCheckingName, setIsCheckingName] = useState(false);
-	const [nameExists, setNameExists] = useState(false);
 
 	const form = useForm<StaffUserCreateFormData>({
 		resolver: zodResolver(staffUserCreateSchema),
@@ -73,6 +67,22 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 	const email = form.watch("email");
 	const confirmEmail = form.watch("confirmEmail");
 
+	// Stable email validator for staff users (must be @dbca.wa.gov.au)
+	const emailValidator = useCallback(
+		(e: string) => e.endsWith("@dbca.wa.gov.au"),
+		[]
+	);
+
+	// Debounced duplicate checking via shared hook
+	const { isCheckingName, nameExists, isCheckingEmail, emailExists } =
+		useUserExistenceCheck({
+			firstName,
+			lastName,
+			email,
+			confirmEmail,
+			emailValidator,
+		});
+
 	// Memoize sorted data
 	const sortedBranches = useMemo(() => {
 		if (!branches) return [];
@@ -87,71 +97,6 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 			return a.name.localeCompare(b.name);
 		});
 	}, [businessAreas]);
-
-	// Debounced name checking
-	useEffect(() => {
-		const isFirstNameValid =
-			firstName.length >= 2 && /^[A-Za-z\- ]+$/.test(firstName);
-		const isLastNameValid =
-			lastName.length >= 2 && /^[A-Za-z\- ]+$/.test(lastName);
-
-		if (isFirstNameValid && isLastNameValid) {
-			setIsCheckingName(true);
-			const timer = setTimeout(async () => {
-				try {
-					const response = await apiClient.post<{ exists: boolean }>(
-						"users/check-name-exists",
-						{
-							first_name: firstName,
-							last_name: lastName,
-						}
-					);
-					setNameExists(response.exists);
-				} catch (error) {
-					console.error("Error checking name:", error);
-				} finally {
-					setIsCheckingName(false);
-				}
-			}, 500);
-
-			return () => clearTimeout(timer);
-		} else {
-			setIsCheckingName(false);
-			setNameExists(false);
-		}
-	}, [firstName, lastName]);
-
-	// Debounced email checking
-	useEffect(() => {
-		const emailsMatch = email === confirmEmail;
-		const isValidEmail =
-			email.length >= 5 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-		const isDbcaEmail = email.endsWith("@dbca.wa.gov.au");
-
-		if (emailsMatch && isValidEmail && isDbcaEmail) {
-			setIsCheckingEmail(true);
-			const timer = setTimeout(async () => {
-				try {
-					const response = await apiClient.post<{ exists: boolean }>(
-						"users/check-email-exists",
-						{
-							email,
-						}
-					);
-					setEmailExists(response.exists);
-				} catch (error) {
-					console.error("Error checking email:", error);
-				} finally {
-					setIsCheckingEmail(false);
-				}
-			}, 500);
-
-			return () => clearTimeout(timer);
-		} else {
-			setIsCheckingEmail(false);
-			setEmailExists(false);
-		}
-	}, [email, confirmEmail]);
 
 	// Warn user about unsaved changes
 	useEffect(() => {

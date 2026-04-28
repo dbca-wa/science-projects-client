@@ -58,6 +58,7 @@ class UserProfileDetail(APIView):
 
     def put(self, request, pk):
         """Update user profile"""
+        settings.LOGGER.info(f"{request.user} is updating user profile (pk={pk})")
         serializer = UserProfileSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -73,6 +74,9 @@ class UpdatePersonalInformation(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
+        settings.LOGGER.info(
+            f"{request.user} is updating personal information (pk={pk})"
+        )
         # Get the user
         try:
             from users.models import User
@@ -126,6 +130,7 @@ class UpdateProfile(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
+        settings.LOGGER.info(f"{request.user} is updating profile (pk={pk})")
         # Get the user
         try:
             from users.models import User
@@ -177,6 +182,7 @@ class UpdateMembership(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
+        settings.LOGGER.info(f"{request.user} is updating membership (pk={pk})")
         serializer = UpdateMembershipSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -212,6 +218,7 @@ class RemoveAvatar(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        settings.LOGGER.warning(f"{request.user} is removing avatar (pk={pk})")
         try:
             from users.models import User
 
@@ -231,6 +238,7 @@ class RemoveAvatar(APIView):
 
     def delete(self, request, pk):
         """DELETE method for removing avatar"""
+        settings.LOGGER.warning(f"{request.user} is removing avatar (pk={pk})")
         try:
             from users.models import User
 

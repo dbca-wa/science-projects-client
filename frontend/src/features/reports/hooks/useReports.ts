@@ -24,7 +24,6 @@ import {
 	deleteReportPDFFile,
 	deleteLegacyPDFFile,
 	toggleReportPublished,
-	getReportsForDivision,
 } from "../services/report.service";
 
 /**
@@ -80,13 +79,9 @@ export const useLatestReport = (divisionSlug?: string) =>
 
 /**
  * Fetch all reports for a specific division, sorted by year descending.
+ * Re-exported from shared for backward compatibility.
  */
-export const useReportsForDivision = (divisionSlug?: string) =>
-	useQuery({
-		queryKey: ["reports", "list", divisionSlug ?? "all"],
-		queryFn: () => getReportsForDivision(divisionSlug),
-		staleTime: 5 * 60_000,
-	});
+export { useReportsForDivision } from "@/shared/hooks/queries/useReportsForDivision";
 
 /**
  * Fetch a specific annual report by ID (full detail with all fields)

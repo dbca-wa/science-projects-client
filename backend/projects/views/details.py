@@ -40,6 +40,7 @@ class ProjectAdditional(APIView):
 
     def post(self, request):
         """Create project detail"""
+        settings.LOGGER.info(f"{request.user} is creating project detail")
         serializer = ProjectDetailSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -120,6 +121,7 @@ class StudentProjectAdditional(APIView):
 
     def post(self, request):
         """Create student project detail"""
+        settings.LOGGER.info(f"{request.user} is creating student project detail")
         serializer = StudentProjectDetailSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -147,6 +149,9 @@ class StudentProjectAdditionalDetail(APIView):
 
     def put(self, request, pk):
         """Update student project detail"""
+        settings.LOGGER.info(
+            f"{request.user} is updating student project detail (pk={pk})"
+        )
         serializer = StudentProjectDetailSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -187,6 +192,7 @@ class ExternalProjectAdditional(APIView):
 
     def post(self, request):
         """Create external project detail"""
+        settings.LOGGER.info(f"{request.user} is creating external project detail")
         serializer = ExternalProjectDetailSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -214,6 +220,9 @@ class ExternalProjectAdditionalDetail(APIView):
 
     def patch(self, request, pk):
         """Partial update external project detail"""
+        settings.LOGGER.info(
+            f"{request.user} is updating external project detail (pk={pk})"
+        )
         serializer = ExternalProjectDetailSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -233,6 +242,9 @@ class ExternalProjectAdditionalDetail(APIView):
 
     def put(self, request, pk):
         """Full update external project detail"""
+        settings.LOGGER.info(
+            f"{request.user} is updating external project detail (pk={pk})"
+        )
         serializer = ExternalProjectDetailSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

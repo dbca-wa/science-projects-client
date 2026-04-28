@@ -2,9 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updatePersonalInformation } from "../../services/user.service";
-import { authKeys } from "@/features/auth/hooks/useAuth";
+import { useUpdatePersonalInformation } from "../../hooks/useUserMutations";
 import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import {
@@ -32,7 +30,6 @@ import {
 } from "@/shared/components/ui/select";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { toast } from "sonner";
 import { Loader2, User, Phone, Printer, Mail, Award } from "lucide-react";
 
 const personalInfoSchema = z.object({
@@ -54,8 +51,6 @@ interface EditPersonalInformationModalProps {
 
 export const EditPersonalInformationModal = observer(
 	({ isOpen, onClose, user, onSuccess }: EditPersonalInformationModalProps) => {
-		const queryClient = useQueryClient();
-
 		const form = useForm<PersonalInfoFormData>({
 			resolver: zodResolver(personalInfoSchema),
 			defaultValues: {
@@ -67,24 +62,10 @@ export const EditPersonalInformationModal = observer(
 			},
 		});
 
-		const updateMutation = useMutation({
-			mutationFn: (data: PersonalInfoFormData) =>
-				updatePersonalInformation(user.id!, data),
-			onSuccess: async () => {
-				// Reset queries to force immediate refetch (ignores staleTime)
-				await queryClient.resetQueries({
-					queryKey: authKeys.user(),
-					exact: true,
-				});
-
-				toast.success("Personal information updated successfully");
+		const updateMutation = useUpdatePersonalInformation(user.id!, {
+			onSuccess: () => {
 				onSuccess();
 				onClose();
-			},
-			onError: (error: Error) => {
-				const message =
-					error.message || "Failed to update personal information";
-				toast.error(message);
 			},
 		});
 

@@ -1,0 +1,57 @@
+{% load custom_filters %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="en">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="supported-color-schemes" content="light only" />
+    <style>
+      :root { color-scheme: light only; }
+      @media (prefers-color-scheme: dark) {
+        body, .email-body { background-color: #f5f7fa !important; color: #000000 !important; }
+        .email-card { background-color: #ffffff !important; }
+      }
+      /* Confetti */
+      .confetti-piece {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -20px;
+        opacity: 0;
+        animation: confettiFall linear forwards;
+        z-index: 50;
+        pointer-events: none;
+      }
+      @keyframes confettiFall {
+        0% { opacity: 1; top: -5%; transform: rotate(0deg) scale(1); }
+        25% { opacity: 1; }
+        100% { opacity: 0; top: 105%; transform: rotate(720deg) scale(0.4); }
+      }
+      /* Celebration banner */
+      @keyframes bannerPulse {
+        0% { opacity: 0; transform: scale(0.92) translateY(-20px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+      }
+      @keyframes emojiFloat {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-7px) scale(1.05); }
+      }
+      /* Button hover */
+      .spms-action-button:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh;">
+    <!-- Confetti container for clients that support it -->
+    <div id="confetti-container"></div>
+    <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);" class="email-card">
+      <tbody>
+        <!-- Accent gradient bar -->
+        <tr>
+          <td style="height: 6px; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #06b6d4 100%); font-size: 0; line-height: 0;">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding: 0 40px;">

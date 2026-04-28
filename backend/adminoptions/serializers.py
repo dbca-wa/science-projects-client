@@ -26,6 +26,9 @@ class GuideSectionSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "description",
+            "icon",
+            "required_role",
             "order",
             "show_divider_after",
             "category",
@@ -49,6 +52,9 @@ class GuideSectionCreateUpdateSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "description",
+            "icon",
+            "required_role",
             "order",
             "show_divider_after",
             "category",
@@ -145,6 +151,9 @@ class AdminOptionsCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating/updating AdminOptions with writable maintainer field"""
 
     maintainer = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    email_test_user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), required=False, allow_null=True
+    )
 
     class Meta:
         model = AdminOptions
@@ -152,6 +161,8 @@ class AdminOptionsCreateSerializer(serializers.ModelSerializer):
             "id",
             "email_options",
             "maintainer",
+            "email_testing_mode",
+            "email_test_user",
             "guide_content",
             # Legacy fields - keep for backward compatibility
             "guide_admin",
@@ -170,6 +181,7 @@ class AdminOptionsCreateSerializer(serializers.ModelSerializer):
 
 class AdminOptionsSerializer(serializers.ModelSerializer):
     maintainer = MiniUserSerializer(read_only=True)
+    email_test_user = MiniUserSerializer(read_only=True)
     guide_sections = serializers.SerializerMethodField()
 
     class Meta:
@@ -180,6 +192,8 @@ class AdminOptionsSerializer(serializers.ModelSerializer):
             "updated_at",
             "email_options",
             "maintainer",
+            "email_testing_mode",
+            "email_test_user",
             "guide_content",
             "guide_sections",
             # Legacy fields - keep for backward compatibility

@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 from documents.models import ProjectDocument
 from documents.utils.filters import apply_annual_report_filters, apply_document_filters
 from documents.utils.helpers import (
+    _get_encoded_image_legacy,
     extract_text_content,
     format_document_date,
     get_approval_stage_name,
@@ -19,7 +20,6 @@ from documents.utils.helpers import (
     get_document_display_name,
     get_document_status_display,
     get_document_year,
-    get_encoded_image,
     get_next_approval_stage,
     is_document_editable,
     sanitize_html_content,
@@ -528,7 +528,7 @@ class TestGetCurrentMaintainerId:
 
 
 class TestGetEncodedImage:
-    """Tests for get_encoded_image"""
+    """Tests for _get_encoded_image_legacy"""
 
     @patch("builtins.open")
     @patch("os.path.join")
@@ -540,7 +540,7 @@ class TestGetEncodedImage:
             b"fake_image_data"
         )
 
-        result = get_encoded_image()
+        result = _get_encoded_image_legacy()
 
         assert result.startswith("data:image/jpeg;base64,")
 
@@ -549,7 +549,7 @@ class TestGetEncodedImage:
     @pytest.mark.unit
     def test_get_encoded_image_not_found(self, mock_join, mock_open):
         """Test image not found"""
-        result = get_encoded_image()
+        result = _get_encoded_image_legacy()
 
         assert result == ""
 

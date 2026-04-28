@@ -35,13 +35,13 @@ interface MentionMatch {
  * Shows dropdown with up to 3 project team members when user types @ followed by at least one character.
  * Highlights @mentions in the textarea.
  *
- * Mention Format: @FirstName LastName (as per Requirements 8.11)
+ * Mention Format: @FirstName LastName
  * Dropdown Limit: Maximum 3 results (matches user search pattern)
  * Trigger: @ followed by at least 1 character
  *
  * Note: The backend currently expects @username format in mention_utils.py.
- * This needs to be updated to match the @FirstName LastName format specified
- * in the requirements. The backend should extract mentions using the pattern
+ * This needs to be updated to match the @FirstName LastName format.
+ * The backend should extract mentions using the pattern
  * @([A-Za-z]+\s[A-Za-z]+) instead of @([\w.-]+).
  */
 export const MentionInput = ({

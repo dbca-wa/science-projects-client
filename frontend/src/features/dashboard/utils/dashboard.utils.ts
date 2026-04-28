@@ -4,17 +4,6 @@ import type {
 } from "../types/dashboard.types";
 import type { IAdminTask } from "../types/admin-tasks.types";
 
-export const formatDocumentKind = (kind: string): string => {
-	const kindMap: Record<string, string> = {
-		concept: "Concept Plan",
-		projectplan: "Project Plan",
-		progressreport: "Progress Report",
-		studentreport: "Student Report",
-		projectclosure: "Project Closure",
-	};
-	return kindMap[kind] || kind;
-};
-
 export const formatRoleKind = (
 	kind: "team" | "project_lead" | "ba_lead" | "directorate"
 ): string => {
@@ -90,24 +79,6 @@ export const calculateDashBadgeCount = (
 };
 
 /**
- * Extract plain text from HTML string
- * Used for project titles that may contain HTML formatting
- */
-export const extractTextFromHTML = (htmlString: string | undefined): string => {
-	if (!htmlString) return "";
-
-	const wrapper = document.createElement("div");
-	wrapper.innerHTML = htmlString;
-	const tag = wrapper.querySelector("p, span, h1, h2, h3, h4");
-
-	if (tag) {
-		return tag.textContent || "";
-	}
-
-	return wrapper.textContent || wrapper.innerHTML || "";
-};
-
-/**
  * Format project deletion reason from backend choice value to display text
  */
 export const formatDeletionReason = (reason: string | undefined): string => {
@@ -128,16 +99,9 @@ export const formatDeletionReason = (reason: string | undefined): string => {
 	return reason.charAt(0).toUpperCase() + reason.slice(1);
 };
 
-/**
- * Format caretaker reason from backend to display text
- * Capitalizes first letter if it's a custom reason
- */
-export const formatCaretakerReason = (reason: string | undefined): string => {
-	if (!reason) return "";
-
-	// Capitalize first letter
-	return reason.charAt(0).toUpperCase() + reason.slice(1);
-};
+// Re-export from shared for backward compatibility
+export { formatCaretakerReason } from "@/shared/utils/caretaker.utils";
+import { formatCaretakerReason } from "@/shared/utils/caretaker.utils";
 
 /**
  * Build detailed description for admin task based on action type

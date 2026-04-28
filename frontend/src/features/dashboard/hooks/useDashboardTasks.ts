@@ -3,9 +3,11 @@ import {
 	getDocumentTasks,
 	getEndorsementTasks,
 	getMyProjects,
-	getAdminTasks,
-} from "../services/dashboard.endpoints";
+} from "../services/dashboard.service";
 import { STALE_TIME } from "@/shared/constants";
+
+// Re-export from shared for backward compatibility
+export { useAdminTasks } from "@/shared/hooks/queries/useAdminTasks";
 
 export const dashboardKeys = {
 	documentTasks: ["dashboard", "documentTasks"] as const,
@@ -45,16 +47,5 @@ export const useMyProjects = () => {
 		staleTime: STALE_TIME.MEDIUM,
 		refetchOnWindowFocus: true,
 		refetchOnReconnect: true,
-	});
-};
-
-export const useAdminTasks = (enabled = true) => {
-	return useQuery({
-		queryKey: dashboardKeys.adminTasks,
-		queryFn: getAdminTasks,
-		staleTime: STALE_TIME.SHORT,
-		refetchOnWindowFocus: true,
-		refetchOnReconnect: true,
-		enabled,
 	});
 };

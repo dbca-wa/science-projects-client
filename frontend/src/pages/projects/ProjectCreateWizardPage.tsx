@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 
@@ -24,7 +25,13 @@ const ProjectCreateWizardPage = observer(() => {
 	const store = useCreateProjectWizardStore();
 	const projectKind = searchParams.get("kind") as ProjectKind | null;
 
-	// Initialize wizard store with project kind and restore from session storage
+	// Dynamic document title based on project type
+	const projectTypeName = projectKind
+		? PROJECT_TYPE_NAMES[projectKind]
+		: "Project";
+	useDocumentTitle(`Create ${projectTypeName}`);
+
+	// Initialise wizard store with project kind and restore from session storage
 	useEffect(() => {
 		if (projectKind && PROJECT_TYPE_NAMES[projectKind]) {
 			store.setProjectKind(projectKind);

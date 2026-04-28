@@ -83,3 +83,11 @@ coverage.json
 backend/templates/admin/medias/projectphoto/change_list.html
 backend/templates/admin/medias/useravatar/change_list.html
 backend/medias/management/commands/audit_media_files.py
+
+# Generated email preview files (created by email testing endpoints)
+backend/test_email_preview.html
+backend/test_email_preview.eml
+backend/email_previews/
+
+# Editor uploaded images (served from media, not committed)
+backend/files/editor/

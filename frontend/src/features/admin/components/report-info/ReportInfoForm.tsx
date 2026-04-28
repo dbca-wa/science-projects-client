@@ -26,8 +26,8 @@ import {
 	useUpdateReportInfo,
 } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
-import { useReportsForDivision } from "@/features/reports/hooks/useReports";
-import type { IAnnualReport } from "@/features/reports/types/report.types";
+import { useReportsForDivision } from "@/shared/hooks/queries/useReportsForDivision";
+import type { IAnnualReport } from "@/shared/types/report.types";
 
 const CURRENT_YEAR = new Date().getFullYear();
 

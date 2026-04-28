@@ -51,12 +51,10 @@ export function SetProjectStatusModal({
 		if (!selectedStatus) return;
 
 		try {
-			console.log("Setting project status to:", selectedStatus);
 			await setStatusMutation.mutateAsync({
 				projectId,
 				status: selectedStatus as ProjectStatus,
 			});
-			console.log("Status set successfully, closing modal");
 			onClose();
 			setSelectedStatus("");
 		} catch (error) {

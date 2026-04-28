@@ -297,6 +297,11 @@ class AnnualReportGenerationService:
                 "introduction": plant_science_ba.introduction or "",
             }
         except Exception:
+            settings.LOGGER.warning(
+                "Failed to fetch Plant Science and Herbarium business area; "
+                "using fallback data",
+                exc_info=True,
+            )
             plant_science_ba_data = {
                 "name": "Plant Science and Herbarium",
                 "pk": None,
@@ -560,9 +565,10 @@ class AnnualReportGenerationService:
         partnerships_chapter_image = (
             get_media_file_path("partnerships") or generic_chapter_image
         )
-        collaborations_chapter_image = (
-            get_media_file_path("collaborations") or generic_chapter_image
-        )
+        # collaborations_chapter_image: not used in the annual report template — enable later if required
+        # collaborations_chapter_image = (
+        #     get_media_file_path("collaborations") or generic_chapter_image
+        # )
         student_projects_chapter_image = (
             get_media_file_path("student_projects") or generic_chapter_image
         )
@@ -602,7 +608,7 @@ class AnnualReportGenerationService:
             "generic_chapter_image_path": generic_chapter_image,
             "research_chapter_image": research_chapter_image,
             "partnerships_chapter_image": partnerships_chapter_image,
-            "collaborations_chapter_image": collaborations_chapter_image,
+            # "collaborations_chapter_image": collaborations_chapter_image,
             "student_projects_chapter_image": student_projects_chapter_image,
             "publications_chapter_image": publications_chapter_image,
             "no_image_path": no_image_path,

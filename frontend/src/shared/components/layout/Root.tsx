@@ -1,7 +1,6 @@
 // The base page that handles scrolling to the top
 
 import { AppLayout } from "./AppLayout";
-import { PageHead } from "./PageHead";
 import { useScrollToTop } from "@/shared/hooks/ui/useScrollToTop";
 import { NavigationBlocker } from "./NavigationBlocker";
 import { UserDataLoader } from "@/app/components/UserDataLoader";
@@ -20,9 +19,6 @@ export function Root() {
 
 	return (
 		<UserDataLoader>
-			{/* Default PageHead - pages can override with their own PageHead */}
-			<PageHead />
-
 			{/* Navigation blocker for unsaved editor changes */}
 			<NavigationBlocker />
 

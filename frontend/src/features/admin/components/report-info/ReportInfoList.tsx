@@ -15,7 +15,7 @@ import { ReportInfoForm } from "./ReportInfoForm";
 import { useReportInfo, useDeleteReportInfo } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
 import { filterByName } from "../../utils/crud.utils";
-import type { IAnnualReport } from "@/features/reports/types/report.types";
+import type { IAnnualReport } from "@/shared/types/report.types";
 
 const columns = [
 	{ header: "Year", accessor: "year" },

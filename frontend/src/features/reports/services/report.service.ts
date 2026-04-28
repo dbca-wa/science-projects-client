@@ -8,7 +8,6 @@ import type {
 	IARStudentReport,
 	IInactiveReportsResponse,
 } from "../types/report.types";
-import type { IBusinessArea } from "@/shared/types/org.types";
 
 /**
  * Fetch published annual report PDFs
@@ -52,11 +51,10 @@ export const getReportDetail = async (id: number): Promise<IAnnualReport> => {
 };
 
 /**
- * Fetch business areas where the current user is the leader
+ * Fetch business areas where the current user is the leader.
+ * Re-exported from shared for backward compatibility.
  */
-export const getMyBusinessAreas = async (): Promise<IBusinessArea[]> => {
-	return apiClient.get<IBusinessArea[]>(REPORT_ENDPOINTS.MY_BUSINESS_AREAS);
-};
+export { getMyBusinessAreas } from "@/shared/services/org.service";
 
 /**
  * Fetch active progress reports, optionally scoped to a specific annual report
@@ -95,17 +93,10 @@ export const getLatestInactiveReports = async (
 };
 
 /**
- * Update a single field on an annual report via partial PUT
+ * Update a single field on an annual report via partial PUT.
+ * Re-exported from shared for backward compatibility.
  */
-export const updateAnnualReportField = async (
-	id: number,
-	fieldName: string,
-	content: string
-): Promise<void> => {
-	await apiClient.put(REPORT_ENDPOINTS.REPORT_DETAIL(id), {
-		[fieldName]: content,
-	});
-};
+export { updateAnnualReportField } from "@/shared/services/content-update.service";
 
 /** Report media item returned by the API */
 export interface IReportMedia {
@@ -324,15 +315,9 @@ export const deleteLegacyPDFFile = async (pdfId: number): Promise<void> => {
 
 /**
  * Fetch reports for a specific division (or all if no slug provided)
+ * Re-exported from shared for backward compatibility.
  */
-export const getReportsForDivision = async (
-	divisionSlug?: string
-): Promise<IAnnualReport[]> => {
-	const endpoint = divisionSlug
-		? `${REPORT_ENDPOINTS.REPORTS_LIST}?division=${divisionSlug}`
-		: REPORT_ENDPOINTS.REPORTS_LIST;
-	return apiClient.get<IAnnualReport[]>(endpoint);
-};
+export { getReportsForDivision } from "@/shared/services/report.service";
 
 /** Toggle the is_published flag on an annual report */
 export const toggleReportPublished = async (

@@ -36,9 +36,6 @@ export const useCloseProject = () => {
 	return useMutation({
 		mutationFn: closeProject,
 		onSuccess: async (_, variables) => {
-			console.log(`[useCloseProject] Mutation succeeded`);
-			console.log(`[useCloseProject] projectId:`, variables.projectId);
-
 			toast.success("Closure requested");
 
 			// Invalidate using predicate to match both string and number IDs
@@ -53,10 +50,6 @@ export const useCloseProject = () => {
 					);
 				},
 			});
-
-			console.log(
-				`[useCloseProject] Query invalidation complete, navigating to closure tab`
-			);
 
 			// Navigate to the closure tab
 			navigate(`/projects/${variables.projectId}/closure`);

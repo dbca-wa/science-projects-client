@@ -38,6 +38,7 @@ django-redis = "^6.0.0"
 django = "^5.2"
 filelock = "^3.23.0"
 platformdirs = "^4.8.0"
+django-anymail = {extras = ["mailchimp-transactional"], version = "^15.0"}
 
 
 [tool.poetry.group.dev.dependencies]

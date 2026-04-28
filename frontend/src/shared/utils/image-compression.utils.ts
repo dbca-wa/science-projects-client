@@ -146,9 +146,6 @@ export const compressImage = async (
 
 	// Check if compression is needed
 	if (!needsCompression(file, maxSizeMB)) {
-		console.log(
-			`File size ${(file.size / (1024 * 1024)).toFixed(2)}MB is within limit, skipping compression`
-		);
 		return {
 			file,
 			metrics: {
@@ -160,12 +157,6 @@ export const compressImage = async (
 			},
 		};
 	}
-
-	// Compress the file
-	console.log(
-		`File size ${(file.size / (1024 * 1024)).toFixed(2)}MB exceeds limit, compressing...`,
-		{ useWebWorker }
-	);
 
 	try {
 		// Get local worker URL if using Web Workers
@@ -203,10 +194,6 @@ export const compressImage = async (
 		};
 
 		logWorkerMetrics(metrics);
-
-		console.log(
-			`Compressed to ${(compressedFile.size / (1024 * 1024)).toFixed(2)}MB`
-		);
 
 		return { file: compressedFile, metrics };
 	} catch (error) {

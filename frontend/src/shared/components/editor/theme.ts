@@ -23,6 +23,9 @@ export const editorTheme: EditorThemeClasses = {
 		ul: "editor-ul",
 		ol: "editor-ol",
 		listitem: "editor-li",
+		listitemChecked: "editor-li-checked",
+		listitemUnchecked: "editor-li-unchecked",
+		checklist: "editor-checklist",
 		nested: {
 			listitem: "editor-nested-li",
 		},

@@ -2,6 +2,8 @@
 Tests for quotes admin
 """
 
+from unittest.mock import patch
+
 import pytest
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
@@ -96,7 +98,7 @@ class TestAdminActions:
 
     @pytest.mark.integration
     def test_export_all_quotes_txt_multiple_selected(
-        self, quote_admin, superuser, quote, quote2, db, capsys
+        self, quote_admin, superuser, quote, quote2, db
     ):
         """Test export all quotes with multiple selected shows error"""
         # Arrange
@@ -104,8 +106,8 @@ class TestAdminActions:
         queryset = Quote.objects.filter(id__in=[quote.id, quote2.id])
 
         # Act
-        export_all_quotes_txt(quote_admin, request, queryset)
+        with patch.object(quote_admin, "message_user") as mock_message:
+            export_all_quotes_txt(quote_admin, request, queryset)
 
-        # Assert - should print error message
-        captured = capsys.readouterr()
-        assert "PLEASE SELECT ONLY ONE" in captured.out
+            # Assert
+            mock_message.assert_called_once()

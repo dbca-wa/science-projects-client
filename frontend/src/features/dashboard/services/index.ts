@@ -3,3 +3,4 @@
  */
 
 export * from "./dashboard.endpoints";
+export * from "./dashboard.service";

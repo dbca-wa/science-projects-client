@@ -43,7 +43,7 @@ export interface AffiliationComboboxRef {
  * Searchable dropdown for selecting affiliations (single or multi-select)
  *
  * Single-select mode uses BaseCombobox for consistency.
- * Multi-select mode uses custom implementation (will be refactored in separate spec).
+ * Multi-select mode uses custom implementation (will be refactored separately).
  *
  * @example Single-select
  * ```tsx
@@ -175,7 +175,7 @@ const SingleSelectAffiliationCombobox = forwardRef<
 SingleSelectAffiliationCombobox.displayName = "SingleSelectAffiliationCombobox";
 
 // =========================================== MULTI-SELECT IMPLEMENTATION ====================================================
-// NOTE: This will be refactored in a separate spec to use BaseCombobox with multi-select support
+// NOTE: Multi-select support will be refactored to use BaseCombobox
 
 const MultiSelectAffiliationCombobox = forwardRef<
 	AffiliationComboboxRef,
@@ -200,33 +200,11 @@ const MultiSelectAffiliationCombobox = forwardRef<
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
 		const [searchTerm, setSearchTerm] = useState("");
-		const [_filteredItems, _setFilteredItems] = useState<IAffiliation[]>([]);
-		const [_isMenuOpen, _setIsMenuOpen] = useState(false);
-		const [_isCreating, _setIsCreating] = useState(false);
-
-		// Debounce search term (300ms)
-		// const _debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
-
-		// Search affiliations based on debounced search term
-		// TODO: Implement search for multi-select mode
-		// This will be refactored in separate spec
-
-		// const _handleSelectAffiliation = (_affiliation: IAffiliation) => {
-		// 	// TODO: Implement for multi-select mode
-		// 	// This will be refactored in separate spec
-		// };
 
 		const handleRemoveAffiliation = (affiliation: IAffiliation) => {
 			if (!isEditable) return;
 			onChangeMultiple?.(values.filter((a) => a.id !== affiliation.id));
 		};
-
-		// const _handleCreateAffiliation = async () => {
-		// 	// TODO: Implement for multi-select mode
-		// 	// This will be refactored in separate spec
-		// };
-
-		// const _showCreateOption = false; // TODO: Implement for multi-select mode
 
 		return (
 			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
@@ -282,7 +260,6 @@ const MultiSelectAffiliationCombobox = forwardRef<
 				</div>
 
 				{/* TODO: Implement portal dropdown for multi-select */}
-				{/* This will be refactored in separate spec */}
 
 				{helperText && (
 					<p className="text-sm text-muted-foreground mt-2">{helperText}</p>

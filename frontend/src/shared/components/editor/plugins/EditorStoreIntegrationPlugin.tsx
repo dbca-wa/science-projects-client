@@ -2,7 +2,7 @@
  * EditorStoreIntegrationPlugin
  *
  * Connects the Lexical editor instance to the EditorStore for toolbar state management.
- * This plugin initializes the store with the editor instance and handles cleanup.
+ * This plugin initialises the store with the editor instance and handles cleanup.
  */
 
 import { useEffect } from "react";

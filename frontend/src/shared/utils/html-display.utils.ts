@@ -90,7 +90,10 @@ export const getStyledHtmlOrFallback = (
  * @param html - HTML string to extract text from
  * @returns Plain text content
  */
-export const extractTextFromHTML = (html: string): string => {
+export const extractTextFromHTML = (
+	html: string | undefined | null
+): string => {
+	if (!html) return "";
 	const div = document.createElement("div");
 	div.innerHTML = html;
 	return div.textContent || div.innerText || "";

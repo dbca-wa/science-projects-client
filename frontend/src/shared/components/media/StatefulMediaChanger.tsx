@@ -136,9 +136,7 @@ export const StatefulMediaChanger = observer(
 						onClick={async (e) => {
 							onDeleteEntry(e);
 							if (clearImageAddedFunctionality) {
-								console.log("Clearing image");
 								await clearImageAddedFunctionality();
-								console.log("cleared");
 							}
 						}}
 					>

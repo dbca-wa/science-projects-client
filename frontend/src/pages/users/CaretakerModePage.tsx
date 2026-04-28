@@ -1,5 +1,6 @@
 import { Loader2, AlertCircle, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Separator } from "@/shared/components/ui/separator";
 import {
 	Card,
@@ -34,6 +35,8 @@ import {
  * Route: /users/me/caretaker
  */
 const CaretakerModePage = () => {
+	useDocumentTitle("Caretaker Mode");
+
 	// Fetch current user data
 	const {
 		data: user,

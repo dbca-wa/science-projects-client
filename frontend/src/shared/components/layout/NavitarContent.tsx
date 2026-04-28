@@ -8,7 +8,7 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
-import { User, Globe, LogOut, Moon, Sun, BookOpen } from "lucide-react";
+import { User, Globe, LogOut, Moon, Sun, BookOpen, Mail } from "lucide-react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
@@ -30,7 +30,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 	const { handleKeyDown, registerMenuItem, focusFirstItem } =
 		useMenuKeyboardNavigation(onClose);
 
-	// Capture store values once on mount using useState with initializer function
+	// Capture store values once on mount using useState with initialiser function
 	const [snapshot] = useState(() => ({
 		userData: authStore.user,
 		theme: uiStore.theme,
@@ -144,6 +144,38 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 			<Separator />
 
+			{/* Admin Section — superusers only */}
+			{snapshot.userData?.is_superuser && (
+				<>
+					<div className="py-1">
+						<div className="px-4 py-2">
+							<span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+								Admin
+							</span>
+						</div>
+
+						{/* Email Testing */}
+						<button
+							ref={registerMenuItem(3)}
+							type="button"
+							onClick={() => {
+								navigate("/admin/email-testing");
+								onClose();
+							}}
+							className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
+							role="menuitem"
+						>
+							<div className="flex gap-2 items-center">
+								<Mail className="h-4 w-4" aria-hidden="true" />
+								<span className="text-sm">Email Testing</span>
+							</div>
+						</button>
+					</div>
+
+					<Separator />
+				</>
+			)}
+
 			{/* Links Section */}
 			<div className="py-1">
 				<div className="px-4 py-2">
@@ -154,7 +186,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Quick Guide */}
 				<button
-					ref={registerMenuItem(3)}
+					ref={registerMenuItem(4)}
 					type="button"
 					onClick={() => {
 						navigate("/guide");
@@ -171,7 +203,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Data Catalogue */}
 				<button
-					ref={registerMenuItem(4)}
+					ref={registerMenuItem(5)}
 					type="button"
 					onClick={() => {
 						window.open("https://data.bio.wa.gov.au/", "_blank");
@@ -188,7 +220,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 
 				{/* Scientific Sites Register */}
 				<button
-					ref={registerMenuItem(5)}
+					ref={registerMenuItem(6)}
 					type="button"
 					onClick={() => {
 						window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
@@ -209,7 +241,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 			{/* Logout Section */}
 			<div className="py-1">
 				<button
-					ref={registerMenuItem(6)}
+					ref={registerMenuItem(7)}
 					type="button"
 					onClick={() => {
 						logout(undefined, {

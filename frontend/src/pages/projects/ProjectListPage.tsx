@@ -29,7 +29,7 @@ const ProjectListPage = observer(() => {
 	const projectSearchStore = useProjectSearchStore();
 	const [, setSearchParams] = useSearchParams();
 
-	// Initialize from URL params and localStorage
+	// Initialise from URL params and localStorage
 	// TypeScript infers TFilters = ProjectSearchFilters from projectSearchStore
 	useSearchStoreInit({
 		store: projectSearchStore,

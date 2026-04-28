@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import type { CaretakerTaskCardProps } from "@/features/dashboard/types/admin-tasks.types";
+import type { CaretakerTaskCardProps } from "@/shared/types/admin.types";
 import { format } from "date-fns";
 
 export const CaretakerTaskCard = ({ task }: CaretakerTaskCardProps) => {

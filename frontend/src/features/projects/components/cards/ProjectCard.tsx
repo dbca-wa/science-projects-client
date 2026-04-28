@@ -6,7 +6,7 @@ import type { IProjectData } from "@/shared/types/project.types";
 import { getProjectStatusDisplay } from "../../utils/project.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
-import { ProjectTag } from "../badges/ProjectTag";
+import { ProjectTag } from "@/shared/components/badges/ProjectTag";
 import { PROJECT_STATUS_COLORS } from "@/shared/constants/project-colors";
 
 interface ProjectCardProps {

@@ -69,6 +69,21 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	/**
 	 * Initialises auth store by checking for existing session cookies
 	 * and validating the session with the backend.
+	 *
+	 * IMPORTANT: This method calls getSSOMe() directly rather than using a
+	 * TanStack Query hook. This is intentional — the auth store initialises
+	 * in main.tsx's initialiseApp() BEFORE createRoot() is called, so no
+	 * React context exists yet. TanStack Query hooks (useQuery, etc.) require
+	 * a QueryClientProvider ancestor in the React tree, which is unavailable
+	 * at this point.
+	 *
+	 * Refactoring to a React-level initialisation (e.g. a top-level query
+	 * in main.tsx) is not feasible because downstream prefetch logic depends
+	 * on the auth result — we must know whether the user is authenticated
+	 * before deciding whether to prefetch branches and business areas. Moving
+	 * auth into the React tree would require rendering a loading state before
+	 * any route content, adding complexity for no practical benefit.
+	 *
 	 * Note: sessionid cookie is HttpOnly and cannot be read by JavaScript.
 	 * We check for the CSRF token to infer potential authentication state,
 	 * then validate with the backend to confirm.

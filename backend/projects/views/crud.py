@@ -303,18 +303,18 @@ class ProjectDetails(APIView):
 
         # Get concept plan
         try:
-            concept_plan = ConceptPlan.objects.select_related("document").get(
-                project=project
-            )
+            concept_plan = ConceptPlan.objects.select_related(
+                "document", "document__project"
+            ).get(project=project)
             documents["concept_plan"] = TinyConceptPlanSerializer(concept_plan).data
         except ConceptPlan.DoesNotExist:
             pass
 
         # Get project plan
         try:
-            project_plan = ProjectPlan.objects.select_related("document").get(
-                project=project
-            )
+            project_plan = ProjectPlan.objects.select_related(
+                "document", "document__project"
+            ).get(project=project)
             documents["project_plan"] = TinyProjectPlanSerializer(project_plan).data
         except ProjectPlan.DoesNotExist:
             pass
@@ -322,7 +322,7 @@ class ProjectDetails(APIView):
         # Get progress reports
         progress_reports = (
             ProgressReport.objects.filter(project=project)
-            .select_related("document")
+            .select_related("document", "document__project")
             .order_by("-year", "-id")
         )
         documents["progress_reports"] = TinyProgressReportSerializer(
@@ -332,7 +332,7 @@ class ProjectDetails(APIView):
         # Get student reports
         student_reports = (
             StudentReport.objects.filter(project=project)
-            .select_related("document")
+            .select_related("document", "document__project")
             .order_by("-id")
         )
         documents["student_reports"] = TinyStudentReportSerializer(
@@ -341,9 +341,9 @@ class ProjectDetails(APIView):
 
         # Get project closure
         try:
-            project_closure = ProjectClosure.objects.select_related("document").get(
-                project=project
-            )
+            project_closure = ProjectClosure.objects.select_related(
+                "document", "document__project"
+            ).get(project=project)
             documents["project_closure"] = TinyProjectClosureSerializer(
                 project_closure
             ).data
@@ -374,6 +374,7 @@ class ProjectDetails(APIView):
 
     def patch(self, request, pk):
         """Partial update project"""
+        settings.LOGGER.info(f"{request.user} is updating project (pk={pk})")
         project = ProjectService.get_project(pk)
         self.check_object_permissions(request, project)
 
@@ -390,6 +391,7 @@ class ProjectDetails(APIView):
 
     def put(self, request, pk):
         """Full update project (replace entire resource)"""
+        settings.LOGGER.info(f"{request.user} is updating project (pk={pk})")
         project = ProjectService.get_project(pk)
         self.check_object_permissions(request, project)
 
@@ -406,6 +408,7 @@ class ProjectDetails(APIView):
 
     def delete(self, request, pk):
         """Delete project"""
+        settings.LOGGER.warning(f"{request.user} is deleting project (pk={pk})")
         project = ProjectService.get_project(pk)
         self.check_object_permissions(request, project)
 

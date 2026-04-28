@@ -18,7 +18,7 @@ import type {
 	IServiceForm,
 	IReportInfoForm,
 } from "../types/admin.types";
-import type { IAnnualReport } from "@/features/reports/types/report.types";
+import type { IAnnualReport } from "@/shared/types/report.types";
 
 // Branches
 export const getBranches = async (): Promise<IBranch[]> => {
@@ -138,9 +138,8 @@ export const cleanOrphanedAffiliations = async (): Promise<{
 };
 
 // Divisions
-export const getDivisions = async (): Promise<IDivision[]> => {
-	return apiClient.get<IDivision[]>(ADMIN_ENDPOINTS.DIVISIONS);
-};
+// Re-exported from shared for backward compatibility
+export { getDivisions } from "@/shared/services/org.service";
 
 export const createDivision = async (
 	data: IDivisionForm
@@ -291,4 +290,52 @@ export const openNewCycle = async (divisionSlug?: string): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE, {
 		division: divisionSlug,
 	});
+};
+
+// Email testing settings
+export interface IEmailTestingSettings {
+	email_testing_mode: boolean;
+	email_test_user: number | null;
+}
+
+export interface IAdminOptionsResponse {
+	id: number;
+	email_testing_mode: boolean;
+	email_test_user: {
+		id: number;
+		display_first_name: string;
+		display_last_name: string;
+		email: string;
+	} | null;
+}
+
+export const getEmailTestingSettings =
+	async (): Promise<IAdminOptionsResponse> => {
+		return apiClient.get<IAdminOptionsResponse>(
+			ADMIN_ENDPOINTS.ADMIN_OPTIONS_DETAIL(1)
+		);
+	};
+
+export const updateEmailTestingSettings = async (
+	data: IEmailTestingSettings
+): Promise<IAdminOptionsResponse> => {
+	return apiClient.put<IAdminOptionsResponse>(
+		ADMIN_ENDPOINTS.ADMIN_OPTIONS_DETAIL(1),
+		data
+	);
+};
+
+export const sendTestEmail = async (): Promise<{ message: string }> => {
+	return apiClient.post<{ message: string }>(ADMIN_ENDPOINTS.SEND_TEST_EMAIL);
+};
+
+export const sendAllTestEmails = async (overrides?: {
+	recipient_user_id?: number | null;
+	actioner_user_id?: number | null;
+}): Promise<{
+	message: string;
+	preview_dir: string;
+	results: Array<{ template: string; status?: string; error?: string }>;
+}> => {
+	return apiClient.post(ADMIN_ENDPOINTS.SEND_ALL_TEST_EMAILS, overrides ?? {});
 };

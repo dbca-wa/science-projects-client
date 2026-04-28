@@ -7,7 +7,7 @@ import { getUserDisplayName } from "@/shared/utils/user.utils";
  * UserCard component
  * Displays user information in a table-like row format
  * By default, clicking navigates to user detail page
- * Pass onClick to override with custom behavior
+ * Pass onClick to override with custom behaviour
  * Pass clickable={false} to make non-clickable (preview mode)
  */
 export const UserCard = ({

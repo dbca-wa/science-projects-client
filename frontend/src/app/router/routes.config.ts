@@ -5,6 +5,10 @@ const Login = lazy(() => import("@/pages/auth/Login"));
 
 // Pages - Dashboard (lazy loaded)
 const Dashboard = lazy(() => import("@/pages/dash/Dashboard"));
+const UserGuide = lazy(() => import("@/pages/dash/KnowledgeBasePage"));
+const KnowledgeBaseCategoryPage = lazy(
+	() => import("@/pages/dash/KnowledgeBaseCategoryPage")
+);
 
 // Pages - Users (lazy loaded)
 const UserListPage = lazy(() => import("@/pages/users/UserListPage"));
@@ -61,6 +65,7 @@ const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
 const EmailsPage = lazy(() => import("@/pages/admin/EmailsPage"));
+const EmailTestingPage = lazy(() => import("@/pages/admin/EmailTestingPage"));
 const BatchApproveOldPage = lazy(
 	() => import("@/pages/admin/BatchApproveOldPage")
 );
@@ -86,8 +91,7 @@ const StaffProfileDetailPage = lazy(
 export interface RouteConfig {
 	name: string;
 	path: string;
-	//  any to allow props
-	component: ComponentType<any>; // eslint-disable-line
+	component: ComponentType<Record<string, unknown>>;
 	requiresAuth: boolean;
 	requiresAdmin?: boolean;
 	requiresKeyStakeholder?: boolean;
@@ -102,9 +106,9 @@ export interface RouteConfig {
 	showBreadcrumb?: boolean; // Whether to show breadcrumb for this route
 	breadcrumbParent?: string; // Path of parent route for breadcrumb trail
 
-	// Behavior/layout
+	// Behaviour/layout
 	layoutWrapper?: "content" | "staffProfile" | "none";
-	componentProps?: Record<string, any>; //eslint-disable-line
+	componentProps?: Record<string, unknown>;
 	children?: RouteConfig[];
 }
 
@@ -133,20 +137,26 @@ export const DASHBOARD_ROUTES: RouteConfig[] = [
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
-	// Quick Guide - COMMENTED OUT: Page not yet created
-	/*
 	{
-		name: "Quick Guide",
+		name: "Knowledge Base",
 		path: "/guide",
 		iconKey: "docs",
 		tooltipKey: "guide",
 		component: UserGuide,
 		requiresAuth: true,
-		showInSidebar: true,
-		section: "Guide",
+		showInSidebar: false,
 		layoutWrapper: "content",
 	},
-	*/
+	{
+		name: "Knowledge Base Category",
+		path: "/guide/:categorySlug",
+		iconKey: "docs",
+		component: KnowledgeBaseCategoryPage,
+		requiresAuth: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+		breadcrumbParent: "/guide",
+	},
 ];
 
 /** ---------------- Users ---------------- */
@@ -534,6 +544,15 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		name: "Email",
 		path: "/admin/emails",
 		component: EmailsPage,
+		requiresAuth: true,
+		requiresAdmin: true,
+		showInSidebar: false,
+		layoutWrapper: "content",
+	},
+	{
+		name: "Email Testing",
+		path: "/admin/email-testing",
+		component: EmailTestingPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,

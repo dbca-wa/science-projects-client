@@ -20,15 +20,17 @@ import {
 import { useUnapprovedDocs } from "../../hooks/useBusinessAreaLead";
 import {
 	getApprovalStage,
-	getDocKindLabel,
-	getDocKindSlug,
 	getDocStatusLabel,
-	getFinancialYearLabel,
-	getProjectTag,
 	isReportKind,
 	sortUnapprovedDocs,
-	stripHtml,
 } from "../../utils/business-area.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
+import {
+	getDocumentTypeName,
+	getDocumentKindSlug,
+} from "@/shared/utils/document.utils";
+import { formatProjectCode } from "@/shared/utils/document-tasks.utils";
+import { getFinancialYearLabel } from "@/shared/utils/date.utils";
 import type { SortConfig } from "../../utils/business-area.utils";
 import type { IUnapprovedDoc } from "../../types/business-area.types";
 
@@ -90,8 +92,8 @@ export const UnapprovedDocumentsTab = observer(function UnapprovedDocumentsTab({
 		const term = filterStore.state.searchTerm.trim().toLowerCase();
 		const searchFiltered = term
 			? stageFiltered.filter((doc) => {
-					const title = stripHtml(doc.project.title).toLowerCase();
-					const tag = getProjectTag(doc.project).toLowerCase();
+					const title = extractTextFromHTML(doc.project.title).toLowerCase();
+					const tag = formatProjectCode(doc.project).toLowerCase();
 					return title.includes(term) || tag.includes(term);
 				})
 			: stageFiltered;
@@ -132,7 +134,7 @@ export const UnapprovedDocumentsTab = observer(function UnapprovedDocumentsTab({
 
 	const handleRowClick = useCallback(
 		(e: React.MouseEvent, doc: IUnapprovedDoc) => {
-			const path = `/projects/${doc.project.id}/${getDocKindSlug(doc.kind)}`;
+			const path = `/projects/${doc.project.id}/${getDocumentKindSlug(doc.kind)}`;
 			if (e.ctrlKey || e.metaKey) {
 				window.open(path, "_blank");
 			} else {
@@ -146,7 +148,7 @@ export const UnapprovedDocumentsTab = observer(function UnapprovedDocumentsTab({
 		(e: React.KeyboardEvent, doc: IUnapprovedDoc) => {
 			if (e.key === "Enter" || e.key === " ") {
 				e.preventDefault();
-				const path = `/projects/${doc.project.id}/${getDocKindSlug(doc.kind)}`;
+				const path = `/projects/${doc.project.id}/${getDocumentKindSlug(doc.kind)}`;
 				navigate(path);
 			}
 		},
@@ -268,14 +270,14 @@ export const UnapprovedDocumentsTab = observer(function UnapprovedDocumentsTab({
 								>
 									<td className="px-4 py-3">
 										<div className="font-medium text-blue-600 dark:text-blue-400">
-											{stripHtml(doc.project.title)}
+											{extractTextFromHTML(doc.project.title)}
 										</div>
 										<div className="text-xs text-muted-foreground">
-											{getProjectTag(doc.project)}
+											{formatProjectCode(doc.project)}
 										</div>
 									</td>
 									<td className="px-4 py-3 text-muted-foreground">
-										{getDocKindLabel(doc.kind)}
+										{getDocumentTypeName(doc.kind)}
 									</td>
 									<td className="px-4 py-3 text-muted-foreground">
 										{getDocStatusLabel(doc.status)}

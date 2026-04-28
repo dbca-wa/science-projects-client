@@ -2,6 +2,7 @@
 import os
 import tempfile
 
+from django.conf import settings
 from django.contrib import admin
 
 from .models import Quote
@@ -16,11 +17,13 @@ from .serializers import QuoteListSerializer
 @admin.action(description="Generate Quotes")
 def generate_quotes(model_admin, req, selected):
     def clean_quotes():
-        print(os.path.dirname(os.path.realpath(__file__)))
+        settings.LOGGER.info(
+            msg=f"Quote file directory: {os.path.dirname(os.path.realpath(__file__))}"
+        )
         quote_file_location = (
             os.path.dirname(os.path.realpath(__file__)) + "/unique_quotes.txt"
         )
-        print(quote_file_location)
+        settings.LOGGER.info(msg=f"Quote file location: {quote_file_location}")
         with open(quote_file_location) as quotesfile:
             processed_1 = []
             duplicates = []
@@ -46,13 +49,16 @@ def generate_quotes(model_admin, req, selected):
                     author = line_array[-1]
                 unique_quotes.append({"text": quote, "author": author})
 
-            print(f"\n\n\nFormatting: {unique_quotes[0]}\n")
-            print(f"Uniques: {len(unique_quotes)}/{len(array_of_raw_quotes)}\n")
-            print(f"Duplicates: {duplicates}\n")
+            settings.LOGGER.info(msg=f"Formatting: {unique_quotes[0]}")
+            settings.LOGGER.info(
+                msg=f"Uniques: {len(unique_quotes)}/{len(array_of_raw_quotes)}"
+            )
+            settings.LOGGER.info(msg=f"Duplicates: {duplicates}")
             return unique_quotes
 
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
     uniques = clean_quotes()
     try:
@@ -61,10 +67,11 @@ def generate_quotes(model_admin, req, selected):
             if ser.is_valid():
                 ser.save()
             else:
-                print(f"ERROR: {ser.errors}")
-        print("SUCCESS: GENERATED")
+                settings.LOGGER.error(msg=f"Error saving quote: {ser.errors}")
+        settings.LOGGER.info(msg="Quotes generated successfully")
+        model_admin.message_user(req, "Quotes generated successfully.")
     except Exception as e:
-        print(f"ERROR: {e}")
+        settings.LOGGER.error(msg=f"Error generating quotes: {e}")
 
 
 @admin.action(description="Selected to TXT")
@@ -79,15 +86,16 @@ def export_selected_quotes_txt(model_admin, req, selected):
             temp_file.write(f"{text} - {author}\n")
         temp_file_path = temp_file.name
     try:
-        print(f"Exported to {temp_file_path}")
+        settings.LOGGER.info(msg=f"Exported to {temp_file_path}")
     except Exception as e:
-        print(f"ERROR: {e}")
+        settings.LOGGER.error(msg=f"Error exporting quotes: {e}")
 
 
 @admin.action(description="All to TXT")
 def export_all_quotes_txt(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
     # Use tempfile to create a temporary file
     with tempfile.NamedTemporaryFile(
@@ -100,9 +108,9 @@ def export_all_quotes_txt(model_admin, req, selected):
             temp_file.write(f"{text} - {author}\n")
         temp_file_path = temp_file.name
     try:
-        print(f"Exported to {temp_file_path}")
+        settings.LOGGER.info(msg=f"Exported to {temp_file_path}")
     except Exception as e:
-        print(f"ERROR: {e}")
+        settings.LOGGER.error(msg=f"Error exporting quotes: {e}")
 
 
 # endregion ==============================================

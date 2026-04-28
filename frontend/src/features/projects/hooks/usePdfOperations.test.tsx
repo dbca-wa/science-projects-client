@@ -1,12 +1,15 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { useDownloadPdf, useGeneratePdf } from "./usePdfOperations";
-import * as pdfService from "../services/pdf.service";
+import {
+	useDownloadPdf,
+	useGeneratePdf,
+} from "@/shared/hooks/usePdfOperations";
+import * as pdfService from "@/shared/services/pdf.service";
 import { toast } from "sonner";
 
 // Mock dependencies
-vi.mock("../services/pdf.service");
+vi.mock("@/shared/services/pdf.service");
 vi.mock("sonner");
 
 describe("usePdfOperations", () => {

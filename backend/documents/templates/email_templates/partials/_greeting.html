@@ -1,0 +1,9 @@
+{% comment %}
+Email greeting partial.
+
+Optional context:
+  - recipient_name: if provided, renders "Hello {name}," — otherwise "Hello,"
+{% endcomment %}
+<p style="font-size: 14px; line-height: 24px; margin: 24px 0 0 0; color: #374151; font-weight: 500;">
+  {% if recipient_name %}Hello {{ recipient_name }},{% else %}Hello,{% endif %}
+</p>
