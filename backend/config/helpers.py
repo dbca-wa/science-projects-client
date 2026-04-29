@@ -110,9 +110,15 @@ def send_email_with_embedded_image(
             recipient_email = [test_email]
 
             # Deduplicate: skip if we already sent this subject to the test user recently
+            # Sanitise cache key — spaces/colons cause memcached warnings
+            import hashlib
+
             from django.core.cache import cache
 
-            dedup_key = f"test_email_dedup:{subject}"
+            safe_subject = hashlib.md5(
+                subject.encode(), usedforsecurity=False
+            ).hexdigest()
+            dedup_key = f"test_email_dedup_{safe_subject}"
             if cache.get(dedup_key):
                 settings.LOGGER.info(
                     f"[TEST MODE] Skipping duplicate email '{subject}' "
@@ -193,8 +199,6 @@ def send_email_with_embedded_image(
                 "Delivered to</td>"
                 '<td style="color:#e2e8f0;padding:3px 0;font-weight:600;">'
                 f"{test_email}</td>"
-                '<td style="color:#e2e8f0;padding:3px 0;font-weight:600;">'
-                f"{original_str}</td>"
                 "</tr>"
                 "</table>"
                 "</div>"

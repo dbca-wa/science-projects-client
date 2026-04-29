@@ -10,7 +10,8 @@ import {
 export const useBatchApprove = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (divisionSlug?: string) => batchApprove(divisionSlug),
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
+			batchApprove(data),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
 			await queryClient.invalidateQueries({ queryKey: ["reports"] });
@@ -26,7 +27,8 @@ export const useBatchApprove = () => {
 export const useBatchApproveOld = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (divisionSlug?: string) => batchApproveOld(divisionSlug),
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
+			batchApproveOld(data),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
 			await queryClient.invalidateQueries({ queryKey: ["reports"] });
@@ -42,7 +44,13 @@ export const useBatchApproveOld = () => {
 export const useOpenNewCycle = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (divisionSlug?: string) => openNewCycle(divisionSlug),
+		mutationFn: (data?: {
+			division?: string;
+			update?: boolean;
+			prepopulate?: boolean;
+			send_emails?: boolean;
+			recipient_groups?: string[];
+		}) => openNewCycle(data),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
 			await queryClient.invalidateQueries({ queryKey: ["reports"] });

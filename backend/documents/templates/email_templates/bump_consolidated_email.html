@@ -20,10 +20,17 @@
     {% for doc in as_project_lead %}
     <tr>
       <td style="padding: 14px 20px; background-color: #f8fafc; {% if forloop.last %}border-radius: 0 0 12px 12px;{% endif %} {% if not forloop.last %}border-bottom: 1px solid #e2e8f0;{% endif %}">
-        <p style="font-size: 14px; line-height: 22px; margin: 0; color: #1f2937;">
-          <a href="{{ doc.document_url }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ doc.project_title }}</a>
-        </p>
-        <p style="font-size: 13px; line-height: 20px; margin: 2px 0 0; color: #6b7280;">{{ doc.document_kind }}</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="vertical-align: middle;">
+            <p style="font-size: 14px; line-height: 22px; margin: 0; color: #1f2937;">
+              <a href="{{ doc.document_url }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ doc.project_title }}</a>
+            </p>
+            <p style="font-size: 13px; line-height: 20px; margin: 2px 0 0; color: #6b7280;">{{ doc.document_kind }}</p>
+          </td>
+          <td style="vertical-align: middle; text-align: right; width: 70px;">
+            <a href="{{ doc.document_url }}" style="display: inline-block; padding: 6px 14px; background-color: #2563eb; color: #ffffff; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 6px;">View</a>
+          </td>
+        </tr></table>
       </td>
     </tr>
     {% endfor %}
@@ -42,10 +49,17 @@
     {% for doc in as_ba_lead %}
     <tr>
       <td style="padding: 14px 20px; background-color: #f8fafc; {% if forloop.last %}border-radius: 0 0 12px 12px;{% endif %} {% if not forloop.last %}border-bottom: 1px solid #e2e8f0;{% endif %}">
-        <p style="font-size: 14px; line-height: 22px; margin: 0; color: #1f2937;">
-          <a href="{{ doc.document_url }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ doc.project_title }}</a>
-        </p>
-        <p style="font-size: 13px; line-height: 20px; margin: 2px 0 0; color: #6b7280;">{{ doc.document_kind }}</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="vertical-align: middle;">
+            <p style="font-size: 14px; line-height: 22px; margin: 0; color: #1f2937;">
+              <a href="{{ doc.document_url }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ doc.project_title }}</a>
+            </p>
+            <p style="font-size: 13px; line-height: 20px; margin: 2px 0 0; color: #6b7280;">{{ doc.document_kind }}</p>
+          </td>
+          <td style="vertical-align: middle; text-align: right; width: 70px;">
+            <a href="{{ doc.document_url }}" style="display: inline-block; padding: 6px 14px; background-color: #2563eb; color: #ffffff; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 6px;">View</a>
+          </td>
+        </tr></table>
       </td>
     </tr>
     {% endfor %}

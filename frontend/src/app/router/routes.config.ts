@@ -67,10 +67,6 @@ const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
 const EmailsPage = lazy(() => import("@/pages/admin/EmailsPage"));
 const EmailTestingPage = lazy(() => import("@/pages/admin/EmailTestingPage"));
-const BatchApproveOldPage = lazy(
-	() => import("@/pages/admin/BatchApproveOldPage")
-);
-const BatchApprovePage = lazy(() => import("@/pages/admin/BatchApprovePage"));
 const NewCyclePage = lazy(() => import("@/pages/admin/NewCyclePage"));
 
 // Pages - Staff Profiles (lazy loaded)
@@ -656,24 +652,6 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		component: ServicesPage,
 		requiresAuth: true,
 		requiresAdmin: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Batch Approve Old Reports",
-		path: "/manage/batch-approve-old",
-		component: BatchApproveOldPage,
-		requiresAuth: true,
-		requiresKeyStakeholder: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Batch Approve Reports",
-		path: "/manage/batch-approve",
-		component: BatchApprovePage,
-		requiresAuth: true,
-		requiresKeyStakeholder: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},

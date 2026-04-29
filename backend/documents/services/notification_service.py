@@ -38,6 +38,96 @@ class NotificationService:
         )
 
     @staticmethod
+    def notify_batch_approved(documents, approver):
+        """
+        Send consolidated approval notification emails for batch-approved documents.
+        Groups documents by recipient so each user gets one email listing all their
+        approved documents, rather than one email per document.
+
+        Args:
+            documents: List of approved ProjectDocument instances
+            approver: User who performed the batch approval
+        """
+        document_kind_dict = {
+            "concept": "Concept Plan",
+            "projectplan": "Project Plan",
+            "progressreport": "Progress Report",
+            "studentreport": "Student Report",
+            "projectclosure": "Project Closure",
+        }
+        url_kind_map = {
+            "concept": "concept",
+            "projectplan": "project",
+            "progressreport": "progress",
+            "studentreport": "student",
+            "projectclosure": "closure",
+        }
+
+        # Group documents by recipient (deduplicated by user PK)
+        user_docs = {}  # pk → {name, email, docs: []}
+
+        for doc in documents:
+            recipients = NotificationService._get_document_recipients(doc)
+            kind_label = document_kind_dict.get(doc.kind, doc.kind)
+            url_kind = url_kind_map.get(doc.kind, doc.kind)
+            doc_info = {
+                "project_title": doc.project.title,
+                "document_kind": kind_label,
+                "document_url": f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}",
+            }
+
+            for recipient in recipients:
+                email = recipient["email"]
+                if not email:
+                    continue
+                # Use email as key since we don't have PK in recipient dicts
+                if email not in user_docs:
+                    user_docs[email] = {
+                        "name": recipient["name"],
+                        "email": email,
+                        "docs": [],
+                    }
+                # Avoid duplicate docs for the same user
+                existing_urls = {d["document_url"] for d in user_docs[email]["docs"]}
+                if doc_info["document_url"] not in existing_urls:
+                    user_docs[email]["docs"].append(doc_info)
+
+        # Send one consolidated email per user
+        for email, data in user_docs.items():
+            total = len(data["docs"])
+            if total == 0:
+                continue
+
+            if total == 1:
+                # Single document — use the standard approval template
+                doc_info = data["docs"][0]
+                email_subject = f"SPMS: {doc_info['document_kind']} Approved"
+            else:
+                email_subject = f"SPMS: {total} Reports Approved"
+
+            template_props = {
+                "recipient_name": data["name"],
+                "documents": data["docs"],
+                "total_documents": total,
+                "site_url": settings.SITE_URL,
+            }
+
+            try:
+                template_content = render_to_string(
+                    "./email_templates/batch_approved_consolidated_email.html",
+                    template_props,
+                )
+                send_email_with_embedded_image(
+                    recipient_email=[email],
+                    subject=email_subject,
+                    html_content=template_content,
+                )
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send batch approval notification to {email}: {e}"
+                )
+
+    @staticmethod
     def notify_document_approved_directorate(document, approver):
         """
         Notify directorate when document is approved at directorate level
@@ -183,14 +273,22 @@ class NotificationService:
     def send_bump_emails(
         documents_requiring_action,
         actioning_user,
+        send_aggressive=False,
     ):
         """
         Send reminder emails for documents requiring action.
+
+        When send_aggressive is False (default), documents are grouped by
+        userToTakeAction and one consolidated email is sent per user listing
+        all their pending documents. When send_aggressive is True, one email
+        is sent per document (the original behaviour).
 
         Args:
             documents_requiring_action: List of dicts from the frontend, each containing
                 userToTakeAction, documentKind, projectTitle, projectId, actionCapacity, etc.
             actioning_user: User who triggered the bump emails.
+            send_aggressive: If True, send one email per document. If False (default),
+                group documents by user and send one consolidated email per user.
 
         Returns:
             dict with emails_sent count and any errors.
@@ -218,24 +316,94 @@ class NotificationService:
             }
             return url_mapping.get(kind, kind)
 
-        template_path = "./email_templates/bump_email.html"
         emails_sent = 0
         errors = []
 
-        for doc_data in documents_requiring_action:
-            try:
-                user_to_action = User.objects.get(pk=doc_data.get("userToTakeAction"))
+        if send_aggressive:
+            # Per-document mode: one email per document (original behaviour)
+            template_path = "./email_templates/bump_email.html"
 
-                if (
-                    not user_to_action.is_active
-                    or not user_to_action.email
-                    or not user_to_action.is_staff
-                ):
-                    errors.append(
-                        f"User {user_to_action.display_first_name} {user_to_action.display_last_name} "
-                        f"is inactive, external or has no email"
+            for doc_data in documents_requiring_action:
+                try:
+                    user_to_action = User.objects.get(
+                        pk=doc_data.get("userToTakeAction")
                     )
-                    continue
+
+                    if (
+                        not user_to_action.is_active
+                        or not user_to_action.email
+                        or not user_to_action.is_staff
+                    ):
+                        errors.append(
+                            f"User {user_to_action.display_first_name} {user_to_action.display_last_name} "
+                            f"is inactive, external or has no email"
+                        )
+                        continue
+
+                    document_kind_raw = doc_data.get("documentKind")
+                    document_kind_title = document_kind_dict.get(
+                        document_kind_raw, document_kind_raw
+                    )
+                    url_doc_kind = determine_doc_kind_url_string(document_kind_raw)
+
+                    email_subject = (
+                        f"SPMS: Action Required - {doc_data.get('projectTitle')}"
+                    )
+                    to_email = [user_to_action.email]
+
+                    template_props = {
+                        "email_subject": email_subject,
+                        "actioning_user_email": actioning_user_email,
+                        "actioning_user_name": actioning_user_name,
+                        "recipient_name": f"{user_to_action.display_first_name} {user_to_action.display_last_name}",
+                        "recipient_email": user_to_action.email,
+                        "project_title": doc_data.get("projectTitle"),
+                        "project_id": doc_data.get("projectId"),
+                        "document_kind": document_kind_title,
+                        "document_kind_raw": document_kind_raw,
+                        "action_capacity": doc_data.get("actionCapacity"),
+                        "site_url": settings.SITE_URL,
+                        "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
+                    }
+
+                    template_content = render_to_string(template_path, template_props)
+
+                    try:
+                        send_email_with_embedded_image(
+                            recipient_email=to_email,
+                            subject=email_subject,
+                            html_content=template_content,
+                        )
+                        emails_sent += 1
+                    except Exception as email_error:
+                        settings.LOGGER.error(f"Email Error: {email_error}")
+                        errors.append(f"Failed to send email to {user_to_action.email}")
+
+                except User.DoesNotExist:
+                    errors.append(
+                        f"User with ID {doc_data.get('userToTakeAction')} not found"
+                    )
+                except Project.DoesNotExist:
+                    errors.append(
+                        f"Project with ID {doc_data.get('projectId')} not found"
+                    )
+                except Exception as e:
+                    settings.LOGGER.error(
+                        f"Unexpected error processing document {doc_data.get('documentId')}: {str(e)}"
+                    )
+                    errors.append(
+                        f"Error processing document {doc_data.get('documentId')}"
+                    )
+        else:
+            # Grouped mode: one consolidated email per user
+            grouped = {}
+            for doc_data in documents_requiring_action:
+                user_pk = doc_data.get("userToTakeAction")
+                if user_pk not in grouped:
+                    grouped[user_pk] = {
+                        "as_project_lead": [],
+                        "as_ba_lead": [],
+                    }
 
                 document_kind_raw = doc_data.get("documentKind")
                 document_kind_title = document_kind_dict.get(
@@ -243,50 +411,104 @@ class NotificationService:
                 )
                 url_doc_kind = determine_doc_kind_url_string(document_kind_raw)
 
-                email_subject = (
-                    f"SPMS: Action Required - {doc_data.get('projectTitle')}"
-                )
-                to_email = [user_to_action.email]
-
-                template_props = {
-                    "email_subject": email_subject,
-                    "actioning_user_email": actioning_user_email,
-                    "actioning_user_name": actioning_user_name,
-                    "recipient_name": f"{user_to_action.display_first_name} {user_to_action.display_last_name}",
-                    "recipient_email": user_to_action.email,
+                doc_info = {
                     "project_title": doc_data.get("projectTitle"),
                     "project_id": doc_data.get("projectId"),
                     "document_kind": document_kind_title,
-                    "document_kind_raw": document_kind_raw,
-                    "action_capacity": doc_data.get("actionCapacity"),
-                    "site_url": settings.SITE_URL,
                     "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
                 }
 
-                template_content = render_to_string(template_path, template_props)
+                action_capacity = doc_data.get("actionCapacity", "")
+                if "business area" in action_capacity.lower():
+                    grouped[user_pk]["as_ba_lead"].append(doc_info)
+                else:
+                    grouped[user_pk]["as_project_lead"].append(doc_info)
 
+            for user_pk, docs_by_role in grouped.items():
                 try:
-                    send_email_with_embedded_image(
-                        recipient_email=to_email,
-                        subject=email_subject,
-                        html_content=template_content,
-                    )
-                    emails_sent += 1
-                except Exception as email_error:
-                    settings.LOGGER.error(f"Email Error: {email_error}")
-                    errors.append(f"Failed to send email to {user_to_action.email}")
+                    user = User.objects.get(pk=user_pk)
 
-            except User.DoesNotExist:
-                errors.append(
-                    f"User with ID {doc_data.get('userToTakeAction')} not found"
-                )
-            except Project.DoesNotExist:
-                errors.append(f"Project with ID {doc_data.get('projectId')} not found")
-            except Exception as e:
-                settings.LOGGER.error(
-                    f"Unexpected error processing document {doc_data.get('documentId')}: {str(e)}"
-                )
-                errors.append(f"Error processing document {doc_data.get('documentId')}")
+                    if not user.is_active or not user.email or not user.is_staff:
+                        errors.append(
+                            f"User {user.display_first_name} {user.display_last_name} "
+                            f"is inactive, external or has no email"
+                        )
+                        continue
+
+                    recipient_name = (
+                        f"{user.display_first_name} {user.display_last_name}"
+                    )
+                    total_docs = len(docs_by_role["as_project_lead"]) + len(
+                        docs_by_role["as_ba_lead"]
+                    )
+
+                    # Single document: use the standard bump template
+                    if total_docs == 1:
+                        doc = (
+                            docs_by_role["as_project_lead"]
+                            or docs_by_role["as_ba_lead"]
+                        )[0]
+                        capacity = (
+                            "Project Lead"
+                            if docs_by_role["as_project_lead"]
+                            else "Business Area Lead"
+                        )
+                        email_subject = (
+                            f"SPMS: Action Required - {doc['project_title']}"
+                        )
+                        template_props = {
+                            "email_subject": email_subject,
+                            "actioning_user_email": actioning_user_email,
+                            "actioning_user_name": actioning_user_name,
+                            "recipient_name": recipient_name,
+                            "recipient_email": user.email,
+                            "project_title": doc["project_title"],
+                            "project_id": doc["project_id"],
+                            "document_kind": doc["document_kind"],
+                            "action_capacity": capacity,
+                            "site_url": settings.SITE_URL,
+                            "document_url": doc["document_url"],
+                        }
+                        template_content = render_to_string(
+                            "./email_templates/bump_email.html", template_props
+                        )
+                    else:
+                        # Multiple documents: use consolidated template
+                        email_subject = (
+                            f"SPMS: {total_docs} Documents Require Your Action"
+                        )
+                        template_props = {
+                            "recipient_name": recipient_name,
+                            "actioning_user_name": actioning_user_name,
+                            "actioning_user_email": actioning_user_email,
+                            "as_project_lead": docs_by_role["as_project_lead"],
+                            "as_ba_lead": docs_by_role["as_ba_lead"],
+                            "total_documents": total_docs,
+                            "site_url": settings.SITE_URL,
+                        }
+                        template_content = render_to_string(
+                            "./email_templates/bump_consolidated_email.html",
+                            template_props,
+                        )
+
+                    try:
+                        send_email_with_embedded_image(
+                            recipient_email=[user.email],
+                            subject=email_subject,
+                            html_content=template_content,
+                        )
+                        emails_sent += 1
+                    except Exception as email_error:
+                        settings.LOGGER.error(f"Email Error: {email_error}")
+                        errors.append(f"Failed to send email to {user.email}")
+
+                except User.DoesNotExist:
+                    errors.append(f"User with ID {user_pk} not found")
+                except Exception as e:
+                    settings.LOGGER.error(
+                        f"Unexpected error processing grouped bump for user {user_pk}: {str(e)}"
+                    )
+                    errors.append(f"Error processing bump for user {user_pk}")
 
         return {"emails_sent": emails_sent, "errors": errors}
 
@@ -524,16 +746,27 @@ class NotificationService:
                 )
 
     @staticmethod
-    def notify_new_cycle_open(last_report, actioning_user, division_slug=None):
+    def notify_new_cycle_open(
+        last_report, actioning_user, division_slug=None, recipient_groups=None
+    ):
         """
-        Send new cycle opened notification emails to business area leaders.
+        Send new cycle opened announcement emails.
+
+        Recipients are deduplicated by highest role (BA Lead > Project Lead > Team Member).
+        Only active staff with @dbca.wa.gov.au emails are included.
 
         Args:
             last_report: AnnualReport instance for the cycle.
             actioning_user: User who opened the cycle.
             division_slug: Optional division slug to scope recipients.
+            recipient_groups: List of groups to include, e.g. ["ba_leads", "project_leads", "team_members"].
+                If None, defaults to ["ba_leads", "project_leads"].
         """
         from agencies.models import BusinessArea
+        from projects.models import ProjectMember
+
+        if recipient_groups is None:
+            recipient_groups = ["ba_leads", "project_leads"]
 
         settings.LOGGER.info("Sending cycle opened emails")
         template_path = "./email_templates/new_cycle_open_email.html"
@@ -545,45 +778,90 @@ class NotificationService:
 
         financial_year_string = f"{int(last_report.year - 1)}-{int(last_report.year)}"
 
-        # Get business area leaders
-        recipients_list = []
-        bas = BusinessArea.objects.all()
+        def _is_valid_recipient(user):
+            return (
+                user
+                and user.is_active
+                and user.is_staff
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
+
+        # Collect users with role priorities for deduplication
+        # Priority: BA Lead (3) > Project Lead (2) > Team Member (1)
+        user_roles = {}  # pk → (priority, name, email)
+
+        all_projects = Project.objects.all()
         if division_slug and last_report.division:
-            bas = bas.filter(division=last_report.division)
-        for ba in bas:
-            ba_lead = ba.leader
-            if ba_lead and ba_lead.is_active and ba_lead.is_staff:
-                data_obj = {
-                    "pk": ba_lead.pk,
-                    "name": f"{ba_lead.display_first_name} {ba_lead.display_last_name}",
-                    "email": ba_lead.email,
-                }
-                recipients_list.append(data_obj)
+            all_projects = all_projects.filter(
+                business_area__division=last_report.division
+            )
 
-        processed = []
-        for recipient in recipients_list:
-            if recipient["pk"] not in processed:
-                email_subject = "SPMS: New Reporting Cycle Open"
-                to_email = [recipient["email"]]
+        if "ba_leads" in recipient_groups:
+            bas = BusinessArea.objects.select_related("leader").all()
+            if division_slug and last_report.division:
+                bas = bas.filter(division=last_report.division)
+            for ba in bas:
+                if _is_valid_recipient(ba.leader):
+                    pk = ba.leader.pk
+                    if pk not in user_roles or user_roles[pk][0] < 3:
+                        user_roles[pk] = (
+                            3,
+                            f"{ba.leader.display_first_name} {ba.leader.display_last_name}",
+                            ba.leader.email,
+                        )
 
-                template_props = {
-                    "email_subject": email_subject,
-                    "actioning_user_email": actioning_user_email,
-                    "actioning_user_name": actioning_user_name,
-                    "financial_year_string": financial_year_string,
-                    "recipient_name": recipient["name"],
-                    "site_url": settings.SITE_URL,
-                }
+        if "project_leads" in recipient_groups:
+            leaders = ProjectMember.objects.filter(
+                project__in=all_projects,
+                is_leader=True,
+            ).select_related("user")
+            for member in leaders:
+                if _is_valid_recipient(member.user):
+                    pk = member.user.pk
+                    if pk not in user_roles or user_roles[pk][0] < 2:
+                        user_roles[pk] = (
+                            2,
+                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            member.user.email,
+                        )
 
-                template_content = render_to_string(template_path, template_props)
+        if "team_members" in recipient_groups:
+            members = ProjectMember.objects.filter(
+                project__in=all_projects,
+                is_leader=False,
+            ).select_related("user")
+            for member in members:
+                if _is_valid_recipient(member.user):
+                    pk = member.user.pk
+                    if pk not in user_roles:
+                        user_roles[pk] = (
+                            1,
+                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            member.user.email,
+                        )
 
-                send_email_with_embedded_image(
-                    recipient_email=to_email,
-                    subject=email_subject,
-                    html_content=template_content,
-                )
+        # Send deduplicated emails
+        for pk, (priority, name, email) in user_roles.items():
+            email_subject = "SPMS: New Reporting Cycle Open"
+            to_email = [email]
 
-                processed.append(recipient["pk"])
+            template_props = {
+                "email_subject": email_subject,
+                "actioning_user_email": actioning_user_email,
+                "actioning_user_name": actioning_user_name,
+                "financial_year_string": financial_year_string,
+                "recipient_name": name,
+                "site_url": settings.SITE_URL,
+            }
+
+            template_content = render_to_string(template_path, template_props)
+
+            send_email_with_embedded_image(
+                recipient_email=to_email,
+                subject=email_subject,
+                html_content=template_content,
+            )
 
     @staticmethod
     def notify_project_closed(project, closer):

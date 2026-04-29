@@ -51,6 +51,7 @@ interface SingleBumpData {
 		actionCapacity: string;
 		documentId: number;
 	}>;
+	send_aggressive?: boolean;
 }
 
 /** Fetch a preview of who would be bumped, optionally filtered by stage and report */
@@ -77,7 +78,11 @@ export const useBumpPreview = (
 /** Send consolidated bump emails, optionally filtered by stage and report */
 export const useSendBumpAll = () => {
 	return useMutation({
-		mutationFn: (data?: { stage?: 1 | 2; report_id?: number }) =>
+		mutationFn: (data?: {
+			stage?: 1 | 2;
+			report_id?: number;
+			send_aggressive?: boolean;
+		}) =>
 			apiClient.post<BumpAllResponse>(DOCUMENT_ENDPOINTS.SEND_BUMP_ALL, data),
 		onSuccess: (data) => {
 			toast.success(
@@ -112,7 +117,7 @@ interface BatchApproveResponse {
 export const useBatchApproveCurrent = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data?: { division?: string }) =>
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
 			apiClient.post<BatchApproveResponse>(
 				DOCUMENT_ENDPOINTS.BATCH_APPROVE_CURRENT,
 				data
@@ -141,7 +146,7 @@ export const useBatchApproveCurrent = () => {
 export const useBatchApproveOld = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data?: { division?: string }) =>
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
 			apiClient.post<string>(DOCUMENT_ENDPOINTS.BATCH_APPROVE_OLD, data),
 		onSuccess: async () => {
 			toast.success("Prior-year reports approved");
@@ -158,5 +163,65 @@ export const useBatchApproveOld = () => {
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to batch approve old reports");
 		},
+	});
+};
+
+/* ------------------------------------------------------------------ */
+/*  Recipient Preview Hooks                                            */
+/* ------------------------------------------------------------------ */
+
+interface RecipientUser {
+	pk: number;
+	name: string;
+	email: string;
+}
+
+interface ApproveAllPreviewResponse {
+	recipients: {
+		ba_leads: RecipientUser[];
+		project_leads: RecipientUser[];
+		team_members: RecipientUser[];
+	};
+	total_recipients: number;
+}
+
+interface NewCyclePreviewResponse {
+	recipients: {
+		ba_leads: RecipientUser[];
+		project_leads: RecipientUser[];
+		team_members: RecipientUser[];
+	};
+	total_recipients: number;
+}
+
+/** Fetch recipient preview for the approve-all modal */
+export const useApproveAllPreview = (enabled = false, division?: string) => {
+	const params = new URLSearchParams();
+	if (division) params.set("division", division);
+	const qs = params.toString();
+	const endpoint = qs
+		? `${DOCUMENT_ENDPOINTS.BATCH_APPROVE_CURRENT_PREVIEW}?${qs}`
+		: DOCUMENT_ENDPOINTS.BATCH_APPROVE_CURRENT_PREVIEW;
+	return useQuery({
+		queryKey: ["approve-all", "preview", division ?? "all"],
+		queryFn: () => apiClient.get<ApproveAllPreviewResponse>(endpoint),
+		enabled,
+		staleTime: 30_000,
+	});
+};
+
+/** Fetch recipient preview for the open-new-cycle modal */
+export const useNewCyclePreview = (enabled = false, division?: string) => {
+	const params = new URLSearchParams();
+	if (division) params.set("division", division);
+	const qs = params.toString();
+	const endpoint = qs
+		? `${DOCUMENT_ENDPOINTS.NEW_CYCLE_OPEN_PREVIEW}?${qs}`
+		: DOCUMENT_ENDPOINTS.NEW_CYCLE_OPEN_PREVIEW;
+	return useQuery({
+		queryKey: ["new-cycle", "preview", division ?? "all"],
+		queryFn: () => apiClient.get<NewCyclePreviewResponse>(endpoint),
+		enabled,
+		staleTime: 30_000,
 	});
 };

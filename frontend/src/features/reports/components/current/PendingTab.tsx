@@ -21,6 +21,8 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/shared/components/ui/accordion";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
 import {
 	Dialog,
 	DialogContent,
@@ -33,7 +35,9 @@ import {
 	useBumpPreview,
 	useSendBumpAll,
 	useBatchApproveCurrent,
+	useApproveAllPreview,
 } from "@/shared/hooks/queries/useBumpEmails";
+import { RecipientPreviewPanel } from "@/shared/components/layout/RecipientPreviewPanel";
 import ReportProjectCard from "./ReportProjectCard";
 import type {
 	IARProgressReport,
@@ -250,6 +254,7 @@ function BumpStagePanel({
 	reportId: number;
 }) {
 	const [showBumpDialog, setShowBumpDialog] = useState(false);
+	const [sendAggressive, setSendAggressive] = useState(false);
 	const { data: bumpPreview, refetch } = useBumpPreview(
 		showBumpDialog,
 		stage,
@@ -301,9 +306,11 @@ function BumpStagePanel({
 						: "Send reminder emails to business area leads with outstanding approvals."
 				}
 				preview={bumpPreview}
+				sendAggressive={sendAggressive}
+				onSendAggressiveChange={setSendAggressive}
 				onSend={() => {
 					sendBumpAll.mutate(
-						{ stage, report_id: reportId },
+						{ stage, report_id: reportId, send_aggressive: sendAggressive },
 						{ onSuccess: () => setShowBumpDialog(false) }
 					);
 				}}
@@ -329,7 +336,12 @@ function FinalApprovalPanel({
 	divisionSlug?: string;
 }) {
 	const [showApproveDialog, setShowApproveDialog] = useState(false);
+	const [sendNotifications, setSendNotifications] = useState(false);
 	const batchApproveCurrent = useBatchApproveCurrent();
+	const { data: recipientPreview } = useApproveAllPreview(
+		sendNotifications && showApproveDialog,
+		divisionSlug
+	);
 	const totalCount = progressReports.length + studentReports.length;
 
 	return (
@@ -387,6 +399,28 @@ function FinalApprovalPanel({
 							</p>
 						)}
 					</div>
+					<div className="flex items-center gap-2 pt-2 border-t">
+						<Checkbox
+							id="send-notifications"
+							checked={sendNotifications}
+							onCheckedChange={(checked) =>
+								setSendNotifications(checked === true)
+							}
+						/>
+						<Label
+							htmlFor="send-notifications"
+							className="text-sm text-muted-foreground cursor-pointer"
+						>
+							Send approval notification emails
+						</Label>
+					</div>
+					{sendNotifications && recipientPreview && (
+						<RecipientPreviewPanel
+							baLeads={recipientPreview.recipients.ba_leads}
+							projectLeads={recipientPreview.recipients.project_leads}
+							teamMembers={recipientPreview.recipients.team_members}
+						/>
+					)}
 					<DialogFooter>
 						<Button
 							variant="outline"
@@ -398,7 +432,10 @@ function FinalApprovalPanel({
 							className="bg-green-600 hover:bg-green-700 text-white"
 							onClick={() => {
 								batchApproveCurrent.mutate(
-									{ division: divisionSlug },
+									{
+										division: divisionSlug,
+										send_notifications: sendNotifications,
+									},
 									{ onSuccess: () => setShowApproveDialog(false) }
 								);
 							}}
@@ -426,6 +463,8 @@ function BumpDialog({
 	title,
 	description,
 	preview,
+	sendAggressive,
+	onSendAggressiveChange,
 	onSend,
 	isSending,
 }: {
@@ -434,6 +473,8 @@ function BumpDialog({
 	title: string;
 	description: string;
 	preview: BumpPreviewResponse | undefined;
+	sendAggressive: boolean;
+	onSendAggressiveChange: (checked: boolean) => void;
 	onSend: () => void;
 	isSending: boolean;
 }) {
@@ -473,6 +514,21 @@ function BumpDialog({
 									</div>
 								</div>
 							))}
+						</div>
+						<div className="flex items-center gap-2 pt-2 border-t">
+							<Checkbox
+								id="send-aggressive"
+								checked={sendAggressive}
+								onCheckedChange={(checked) =>
+									onSendAggressiveChange(checked === true)
+								}
+							/>
+							<Label
+								htmlFor="send-aggressive"
+								className="text-sm text-muted-foreground cursor-pointer"
+							>
+								Send individual emails per document
+							</Label>
 						</div>
 					</div>
 				) : (

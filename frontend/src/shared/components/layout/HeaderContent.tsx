@@ -15,8 +15,6 @@ import {
 	Briefcase,
 	Settings,
 	List,
-	CheckSquare,
-	RefreshCw,
 	Mail,
 	FlaskConical,
 } from "lucide-react";
@@ -367,31 +365,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/batch-approve-old")}
+								onClick={() => navigateAndClose("/reports/my-division")}
 							>
 								<span className="flex items-center gap-3">
-									<CheckSquare className="text-xl" aria-hidden="true" />
-									<span>Batch Approve Old Reports</span>
-								</span>
-							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/batch-approve")}
-							>
-								<span className="flex items-center gap-3">
-									<CheckSquare className="text-xl" aria-hidden="true" />
-									<span>Batch Approve Reports</span>
-								</span>
-							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/new-cycle")}
-							>
-								<span className="flex items-center gap-3">
-									<RefreshCw className="text-xl" aria-hidden="true" />
-									<span>Open New Cycle</span>
+									<Settings className="text-xl" aria-hidden="true" />
+									<span>Division Actions</span>
 								</span>
 							</Button>
 						</div>

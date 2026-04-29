@@ -42,6 +42,5 @@ export const ADMIN_ENDPOINTS = {
 
 	// Admin options (email testing settings)
 	ADMIN_OPTIONS_DETAIL: (pk: number) => `adminoptions/${pk}`,
-	SEND_TEST_EMAIL: "adminoptions/send-test-email",
 	SEND_ALL_TEST_EMAILS: "adminoptions/send-all-test-emails",
 } as const;

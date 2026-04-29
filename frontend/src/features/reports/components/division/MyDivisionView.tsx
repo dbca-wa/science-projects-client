@@ -18,12 +18,9 @@ import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useReportsForDivision } from "@/features/reports/hooks/useReports";
-import {
-	useOpenNewCycle,
-	useBatchApprove,
-	useBatchApproveOld,
-} from "@/features/admin/hooks/useAdminActions";
 import { ReportInfoForm } from "@/features/admin/components/report-info/ReportInfoForm";
+import { ARActionDialogs } from "@/shared/components/layout/ARActionDialogs";
+import type { ARActionId } from "@/shared/components/layout/ManageDropdownContent";
 
 /**
  * My Division view — shows AR actions scoped to the user's division(s).
@@ -38,21 +35,18 @@ export const MyDivisionView = observer(function MyDivisionView() {
 	const [selectedYear, setSelectedYear] = useState<number | null>(null);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 
-	// Filter divisions: superusers see all, KS sees only theirs
 	const availableDivisions = useMemo(() => {
 		if (!allDivisions || !currentUser) return [];
 		if (authStore.isSuperuser) return allDivisions;
 		return allDivisions.filter((d) => d.key_stakeholder?.id === currentUser.id);
 	}, [allDivisions, currentUser, authStore.isSuperuser]);
 
-	// Auto-select first division when available
 	useEffect(() => {
 		if (availableDivisions.length > 0 && !selectedSlug) {
 			setSelectedSlug(availableDivisions[0].slug);
 		}
 	}, [availableDivisions, selectedSlug]);
 
-	// Fetch reports for the selected division
 	const { data: divisionReports = [] } = useReportsForDivision(
 		selectedSlug ?? undefined
 	);
@@ -62,7 +56,6 @@ export const MyDivisionView = observer(function MyDivisionView() {
 		[divisionReports]
 	);
 
-	// Auto-select latest year when division changes
 	useEffect(() => {
 		if (availableYears.length > 0) {
 			setSelectedYear(availableYears[0]);
@@ -76,7 +69,6 @@ export const MyDivisionView = observer(function MyDivisionView() {
 		[availableDivisions, selectedSlug]
 	);
 
-	// Title: show full division name when selected, otherwise "My Division"
 	const pageTitle = selectedDivision ? selectedDivision.name : "My Division";
 
 	if (divisionsLoading) {
@@ -144,7 +136,6 @@ export const MyDivisionView = observer(function MyDivisionView() {
 								</SelectContent>
 							</Select>
 						)}
-						{/* Square icon button — visible on sm+ */}
 						{selectedSlug && (
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -161,7 +152,6 @@ export const MyDivisionView = observer(function MyDivisionView() {
 							</Tooltip>
 						)}
 					</div>
-					{/* Full-width labelled button — visible on mobile only */}
 					{selectedSlug && (
 						<Button
 							className="w-full bg-green-600 hover:bg-green-500 text-white sm:hidden"
@@ -220,7 +210,10 @@ export const MyDivisionView = observer(function MyDivisionView() {
 	);
 });
 
-/** AR action cards for the selected division and year */
+/* ------------------------------------------------------------------ */
+/*  AR Action Cards                                                    */
+/* ------------------------------------------------------------------ */
+
 // eslint-disable-next-line react-refresh/only-export-components
 const ARActionCards = ({
 	divisionSlug,
@@ -231,48 +224,16 @@ const ARActionCards = ({
 	year: number;
 	divisionName: string;
 }) => {
-	const newCycleMutation = useOpenNewCycle();
-	const batchApproveMutation = useBatchApprove();
-	const batchApproveOldMutation = useBatchApproveOld();
+	const [arAction, setARAction] = useState<ARActionId | null>(null);
 
 	const fyString = `FY ${String(year - 1).slice(2)}-${String(year).slice(2)}`;
 
 	return (
 		<div className="space-y-4">
-			{/* Batch approve cards */}
-			<div className="grid gap-4 md:grid-cols-2">
-				<ActionCard
-					title="Batch Approve"
-					description={`Approve all outstanding reports for ${divisionName} (${fyString}).`}
-					icon={<CheckSquare className="size-6 text-green-500" />}
-					isPending={batchApproveMutation.isPending}
-					onAction={() => batchApproveMutation.mutate(divisionSlug)}
-					confirmMessage={`This will batch approve all current reports for ${divisionName} (${fyString}). Continue?`}
-				/>
-				<ActionCard
-					title="Batch Approve Old"
-					description={`Approve all outstanding reports from previous years for ${divisionName}.`}
-					icon={<CheckSquare className="size-6 text-blue-500" />}
-					isPending={batchApproveOldMutation.isPending}
-					onAction={() => batchApproveOldMutation.mutate(divisionSlug)}
-					confirmMessage={`This will batch approve all older reports for ${divisionName}. Continue?`}
-				/>
-			</div>
-
-			{/* Open New Cycle — prominent full-width clickable card */}
 			<button
 				type="button"
 				className="action-card action-card-primary flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-5 sm:p-6 md:py-12"
-				disabled={newCycleMutation.isPending}
-				onClick={() => {
-					if (
-						window.confirm(
-							`This will open a new reporting cycle for ${divisionName} (${fyString}). Continue?`
-						)
-					) {
-						newCycleMutation.mutate(divisionSlug);
-					}
-				}}
+				onClick={() => setARAction("new-cycle")}
 			>
 				<div className="rounded-full bg-blue-50 dark:bg-blue-950/50 p-3 mb-3 sm:mb-0 shrink-0">
 					<RefreshCw className="size-7 text-blue-600 dark:text-blue-400" />
@@ -285,56 +246,54 @@ const ARActionCards = ({
 						Create progress and student reports for {divisionName} ({fyString}).
 					</p>
 				</div>
-				{newCycleMutation.isPending && (
-					<Loader2 className="mt-3 sm:mt-0 size-5 animate-spin text-muted-foreground shrink-0" />
-				)}
 			</button>
+
+			<div className="flex justify-end">
+				<div className="grid gap-4 md:grid-cols-2 w-full md:w-auto">
+					<button
+						type="button"
+						className="action-card flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-4"
+						onClick={() => setARAction("batch-approve")}
+					>
+						<div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 shrink-0 mb-3 sm:mb-0">
+							<CheckSquare className="size-6 text-green-500" />
+						</div>
+						<div className="flex-1 min-w-0">
+							<h3 className="font-semibold text-gray-900 dark:text-gray-100">
+								Batch Approve
+							</h3>
+							<p className="mt-1 text-sm text-muted-foreground">
+								Approve all outstanding reports for {divisionName} ({fyString}).
+							</p>
+						</div>
+					</button>
+
+					<button
+						type="button"
+						className="action-card flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-4"
+						onClick={() => setARAction("batch-approve-old")}
+					>
+						<div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 shrink-0 mb-3 sm:mb-0">
+							<CheckSquare className="size-6 text-blue-500" />
+						</div>
+						<div className="flex-1 min-w-0">
+							<h3 className="font-semibold text-gray-900 dark:text-gray-100">
+								Batch Approve Old
+							</h3>
+							<p className="mt-1 text-sm text-muted-foreground">
+								Approve all outstanding reports from previous years for{" "}
+								{divisionName}.
+							</p>
+						</div>
+					</button>
+				</div>
+			</div>
+
+			<ARActionDialogs
+				activeAction={arAction}
+				onClose={() => setARAction(null)}
+				divisionSlug={divisionSlug}
+			/>
 		</div>
-	);
-};
-
-/** Single action card — the entire card is clickable */
-// eslint-disable-next-line react-refresh/only-export-components
-const ActionCard = ({
-	title,
-	description,
-	icon,
-	isPending,
-	onAction,
-	confirmMessage,
-}: {
-	title: string;
-	description: string;
-	icon: React.ReactNode;
-	isPending: boolean;
-	onAction: () => void;
-	confirmMessage: string;
-}) => {
-	const handleClick = () => {
-		if (window.confirm(confirmMessage)) {
-			onAction();
-		}
-	};
-
-	return (
-		<button
-			type="button"
-			className="action-card flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-4"
-			disabled={isPending}
-			onClick={handleClick}
-		>
-			<div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 shrink-0 mb-3 sm:mb-0">
-				{icon}
-			</div>
-			<div className="flex-1 min-w-0">
-				<h3 className="font-semibold text-gray-900 dark:text-gray-100">
-					{title}
-				</h3>
-				<p className="mt-1 text-sm text-muted-foreground">{description}</p>
-			</div>
-			{isPending && (
-				<Loader2 className="mt-3 sm:mt-0 size-5 animate-spin text-muted-foreground shrink-0" />
-			)}
-		</button>
 	);
 };

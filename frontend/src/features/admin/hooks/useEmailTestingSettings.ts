@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import {
 	getEmailTestingSettings,
 	updateEmailTestingSettings,
-	sendTestEmail,
 	sendAllTestEmails,
 	type IEmailTestingSettings,
 } from "../services/admin.service";
@@ -35,31 +34,19 @@ export const useUpdateEmailTestingSettings = () => {
 	});
 };
 
-/** Send a test email to verify Mandrill configuration */
-export const useSendTestEmail = () => {
-	return useMutation({
-		mutationFn: sendTestEmail,
-		onSuccess: (data) => {
-			toast.success(data.message || "Test email sent");
-		},
-		onError: (error: Error) => {
-			toast.error(error.message || "Failed to send test email");
-		},
-	});
-};
-
-/** Send all email templates with sample data for visual review */
+/** Send one or all email templates with sample data for visual review */
 export const useSendAllTestEmails = () => {
 	return useMutation({
 		mutationFn: (overrides?: {
 			recipient_user_id?: number | null;
 			actioner_user_id?: number | null;
+			template_name?: string;
 		}) => sendAllTestEmails(overrides),
 		onSuccess: (data) => {
-			toast.success(data.message || "All test emails sent");
+			toast.success(data.message || "Test emails sent");
 		},
 		onError: (error: Error) => {
-			toast.error(error.message || "Failed to send all test emails");
+			toast.error(error.message || "Failed to send test emails");
 		},
 	});
 };

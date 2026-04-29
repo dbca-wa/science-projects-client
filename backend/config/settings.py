@@ -45,7 +45,8 @@ IT_ASSETS_URL = IT_ASSETS_URLS.get(ENVIRONMENT)
 # Domain configuration
 DOMAINS = {
     "development": {
-        "main": "127.0.0.1:8000",
+        "main": "127.0.0.1:3000",
+        "backend": "127.0.0.1:8000",
         "profiles": "127.0.0.1:8000",
     },
     "staging": {

@@ -274,21 +274,39 @@ export const deleteReportInfo = async (id: number): Promise<void> => {
 };
 
 // Admin actions
-export const batchApprove = async (divisionSlug?: string): Promise<void> => {
+export const batchApprove = async (data?: {
+	division?: string;
+	send_notifications?: boolean;
+}): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE, {
-		division: divisionSlug,
+		division: data?.division,
+		send_notifications: data?.send_notifications ?? false,
 	});
 };
 
-export const batchApproveOld = async (divisionSlug?: string): Promise<void> => {
+export const batchApproveOld = async (data?: {
+	division?: string;
+	send_notifications?: boolean;
+}): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.BATCH_APPROVE_OLD, {
-		division: divisionSlug,
+		division: data?.division,
+		send_notifications: data?.send_notifications ?? false,
 	});
 };
 
-export const openNewCycle = async (divisionSlug?: string): Promise<void> => {
+export const openNewCycle = async (data?: {
+	division?: string;
+	update?: boolean;
+	prepopulate?: boolean;
+	send_emails?: boolean;
+	recipient_groups?: string[];
+}): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE, {
-		division: divisionSlug,
+		division: data?.division,
+		update: data?.update ?? true,
+		prepopulate: data?.prepopulate ?? false,
+		send_emails: data?.send_emails ?? false,
+		recipient_groups: data?.recipient_groups,
 	});
 };
 
@@ -325,13 +343,10 @@ export const updateEmailTestingSettings = async (
 	);
 };
 
-export const sendTestEmail = async (): Promise<{ message: string }> => {
-	return apiClient.post<{ message: string }>(ADMIN_ENDPOINTS.SEND_TEST_EMAIL);
-};
-
 export const sendAllTestEmails = async (overrides?: {
 	recipient_user_id?: number | null;
 	actioner_user_id?: number | null;
+	template_name?: string;
 }): Promise<{
 	message: string;
 	preview_dir: string;

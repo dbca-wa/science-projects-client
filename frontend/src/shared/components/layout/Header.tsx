@@ -16,6 +16,8 @@ import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import HeaderContent from "./HeaderContent";
 import { ManageDropdownContent } from "./ManageDropdownContent";
+import type { ARActionId } from "./ManageDropdownContent";
+import { ARActionDialogs } from "./ARActionDialogs";
 import { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
@@ -79,6 +81,7 @@ export const Header = observer(() => {
 	const [usersOpen, setUsersOpen] = useState(false);
 	const [reportsOpen, setReportsOpen] = useState(false);
 	const [manageOpen, setManageOpen] = useState(false);
+	const [arAction, setARAction] = useState<ARActionId | null>(null);
 	const [navitarOpen, setNavitarOpen] = useState(false);
 
 	const { data: myBusinessAreas } = useMyBusinessAreas();
@@ -151,200 +154,209 @@ export const Header = observer(() => {
 	};
 
 	return (
-		<header className="sticky top-0 z-50 bg-gray-900 rounded-b py-0.5">
-			{/* Skip to main content link for keyboard users */}
-			<button
-				onClick={(e) => {
-					e.preventDefault();
-					const mainContent = document.getElementById("main-content");
-					if (mainContent) {
-						mainContent.focus();
-						mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
-					}
-				}}
-				className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100000] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded focus:outline-none focus:ring-2 focus:ring-white"
-			>
-				Skip to main content
-			</button>
+		<>
+			<header className="sticky top-0 z-50 bg-gray-900 rounded-b py-0.5">
+				{/* Skip to main content link for keyboard users */}
+				<button
+					onClick={(e) => {
+						e.preventDefault();
+						const mainContent = document.getElementById("main-content");
+						if (mainContent) {
+							mainContent.focus();
+							mainContent.scrollIntoView({
+								behavior: "smooth",
+								block: "start",
+							});
+						}
+					}}
+					className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100000] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded focus:outline-none focus:ring-2 focus:ring-white"
+				>
+					Skip to main content
+				</button>
 
-			<div className="px-4 sm:px-6 md:px-[10%] lg:px-[15%] py-4 lg:py-1">
-				<div className="flex items-center justify-between">
-					{/* Left side - Logo */}
-					<div className="flex items-center">
-						{/* SPMS Logo/Title */}
-						<Link
-							to="/"
-							className="px-5 text-white/70 hover:text-white/90 text-lg font-bold select-none no-underline transition-colors"
-							aria-label="SPMS Home"
-						>
-							SPMS
-						</Link>
-					</div>
-
-					{shouldShowHamburger ? (
-						/* Mobile/Tablet - Hamburger Menu */
+				<div className="px-4 sm:px-6 md:px-[10%] lg:px-[15%] py-4 lg:py-1">
+					<div className="flex items-center justify-between">
+						{/* Left side - Logo */}
 						<div className="flex items-center">
-							<HamburgerMenuSheet handleNavigation={handleNavigation} />
+							{/* SPMS Logo/Title */}
+							<Link
+								to="/"
+								className="px-5 text-white/70 hover:text-white/90 text-lg font-bold select-none no-underline transition-colors"
+								aria-label="SPMS Home"
+							>
+								SPMS
+							</Link>
 						</div>
-					) : (
-						/* Desktop - Full Navigation */
-						<nav
-							aria-label="Main navigation"
-							className="flex items-center justify-between flex-grow"
-						>
-							<div className="flex items-center gap-1">
-								{/* Projects Menu */}
-								<NavigationDropdownMenu
-									label="Projects"
-									open={projectsOpen}
-									onOpenChange={setProjectsOpen}
-								>
-									<NavigationDropdownMenuContent
-										label="Projects"
-										items={[
-											{
-												targetPath: "/projects",
-												icon: (
-													<CgBrowse className="size-4" aria-hidden="true" />
-												),
-												label: "Browse Projects",
-											},
-											{
-												targetPath: "/projects/map",
-												icon: (
-													<FaMapMarkedAlt
-														className="size-4"
-														aria-hidden="true"
-													/>
-												),
-												label: "Project Map",
-											},
-											{
-												targetPath: "/projects/create",
-												icon: (
-													<CgPlayListAdd
-														className="size-4"
-														aria-hidden="true"
-													/>
-												),
-												label: "Create New Project",
-											},
-										]}
-										onClose={() => setProjectsOpen(false)}
-									/>
-								</NavigationDropdownMenu>
 
-								{/* Users Menu */}
-								<NavigationDropdownMenu
-									label="Users"
-									open={usersOpen}
-									onOpenChange={setUsersOpen}
-								>
-									<NavigationDropdownMenuContent
-										label="Users"
-										items={[
-											{
-												targetPath: "/users",
-												icon: <ImUsers className="size-4" aria-hidden="true" />,
-												label: "Browse Users",
-											},
-											{
-												targetPath: "/users/create",
-												icon: (
-													<FaUserPlus className="size-4" aria-hidden="true" />
-												),
-												label: "Add User",
-											},
-											...(authStore.isSuperuser
-												? [
-														{
-															targetPath: "/manage/create-staff",
-															icon: (
-																<FaUserPlus
-																	className="size-4"
-																	aria-hidden="true"
-																/>
-															),
-															label: "Add DBCA User (Admin)",
-														},
-													]
-												: []),
-										]}
-										onClose={() => setUsersOpen(false)}
-									/>
-								</NavigationDropdownMenu>
-
-								{/* Reports Menu */}
-								<NavigationDropdownMenu
-									label="Reports"
-									open={reportsOpen}
-									onOpenChange={setReportsOpen}
-								>
-									<NavigationDropdownMenuContent
-										label="Annual Report"
-										items={[
-											{
-												targetPath: "/reports/details",
-												icon: (
-													<FileText className="size-4" aria-hidden="true" />
-												),
-												label: "Report Details",
-											},
-											{
-												targetPath: "/reports",
-												icon: <Archive className="size-4" aria-hidden="true" />,
-												label: "Published Reports",
-											},
-											...((myBusinessAreas && myBusinessAreas.length > 0) ||
-											authStore.isSuperuser
-												? [
-														{
-															targetPath: "/reports/business-area",
-															icon: (
-																<Briefcase
-																	className="size-4"
-																	aria-hidden="true"
-																/>
-															),
-															label: "My Business Area",
-														},
-													]
-												: []),
-											...(authStore.isSuperuser || isKeyStakeholder
-												? [
-														{
-															targetPath: "/reports/my-division",
-															icon: (
-																<Building
-																	className="size-4"
-																	aria-hidden="true"
-																/>
-															),
-															label: "My Division",
-														},
-													]
-												: []),
-										]}
-										onClose={() => setReportsOpen(false)}
-									/>
-								</NavigationDropdownMenu>
-
-								{/* Manage Menu — superuser or key stakeholder */}
-								{(authStore.isSuperuser || isKeyStakeholder) && (
+						{shouldShowHamburger ? (
+							/* Mobile/Tablet - Hamburger Menu */
+							<div className="flex items-center">
+								<HamburgerMenuSheet handleNavigation={handleNavigation} />
+							</div>
+						) : (
+							/* Desktop - Full Navigation */
+							<nav
+								aria-label="Main navigation"
+								className="flex items-center justify-between flex-grow"
+							>
+								<div className="flex items-center gap-1">
+									{/* Projects Menu */}
 									<NavigationDropdownMenu
-										label="Manage"
-										open={manageOpen}
-										onOpenChange={setManageOpen}
+										label="Projects"
+										open={projectsOpen}
+										onOpenChange={setProjectsOpen}
 									>
-										<ManageDropdownContent
-											onClose={() => setManageOpen(false)}
-											isKeyStakeholder={isKeyStakeholder}
+										<NavigationDropdownMenuContent
+											label="Projects"
+											items={[
+												{
+													targetPath: "/projects",
+													icon: (
+														<CgBrowse className="size-4" aria-hidden="true" />
+													),
+													label: "Browse Projects",
+												},
+												{
+													targetPath: "/projects/map",
+													icon: (
+														<FaMapMarkedAlt
+															className="size-4"
+															aria-hidden="true"
+														/>
+													),
+													label: "Project Map",
+												},
+												{
+													targetPath: "/projects/create",
+													icon: (
+														<CgPlayListAdd
+															className="size-4"
+															aria-hidden="true"
+														/>
+													),
+													label: "Create New Project",
+												},
+											]}
+											onClose={() => setProjectsOpen(false)}
 										/>
 									</NavigationDropdownMenu>
-								)}
 
-								{/* Guide Button — page not yet created */}
-								{/*
+									{/* Users Menu */}
+									<NavigationDropdownMenu
+										label="Users"
+										open={usersOpen}
+										onOpenChange={setUsersOpen}
+									>
+										<NavigationDropdownMenuContent
+											label="Users"
+											items={[
+												{
+													targetPath: "/users",
+													icon: (
+														<ImUsers className="size-4" aria-hidden="true" />
+													),
+													label: "Browse Users",
+												},
+												{
+													targetPath: "/users/create",
+													icon: (
+														<FaUserPlus className="size-4" aria-hidden="true" />
+													),
+													label: "Add User",
+												},
+												...(authStore.isSuperuser
+													? [
+															{
+																targetPath: "/manage/create-staff",
+																icon: (
+																	<FaUserPlus
+																		className="size-4"
+																		aria-hidden="true"
+																	/>
+																),
+																label: "Add DBCA User (Admin)",
+															},
+														]
+													: []),
+											]}
+											onClose={() => setUsersOpen(false)}
+										/>
+									</NavigationDropdownMenu>
+
+									{/* Reports Menu */}
+									<NavigationDropdownMenu
+										label="Reports"
+										open={reportsOpen}
+										onOpenChange={setReportsOpen}
+									>
+										<NavigationDropdownMenuContent
+											label="Annual Report"
+											items={[
+												{
+													targetPath: "/reports/details",
+													icon: (
+														<FileText className="size-4" aria-hidden="true" />
+													),
+													label: "Report Details",
+												},
+												{
+													targetPath: "/reports",
+													icon: (
+														<Archive className="size-4" aria-hidden="true" />
+													),
+													label: "Published Reports",
+												},
+												...((myBusinessAreas && myBusinessAreas.length > 0) ||
+												authStore.isSuperuser
+													? [
+															{
+																targetPath: "/reports/business-area",
+																icon: (
+																	<Briefcase
+																		className="size-4"
+																		aria-hidden="true"
+																	/>
+																),
+																label: "My Business Area",
+															},
+														]
+													: []),
+												...(authStore.isSuperuser || isKeyStakeholder
+													? [
+															{
+																targetPath: "/reports/my-division",
+																icon: (
+																	<Building
+																		className="size-4"
+																		aria-hidden="true"
+																	/>
+																),
+																label: "My Division",
+															},
+														]
+													: []),
+											]}
+											onClose={() => setReportsOpen(false)}
+										/>
+									</NavigationDropdownMenu>
+
+									{/* Manage Menu — superuser or key stakeholder */}
+									{(authStore.isSuperuser || isKeyStakeholder) && (
+										<NavigationDropdownMenu
+											label="Manage"
+											open={manageOpen}
+											onOpenChange={setManageOpen}
+										>
+											<ManageDropdownContent
+												onClose={() => setManageOpen(false)}
+												isKeyStakeholder={isKeyStakeholder}
+												onARAction={(actionId) => setARAction(actionId)}
+											/>
+										</NavigationDropdownMenu>
+									)}
+
+									{/* Guide Button — page not yet created */}
+									{/*
                 <Button
                   variant="ghost"
                   className="text-white/70 hover:text-white hover:bg-white/10 select-none"
@@ -353,20 +365,27 @@ export const Header = observer(() => {
                   Guide
                 </Button>
                 */}
-							</div>
+								</div>
 
-							{/* Right side - Navitar with name */}
-							<div className="flex items-center px-3">
-								<Navitar
-									shouldShowName
-									open={navitarOpen}
-									onOpenChange={setNavitarOpen}
-								/>
-							</div>
-						</nav>
-					)}
+								{/* Right side - Navitar with name */}
+								<div className="flex items-center px-3">
+									<Navitar
+										shouldShowName
+										open={navitarOpen}
+										onOpenChange={setNavitarOpen}
+									/>
+								</div>
+							</nav>
+						)}
+					</div>
 				</div>
-			</div>
-		</header>
+			</header>
+
+			{/* AR Action modals — rendered at layout level so they persist after dropdown closes */}
+			<ARActionDialogs
+				activeAction={arAction}
+				onClose={() => setARAction(null)}
+			/>
+		</>
 	);
 });

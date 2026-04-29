@@ -340,11 +340,13 @@ class NewCycleOpen(APIView):
 
         # Send emails if requested
         if should_email:
+            recipient_groups = request.data.get("recipient_groups")
             try:
                 NotificationService.notify_new_cycle_open(
                     last_report=last_report,
                     actioning_user=User.objects.get(pk=request.user.pk),
                     division_slug=division_slug,
+                    recipient_groups=recipient_groups,
                 )
             except Exception as e:
                 settings.LOGGER.error(f"Email Error: {e}", exc_info=True)
@@ -379,9 +381,11 @@ class SendBumpEmails(APIView):
         )
 
         actioning_user = User.objects.get(pk=request.user.pk)
+        send_aggressive = request.data.get("send_aggressive", False)
         result = NotificationService.send_bump_emails(
             documents_requiring_action=documents_requiring_action,
             actioning_user=actioning_user,
+            send_aggressive=send_aggressive,
         )
 
         emails_sent = result["emails_sent"]
@@ -568,8 +572,9 @@ class BumpPreview(APIView):
 
 class SendBumpAll(APIView):
     """
-    Send consolidated bump emails to all users with outstanding documents
-    at stage 1 and stage 2. Each user receives one email listing all their items.
+    Send bump emails to all users with outstanding documents at stage 1 and stage 2.
+    By default (send_aggressive=False), each user receives one consolidated email.
+    When send_aggressive=True, one email is sent per document.
     """
 
     permission_classes = [IsAdminUser]
@@ -578,6 +583,8 @@ class SendBumpAll(APIView):
         from django.template.loader import render_to_string
 
         from config.helpers import send_email_with_embedded_image
+
+        send_aggressive = request.data.get("send_aggressive", False)
 
         # Reuse the preview logic to get the user/document grouping
         # BumpPreview reads stage from both query_params and request.data
@@ -600,61 +607,105 @@ class SendBumpAll(APIView):
         emails_sent = 0
         errors = []
 
-        for user_data in users_data:
-            total = user_data["total"]
-            recipient_name = user_data["name"]
-            recipient_email = user_data["email"]
+        if send_aggressive:
+            # Per-document mode: one email per document
+            for user_data in users_data:
+                recipient_name = user_data["name"]
+                recipient_email = user_data["email"]
 
-            context = {
-                "recipient_name": recipient_name,
-                "actioning_user_name": actioning_name,
-                "actioning_user_email": actioning_user.email,
-                "as_project_lead": user_data["as_project_lead"],
-                "as_ba_lead": user_data["as_ba_lead"],
-                "total_documents": total,
-                "logo_url": True,
-                "site_url": settings.SITE_URL,
-                "site_name": "SPMS",
-            }
+                all_docs = [
+                    (doc, "Project Lead") for doc in user_data["as_project_lead"]
+                ] + [(doc, "Business Area Lead") for doc in user_data["as_ba_lead"]]
 
-            # Use consolidated template for multiple docs, single template for one
-            if total == 1:
-                # Single document — use existing bump template
-                doc = (user_data["as_project_lead"] or user_data["as_ba_lead"])[0]
-                capacity = (
-                    "Project Lead"
-                    if user_data["as_project_lead"]
-                    else "Business Area Lead"
-                )
-                single_context = {
-                    **context,
-                    "project_title": doc["project_title"],
-                    "project_id": doc["project_id"],
-                    "document_kind": doc["document_kind"],
-                    "action_capacity": capacity,
-                    "document_url": doc["document_url"],
-                    "email_subject": f"SPMS: Action Required - {doc['project_title']}",
+                for doc, capacity in all_docs:
+                    subject = f"SPMS: Action Required - {doc['project_title']}"
+                    single_context = {
+                        "recipient_name": recipient_name,
+                        "actioning_user_name": actioning_name,
+                        "actioning_user_email": actioning_user.email,
+                        "project_title": doc["project_title"],
+                        "project_id": doc["project_id"],
+                        "document_kind": doc["document_kind"],
+                        "action_capacity": capacity,
+                        "document_url": doc["document_url"],
+                        "email_subject": subject,
+                        "site_url": settings.SITE_URL,
+                    }
+                    html = render_to_string(
+                        "./email_templates/bump_email.html", single_context
+                    )
+
+                    try:
+                        send_email_with_embedded_image(
+                            recipient_email=[recipient_email],
+                            subject=subject,
+                            html_content=html,
+                        )
+                        emails_sent += 1
+                    except Exception as e:
+                        settings.LOGGER.error(
+                            f"Failed to send bump to {recipient_email}: {e}"
+                        )
+                        errors.append(f"Failed: {recipient_name} ({recipient_email})")
+        else:
+            # Grouped mode (default): one consolidated email per user
+            for user_data in users_data:
+                total = user_data["total"]
+                recipient_name = user_data["name"]
+                recipient_email = user_data["email"]
+
+                context = {
+                    "recipient_name": recipient_name,
+                    "actioning_user_name": actioning_name,
+                    "actioning_user_email": actioning_user.email,
+                    "as_project_lead": user_data["as_project_lead"],
+                    "as_ba_lead": user_data["as_ba_lead"],
+                    "total_documents": total,
+                    "logo_url": True,
+                    "site_url": settings.SITE_URL,
+                    "site_name": "SPMS",
                 }
-                template = "./email_templates/bump_email.html"
-                subject = f"SPMS: Action Required - {doc['project_title']}"
-                html = render_to_string(template, single_context)
-            else:
-                template = "./email_templates/bump_consolidated_email.html"
-                subject = (
-                    f"SPMS: Action Required - {total} documents need your attention"
-                )
-                html = render_to_string(template, context)
 
-            try:
-                send_email_with_embedded_image(
-                    recipient_email=[recipient_email],
-                    subject=subject,
-                    html_content=html,
-                )
-                emails_sent += 1
-            except Exception as e:
-                settings.LOGGER.error(f"Failed to send bump to {recipient_email}: {e}")
-                errors.append(f"Failed: {recipient_name} ({recipient_email})")
+                # Use consolidated template for multiple docs, single template for one
+                if total == 1:
+                    # Single document — use existing bump template
+                    doc = (user_data["as_project_lead"] or user_data["as_ba_lead"])[0]
+                    capacity = (
+                        "Project Lead"
+                        if user_data["as_project_lead"]
+                        else "Business Area Lead"
+                    )
+                    single_context = {
+                        **context,
+                        "project_title": doc["project_title"],
+                        "project_id": doc["project_id"],
+                        "document_kind": doc["document_kind"],
+                        "action_capacity": capacity,
+                        "document_url": doc["document_url"],
+                        "email_subject": f"SPMS: Action Required - {doc['project_title']}",
+                    }
+                    template = "./email_templates/bump_email.html"
+                    subject = f"SPMS: Action Required - {doc['project_title']}"
+                    html = render_to_string(template, single_context)
+                else:
+                    template = "./email_templates/bump_consolidated_email.html"
+                    subject = (
+                        f"SPMS: Action Required - {total} documents need your attention"
+                    )
+                    html = render_to_string(template, context)
+
+                try:
+                    send_email_with_embedded_image(
+                        recipient_email=[recipient_email],
+                        subject=subject,
+                        html_content=html,
+                    )
+                    emails_sent += 1
+                except Exception as e:
+                    settings.LOGGER.error(
+                        f"Failed to send bump to {recipient_email}: {e}"
+                    )
+                    errors.append(f"Failed: {recipient_name} ({recipient_email})")
 
         settings.LOGGER.info(
             f"{actioning_user} sent bulk bump emails: {emails_sent} users bumped"

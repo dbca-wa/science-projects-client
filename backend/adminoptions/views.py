@@ -4,7 +4,6 @@
 import os
 
 from django.conf import settings
-from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -745,117 +744,6 @@ class MergeUsers(APIView):
 # Use /api/v1/caretakers/admin-set/ instead
 
 
-class SendTestEmail(APIView):
-    """Send a test email to verify email configuration with CID-attached inline images."""
-
-    permission_classes = [IsAdminUser]
-
-    def post(self, req):
-        from email.mime.image import MIMEImage
-
-        from django.core.mail import EmailMultiAlternatives
-        from django.template.loader import render_to_string
-
-        admin_opts = AdminOptions.objects.first()
-        if not admin_opts or not admin_opts.email_test_user:
-            return Response(
-                {"error": "Email testing mode must be enabled with a test user set"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        test_user = admin_opts.email_test_user
-        try:
-            # Build template context
-            context = {
-                "recipient_name": (
-                    f"{test_user.display_first_name} {test_user.display_last_name}"
-                ),
-                "test_timestamp": timezone.now().strftime("%d %B %Y, %I:%M %p"),
-                "logo_url": True,  # Truthy so the {% if logo_url %} block renders
-                "site_url": settings.SITE_URL,
-                "site_name": "SPMS",
-            }
-
-            html_content = render_to_string(
-                "./email_templates/test_email.html", context
-            )
-
-            subject = "[TEST] SPMS Test Email — CID Inline Image"
-            from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = [test_user.email]
-
-            # Build the email with CID-attached logo
-            msg = EmailMultiAlternatives(
-                subject,
-                "Please view this email in an HTML-compatible email client.",
-                from_email,
-                to_email,
-            )
-            msg.attach_alternative(html_content, "text/html")
-            msg.mixed_subtype = "related"  # Required for CID inline images
-
-            # Attach the DBCA logo as an inline image
-            logo_path = os.path.join(
-                settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
-            )
-            if os.path.exists(logo_path):
-                with open(logo_path, "rb") as f:
-                    logo_img = MIMEImage(f.read(), _subtype="png")
-                    logo_img.add_header("Content-ID", "<dbca-logo>")
-                    logo_img.add_header(
-                        "Content-Disposition", "inline", filename="dbca.png"
-                    )
-                    msg.attach(logo_img)
-            else:
-                settings.LOGGER.warning(f"DBCA logo not found at {logo_path}")
-
-            msg.send()
-
-            # Save preview files for local visual testing
-            preview_path = None
-            eml_path = None
-            if settings.DEBUG:
-                import base64 as b64mod
-
-                # HTML preview with base64-inlined image (for browser)
-                preview_html = html_content
-                if os.path.exists(logo_path):
-                    with open(logo_path, "rb") as f:
-                        logo_bytes = f.read()
-                        img_b64 = b64mod.b64encode(logo_bytes).decode("utf-8")
-                    preview_html = preview_html.replace(
-                        'src="cid:dbca-logo"',
-                        f'src="data:image/png;base64,{img_b64}"',
-                    )
-                preview_path = os.path.join(
-                    settings.BASE_DIR, "test_email_preview.html"
-                )
-                with open(preview_path, "w") as f:
-                    f.write(preview_html)
-
-                # EML file with CID attachment (for mail client)
-                eml_path = os.path.join(settings.BASE_DIR, "test_email_preview.eml")
-                with open(eml_path, "wb") as f:
-                    f.write(msg.message().as_bytes())
-
-                settings.LOGGER.info(
-                    f"Email previews saved: {preview_path}, {eml_path}"
-                )
-
-            settings.LOGGER.info(f"{req.user} sent test email to {test_user.email}")
-
-            response_data = {"message": f"Test email sent to {test_user.email}"}
-            if preview_path:
-                response_data["preview_file"] = preview_path
-            return Response(response_data)
-        except Exception as e:
-            settings.LOGGER.error(f"Failed to send test email: {e}", exc_info=True)
-            return Response(
-                {"error": "Failed to send test email. Please try again."},
-                status=HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-
 class SendAllTestEmails(APIView):
     """Render and send all email templates with sample data for visual review."""
 
@@ -875,7 +763,7 @@ class SendAllTestEmails(APIView):
                 "document_type": "concept",
                 "plain_project_name": "Fauna Survey 2026",
                 "project_id": 42,
-                "document_url": "",
+                "document_url": "/projects/42/concept",
                 "stage": 2,
                 "email_subject": "Concept Plan Approved",
             },
@@ -890,7 +778,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "director@dbca.wa.gov.au",
                 "document_type_title": "Concept Plan",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/concept",
                 "email_subject": "Concept Plan Approved by Directorate",
             },
         },
@@ -904,7 +792,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "recaller@dbca.wa.gov.au",
                 "document_type_title": "Progress Report",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/progress",
                 "feedback_html": "<p>Needs additional data before resubmission. Will update the methodology section and resubmit.</p>",
                 "email_subject": "Progress Report Recalled",
             },
@@ -919,7 +807,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "reviewer@dbca.wa.gov.au",
                 "document_type_title": "Project Plan",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/project",
                 "feedback_html": "<p>Please revise the budget section and add more detail to the timeline.</p>",
                 "email_subject": "Project Plan Sent Back",
             },
@@ -934,7 +822,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "submitter@dbca.wa.gov.au",
                 "document_type_title": "Student Report",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/student",
                 "email_subject": "Student Report Ready for Review",
             },
         },
@@ -948,7 +836,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "feedback@dbca.wa.gov.au",
                 "document_type_title": "Concept Plan",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/concept",
                 "feedback_text": "The methodology section could use more detail on sampling approach.",
                 "email_subject": "Feedback on Concept Plan",
             },
@@ -963,7 +851,7 @@ class SendAllTestEmails(APIView):
                 "actioning_user_email": "requester@dbca.wa.gov.au",
                 "document_type_title": "Project Plan",
                 "plain_project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/project",
                 "email_subject": "Review Requested: Project Plan",
             },
         },
@@ -980,8 +868,67 @@ class SendAllTestEmails(APIView):
                 "document_kind": "Progress Report",
                 "document_kind_raw": "progressreport",
                 "action_capacity": "Approver",
-                "document_url": "",
+                "document_url": "/projects/42/progress",
                 "email_subject": "SPMS: Action Required - Fauna Survey 2026",
+            },
+        },
+        {
+            "name": "bump_consolidated_email",
+            "subject": "SPMS: Action Required - 4 documents need your attention",
+            "context": {
+                "recipient_name": "Test User",
+                "actioning_user_name": "Admin User",
+                "actioning_user_email": "admin@dbca.wa.gov.au",
+                "as_project_lead": [
+                    {
+                        "project_title": "Fauna Survey 2026",
+                        "document_kind": "Progress Report",
+                        "document_url": "/projects/42/progress",
+                    },
+                    {
+                        "project_title": "Flora Mapping WA",
+                        "document_kind": "Progress Report",
+                        "document_url": "/projects/58/progress",
+                    },
+                ],
+                "as_ba_lead": [
+                    {
+                        "project_title": "Marine Ecology Study",
+                        "document_kind": "Student Report",
+                        "document_url": "/projects/73/student",
+                    },
+                    {
+                        "project_title": "Wetland Conservation",
+                        "document_kind": "Progress Report",
+                        "document_url": "/projects/91/progress",
+                    },
+                ],
+                "total_documents": 4,
+            },
+        },
+        {
+            "name": "batch_approved_consolidated_email",
+            "subject": "SPMS: 3 Reports Approved",
+            "context": {
+                "recipient_name": "Test User",
+                "documents": [
+                    {
+                        "project_title": "Fauna Survey 2026",
+                        "document_kind": "Progress Report",
+                        "document_url": "/projects/42/progress",
+                    },
+                    {
+                        "project_title": "Flora Mapping WA",
+                        "document_kind": "Progress Report",
+                        "document_url": "/projects/58/progress",
+                    },
+                    {
+                        "project_title": "Marine Ecology Study",
+                        "document_kind": "Student Report",
+                        "document_url": "/projects/73/student",
+                    },
+                ],
+                "total_documents": 3,
             },
         },
         {
@@ -993,7 +940,7 @@ class SendAllTestEmails(APIView):
                 "document_type_title": "Concept Plan",
                 "project_tag": "SP-042",
                 "project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/concept",
                 "comment_content": "Hey, can you review the budget section?",
                 "is_mention": True,
             },
@@ -1007,7 +954,7 @@ class SendAllTestEmails(APIView):
                 "document_type_title": "Concept Plan",
                 "project_tag": "SP-042",
                 "project_name": "Fauna Survey 2026",
-                "document_url": "",
+                "document_url": "/projects/42/concept",
                 "comment_content": "I have updated the methodology section as discussed.",
             },
         },
@@ -1031,7 +978,7 @@ class SendAllTestEmails(APIView):
                 "user_kind": "Team Member",
                 "actioning_user_name": "Admin Closer",
                 "actioning_user_email": "closer@dbca.wa.gov.au",
-                "project_url": "",
+                "project_url": "/projects/42",
                 "email_subject": "Project Closed: Fauna Survey 2026",
             },
         },
@@ -1043,7 +990,7 @@ class SendAllTestEmails(APIView):
                 "user_kind": "Team Member",
                 "actioning_user_name": "Admin Reopener",
                 "actioning_user_email": "reopener@dbca.wa.gov.au",
-                "project_url": "",
+                "project_url": "/projects/42",
                 "email_subject": "Project Reopened: Fauna Survey 2026",
             },
         },
@@ -1094,6 +1041,19 @@ class SendAllTestEmails(APIView):
             except User.DoesNotExist:
                 pass
 
+        # Optional: send only a specific template
+        single_template = req.data.get("template_name")
+        templates_to_send = self.TEMPLATES
+        if single_template:
+            templates_to_send = [
+                t for t in self.TEMPLATES if t["name"] == single_template
+            ]
+            if not templates_to_send:
+                return Response(
+                    {"error": f"Template '{single_template}' not found"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
         logo_path = os.path.join(
             settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
         )
@@ -1122,7 +1082,7 @@ class SendAllTestEmails(APIView):
         }
 
         results = []
-        for tmpl in self.TEMPLATES:
+        for tmpl in templates_to_send:
             template_file = f"./email_templates/{tmpl['name']}.html"
             context = {**base_context, **tmpl["context"]}
 
@@ -1143,10 +1103,25 @@ class SendAllTestEmails(APIView):
                     if key in context:
                         context[key] = a_email
 
-            # Fill in empty URLs with site_url
+            # Fill in URLs: prepend site_url to relative paths, replace empty with site_url
             for url_key in ("document_url", "project_url", "invite_link"):
-                if url_key in context and not context[url_key]:
-                    context[url_key] = settings.SITE_URL
+                if url_key in context:
+                    if not context[url_key]:
+                        context[url_key] = settings.SITE_URL
+                    elif context[url_key].startswith("/"):
+                        context[url_key] = f"{settings.SITE_URL}{context[url_key]}"
+
+            # Fill in nested list URLs (consolidated templates)
+            for list_key in ("as_project_lead", "as_ba_lead", "documents"):
+                if list_key in context and isinstance(context[list_key], list):
+                    for item in context[list_key]:
+                        if isinstance(item, dict) and "document_url" in item:
+                            if not item["document_url"]:
+                                item["document_url"] = settings.SITE_URL
+                            elif item["document_url"].startswith("/"):
+                                item["document_url"] = (
+                                    f"{settings.SITE_URL}{item['document_url']}"
+                                )
 
             try:
                 html_content = render_to_string(template_file, context)

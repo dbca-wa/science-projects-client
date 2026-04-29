@@ -18,5 +18,9 @@ export const DOCUMENT_ENDPOINTS = {
 
 	// Batch approve
 	BATCH_APPROVE_CURRENT: "documents/batchapprovecurrent",
+	BATCH_APPROVE_CURRENT_PREVIEW: "documents/batchapprovecurrent/preview",
 	BATCH_APPROVE_OLD: "documents/batchapproveold",
+
+	// New cycle
+	NEW_CYCLE_OPEN_PREVIEW: "documents/opennewcycle/preview",
 } as const;
