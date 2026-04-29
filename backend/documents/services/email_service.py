@@ -118,6 +118,11 @@ class EmailService:
             "document": document,
             "actioning_user": actioning_user,
             "actioning_user_email": actioning_user.email,
+            "actioning_user_name": (
+                actioning_user.get_full_name()
+                if hasattr(actioning_user, "get_full_name")
+                else str(actioning_user)
+            ),
             **(additional_context or {}),
         }
 

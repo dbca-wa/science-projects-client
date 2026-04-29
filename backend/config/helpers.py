@@ -123,15 +123,83 @@ def send_email_with_embedded_image(
 
             subject = f"[TEST] {subject}"
             # Add test mode banner to the HTML content
+            original_str = (
+                ", ".join(original_recipients)
+                if isinstance(original_recipients, list)
+                else original_recipients
+            )
             test_banner = (
-                '<div style="background:#fef3c7;border:1px solid #f59e0b;'
-                "border-radius:6px;padding:12px 16px;margin-bottom:16px;"
-                'font-size:13px;color:#92400e;text-align:center;">'
-                f"<strong>TEST MODE</strong> — This email was redirected to "
-                f"{admin_opts.email_test_user.display_first_name} "
-                f"{admin_opts.email_test_user.display_last_name}. "
-                f"Original recipient(s): {', '.join(original_recipients) if isinstance(original_recipients, list) else original_recipients}"
+                '<table width="100%" cellpadding="0" cellspacing="0" border="0" '
+                'style="margin-bottom:24px;">'
+                "<tr><td>"
+                # Outer container — dark with amber bottom accent
+                '<div style="'
+                "background:#1e293b;"
+                "border-radius:8px;"
+                "border-bottom:4px solid #f59e0b;"
+                "padding:20px 24px;"
+                "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;"
+                '">'
+                # Top row: icon + badge + message
+                '<table cellpadding="0" cellspacing="0" border="0" width="100%">'
+                "<tr>"
+                # Warning icon — amber to be visible on dark bg
+                '<td style="vertical-align:top;width:24px;padding-right:14px;">'
+                '<span style="font-size:20px;line-height:1;color:#f59e0b;">&#9888;</span>'
+                "</td>"
+                '<td style="vertical-align:top;">'
+                # Badge
+                '<span style="'
+                "display:inline-block;"
+                "background:#f59e0b;"
+                "color:#1e293b;"
+                "font-size:10px;"
+                "font-weight:800;"
+                "letter-spacing:1px;"
+                "text-transform:uppercase;"
+                "padding:2px 8px;"
+                "border-radius:3px;"
+                "margin-bottom:8px;"
+                '">'
+                "Test Mode"
+                "</span>"
+                # Main message
+                '<p style="'
+                "color:#f1f5f9;"
+                "font-size:14px;"
+                "font-weight:500;"
+                "line-height:22px;"
+                "margin:8px 0 0 0;"
+                '">'
+                'This email was <strong style="color:#fbbf24;">redirected</strong> '
+                "and not delivered to the original recipient."
+                "</p>"
+                "</td>"
+                "</tr>"
+                "</table>"
+                # Divider
+                '<div style="border-top:1px solid #334155;margin:14px 0 12px 0;"></div>'
+                # Details rows — original recipient first, delivered to second
+                '<table cellpadding="0" cellspacing="0" border="0" width="100%" '
+                'style="font-size:13px;line-height:20px;">'
+                "<tr>"
+                '<td style="color:#64748b;padding:3px 0;width:130px;vertical-align:top;">'
+                "Original recipient</td>"
+                '<td style="color:#e2e8f0;padding:3px 0;font-weight:600;">'
+                f"{original_str}</td>"
+                "</tr>"
+                "<tr>"
+                '<td style="color:#64748b;padding:3px 0;width:130px;vertical-align:top;">'
+                "Delivered to</td>"
+                '<td style="color:#e2e8f0;padding:3px 0;font-weight:600;">'
+                f"{test_email}</td>"
+                '<td style="color:#e2e8f0;padding:3px 0;font-weight:600;">'
+                f"{original_str}</td>"
+                "</tr>"
+                "</table>"
                 "</div>"
+                "</td></tr>"
+                "</table>"
             )
             # Insert banner after <body> tag or at the start of content
             if "<body" in html_content:
