@@ -1106,9 +1106,14 @@ class SendAllTestEmails(APIView):
                 logo_data = f.read()
                 logo_b64 = b64mod.b64encode(logo_data).decode("utf-8")
 
-        # Create preview directory
+        # Create preview directory (skip on read-only filesystem)
         preview_dir = os.path.join(settings.BASE_DIR, "email_previews")
-        os.makedirs(preview_dir, exist_ok=True)
+        save_previews = settings.DEBUG
+        if save_previews:
+            try:
+                os.makedirs(preview_dir, exist_ok=True)
+            except OSError:
+                save_previews = False
 
         base_context = {
             "logo_url": True,
@@ -1177,23 +1182,24 @@ class SendAllTestEmails(APIView):
             except Exception as e:
                 settings.LOGGER.warning(f"Failed to send {tmpl['name']}: {e}")
 
-            # Save HTML preview (base64 inlined image)
-            if settings.DEBUG and logo_b64:
-                preview_html = html_content.replace(
-                    'src="cid:dbca-logo"',
-                    f'src="data:image/png;base64,{logo_b64}"',
-                )
-            else:
-                preview_html = html_content
+            # Save HTML preview (base64 inlined image) — only in dev
+            if save_previews:
+                if logo_b64:
+                    preview_html = html_content.replace(
+                        'src="cid:dbca-logo"',
+                        f'src="data:image/png;base64,{logo_b64}"',
+                    )
+                else:
+                    preview_html = html_content
 
-            html_path = os.path.join(preview_dir, f"{tmpl['name']}.html")
-            with open(html_path, "w") as f:
-                f.write(preview_html)
+                html_path = os.path.join(preview_dir, f"{tmpl['name']}.html")
+                with open(html_path, "w") as f:
+                    f.write(preview_html)
 
-            # Save EML preview
-            eml_path = os.path.join(preview_dir, f"{tmpl['name']}.eml")
-            with open(eml_path, "wb") as f:
-                f.write(msg.message().as_bytes())
+                # Save EML preview
+                eml_path = os.path.join(preview_dir, f"{tmpl['name']}.eml")
+                with open(eml_path, "wb") as f:
+                    f.write(msg.message().as_bytes())
 
             results.append({"template": tmpl["name"], "status": "ok"})
 
