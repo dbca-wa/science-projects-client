@@ -1,73 +1,15 @@
 import { apiClient } from "@/shared/services/api/client.service";
 import { USER_ENDPOINTS } from "./user.endpoints";
-import type { IUserData, IMemberUserDetails } from "@/shared/types/user.types";
-import type {
-	UserSearchFilters,
-	UserSearchResponse,
-} from "../types/user.types";
+import type { IUserData } from "@/shared/types/user.types";
 
-// ============================================================================
-// USER SEARCH (Phase 1 - Read Only)
-// ============================================================================
+// Import getFullUser for internal use (adminUpdateUser)
+import { getFullUser as _getFullUser } from "@/shared/services/user.service";
 
-/**
- * Search users with filters and pagination
- * @param searchTerm - Search term to filter by username, first name, last name, or email
- * @param page - Page number for pagination
- * @param filters - Filter options (staff, external, superuser, business area, ignoreArray)
- * @returns Paginated user search results
- */
-export const getUsersBasedOnSearchTerm = async (
-	searchTerm: string,
-	page: number,
-	filters: UserSearchFilters
-): Promise<UserSearchResponse> => {
-	let url = `${USER_ENDPOINTS.SEARCH}?page=${page}`;
-
-	if (searchTerm !== "") {
-		url += `&search=${encodeURIComponent(searchTerm)}`;
-	}
-
-	// Map roleFilter to the appropriate backend query param
-	const roleFilter = filters.roleFilter;
-	if (roleFilter && roleFilter !== "all") {
-		const roleParamMap: Record<string, string> = {
-			external: "only_external=true",
-			staff: "only_staff=true",
-			ba_lead: "only_ba_lead=true",
-			approver: "approver=true",
-			key_stakeholder: "only_key_stakeholder=true",
-			admin: "only_superuser=true",
-		};
-		const param = roleParamMap[roleFilter];
-		if (param) {
-			url += `&${param}`;
-		}
-	}
-
-	if (filters.businessArea) {
-		url += `&businessArea=${filters.businessArea}`;
-	}
-
-	if (filters.ignoreArray && filters.ignoreArray.length > 0) {
-		url += `&ignoreArray=${filters.ignoreArray.join(",")}`;
-	}
-
-	return apiClient.get<UserSearchResponse>(url);
-};
-
-// ============================================================================
-// USER DETAIL (Phase 1 - Read Only)
-// ============================================================================
-
-/**
- * Get full user details by ID
- * @param id - User ID
- * @returns Full user data with caretaker fields
- */
-export const getFullUser = async (id: number): Promise<IMemberUserDetails> => {
-	return apiClient.get<IMemberUserDetails>(USER_ENDPOINTS.DETAIL(id));
-};
+// Re-export shared user service functions for backward compatibility
+export {
+	getUsersBasedOnSearchTerm,
+	getFullUser,
+} from "@/shared/services/user.service";
 
 /**
  * Get current authenticated user
@@ -255,7 +197,7 @@ export const adminUpdateUser = async (
 	}
 
 	// Fetch and return updated user data
-	return getFullUser(userId);
+	return _getFullUser(userId);
 };
 
 /**
@@ -267,6 +209,23 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
 	const response = await apiClient.post<{ exists: boolean }>(
 		USER_ENDPOINTS.CHECK_EMAIL_EXISTS,
 		{ email }
+	);
+	return response.exists;
+};
+
+/**
+ * Check if a user with the given name already exists
+ * @param firstName - First name to check
+ * @param lastName - Last name to check
+ * @returns Whether a user with that name exists
+ */
+export const checkNameExists = async (
+	firstName: string,
+	lastName: string
+): Promise<boolean> => {
+	const response = await apiClient.post<{ exists: boolean }>(
+		USER_ENDPOINTS.CHECK_NAME_EXISTS,
+		{ first_name: firstName, last_name: lastName }
 	);
 	return response.exists;
 };
@@ -341,4 +300,13 @@ export const toggleStaffProfileVisibility = async (
 	return apiClient.post<{ success: boolean }>(
 		USER_ENDPOINTS.TOGGLE_STAFF_PROFILE_VISIBILITY(staffProfileId)
 	);
+};
+
+/** Invite a new DBCA user to SPMS */
+export const inviteUser = async (data: {
+	email: string;
+	first_name: string;
+	last_name: string;
+}): Promise<IUserData> => {
+	return apiClient.post<IUserData>(USER_ENDPOINTS.INVITE, data);
 };

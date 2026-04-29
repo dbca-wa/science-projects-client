@@ -75,6 +75,9 @@ class CaretakerDetail(APIView):
 
     def delete(self, request, pk):
         """Delete caretaker relationship"""
+        settings.LOGGER.warning(
+            f"{request.user} is removing caretaker relationship (pk={pk})"
+        )
         CaretakerService.delete_caretaker(pk, request.user)
 
         return Response(status=HTTP_204_NO_CONTENT)

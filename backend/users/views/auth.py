@@ -27,6 +27,9 @@ class Login(APIView):
         return Response({"ok": "CSRF cookie set"})
 
     def post(self, request):
+        settings.LOGGER.info(
+            f"Login attempt for username: {request.data.get('username')}"
+        )
         username = request.data.get("username")
         password = request.data.get("password")
 
@@ -47,6 +50,7 @@ class Logout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        settings.LOGGER.info(f"{request.user} is logging out")
         if settings.DEBUG:
             UserService.logout_user(request)
             return Response({"ok": "True"})
@@ -61,6 +65,7 @@ class ChangePassword(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
+        settings.LOGGER.info(f"{request.user} is changing password")
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
 

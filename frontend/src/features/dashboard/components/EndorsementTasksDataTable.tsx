@@ -11,7 +11,7 @@ import { FaShieldDog } from "react-icons/fa6";
 import { FaBiohazard } from "react-icons/fa";
 import { PiPlantFill } from "react-icons/pi";
 import type { IEndorsement } from "../types/dashboard.types";
-import { extractTextFromHTML } from "../utils/dashboard.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 import { LINK_COLOR } from "@/shared/constants/colors";
 
 interface EndorsementTasksDataTableProps {

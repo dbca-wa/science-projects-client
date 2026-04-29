@@ -108,14 +108,12 @@ function ChapterPreview({
 						borderBottom: "2px solid #396494",
 						borderRight: "none",
 						borderRadius: "14px 0 0 14px",
-						backgroundColor: "rgba(255, 255, 255, 0.6)",
 						paddingLeft: "10px",
 					}}
 				>
-					<span
-						className="text-[10px] font-bold leading-tight truncate"
-						style={{ color: "#000" }}
-					>
+					{/* Semi-transparent overlay matching the PDF title pill */}
+					<div className="absolute inset-0 rounded-l-[14px] bg-white/60 dark:bg-gray-900/70" />
+					<span className="relative text-[10px] font-bold leading-tight truncate text-black dark:text-gray-100">
 						{sectionLabel}
 					</span>
 				</div>

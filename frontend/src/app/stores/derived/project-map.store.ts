@@ -158,7 +158,7 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 	 */
 	async initialise() {
 		this.state.initialised = true;
-		logger.info("ProjectMap store initialized");
+		logger.info("ProjectMap store initialised");
 	}
 
 	/**

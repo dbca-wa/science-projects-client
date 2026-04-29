@@ -13,7 +13,7 @@ from rest_framework.status import (
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 )
 from rest_framework.views import APIView
@@ -21,13 +21,13 @@ from rest_framework.views import APIView
 from projects.models import Project, ProjectMember
 from users.models import User
 
-from ..models import (  # Comment,  # TODO: Comment model not yet implemented
+from ..models import (
     AnnualReport,
     ProgressReport,
     ProjectDocument,
     StudentReport,
 )
-from ..serializers import (  # TinyCommentSerializer,  # TODO: Comment serializers not yet implemented; TinyCommentCreateSerializer,
+from ..serializers import (
     ProjectDocumentSerializer,
     TinyProjectDocumentSerializer,
 )
@@ -66,27 +66,22 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 ba is not None and ba.name == "Directorate"
             ) or request.user.is_superuser
 
-            active_projects = Project.objects.exclude(
-                status__in=Project.CLOSED_ONLY
-            ).all()
+            active_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY)
 
             # Check if the user is a leader of any business area
-            business_areas_led = small_user_object.business_areas_led.values_list(
-                "id", flat=True
+            business_areas_led = list(
+                small_user_object.business_areas_led.values_list("id", flat=True)
             )
 
             is_ba_leader = len(business_areas_led) >= 1
 
             if is_ba_leader:
                 # Filter for projects which the user leads
-                ba_projects = active_projects.filter(
+                ba_project_ids = active_projects.filter(
                     business_area__pk__in=business_areas_led
-                ).all()
+                ).values_list("id", flat=True)
 
-                # Extract project IDs for Business Area
-                ba_project_ids = ba_projects.values_list("id", flat=True)
-
-                # Fetch all documents requiring BA attention with optimized relationships
+                # Fetch all documents requiring BA attention with optimised relationships
                 docs_requiring_ba_attention = (
                     ProjectDocument.objects.exclude(
                         status=ProjectDocument.StatusChoices.APPROVED
@@ -118,7 +113,6 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                     .prefetch_related(
                         "project__business_area__division__directorate_email_list",
                     )
-                    .all()
                 )
 
                 # Append the documents to the respective lists
@@ -127,10 +121,10 @@ class ProjectDocsPendingMyActionAllStages(APIView):
 
             # Directorate Filtering
             if is_directorate:
-                # Extract project IDs for Directorate
+                # Use subquery for active project IDs instead of loading all into memory
                 directorate_project_ids = active_projects.values_list("id", flat=True)
 
-                # Fetch all documents requiring Directorate attention with optimized relationships
+                # Fetch all documents requiring Directorate attention with optimised relationships
                 docs_requiring_directorate_attention = (
                     ProjectDocument.objects.exclude(
                         status=ProjectDocument.StatusChoices.APPROVED
@@ -162,24 +156,22 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                     .prefetch_related(
                         "project__business_area__division__directorate_email_list",
                     )
-                    .all()
                 )
 
                 # Append the documents to the respective lists
                 documents.extend(docs_requiring_directorate_attention)
                 directorate_input_required.extend(docs_requiring_directorate_attention)
 
-            # Lead Filtering - optimized the membership query
-            all_leader_memberships = ProjectMember.objects.filter(
-                project__in=active_projects, user=small_user_object, is_leader=True
-            ).select_related("project")
+            # Lead Filtering — use subquery for lead project IDs
+            lead_project_ids = list(
+                ProjectMember.objects.filter(
+                    project__in=active_projects,
+                    user=small_user_object,
+                    is_leader=True,
+                ).values_list("project_id", flat=True)
+            )
 
-            # Extract project IDs for projects where the user is a lead
-            lead_project_ids = [
-                membership.project_id for membership in all_leader_memberships
-            ]
-
-            # Fetch all documents requiring lead attention with optimized relationships
+            # Fetch all documents requiring lead attention with optimised relationships
             docs_requiring_lead_attention = (
                 ProjectDocument.objects.exclude(
                     status=ProjectDocument.StatusChoices.APPROVED
@@ -210,7 +202,6 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 .prefetch_related(
                     "project__business_area__division__directorate_email_list",
                 )
-                .all()
             )
 
             # Separate the documents based on lead and member input
@@ -219,22 +210,23 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 if doc.project_id in lead_project_ids:
                     pl_input_required.append(doc)
 
-            # Optimized this query too (N+1)
-            my_non_leader_memberships = (
-                ProjectMember.objects.filter(user=request.user, is_leader=False)
-                .select_related("project")
-                .all()
+            # Team member filtering — use subquery for non-leader project IDs
+            my_non_leader_project_ids = list(
+                ProjectMember.objects.filter(
+                    user=request.user,
+                    is_leader=False,
+                    project__in=active_projects,
+                ).values_list("project_id", flat=True)
             )
-
-            my_projects = [
-                membership.project for membership in my_non_leader_memberships
-            ]
 
             docs_requiring_team_attention = (
                 ProjectDocument.objects.exclude(
                     status=ProjectDocument.StatusChoices.APPROVED
                 )
-                .filter(project_lead_approval_granted=False, project__in=my_projects)
+                .filter(
+                    project_lead_approval_granted=False,
+                    project__in=my_non_leader_project_ids,
+                )
                 .select_related(
                     "project",
                     "project__business_area",
@@ -257,7 +249,6 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 .prefetch_related(
                     "project__business_area__division__directorate_email_list",
                 )
-                .all()
             )
 
             for doc in docs_requiring_team_attention:
@@ -320,140 +311,6 @@ class ProjectDocsPendingMyActionAllStages(APIView):
             )
 
 
-# TODO: Comment model and serializers not yet implemented
-# class ProjectDocumentComments(APIView):
-#     """Manage document comments"""
-#
-#     permission_classes = [IsAuthenticated]
-#
-#     def get(self, request, pk):
-#         """Get all comments for a document"""
-#         comments = Comment.objects.filter(document_id=pk).all()
-#         comments = comments.order_by("-updated_at", "-created_at")
-#
-#         ser = TinyCommentSerializer(
-#             comments,
-#             many=True,
-#             context={"request": request},
-#         )
-#         return Response(
-#             ser.data,
-#             status=HTTP_200_OK,
-#         )
-#
-#     def sanitize_html(self, html_content):
-#         """
-#         Sanitize HTML content while preserving mention data attributes and safely handling CSS
-#         """
-#         if not html_content:
-#             return ""
-#
-#         import bleach
-#         from bleach.css_sanitizer import CSSSanitizer
-#
-#         # Define allowed tags and attributes
-#         allowed_tags = [
-#             "a",
-#             "abbr",
-#             "acronym",
-#             "b",
-#             "blockquote",
-#             "code",
-#             "em",
-#             "i",
-#             "li",
-#             "ol",
-#             "p",
-#             "strong",
-#             "ul",
-#             "br",
-#             "div",
-#             "span",
-#             "h1",
-#             "h2",
-#             "h3",
-#             "h4",
-#             "h5",
-#             "h6",
-#             "table",
-#             "thead",
-#             "tbody",
-#             "tr",
-#             "th",
-#             "td",
-#         ]
-#
-#         allowed_attributes = {
-#             "*": ["class"],
-#             "a": ["href", "title", "target"],
-#             "span": [
-#                 "data-user-id",
-#                 "data-user-email",
-#                 "data-user-name",
-#                 "data-lexical-mention",
-#                 "class",
-#                 "style",
-#             ],
-#             "th": ["colspan", "rowspan"],
-#             "td": ["colspan", "rowspan"],
-#             "div": ["style"],
-#             "p": ["style"],
-#         }
-#
-#         # Define allowed CSS properties (specifically for mentions)
-#         allowed_css_properties = [
-#             "background-color",
-#             "color",
-#             "padding-left",
-#             "padding-right",
-#             "border-radius",
-#             "font-weight",
-#         ]
-#
-#         # Create a CSS sanitizer with our allowed properties
-#         css_sanitizer = CSSSanitizer(
-#             allowed_css_properties=allowed_css_properties,
-#             allowed_svg_properties=[],
-#         )
-#
-#         # Clean the HTML while preserving the allowed tags and attributes
-#         clean_html = bleach.clean(
-#             html_content,
-#             tags=allowed_tags,
-#             attributes=allowed_attributes,
-#             css_sanitizer=css_sanitizer,
-#             strip=True,
-#         )
-#
-#         return clean_html
-#
-#     def post(self, request, pk):
-#         """Create a new comment on a document"""
-#         settings.LOGGER.info(
-#             msg=f"{request.user} is trying to post a comment to doc {pk}:\n{extract_text_content(request.data['payload'])}"
-#         )
-#
-#         sanitized_payload = self.sanitize_html(request.data["payload"])
-#
-#         ser = TinyCommentCreateSerializer(
-#             data={
-#                 "document": pk,
-#                 "text": sanitized_payload,
-#                 "user": request.data["user"],
-#             },
-#             context={"request": request},
-#         )
-#         if ser.is_valid():
-#             ser.save()
-#             return Response(
-#                 ser.data,
-#                 status=HTTP_201_CREATED,
-#             )
-#         else:
-#             settings.LOGGER.error(msg=f"FAIL: {ser.errors}")
-#             return Response(ser.errors, status=HTTP_400_BAD_REQUEST)
-
-
 class DocumentSpawner(APIView):
     """Spawn a new document for a project"""
 
@@ -469,7 +326,9 @@ class DocumentSpawner(APIView):
                 try:
                     project_document = ser.save()
                 except Exception as e:
-                    settings.LOGGER.error(msg=f"{e}")
+                    settings.LOGGER.error(
+                        msg=f"Failed to create document: {e}", exc_info=True
+                    )
                     return Response(
                         {"error": "Failed to create document. Please try again."},
                         HTTP_400_BAD_REQUEST,
@@ -574,7 +433,7 @@ class ReopenProject(APIView):
                     ).first()
                     project_document.delete()
 
-                print("SENDING PROJECT REOPENED EMAIL")
+                settings.LOGGER.info(msg="Sending project reopened email")
 
                 if project:
                     # Send notification via service
@@ -588,7 +447,9 @@ class ReopenProject(APIView):
                     )
                 return Response(status=HTTP_204_NO_CONTENT)
             except Exception as e:
-                settings.LOGGER.error(msg=f"{e}")
+                settings.LOGGER.error(
+                    msg=f"Error reopening project {pk}: {e}", exc_info=True
+                )
                 return Response(
                     {"error": "Operation failed. Please try again."},
                     status=HTTP_400_BAD_REQUEST,
@@ -608,7 +469,7 @@ class BatchApproveOld(APIView):
         if not request.user.is_superuser:
             return Response(
                 {"error": "You don't have permission to do that!"},
-                HTTP_401_UNAUTHORIZED,
+                HTTP_403_FORBIDDEN,
             )
 
         # Get the last report with the highest year
@@ -632,19 +493,18 @@ class BatchApproveOld(APIView):
             if division_report:
                 last_report = division_report
 
-        # Get relevant documents with optimized queries using select_related and prefetch_related
+        # Get relevant documents — progress/student reports with PL and BAL approval granted
+        # Do NOT exclude completed projects: they may have an approved closure but still
+        # have an unapproved report that needs batch approval
         relevant_docs = (
             ProjectDocument.objects.filter(
                 Q(kind="studentreport") | Q(kind="progressreport"),
                 project_lead_approval_granted=True,
                 business_area_lead_approval_granted=True,
             )
-            .exclude(
-                project__status__in=["suspended", "terminated", "completed"],
-            )
+            .exclude(project__status="terminated")
             .select_related("project")
             .prefetch_related(
-                "project__members",
                 "student_report_details",
                 "progress_report_details",
             )
@@ -656,6 +516,14 @@ class BatchApproveOld(APIView):
                 project__business_area__division=last_report.division
             )
 
+        # Pre-fetch project PKs that have an approved closure (for status logic)
+        closure_project_pks = set(
+            ProjectDocument.objects.filter(
+                kind="projectclosure",
+                status="approved",
+            ).values_list("project_id", flat=True)
+        )
+
         try:
             # Collect documents and projects that need updating
             docs_to_update = []
@@ -665,46 +533,36 @@ class BatchApproveOld(APIView):
                 should_process = False
 
                 if doc.kind == "studentreport":
-                    # Use prefetched data instead of separate query
                     sr_obj = (
                         doc.student_report_details.first()
                         if doc.student_report_details.exists()
                         else None
                     )
-
-                    # Use .count() instead of .length
-                    if sr_obj and doc.project.members.count() == 0:
-                        continue
-
                     if sr_obj and sr_obj.report != last_report:
                         should_process = True
 
                 elif doc.kind == "progressreport":
-                    # Use prefetched data instead of separate query
                     pr_obj = (
                         doc.progress_report_details.first()
                         if doc.progress_report_details.exists()
                         else None
                     )
-
-                    # Use .count() instead of .length
-                    if pr_obj and doc.project.members.count() == 0:
-                        continue
-
                     if pr_obj and pr_obj.report != last_report:
                         should_process = True
 
                 if should_process:
-                    # Prepare document for bulk update
                     doc.project_lead_approval_granted = True
                     doc.business_area_lead_approval_granted = True
                     doc.directorate_approval_granted = True
                     doc.status = "approved"
                     docs_to_update.append(doc)
 
-                    # Prepare project for bulk update (avoid duplicate projects)
+                    # Only update project status if no approved closure exists
                     project = doc.project
-                    if project not in projects_to_update:
+                    if (
+                        project.pk not in closure_project_pks
+                        and project not in projects_to_update
+                    ):
                         project.status = Project.StatusChoices.ACTIVE
                         projects_to_update.append(project)
 
@@ -725,7 +583,7 @@ class BatchApproveOld(APIView):
                 Project.objects.bulk_update(projects_to_update, ["status"])
 
         except Exception as e:
-            settings.LOGGER.error(msg=f"{e}")
+            settings.LOGGER.error(msg=f"Batch approval failed: {e}", exc_info=True)
             return Response(
                 {"error": "Batch approval failed. Please try again."},
                 HTTP_400_BAD_REQUEST,
@@ -738,6 +596,146 @@ class BatchApproveOld(APIView):
                 "Success",
                 HTTP_202_ACCEPTED,
             )
+
+
+class BatchApproveCurrent(APIView):
+    """Batch approve all stage-3 progress/student reports for the current annual report year."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Approve all stage-3 reports for the current year, optionally scoped by division."""
+        settings.LOGGER.warning(
+            msg=f"{request.user} is attempting to batch approve current year reports..."
+        )
+        if not request.user.is_superuser and not getattr(
+            request.user, "is_key_stakeholder", False
+        ):
+            return Response(
+                {"error": "You don't have permission to do that!"},
+                HTTP_403_FORBIDDEN,
+            )
+
+        division_slug = request.data.get("division")
+
+        # Get the latest annual report (optionally for a specific division)
+        if division_slug:
+            last_report = (
+                AnnualReport.objects.filter(division__slug=division_slug)
+                .order_by("-year")
+                .first()
+            )
+        else:
+            last_report = AnnualReport.objects.order_by("-year").first()
+
+        if not last_report:
+            return Response(
+                {"error": "No annual reports found!"},
+                status=HTTP_404_NOT_FOUND,
+            )
+
+        # Find all stage-3 progress/student reports for the current year
+        relevant_docs = (
+            ProjectDocument.objects.filter(
+                Q(kind="studentreport") | Q(kind="progressreport"),
+                project_lead_approval_granted=True,
+                business_area_lead_approval_granted=True,
+                directorate_approval_granted=False,
+            )
+            .exclude(status="approved")
+            .exclude(project__status="terminated")
+            .select_related("project")
+            .prefetch_related(
+                "student_report_details",
+                "progress_report_details",
+            )
+        )
+
+        # Filter by division if specified
+        if division_slug and last_report.division:
+            relevant_docs = relevant_docs.filter(
+                project__business_area__division=last_report.division
+            )
+
+        # Pre-fetch project PKs with approved closures
+        closure_project_pks = set(
+            ProjectDocument.objects.filter(
+                kind="projectclosure",
+                status="approved",
+            ).values_list("project_id", flat=True)
+        )
+
+        try:
+            docs_to_update = []
+            projects_to_update = []
+
+            for doc in relevant_docs:
+                # Check the report is linked to the current year
+                is_current_year = False
+
+                if doc.kind == "studentreport":
+                    sr_obj = (
+                        doc.student_report_details.first()
+                        if doc.student_report_details.exists()
+                        else None
+                    )
+                    if sr_obj and sr_obj.report == last_report:
+                        is_current_year = True
+
+                elif doc.kind == "progressreport":
+                    pr_obj = (
+                        doc.progress_report_details.first()
+                        if doc.progress_report_details.exists()
+                        else None
+                    )
+                    if pr_obj and pr_obj.report == last_report:
+                        is_current_year = True
+
+                if is_current_year:
+                    doc.project_lead_approval_granted = True
+                    doc.business_area_lead_approval_granted = True
+                    doc.directorate_approval_granted = True
+                    doc.status = "approved"
+                    docs_to_update.append(doc)
+
+                    project = doc.project
+                    if (
+                        project.pk not in closure_project_pks
+                        and project not in projects_to_update
+                    ):
+                        project.status = Project.StatusChoices.ACTIVE
+                        projects_to_update.append(project)
+
+            if docs_to_update:
+                ProjectDocument.objects.bulk_update(
+                    docs_to_update,
+                    [
+                        "project_lead_approval_granted",
+                        "business_area_lead_approval_granted",
+                        "directorate_approval_granted",
+                        "status",
+                    ],
+                )
+
+            if projects_to_update:
+                Project.objects.bulk_update(projects_to_update, ["status"])
+
+        except Exception as e:
+            settings.LOGGER.error(
+                msg=f"Batch approval (current) failed: {e}", exc_info=True
+            )
+            return Response(
+                {"error": "Batch approval failed. Please try again."},
+                HTTP_400_BAD_REQUEST,
+            )
+
+        settings.LOGGER.info(
+            msg=f"Batch approved {len(docs_to_update)} reports for year {last_report.year}"
+        )
+        return Response(
+            {"approved": len(docs_to_update)},
+            HTTP_202_ACCEPTED,
+        )
 
 
 class FinalDocApproval(APIView):
@@ -821,7 +819,7 @@ class FinalDocApproval(APIView):
                 status=HTTP_202_ACCEPTED,
             )
         else:
-            print("Noned")
+            settings.LOGGER.error(msg="FinalDocApproval: isActive was None")
             return Response(
                 {"error": "Something went wrong!"},
                 status=HTTP_400_BAD_REQUEST,

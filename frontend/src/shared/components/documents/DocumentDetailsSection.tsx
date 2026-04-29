@@ -9,9 +9,9 @@ import {
 } from "@/shared/utils/document.utils";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { UserLink } from "@/shared/components/user";
-import { ProjectTag } from "@/features/projects/components/badges/ProjectTag";
-import { ProjectStatusBadge } from "@/features/projects/components/badges/ProjectStatusBadge";
-import { useUserDetail } from "@/features/users/hooks";
+import { ProjectTag } from "@/shared/components/badges/ProjectTag";
+import { ProjectStatusBadge } from "@/shared/components/projects/ProjectStatusBadge";
+import { useUserDetail } from "@/shared/hooks/queries/useUserDetail";
 
 interface DocumentDetailsSectionProps {
 	document: IMainDoc;

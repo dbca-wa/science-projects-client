@@ -1,10 +1,14 @@
+// Re-export IProjectDocument from shared for backward compatibility
+export type { IProjectDocument } from "@/shared/types/document.types";
+import type { IProjectDocument } from "@/shared/types/document.types";
+
 // ============================================================================
 // API RESPONSE TYPES
 // ============================================================================
 
 /**
  * Response from /documents/projectdocuments/pendingmyaction endpoint
- * Contains categorized document tasks requiring user action
+ * Contains categorised document tasks requiring user action
  */
 export interface DocumentTasksResponse {
 	all: IProjectDocument[];
@@ -16,7 +20,7 @@ export interface DocumentTasksResponse {
 
 /**
  * Response from /documents/endorsements/pendingmyaction endpoint
- * Contains categorized endorsement tasks requiring user approval
+ * Contains categorised endorsement tasks requiring user approval
  */
 export interface EndorsementTasksResponse {
 	aec: IEndorsement[];
@@ -27,38 +31,6 @@ export interface EndorsementTasksResponse {
 // ============================================================================
 // DOCUMENT & ENDORSEMENT TYPES
 // ============================================================================
-
-/**
- * Project document requiring user action
- * Represents documents like concept plans, project plans, progress reports, etc.
- */
-export interface IProjectDocument {
-	id: number;
-	kind:
-		| "concept"
-		| "projectplan"
-		| "progressreport"
-		| "studentreport"
-		| "projectclosure";
-	status: string;
-	project: {
-		id: number;
-		title: string;
-		kind: string;
-		year: number;
-		number: number;
-	};
-	project_lead_approval_granted: boolean;
-	business_area_lead_approval_granted: boolean;
-	directorate_approval_granted: boolean;
-	for_user?: {
-		id: number;
-		display_first_name: string;
-		display_last_name: string;
-		email: string;
-		image: string | null;
-	};
-}
 
 /**
  * Endorsement task requiring user approval

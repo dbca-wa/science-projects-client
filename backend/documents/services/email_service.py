@@ -15,6 +15,20 @@ class EmailService:
     """Centralized email sending service"""
 
     @staticmethod
+    def _get_base_context():
+        """Returns base context variables shared across all email templates.
+
+        Uses logo_url=True as a truthy flag so templates render the logo block.
+        The actual image is delivered via CID attachment (src="cid:dbca-logo")
+        handled by send_email_with_embedded_image().
+        """
+        return {
+            "logo_url": True,
+            "site_url": settings.SITE_URL,
+            "site_name": "SPMS",
+        }
+
+    @staticmethod
     def send_template_email(
         template_name: str,
         recipient_email: list[str],
@@ -41,9 +55,12 @@ class EmailService:
         if from_email is None:
             from_email = settings.DEFAULT_FROM_EMAIL
 
+        # Merge base context (logo_url, site_url, site_name) into template context
+        merged_context = {**EmailService._get_base_context(), **context}
+
         # Render template
         template_path = f"./email_templates/{template_name}"
-        html_content = render_to_string(template_path, context)
+        html_content = render_to_string(template_path, merged_context)
 
         # Send email
         try:

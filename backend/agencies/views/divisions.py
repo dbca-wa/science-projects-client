@@ -93,6 +93,9 @@ class DivisionEmailList(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
+        settings.LOGGER.info(
+            f"{request.user} is updating division email list (pk={pk})"
+        )
         division = AgencyService.get_division(pk)
 
         # Handle directorate email list (existing behaviour)

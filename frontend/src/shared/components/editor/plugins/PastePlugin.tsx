@@ -84,9 +84,21 @@ function cleanWordHTML(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	// Remove unsupported elements
-	const elementsToRemove = doc.querySelectorAll("style, script, meta, link");
-	elementsToRemove.forEach((el) => el.remove());
+	// Remove unsupported elements (no registered Lexical nodes for these)
+	const unsupportedElements = doc.querySelectorAll(
+		"style, script, meta, link, img, object, embed, applet, video, audio, canvas, svg, iframe"
+	);
+	unsupportedElements.forEach((el) => el.remove());
+
+	// Unwrap non-semantic block elements to paragraphs, preserving inner content
+	const blockElementsToUnwrap = doc.querySelectorAll(
+		"section, article, header, footer, nav, aside, figure, figcaption, main"
+	);
+	blockElementsToUnwrap.forEach((el) => {
+		const p = doc.createElement("p");
+		p.innerHTML = el.innerHTML;
+		el.replaceWith(p);
+	});
 
 	// Clean all elements
 	const allElements = doc.querySelectorAll("*");

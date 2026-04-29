@@ -55,17 +55,10 @@ export function RequestDeleteProjectModal({
 		if (!reason) return;
 
 		try {
-			console.log(
-				"[RequestDeleteProjectModal] Requesting deletion for project:",
-				projectId
-			);
 			await requestDeleteMutation.mutateAsync({
 				projectId,
 				reason: reason as "duplicate" | "mistake" | "other",
 			});
-			console.log(
-				"[RequestDeleteProjectModal] Request successful, closing modal"
-			);
 			onClose();
 			setReason("");
 		} catch (error) {

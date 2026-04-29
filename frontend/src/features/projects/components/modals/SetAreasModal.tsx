@@ -43,7 +43,7 @@ export function SetAreasModal({
 		];
 	}, [dbcaRegions, dbcaDistricts, ibra, imcra, nrm]);
 
-	// Initialize selected areas from current areas
+	// Initialise selected areas from current areas
 	const [selectedAreas, setSelectedAreas] = useState<number[]>(() =>
 		currentAreas.map((area) => area.id)
 	);

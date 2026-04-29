@@ -11,6 +11,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -19,6 +20,7 @@ import { ListNode, ListItemNode } from "@lexical/list";
 import { LinkNode, AutoLinkNode } from "@lexical/link";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ImageNode } from "./nodes/ImageNode";
 
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
 import { cn } from "@/shared/lib/utils";
@@ -99,7 +101,7 @@ const EditableOnInteractionPlugin: React.FC<{ shouldBeEditable: boolean }> = ({
  * Inner wrapper that reads LinkEditorContext to drive the slide animation.
  * Must be rendered inside LinkEditorProvider so useLinkEditor() returns context.
  */
-function ContentSliderWrapper({
+const ContentSliderWrapper = ({
 	children,
 	linkPanel,
 	containerRef,
@@ -107,7 +109,7 @@ function ContentSliderWrapper({
 	children: React.ReactNode;
 	linkPanel: React.ReactNode;
 	containerRef?: React.RefObject<HTMLDivElement | null>;
-}) {
+}) => {
 	const linkEditor = useLinkEditor();
 	const isOpen = linkEditor?.state.isOpen ?? false;
 
@@ -137,16 +139,16 @@ function ContentSliderWrapper({
 			{isOpen && <div>{linkPanel}</div>}
 		</div>
 	);
-}
+};
 
 /**
  * Notifies the parent when the link panel open state changes.
  */
-function LinkPanelStateNotifier({
+const LinkPanelStateNotifier = ({
 	onChange,
 }: {
 	onChange?: (isOpen: boolean) => void;
-}) {
+}) => {
 	const linkEditor = useLinkEditor();
 	const isOpen = linkEditor?.state.isOpen ?? false;
 
@@ -155,16 +157,16 @@ function LinkPanelStateNotifier({
 	}, [isOpen, onChange]);
 
 	return null;
-}
+};
 
 /**
  * Conditionally renders DragDropPlugin — hidden when the inline link panel is open.
  */
-function ConditionalDragDrop() {
+const ConditionalDragDrop = () => {
 	const linkEditor = useLinkEditor();
 	if (linkEditor?.state.isOpen) return null;
 	return <DragDropPlugin />;
-}
+};
 
 export const RichTextEditor = React.forwardRef<
 	HTMLDivElement,
@@ -223,6 +225,7 @@ export const RichTextEditor = React.forwardRef<
 				TableNode,
 				TableCellNode,
 				TableRowNode,
+				ImageNode,
 			],
 		};
 
@@ -287,6 +290,7 @@ export const RichTextEditor = React.forwardRef<
 						{/* Plugins */}
 						<HistoryPlugin />
 						<ListPlugin />
+						<CheckListPlugin />
 						<ListMaxIndentPlugin maxDepth={9} />
 						<RemoveEmptyListItemsPlugin />
 						<LinkPlugin />

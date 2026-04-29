@@ -1,15 +1,9 @@
+import { getFinancialYearLabel } from "@/shared/utils/date.utils";
+
 interface BannerPreviewProps {
 	imageUrl: string | null;
 	variant: "full" | "cropped";
 	reportYear: number;
-}
-
-/**
- * Formats the financial year string from a calendar year.
- * e.g. 2025 → "FY 24-25"
- */
-function formatFYString(year: number): string {
-	return `FY ${String(year - 1).slice(2)}-${String(year).slice(2)}`;
 }
 
 /**
@@ -23,7 +17,7 @@ export function BannerPreview({
 	variant,
 	reportYear,
 }: BannerPreviewProps) {
-	const fyString = formatFYString(reportYear);
+	const fyString = getFinancialYearLabel(reportYear);
 
 	if (variant === "full") {
 		return (

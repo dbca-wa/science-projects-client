@@ -137,3 +137,20 @@ const DOCUMENT_STATUS_LABELS: Record<string, string> = {
 export function getDocumentStatusLabel(status: string): string {
 	return DOCUMENT_STATUS_LABELS[status] ?? status;
 }
+
+/**
+ * Get URL slug for a document kind (used in navigation)
+ *
+ * @param kind - Document kind from API (e.g. "projectplan")
+ * @returns URL-friendly slug (e.g. "project")
+ */
+export function getDocumentKindSlug(kind: string): string {
+	const slugs: Record<string, string> = {
+		concept: "concept",
+		projectplan: "project",
+		progressreport: "progress",
+		studentreport: "student",
+		projectclosure: "closure",
+	};
+	return slugs[kind] ?? kind;
+}

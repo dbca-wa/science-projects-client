@@ -164,7 +164,7 @@ export const OutgoingCaretakerRequest = ({
 								Reason
 							</h4>
 							<p className="text-sm">
-								{getCaretakerReasonLabel(request.reason)}
+								{getCaretakerReasonLabel(request.reason ?? "")}
 							</p>
 						</div>
 

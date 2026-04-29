@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getMyBusinessAreas } from "../services/report.service";
 import {
 	getProblematicProjects,
 	getUnapprovedDocs,
@@ -8,15 +7,8 @@ import {
 	updateBusinessAreaLead,
 } from "../services/business-area.service";
 
-/**
- * Fetch business areas where the current user is the leader
- */
-export const useMyBusinessAreas = () =>
-	useQuery({
-		queryKey: ["business-areas", "mine"],
-		queryFn: getMyBusinessAreas,
-		staleTime: 5 * 60_000,
-	});
+// Re-export from shared for backward compatibility
+export { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
 
 /**
  * Fetch a single business area by ID

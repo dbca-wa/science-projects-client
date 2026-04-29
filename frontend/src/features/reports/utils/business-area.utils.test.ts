@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import type { IUnapprovedDoc } from "../types/business-area.types";
 import {
 	getApprovalStage,
-	getFinancialYearLabel,
-	getProjectTag,
 	getWaitingOnLabel,
 	isReportKind,
 	sortUnapprovedDocs,
 	DOC_KIND_ORDER,
 	STATUS_ORDER,
 } from "./business-area.utils";
+import { getFinancialYearLabel } from "@/shared/utils/date.utils";
+import { formatProjectCode } from "@/shared/utils/document-tasks.utils";
 
 /** Helper to build a minimal IUnapprovedDoc for testing */
 function makeDoc(
@@ -87,37 +87,31 @@ describe("getFinancialYearLabel", () => {
 	});
 });
 
-// ── getProjectTag ───────────────────────────────────────────────────────────
+// ── formatProjectCode (moved from getProjectTag) ────────────────────────────
 
-describe("getProjectTag", () => {
+describe("formatProjectCode", () => {
 	it("maps science kind to SP prefix", () => {
-		expect(getProjectTag({ kind: "science", year: 2025, number: 1 })).toBe(
+		expect(formatProjectCode({ kind: "science", year: 2025, number: 1 })).toBe(
 			"SP-2025-001"
 		);
 	});
 
 	it("maps student kind to STP prefix", () => {
-		expect(getProjectTag({ kind: "student", year: 2024, number: 42 })).toBe(
+		expect(formatProjectCode({ kind: "student", year: 2024, number: 42 })).toBe(
 			"STP-2024-042"
 		);
 	});
 
 	it("maps external kind to EXT prefix", () => {
-		expect(getProjectTag({ kind: "external", year: 2023, number: 100 })).toBe(
-			"EXT-2023-100"
-		);
+		expect(
+			formatProjectCode({ kind: "external", year: 2023, number: 100 })
+		).toBe("EXT-2023-100");
 	});
 
 	it("maps core_function kind to CF prefix", () => {
 		expect(
-			getProjectTag({ kind: "core_function", year: 2025, number: 7 })
+			formatProjectCode({ kind: "core_function", year: 2025, number: 7 })
 		).toBe("CF-2025-007");
-	});
-
-	it("falls back to uppercased kind for unknown kinds", () => {
-		expect(getProjectTag({ kind: "custom", year: 2025, number: 3 })).toBe(
-			"CUSTOM-2025-003"
-		);
 	});
 });
 

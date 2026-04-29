@@ -2,6 +2,7 @@
 Staff profile section views
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -81,6 +82,9 @@ class StaffProfileOverviewDetail(APIView):
     def put(self, request, pk):
         from rest_framework.exceptions import PermissionDenied
 
+        settings.LOGGER.info(
+            f"{request.user} is updating staff profile overview (pk={pk})"
+        )
         profile = ProfileService.get_staff_profile(pk)
 
         # Ownership check: only the profile owner or a superuser can edit

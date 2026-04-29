@@ -117,11 +117,11 @@ class TestConvertExtPeerToConsulted:
         selected = [project_member, project_member]  # Multiple selections
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             convert_ext_peer_to_consulted(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_converts_external_peer_to_consulted(
@@ -163,11 +163,11 @@ class TestConvertExtCollaboratorToConsulted:
         selected = [project_member, project_member]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             convert_ext_collaborator_to_consulted(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_converts_external_collaborator_to_consulted(

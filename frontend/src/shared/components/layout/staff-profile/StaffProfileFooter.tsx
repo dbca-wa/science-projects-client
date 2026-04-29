@@ -54,10 +54,5 @@ const MobileFooter = ({ currentYear }: { currentYear: number }) => {
 const StaffProfileFooter = () => {
 	const currentYear = useCurrentYear();
 	return <MobileFooter currentYear={currentYear} />;
-	// return isDesktop ? (
-	//   <DesktopFooter currentYear={currentYear} />
-	// ) : (
-	//   <MobileFooter currentYear={currentYear} />
-	// );
 };
 export default StaffProfileFooter;

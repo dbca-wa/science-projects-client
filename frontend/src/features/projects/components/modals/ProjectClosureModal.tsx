@@ -76,21 +76,12 @@ export function ProjectClosureModal({
 	const onSubmit = async (data: ClosureFormData) => {
 		if (!reason) return;
 
-		console.log(
-			`[ProjectClosureModal] Submit clicked - closing project ${projectId}`
-		);
-		console.log(`[ProjectClosureModal] Outcome: ${data.outcome}`);
-		console.log(`[ProjectClosureModal] Reason: ${reason}`);
-
 		try {
-			console.log(`[ProjectClosureModal] Calling mutateAsync...`);
 			await closeMutation.mutateAsync({
 				projectId,
 				outcome: data.outcome,
 				reason,
 			});
-			console.log(`[ProjectClosureModal] mutateAsync completed successfully`);
-			console.log(`[ProjectClosureModal] Closing modal...`);
 			onClose();
 			reset();
 			setReason("");

@@ -234,9 +234,10 @@ def extract_text_content(html_content):
     return text
 
 
-def get_encoded_image():
+def _get_encoded_image_legacy():
     """
-    Get base64 encoded DBCA logo image
+    Legacy: Get base64 encoded DBCA logo image.
+    Kept for reference — prefer config.helpers.get_logo_url() for hosted image URLs.
 
     Returns:
         str: Base64 encoded image string
@@ -256,3 +257,27 @@ def get_encoded_image():
     except FileNotFoundError:
         # Return empty string if image not found
         return ""
+
+
+def sanitise_feedback_html(html: str) -> str:
+    """
+    Sanitise rich text feedback HTML for safe inclusion in email templates.
+
+    Only allows basic formatting tags (bold, italic, lists, links, paragraphs).
+    Strips all other HTML including scripts, iframes, etc.
+
+    Args:
+        html: Raw HTML string from the rich text editor
+
+    Returns:
+        Sanitised HTML string safe for email templates
+    """
+    import bleach
+
+    if not html:
+        return ""
+
+    ALLOWED_TAGS = ["p", "strong", "em", "ul", "ol", "li", "a", "br"]
+    ALLOWED_ATTRS = {"a": ["href", "target"]}
+
+    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)

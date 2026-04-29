@@ -619,3 +619,27 @@ class PublicStaffProfile(CommonModel):
 
 
 # endregion =======================================
+
+
+# region Invite Models ===================================
+
+
+class UserInvite(models.Model):
+    """Tracks invitations sent to new DBCA users to prevent duplicate invites"""
+
+    email = models.EmailField(unique=True)
+    invited_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="sent_invites"
+    )
+    invited_at = models.DateTimeField(auto_now_add=True)
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-invited_at"]
+
+    def __str__(self):
+        status = "accepted" if self.accepted else "pending"
+        return f"Invite to {self.email} ({status})"
+
+
+# endregion =======================================

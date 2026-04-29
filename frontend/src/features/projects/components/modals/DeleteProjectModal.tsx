@@ -24,9 +24,7 @@ export function DeleteProjectModal({
 
 	const handleDelete = async () => {
 		try {
-			console.log("[DeleteProjectModal] Deleting project:", projectId);
 			await deleteMutation.mutateAsync(projectId);
-			console.log("[DeleteProjectModal] Delete successful, closing modal");
 			onClose();
 		} catch (error) {
 			console.error("[DeleteProjectModal] Delete failed:", error);

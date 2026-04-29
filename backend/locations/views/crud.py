@@ -2,6 +2,7 @@
 Area CRUD views
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -30,6 +31,7 @@ class Areas(APIView):
 
     def post(self, request):
         """Create new area"""
+        settings.LOGGER.info(f"{request.user} is creating area")
         serializer = AreaSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -52,6 +54,7 @@ class AreaDetail(APIView):
 
     def put(self, request, pk):
         """Update area"""
+        settings.LOGGER.info(f"{request.user} is updating area (pk={pk})")
         area = AreaService.get_area(pk)
         serializer = AreaSerializer(area, data=request.data, partial=True)
         if not serializer.is_valid():
@@ -65,5 +68,6 @@ class AreaDetail(APIView):
 
     def delete(self, request, pk):
         """Delete area"""
+        settings.LOGGER.warning(f"{request.user} is deleting area (pk={pk})")
         AreaService.delete_area(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)

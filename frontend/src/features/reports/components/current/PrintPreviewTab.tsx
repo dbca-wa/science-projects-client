@@ -174,7 +174,7 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 	return (
 		<div className="space-y-4 py-4">
 			{/* Action bar */}
-			<div className="flex items-center gap-2 sm:justify-end">
+			<div className="flex flex-wrap items-center gap-2 sm:justify-end">
 				{isGenerating ? (
 					<Button
 						size="sm"

@@ -6,7 +6,7 @@ import {
 	usePendingCaretakerRequests,
 	useBecomeCaretaker,
 	useCancelBecomeCaretakerRequest,
-} from "@/features/caretakers/hooks";
+} from "@/shared/hooks/useCaretakerActions";
 import { useInvolvedProjects } from "@/shared/hooks/queries/useInvolvedProjects";
 import { UserAdminActionButtons } from "./UserAdminActionButtons";
 import { ProjectsDataTable } from "@/shared/components/projects/ProjectsDataTable";
@@ -673,10 +673,12 @@ export const UserDetailSheet = observer(
 																/>
 																<p className="text-xs text-muted-foreground mt-1">
 																	Requested{" "}
-																	{format(
-																		new Date(request.created_at),
-																		"MMM d, yyyy"
-																	)}
+																	{request.created_at
+																		? format(
+																				new Date(request.created_at),
+																				"MMM d, yyyy"
+																			)
+																		: "recently"}
 																</p>
 																{request.end_date && (
 																	<p className="text-xs text-muted-foreground">

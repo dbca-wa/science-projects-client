@@ -23,7 +23,8 @@ from .models import KeywordTag, PublicStaffProfile, User, UserProfile, UserWork
 @admin.action(description="Send About and Expertise to SP")
 def copy_about_expertise_to_staff_profile(model_admin, req, selected):
     if len(selected) > 1:
-        print("Please select only one")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     users_to_update = User.objects.filter(is_staff=True)
@@ -45,7 +46,8 @@ def copy_about_expertise_to_staff_profile(model_admin, req, selected):
 @admin.action(description="Hide all staff profiles")
 def hide_all_staff_profiles(model_admin, req, selected):
     if len(selected) > 1:
-        print("Please select only one")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
     # Find all users that are staff and have a public profile
     users_to_update = User.objects.filter(
@@ -65,7 +67,8 @@ def hide_all_staff_profiles(model_admin, req, selected):
 @admin.action(description="Creates a staff profile for users w/o")
 def create_staff_profiles(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     # Filter for users that do not have public profiles
@@ -85,7 +88,8 @@ def create_staff_profiles(model_admin, req, selected):
 @admin.action(description="Generate CSV of active staff data")
 def generate_active_staff_csv(model_admin, request, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(request, "Please select only one item.")
         return
 
     # Create the HttpResponse object with CSV header
@@ -191,7 +195,8 @@ def generate_active_staff_csv(model_admin, request, selected):
 @admin.action(description="Sets the it_asset id ")
 def set_it_assets_id(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     # Filter for users that do not have display names set but have first and last names
@@ -243,7 +248,8 @@ def set_it_assets_id(model_admin, req, selected):
 @admin.action(description="Sets the display names to first and last")
 def update_display_names(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
 
     # Filter for users that do not have display names set but have first and last names
@@ -287,7 +293,8 @@ def export_selected_users_to_csv(model_admin, req, selected):
 @admin.action(description="Export Active Project Leaders")
 def export_current_active_project_leads(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
     active_project_leaders = ProjectMember.objects.filter(
         is_leader=True, project__status="active"
@@ -308,8 +315,8 @@ def export_current_active_project_leads(model_admin, req, selected):
     )
 
     for leader in unique_active_project_leads:
-        print(
-            f"handling leader {leader.email} | {leader.first_name} {leader.last_name}"
+        settings.LOGGER.info(
+            msg=f"handling leader {leader.email} | {leader.first_name} {leader.last_name}"
         )
         if leader.email.endswith("dbca.wa.gov.au"):
             dbca_users.append(leader)
@@ -349,7 +356,8 @@ def export_current_active_project_leads(model_admin, req, selected):
 @admin.action(description="Delete unused tags")
 def delete_unused_tags(model_admin, req, selected):
     if len(selected) > 1:
-        print("PLEASE SELECT ONLY ONE")
+        settings.LOGGER.info(msg="Please select only one item")
+        model_admin.message_user(req, "Please select only one item.")
         return
     # Filter out tags that are not associated with any PublicStaffProfile
     unused_tags = KeywordTag.objects.filter(staff_profiles__isnull=True)

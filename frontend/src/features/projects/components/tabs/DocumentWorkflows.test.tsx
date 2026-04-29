@@ -21,13 +21,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	useDocumentAction,
 	useDeleteDocument,
-} from "../../hooks/useDocumentAction";
-import * as documentActionService from "../../services/document.service";
+} from "@/shared/hooks/useDocumentAction";
+import * as documentActionService from "@/shared/services/document.service";
 import { toast } from "sonner";
 import { toCompactDocumentType } from "@/shared/utils/document.utils";
 
 // Mock services
-vi.mock("../../services/document.service");
+vi.mock("@/shared/services/document.service");
 vi.mock("sonner");
 
 describe.skip("Document Action Workflows", () => {

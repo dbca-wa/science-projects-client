@@ -2,6 +2,7 @@
 Profile entry views (employment and education)
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -34,6 +35,7 @@ class StaffProfileEmploymentEntries(APIView):
 
     def post(self, request, profile_id):
         """Create employment entry"""
+        settings.LOGGER.info(f"{request.user} is creating employment entry")
         serializer = EmploymentEntryCreationSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -58,6 +60,7 @@ class StaffProfileEmploymentEntryDetail(APIView):
 
     def put(self, request, pk):
         """Update employment entry"""
+        settings.LOGGER.info(f"{request.user} is updating employment entry (pk={pk})")
         serializer = EmploymentEntrySerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -68,6 +71,9 @@ class StaffProfileEmploymentEntryDetail(APIView):
 
     def delete(self, request, pk):
         """Delete employment entry"""
+        settings.LOGGER.warning(
+            f"{request.user} is deleting employment entry (pk={pk})"
+        )
         EmploymentService.delete_employment(pk)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -85,6 +91,7 @@ class StaffProfileEducationEntries(APIView):
 
     def post(self, request, profile_id):
         """Create education entry"""
+        settings.LOGGER.info(f"{request.user} is creating education entry")
         serializer = EducationEntryCreationSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -107,6 +114,7 @@ class StaffProfileEducationEntryDetail(APIView):
 
     def put(self, request, pk):
         """Update education entry"""
+        settings.LOGGER.info(f"{request.user} is updating education entry (pk={pk})")
         serializer = EducationEntrySerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -117,6 +125,7 @@ class StaffProfileEducationEntryDetail(APIView):
 
     def delete(self, request, pk):
         """Delete education entry"""
+        settings.LOGGER.warning(f"{request.user} is deleting education entry (pk={pk})")
         EducationService.delete_education(pk)
         return Response(status=HTTP_204_NO_CONTENT)
 

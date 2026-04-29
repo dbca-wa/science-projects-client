@@ -68,7 +68,8 @@ class AgencyImageAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = AgencyImage.objects.all()  # Get all ProjectPhoto instances
@@ -119,7 +120,8 @@ class ProjectDocumentPDFAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate pdf sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = ProjectDocumentPDF.objects.all()  # Get all ProjectPhoto instances
@@ -170,7 +172,8 @@ class AECEndorsementPDFAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = AECEndorsementPDF.objects.all()  # Get all ProjectPhoto instances
@@ -219,7 +222,8 @@ class AnnualReportPDFAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate file sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = AnnualReportPDF.objects.all()
@@ -304,7 +308,8 @@ class LegacyAnnualReportPDFAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate file sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_items = (
@@ -357,7 +362,8 @@ class AnnualReportMediaAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = AnnualReportMedia.objects.all()  # Get all ProjectPhoto instances
@@ -403,7 +409,8 @@ class BusinessAreaPhotoAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = BusinessAreaPhoto.objects.all()  # Get all ProjectPhoto instances
@@ -463,7 +470,8 @@ class ProjectPhotoAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = ProjectPhoto.objects.all()
@@ -639,7 +647,8 @@ class ProjectPlanMethodologyPhotoAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = (
@@ -697,7 +706,8 @@ class UserAvatarAdmin(admin.ModelAdmin):
     @admin.action(description="Recalculate photo sizes")
     def recalculate_photo_sizes(self, request, selected):
         if len(selected) > 1:
-            print("PLEASE SELECT ONLY ONE")
+            settings.LOGGER.info(msg="Please select only one item")
+            self.message_user(request, "Please select only one item.")
             return
         updated_count = 0
         all_photos = UserAvatar.objects.all()

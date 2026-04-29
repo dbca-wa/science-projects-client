@@ -2,13 +2,13 @@
 export * from "./comment.service";
 export * from "./comment.endpoints";
 
-// Document services
-export * from "./document.service";
-export * from "./document.endpoints";
+// Document services (re-exported from shared)
+export * from "@/shared/services/document.service";
+export * from "@/shared/services/document.endpoints";
 
-// PDF services
-export * from "./pdf.service";
-export * from "./pdf.endpoints";
+// PDF services (re-exported from shared)
+export * from "@/shared/services/pdf.service";
+export * from "@/shared/services/pdf.endpoints";
 
 // Project services
 export * from "./project.service";

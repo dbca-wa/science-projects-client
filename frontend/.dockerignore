@@ -75,3 +75,7 @@ Thumbs.db
 
 # Misc
 .unlighthouse/
+
+# Storybook (if present)
+.storybook/
+storybook-static/

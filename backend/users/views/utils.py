@@ -2,6 +2,7 @@
 User utility views
 """
 
+from django.conf import settings
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,6 +49,10 @@ class CheckUserIsStaff(APIView):
             user = UserService.get_user(pk)
             return Response({"is_staff": user.is_staff})
         except Exception:
+            settings.LOGGER.warning(
+                f"Failed to check is_staff for user pk={pk}",
+                exc_info=True,
+            )
             return Response({"error": "User not found"}, status=400)
 
 

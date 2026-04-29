@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Download, FileText, Trash2 } from "lucide-react";
+import { Download, FileText, Trash2, Bell } from "lucide-react";
+import { useSendBump } from "@/shared/hooks/queries/useBumpEmails";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type {
 	IProjectData,
@@ -15,10 +16,10 @@ import type { DocumentType } from "@/shared/utils/document.utils";
 import {
 	getApprovalState,
 	getCurrentApprovalStage,
-} from "@/features/projects/utils/authors/approval.utils";
+} from "@/shared/utils/approval.utils";
 import { useCurrentUser } from "@/features/auth";
-import { isUserAtApprovalStage } from "@/features/projects/utils/permissions/project-permissions.utils";
-import { findProjectLeader } from "@/features/projects/utils/team/team.utils";
+import { isUserAtApprovalStage } from "@/shared/utils/project-permissions.utils";
+import { findProjectLeader } from "@/shared/utils/team.utils";
 
 interface DocumentActionsSectionProps {
 	document: IMainDoc;
@@ -530,6 +531,29 @@ export function DocumentActionsSection({
 						</div>
 					</div>
 
+					{/* Send Reminder Button — for admins/KS/BA leads when document is at stage 1 or 2 */}
+					{currentUser?.is_superuser &&
+						(currentStage === "project_lead" ||
+							currentStage === "business_area_lead") &&
+						document.status !== "approved" &&
+						document.status !== "new" && (
+							<div className="rounded-lg border-2 border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-950/20 p-3 space-y-2">
+								<h3 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+									Send Reminder
+								</h3>
+								<p className="text-xs text-amber-700 dark:text-amber-300">
+									Send a reminder email to the person whose action is required
+									on this document.
+								</p>
+								<BumpButton
+									document={document}
+									project={project}
+									members={members}
+									currentStage={currentStage}
+								/>
+							</div>
+						)}
+
 					{/* Special Action Buttons Section */}
 					{(canCreateProgressReport || canSetAreas || canReopenProject) && (
 						<div className="rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3">
@@ -634,5 +658,86 @@ export function DocumentActionsSection({
 				</CardContent>
 			</Card>
 		</>
+	);
+}
+
+/** Inline bump button for sending a reminder to the person whose action is required */
+function BumpButton({
+	document,
+	project,
+	members,
+	currentStage,
+}: {
+	document: IMainDoc;
+	project: IProjectData;
+	members: IProjectMember[] | null;
+	currentStage: string;
+}) {
+	const sendBump = useSendBump();
+
+	const targetUser = useMemo(() => {
+		if (currentStage === "project_lead") {
+			const leader = members?.find((m) => m.is_leader);
+			return leader
+				? {
+						id: leader.user.id,
+						name: `${leader.user.display_first_name} ${leader.user.display_last_name}`,
+						capacity: "Project Lead",
+					}
+				: null;
+		}
+		if (
+			currentStage === "business_area_lead" &&
+			project.business_area?.leader
+		) {
+			const leaderId =
+				typeof project.business_area.leader === "number"
+					? project.business_area.leader
+					: (project.business_area.leader as { id: number }).id;
+			return {
+				id: leaderId,
+				name: "Business Area Lead",
+				capacity: "Business Area Lead",
+			};
+		}
+		return null;
+	}, [currentStage, members, project]);
+
+	if (!targetUser) return null;
+
+	const docKindMap: Record<string, string> = {
+		concept: "concept",
+		projectplan: "projectplan",
+		progressreport: "progressreport",
+		studentreport: "studentreport",
+		projectclosure: "projectclosure",
+	};
+
+	const handleBump = () => {
+		sendBump.mutate({
+			documentsRequiringAction: [
+				{
+					userToTakeAction: targetUser.id,
+					documentKind: docKindMap[document.kind] || document.kind,
+					projectTitle: project.title,
+					projectId: project.id,
+					actionCapacity: targetUser.capacity,
+					documentId: document.id,
+				},
+			],
+		});
+	};
+
+	return (
+		<Button
+			variant="outline"
+			size="sm"
+			className="w-full gap-1.5 border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900"
+			onClick={handleBump}
+			disabled={sendBump.isPending}
+		>
+			<Bell className="h-3.5 w-3.5" />
+			{sendBump.isPending ? "Sending..." : `Remind ${targetUser.name}`}
+		</Button>
 	);
 }

@@ -27,17 +27,7 @@ export const CARETAKER_ENDPOINTS = {
 } as const;
 
 /**
- * Query key factory for caretaker-related queries
+ * Query key factory for caretaker-related queries.
+ * Re-exported from shared for backward compatibility.
  */
-export const caretakerKeys = {
-	all: ["caretakers"] as const,
-	lists: () => [...caretakerKeys.all, "list"] as const,
-	list: (filters: string) => [...caretakerKeys.lists(), { filters }] as const,
-	details: () => [...caretakerKeys.all, "detail"] as const,
-	detail: (id: number) => [...caretakerKeys.details(), id] as const,
-	check: (userId: number) => [...caretakerKeys.all, "check", userId] as const,
-	pending: (userId: number) =>
-		[...caretakerKeys.all, "pending", userId] as const,
-	outgoing: (userId: number) =>
-		[...caretakerKeys.all, "outgoing", userId] as const,
-};
+export { caretakerKeys } from "@/shared/types/caretaker.types";

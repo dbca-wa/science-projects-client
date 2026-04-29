@@ -30,11 +30,6 @@ export const useRequestDeleteProject = () => {
 	return useMutation({
 		mutationFn: requestDeleteProject,
 		onSuccess: async (_, variables) => {
-			console.log(
-				"[useRequestDeleteProject] Mutation succeeded, invalidating queries for project:",
-				variables.projectId
-			);
-
 			// Invalidate project detail query
 			await queryClient.invalidateQueries({
 				predicate: (query) => {
@@ -51,8 +46,6 @@ export const useRequestDeleteProject = () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["pendingAdminTasks"],
 			});
-
-			console.log("[useRequestDeleteProject] Query invalidation complete");
 
 			toast.success("Request made");
 		},

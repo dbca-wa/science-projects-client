@@ -373,6 +373,10 @@ class BusinessAreasProblematicProjects(APIView):
         except Project.DoesNotExist:
             raise NotFound
         except Exception:
+            settings.LOGGER.error(
+                f"Failed to fetch projects for business areas {ba_array}",
+                exc_info=True,
+            )
             return Project.objects.none()
         return projects
 
@@ -397,6 +401,10 @@ class BusinessAreasProblematicProjects(APIView):
                 try:
                     user = mem.user
                 except Exception:  # nosec B112
+                    settings.LOGGER.warning(
+                        f"Orphaned ProjectMember pk={mem.pk} — related user missing",
+                        exc_info=True,
+                    )
                     continue
                 if mem.role == ProjectMember.RoleChoices.SUPERVISING:
                     leader_tag_count += 1

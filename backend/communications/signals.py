@@ -60,11 +60,22 @@ def handle_comment_created(sender, instance, created, **kwargs):
         if mentioned_users:
             for mentioned_user in mentioned_users:
                 try:
+                    commenter_data = {
+                        "name": f"{instance.user.display_first_name} {instance.user.display_last_name}",
+                    }
+                    mentioned_user_data = [
+                        {
+                            "id": mentioned_user.pk,
+                            "name": mentioned_user.get_full_name(),
+                            "email": mentioned_user.email,
+                        }
+                    ]
                     NotificationService.notify_comment_mention(
-                        document=instance.document,
-                        comment=instance.text,
-                        mentioned_user=mentioned_user,
-                        commenter=instance.user,
+                        document_id=instance.document.pk,
+                        project_id=instance.document.project.pk,
+                        commenter_data=commenter_data,
+                        mentioned_users=mentioned_user_data,
+                        comment_content=instance.text,
                     )
                     settings.LOGGER.info(
                         f"Sent mention notification to {mentioned_user.get_full_name()} "
@@ -77,9 +88,17 @@ def handle_comment_created(sender, instance, created, **kwargs):
                         f"{mentioned_user.get_full_name()}: {e}"
                     )
 
-        # TODO: Task 27 - Implement new comment notifications
         # Send new comment notifications to project team (excluding mentioned users)
-        # This will be implemented in a future task
+        try:
+            NotificationService.notify_new_comment(
+                document=instance.document,
+                comment=instance,
+                commenter=instance.user,
+            )
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Failed to send new comment team notification for comment {instance.pk}: {e}"
+            )
 
         settings.LOGGER.info(
             f"Processed notifications for comment {instance.pk} "

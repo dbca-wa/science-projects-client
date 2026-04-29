@@ -12,7 +12,7 @@ import { BaseCombobox } from "@/shared/components/combobox";
 import {
 	getUsersBasedOnSearchTerm,
 	getFullUser,
-} from "@/features/users/services/user.service";
+} from "@/shared/services/user.service";
 import type { IUserData } from "@/shared/types/user.types";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -107,11 +107,6 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 			});
 			return result.users.slice(0, maxResults);
 		};
-
-		// Handle clear selection (exposed via ref)
-		// const handleClearSelection = () => {
-		// 	onValueChange(null);
-		// };
 
 		return (
 			<BaseCombobox<IUserData>

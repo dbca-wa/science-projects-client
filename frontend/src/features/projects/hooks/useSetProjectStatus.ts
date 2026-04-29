@@ -19,11 +19,6 @@ export const useSetProjectStatus = () => {
 		mutationFn: ({ projectId, status }: SetProjectStatusParams) =>
 			updateProjectStatus(projectId, status),
 		onSuccess: async (_, variables) => {
-			console.log(
-				"Set status success, invalidating queries for project:",
-				variables.projectId
-			);
-
 			// Invalidate project query with await to ensure fresh data before modal closes
 			await queryClient.invalidateQueries({
 				predicate: (query) => {
@@ -36,8 +31,6 @@ export const useSetProjectStatus = () => {
 					);
 				},
 			});
-
-			console.log("Project query invalidated and refetched");
 
 			toast.success("Project status updated");
 		},

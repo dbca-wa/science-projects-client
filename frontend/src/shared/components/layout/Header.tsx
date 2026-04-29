@@ -16,8 +16,8 @@ import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { useUIStore, useAuthStore } from "@/app/stores/store-context";
 import HeaderContent from "./HeaderContent";
 import { ManageDropdownContent } from "./ManageDropdownContent";
-import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 
 /** Division slugs that grant AR admin access to key stakeholders */

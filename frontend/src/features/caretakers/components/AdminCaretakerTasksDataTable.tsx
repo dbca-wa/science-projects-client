@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { format } from "date-fns";
-import type { IAdminTask } from "@/features/dashboard/types/admin-tasks.types";
+import type { IAdminTask } from "@/shared/types/admin.types";
 import {
 	Avatar,
 	AvatarFallback,

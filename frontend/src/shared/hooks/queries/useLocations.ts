@@ -3,7 +3,7 @@ import { getAllLocations } from "@/shared/services/api/locations.service";
 import { STALE_TIME } from "@/shared/constants";
 
 /**
- * Hook to get all locations organized by area type
+ * Hook to get all locations organised by area type
  * Locations are relatively static data, so we use a longer stale time
  */
 export const useLocations = () => {

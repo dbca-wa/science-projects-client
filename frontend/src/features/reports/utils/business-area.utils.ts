@@ -5,6 +5,7 @@ import type {
 	ProblemKind,
 } from "../types/business-area.types";
 import { getDocumentStatusLabel } from "@/shared/utils/document.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 
 /** Approval stage derived from the three boolean flags */
 export type ApprovalStage = 1 | 2 | 3;
@@ -80,30 +81,6 @@ export function getProblemColour(kind: ProblemKind): string {
 	return colours[kind];
 }
 
-/** Display label for document kinds */
-export function getDocKindLabel(kind: string): string {
-	const labels: Record<string, string> = {
-		concept: "Concept Plan",
-		projectplan: "Project Plan",
-		progressreport: "Progress Report",
-		studentreport: "Student Report",
-		projectclosure: "Project Closure",
-	};
-	return labels[kind] ?? kind;
-}
-
-/** URL slug for document kinds (used in navigation) */
-export function getDocKindSlug(kind: string): string {
-	const slugs: Record<string, string> = {
-		concept: "concept",
-		projectplan: "project",
-		progressreport: "progress",
-		studentreport: "student",
-		projectclosure: "closure",
-	};
-	return slugs[kind] ?? kind;
-}
-
 /** Display label for document or project statuses */
 export function getDocStatusLabel(status: string): string {
 	// Try document status labels first (covers revising, inreview, inapproval, etc.)
@@ -125,41 +102,11 @@ export function getDocStatusLabel(status: string): string {
 	return projectLabels[status] ?? status;
 }
 
-/** Strip HTML tags from a string, returning plain text */
-export function stripHtml(html: string): string {
-	return html.replace(/<[^>]*>/g, "");
-}
-
 /** Classify a document into its approval stage */
 export function getApprovalStage(doc: IUnapprovedDoc): ApprovalStage {
 	if (!doc.project_lead_approval_granted) return 1;
 	if (!doc.business_area_lead_approval_granted) return 2;
 	return 3;
-}
-
-/** Format a report year as "FY YY-YY". The year is the publication year (end of the financial year). */
-export function getFinancialYearLabel(year: number | null | undefined): string {
-	if (year == null) return "—";
-	const startYY = String(year - 1).slice(-2);
-	const endYY = String(year).slice(-2);
-	return `FY ${startYY}-${endYY}`;
-}
-
-/** Compute a project tag from kind, year, and number (e.g. "SP-2025-001") */
-export function getProjectTag(project: {
-	kind: string;
-	year: number;
-	number: number;
-}): string {
-	const kindMap: Record<string, string> = {
-		science: "SP",
-		student: "STP",
-		external: "EXT",
-		core_function: "CF",
-	};
-	const prefix = kindMap[project.kind] ?? project.kind.toUpperCase();
-	const num = String(project.number).padStart(3, "0");
-	return `${prefix}-${project.year}-${num}`;
 }
 
 /** Whether a document kind has a financial year */
@@ -190,8 +137,8 @@ export function sortUnapprovedDocs(
 		let cmp = 0;
 		switch (config.column) {
 			case "title":
-				cmp = stripHtml(a.project.title).localeCompare(
-					stripHtml(b.project.title)
+				cmp = extractTextFromHTML(a.project.title).localeCompare(
+					extractTextFromHTML(b.project.title)
 				);
 				break;
 			case "kind":

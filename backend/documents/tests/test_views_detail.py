@@ -143,7 +143,7 @@ class TestBatchApproveOld:
         response = api_client.post(documents_urls.path("batchapproveold"))
 
         # Assert
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert "error" in response.data
 
     @pytest.mark.integration

@@ -1,2 +1,2 @@
 export * from "./authors.utils";
-export * from "./approval.utils";
+export * from "@/shared/utils/approval.utils";

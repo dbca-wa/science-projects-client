@@ -16,6 +16,7 @@ import {
 	useDeleteReportPDFFile,
 	useToggleReportPublished,
 } from "@/features/reports/hooks/useReports";
+import { getFinancialYearLabel } from "@/shared/utils/date.utils";
 
 interface UpdateReportPDFModalProps {
 	isOpen: boolean;
@@ -36,14 +37,6 @@ async function validatePDF(file: File): Promise<boolean> {
 	const buffer = await file.slice(0, 4).arrayBuffer();
 	const bytes = new Uint8Array(buffer);
 	return bytes.every((b, i) => b === PDF_MAGIC[i]);
-}
-
-function formatFY(year: number): string {
-	const prev = String(year - 1)
-		.slice(-2)
-		.padStart(2, "0");
-	const current = String(year).slice(-2).padStart(2, "0");
-	return `FY ${prev}-${current}`;
 }
 
 export function UpdateReportPDFModal({
@@ -100,7 +93,7 @@ export function UpdateReportPDFModal({
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Manage PDF — {formatFY(year)}</DialogTitle>
+					<DialogTitle>Manage PDF — {getFinancialYearLabel(year)}</DialogTitle>
 					<DialogDescription>
 						Update the PDF file or change the published status.
 					</DialogDescription>

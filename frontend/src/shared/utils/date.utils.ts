@@ -164,3 +164,19 @@ function getOrdinalSuffix(day: number): string {
 			return "th";
 	}
 }
+
+/**
+ * Format a financial year as "FY YY-YY"
+ *
+ * The year parameter is the publication year (end of the financial year).
+ * For example, year=2025 returns "FY 24-25".
+ *
+ * @param year - The financial year end (publication year)
+ * @returns Formatted financial year label, or em dash for null/undefined
+ */
+export function getFinancialYearLabel(year: number | null | undefined): string {
+	if (year == null) return "—";
+	const startYY = String(year - 1).slice(-2);
+	const endYY = String(year).slice(-2);
+	return `FY ${startYY}-${endYY}`;
+}

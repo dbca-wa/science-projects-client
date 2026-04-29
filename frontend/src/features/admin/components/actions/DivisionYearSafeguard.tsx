@@ -11,7 +11,7 @@ import {
 import { useDivisions } from "../../hooks/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { useAuthStore } from "@/app/stores/store-context";
-import { useReportsForDivision } from "@/features/reports/hooks/useReports";
+import { useReportsForDivision } from "@/shared/hooks/queries/useReportsForDivision";
 
 interface DivisionYearSafeguardProps {
 	title: string;

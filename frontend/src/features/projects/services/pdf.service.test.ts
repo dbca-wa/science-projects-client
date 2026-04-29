@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { downloadPdf, generatePdf } from "./pdf.service";
+import { downloadPdf, generatePdf } from "@/shared/services/pdf.service";
 import { apiClient } from "@/shared/services/api/client.service";
 import type { DocumentType } from "@/shared/utils/document.utils";
 

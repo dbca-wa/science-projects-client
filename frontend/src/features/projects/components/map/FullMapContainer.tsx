@@ -32,7 +32,7 @@ interface FullMapContainerProps {
  * FullMapContainer component
  *
  * Main map component that:
- * - Initializes Leaflet map centered on WA
+ * - Initialises Leaflet map centred on WA
  * - Fetches projects and GeoJSON data
  * - Computes filtered projects based on store state
  * - Computes clustered markers

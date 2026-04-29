@@ -172,7 +172,7 @@ const ProjectDetailsStep = observer(() => {
 									</div>,
 									...divisionBusinessAreas.map((ba) => (
 										<SelectItem key={ba.id} value={ba.id?.toString() || ""}>
-											{ba.name}
+											{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
 										</SelectItem>
 									)),
 								];

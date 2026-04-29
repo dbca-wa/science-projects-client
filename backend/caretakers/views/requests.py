@@ -57,6 +57,7 @@ class ApproveCaretakerRequest(APIView):
 
     def post(self, request, pk):
         """Approve caretaker request"""
+        settings.LOGGER.info(f"{request.user} is approving caretaker request (pk={pk})")
         caretaker = CaretakerRequestService.approve_request(pk, request.user)
 
         return Response(
@@ -75,6 +76,7 @@ class RejectCaretakerRequest(APIView):
 
     def post(self, request, pk):
         """Reject caretaker request"""
+        settings.LOGGER.info(f"{request.user} is rejecting caretaker request (pk={pk})")
         CaretakerRequestService.reject_request(pk, request.user)
 
         return Response(
@@ -90,6 +92,7 @@ class CaretakerRequestCreate(APIView):
 
     def post(self, request):
         """Create caretaker request"""
+        settings.LOGGER.info(f"{request.user} is creating caretaker request")
         # Validate input
         user_id = request.data.get("user_id")
         caretaker_id = request.data.get("caretaker_id")
@@ -163,6 +166,9 @@ class CaretakerRequestCancel(APIView):
 
     def post(self, request, pk):
         """Cancel caretaker request"""
+        settings.LOGGER.info(
+            f"{request.user} is cancelling caretaker request (pk={pk})"
+        )
         try:
             CaretakerRequestService.cancel_request(pk, request.user)
 

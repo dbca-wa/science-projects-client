@@ -74,7 +74,7 @@ export function TeamMemberSheet({
 	const { mutate: setLeader, isPending: isSettingLeader } =
 		useSetTeamLeader(projectId);
 
-	// Form state - initialize from member prop
+	// Form state - initialise from member prop
 	const [role, setRole] = useState(member.role);
 	const [timeAllocation, setTimeAllocation] = useState(member.time_allocation);
 	const [shortCode, setShortCode] = useState(

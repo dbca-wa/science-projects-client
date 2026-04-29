@@ -40,7 +40,7 @@ const mockUsers = [
 ] as unknown as IUserData[];
 
 // Mock the user service
-vi.mock("@/features/users/services/user.service", () => ({
+vi.mock("@/shared/services/user.service", () => ({
 	getUsersBasedOnSearchTerm: vi.fn((searchTerm: string) => {
 		if (searchTerm.toLowerCase().includes("adrian")) {
 			return Promise.resolve({ users: mockUsers, total: mockUsers.length });

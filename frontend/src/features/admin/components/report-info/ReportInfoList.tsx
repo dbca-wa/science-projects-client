@@ -15,7 +15,7 @@ import { ReportInfoForm } from "./ReportInfoForm";
 import { useReportInfo, useDeleteReportInfo } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
 import { filterByName } from "../../utils/crud.utils";
-import type { IAnnualReport } from "@/features/reports/types/report.types";
+import type { IAnnualReport } from "@/shared/types/report.types";
 
 const columns = [
 	{ header: "Year", accessor: "year" },
@@ -32,7 +32,7 @@ const columns = [
 	{ header: "Change", accessor: "actions", className: "text-right" },
 ];
 
-export function ReportInfoList() {
+export const ReportInfoList = () => {
 	const { data: reports = [], isLoading, error } = useReportInfo();
 	const { data: divisions } = useDivisions();
 	const deleteMutation = useDeleteReportInfo();
@@ -74,29 +74,6 @@ export function ReportInfoList() {
 
 	return (
 		<>
-			<div className="mb-4 flex items-center gap-2">
-				<Select
-					value={
-						selectedDivision === "all" ? "all" : selectedDivision.toString()
-					}
-					onValueChange={(v) =>
-						setSelectedDivision(v === "all" ? "all" : Number(v))
-					}
-				>
-					<SelectTrigger className="w-[200px]" aria-label="Filter by division">
-						<SelectValue placeholder="All Divisions" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All Divisions</SelectItem>
-						{divisions?.map((d) => (
-							<SelectItem key={d.id} value={d.id.toString()}>
-								{d.name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</div>
-
 			<CrudListLayout<IAnnualReport>
 				title="Report Info"
 				itemCount={filtered.length}
@@ -105,6 +82,31 @@ export function ReportInfoList() {
 				onSearchChange={setSearchTerm}
 				onAddClick={handleAdd}
 				addButtonLabel="Create Report Info"
+				extraActions={
+					<Select
+						value={
+							selectedDivision === "all" ? "all" : selectedDivision.toString()
+						}
+						onValueChange={(v) =>
+							setSelectedDivision(v === "all" ? "all" : Number(v))
+						}
+					>
+						<SelectTrigger
+							className="w-[200px]"
+							aria-label="Filter by division"
+						>
+							<SelectValue placeholder="All Divisions" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All Divisions</SelectItem>
+							{divisions?.map((d) => (
+								<SelectItem key={d.id} value={d.id.toString()}>
+									{d.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				}
 				columns={columns}
 				data={filtered}
 				isLoading={isLoading}
@@ -159,4 +161,4 @@ export function ReportInfoList() {
 			/>
 		</>
 	);
-}
+};

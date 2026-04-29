@@ -1,3 +1,5 @@
+// Configuration for the inline editing system — maps content types to their
+// update functions. All update functions are imported from shared services.
 import type {
 	ContentType,
 	ContentTypeConfig,
@@ -11,8 +13,8 @@ import {
 	updateProgressReportField,
 	updateStudentReportField,
 	updateProjectClosureField,
-} from "@/features/projects/services/project.service";
-import { updateAnnualReportField } from "@/features/reports/services/report.service";
+	updateAnnualReportField,
+} from "@/shared/services/content-update.service";
 
 /**
  * Central registry mapping content types to their configurations

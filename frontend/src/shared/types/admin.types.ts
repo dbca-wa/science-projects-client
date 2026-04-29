@@ -1,3 +1,4 @@
+import type { IImageData } from "./media.types";
 import type { IAffiliation } from "./org.types";
 import type { ITaskDocument, ITaskUser } from "./project.types";
 import type { IMiniUser, IUserData } from "./user.types";
@@ -90,6 +91,42 @@ export interface ICaretakerEntry {
 // ADMIN TASKS
 // ============================================================================
 
+export type AdminTaskAction = "deleteproject" | "mergeuser" | "setcaretaker";
+
+export type AdminTaskStatus =
+	| "pending"
+	| "approved"
+	| "fulfilled"
+	| "cancelled"
+	| "rejected";
+
+export interface IAdminTaskUser {
+	id: number;
+	display_first_name: string;
+	display_last_name: string;
+	email: string;
+	image?: IImageData;
+}
+
+export interface IAdminTaskProject {
+	id: number;
+	title: string;
+}
+
+/**
+ * Simple user data for secondary_users in AdminTask.
+ * Matches SecondaryUserSerializer from backend.
+ */
+export interface ISecondaryUserData {
+	id: number;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	email: string;
+	image?: {
+		file: string;
+	} | null;
+}
+
 export interface IAdminRequestUser {
 	id: number;
 	display_first_name?: string;
@@ -97,7 +134,7 @@ export interface IAdminRequestUser {
 }
 
 export interface IMakeRequestToAdmins {
-	action: "deleteproject" | "mergeuser" | "setcaretaker";
+	action: AdminTaskAction;
 	project?: number;
 	primaryUserId?: number;
 	secondaryUserIds?: number[];
@@ -112,22 +149,28 @@ export interface IActionAdminTask {
 	taskId: number;
 }
 
+/**
+ * Canonical admin task type — consolidated from dashboard, caretakers,
+ * and shared definitions. Matches AdminTaskSerializer from backend.
+ */
 export interface IAdminTask {
-	action: "deleteproject" | "mergeuser" | "setcaretaker";
-	status: "pending" | "approved" | "fulfilled" | "rejected";
-	project?: {
-		id: number;
-		title: string;
-	};
-	requester?: IAdminRequestUser;
-	primary_user?: IAdminRequestUser;
-	secondary_users?: IAdminRequestUser[];
-	reason?: string;
-	notes?: string;
-	start_date?: Date;
-	end_date?: Date;
 	id: number;
-	created_at?: Date;
+	action: AdminTaskAction;
+	status: AdminTaskStatus;
+	project?: IAdminTaskProject;
+	requester: IAdminTaskUser;
+	primary_user?: IAdminTaskUser;
+	secondary_users?: IAdminTaskUser[];
+	reason?: string;
+	start_date?: string;
+	end_date?: string;
+	notes?: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CaretakerTaskCardProps {
+	task: IAdminTask;
 }
 
 export interface ITaskDisplayCard {

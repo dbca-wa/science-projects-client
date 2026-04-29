@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Navigate, useLocation } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { toast } from "sonner";
 
@@ -11,8 +11,8 @@ const AR_ENABLED_DIVISION_SLUGS = ["BCS"];
 
 /**
  * Protected Route Guard
- * - Checks if auth store is initialized
- * - Shows loading spinner while initializing
+ * - Checks if auth store is initialised
+ * - Shows loading spinner while initialising
  * - Redirects to login if not authenticated
  * - Preserves original location in redirect state
  * - Renders children if authenticated
@@ -22,7 +22,7 @@ export const ProtectedRoute = observer(
 		const authStore = useAuthStore();
 		const location = useLocation();
 
-		// Show loading spinner while initializing from cookies
+		// Show loading spinner while initialising from cookies
 		if (!authStore.state.initialised) {
 			return (
 				<div className="min-h-screen flex items-center justify-center">

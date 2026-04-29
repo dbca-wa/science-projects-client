@@ -14,12 +14,12 @@ import type { DocumentType } from "@/shared/utils/document.utils";
 import {
 	useDocumentAction,
 	useDeleteDocument,
-} from "@/features/projects/hooks/useDocumentAction";
+} from "@/shared/hooks/useDocumentAction";
 import {
 	useDownloadPdf,
 	useGeneratePdf,
-} from "@/features/projects/hooks/usePdfOperations";
-import { getCurrentApprovalStage } from "@/features/projects/utils/authors/approval.utils";
+} from "@/shared/hooks/usePdfOperations";
+import { getCurrentApprovalStage } from "@/shared/utils/approval.utils";
 
 interface DocumentActionsSectionWithModalsProps {
 	document: IMainDoc;
@@ -140,6 +140,7 @@ export function DocumentActionsSectionWithModals({
 		comment?: string;
 		reason?: string;
 		sendEmail: boolean;
+		feedbackHTML?: string;
 	}) => {
 		if (!currentAction) return;
 
@@ -153,6 +154,7 @@ export function DocumentActionsSectionWithModals({
 					stage: STAGE_MAP[currentStage] ?? 1,
 					documentPk: document.id,
 					reason: data.reason,
+					feedbackHTML: data.feedbackHTML,
 					// TODO: Email logic to be implemented later
 					send_email: data.sendEmail,
 				},
@@ -168,9 +170,7 @@ export function DocumentActionsSectionWithModals({
 
 	const handleDeleteConfirm = async () => {
 		try {
-			console.log("Deleting document:", document.id);
 			await deleteDocumentMutation.mutateAsync(document.id);
-			console.log("Document deleted, closing modal and navigating");
 			setDeleteModalOpen(false);
 			// Navigate to project overview tab
 			navigate(`/projects/${project.id}/overview`);

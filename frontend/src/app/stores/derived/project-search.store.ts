@@ -71,7 +71,7 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 	 */
 	async initialise() {
 		this.state.initialised = true;
-		logger.info("ProjectSearch store initialized");
+		logger.info("ProjectSearch store initialised");
 	}
 
 	/**

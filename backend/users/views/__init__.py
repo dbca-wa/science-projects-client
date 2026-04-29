@@ -5,6 +5,7 @@ User views
 from .admin import SwitchAdmin, ToggleUserActive
 from .auth import ChangePassword, Login, Logout
 from .crud import DirectorateUsers, UserDetail, Users
+from .invite import InviteUser
 from .profile_entries import (
     StaffProfileEducationEntries,
     StaffProfileEducationEntryDetail,
@@ -97,4 +98,6 @@ __all__ = [
     "UserWorks",
     "UserWorkDetail",
     "UsersProjects",
+    # Invite
+    "InviteUser",
 ]

@@ -16,6 +16,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertTriangle, Info } from "lucide-react";
+import { RichTextEditor } from "../editor/RichTextEditor";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type { IProjectData } from "@/shared/types/project.types";
 import type { DocumentType } from "@/shared/utils/document.utils";
@@ -67,6 +68,7 @@ export interface DocumentActionFormData {
 	comment?: string;
 	reason?: string;
 	sendEmail: boolean;
+	feedbackHTML?: string;
 }
 
 // Validation schema
@@ -78,7 +80,7 @@ const documentActionSchema = z.object({
 
 type FormData = z.infer<typeof documentActionSchema>;
 
-export function UnifiedDocumentActionModal({
+export const UnifiedDocumentActionModal = ({
 	isOpen,
 	onClose,
 	action,
@@ -88,8 +90,9 @@ export function UnifiedDocumentActionModal({
 	currentStage,
 	onSubmit,
 	isSubmitting = false,
-}: UnifiedDocumentActionModalProps) {
+}: UnifiedDocumentActionModalProps) => {
 	const [showEmailCheckbox] = useState(true);
+	const [feedbackHTML, setFeedbackHTML] = useState("");
 
 	const {
 		register,
@@ -264,19 +267,22 @@ export function UnifiedDocumentActionModal({
 			sendEmail: data.sendEmail,
 		};
 
-		// Add comment or reason based on action
-		if (action === "send_back") {
-			formData.reason = data.reason || "";
+		// For recall and send_back, the rich text editor content is both the reason and the email feedback
+		if (action === "recall" || action === "send_back") {
+			formData.reason = feedbackHTML || "";
+			formData.feedbackHTML = feedbackHTML || "";
 		} else {
 			formData.comment = data.comment || "";
 		}
 
 		onSubmit(formData);
 		reset();
+		setFeedbackHTML("");
 	};
 
 	const handleClose = () => {
 		reset();
+		setFeedbackHTML("");
 		onClose();
 	};
 
@@ -312,30 +318,40 @@ export function UnifiedDocumentActionModal({
 						</Alert>
 					)}
 
-					{/* Comment/Reason Textarea */}
-					<div className="space-y-2">
-						<Label htmlFor={action === "send_back" ? "reason" : "comment"}>
-							{getTextareaLabel()}
-						</Label>
-						<Textarea
-							id={action === "send_back" ? "reason" : "comment"}
-							{...register(action === "send_back" ? "reason" : "comment")}
-							placeholder={getTextareaPlaceholder()}
-							rows={4}
-							className="resize-none"
-							required={action === "send_back"}
-						/>
-						{errors.reason && (
-							<p className="text-sm text-destructive">
-								{errors.reason.message}
-							</p>
-						)}
-						{errors.comment && (
-							<p className="text-sm text-destructive">
-								{errors.comment.message}
-							</p>
-						)}
-					</div>
+					{/* Comment/Reason field */}
+					{action === "recall" || action === "send_back" ? (
+						/* Rich text editor for recall and send back — serves as both reason and email feedback */
+						<div className="space-y-2">
+							<Label>{getTextareaLabel()}</Label>
+							<div className="min-h-[120px]">
+								<RichTextEditor
+									value={feedbackHTML}
+									onChange={setFeedbackHTML}
+									toolbar="simple"
+									placeholder={getTextareaPlaceholder()}
+									minHeight="120px"
+									wordLimit={2000}
+								/>
+							</div>
+						</div>
+					) : (
+						/* Plain textarea for submit, approve, reopen */
+						<div className="space-y-2">
+							<Label htmlFor="comment">{getTextareaLabel()}</Label>
+							<Textarea
+								id="comment"
+								{...register("comment")}
+								placeholder={getTextareaPlaceholder()}
+								rows={4}
+								className="resize-none"
+							/>
+							{errors.comment && (
+								<p className="text-sm text-destructive">
+									{errors.comment.message}
+								</p>
+							)}
+						</div>
+					)}
 
 					{/* Email Notification Checkbox */}
 					{showEmailCheckbox && (
@@ -377,4 +393,4 @@ export function UnifiedDocumentActionModal({
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

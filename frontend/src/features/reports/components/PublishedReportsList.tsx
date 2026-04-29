@@ -24,7 +24,6 @@ import {
 	TabsTrigger,
 	TabsContent,
 } from "@/shared/components/ui/tabs";
-import type { IAnnualReportPDF } from "@/features/reports/types/report.types";
 import {
 	Select,
 	SelectContent,
@@ -32,18 +31,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { getImageUrl } from "@/shared/utils/image.utils";
 import { useAuthStore } from "@/app/stores/store-context";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
-
-/** Format a year into "FY {prevYear}-{reportYear}" (e.g. 2025 → "FY 24-25") */
-function formatFY(year: number): string {
-	const prev = String(year - 1)
-		.slice(-2)
-		.padStart(2, "0");
-	const current = String(year).slice(-2).padStart(2, "0");
-	return `FY ${prev}-${current}`;
-}
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { getFinancialYearLabel } from "@/shared/utils/date.utils";
+import {
+	transformPublishedReports,
+	filterReportsByDivision,
+	type ReportItem,
+} from "../utils/published-reports.utils";
 
 interface ReportCardProps {
 	fileUrl: string;
@@ -86,7 +81,7 @@ function ReportCard({
 				/>
 				<span className="mt-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
 					{divisionSlug ? `${divisionSlug} ` : ""}
-					{formatFY(year)}
+					{getFinancialYearLabel(year)}
 				</span>
 				<span className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
 					Annual Report
@@ -119,18 +114,6 @@ interface UpdateModalData {
 	year: number;
 	isPublished: boolean;
 	isLegacy: boolean;
-}
-
-interface ReportItem {
-	id: number;
-	year: number;
-	fileUrl: string;
-	pdfId: number;
-	reportId: number;
-	isPublished: boolean;
-	isLegacy: boolean;
-	divisionId: number | null;
-	divisionSlug: string | null;
 }
 
 /** Grid of report cards */
@@ -232,88 +215,32 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 	const published = publishedReports ?? [];
 	const legacy = legacyReports ?? [];
 
-	/*
-	 * Transform published reports: the backend returns AnnualReport objects
-	 * with a nested `pdf` field. Extract all reports that have a PDF file.
-	 */
-	const allWithPDFs = published
-		.filter((r) => {
-			const report = r as unknown as Record<string, unknown>;
-			const pdf = report.pdf as Record<string, unknown> | null | undefined;
-			if (!pdf || typeof pdf !== "object") return false;
-			return (
-				("published_file" in pdf && !!pdf.published_file) ||
-				("draft_file" in pdf && !!pdf.draft_file)
-			);
-		})
-		.map((r) => {
-			const report = r as unknown as Record<string, unknown>;
-			const pdf = report.pdf as {
-				id: number;
-				published_file: string | null;
-				draft_file: string | null;
-			};
-			const division = report.division as {
-				id: number;
-				name: string;
-				slug?: string;
-			} | null;
-			const fileForCard = pdf.published_file || pdf.draft_file || "";
-			const fileUrl = getImageUrl(fileForCard) ?? fileForCard;
-			return {
-				id: pdf.id,
-				year: (report.year as number) ?? 0,
-				fileUrl,
-				isPublished: report.is_published === true,
-				pdfId: pdf.id,
-				reportId: (report.id as number) ?? 0,
-				isLegacy: false,
-				divisionId: division?.id ?? null,
-				divisionSlug: division?.slug ?? null,
-				hasPublishedFile: !!pdf.published_file,
-				hasDraftFile: !!pdf.draft_file,
-			};
-		});
-
-	const official = allWithPDFs.filter((r) => r.hasPublishedFile);
-	const unpublished = allWithPDFs.filter(
-		(r) => r.hasDraftFile && !r.hasPublishedFile
-	);
-
-	/* Legacy reports have `file` directly on the object */
-	const legacyWithFiles = legacy
-		.filter((r: IAnnualReportPDF) => !!r.file)
-		.map((r: IAnnualReportPDF) => ({
-			id: r.id,
-			year: r.year,
-			fileUrl: getImageUrl(r.file) ?? r.file,
-			pdfId: r.id,
-			reportId: r.report,
-			isPublished: false,
-			isLegacy: true,
-			divisionId: null,
-			divisionSlug: null,
-		}));
+	const {
+		official,
+		unpublished,
+		legacy: legacyWithFiles,
+	} = transformPublishedReports(published, legacy);
 
 	/* Apply division filter across all tabs */
-	const filterByDivision = (items: ReportItem[]) =>
-		selectedDivision === "all"
-			? items
-			: items.filter((r) => r.divisionId === selectedDivision);
-
-	const filteredOfficial = filterByDivision(official);
-	const filteredUnpublished = filterByDivision(unpublished);
-	const filteredLegacy = filterByDivision(legacyWithFiles);
+	const filteredOfficial = filterReportsByDivision(official, selectedDivision);
+	const filteredUnpublished = filterReportsByDivision(
+		unpublished,
+		selectedDivision
+	);
+	const filteredLegacy = filterReportsByDivision(
+		legacyWithFiles,
+		selectedDivision
+	);
 
 	const handleUpdate = (data: UpdateModalData) => setUpdateModalData(data);
 
 	return (
 		<>
-			<div className="mb-4 flex items-center justify-between">
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 					Published Reports
 				</h1>
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
 					<Select
 						value={
 							selectedDivision === "all" ? "all" : selectedDivision.toString()
@@ -322,7 +249,10 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 							setSelectedDivision(v === "all" ? "all" : Number(v))
 						}
 					>
-						<SelectTrigger className="w-48" aria-label="Filter by division">
+						<SelectTrigger
+							className="w-full sm:w-48"
+							aria-label="Filter by division"
+						>
 							<SelectValue placeholder="All Divisions" />
 						</SelectTrigger>
 						<SelectContent>

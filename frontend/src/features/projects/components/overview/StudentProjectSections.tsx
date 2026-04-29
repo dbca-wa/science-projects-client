@@ -13,16 +13,6 @@ export function StudentProjectSections({
 		? STUDY_LEVEL_LABELS[studentDetails.level] || studentDetails.level
 		: null;
 
-	// Debug logging
-	console.log("=== StudentProjectSections Debug ===");
-	console.log("Student details:", studentDetails);
-	console.log("Organisation:", studentDetails.organisation);
-	console.log("Level:", studentDetails.level);
-	console.log("Study level label:", studyLevelLabel);
-	console.log("Has organisation?", !!studentDetails.organisation);
-	console.log("Has level?", !!studyLevelLabel);
-	console.log("====================================");
-
 	return (
 		<>
 			{/* Organisation Section */}

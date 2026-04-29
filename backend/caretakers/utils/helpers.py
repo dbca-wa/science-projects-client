@@ -2,6 +2,8 @@
 Helper utilities for caretaker operations
 """
 
+from django.conf import settings
+
 
 def get_all_caretaker_assignments(user_id, processed_users=None):
     """
@@ -49,7 +51,7 @@ def deduplicate_documents(docs, is_serialized=False):
             doc_dict[key] = doc
 
         except (KeyError, AttributeError) as e:
-            print(f"Error processing document: {e}")
+            settings.LOGGER.error(msg=f"Error processing document: {e}")
             continue
 
     return list(doc_dict.values())

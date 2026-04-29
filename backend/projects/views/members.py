@@ -31,6 +31,7 @@ class ProjectMembers(APIView):
 
     def post(self, request):
         """Add member to project"""
+        settings.LOGGER.info(f"{request.user} is adding project member")
         settings.LOGGER.info(f"Received POST data: {request.data}")
 
         serializer = ProjectMemberSerializer(data=request.data)
@@ -62,6 +63,9 @@ class ProjectMemberDetail(APIView):
 
     def put(self, request, project_id, user_id):
         """Update project member"""
+        settings.LOGGER.info(
+            f"{request.user} is updating project member (project={project_id}, user={user_id})"
+        )
         # Get existing member first
         member = MemberService.get_member(project_id, user_id)
 
@@ -83,6 +87,9 @@ class ProjectMemberDetail(APIView):
 
     def delete(self, request, project_id, user_id):
         """Remove member from project"""
+        settings.LOGGER.warning(
+            f"{request.user} is removing project member (project={project_id}, user={user_id})"
+        )
         MemberService.remove_member(project_id, user_id, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -159,6 +166,7 @@ class PromoteToLeader(APIView):
 
     def post(self, request):
         """Promote user to leader"""
+        settings.LOGGER.info(f"{request.user} is promoting member to leader")
         user_id = request.data.get("user_id")
         project_id = request.data.get("project_id")
 

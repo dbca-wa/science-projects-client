@@ -9,7 +9,9 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        exclude: '\.(png|jpg|jpeg|gif|ico|bmp|tif|tiff|webp|svg|woff|woff2|ttf|eot|otf|pdf|eml|lock|zip|tar|gz|bz2|mp3|mp4|wav|ogg|avi|mov)$'
       - id: end-of-file-fixer
+        exclude: '\.(png|jpg|jpeg|gif|ico|bmp|tif|tiff|webp|svg|woff|woff2|ttf|eot|otf|pdf|eml|lock|zip|tar|gz|bz2|mp3|mp4|wav|ogg|avi|mov)$'
       - id: check-json
       - id: check-yaml
       - id: check-added-large-files
@@ -19,6 +21,7 @@ repos:
       - id: detect-private-key
       - id: mixed-line-ending
         args: [--fix=lf]
+        exclude: '\.(png|jpg|jpeg|gif|ico|bmp|tif|tiff|webp|svg|woff|woff2|ttf|eot|otf|pdf|eml|lock|zip|tar|gz|bz2|mp3|mp4|wav|ogg|avi|mov)$'
 
   # Frontend pre-commit hooks (only run when frontend files change)
   - repo: local

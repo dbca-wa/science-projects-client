@@ -34,7 +34,7 @@ const ProjectMapPage = observer(() => {
 	const filterButtonRef = useRef<HTMLDivElement>(null);
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
-	// Initialize screen reader announcements
+	// Initialise screen reader announcements
 	useScreenReaderAnnouncements();
 
 	// Disable Leaflet drag on control elements
@@ -49,7 +49,7 @@ const ProjectMapPage = observer(() => {
 		}
 	}, [store.state.filtersMinimized]);
 
-	// Initialize from URL params and localStorage
+	// Initialise from URL params and localStorage
 	// TypeScript infers TFilters from projectMapStore
 	useSearchStoreInit({
 		store,

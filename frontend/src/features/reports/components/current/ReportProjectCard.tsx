@@ -90,13 +90,13 @@ function getMembersByRole(members: IReportTeamMember[], role: string): string {
  * (stacked on mobile), an optional approve button on hover,
  * and labelled rich text sections below.
  */
-export default function ReportProjectCard({
+const ReportProjectCard = ({
 	report,
 	reportType,
 	index,
 	canEdit,
 	showApproveButton = false,
-}: ReportProjectCardProps) {
+}: ReportProjectCardProps) => {
 	const [approveDialogOpen, setApproveDialogOpen] = useState(false);
 
 	const project = report.document?.project;
@@ -104,7 +104,7 @@ export default function ReportProjectCard({
 
 	const imageUrl = getImageUrl(project?.image);
 	const projectTitle = sanitizeInput(project?.title ?? "Untitled Project");
-	const projectUrl = `/projects/${project?.id}/progress`;
+	const projectUrl = `/projects/${project?.id}/${reportType === "student" ? "student" : "progress"}`;
 	const tag = buildProjectTag(
 		project?.kind ?? "science",
 		project?.year ?? new Date().getFullYear(),
@@ -222,14 +222,14 @@ export default function ReportProjectCard({
 			/>
 		</>
 	);
-}
+};
 
 /* ------------------------------------------------------------------ */
 /*  Info blocks                                                        */
 /* ------------------------------------------------------------------ */
 
 /** Project info for progress reports: status, tag, scientists. */
-function ProgressInfoBlock({
+const ProgressInfoBlock = ({
 	projectTitle,
 	projectUrl,
 	statusClass,
@@ -243,7 +243,7 @@ function ProgressInfoBlock({
 	capitalisedStatus: string;
 	tag: string;
 	scientists: string;
-}) {
+}) => {
 	return (
 		<div className="flex-1 min-w-0">
 			<a
@@ -273,10 +273,10 @@ function ProgressInfoBlock({
 			</div>
 		</div>
 	);
-}
+};
 
 /** Project info for student reports: status, tag, student, academics, scientists. */
-function StudentInfoBlock({
+const StudentInfoBlock = ({
 	projectTitle,
 	projectUrl,
 	statusClass,
@@ -290,7 +290,7 @@ function StudentInfoBlock({
 	capitalisedStatus: string;
 	tag: string;
 	teamMembers: IReportTeamMember[];
-}) {
+}) => {
 	const student = getMembersByRole(teamMembers, "student");
 	const academics = getMembersByRole(teamMembers, "academicsuper");
 	const scientists = getMembersByRole(teamMembers, "supervising");
@@ -336,13 +336,13 @@ function StudentInfoBlock({
 			</div>
 		</div>
 	);
-}
+};
 
 /* ------------------------------------------------------------------ */
 /*  Approve dialogue                                                   */
 /* ------------------------------------------------------------------ */
 
-function ApproveDialog({
+const ApproveDialog = ({
 	open,
 	onOpenChange,
 	report,
@@ -352,7 +352,7 @@ function ApproveDialog({
 	onOpenChange: (open: boolean) => void;
 	report: IARProgressReport | IARStudentReport;
 	reportType: "progress" | "student";
-}) {
+}) => {
 	const approveMutation = useApproveReport();
 	const isActive = report.document?.project?.status === "active";
 	const kind =
@@ -419,20 +419,20 @@ function ApproveDialog({
 			</DialogContent>
 		</Dialog>
 	);
-}
+};
 
 /* ------------------------------------------------------------------ */
 /*  Rich text sections                                                 */
 /* ------------------------------------------------------------------ */
 
 /** Five rich text sections for a progress report. */
-function ProgressReportSections({
+const ProgressReportSections = ({
 	report,
 	canEdit,
 }: {
 	report: IARProgressReport;
 	canEdit: boolean;
-}) {
+}) => {
 	return (
 		<>
 			<InlineSaveEditor
@@ -482,16 +482,16 @@ function ProgressReportSections({
 			/>
 		</>
 	);
-}
+};
 
 /** Single rich text section for a student report. */
-function StudentReportSections({
+const StudentReportSections = ({
 	report,
 	canEdit,
 }: {
 	report: IARStudentReport;
 	canEdit: boolean;
-}) {
+}) => {
 	return (
 		<InlineSaveEditor
 			contentType="student-report-progress-report"
@@ -503,4 +503,6 @@ function StudentReportSections({
 			compact
 		/>
 	);
-}
+};
+
+export default ReportProjectCard;

@@ -7,8 +7,8 @@ import {
 	getProblemLabel,
 	getProblemColour,
 	getDocStatusLabel,
-	stripHtml,
 } from "../../utils/business-area.utils";
+import { extractTextFromHTML } from "@/shared/utils/html-display.utils";
 import type { IProblematicProjectRow } from "../../types/business-area.types";
 
 interface ProblematicProjectsTabProps {
@@ -104,7 +104,7 @@ export function ProblematicProjectsTab({
 									</td>
 									<td className="px-4 py-3">
 										<div className="font-medium text-blue-600 dark:text-blue-400">
-											{stripHtml(row.title)}
+											{extractTextFromHTML(row.title)}
 										</div>
 										<div className="text-xs text-muted-foreground">
 											{row.tag}

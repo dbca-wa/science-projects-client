@@ -2,6 +2,7 @@
 Concept plan views
 """
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -51,6 +52,7 @@ class ConceptPlans(APIView):
 
     def post(self, request):
         """Create concept plan"""
+        settings.LOGGER.info(f"{request.user} is creating concept plan")
         serializer = ConceptPlanCreateSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -94,6 +96,7 @@ class ConceptPlanDetail(APIView):
 
     def patch(self, request, pk):
         """Partial update concept plan"""
+        settings.LOGGER.info(f"{request.user} is updating concept plan (pk={pk})")
         serializer = ConceptPlanUpdateSerializer(data=request.data, partial=True)
 
         if not serializer.is_valid():
@@ -114,6 +117,7 @@ class ConceptPlanDetail(APIView):
 
     def put(self, request, pk):
         """Full update concept plan"""
+        settings.LOGGER.info(f"{request.user} is updating concept plan (pk={pk})")
         serializer = ConceptPlanUpdateSerializer(data=request.data, partial=False)
 
         if not serializer.is_valid():
@@ -134,6 +138,7 @@ class ConceptPlanDetail(APIView):
 
     def delete(self, request, pk):
         """Delete concept plan"""
+        settings.LOGGER.warning(f"{request.user} is deleting concept plan (pk={pk})")
         DocumentService.delete_document(pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -148,6 +153,7 @@ class GetConceptPlanData(APIView):
         Get formatted concept plan data for PDF generation.
         This endpoint processes concept plan data and formats it for document generation.
         """
+        settings.LOGGER.info(f"{request.user} is getting concept plan data (pk={pk})")
         import datetime
         from operator import attrgetter
 

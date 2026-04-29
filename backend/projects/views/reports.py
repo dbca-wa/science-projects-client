@@ -33,6 +33,9 @@ class CreateProgressReport(APIView):
             "year": <year>
         }
         """
+        settings.LOGGER.info(
+            f"{request.user} is creating progress report for project (pk={pk})"
+        )
         project_id = pk
         report_id = request.data.get("report_id")
         year = request.data.get("year")
@@ -101,6 +104,9 @@ class CreateStudentReport(APIView):
             "year": <year>
         }
         """
+        settings.LOGGER.info(
+            f"{request.user} is creating student report for project (pk={pk})"
+        )
         project_id = pk
         report_id = request.data.get("report_id")
         year = request.data.get("year")

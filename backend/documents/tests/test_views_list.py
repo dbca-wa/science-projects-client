@@ -1442,7 +1442,7 @@ class TestCancelReportDocGeneration:
 class TestNewCycleOpen:
     """Tests for new cycle open endpoint"""
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_new_cycle_open_superuser(
         self,
@@ -1487,7 +1487,7 @@ class TestNewCycleOpen:
         )
 
         # Assert
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert "error" in response.data
 
     @pytest.mark.integration
@@ -1504,7 +1504,7 @@ class TestNewCycleOpen:
             status.HTTP_403_FORBIDDEN,
         ]
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_new_cycle_open_with_emails(
         self,
@@ -1557,7 +1557,7 @@ class TestNewCycleOpen:
 class TestSendBumpEmails:
     """Tests for send bump emails endpoint"""
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_admin(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
@@ -1631,7 +1631,7 @@ class TestSendBumpEmails:
             status.HTTP_403_FORBIDDEN,
         ]
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_multiple_documents(
         self,
@@ -1675,7 +1675,7 @@ class TestSendBumpEmails:
         # Assert
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_400_BAD_REQUEST]
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_inactive_user(
         self,
@@ -1712,7 +1712,7 @@ class TestSendBumpEmails:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "errors" in response.data or "error" in response.data
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_user_not_found(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
@@ -1741,7 +1741,7 @@ class TestSendBumpEmails:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_email_error(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
@@ -1771,7 +1771,7 @@ class TestSendBumpEmails:
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_bump_emails_different_document_kinds(
         self, mock_send_email, api_client, admin_user, project_with_lead, db
@@ -2048,7 +2048,7 @@ class TestUserPublications:
 class TestSendMentionNotification:
     """Tests for send mention notification endpoint"""
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
@@ -2147,7 +2147,7 @@ class TestSendMentionNotification:
             status.HTTP_403_FORBIDDEN,
         ]
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification_with_html_content(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
@@ -2180,7 +2180,7 @@ class TestSendMentionNotification:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification_inactive_user(
         self,
@@ -2222,7 +2222,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["recipients"] == 0  # Inactive user not included
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification_non_dbca_email(
         self,
@@ -2264,7 +2264,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["recipients"] == 0  # Non-DBCA email not included
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification_user_not_found(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db
@@ -2298,7 +2298,7 @@ class TestSendMentionNotification:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["recipients"] == 0  # User not found, skipped
 
-    @patch("documents.views.notifications.send_email_with_embedded_image")
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
     @pytest.mark.integration
     def test_send_mention_notification_email_error(
         self, mock_send_email, api_client, user, project_document, project_with_lead, db

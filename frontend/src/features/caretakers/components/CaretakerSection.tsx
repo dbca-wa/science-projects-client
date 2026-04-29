@@ -94,7 +94,7 @@ export const CaretakerSection = ({
 		requestsCount,
 	]);
 
-	// Initialize activeTab - if no caretakees, default to Requests tab (which will be index 0)
+	// Initialise activeTab - if no caretakees, default to Requests tab (which will be index 0)
 	const [activeTab, setActiveTab] = useState<number>(() => {
 		// If no caretakees, Requests tab will be the only tab (index 0)
 		// If has caretakees, default to first tab (Caretaking For at index 0)

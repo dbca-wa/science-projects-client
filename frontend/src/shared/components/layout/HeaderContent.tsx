@@ -18,13 +18,14 @@ import {
 	CheckSquare,
 	RefreshCw,
 	Mail,
+	FlaskConical,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleDarkMode } from "./ToggleDarkMode";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
-import { useMyBusinessAreas } from "@/features/reports/hooks/useBusinessAreaLead";
-import { useDivisions } from "@/features/admin/hooks/useDivisions";
+import { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 
 interface HeaderContentProps {
@@ -36,10 +37,7 @@ interface HeaderContentProps {
  * HeaderContent
  * Navigation menu content for hamburger menu with navigation items and quick links
  */
-export default function HeaderContent({
-	handleNavigation,
-	onClose,
-}: HeaderContentProps) {
+const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 	const authStore = useAuthStore();
 	const { mutate: logout } = useLogout();
 	const { data: myBusinessAreas } = useMyBusinessAreas();
@@ -266,6 +264,16 @@ export default function HeaderContent({
 									<span>Email</span>
 								</span>
 							</Button>
+							<Button
+								variant="ghost"
+								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+								onClick={() => navigateAndClose("/admin/email-testing")}
+							>
+								<span className="flex items-center gap-3">
+									<FlaskConical className="text-xl" aria-hidden="true" />
+									<span>Email Testing</span>
+								</span>
+							</Button>
 
 							{/* CRUD */}
 							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
@@ -457,4 +465,6 @@ export default function HeaderContent({
 			</div>
 		</nav>
 	);
-}
+};
+
+export default HeaderContent;

@@ -47,11 +47,11 @@ class TestDeleteUnusedTags:
         selected = [tag1, tag2]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             delete_unused_tags(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.unit
     def test_deletes_unused_tags(self, staff_profile):
@@ -120,11 +120,11 @@ class TestCopyAboutExpertiseToStaffProfile:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             copy_about_expertise_to_staff_profile(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("Please select only one")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_copies_profile_data_to_staff_profile(self, staff_user):
@@ -172,11 +172,11 @@ class TestHideAllStaffProfiles:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             hide_all_staff_profiles(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("Please select only one")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_hides_all_staff_profiles(self, staff_user):
@@ -217,11 +217,11 @@ class TestCreateStaffProfiles:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             create_staff_profiles(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_creates_staff_profiles_for_users_without(self, staff_user):
@@ -260,11 +260,11 @@ class TestUpdateDisplayNames:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             update_display_names(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_updates_display_names_from_first_last(self, user_factory):
@@ -363,11 +363,11 @@ class TestSetItAssetsId:
         selected = [staff_profile, staff_profile]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             set_it_assets_id(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @patch("users.admin.requests.get")
     @pytest.mark.integration
@@ -449,11 +449,11 @@ class TestGenerateActiveStaffCSV:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             generate_active_staff_csv(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @patch("users.admin.requests.get")
     @pytest.mark.integration
@@ -552,11 +552,11 @@ class TestExportCurrentActiveProjectLeads:
         selected = [user, user]
 
         # Act
-        with patch("builtins.print") as mock_print:
+        with patch.object(admin, "message_user") as mock_message:
             export_current_active_project_leads(admin, request, selected)
 
             # Assert
-            mock_print.assert_called_once_with("PLEASE SELECT ONLY ONE")
+            mock_message.assert_called_once()
 
     @pytest.mark.integration
     def test_exports_active_project_leads(self, user_factory):

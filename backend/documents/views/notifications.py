@@ -9,21 +9,18 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q
-from django.template.loader import render_to_string
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_202_ACCEPTED,
     HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
 from rest_framework.views import APIView
 
-from agencies.models import BusinessArea
-from config.helpers import send_email_with_embedded_image
 from projects.models import Project
 from users.models import PublicStaffProfile, User
 
@@ -42,7 +39,7 @@ from ..serializers import (
     PublicationResponseSerializer,
     StudentReportCreateSerializer,
 )
-from ..utils.helpers import get_current_maintainer_id, get_encoded_image
+from ..services.notification_service import NotificationService
 
 
 class NewCycleOpen(APIView):
@@ -65,7 +62,7 @@ class NewCycleOpen(APIView):
         if not request.user.is_superuser:
             return Response(
                 {"error": "You don't have permission to do that!"},
-                HTTP_401_UNAUTHORIZED,
+                HTTP_403_FORBIDDEN,
             )
 
         last_report = AnnualReport.objects.order_by("-year").first()
@@ -140,6 +137,45 @@ class NewCycleOpen(APIView):
         # Combine querysets
         all_eligible_projects = eligible_projects | eligible_student_projects
 
+        # Prefetch existing report data to avoid N+1 queries inside the loop
+        all_eligible_pks = list(all_eligible_projects.values_list("pk", flat=True))
+
+        existing_pr_project_pks = set(
+            ProgressReport.objects.filter(
+                year=last_report.year, project__in=all_eligible_pks
+            ).values_list("project_id", flat=True)
+        )
+        existing_sr_project_pks = set(
+            StudentReport.objects.filter(
+                year=last_report.year, project__in=all_eligible_pks
+            ).values_list("project_id", flat=True)
+        )
+
+        # Prefetch latest previous reports per project for prepopulation
+        from django.db.models import OuterRef, Subquery
+
+        latest_pr_year_subquery = (
+            ProgressReport.objects.filter(project=OuterRef("project"))
+            .order_by("-year")
+            .values("pk")[:1]
+        )
+        latest_pr_objects = ProgressReport.objects.filter(
+            project__in=all_eligible_pks,
+            pk__in=Subquery(latest_pr_year_subquery),
+        ).select_related("document")
+        previous_pr_by_project = {pr.project_id: pr for pr in latest_pr_objects}
+
+        latest_sr_year_subquery = (
+            StudentReport.objects.filter(project=OuterRef("project"))
+            .order_by("-year")
+            .values("pk")[:1]
+        )
+        latest_sr_objects = StudentReport.objects.filter(
+            project__in=all_eligible_pks,
+            pk__in=Subquery(latest_sr_year_subquery),
+        ).select_related("document")
+        previous_sr_by_project = {sr.project_id: sr for sr in latest_sr_objects}
+
         # Create documents for each eligible project
         for project in all_eligible_projects:
             if project.kind == Project.CategoryKindChoices.STUDENT:
@@ -168,17 +204,11 @@ class NewCycleOpen(APIView):
 
                     if project.kind != Project.CategoryKindChoices.STUDENT:
                         # Create progress report
-                        exists = ProgressReport.objects.filter(
-                            year=last_report.year, project=project.pk
-                        ).exists()
+                        exists = project.pk in existing_pr_project_pks
 
                         if not exists:
                             # Get previous report for prepopulation
-                            last_one = (
-                                ProgressReport.objects.filter(project=project.pk)
-                                .order_by("-year")
-                                .first()
-                            )
+                            last_one = previous_pr_by_project.get(project.pk)
 
                             if not should_prepopulate:
                                 # Prepopulate only aims, context, implications
@@ -250,17 +280,11 @@ class NewCycleOpen(APIView):
                             project.save()
                     else:
                         # Create student report
-                        exists = StudentReport.objects.filter(
-                            year=last_report.year, project=project.pk
-                        ).exists()
+                        exists = project.pk in existing_sr_project_pks
 
                         if not exists:
                             # Get previous report for prepopulation
-                            last_one = (
-                                StudentReport.objects.filter(project=project.pk)
-                                .order_by("-year")
-                                .first()
-                            )
+                            last_one = previous_sr_by_project.get(project.pk)
 
                             if not should_prepopulate:
                                 student_report_data = {
@@ -316,110 +340,18 @@ class NewCycleOpen(APIView):
 
         # Send emails if requested
         if should_email:
-            settings.LOGGER.info("Sending cycle opened emails")
-            maintainer_id = get_current_maintainer_id()
-            settings.DEFAULT_FROM_EMAIL
-            template_path = "./email_templates/new_cycle_open_email.html"
-
-            actioning_user = User.objects.get(pk=request.user.pk)
-            actioning_user_name = f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
-            actioning_user_email = actioning_user.email
-
-            financial_year_string = f"{int(last_report.year-1)}-{int(last_report.year)}"
-
-            # Get business area leaders
-            recipients_list = []
-            bas = BusinessArea.objects.all()
-            if division_slug and last_report.division:
-                bas = bas.filter(division=last_report.division)
-            for ba in bas:
-                ba_lead = ba.leader
-                if ba_lead and ba_lead.is_active and ba_lead.is_staff:
-                    data_obj = {
-                        "pk": ba_lead.pk,
-                        "name": f"{ba_lead.display_first_name} {ba_lead.display_last_name}",
-                        "email": ba_lead.email,
-                    }
-                    recipients_list.append(data_obj)
-
-            processed = []
-            for recipient in recipients_list:
-                if recipient["pk"] not in processed:
-                    if settings.ENVIRONMENT == "production":
-                        settings.LOGGER.info(
-                            f"PRODUCTION: Sending email to {recipient['name']}"
-                        )
-
-                        email_subject = "SPMS: New Reporting Cycle Open"
-                        to_email = [recipient["email"]]
-
-                        template_props = {
-                            "email_subject": email_subject,
-                            "actioning_user_email": actioning_user_email,
-                            "actioning_user_name": actioning_user_name,
-                            "financial_year_string": financial_year_string,
-                            "recipient_name": recipient["name"],
-                            "site_url": settings.SITE_URL,
-                            "dbca_image_path": get_encoded_image(),
-                        }
-
-                        template_content = render_to_string(
-                            template_path, template_props
-                        )
-
-                        try:
-                            send_email_with_embedded_image(
-                                recipient_email=to_email,
-                                subject=email_subject,
-                                html_content=template_content,
-                            )
-                        except Exception as e:
-                            settings.LOGGER.error(f"Email Error: {e}")
-                            return Response(
-                                {
-                                    "error": "Failed to send notification email. Please try again."
-                                },
-                                status=HTTP_400_BAD_REQUEST,
-                            )
-                    else:
-                        # Test environment - only send to maintainer
-                        if recipient["pk"] == maintainer_id:
-                            settings.LOGGER.info(
-                                f"TEST: Sending email to {recipient['name']}"
-                            )
-
-                            email_subject = "SPMS: New Reporting Cycle Open"
-                            to_email = [recipient["email"]]
-
-                            template_props = {
-                                "email_subject": email_subject,
-                                "actioning_user_email": actioning_user_email,
-                                "actioning_user_name": actioning_user_name,
-                                "financial_year_string": financial_year_string,
-                                "recipient_name": recipient["name"],
-                                "site_url": settings.SITE_URL,
-                                "dbca_image_path": get_encoded_image(),
-                            }
-
-                            template_content = render_to_string(
-                                template_path, template_props
-                            )
-
-                            try:
-                                send_email_with_embedded_image(
-                                    recipient_email=to_email,
-                                    subject=email_subject,
-                                    html_content=template_content,
-                                )
-                            except Exception as e:
-                                settings.LOGGER.error(f"Email Error: {e}")
-                                return Response(
-                                    {
-                                        "error": "Failed to send notification email. Please try again."
-                                    },
-                                    status=HTTP_400_BAD_REQUEST,
-                                )
-                    processed.append(recipient["pk"])
+            try:
+                NotificationService.notify_new_cycle_open(
+                    last_report=last_report,
+                    actioning_user=User.objects.get(pk=request.user.pk),
+                    division_slug=division_slug,
+                )
+            except Exception as e:
+                settings.LOGGER.error(f"Email Error: {e}", exc_info=True)
+                return Response(
+                    {"error": "Failed to send notification email. Please try again."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
 
             return Response("Emails Sent!", status=HTTP_202_ACCEPTED)
 
@@ -446,130 +378,14 @@ class SendBumpEmails(APIView):
             f"{request.user} is sending bump emails for {len(documents_requiring_action)} documents..."
         )
 
-        template_path = "./email_templates/bump_email.html"
-
         actioning_user = User.objects.get(pk=request.user.pk)
-        actioning_user_name = (
-            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
+        result = NotificationService.send_bump_emails(
+            documents_requiring_action=documents_requiring_action,
+            actioning_user=actioning_user,
         )
-        actioning_user_email = actioning_user.email
 
-        # Document kind mapping
-        document_kind_dict = {
-            "concept": "Concept Plan",
-            "projectplan": "Project Plan",
-            "progressreport": "Progress Report",
-            "studentreport": "Student Report",
-            "projectclosure": "Project Closure",
-        }
-
-        def determine_doc_kind_url_string(kind):
-            url_mapping = {
-                "concept": "concept",
-                "projectplan": "project",
-                "progressreport": "progress",
-                "studentreport": "student",
-                "projectclosure": "closure",
-            }
-            return url_mapping.get(kind, kind)
-
-        emails_sent = 0
-        errors = []
-
-        for doc_data in documents_requiring_action:
-            try:
-                user_to_action = User.objects.get(pk=doc_data.get("userToTakeAction"))
-
-                if (
-                    not user_to_action.is_active
-                    or not user_to_action.email
-                    or not user_to_action.is_staff
-                ):
-                    errors.append(
-                        f"User {user_to_action.display_first_name} {user_to_action.display_last_name} "
-                        f"is inactive, external or has no email"
-                    )
-                    continue
-
-                document_kind_raw = doc_data.get("documentKind")
-                document_kind_title = document_kind_dict.get(
-                    document_kind_raw, document_kind_raw
-                )
-                url_doc_kind = determine_doc_kind_url_string(document_kind_raw)
-
-                email_subject = (
-                    f"SPMS: Action Required - {doc_data.get('projectTitle')}"
-                )
-                to_email = [user_to_action.email]
-
-                template_props = {
-                    "email_subject": email_subject,
-                    "actioning_user_email": actioning_user_email,
-                    "actioning_user_name": actioning_user_name,
-                    "recipient_name": f"{user_to_action.display_first_name} {user_to_action.display_last_name}",
-                    "recipient_email": user_to_action.email,
-                    "project_title": doc_data.get("projectTitle"),
-                    "project_id": doc_data.get("projectId"),
-                    "document_kind": document_kind_title,
-                    "document_kind_raw": document_kind_raw,
-                    "action_capacity": doc_data.get("actionCapacity"),
-                    "site_url": settings.SITE_URL,
-                    "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
-                }
-
-                template_content = render_to_string(template_path, template_props)
-
-                if settings.ENVIRONMENT == "production":
-                    settings.LOGGER.info(
-                        f"PRODUCTION: Sending bump email to {user_to_action.email}"
-                    )
-
-                    try:
-                        send_email_with_embedded_image(
-                            recipient_email=to_email,
-                            subject=email_subject,
-                            html_content=template_content,
-                        )
-                        emails_sent += 1
-                    except Exception as email_error:
-                        settings.LOGGER.error(f"Email Error: {email_error}")
-                        errors.append(f"Failed to send email to {user_to_action.email}")
-                else:
-                    # Test environment - only send to maintainer
-                    maintainer_id = get_current_maintainer_id()
-                    if user_to_action.pk == maintainer_id:
-                        settings.LOGGER.info(
-                            f"TEST: Sending bump email to {user_to_action.email}"
-                        )
-
-                        try:
-                            send_email_with_embedded_image(
-                                recipient_email=to_email,
-                                subject=email_subject,
-                                html_content=template_content,
-                            )
-                            emails_sent += 1
-                        except Exception as email_error:
-                            settings.LOGGER.error(f"Email Error: {email_error}")
-                            errors.append(
-                                f"Failed to send email to {user_to_action.email}"
-                            )
-                    else:
-                        settings.LOGGER.info(
-                            f"TEST: Skipping email to {user_to_action.email} (not maintainer)"
-                        )
-
-            except User.DoesNotExist:
-                errors.append(
-                    f"User with ID {doc_data.get('userToTakeAction')} not found"
-                )
-            except Project.DoesNotExist:
-                errors.append(f"Project with ID {doc_data.get('projectId')} not found")
-            except Exception as e:
-                settings.LOGGER.error(
-                    f"Unexpected error processing document {doc_data.get('documentId')}: {str(e)}"
-                )
-                errors.append(f"Error processing document {doc_data.get('documentId')}")
+        emails_sent = result["emails_sent"]
+        errors = result["errors"]
 
         response_data = {
             "emails_sent": emails_sent,
@@ -590,6 +406,267 @@ class SendBumpEmails(APIView):
                 {"error": "No emails were sent", "details": errors},
                 status=HTTP_400_BAD_REQUEST,
             )
+
+
+class BumpPreview(APIView):
+    """
+    Preview who would be bumped — returns users with outstanding documents
+    at stage 1 (project lead) and stage 2 (business area lead).
+    Stage 3 (directorate) documents are excluded.
+
+    Optional query params:
+    - ?stage=1 — only show stage 1 (project lead) items
+    - ?stage=2 — only show stage 2 (business area lead) items
+    - ?report_id=N — scope to a specific annual report (year + division)
+    """
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        from collections import defaultdict
+
+        from documents.models import AnnualReport, ProjectDocument
+        from projects.models import ProjectMember
+
+        stage_filter = request.query_params.get("stage") or request.data.get("stage")
+        report_id = request.query_params.get("report_id") or request.data.get(
+            "report_id"
+        )
+
+        doc_kind_labels = {
+            "progressreport": "Progress Report",
+            "studentreport": "Student Report",
+        }
+
+        url_kind_map = {
+            "progressreport": "progress",
+            "studentreport": "student",
+        }
+
+        # Only progress/student reports, non-approved, non-new
+        pending_docs = (
+            ProjectDocument.objects.filter(
+                Q(kind="progressreport") | Q(kind="studentreport"),
+            )
+            .exclude(
+                status__in=[
+                    ProjectDocument.StatusChoices.APPROVED,
+                    ProjectDocument.StatusChoices.NEW,
+                ]
+            )
+            .exclude(
+                project__status="terminated",
+            )
+            .select_related(
+                "project", "project__business_area", "project__business_area__leader"
+            )
+        )
+
+        # Scope to a specific annual report if provided
+        if report_id:
+            try:
+                target_report = AnnualReport.objects.get(pk=report_id)
+            except AnnualReport.DoesNotExist:
+                target_report = None
+
+            if target_report:
+                # Filter to documents linked to this annual report
+                from documents.models import ProgressReport, StudentReport
+
+                pr_doc_pks = set(
+                    ProgressReport.objects.filter(report=target_report).values_list(
+                        "document_id", flat=True
+                    )
+                )
+                sr_doc_pks = set(
+                    StudentReport.objects.filter(report=target_report).values_list(
+                        "document_id", flat=True
+                    )
+                )
+                report_doc_pks = pr_doc_pks | sr_doc_pks
+                pending_docs = pending_docs.filter(pk__in=report_doc_pks)
+
+                # Also filter by division if the report has one
+                if target_report.division:
+                    pending_docs = pending_docs.filter(
+                        project__business_area__division=target_report.division
+                    )
+
+        user_docs = defaultdict(
+            lambda: {"as_project_lead": [], "as_ba_lead": [], "user": None}
+        )
+
+        for doc in pending_docs:
+            kind_raw = doc.kind or ""
+            kind_label = doc_kind_labels.get(kind_raw, kind_raw)
+            url_kind = url_kind_map.get(kind_raw, kind_raw)
+            doc_info = {
+                "document_id": doc.pk,
+                "project_title": doc.project.title,
+                "project_id": doc.project.pk,
+                "document_kind": kind_label,
+                "document_url": f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}",
+            }
+
+            # Stage 1: project lead approval not granted
+            if not doc.project_lead_approval_granted:
+                if stage_filter and stage_filter != "1":
+                    continue
+                leader = (
+                    ProjectMember.objects.filter(project=doc.project, is_leader=True)
+                    .select_related("user")
+                    .first()
+                )
+                if leader and leader.user.is_active and leader.user.is_staff:
+                    uid = leader.user.pk
+                    user_docs[uid]["user"] = leader.user
+                    user_docs[uid]["as_project_lead"].append(doc_info)
+
+            # Stage 2: project lead approved, BA lead not
+            elif (
+                doc.project_lead_approval_granted
+                and not doc.business_area_lead_approval_granted
+            ):
+                if stage_filter and stage_filter != "2":
+                    continue
+                ba = doc.project.business_area
+                if ba and ba.leader and ba.leader.is_active and ba.leader.is_staff:
+                    uid = ba.leader.pk
+                    user_docs[uid]["user"] = ba.leader
+                    user_docs[uid]["as_ba_lead"].append(doc_info)
+
+            # Stage 3 (directorate): excluded
+
+        preview = []
+        for uid, data in user_docs.items():
+            u = data["user"]
+            if not u:
+                continue
+            preview.append(
+                {
+                    "user_id": u.pk,
+                    "name": f"{u.display_first_name} {u.display_last_name}",
+                    "email": u.email,
+                    "as_project_lead_count": len(data["as_project_lead"]),
+                    "as_ba_lead_count": len(data["as_ba_lead"]),
+                    "total": len(data["as_project_lead"]) + len(data["as_ba_lead"]),
+                    "as_project_lead": data["as_project_lead"],
+                    "as_ba_lead": data["as_ba_lead"],
+                }
+            )
+
+        preview.sort(key=lambda x: x["total"], reverse=True)
+
+        return Response(
+            {
+                "users": preview,
+                "total_users": len(preview),
+                "total_documents": sum(p["total"] for p in preview),
+            }
+        )
+
+
+class SendBumpAll(APIView):
+    """
+    Send consolidated bump emails to all users with outstanding documents
+    at stage 1 and stage 2. Each user receives one email listing all their items.
+    """
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        from django.template.loader import render_to_string
+
+        from config.helpers import send_email_with_embedded_image
+
+        # Reuse the preview logic to get the user/document grouping
+        # BumpPreview reads stage from both query_params and request.data
+        preview_view = BumpPreview()
+        preview_view.request = request
+        preview_response = preview_view.get(request)
+        users_data = preview_response.data.get("users", [])
+
+        if not users_data:
+            return Response(
+                {"error": "No users with outstanding documents found"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        actioning_user = request.user
+        actioning_name = (
+            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
+        )
+
+        emails_sent = 0
+        errors = []
+
+        for user_data in users_data:
+            total = user_data["total"]
+            recipient_name = user_data["name"]
+            recipient_email = user_data["email"]
+
+            context = {
+                "recipient_name": recipient_name,
+                "actioning_user_name": actioning_name,
+                "actioning_user_email": actioning_user.email,
+                "as_project_lead": user_data["as_project_lead"],
+                "as_ba_lead": user_data["as_ba_lead"],
+                "total_documents": total,
+                "logo_url": True,
+                "site_url": settings.SITE_URL,
+                "site_name": "SPMS",
+            }
+
+            # Use consolidated template for multiple docs, single template for one
+            if total == 1:
+                # Single document — use existing bump template
+                doc = (user_data["as_project_lead"] or user_data["as_ba_lead"])[0]
+                capacity = (
+                    "Project Lead"
+                    if user_data["as_project_lead"]
+                    else "Business Area Lead"
+                )
+                single_context = {
+                    **context,
+                    "project_title": doc["project_title"],
+                    "project_id": doc["project_id"],
+                    "document_kind": doc["document_kind"],
+                    "action_capacity": capacity,
+                    "document_url": doc["document_url"],
+                    "email_subject": f"SPMS: Action Required - {doc['project_title']}",
+                }
+                template = "./email_templates/bump_email.html"
+                subject = f"SPMS: Action Required - {doc['project_title']}"
+                html = render_to_string(template, single_context)
+            else:
+                template = "./email_templates/bump_consolidated_email.html"
+                subject = (
+                    f"SPMS: Action Required - {total} documents need your attention"
+                )
+                html = render_to_string(template, context)
+
+            try:
+                send_email_with_embedded_image(
+                    recipient_email=[recipient_email],
+                    subject=subject,
+                    html_content=html,
+                )
+                emails_sent += 1
+            except Exception as e:
+                settings.LOGGER.error(f"Failed to send bump to {recipient_email}: {e}")
+                errors.append(f"Failed: {recipient_name} ({recipient_email})")
+
+        settings.LOGGER.info(
+            f"{actioning_user} sent bulk bump emails: {emails_sent} users bumped"
+        )
+
+        return Response(
+            {
+                "emails_sent": emails_sent,
+                "total_users": len(users_data),
+                "errors": errors,
+            }
+        )
 
 
 class UserPublications(APIView):
@@ -728,7 +805,7 @@ class UserPublications(APIView):
             return Response(final_serializer.data, status=HTTP_200_OK)
 
         except Exception as e:
-            settings.LOGGER.error(f"Error processing request: {str(e)}")
+            settings.LOGGER.error(f"Error processing request: {str(e)}", exc_info=True)
             return self._error_response("Failed to process request")
 
 
@@ -747,11 +824,14 @@ class SendMentionNotification(APIView):
             mentioned_users = request.data.get("mentionedUsers", [])
             comment_content = request.data.get("commentContent", "")
 
-            # Fetch document and project
             try:
-                document = ProjectDocument.objects.get(pk=document_id)
-                project = Project.objects.get(pk=project_id)
-                project_tag = project.get_project_tag()
+                result = NotificationService.notify_comment_mention(
+                    document_id=document_id,
+                    project_id=project_id,
+                    commenter_data=commenter,
+                    mentioned_users=mentioned_users,
+                    comment_content=comment_content,
+                )
             except (ProjectDocument.DoesNotExist, Project.DoesNotExist) as e:
                 settings.LOGGER.error(f"Document or Project not found: {e}")
                 return Response(
@@ -759,136 +839,12 @@ class SendMentionNotification(APIView):
                     status=HTTP_404_NOT_FOUND,
                 )
 
-            # Generate document URL
-            url_safe_kind_dict = {
-                "concept": "concept",
-                "projectplan": "project",
-                "progressreport": "progress",
-                "studentreport": "student",
-                "projectclosure": "closure",
-            }
-
-            document_url = f"{settings.SITE_URL}/projects/{project.pk}/{url_safe_kind_dict[document.kind]}"
-
-            # Clean comment content
-            def clean_comment_content(html_content):
-                from bs4 import BeautifulSoup
-
-                if not html_content:
-                    return ""
-
-                try:
-                    soup = BeautifulSoup(html_content, "html.parser")
-                    mention_spans = soup.find_all(
-                        "span", {"data-lexical-mention": "true"}
-                    )
-                    for span in mention_spans:
-                        span.replace_with(span.get_text())
-                    return soup.get_text().strip()
-                except Exception as e:
-                    settings.LOGGER.error(f"Error cleaning comment content: {e}")
-                    return html_content
-
-            cleaned_comment = clean_comment_content(comment_content)
-
-            if not mentioned_users:
-                return Response(
-                    {
-                        "message": "No mentioned users found - no emails sent",
-                        "recipients": 0,
-                        "mentioned_users": 0,
-                    },
-                    status=HTTP_200_OK,
-                )
-
-            # Process mentioned users
-            recipients_to_notify = []
-            for user_data in mentioned_users:
-                user_id = user_data.get("id")
-                user_name = user_data.get("name")
-                user_email = user_data.get("email")
-
-                if user_email and user_email.endswith("@dbca.wa.gov.au"):
-                    try:
-                        user = User.objects.get(pk=user_id)
-                        if user.is_active and user.is_staff:
-                            recipients_to_notify.append(
-                                {"id": user_id, "name": user_name, "email": user_email}
-                            )
-                    except User.DoesNotExist:
-                        settings.LOGGER.warning(f"Mentioned user {user_id} not found")
-                        continue
-
-            # Send emails
-            processed_users = set()
-            emails_sent = 0
-
-            for recipient in recipients_to_notify:
-                user_id = recipient.get("id")
-                user_name = recipient.get("name")
-                user_email = recipient.get("email")
-
-                if user_id in processed_users:
-                    continue
-
-                processed_users.add(user_id)
-
-                # Skip if not in production and not test user
-                maintainer_id = get_current_maintainer_id()
-                if (settings.ENVIRONMENT != "production") and user_id != maintainer_id:
-                    settings.LOGGER.info(
-                        f"TEST: Skipping mention notification to {user_name}"
-                    )
-                    continue
-
-                to_email = [user_email]
-                document_kind_string_readable = ProjectDocument.CategoryKindChoices(
-                    document.kind
-                ).label
-
-                email_subject = f"SPMS: You were mentioned in a comment on {document_kind_string_readable} ({project_tag})"
-
-                template_props = {
-                    "recipient_name": user_name,
-                    "commenter_name": commenter.get("name"),
-                    "document_type_title": document_kind_string_readable,
-                    "project_tag": project_tag,
-                    "project_name": project.title,
-                    "document_url": document_url,
-                    "comment_content": cleaned_comment,
-                    "is_mention": True,
-                    "site_url": settings.SITE_URL,
-                }
-
-                try:
-                    template_content = render_to_string(
-                        "./email_templates/document_comment_mention.html",
-                        template_props,
-                    )
-                    send_email_with_embedded_image(
-                        recipient_email=to_email,
-                        subject=email_subject,
-                        html_content=template_content,
-                    )
-                    emails_sent += 1
-                    settings.LOGGER.info(
-                        f"{'PRODUCTION' if settings.ENVIRONMENT == 'production' else 'TEST'}: "
-                        f"Sent comment notification to {user_name}"
-                    )
-                except Exception as e:
-                    settings.LOGGER.error(f"Comment Notification Email Error: {e}")
-
-            return Response(
-                {
-                    "message": f"Mention notifications sent to {emails_sent} users",
-                    "recipients": len(recipients_to_notify),
-                    "mentioned_users": len(mentioned_users),
-                },
-                status=HTTP_200_OK,
-            )
+            return Response(result, status=HTTP_200_OK)
 
         except Exception as e:
-            settings.LOGGER.error(f"Error sending comment notifications: {str(e)}")
+            settings.LOGGER.error(
+                f"Error sending comment notifications: {str(e)}", exc_info=True
+            )
             return Response(
                 {"error": "Failed to send comment notifications. Please try again."},
                 status=HTTP_500_INTERNAL_SERVER_ERROR,

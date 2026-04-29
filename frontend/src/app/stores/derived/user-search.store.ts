@@ -67,7 +67,7 @@ export class UserSearchStore extends BaseStore<UserSearchStoreState> {
 	async initialise() {
 		this.loadFromStorage();
 		this.state.initialised = true;
-		logger.info("UserSearch store initialized", {
+		logger.info("UserSearch store initialised", {
 			saveSearch: this.state.saveSearch,
 			hasFilters: this.hasActiveFilters,
 		});
