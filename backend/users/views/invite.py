@@ -1,5 +1,7 @@
 """
-Invite user view — creates a new DBCA user and sends a welcome email
+Invite user view — sends an invitation email to a DBCA staff member.
+The user's account is created automatically when they first visit SPMS
+via the DBCA SSO middleware.
 """
 
 import requests as http_requests
@@ -11,15 +13,27 @@ from rest_framework.views import APIView
 
 from documents.services.notification_service import NotificationService
 from users.models import User, UserInvite
-from users.serializers.base import UserSerializer
+
+
+class _InviteRecipient:
+    """Lightweight stand-in for a User object, used by NotificationService."""
+
+    def __init__(self, email, first_name, last_name):
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
 
 
 class InviteUser(APIView):
     """
-    Invite a new DBCA staff member to SPMS.
+    Invite a DBCA staff member to SPMS.
 
     Validates the email exists in IT Assets (DBCA directory),
-    creates a user account, tracks the invite, and sends a welcome email.
+    creates an invite record, and sends an invitation email.
+    The user's account is created when they first visit the site.
     """
 
     permission_classes = [IsAuthenticated]
@@ -73,7 +87,6 @@ class InviteUser(APIView):
                 )
         except http_requests.RequestException as e:
             settings.LOGGER.error(f"IT Assets lookup failed for {email}: {e}")
-            # Allow invite to proceed if IT Assets is temporarily unavailable
             settings.LOGGER.warning(
                 "IT Assets unavailable — proceeding with invite without directory validation"
             )
@@ -92,41 +105,29 @@ class InviteUser(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        # Create user
-        username = email.split("@")[0]
-        # Handle duplicate usernames by appending a number
-        base_username = username
-        counter = 1
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
-
-        user = User.objects.create(
-            email=email,
-            username=username,
-            display_first_name=first_name,
-            display_last_name=last_name,
-            first_name=first_name,
-            last_name=last_name,
-            is_staff=True,
-            is_active=True,
-        )
-
-        # Create invite record
+        # Create invite record (no user account — that happens on first visit)
         UserInvite.objects.create(
             email=email,
             invited_by=request.user,
         )
 
-        # Send welcome email
+        # Send invitation email
+        recipient = _InviteRecipient(email, first_name, last_name)
         try:
-            NotificationService.send_spms_invite(user, request.user, settings.SITE_URL)
+            NotificationService.send_spms_invite(
+                recipient, request.user, settings.SITE_URL
+            )
         except Exception as e:
             settings.LOGGER.error(f"Failed to send invite email to {email}: {e}")
 
         settings.LOGGER.info(f"{request.user} invited {email} to SPMS")
 
         return Response(
-            UserSerializer(user).data,
+            {
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "invited": True,
+            },
             status=HTTP_201_CREATED,
         )

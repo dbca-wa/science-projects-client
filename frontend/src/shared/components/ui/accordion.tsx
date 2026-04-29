@@ -45,6 +45,36 @@ function AccordionTrigger({
 	);
 }
 
+/**
+ * Stable wrapper that prevents children from re-rendering during
+ * accordion open/close animations. MobX observer() on parent components
+ * can trigger re-renders mid-animation, which causes Radix's internal
+ * Presence component to re-measure content height and flash.
+ */
+const StableContent = React.memo(
+	({
+		children,
+		className,
+	}: {
+		children: React.ReactNode;
+		className?: string;
+	}) => <div className={cn("pt-0 pb-4", className)}>{children}</div>
+);
+StableContent.displayName = "StableContent";
+
+/**
+ * AccordionContent with MobX-safe animation handling.
+ *
+ * The flicker occurs because Radix's internal Presence component runs a
+ * useLayoutEffect that temporarily removes the CSS animation to measure
+ * content height. When MobX triggers a re-render during the close animation,
+ * this effect re-runs mid-transition, causing a visible flash.
+ *
+ * Fix: The StableContent wrapper uses React.memo to prevent children from
+ * re-rendering during animation. Combined with overflow:hidden (inline style
+ * to survive re-renders) and animation-fill-mode:forwards (persists final
+ * animation state), this eliminates the flicker.
+ */
 function AccordionContent({
 	className,
 	children,
@@ -53,10 +83,11 @@ function AccordionContent({
 	return (
 		<AccordionPrimitive.Content
 			data-slot="accordion-content"
-			className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+			className="text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+			style={{ overflow: "hidden" }}
 			{...props}
 		>
-			<div className={cn("pt-0 pb-4", className)}>{children}</div>
+			<StableContent className={className}>{children}</StableContent>
 		</AccordionPrimitive.Content>
 	);
 }

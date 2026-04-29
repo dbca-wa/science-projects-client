@@ -159,7 +159,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 							ref={registerMenuItem(3)}
 							type="button"
 							onClick={() => {
-								navigate("/admin/email-testing");
+								navigate("/manage/email-testing");
 								onClose();
 							}}
 							className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"

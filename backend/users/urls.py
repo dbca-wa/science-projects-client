@@ -8,6 +8,7 @@ urlpatterns = [
     path("me", views.Me.as_view()),
     path("smallsearch", views.SmallInternalUserSearch.as_view()),
     path("invite", views.InviteUser.as_view()),
+    path("it-assets-search", views.ITAssetsSearch.as_view()),
     path("directorate", views.DirectorateUsers.as_view()),
     path(
         "list", views.Users.as_view()

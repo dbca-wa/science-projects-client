@@ -111,8 +111,8 @@ const config = {
 				},
 			},
 			animation: {
-				"accordion-down": "accordion-down 0.2s ease-out",
-				"accordion-up": "accordion-up 0.2s ease-out",
+				"accordion-down": "accordion-down 0.2s ease-out forwards",
+				"accordion-up": "accordion-up 0.2s ease-out forwards",
 				shimmer: "shimmer 2s ease-in-out infinite",
 				buttonBounce: "buttonBounce 0.3s ease-out",
 			},

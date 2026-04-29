@@ -25,6 +25,9 @@ export const USER_ENDPOINTS = {
 	REQUEST_MERGE: "adminoptions/tasks",
 	INVITE: "users/invite",
 
+	// IT Assets search
+	IT_ASSETS_SEARCH: "users/it-assets-search",
+
 	// Staff profile
 	TOGGLE_STAFF_PROFILE_VISIBILITY: (staffProfileId: number | string) =>
 		`users/staffprofiles/${staffProfileId}/toggle_visibility`,

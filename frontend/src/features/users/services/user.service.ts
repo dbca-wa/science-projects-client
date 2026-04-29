@@ -302,11 +302,37 @@ export const toggleStaffProfileVisibility = async (
 	);
 };
 
-/** Invite a new DBCA user to SPMS */
+/** Response from the invite endpoint */
+export interface InviteResponse {
+	email: string;
+	first_name: string;
+	last_name: string;
+	invited: boolean;
+}
+
+/** Invite a DBCA user to SPMS (sends email only, no account creation) */
 export const inviteUser = async (data: {
 	email: string;
 	first_name: string;
 	last_name: string;
-}): Promise<IUserData> => {
-	return apiClient.post<IUserData>(USER_ENDPOINTS.INVITE, data);
+}): Promise<InviteResponse> => {
+	return apiClient.post<InviteResponse>(USER_ENDPOINTS.INVITE, data);
+};
+
+/** IT Assets search result */
+export interface ITAssetUser {
+	employee_id: string;
+	name: string;
+	email: string;
+	title: string;
+	location: string;
+	in_spms: boolean;
+	already_invited: boolean;
+}
+
+/** Search IT Assets directory for DBCA users */
+export const searchITAssets = async (query: string): Promise<ITAssetUser[]> => {
+	return apiClient.get<ITAssetUser[]>(USER_ENDPOINTS.IT_ASSETS_SEARCH, {
+		params: { q: query },
+	});
 };

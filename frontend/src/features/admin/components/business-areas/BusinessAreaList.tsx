@@ -72,7 +72,7 @@ export function BusinessAreaList() {
 	);
 
 	const handleAdd = () => {
-		navigate("/admin/business-areas/add");
+		navigate("/manage/business-areas/add");
 	};
 
 	const handleEdit = (item: IBusinessArea) => {

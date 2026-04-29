@@ -312,7 +312,7 @@ export function BusinessAreaPageForm({
 
 			updateMutation.mutate(
 				{ id: businessAreaId, formData },
-				{ onSuccess: () => navigate("/admin/business-areas") }
+				{ onSuccess: () => navigate("/manage/business-areas") }
 			);
 		} else {
 			// Create — always use FormData
@@ -330,7 +330,7 @@ export function BusinessAreaPageForm({
 			if (imageFile) formData.append("image", imageFile);
 
 			createMutation.mutate(formData, {
-				onSuccess: () => navigate("/admin/business-areas"),
+				onSuccess: () => navigate("/manage/business-areas"),
 			});
 		}
 	};
@@ -350,7 +350,7 @@ export function BusinessAreaPageForm({
 				<Button
 					variant="ghost"
 					size="icon"
-					onClick={() => navigate("/admin/business-areas")}
+					onClick={() => navigate("/manage/business-areas")}
 					aria-label="Back to business areas"
 				>
 					<ArrowLeft className="size-5" />
@@ -646,7 +646,7 @@ export function BusinessAreaPageForm({
 					<Button
 						type="button"
 						variant="outline"
-						onClick={() => navigate("/admin/business-areas")}
+						onClick={() => navigate("/manage/business-areas")}
 					>
 						Cancel
 					</Button>

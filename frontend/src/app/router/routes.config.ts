@@ -16,6 +16,7 @@ const UserCreatePage = lazy(() => import("@/pages/users/UserCreatePage"));
 const UserCreateStaffPage = lazy(
 	() => import("@/pages/users/UserCreateStaffPage")
 );
+const InviteUserPage = lazy(() => import("@/pages/users/InviteUserPage"));
 const UserDetailPage = lazy(() => import("@/pages/users/UserDetailPage"));
 const UserEditPage = lazy(() => import("@/pages/users/UserEditPage"));
 const MyProfilePage = lazy(() => import("@/pages/users/MyProfilePage"));
@@ -186,7 +187,7 @@ export const USER_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Add DBCA User (Admin)",
-		path: "/users/create-staff",
+		path: "/manage/create-staff",
 		iconKey: "userAdd",
 		tooltipKey: "users",
 		component: UserCreateStaffPage,
@@ -194,6 +195,16 @@ export const USER_ROUTES: RouteConfig[] = [
 		requiresAdmin: true,
 		showInSidebar: true,
 		section: "Users",
+		layoutWrapper: "content",
+		breadcrumbParent: "/users",
+	},
+	{
+		name: "Invite DBCA User",
+		path: "/users/invite",
+		iconKey: "userAdd",
+		component: InviteUserPage,
+		requiresAuth: true,
+		showInSidebar: false,
 		layoutWrapper: "content",
 		breadcrumbParent: "/users",
 	},
@@ -533,7 +544,7 @@ export const REPORT_ROUTES: RouteConfig[] = [
 export const ADMIN_ROUTES: RouteConfig[] = [
 	{
 		name: "Data Lists",
-		path: "/admin/data",
+		path: "/manage/data",
 		component: DataListsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -542,7 +553,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Email",
-		path: "/admin/emails",
+		path: "/manage/emails",
 		component: EmailsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -551,7 +562,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Email Testing",
-		path: "/admin/email-testing",
+		path: "/manage/email-testing",
 		component: EmailTestingPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -560,7 +571,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Addresses",
-		path: "/admin/addresses",
+		path: "/manage/addresses",
 		component: AddressesPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -569,7 +580,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Affiliations",
-		path: "/admin/affiliations",
+		path: "/manage/affiliations",
 		component: AffiliationsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -578,7 +589,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Branches",
-		path: "/admin/branches",
+		path: "/manage/branches",
 		component: BranchesPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -587,7 +598,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Add Business Area",
-		path: "/admin/business-areas/add",
+		path: "/manage/business-areas/add",
 		component: BusinessAreaAddPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -596,7 +607,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Edit Business Area",
-		path: "/admin/business-areas/:id/edit",
+		path: "/manage/business-areas/:id/edit",
 		component: BusinessAreaEditPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -605,7 +616,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Business Areas",
-		path: "/admin/business-areas",
+		path: "/manage/business-areas",
 		component: BusinessAreasPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -614,7 +625,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Divisions",
-		path: "/admin/divisions",
+		path: "/manage/divisions",
 		component: DivisionsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -623,7 +634,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Locations",
-		path: "/admin/locations",
+		path: "/manage/locations",
 		component: LocationsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -632,7 +643,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Report Info",
-		path: "/admin/reports",
+		path: "/manage/reports",
 		component: ReportInfoPage,
 		requiresAuth: true,
 		requiresKeyStakeholder: true,
@@ -641,7 +652,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Services",
-		path: "/admin/services",
+		path: "/manage/services",
 		component: ServicesPage,
 		requiresAuth: true,
 		requiresAdmin: true,
@@ -650,7 +661,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Batch Approve Old Reports",
-		path: "/admin/batch-approve-old",
+		path: "/manage/batch-approve-old",
 		component: BatchApproveOldPage,
 		requiresAuth: true,
 		requiresKeyStakeholder: true,
@@ -659,7 +670,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Batch Approve Reports",
-		path: "/admin/batch-approve",
+		path: "/manage/batch-approve",
 		component: BatchApprovePage,
 		requiresAuth: true,
 		requiresKeyStakeholder: true,
@@ -668,7 +679,7 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 	},
 	{
 		name: "Open New Cycle",
-		path: "/admin/new-cycle",
+		path: "/manage/new-cycle",
 		component: NewCyclePage,
 		requiresAuth: true,
 		requiresKeyStakeholder: true,

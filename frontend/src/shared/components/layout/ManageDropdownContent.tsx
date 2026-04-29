@@ -38,12 +38,12 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "Lists & Emails",
 		items: [
 			{
-				targetPath: "/admin/data",
+				targetPath: "/manage/data",
 				icon: <Database className="size-4" aria-hidden="true" />,
 				label: "Data Lists",
 			},
 			{
-				targetPath: "/admin/emails",
+				targetPath: "/manage/emails",
 				icon: <Mail className="size-4" aria-hidden="true" />,
 				label: "Email",
 			},
@@ -53,42 +53,42 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "CRUD",
 		items: [
 			{
-				targetPath: "/admin/addresses",
+				targetPath: "/manage/addresses",
 				icon: <MapPin className="size-4" aria-hidden="true" />,
 				label: "Addresses",
 			},
 			{
-				targetPath: "/admin/affiliations",
+				targetPath: "/manage/affiliations",
 				icon: <Building className="size-4" aria-hidden="true" />,
 				label: "Affiliations",
 			},
 			{
-				targetPath: "/admin/branches",
+				targetPath: "/manage/branches",
 				icon: <GitBranch className="size-4" aria-hidden="true" />,
 				label: "Branches",
 			},
 			{
-				targetPath: "/admin/business-areas",
+				targetPath: "/manage/business-areas",
 				icon: <Briefcase className="size-4" aria-hidden="true" />,
 				label: "Business Areas",
 			},
 			{
-				targetPath: "/admin/divisions",
+				targetPath: "/manage/divisions",
 				icon: <Settings className="size-4" aria-hidden="true" />,
 				label: "Divisions",
 			},
 			{
-				targetPath: "/admin/locations",
+				targetPath: "/manage/locations",
 				icon: <Globe className="size-4" aria-hidden="true" />,
 				label: "Locations",
 			},
 			{
-				targetPath: "/admin/reports",
+				targetPath: "/manage/reports",
 				icon: <FileText className="size-4" aria-hidden="true" />,
 				label: "Report Info",
 			},
 			{
-				targetPath: "/admin/services",
+				targetPath: "/manage/services",
 				icon: <List className="size-4" aria-hidden="true" />,
 				label: "Services",
 			},
@@ -98,17 +98,17 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "AR Actions",
 		items: [
 			{
-				targetPath: "/admin/batch-approve-old",
+				targetPath: "/manage/batch-approve-old",
 				icon: <CheckSquare className="size-4" aria-hidden="true" />,
 				label: "Batch Approve Old Reports",
 			},
 			{
-				targetPath: "/admin/batch-approve",
+				targetPath: "/manage/batch-approve",
 				icon: <CheckSquare className="size-4" aria-hidden="true" />,
 				label: "Batch Approve Reports",
 			},
 			{
-				targetPath: "/admin/new-cycle",
+				targetPath: "/manage/new-cycle",
 				icon: <RefreshCw className="size-4" aria-hidden="true" />,
 				label: "Open New Cycle",
 			},
@@ -144,7 +144,7 @@ export function ManageDropdownContent({
 				return {
 					...section,
 					items: section.items.filter(
-						(item) => item.targetPath !== "/admin/reports"
+						(item) => item.targetPath !== "/manage/reports"
 					),
 				};
 			}

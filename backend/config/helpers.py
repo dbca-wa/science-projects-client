@@ -88,13 +88,24 @@ def send_email_with_embedded_image(
     """
     from email.mime.image import MIMEImage
 
+    # Track test mode state for final logging
+    is_test_mode = False
+    test_mode_user = None
+    original_recipients = None
+
     # Check testing mode before sending
     try:
         from adminoptions.models import AdminOptions
 
         admin_opts = AdminOptions.objects.first()
         if admin_opts and admin_opts.email_testing_mode and admin_opts.email_test_user:
+            is_test_mode = True
             test_email = admin_opts.email_test_user.email
+            test_mode_user = (
+                f"{admin_opts.email_test_user.display_first_name} "
+                f"{admin_opts.email_test_user.display_last_name} "
+                f"({test_email})"
+            )
             original_recipients = recipient_email
             recipient_email = [test_email]
 
@@ -104,8 +115,8 @@ def send_email_with_embedded_image(
             dedup_key = f"test_email_dedup:{subject}"
             if cache.get(dedup_key):
                 settings.LOGGER.info(
-                    f"TESTING MODE: Skipping duplicate email '{subject}' "
-                    f"(original: {original_recipients})"
+                    f"[TEST MODE] Skipping duplicate email '{subject}' "
+                    f"(original: {original_recipients}, test user: {test_mode_user})"
                 )
                 return
             cache.set(dedup_key, True, timeout=30)  # 30-second dedup window
@@ -139,7 +150,9 @@ def send_email_with_embedded_image(
             else:
                 html_content = test_banner + html_content
             settings.LOGGER.info(
-                f"TESTING MODE: Redirecting email from {original_recipients} to {test_email}"
+                f"[TEST MODE] Redirecting '{subject}' — "
+                f"original: {', '.join(original_recipients) if isinstance(original_recipients, list) else original_recipients} "
+                f"→ test user: {test_mode_user}"
             )
     except Exception as e:
         settings.LOGGER.error(f"Error checking email testing mode: {e}")
@@ -178,6 +191,38 @@ def send_email_with_embedded_image(
 
     # Send the message
     msg.send()
+
+    # Clear summary log covering all scenarios
+    backend = settings.EMAIL_BACKEND
+    is_console = "console" in backend
+    recipients_str = (
+        ", ".join(recipient_email)
+        if isinstance(recipient_email, list)
+        else recipient_email
+    )
+
+    if is_console and is_test_mode:
+        settings.LOGGER.info(
+            f"[CONSOLE + TEST MODE] Email rendered to terminal (not sent). "
+            f"Subject: '{subject}' | "
+            f"Original recipient: {', '.join(original_recipients) if isinstance(original_recipients, list) else original_recipients} | "
+            f"Redirected to test user: {test_mode_user}"
+        )
+    elif is_console:
+        settings.LOGGER.info(
+            f"[CONSOLE] Email rendered to terminal (not sent). "
+            f"Subject: '{subject}' | Recipient: {recipients_str}"
+        )
+    elif is_test_mode:
+        settings.LOGGER.info(
+            f"[TEST MODE] Email SENT to test user {test_mode_user} "
+            f"(original recipient: {', '.join(original_recipients) if isinstance(original_recipients, list) else original_recipients}). "
+            f"Subject: '{subject}'"
+        )
+    else:
+        settings.LOGGER.info(
+            f"[LIVE] Email sent. Subject: '{subject}' | Recipient: {recipients_str}"
+        )
 
 
 def _get_encoded_ar_dbca_image_legacy():

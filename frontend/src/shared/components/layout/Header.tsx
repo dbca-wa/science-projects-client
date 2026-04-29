@@ -258,7 +258,7 @@ export const Header = observer(() => {
 											...(authStore.isSuperuser
 												? [
 														{
-															targetPath: "/users/create-staff",
+															targetPath: "/manage/create-staff",
 															icon: (
 																<FaUserPlus
 																	className="size-4"

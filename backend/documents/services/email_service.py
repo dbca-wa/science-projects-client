@@ -69,9 +69,6 @@ class EmailService:
                 subject=subject,
                 html_content=html_content,
             )
-            settings.LOGGER.info(
-                f"Email sent: {subject} to {', '.join(recipient_email)}"
-            )
             return True
         except Exception as e:
             settings.LOGGER.error(f"Email send failed: {e}")
