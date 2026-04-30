@@ -45,6 +45,7 @@ class ConceptPlanCreateSerializer(serializers.ModelSerializer):
         model = ConceptPlan
         fields = [
             "document",
+            "project",
             "background",
             "aims",
             "outcome",

@@ -7,6 +7,8 @@ import {
 	Settings,
 	Trash2,
 	ChevronDown,
+	EyeOff,
+	Eye,
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -37,6 +39,8 @@ interface ProjectActionsDropdownProps {
 	onDeleteProject?: () => void;
 	onRequestDeletion?: () => void;
 	onCancelDeletionRequest?: () => void;
+	onHideProject?: () => void;
+	isHiddenFromProfile?: boolean;
 }
 
 export function ProjectActionsDropdown({
@@ -53,6 +57,8 @@ export function ProjectActionsDropdown({
 	onDeleteProject,
 	onRequestDeletion,
 	onCancelDeletionRequest,
+	onHideProject,
+	isHiddenFromProfile,
 }: ProjectActionsDropdownProps) {
 	// Check if user can manage project
 	const hasManagePermission = canEditProject(currentUser, project);
@@ -198,6 +204,20 @@ export function ProjectActionsDropdown({
 								<span>Set Status</span>
 							</DropdownMenuItem>
 						</>
+					)}
+
+					{/* Hide/Show from Staff Profile */}
+					{onHideProject && (
+						<DropdownMenuItem onClick={onHideProject}>
+							{isHiddenFromProfile ? (
+								<Eye className="mr-2 h-4 w-4" />
+							) : (
+								<EyeOff className="mr-2 h-4 w-4" />
+							)}
+							<span>
+								{isHiddenFromProfile ? "Show on Profile" : "Hide from Profile"}
+							</span>
+						</DropdownMenuItem>
 					)}
 
 					{/* Delete/Request Deletion */}

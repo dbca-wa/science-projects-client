@@ -4,10 +4,23 @@ Project plan serializers
 
 from rest_framework import serializers
 
-from medias.serializers import AECPDFSerializer
+from medias.models import ProjectPlanMethodologyPhoto
+from medias.serializers import AECPDFSerializer, TinyMethodologyImageSerializer
 
 from ..models import Endorsement, ProjectPlan
 from .base import TinyProjectDocumentSerializer
+
+
+class MethodologyImageMethodMixin:
+    """Mixin to provide get_methodology_image method for project plan serializers"""
+
+    def get_methodology_image(self, obj):
+        """Get methodology image for this project plan"""
+        try:
+            image = ProjectPlanMethodologyPhoto.objects.get(project_plan=obj)
+        except ProjectPlanMethodologyPhoto.DoesNotExist:
+            return None
+        return TinyMethodologyImageSerializer(image).data
 
 
 class EndorsementMethodMixin:
@@ -43,11 +56,14 @@ class EndorsementMethodMixin:
             return None
 
 
-class TinyProjectPlanSerializer(EndorsementMethodMixin, serializers.ModelSerializer):
+class TinyProjectPlanSerializer(
+    EndorsementMethodMixin, MethodologyImageMethodMixin, serializers.ModelSerializer
+):
     """Minimal project plan serializer"""
 
     document = TinyProjectDocumentSerializer(read_only=True)
     endorsements = serializers.SerializerMethodField()
+    methodology_image = serializers.SerializerMethodField()
 
     class Meta:
         model = ProjectPlan
@@ -59,22 +75,44 @@ class TinyProjectPlanSerializer(EndorsementMethodMixin, serializers.ModelSeriali
             "outcome",
             "knowledge_transfer",
             "listed_references",
+            "methodology",
+            "project_tasks",
             "operating_budget",
             "operating_budget_external",
             "related_projects",
             "endorsements",
+            "methodology_image",
         ]
 
 
-class ProjectPlanSerializer(EndorsementMethodMixin, serializers.ModelSerializer):
+class ProjectPlanSerializer(
+    EndorsementMethodMixin, MethodologyImageMethodMixin, serializers.ModelSerializer
+):
     """Standard project plan serializer"""
 
     document = TinyProjectDocumentSerializer(read_only=True)
     endorsements = serializers.SerializerMethodField()
+    methodology_image = serializers.SerializerMethodField()
 
     class Meta:
         model = ProjectPlan
-        fields = "__all__"
+        fields = [
+            "id",
+            "document",
+            "project",
+            "background",
+            "aims",
+            "outcome",
+            "knowledge_transfer",
+            "listed_references",
+            "methodology",
+            "project_tasks",
+            "operating_budget",
+            "operating_budget_external",
+            "related_projects",
+            "endorsements",
+            "methodology_image",
+        ]
 
 
 class ProjectPlanCreateSerializer(serializers.ModelSerializer):
@@ -84,6 +122,7 @@ class ProjectPlanCreateSerializer(serializers.ModelSerializer):
         model = ProjectPlan
         fields = [
             "document",
+            "project",
             "background",
             "aims",
             "outcome",

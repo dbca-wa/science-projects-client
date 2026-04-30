@@ -2,46 +2,74 @@ import { observer } from "mobx-react-lite";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { Label } from "@/shared/components/ui/label";
 import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
-import {
-	Building2,
-	DollarSign,
-	Target,
-	FileText,
-	AlertCircle,
-} from "lucide-react";
+import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
+import { Building2, DollarSign } from "lucide-react";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import type { IAffiliation } from "@/shared/types/org.types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
+import { FieldError } from "../FieldError";
+import { shouldShowError } from "../validation-helpers";
 
 /**
- * FieldError - Display validation error for a field
+ * Stable RTE wrappers — memoised so they never re-render from parent
+ * observer updates. Prevents Lexical focus loss.
  */
-const FieldError = ({ error }: { error?: string }) => {
-	if (!error) return null;
-	return (
-		<div className="flex items-center gap-1 text-xs text-destructive mt-1">
-			<AlertCircle className="h-3 w-3" />
-			<span>{error}</span>
-		</div>
-	);
-};
+const StableExternalDescEditor = memo(
+	({
+		initialValue,
+		onChange,
+	}: {
+		initialValue: string;
+		onChange: (html: string) => void;
+	}) => (
+		<RichTextEditor
+			value={initialValue}
+			onChange={onChange}
+			placeholder="Description specific to this external project..."
+			toolbar="projectDescription"
+			minHeight="150px"
+			aria-label="External project description"
+			className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+		/>
+	),
+	() => true
+);
+StableExternalDescEditor.displayName = "StableExternalDescEditor";
+
+const StableAimsEditor = memo(
+	({
+		initialValue,
+		onChange,
+	}: {
+		initialValue: string;
+		onChange: (html: string) => void;
+	}) => (
+		<RichTextEditor
+			value={initialValue}
+			onChange={onChange}
+			placeholder="List out the aims of your project..."
+			toolbar="projectDescription"
+			minHeight="150px"
+			aria-label="External project aims"
+			className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+		/>
+	),
+	() => true
+);
+StableAimsEditor.displayName = "StableAimsEditor";
 
 /**
  * ExternalDetailsStep - Step 4 of project creation wizard (conditional)
  *
- * Only shown when project kind is "external"
- *
- * Collects:
- * - Collaboration with (required, affiliation multi-select)
- * - Budget (optional, text)
- * - External description (optional, rich text)
- * - Aims (optional, rich text)
+ * Only shown when project kind is "external".
+ * Updates the MobX store directly. RTE components use stable memo wrappers
+ * to prevent focus loss during typing.
  */
 const ExternalDetailsStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
 	const formData = wizardStore.state.formData.externalDetails;
-	const validation = wizardStore.state.validation[3]; // Step 3 is External Details
+	const validation = wizardStore.state.validation[3];
+	const stepIndex = 3;
 	const [selectedAffiliations, setSelectedAffiliations] = useState<
 		IAffiliation[]
 	>([]);
@@ -58,14 +86,13 @@ const ExternalDetailsStep = observer(() => {
 	}
 
 	// Parse collaboration_with string into affiliations array on mount
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		const collaborationWith = formData?.collaboration_with || "";
 		if (collaborationWith && selectedAffiliations.length === 0) {
 			const names = collaborationWith.split("; ").filter((n) => n.trim());
-			// For now, just store as objects with names
-			// In a real implementation, we'd fetch the full affiliation objects
 			const affiliations = names.map((name, index) => ({
-				id: -index - 1, // Temporary negative IDs
+				id: -index - 1,
 				name: name.trim(),
 			})) as IAffiliation[];
 			setSelectedAffiliations(affiliations);
@@ -73,27 +100,60 @@ const ExternalDetailsStep = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const handleAffiliationsChange = (affiliations: IAffiliation[]) => {
-		setSelectedAffiliations(affiliations);
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const handleAffiliationsChange = useCallback(
+		(affiliations: IAffiliation[]) => {
+			setSelectedAffiliations(affiliations);
+			const collaborationString = affiliations.map((a) => a.name).join("; ");
+			wizardStore.setExternalDetails({
+				collaboration_with: collaborationString,
+			});
+		},
+		[wizardStore]
+	);
 
-		// Update store with semicolon-separated string
-		const collaborationString = affiliations.map((a) => a.name).join("; ");
-		wizardStore.setExternalDetails({ collaboration_with: collaborationString });
-	};
+	// Validate on every form data change
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	useEffect(() => {
+		if (!formData) return;
 
-	const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		wizardStore.setExternalDetails({ budget: e.target.value });
-	};
+		const errors: Record<string, string> = {};
 
-	const handleDescriptionChange = (
-		e: React.ChangeEvent<HTMLTextAreaElement>
-	) => {
-		wizardStore.setExternalDetails({ external_description: e.target.value });
-	};
+		if (
+			!formData.collaboration_with ||
+			formData.collaboration_with.trim() === ""
+		) {
+			errors.collaboration_with =
+				"At least one collaboration partner is required";
+		}
 
-	const handleAimsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		wizardStore.setExternalDetails({ aims: e.target.value });
-	};
+		const isValid = Object.keys(errors).length === 0;
+		wizardStore.setStepValidation(3, isValid, errors);
+	}, [formData?.collaboration_with, wizardStore, formData]);
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const handleBudgetChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			wizardStore.setExternalDetails({ budget: e.target.value });
+		},
+		[wizardStore]
+	);
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const handleDescriptionChange = useCallback(
+		(html: string) => {
+			wizardStore.setExternalDetails({ external_description: html });
+		},
+		[wizardStore]
+	);
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const handleAimsChange = useCallback(
+		(html: string) => {
+			wizardStore.setExternalDetails({ aims: html });
+		},
+		[wizardStore]
+	);
 
 	return (
 		<div className="space-y-6">
@@ -118,7 +178,13 @@ const ExternalDetailsStep = observer(() => {
 					isRequired={true}
 					showIcon={true}
 				/>
-				<FieldError error={validation?.errors.collaboration_with} />
+				<FieldError
+					error={
+						shouldShowError(wizardStore, "collaboration_with", stepIndex)
+							? validation?.errors.collaboration_with
+							: undefined
+					}
+				/>
 			</div>
 
 			{/* Budget */}
@@ -128,6 +194,9 @@ const ExternalDetailsStep = observer(() => {
 					<DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 					<Input
 						id="budget"
+						type="number"
+						inputMode="numeric"
+						min="0"
 						value={formData.budget}
 						onChange={handleBudgetChange}
 						placeholder="The estimated operating budget in dollars..."
@@ -142,17 +211,10 @@ const ExternalDetailsStep = observer(() => {
 			{/* External Description */}
 			<div className="space-y-2">
 				<Label htmlFor="external_description">Description (Optional)</Label>
-				<div className="relative">
-					<FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-					<Textarea
-						id="external_description"
-						value={formData.external_description}
-						onChange={handleDescriptionChange}
-						placeholder="Description specific to this external project..."
-						rows={6}
-						className="pl-9 text-base resize-none"
-					/>
-				</div>
+				<StableExternalDescEditor
+					initialValue={formData.external_description}
+					onChange={handleDescriptionChange}
+				/>
 				<p className="text-xs text-muted-foreground">
 					Description specific to this external project
 				</p>
@@ -161,17 +223,10 @@ const ExternalDetailsStep = observer(() => {
 			{/* Aims */}
 			<div className="space-y-2">
 				<Label htmlFor="aims">Aims (Optional)</Label>
-				<div className="relative">
-					<Target className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-					<Textarea
-						id="aims"
-						value={formData.aims}
-						onChange={handleAimsChange}
-						placeholder="List out the aims of your project..."
-						rows={6}
-						className="pl-9 text-base resize-none"
-					/>
-				</div>
+				<StableAimsEditor
+					initialValue={formData.aims}
+					onChange={handleAimsChange}
+				/>
 				<p className="text-xs text-muted-foreground">
 					List out the aims of your project
 				</p>

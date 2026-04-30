@@ -26,15 +26,20 @@ import {
 } from "lucide-react";
 import { useEditorStore } from "@/app/stores/store-context";
 import { useLinkEditor } from "../toolbar/link-editor.utils";
+import type { ToolbarMode } from "@/shared/types/editor.types";
 
 interface FloatingLinkToolbarProps {
 	showLinks: boolean;
+	toolbar?: ToolbarMode;
 }
 
 const TOOLBAR_HEIGHT = 36;
 const TOOLBAR_GAP = 10;
 
-export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
+export function FloatingLinkToolbar({
+	showLinks,
+	toolbar = "full",
+}: FloatingLinkToolbarProps) {
 	const [editor] = useLexicalComposerContext();
 	const linkEditor = useLinkEditor();
 	const editorStore = useEditorStore();
@@ -46,6 +51,44 @@ export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 	const [visible, setVisible] = useState(false);
 	const toolbarRef = useRef<HTMLDivElement>(null);
 	const mouseIsDown = useRef(false);
+
+	// Determine which buttons are visible based on toolbar mode
+	// Mirrors the main Toolbar component's visibility logic
+	const isProfileMode = toolbar === "profile" || toolbar === "staffProfile";
+	const isProgressReport = toolbar === "progressReport";
+	const isBusinessArea = toolbar === "businessArea";
+
+	const showBold =
+		toolbar === "full" ||
+		toolbar === "simple" ||
+		toolbar === "minimal" ||
+		isBusinessArea ||
+		isProfileMode ||
+		isProgressReport;
+	const showItalic = toolbar !== "none";
+	const showUnderline =
+		toolbar === "full" || isProfileMode || isProgressReport || isBusinessArea;
+	const showSubscriptSuperscript =
+		toolbar === "full" ||
+		isProfileMode ||
+		toolbar === "projectTitle" ||
+		isProgressReport ||
+		isBusinessArea;
+	const showClearFormatting =
+		toolbar === "full" ||
+		isProfileMode ||
+		toolbar === "projectTitle" ||
+		isProgressReport ||
+		isBusinessArea;
+
+	// Count visible buttons to decide whether to render at all
+	const visibleButtonCount =
+		(showBold ? 1 : 0) +
+		(showItalic ? 1 : 0) +
+		(showUnderline ? 1 : 0) +
+		(showSubscriptSuperscript ? 2 : 0) +
+		(showClearFormatting ? 1 : 0) +
+		(showLinks ? 1 : 0);
 
 	const updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -228,7 +271,12 @@ export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 		});
 	}, [editor]);
 
-	if (!position || !visible || linkEditor?.state.isOpen) {
+	if (
+		!position ||
+		!visible ||
+		linkEditor?.state.isOpen ||
+		visibleButtonCount === 0
+	) {
 		return null;
 	}
 
@@ -238,6 +286,10 @@ export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 				? "bg-accent text-accent-foreground"
 				: "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 		}`;
+
+	// Track whether we need a separator before the next group
+	const hasFormatButtons = showBold || showItalic || showUnderline;
+	const hasSubSuperClear = showSubscriptSuperscript || showClearFormatting;
 
 	return (
 		<div
@@ -252,63 +304,77 @@ export function FloatingLinkToolbar({ showLinks }: FloatingLinkToolbarProps) {
 			aria-label="Floating formatting toolbar"
 			onMouseDown={(e) => e.preventDefault()}
 		>
-			<button
-				type="button"
-				className={btnClass(editorStore.state.isBold)}
-				onClick={() => editorStore.toggleFormat("bold")}
-				aria-label="Bold"
-				aria-pressed={editorStore.state.isBold}
-			>
-				<Bold className="h-3.5 w-3.5" />
-			</button>
-			<button
-				type="button"
-				className={btnClass(editorStore.state.isItalic)}
-				onClick={() => editorStore.toggleFormat("italic")}
-				aria-label="Italic"
-				aria-pressed={editorStore.state.isItalic}
-			>
-				<Italic className="h-3.5 w-3.5" />
-			</button>
-			<button
-				type="button"
-				className={btnClass(editorStore.state.isUnderline)}
-				onClick={() => editorStore.toggleFormat("underline")}
-				aria-label="Underline"
-				aria-pressed={editorStore.state.isUnderline}
-			>
-				<Underline className="h-3.5 w-3.5" />
-			</button>
+			{showBold && (
+				<button
+					type="button"
+					className={btnClass(editorStore.state.isBold)}
+					onClick={() => editorStore.toggleFormat("bold")}
+					aria-label="Bold"
+					aria-pressed={editorStore.state.isBold}
+				>
+					<Bold className="h-3.5 w-3.5" />
+				</button>
+			)}
+			{showItalic && (
+				<button
+					type="button"
+					className={btnClass(editorStore.state.isItalic)}
+					onClick={() => editorStore.toggleFormat("italic")}
+					aria-label="Italic"
+					aria-pressed={editorStore.state.isItalic}
+				>
+					<Italic className="h-3.5 w-3.5" />
+				</button>
+			)}
+			{showUnderline && (
+				<button
+					type="button"
+					className={btnClass(editorStore.state.isUnderline)}
+					onClick={() => editorStore.toggleFormat("underline")}
+					aria-label="Underline"
+					aria-pressed={editorStore.state.isUnderline}
+				>
+					<Underline className="h-3.5 w-3.5" />
+				</button>
+			)}
 
-			{/* Separator */}
-			<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
+			{/* Separator between format buttons and sub/super/clear */}
+			{hasFormatButtons && hasSubSuperClear && (
+				<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
+			)}
 
-			<button
-				type="button"
-				className={btnClass(editorStore.state.isSubscript)}
-				onClick={() => editorStore.toggleFormat("subscript")}
-				aria-label="Subscript"
-				aria-pressed={editorStore.state.isSubscript}
-			>
-				<Subscript className="h-3.5 w-3.5" />
-			</button>
-			<button
-				type="button"
-				className={btnClass(editorStore.state.isSuperscript)}
-				onClick={() => editorStore.toggleFormat("superscript")}
-				aria-label="Superscript"
-				aria-pressed={editorStore.state.isSuperscript}
-			>
-				<Superscript className="h-3.5 w-3.5" />
-			</button>
-			<button
-				type="button"
-				className={btnClass(false)}
-				onClick={handleClearFormatting}
-				aria-label="Clear formatting"
-			>
-				<RemoveFormatting className="h-3.5 w-3.5" />
-			</button>
+			{showSubscriptSuperscript && (
+				<>
+					<button
+						type="button"
+						className={btnClass(editorStore.state.isSubscript)}
+						onClick={() => editorStore.toggleFormat("subscript")}
+						aria-label="Subscript"
+						aria-pressed={editorStore.state.isSubscript}
+					>
+						<Subscript className="h-3.5 w-3.5" />
+					</button>
+					<button
+						type="button"
+						className={btnClass(editorStore.state.isSuperscript)}
+						onClick={() => editorStore.toggleFormat("superscript")}
+						aria-label="Superscript"
+						aria-pressed={editorStore.state.isSuperscript}
+					>
+						<Superscript className="h-3.5 w-3.5" />
+					</button>
+				</>
+			)}
+			{showClearFormatting && (
+				<button
+					type="button"
+					className={btnClass(false)}
+					onClick={handleClearFormatting}
+					aria-label="Clear formatting"
+				>
+					<RemoveFormatting className="h-3.5 w-3.5" />
+				</button>
+			)}
 
 			{showLinks && (
 				<>

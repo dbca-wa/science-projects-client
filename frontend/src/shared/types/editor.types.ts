@@ -46,6 +46,9 @@ export interface RichTextEditorProps {
 	"aria-describedby"?: string;
 	"aria-invalid"?: boolean;
 
+	// Floating toolbar
+	floatingToolbar?: boolean;
+
 	// Link panel state callback
 	onLinkPanelChange?: (isOpen: boolean) => void;
 }

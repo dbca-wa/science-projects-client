@@ -166,7 +166,7 @@ export function ProjectPlanEndorsements({
 				isLoading={deletePDFMutation.isPending}
 			/>
 
-			<ProjectSection>
+			<ProjectSection id="endorsements">
 				{/* Section Title */}
 				<h3 className="text-lg font-semibold">Endorsements</h3>
 

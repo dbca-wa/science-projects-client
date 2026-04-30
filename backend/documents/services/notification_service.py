@@ -4,6 +4,7 @@ Notification service - Business logic for document notifications
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from config.helpers import send_email_with_embedded_image
 from projects.models import Project
@@ -71,7 +72,7 @@ class NotificationService:
             kind_label = document_kind_dict.get(doc.kind, doc.kind)
             url_kind = url_kind_map.get(doc.kind, doc.kind)
             doc_info = {
-                "project_title": doc.project.title,
+                "project_title": strip_tags(doc.project.title),
                 "document_kind": kind_label,
                 "document_url": f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}",
             }
@@ -346,9 +347,7 @@ class NotificationService:
                     )
                     url_doc_kind = determine_doc_kind_url_string(document_kind_raw)
 
-                    email_subject = (
-                        f"SPMS: Action Required - {doc_data.get('projectTitle')}"
-                    )
+                    email_subject = f"SPMS: Action Required - {strip_tags(doc_data.get('projectTitle', ''))}"
                     to_email = [user_to_action.email]
 
                     template_props = {
@@ -357,7 +356,7 @@ class NotificationService:
                         "actioning_user_name": actioning_user_name,
                         "recipient_name": f"{user_to_action.display_first_name} {user_to_action.display_last_name}",
                         "recipient_email": user_to_action.email,
-                        "project_title": doc_data.get("projectTitle"),
+                        "project_title": strip_tags(doc_data.get("projectTitle", "")),
                         "project_id": doc_data.get("projectId"),
                         "document_kind": document_kind_title,
                         "document_kind_raw": document_kind_raw,
@@ -412,7 +411,7 @@ class NotificationService:
                 url_doc_kind = determine_doc_kind_url_string(document_kind_raw)
 
                 doc_info = {
-                    "project_title": doc_data.get("projectTitle"),
+                    "project_title": strip_tags(doc_data.get("projectTitle", "")),
                     "project_id": doc_data.get("projectId"),
                     "document_kind": document_kind_title,
                     "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
@@ -618,7 +617,7 @@ class NotificationService:
                 "commenter_name": commenter_data.get("name"),
                 "document_type_title": document_kind_string_readable,
                 "project_tag": project_tag,
-                "project_name": project.title,
+                "project_name": strip_tags(project.title),
                 "document_url": document_url,
                 "comment_content": cleaned_comment,
                 "is_mention": True,
@@ -721,7 +720,7 @@ class NotificationService:
                 "commenter_name": commenter_name,
                 "document_type_title": document_kind_readable,
                 "project_tag": project_tag,
-                "project_name": project.title,
+                "project_name": strip_tags(project.title),
                 "document_url": document_url,
                 "comment_content": cleaned_comment,
                 "site_url": settings.SITE_URL,
@@ -880,8 +879,9 @@ class NotificationService:
             recipients=recipients,
             actioning_user=closer,
             additional_context={
-                "email_subject": f"Project Closed: {project.title}",
+                "email_subject": f"Project Closed: {strip_tags(project.title)}",
                 "project": project,
+                "plain_project_title": strip_tags(project.title),
             },
         )
 
@@ -902,8 +902,9 @@ class NotificationService:
             recipients=recipients,
             actioning_user=reopener,
             additional_context={
-                "email_subject": f"Project Reopened: {project.title}",
+                "email_subject": f"Project Reopened: {strip_tags(project.title)}",
                 "project": project,
+                "plain_project_title": strip_tags(project.title),
             },
         )
 

@@ -34,7 +34,7 @@ export interface EndorsementTasksResponse {
 
 /**
  * Endorsement task requiring user approval
- * Represents AEC, Biometrician, or Herbarium Curator endorsements
+ * Represents AEC endorsements pending action
  */
 export interface IEndorsement {
 	id: number;
@@ -49,10 +49,6 @@ export interface IEndorsement {
 	};
 	ae_endorsement_required: boolean;
 	ae_endorsement_provided: boolean;
-	bm_endorsement_required: boolean;
-	bm_endorsement_provided: boolean;
-	hc_endorsement_required: boolean;
-	hc_endorsement_provided: boolean;
 }
 
 // ============================================================================

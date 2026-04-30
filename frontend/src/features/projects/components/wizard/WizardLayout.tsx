@@ -20,21 +20,19 @@ interface WizardLayoutProps {
  * - Tailwind breakpoint: 3xl:grid-cols-2 (1920px)
  * - Smooth transitions between layouts
  */
-export function WizardLayout({
+export const WizardLayout = ({
 	formPanel,
 	previewPanel,
 	showPreview,
-}: WizardLayoutProps) {
+}: WizardLayoutProps) => {
 	return (
 		<div className="h-full flex flex-col">
 			{/* Main content area */}
 			<div className="flex-1 overflow-hidden">
 				{/* Ultra-wide: Side-by-side layout */}
 				<div className="hidden 3xl:grid 3xl:grid-cols-2 3xl:gap-8 h-full">
-					{/* Form panel */}
-					<div className="overflow-y-auto pr-4">
-						<div className="max-w-3xl">{formPanel}</div>
-					</div>
+					{/* Form panel — full width within its column */}
+					<div className="overflow-y-auto pr-4">{formPanel}</div>
 
 					{/* Preview panel */}
 					<div className="overflow-y-auto pl-4 border-l">
@@ -56,7 +54,7 @@ export function WizardLayout({
 							showPreview ? "hidden" : "block"
 						)}
 					>
-						<div className="max-w-3xl mx-auto">{formPanel}</div>
+						<div className="max-w-4xl mx-auto">{formPanel}</div>
 					</div>
 
 					<div
@@ -79,4 +77,4 @@ export function WizardLayout({
 			</div>
 		</div>
 	);
-}
+};

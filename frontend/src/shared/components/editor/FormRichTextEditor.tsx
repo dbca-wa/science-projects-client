@@ -113,6 +113,7 @@ export const FormRichTextEditor = forwardRef<
 			wordLimit,
 			showWordCounter = !!wordLimit,
 			toolbar = "full",
+			floatingToolbar = true,
 			disabled = false,
 			error,
 			label,
@@ -154,6 +155,7 @@ export const FormRichTextEditor = forwardRef<
 					onChange={onChange}
 					placeholder={placeholder}
 					toolbar={toolbar}
+					floatingToolbar={floatingToolbar}
 					disabled={disabled}
 					wordLimit={wordLimit}
 					autoFocus={false}

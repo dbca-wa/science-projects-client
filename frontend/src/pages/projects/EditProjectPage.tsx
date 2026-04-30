@@ -55,12 +55,30 @@ const EditProjectPage = observer(() => {
 
 	// Handle form submission
 	const handleSubmit = (formData: EditProjectFormData) => {
-		if (!id) return;
+		if (!id || !data) return;
+
+		const { details } = data;
+
+		// Determine detail IDs for related model updates
+		const detailId = details.base?.id;
+
+		let externalDetailId: number | undefined;
+		if (details.external && !Array.isArray(details.external)) {
+			externalDetailId = details.external.id;
+		}
+
+		let studentDetailId: number | undefined;
+		if (details.student && !Array.isArray(details.student)) {
+			studentDetailId = details.student.id;
+		}
 
 		updateMutation.mutate(
 			{
 				id: Number(id),
 				data: formData,
+				detailId,
+				externalDetailId,
+				studentDetailId,
 			},
 			{
 				onSuccess: () => {

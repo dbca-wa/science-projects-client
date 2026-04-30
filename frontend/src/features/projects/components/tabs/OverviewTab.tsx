@@ -35,6 +35,7 @@ import { ReopenProjectModal } from "../modals/ReopenProjectModal";
 import { SetProjectStatusModal } from "../modals/SetProjectStatusModal";
 import { DeleteProjectModal } from "../modals/DeleteProjectModal";
 import { RequestDeleteProjectModal } from "../modals/RequestDeleteProjectModal";
+import { HideProjectModal } from "../modals/HideProjectModal";
 
 interface OverviewTabProps {
 	project: IProjectData;
@@ -70,6 +71,7 @@ export function OverviewTab({
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isRequestDeleteModalOpen, setIsRequestDeleteModalOpen] =
 		useState(false);
+	const [isHideProjectModalOpen, setIsHideProjectModalOpen] = useState(false);
 
 	// Sanitise title to remove HTML tags (including bold)
 	const plainTextTitle = sanitizeInput(project.title);
@@ -102,6 +104,13 @@ export function OverviewTab({
 	const handleSetStatus = () => setIsSetStatusModalOpen(true);
 	const handleDeleteProject = () => setIsDeleteModalOpen(true);
 	const handleRequestDeletion = () => setIsRequestDeleteModalOpen(true);
+	const handleHideProject = () => setIsHideProjectModalOpen(true);
+
+	// Determine if the project is hidden from the current user's staff profile
+	const isHiddenFromProfile =
+		currentUser && project.hidden_from_staff_profiles
+			? project.hidden_from_staff_profiles.includes(currentUser.id)
+			: false;
 
 	const handleCancelDeletionRequest = () => {
 		if (project.deletion_request_id) {
@@ -241,6 +250,8 @@ export function OverviewTab({
 							onDeleteProject={handleDeleteProject}
 							onRequestDeletion={handleRequestDeletion}
 							onCancelDeletionRequest={handleCancelDeletionRequest}
+							onHideProject={handleHideProject}
+							isHiddenFromProfile={isHiddenFromProfile}
 						/>
 					</div>
 				</div>
@@ -378,6 +389,14 @@ export function OverviewTab({
 					projectId={project.id}
 				/>
 			)}
+
+			{/* Hide/Show Project from Staff Profile Modal */}
+			<HideProjectModal
+				isOpen={isHideProjectModalOpen}
+				onClose={() => setIsHideProjectModalOpen(false)}
+				projectId={project.id}
+				isCurrentlyHidden={isHiddenFromProfile}
+			/>
 		</div>
 	);
 }

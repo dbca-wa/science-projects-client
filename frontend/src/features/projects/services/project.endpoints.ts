@@ -31,4 +31,9 @@ export const PROJECT_ENDPOINTS = {
 
 	// Project closures
 	PROJECT_CLOSURE: (id: number | string) => `documents/projectclosures/${id}`,
+
+	// Methodology image
+	METHODOLOGY_IMAGE_LIST: "medias/methodology_photos",
+	METHODOLOGY_IMAGE_DETAIL: (projectPlanId: number | string) =>
+		`medias/methodology_photos/${projectPlanId}`,
 } as const;

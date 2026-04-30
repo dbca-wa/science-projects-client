@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q
+from django.utils.html import strip_tags
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -506,7 +507,7 @@ class BumpPreview(APIView):
             url_kind = url_kind_map.get(kind_raw, kind_raw)
             doc_info = {
                 "document_id": doc.pk,
-                "project_title": doc.project.title,
+                "project_title": strip_tags(doc.project.title),
                 "project_id": doc.project.pk,
                 "document_kind": kind_label,
                 "document_url": f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}",

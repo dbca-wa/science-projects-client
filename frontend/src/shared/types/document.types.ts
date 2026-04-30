@@ -19,22 +19,11 @@ interface ISmallProj {
 
 interface IEndorsement {
 	id: number;
-	project_plan: number;
-	bm_endorsement_required: boolean;
-	bm_endorsement_provided: boolean;
-
-	hc_endorsement_required: boolean;
-	hc_endorsement_provided: boolean;
-
-	dm_endorsement_required: boolean;
-	dm_endorsement_provided: boolean;
-
 	ae_endorsement_required: boolean;
 	ae_endorsement_provided: boolean;
-
 	data_management: string;
 	no_specimens: string;
-	aec_pdf: IAECPDF;
+	aec_pdf: IAECPDF | null;
 }
 
 export interface IReferencedDoc {
@@ -94,7 +83,7 @@ export interface IConceptPlan {
 	budget: string | null;
 }
 
-interface IMethodologyImage {
+export interface IMethodologyImage {
 	id: number;
 	file: string;
 	project_plan: {
@@ -114,8 +103,6 @@ export interface IProjectPlan {
 	outcome: string | null;
 	knowledge_transfer: string | null;
 	listed_references: string | null;
-	involves_plants: boolean;
-	involves_animals: boolean;
 	operating_budget: string | null;
 	operating_budget_external: string | null;
 	methodology: string | null;

@@ -39,6 +39,19 @@ export interface IStudentDetailsData {
 }
 
 /**
+ * Team member added during project creation (wizard-scoped, no API calls)
+ */
+export interface IWizardTeamMember {
+	userId: number;
+	role: string;
+	isLeader: boolean;
+	displayName: string;
+	position: number;
+	isStaff: boolean;
+	timeAllocation: number;
+}
+
+/**
  * Validation state for a step
  */
 export interface IStepValidation {
@@ -53,6 +66,8 @@ interface ProjectWizardStoreState extends BaseStoreState {
 	currentStep: number;
 	projectKind: ProjectKind | null;
 	completedSteps: Set<number>;
+	touchedSteps: Set<number>;
+	touchedFields: Set<string>;
 	formData: {
 		baseInformation: IBaseInformationData;
 		projectDetails: IProjectDetailsData;
@@ -60,8 +75,10 @@ interface ProjectWizardStoreState extends BaseStoreState {
 		externalDetails: IExternalDetailsData | null;
 		studentDetails: IStudentDetailsData | null;
 	};
+	teamMembers: IWizardTeamMember[];
 	validation: Record<number, IStepValidation>;
 	isSubmitting: boolean;
+	showPreview: boolean;
 }
 
 /**
@@ -74,6 +91,8 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			currentStep: 0,
 			projectKind: null,
 			completedSteps: new Set<number>(),
+			touchedSteps: new Set<number>(),
+			touchedFields: new Set<string>(),
 			formData: {
 				baseInformation: {
 					title: "",
@@ -95,8 +114,10 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 				externalDetails: null,
 				studentDetails: null,
 			},
+			teamMembers: [],
 			validation: {},
 			isSubmitting: false,
+			showPreview: false,
 			loading: false,
 			error: null,
 			initialised: false,
@@ -107,7 +128,11 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			goToStep: action,
 			goToNextStep: action,
 			goToPreviousStep: action,
+			nextStep: action,
+			previousStep: action,
 			markStepCompleted: action,
+			markStepTouched: action,
+			markFieldTouched: action,
 			resetWizard: action,
 			setBaseInformation: action,
 			setProjectDetails: action,
@@ -119,11 +144,21 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			validateAllSteps: action,
 			setProjectKind: action,
 			setSubmitting: action,
+			togglePreview: action,
+			setShowPreview: action,
+			addTeamMember: action,
+			removeTeamMember: action,
+			reorderTeamMembers: action,
+			updateTeamMemberRole: action,
+			syncLeaderToTeam: action,
 			reset: action,
 
 			// Computed
 			canGoToNextStep: computed,
+			canGoForward: computed,
 			canGoToPreviousStep: computed,
+			canGoBack: computed,
+			isLastStep: computed,
 			isCurrentStepValid: computed,
 			progressPercentage: computed,
 			totalSteps: computed,
@@ -192,11 +227,29 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
+	 * Mark a step as touched (user attempted to proceed past it)
+	 */
+	markStepTouched = (stepIndex: number) => {
+		this.state.touchedSteps.add(stepIndex);
+		logger.debug("Marked step as touched", { stepIndex });
+	};
+
+	/**
+	 * Mark an individual field as touched (user focused then blurred it)
+	 */
+	markFieldTouched = (fieldName: string) => {
+		this.state.touchedFields.add(fieldName);
+		logger.debug("Marked field as touched", { fieldName });
+	};
+
+	/**
 	 * Reset the wizard to initial state
 	 */
 	resetWizard = () => {
 		this.state.currentStep = 0;
 		this.state.completedSteps.clear();
+		this.state.touchedSteps.clear();
+		this.state.touchedFields.clear();
 		this.state.formData = {
 			baseInformation: {
 				title: "",
@@ -219,7 +272,9 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			studentDetails: null,
 		};
 		this.state.validation = {};
+		this.state.teamMembers = [];
 		this.state.isSubmitting = false;
+		this.state.showPreview = false;
 		logger.info("Wizard reset to initial state");
 	};
 
@@ -290,6 +345,133 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			...data,
 		};
 		logger.debug("Updated student details", { data });
+	};
+
+	/**
+	 * Add a team member to the wizard's team list.
+	 * Silently prevents duplicates (same userId).
+	 */
+	addTeamMember = (member: IWizardTeamMember) => {
+		const exists = this.state.teamMembers.some(
+			(tm) => tm.userId === member.userId
+		);
+		if (exists) return;
+
+		this.state.teamMembers = [
+			...this.state.teamMembers,
+			{
+				...member,
+				position: this.state.teamMembers.length,
+				isStaff: member.isStaff ?? false,
+				timeAllocation: member.timeAllocation ?? (member.isStaff ? 1.0 : 0.0),
+			},
+		];
+		logger.debug("Added team member", { userId: member.userId });
+	};
+
+	/**
+	 * Remove a team member from the wizard's team list.
+	 * The project leader cannot be removed.
+	 */
+	removeTeamMember = (userId: number) => {
+		const member = this.state.teamMembers.find((tm) => tm.userId === userId);
+		if (!member || member.isLeader) return;
+
+		this.state.teamMembers = this.state.teamMembers
+			.filter((tm) => tm.userId !== userId)
+			.map((tm, index) => ({ ...tm, position: index }));
+		logger.debug("Removed team member", { userId });
+	};
+
+	/**
+	 * Reorder team members via drag-and-drop.
+	 * The leader is always pinned at position 0.
+	 */
+	reorderTeamMembers = (fromIndex: number, toIndex: number) => {
+		const members = [...this.state.teamMembers];
+		const draggedMember = members[fromIndex];
+
+		// Prevent moving the leader away from position 0
+		if (draggedMember.isLeader && toIndex !== 0) return;
+		// Prevent moving a non-leader to position 0 (leader's spot)
+		if (!draggedMember.isLeader && toIndex === 0) return;
+
+		const [moved] = members.splice(fromIndex, 1);
+		members.splice(toIndex, 0, moved);
+
+		this.state.teamMembers = members.map((tm, index) => ({
+			...tm,
+			position: index,
+		}));
+		logger.debug("Reordered team members", { fromIndex, toIndex });
+	};
+
+	/**
+	 * Update the role of a team member.
+	 */
+	updateTeamMemberRole = (userId: number, role: string) => {
+		this.state.teamMembers = this.state.teamMembers.map((tm) =>
+			tm.userId === userId ? { ...tm, role } : tm
+		);
+		logger.debug("Updated team member role", { userId, role });
+	};
+
+	/**
+	 * Synchronise the project leader into the team members list.
+	 * Called when project_leader changes in the form data.
+	 * If the leader changes, the old leader entry is demoted and the new one is added/promoted.
+	 */
+	syncLeaderToTeam = () => {
+		const leaderId = this.state.formData.projectDetails.project_leader;
+
+		if (!leaderId) {
+			// No leader selected — remove any existing leader flag
+			this.state.teamMembers = this.state.teamMembers.map((tm) =>
+				tm.isLeader ? { ...tm, isLeader: false } : tm
+			);
+			return;
+		}
+
+		// Demote any existing leader
+		const updatedMembers = this.state.teamMembers.map((tm) =>
+			tm.isLeader ? { ...tm, isLeader: false } : tm
+		);
+
+		// Check if the new leader is already in the team
+		const existingIndex = updatedMembers.findIndex(
+			(tm) => tm.userId === leaderId
+		);
+
+		if (existingIndex >= 0) {
+			// Promote existing member to leader and move to position 0
+			updatedMembers[existingIndex] = {
+				...updatedMembers[existingIndex],
+				isLeader: true,
+				role: "supervising",
+			};
+			// Move leader to front
+			const [leader] = updatedMembers.splice(existingIndex, 1);
+			updatedMembers.unshift(leader);
+		} else {
+			// Add new leader at position 0 — displayName will be "Project Leader" as placeholder
+			// until the component resolves the actual name
+			updatedMembers.unshift({
+				userId: leaderId,
+				role: "supervising",
+				isLeader: true,
+				displayName: "Project Leader",
+				position: 0,
+				isStaff: true,
+				timeAllocation: 1.0,
+			});
+		}
+
+		// Recalculate positions
+		this.state.teamMembers = updatedMembers.map((tm, index) => ({
+			...tm,
+			position: index,
+		}));
+		logger.debug("Synced leader to team", { leaderId });
 	};
 
 	/**
@@ -368,12 +550,47 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
+	 * Toggle preview panel visibility
+	 */
+	togglePreview = () => {
+		this.state.showPreview = !this.state.showPreview;
+	};
+
+	/**
+	 * Set preview panel visibility
+	 */
+	setShowPreview = (show: boolean) => {
+		this.state.showPreview = show;
+	};
+
+	/**
+	 * Navigate to next step (alias for WizardContainer compatibility)
+	 */
+	nextStep = () => {
+		this.goToNextStep();
+	};
+
+	/**
+	 * Navigate to previous step (alias for WizardContainer compatibility)
+	 */
+	previousStep = () => {
+		this.goToPreviousStep();
+	};
+
+	/**
 	 * Check if can navigate to next step
 	 */
 	get canGoToNextStep(): boolean {
 		return (
 			this.state.currentStep < this.totalSteps - 1 && this.isCurrentStepValid
 		);
+	}
+
+	/**
+	 * Alias for WizardContainer compatibility
+	 */
+	get canGoForward(): boolean {
+		return this.canGoToNextStep;
 	}
 
 	/**
@@ -384,16 +601,25 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	}
 
 	/**
+	 * Alias for WizardContainer compatibility
+	 */
+	get canGoBack(): boolean {
+		return this.canGoToPreviousStep;
+	}
+
+	/**
+	 * Check if on the last step
+	 */
+	get isLastStep(): boolean {
+		return this.state.currentStep === this.totalSteps - 1;
+	}
+
+	/**
 	 * Check if current step is valid
 	 */
 	get isCurrentStepValid(): boolean {
-		// For now, allow navigation without validation
-		// Validation will be added in Phase 6
-		return true;
-
-		// TODO: Implement proper validation in Phase 6
-		// const validation = this.state.validation[this.state.currentStep];
-		// return validation?.isValid ?? false;
+		const validation = this.state.validation[this.state.currentStep];
+		return validation?.isValid ?? false;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,7 +20,7 @@ import {
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { Loader2, Check, ChevronDown, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Search, MapPin, X } from "lucide-react";
 import { DatePicker } from "@/shared/components/DatePicker";
 import {
 	Select,
@@ -35,34 +35,41 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@/shared/components/ui/tabs";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
-import { UserSearchDropdown } from "@/shared/components/user/UserSearchDropdown";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { FormRichTextEditor } from "@/shared/components/editor/FormRichTextEditor";
+import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
+import { UserCombobox } from "@/shared/components/user";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useServices } from "@/shared/hooks/queries/useServices";
 import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
-import type { IAffiliation } from "@/shared/types/org.types";
+import { useLocations } from "@/shared/hooks/queries/useLocations";
+import type {
+	IAffiliation,
+	ISimpleLocationData,
+} from "@/shared/types/org.types";
 import { cn } from "@/shared/lib/utils";
+import { KeywordInput } from "@/shared/components/KeywordInput";
+import { Badge } from "@/shared/components/ui/badge";
 
 // Form schema with validation
 const editProjectSchema = z
 	.object({
 		title: z.string().min(1, "Title is required"),
+		description: z.string().optional(),
 		image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
 		business_area: z.number().min(1, "Business area is required"),
 		service: z.number().nullable().optional(),
 		start_date: z.string().min(1, "Start date is required"),
 		end_date: z.string().nullable().optional(),
+		project_leader: z.number().nullable().optional(),
 		data_custodian: z.number().nullable().optional(),
+		keywords: z.string().optional(),
 		project_areas: z.array(z.number()),
 		// External project fields
 		collaboration_with: z.string().optional(),
 		budget: z.string().optional(),
+		external_description: z.string().optional(),
+		aims: z.string().optional(),
 		// Student project fields
 		organisation: z.string().optional(),
 		level: z.string().optional(),
@@ -106,8 +113,12 @@ export const EditProjectForm = observer(function EditProjectForm({
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
 	const { data: services, isLoading: isLoadingServices } = useServices();
-	const { data: projectAreas, isLoading: isLoadingProjectAreas } =
+	const { data: _projectAreas, isLoading: isLoadingProjectAreas } =
 		useProjectAreas();
+	const { dbcaRegions, dbcaDistricts } = useLocations();
+
+	// Location search state for project areas tab
+	const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
 	// Determine project type
 	const isExternalProject =
@@ -119,19 +130,52 @@ export const EditProjectForm = observer(function EditProjectForm({
 		!Array.isArray(details.student) &&
 		details.student.organisation !== undefined;
 
+	// Combine all locations with display type for selected chips
+	const allLocationsWithType = useMemo(() => {
+		const locations: Array<ISimpleLocationData & { displayType: string }> = [];
+		dbcaRegions.forEach((loc) =>
+			locations.push({ ...loc, displayType: "DBCA Region" })
+		);
+		dbcaDistricts.forEach((loc) =>
+			locations.push({ ...loc, displayType: "DBCA District" })
+		);
+		return locations;
+	}, [dbcaRegions, dbcaDistricts]);
+
+	// Filter districts by search query
+	const filteredEditDistricts = useMemo(() => {
+		if (!locationSearchQuery.trim()) return dbcaDistricts;
+		const query = locationSearchQuery.toLowerCase();
+		return dbcaDistricts.filter((loc) =>
+			loc.name.toLowerCase().includes(query)
+		);
+	}, [dbcaDistricts, locationSearchQuery]);
+
+	// Filter regions by search query
+	const filteredEditRegions = useMemo(() => {
+		if (!locationSearchQuery.trim()) return dbcaRegions;
+		const query = locationSearchQuery.toLowerCase();
+		return dbcaRegions.filter((loc) => loc.name.toLowerCase().includes(query));
+	}, [dbcaRegions, locationSearchQuery]);
+
 	const form = useForm<EditProjectFormData>({
 		resolver: zodResolver(editProjectSchema),
 		defaultValues: {
 			title: "",
+			description: "",
 			image: null,
 			business_area: 0,
 			service: null,
 			start_date: "",
 			end_date: null,
+			project_leader: null,
 			data_custodian: null,
+			keywords: "",
 			project_areas: [],
 			collaboration_with: "",
 			budget: "",
+			external_description: "",
+			aims: "",
 			organisation: "",
 			level: "",
 		},
@@ -267,13 +311,18 @@ export const EditProjectForm = observer(function EditProjectForm({
 		const basicInfoFields = [
 			"image",
 			"title",
+			"description",
 			"service",
 			"business_area",
 			"start_date",
 			"end_date",
+			"project_leader",
 			"data_custodian",
+			"keywords",
 			"collaboration_with",
 			"budget",
+			"external_description",
+			"aims",
 			"organisation",
 			"level",
 		];
@@ -357,10 +406,13 @@ export const EditProjectForm = observer(function EditProjectForm({
 								"bg-card rounded-lg border p-6 mt-6",
 								getSectionBorderClass([
 									"title",
+									"description",
+									"keywords",
 									"service",
 									"business_area",
 									"start_date",
 									"end_date",
+									"project_leader",
 									"data_custodian",
 								])
 							)}
@@ -380,6 +432,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 													onChange={field.onChange}
 													placeholder="Enter project title..."
 													toolbar="projectTitle"
+													floatingToolbar={false}
 													disabled={isLoading}
 													minHeight="80px"
 													aria-label="Project title"
@@ -388,6 +441,68 @@ export const EditProjectForm = observer(function EditProjectForm({
 											<FormMessage />
 										</FormItem>
 									)}
+								/>
+
+								{/* Description */}
+								<FormField
+									control={form.control}
+									name="description"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Description</FormLabel>
+											<FormControl>
+												<RichTextEditor
+													value={field.value || ""}
+													onChange={field.onChange}
+													placeholder="A concise project summary, or any additional useful information..."
+													toolbar="projectDescription"
+													disabled={isLoading}
+													minHeight="150px"
+													aria-label="Project description"
+													className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+												/>
+											</FormControl>
+											<FormDescription>
+												A concise project summary (optional)
+											</FormDescription>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								{/* Keywords */}
+								<FormField
+									control={form.control}
+									name="keywords"
+									render={({ field }) => {
+										const keywordsArray = field.value
+											? field.value.split("; ").filter((k) => k.trim())
+											: [];
+
+										const handleKeywordsChange = (keywords: string[]) => {
+											field.onChange(keywords.join("; "));
+										};
+
+										return (
+											<FormItem>
+												<FormLabel>Keywords</FormLabel>
+												<FormControl>
+													<KeywordInput
+														keywords={keywordsArray}
+														onKeywordsChange={handleKeywordsChange}
+														disabled={isLoading}
+														placeholder="Type a keyword and press Enter (use ; for multiple)"
+													/>
+												</FormControl>
+												<FormDescription>
+													Type a keyword and press Enter to add it. Use
+													semicolons (;) to add multiple keywords at once (e.g.
+													&apos;ecology; conservation; biodiversity&apos;).
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										);
+									}}
 								/>
 
 								{/* Service */}
@@ -412,14 +527,18 @@ export const EditProjectForm = observer(function EditProjectForm({
 												</FormControl>
 												<SelectContent>
 													<SelectItem value="none">None</SelectItem>
-													{services?.map((service) => (
-														<SelectItem
-															key={service.id}
-															value={service.id!.toString()}
-														>
-															{service.name}
-														</SelectItem>
-													))}
+													{[...(services || [])]
+														.sort((a, b) =>
+															(a.name || "").localeCompare(b.name || "")
+														)
+														.map((service) => (
+															<SelectItem
+																key={service.id}
+																value={service.id!.toString()}
+															>
+																{service.name}
+															</SelectItem>
+														))}
 												</SelectContent>
 											</Select>
 											<FormDescription>
@@ -523,32 +642,58 @@ export const EditProjectForm = observer(function EditProjectForm({
 									/>
 								</div>
 
-								{/* Data Custodian */}
-								<FormField
-									control={form.control}
-									name="data_custodian"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Data Custodian</FormLabel>
-											<FormControl>
-												<UserSearchDropdown
-													onlyInternal={true}
-													isRequired={false}
-													setUserFunction={(userId) => field.onChange(userId)}
-													label=""
-													placeholder="Search for a user..."
-													helperText=""
-													preselectedUserPk={field.value || undefined}
-													isEditable={true}
-												/>
-											</FormControl>
-											<FormDescription>
-												Select a data custodian for this project (optional)
-											</FormDescription>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
+								{/* Project Leader and Data Custodian */}
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+									{/* Project Leader */}
+									<FormField
+										control={form.control}
+										name="project_leader"
+										render={({ field }) => (
+											<FormItem>
+												<FormControl>
+													<UserCombobox
+														value={field.value}
+														onValueChange={(userId) => field.onChange(userId)}
+														onlyInternal={true}
+														label="Project Leader"
+														placeholder="Search for a project leader..."
+														helperText="The project leader"
+														isRequired={false}
+														isEditable={true}
+														showIcon={true}
+														wrapperClassName="space-y-2"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Data Custodian */}
+									<FormField
+										control={form.control}
+										name="data_custodian"
+										render={({ field }) => (
+											<FormItem>
+												<FormControl>
+													<UserCombobox
+														value={field.value}
+														onValueChange={(userId) => field.onChange(userId)}
+														onlyInternal={true}
+														label="Data Custodian"
+														placeholder="Search for a data custodian..."
+														helperText="The data custodian is responsible for data management"
+														isRequired={false}
+														isEditable={true}
+														showIcon={true}
+														wrapperClassName="space-y-2"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
 							</div>
 						</section>
 
@@ -557,7 +702,12 @@ export const EditProjectForm = observer(function EditProjectForm({
 							<section
 								className={cn(
 									"bg-card rounded-lg border p-6 mt-6",
-									getSectionBorderClass(["collaboration_with", "budget"])
+									getSectionBorderClass([
+										"collaboration_with",
+										"budget",
+										"external_description",
+										"aims",
+									])
 								)}
 							>
 								<h2 className="text-xl font-semibold mb-4">
@@ -616,6 +766,61 @@ export const EditProjectForm = observer(function EditProjectForm({
 												<FormDescription>
 													The estimated budget for the project in dollars
 													(optional)
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* External Description */}
+									<FormField
+										control={form.control}
+										name="external_description"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>External Description</FormLabel>
+												<FormControl>
+													<RichTextEditor
+														value={field.value || ""}
+														onChange={field.onChange}
+														placeholder="Description specific to this external project..."
+														toolbar="projectDescription"
+														disabled={isLoading}
+														minHeight="150px"
+														aria-label="External project description"
+														className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+													/>
+												</FormControl>
+												<FormDescription>
+													Description specific to this external project
+													(optional)
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Aims */}
+									<FormField
+										control={form.control}
+										name="aims"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Aims</FormLabel>
+												<FormControl>
+													<RichTextEditor
+														value={field.value || ""}
+														onChange={field.onChange}
+														placeholder="List out the aims of your project..."
+														toolbar="projectDescription"
+														disabled={isLoading}
+														minHeight="150px"
+														aria-label="External project aims"
+														className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+													/>
+												</FormControl>
+												<FormDescription>
+													List out the aims of your project (optional)
 												</FormDescription>
 												<FormMessage />
 											</FormItem>
@@ -718,7 +923,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 					</TabsContent>
 
 					<TabsContent value="project-areas" className="space-y-0">
-						{/* Project Areas Section */}
+						{/* Project Areas Section — matching wizard LocationStep design */}
 						<section
 							className={cn(
 								"bg-card rounded-lg border p-6",
@@ -729,105 +934,117 @@ export const EditProjectForm = observer(function EditProjectForm({
 							<FormField
 								control={form.control}
 								name="project_areas"
-								render={({ field }) => (
-									<FormItem>
-										<FormControl>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button
-														variant="outline"
-														className="w-full justify-between text-sm font-normal h-11"
-														type="button"
-													>
-														<span className="truncate">
-															{field.value.length === 0
-																? "Select project areas"
-																: field.value.length === 1
-																	? projectAreas?.find(
-																			(area) => area.id === field.value[0]
-																		)?.area_name || "1 Selected"
-																	: `${field.value.length} Selected`}
-														</span>
-														<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent
-													className="w-[400px] p-0"
-													align="start"
-												>
-													<div className="flex flex-col">
-														<div className="p-3 border-b">
-															<div className="flex items-center justify-between mb-2">
-																<span className="text-sm font-medium">
-																	Project Areas
+								render={({ field }) => {
+									const selectedLocations = allLocationsWithType.filter((loc) =>
+										field.value.includes(loc.id)
+									);
+									const hasFilteredResults =
+										filteredEditDistricts.length > 0 ||
+										filteredEditRegions.length > 0;
+
+									const handleToggle = (locationId: number) => {
+										const isSelected = field.value.includes(locationId);
+										if (isSelected) {
+											field.onChange(
+												field.value.filter((id) => id !== locationId)
+											);
+										} else {
+											field.onChange([...field.value, locationId]);
+										}
+									};
+
+									return (
+										<FormItem className="space-y-4">
+											{/* Selected Locations */}
+											{selectedLocations.length > 0 && (
+												<div className="space-y-2">
+													<FormLabel className="text-sm font-medium">
+														Selected Locations ({selectedLocations.length})
+													</FormLabel>
+													<div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-md border">
+														{selectedLocations.map((location) => (
+															<Badge
+																key={location.id}
+																variant="secondary"
+																className="gap-1 pr-1 text-sm"
+															>
+																<MapPin className="h-3 w-3" />
+																{location.name}
+																<span className="text-xs text-muted-foreground ml-1">
+																	({location.displayType})
 																</span>
-																<div className="flex gap-2">
-																	<button
-																		type="button"
-																		onClick={() => {
-																			const allIds =
-																				projectAreas?.map((area) => area.id) ||
-																				[];
-																			field.onChange(allIds);
-																		}}
-																		className="h-7 px-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-																	>
-																		Select All
-																	</button>
-																	<button
-																		type="button"
-																		onClick={() => field.onChange([])}
-																		className="h-7 px-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-																	>
-																		Clear
-																	</button>
-																</div>
-															</div>
-														</div>
-														<div className="max-h-[300px] overflow-y-auto p-3">
-															<div className="space-y-2">
-																{projectAreas?.map((area) => {
-																	const isChecked = field.value.includes(
-																		area.id
-																	);
-																	return (
-																		<div
-																			key={area.id}
-																			onClick={() => {
-																				const newValue = isChecked
-																					? field.value.filter(
-																							(id) => id !== area.id
-																						)
-																					: [...field.value, area.id];
-																				field.onChange(newValue);
-																			}}
-																			className="flex items-center space-x-2 rounded px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-																		>
-																			<div className="flex items-center justify-center w-4 h-4 border border-gray-300 dark:border-gray-600 rounded">
-																				{isChecked && (
-																					<Check className="w-3 h-3" />
-																				)}
-																			</div>
-																			<span className="text-sm font-normal flex-1">
-																				{area.area_name}
-																			</span>
-																		</div>
-																	);
-																})}
-															</div>
-														</div>
+																<button
+																	type="button"
+																	onClick={() => handleToggle(location.id)}
+																	className="ml-1 rounded-full hover:bg-muted p-0.5"
+																>
+																	<X className="h-3 w-3" />
+																</button>
+															</Badge>
+														))}
 													</div>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</FormControl>
-										<FormDescription>
-											Select one or more project areas (optional). Future
-											enhancement: integrate map component for visual area
-											selection.
-										</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
+												</div>
+											)}
+
+											{/* Search */}
+											<div className="relative">
+												<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+												<Input
+													placeholder="Search locations..."
+													value={locationSearchQuery}
+													onChange={(e) =>
+														setLocationSearchQuery(e.target.value)
+													}
+													className="pl-9 text-base"
+												/>
+											</div>
+
+											{/* Location Lists — separate bordered containers for Districts and Regions */}
+											<FormControl>
+												<div>
+													<FormLabel className="text-sm font-medium">
+														Available Locations
+													</FormLabel>
+													{!hasFilteredResults ? (
+														<div className="p-8 text-center text-muted-foreground border rounded-md mt-2">
+															No locations found matching your search.
+														</div>
+													) : (
+														<div className="space-y-4 mt-2">
+															{/* DBCA Districts */}
+															{filteredEditDistricts.length > 0 && (
+																<div className="border rounded-md max-h-64 overflow-y-auto">
+																	<EditLocationSection
+																		title="DBCA Districts"
+																		locations={filteredEditDistricts}
+																		selectedAreas={field.value}
+																		onToggle={handleToggle}
+																	/>
+																</div>
+															)}
+
+															{/* DBCA Regions */}
+															{filteredEditRegions.length > 0 && (
+																<div className="border rounded-md max-h-64 overflow-y-auto">
+																	<EditLocationSection
+																		title="DBCA Regions"
+																		locations={filteredEditRegions}
+																		selectedAreas={field.value}
+																		onToggle={handleToggle}
+																	/>
+																</div>
+															)}
+														</div>
+													)}
+												</div>
+											</FormControl>
+											<FormDescription>
+												Select one or more project areas (optional).
+											</FormDescription>
+											<FormMessage />
+										</FormItem>
+									);
+								}}
 							/>
 						</section>
 					</TabsContent>
@@ -852,3 +1069,73 @@ export const EditProjectForm = observer(function EditProjectForm({
 		</Form>
 	);
 });
+
+/** Section header and location list for a single area type in the edit form */
+interface EditLocationSectionProps {
+	title: string;
+	locations: ISimpleLocationData[];
+	selectedAreas: number[];
+	onToggle: (locationId: number) => void;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+const EditLocationSection = ({
+	title,
+	locations,
+	selectedAreas,
+	onToggle,
+}: EditLocationSectionProps) => (
+	<div>
+		<div className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-2 border-b">
+			<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+				{title}
+			</span>
+		</div>
+		<div className="divide-y">
+			{locations.map((location) => {
+				const isSelected = selectedAreas.includes(location.id);
+
+				return (
+					<button
+						key={location.id}
+						type="button"
+						onClick={() => onToggle(location.id)}
+						className={`
+							w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors
+							flex items-center justify-between gap-3
+							${isSelected ? "bg-primary/5" : ""}
+						`}
+					>
+						<div className="flex items-center gap-3 flex-1 min-w-0">
+							<div
+								className={`
+									flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center
+									${isSelected ? "bg-primary border-primary" : "border-muted-foreground/30"}
+								`}
+							>
+								{isSelected && (
+									<svg
+										className="w-3 h-3 text-primary-foreground"
+										fill="none"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path d="M5 13l4 4L19 7" />
+									</svg>
+								)}
+							</div>
+							<div className="flex-1 min-w-0">
+								<div className="font-medium text-sm truncate">
+									{location.name}
+								</div>
+							</div>
+						</div>
+					</button>
+				);
+			})}
+		</div>
+	</div>
+);

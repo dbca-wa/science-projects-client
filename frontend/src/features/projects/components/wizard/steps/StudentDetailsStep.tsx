@@ -9,22 +9,11 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
-import { GraduationCap, AlertCircle } from "lucide-react";
-import type { IAffiliation } from "@/shared/types/org.types";
+import { GraduationCap } from "lucide-react";
 import { useState, useEffect } from "react";
-
-/**
- * FieldError - Display validation error for a field
- */
-const FieldError = ({ error }: { error?: string }) => {
-	if (!error) return null;
-	return (
-		<div className="flex items-center gap-1 text-xs text-destructive mt-1">
-			<AlertCircle className="h-3 w-3" />
-			<span>{error}</span>
-		</div>
-	);
-};
+import type { IAffiliation } from "@/shared/types/org.types";
+import { FieldError } from "../FieldError";
+import { shouldShowError } from "../validation-helpers";
 
 /**
  * StudentDetailsStep - Step 4 of project creation wizard (conditional)
@@ -32,15 +21,17 @@ const FieldError = ({ error }: { error?: string }) => {
  * Only shown when project kind is "student"
  *
  * Collects:
- * - Organisation (required, affiliation single-select)
+ * - Organisation (required, affiliation multi-select — matches edit form)
  * - Level (required, dropdown)
  */
 const StudentDetailsStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
 	const formData = wizardStore.state.formData.studentDetails;
 	const validation = wizardStore.state.validation[3]; // Step 3 is Student Details
-	const [selectedAffiliation, setSelectedAffiliation] =
-		useState<IAffiliation | null>(null);
+	const stepIndex = 3;
+	const [selectedAffiliations, setSelectedAffiliations] = useState<
+		IAffiliation[]
+	>([]);
 
 	// If student details is null, initialise it
 	if (!formData) {
@@ -51,34 +42,48 @@ const StudentDetailsStep = observer(() => {
 		return null;
 	}
 
-	// Parse organisation string into affiliation on mount
+	// Parse organisation string into affiliations array on mount
 	useEffect(() => {
-		const organisation = formData?.organisation || "";
-		if (organisation && !selectedAffiliation) {
-			// For now, just store as object with name
-			// In a real implementation, we'd fetch the full affiliation object
-			const affiliation = {
-				id: -1, // Temporary negative ID
-				name: organisation.trim(),
-			} as IAffiliation;
-			setSelectedAffiliation(affiliation);
+		const organisationStr = formData?.organisation || "";
+		if (organisationStr && selectedAffiliations.length === 0) {
+			const names = organisationStr.split("; ").filter((n) => n.trim());
+			const affiliations = names.map((name, index) => ({
+				id: -index - 1,
+				name: name.trim(),
+			})) as IAffiliation[];
+			setSelectedAffiliations(affiliations);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const handleAffiliationChange = (affiliationId?: number) => {
-		if (!affiliationId) {
-			setSelectedAffiliation(null);
-			wizardStore.setStudentDetails({ organisation: "" });
-		}
-		// The affiliation will be set when the component loads it
+	const handleAffiliationsChange = (affiliations: IAffiliation[]) => {
+		setSelectedAffiliations(affiliations);
+		const organisationString = affiliations.map((a) => a.name).join("; ");
+		wizardStore.setStudentDetails({ organisation: organisationString });
 	};
+
+	// Validate on every form data change
+	useEffect(() => {
+		if (!formData) return;
+
+		const errors: Record<string, string> = {};
+
+		if (!formData.organisation || formData.organisation.trim() === "") {
+			errors.organisation = "Organisation is required";
+		}
+		if (!formData.level || formData.level.trim() === "") {
+			errors.level = "Student level is required";
+		}
+
+		const isValid = Object.keys(errors).length === 0;
+		wizardStore.setStepValidation(3, isValid, errors);
+	}, [formData?.organisation, formData?.level, wizardStore, formData]);
 
 	const handleLevelChange = (value: string) => {
 		wizardStore.setStudentDetails({ level: value });
 	};
 
-	// Level options from the original implementation
+	// Level options matching the edit form
 	const levelOptions = [
 		{ value: "phd", label: "PhD" },
 		{ value: "msc", label: "MSc" },
@@ -99,18 +104,25 @@ const StudentDetailsStep = observer(() => {
 				</p>
 			</div>
 
-			{/* Organisation */}
+			{/* Organisation — multi-select matching edit form */}
 			<div className="space-y-2">
 				<AffiliationCombobox
-					value={selectedAffiliation?.id}
-					onChange={handleAffiliationChange}
+					multiple
+					values={selectedAffiliations}
+					onChangeMultiple={handleAffiliationsChange}
 					label="Organisation"
-					placeholder="Enter the academic organisation..."
+					placeholder="Search for or add an organisation"
 					helperText="The academic organisation of the student"
 					isRequired={true}
 					showIcon={true}
 				/>
-				<FieldError error={validation?.errors.organisation} />
+				<FieldError
+					error={
+						shouldShowError(wizardStore, "organisation", stepIndex)
+							? validation?.errors.organisation
+							: undefined
+					}
+				/>
 			</div>
 
 			{/* Level */}
@@ -133,7 +145,13 @@ const StudentDetailsStep = observer(() => {
 						</SelectContent>
 					</Select>
 				</div>
-				<FieldError error={validation?.errors.level} />
+				<FieldError
+					error={
+						shouldShowError(wizardStore, "level", stepIndex)
+							? validation?.errors.level
+							: undefined
+					}
+				/>
 				<p className="text-xs text-muted-foreground">
 					The level of the student and the project
 				</p>

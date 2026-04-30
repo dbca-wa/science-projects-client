@@ -261,6 +261,62 @@ export const getMyProjects = async (): Promise<IProjectData[]> => {
 };
 
 // ============================================================================
+// METHODOLOGY IMAGE
+// ============================================================================
+
+import type { IMethodologyImage } from "@/shared/types/document.types";
+
+/**
+ * Upload a methodology image for a project plan.
+ * Uses multipart form data with the project plan ID and image file.
+ */
+export const uploadMethodologyImage = async (
+	projectPlanId: number,
+	file: File
+): Promise<IMethodologyImage> => {
+	const formData = new FormData();
+	formData.append("file", file);
+	formData.append("pk", projectPlanId.toString());
+
+	return apiClient.post<IMethodologyImage>(
+		PROJECT_ENDPOINTS.METHODOLOGY_IMAGE_LIST,
+		formData,
+		{ headers: { "Content-Type": "multipart/form-data" } }
+	);
+};
+
+/**
+ * Update an existing methodology image for a project plan.
+ * The backend uses the project plan ID as the lookup key.
+ */
+export const updateMethodologyImage = async (
+	projectPlanId: number,
+	file: File
+): Promise<IMethodologyImage> => {
+	const formData = new FormData();
+	formData.append("file", file);
+	formData.append("pk", projectPlanId.toString());
+
+	return apiClient.put<IMethodologyImage>(
+		PROJECT_ENDPOINTS.METHODOLOGY_IMAGE_DETAIL(projectPlanId),
+		formData,
+		{ headers: { "Content-Type": "multipart/form-data" } }
+	);
+};
+
+/**
+ * Delete the methodology image for a project plan.
+ * The backend uses the project plan ID as the lookup key.
+ */
+export const deleteMethodologyImage = async (
+	projectPlanId: number
+): Promise<void> => {
+	return apiClient.delete<void>(
+		PROJECT_ENDPOINTS.METHODOLOGY_IMAGE_DETAIL(projectPlanId)
+	);
+};
+
+// ============================================================================
 // PROJECT DOCUMENT UPDATES
 // Re-exported from shared for backward compatibility.
 // The canonical implementations live in shared/services/content-update.service.ts.

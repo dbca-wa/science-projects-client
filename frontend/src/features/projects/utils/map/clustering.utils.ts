@@ -9,7 +9,7 @@ import type {
  * Groups projects within 0.0001 degrees (≈11 meters) into clusters.
  * This reduces marker count and improves map performance.
  *
- * Performance optimizations:
+ * Performance optimisations:
  * - Uses Map for O(1) lookups instead of array searches
  * - Pre-allocates cluster objects to reduce garbage collection
  * - Uses fixed-precision coordinate keys for consistent clustering

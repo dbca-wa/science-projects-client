@@ -15,8 +15,58 @@ import { $generateNodesFromDOM } from "@lexical/html";
 import { $insertNodes, $getSelection, $isRangeSelection } from "lexical";
 import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
 
-export const PastePlugin = () => {
+interface PastePluginProps {
+	stripBold?: boolean;
+}
+
+/**
+ * Strip bold formatting tags (<strong> and <b>) from HTML,
+ * preserving the inner content.
+ */
+function stripBoldTags(html: string): string {
+	return html.replace(/<\/?strong[^>]*>/gi, "").replace(/<\/?b[^>]*>/gi, "");
+}
+
+export const PastePlugin = ({ stripBold = false }: PastePluginProps) => {
 	const [editor] = useLexicalComposerContext();
+
+	// Handle bold stripping for all pasted HTML content
+	useEffect(() => {
+		if (!stripBold) return;
+
+		return editor.registerCommand(
+			PASTE_COMMAND,
+			(event: ClipboardEvent) => {
+				const clipboardData = event.clipboardData;
+				if (!clipboardData) return false;
+
+				const html = clipboardData.getData("text/html");
+				if (!html) return false;
+
+				// Only intercept if the pasted HTML contains bold tags
+				if (!/<\/?(?:strong|b)\b[^>]*>/i.test(html)) return false;
+
+				event.preventDefault();
+
+				editor.update(() => {
+					const selection = $getSelection();
+					if (!$isRangeSelection(selection)) return;
+
+					// Strip bold tags from the pasted HTML
+					const cleanedHTML = stripBoldTags(html);
+
+					const parser = new DOMParser();
+					const dom = parser.parseFromString(cleanedHTML, "text/html");
+					const nodes = $generateNodesFromDOM(editor, dom);
+					$insertNodes(nodes);
+				});
+
+				return true;
+			},
+			// Use CRITICAL priority so this runs before the Word paste handler
+			4
+		);
+	}, [editor, stripBold]);
 
 	useEffect(() => {
 		return editor.registerCommand(

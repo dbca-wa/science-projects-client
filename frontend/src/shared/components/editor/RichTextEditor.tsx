@@ -41,6 +41,7 @@ import { ListMaxIndentPlugin } from "./plugins/ListMaxIndentPlugin";
 import { RemoveEmptyListItemsPlugin } from "./plugins/RemoveEmptyListItemsPlugin";
 import { EditorStoreIntegrationPlugin } from "./plugins/EditorStoreIntegrationPlugin";
 import { MoveCursorToEndPlugin } from "./plugins/MoveCursorToEndPlugin";
+import { BoldBlockPlugin } from "./plugins/BoldBlockPlugin";
 import { Toolbar } from "./toolbar/Toolbar";
 import { LinkEditorProvider } from "./toolbar/LinkEditorContext";
 import { useLinkEditor } from "./toolbar/link-editor.utils";
@@ -183,6 +184,7 @@ export const RichTextEditor = React.forwardRef<
 			autoFocus = false,
 			moveCursorToEnd = false,
 			toolbar = "full",
+			floatingToolbar = true,
 			wordLimit,
 			limitCanBePassed: _limitCanBePassed = false,
 			className = "",
@@ -210,6 +212,7 @@ export const RichTextEditor = React.forwardRef<
 			shouldBeEditable && (autoFocus || moveCursorToEnd);
 		const showLinks =
 			toolbar === "full" || toolbar === "profile" || toolbar === "staffProfile";
+		const stripBold = toolbar === "projectTitle";
 
 		const initialConfig = {
 			namespace: "RichTextEditor",
@@ -283,8 +286,8 @@ export const RichTextEditor = React.forwardRef<
 						</ContentSliderWrapper>
 
 						{/* Floating toolbar — appears near text selection */}
-						{!readOnly && toolbar !== "none" && (
-							<FloatingLinkToolbar showLinks={showLinks} />
+						{!readOnly && toolbar !== "none" && floatingToolbar && (
+							<FloatingLinkToolbar showLinks={showLinks} toolbar={toolbar} />
 						)}
 
 						{/* Plugins */}
@@ -303,11 +306,15 @@ export const RichTextEditor = React.forwardRef<
 						<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
 						<SubscriptSuperscriptPlugin />
 						<SaveOnCtrlSPlugin onSave={onSave} />
-						<PastePlugin />
+						<PastePlugin stripBold={stripBold} />
+						<BoldBlockPlugin enabled={stripBold} />
 						{!readOnly && <ConditionalDragDrop />}
 						{autoFocus && <AutoFocusPlugin />}
 						{moveCursorToEnd && <MoveCursorToEndPlugin />}
-						<OnChangePlugin onChange={handleContentChange} />
+						<OnChangePlugin
+							onChange={handleContentChange}
+							stripBold={stripBold}
+						/>
 						{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
 						<PrepopulateHTMLPlugin html={value} />
 						{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}

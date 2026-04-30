@@ -7,7 +7,7 @@
 {% include "email_templates/partials/_greeting.html" %}
 
 <p style="font-size: 14px; line-height: 26px; margin: 16px 0; color: #4b5563;">
-  {% if actioning_user_name %}<strong style="color: #1f2937;">{{ actioning_user_name }}</strong> (<a href="mailto:{{ actioning_user_email }}" style="color: #2563eb; text-decoration: none; font-weight: 500;" target="_blank">{{ actioning_user_email }}</a>) has reopened {% endif %}the project{% if project %} <strong style="color: #1f2937;">&#x27;{{ project.title }}&#x27;</strong>{% endif %} that you are a member of.
+  {% if actioning_user_name %}<strong style="color: #1f2937;">{{ actioning_user_name }}</strong> (<a href="mailto:{{ actioning_user_email }}" style="color: #2563eb; text-decoration: none; font-weight: 500;" target="_blank">{{ actioning_user_email }}</a>) has reopened {% endif %}the project{% if plain_project_title %} <strong style="color: #1f2937;">&#x27;{{ plain_project_title }}&#x27;</strong>{% endif %} that you are a member of.
 </p>
 <p style="font-size: 14px; line-height: 26px; margin: 16px 0; color: #4b5563;">
   This project is now active again. Please review any outstanding tasks or documents.

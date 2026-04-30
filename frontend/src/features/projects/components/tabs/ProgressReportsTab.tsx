@@ -6,6 +6,8 @@ import type {
 	IProjectDocuments,
 } from "@/shared/types/project.types";
 import type { IUserData } from "@/shared/types/user.types";
+import { useCurrentUser } from "@/features/auth";
+import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
@@ -58,6 +60,8 @@ export function ProgressReportsTab({
 		);
 	}, [selectedYear, progressReports]);
 
+	const { data: currentUser } = useCurrentUser();
+
 	if (progressReports.length === 0) {
 		return (
 			<div className="rounded-lg border bg-card p-6">
@@ -76,8 +80,16 @@ export function ProgressReportsTab({
 		);
 	}
 
-	// TODO: Calculate edit permissions using canEditProject utility
-	const canEdit = true; // Temporarily true to see the button
+	const canEdit = selectedReport
+		? calculateDocumentEditPermission({
+				currentUser,
+				members,
+				document: selectedReport.document,
+				isBaLead,
+				userIsCaretakerOfBaLeader,
+				userIsCaretakerOfAdmin,
+			})
+		: false;
 
 	return (
 		<>

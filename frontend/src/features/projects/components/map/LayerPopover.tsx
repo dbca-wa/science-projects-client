@@ -102,7 +102,7 @@ export const LayerPopover = observer(
 		// Handle keyboard navigation within popover
 		const handleKeyDown = (event: React.KeyboardEvent) => {
 			if (event.key === "Tab") {
-				// Let default tab behavior handle focus management
+				// Let default tab behaviour handle focus management
 				return;
 			}
 

@@ -33,16 +33,21 @@ export interface IProjectFilters {
  */
 export interface EditProjectFormData {
 	title: string;
+	description?: string;
 	image?: File | string | null;
 	business_area: number;
 	service?: number | null;
 	start_date: string;
 	end_date?: string | null;
+	project_leader?: number | null;
 	data_custodian?: number | null;
+	keywords?: string;
 	project_areas: number[];
 	// External project fields
 	collaboration_with?: string;
 	budget?: string;
+	external_description?: string;
+	aims?: string;
 	// Student project fields
 	organisation?: string;
 	level?: string;
@@ -53,17 +58,21 @@ export interface EditProjectFormData {
  */
 export interface UpdateProjectPayload {
 	title?: string;
+	description?: string;
 	image?: File | string | null;
 	business_area?: number;
 	service?: number | null;
 	start_date?: string;
 	end_date?: string | null;
+	project_leader?: number | null;
 	data_custodian?: number | null;
 	project_areas?: number[];
 	keywords?: string;
 	// External project fields
 	collaboration_with?: string;
 	budget?: string;
+	external_description?: string;
+	aims?: string;
 	// Student project fields
 	organisation?: string;
 	level?: string;

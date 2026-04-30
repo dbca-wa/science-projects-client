@@ -388,7 +388,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						>
 							<span className="flex items-center gap-3">
 								<BookOpen className="text-xl" aria-hidden="true" />
-								<span>Quick Guide</span>
+								<span>Knowledge Base</span>
 							</span>
 						</Button>
 
