@@ -41,6 +41,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
+import { getImageUrl } from "@/shared/utils/image.utils";
 import type { IWizardTeamMember } from "@/app/stores/derived/project-wizard.store";
 import { useQuery } from "@tanstack/react-query";
 import { getFullUser } from "@/features/users/services/user.service";
@@ -200,8 +201,8 @@ const SortableWizardMemberCard = ({
 // ─── Resolved Display Name ───────────────────────────────────────────────────
 
 /**
- * Resolves and displays the actual user name for a wizard team member.
- * Falls back to the cached displayName while loading.
+ * Resolves and displays the actual user name and avatar for a wizard team member.
+ * Falls back to the cached displayName and initials while loading.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 const ResolvedDisplayName = ({ member }: { member: IWizardTeamMember }) => {
@@ -213,8 +214,32 @@ const ResolvedDisplayName = ({ member }: { member: IWizardTeamMember }) => {
 	});
 
 	const name = user ? getUserDisplayName(user) : member.displayName;
+	const avatarUrl = user?.image ? getImageUrl(user.image) : null;
+	const initials = name
+		.split(" ")
+		.map((n) => n[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 
-	return <span className="text-sm font-medium truncate">{name}</span>;
+	return (
+		<div className="flex items-center gap-2 min-w-0">
+			{avatarUrl ? (
+				<img
+					src={avatarUrl}
+					alt={name}
+					width={28}
+					height={28}
+					className="size-7 rounded-full object-cover flex-shrink-0"
+				/>
+			) : (
+				<div className="size-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground flex-shrink-0">
+					{initials}
+				</div>
+			)}
+			<span className="text-sm font-medium truncate">{name}</span>
+		</div>
+	);
 };
 
 // ─── Main Component ──────────────────────────────────────────────────────────

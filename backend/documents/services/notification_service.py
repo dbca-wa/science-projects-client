@@ -648,6 +648,11 @@ class NotificationService:
     @staticmethod
     def notify_new_comment(document, comment, commenter):
         """
+        DEPRECATED: No longer called from handle_comment_created signal.
+        Blanket team notifications for new comments have been removed — only
+        @mentioned users now receive comment emails via notify_comment_mention().
+        Kept for reference and potential future use.
+
         Notify project team about a new comment, excluding the commenter
         and any users who were @mentioned (they receive mention notifications).
 
@@ -746,7 +751,11 @@ class NotificationService:
 
     @staticmethod
     def notify_new_cycle_open(
-        last_report, actioning_user, division_slug=None, recipient_groups=None
+        last_report,
+        actioning_user,
+        division_slug=None,
+        recipient_groups=None,
+        excluded_user_ids=None,
     ):
         """
         Send new cycle opened announcement emails.
@@ -790,7 +799,14 @@ class NotificationService:
         # Priority: BA Lead (3) > Project Lead (2) > Team Member (1)
         user_roles = {}  # pk → (priority, name, email)
 
-        all_projects = Project.objects.all()
+        # Exclude terminated and completed projects — only open/active projects
+        # should have their leads and members notified about new cycles
+        all_projects = Project.objects.exclude(
+            status__in=[
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ]
+        )
         if division_slug and last_report.division:
             all_projects = all_projects.filter(
                 business_area__division=last_report.division
@@ -839,6 +855,11 @@ class NotificationService:
                             f"{member.user.display_first_name} {member.user.display_last_name}",
                             member.user.email,
                         )
+
+        # Remove excluded users from the recipient list
+        if excluded_user_ids:
+            for pk in excluded_user_ids:
+                user_roles.pop(pk, None)
 
         # Send deduplicated emails
         for pk, (priority, name, email) in user_roles.items():

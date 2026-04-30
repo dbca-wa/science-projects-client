@@ -153,6 +153,7 @@ export const WizardContainer = observer(
 						currentStep={wizardStore.state.currentStep}
 						totalSteps={wizardStore.totalSteps}
 						completedSteps={wizardStore.state.completedSteps}
+						validation={wizardStore.state.validation}
 						projectKind={wizardStore.state.projectKind!}
 						onStepClick={handleStepClick}
 					/>
@@ -188,7 +189,8 @@ export const WizardContainer = observer(
 						canGoBack={wizardStore.canGoBack}
 						canGoNext={
 							wizardStore.isLastStep
-								? wizardStore.isCurrentStepValid
+								? wizardStore.isCurrentStepValid &&
+									wizardStore.validateAllSteps()
 								: wizardStore.canGoForward
 						}
 						isLastStep={wizardStore.isLastStep}

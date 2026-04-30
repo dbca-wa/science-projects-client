@@ -75,9 +75,9 @@ export function WizardNavigation({
 					>
 						{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 						<span className="hidden sm:inline">
-							{isLastStep ? "Create Project" : "Continue"}
+							{isLastStep ? "Create Project" : "Save and Continue"}
 						</span>
-						<span className="sm:hidden">{isLastStep ? "Create" : "Next"}</span>
+						<span className="sm:hidden">{isLastStep ? "Create" : "Save"}</span>
 						{!isLastStep && !isSubmitting && <span className="ml-2">→</span>}
 					</Button>
 				</div>

@@ -323,6 +323,8 @@ export const UserDetailSheet = observer(
 											<img
 												src="/dbca.jpg"
 												alt="Agency logo"
+												width={60}
+												height={60}
 												className="rounded-lg w-[60px] h-[60px] object-cover pointer-events-none select-none"
 											/>
 											<div className="flex ml-3 flex-col justify-center">
@@ -438,6 +440,8 @@ export const UserDetailSheet = observer(
 																<img
 																	src={baImage}
 																	alt={baName}
+																	width={80}
+																	height={80}
 																	className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600"
 																	onError={(e) => {
 																		// Hide the broken image and show placeholder instead

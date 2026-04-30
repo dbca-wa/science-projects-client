@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -19,6 +19,7 @@ export const NewCycleContent = ({ divisionSlug }: NewCycleContentProps) => {
 	const [sendBaLeads, setSendBaLeads] = useState(false);
 	const [sendProjectLeads, setSendProjectLeads] = useState(false);
 	const [sendTeamMembers, setSendTeamMembers] = useState(false);
+	const [excludedUserIds, setExcludedUserIds] = useState<number[]>([]);
 
 	const anySendGroup = sendBaLeads || sendProjectLeads || sendTeamMembers;
 	const isEmailOnly = anySendGroup && !includeUpdating && !prepopulate;
@@ -45,6 +46,16 @@ export const NewCycleContent = ({ divisionSlug }: NewCycleContentProps) => {
 		sendTeamMembers && recipientPreview
 			? recipientPreview.recipients.team_members
 			: [];
+
+	const handleExcludeUser = useCallback((userId: number) => {
+		setExcludedUserIds((prev) =>
+			prev.includes(userId) ? prev : [...prev, userId]
+		);
+	}, []);
+
+	const handleRestoreUser = useCallback((userId: number) => {
+		setExcludedUserIds((prev) => prev.filter((id) => id !== userId));
+	}, []);
 
 	return (
 		<div className="space-y-6">
@@ -176,6 +187,9 @@ export const NewCycleContent = ({ divisionSlug }: NewCycleContentProps) => {
 							baLeads={filteredBaLeads}
 							projectLeads={filteredProjectLeads}
 							teamMembers={filteredTeamMembers}
+							excludedUserIds={excludedUserIds}
+							onExcludeUser={handleExcludeUser}
+							onRestoreUser={handleRestoreUser}
 						/>
 					</div>
 				)}
@@ -189,6 +203,8 @@ export const NewCycleContent = ({ divisionSlug }: NewCycleContentProps) => {
 								prepopulate,
 								send_emails: anySendGroup,
 								recipient_groups: anySendGroup ? selectedGroups : undefined,
+								excluded_user_ids:
+									excludedUserIds.length > 0 ? excludedUserIds : undefined,
 							})
 						}
 						disabled={!hasAnySelection || isPending}

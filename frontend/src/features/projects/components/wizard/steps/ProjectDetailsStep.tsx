@@ -14,6 +14,7 @@ import {
 import { UserCombobox } from "@/shared/components/user";
 import { DatePicker } from "@/shared/components/DatePicker";
 import type { UserComboboxRef } from "@/shared/components/user";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import { FieldError } from "../FieldError";
 import { shouldShowError } from "../validation-helpers";
 import { SectionCard } from "../SectionCard";
@@ -129,25 +130,6 @@ const ProjectDetailsStep = observer(() => {
 		return formData.end_date > formData.start_date;
 	};
 
-	// Group business areas by division
-	const groupedBusinessAreas = businessAreas?.reduce(
-		(acc, ba) => {
-			const division =
-				typeof ba.division === "object" && ba.division
-					? ba.division.name
-					: "Other";
-			if (!acc[division]) {
-				acc[division] = [];
-			}
-			acc[division].push(ba);
-			return acc;
-		},
-		{} as Record<string, typeof businessAreas>
-	);
-
-	// Ordered division slugs for display
-	const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
-
 	// Compute section completion states
 	const isBusinessAreaComplete =
 		!!formData.business_area && formData.business_area > 0;
@@ -221,43 +203,10 @@ const ProjectDetailsStep = observer(() => {
 									<SelectItem value="loading" disabled>
 										Loading business areas...
 									</SelectItem>
-								) : groupedBusinessAreas ? (
-									orderedDivisionSlugs.flatMap((divSlug) => {
-										const divisionBusinessAreas = businessAreas
-											?.filter(
-												(ba) =>
-													typeof ba.division === "object" &&
-													ba.division &&
-													ba.division.slug === divSlug &&
-													ba.is_active
-											)
-											.sort((a, b) => a.name.localeCompare(b.name));
-
-										if (
-											!divisionBusinessAreas ||
-											divisionBusinessAreas.length === 0
-										) {
-											return [];
-										}
-
-										return [
-											<div
-												key={`${divSlug}-header`}
-												className="px-2 py-1.5 text-xs font-semibold text-muted-foreground"
-											>
-												{divSlug}
-											</div>,
-											...divisionBusinessAreas.map((ba) => (
-												<SelectItem key={ba.id} value={ba.id?.toString() || ""}>
-													{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-												</SelectItem>
-											)),
-										];
-									})
 								) : (
-									<SelectItem value="none" disabled>
-										No business areas available
-									</SelectItem>
+									<BusinessAreaSelectItems
+										businessAreas={businessAreas || []}
+									/>
 								)}
 							</SelectContent>
 						</Select>

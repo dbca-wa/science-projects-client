@@ -342,12 +342,14 @@ class NewCycleOpen(APIView):
         # Send emails if requested
         if should_email:
             recipient_groups = request.data.get("recipient_groups")
+            excluded_user_ids = request.data.get("excluded_user_ids", [])
             try:
                 NotificationService.notify_new_cycle_open(
                     last_report=last_report,
                     actioning_user=User.objects.get(pk=request.user.pk),
                     division_slug=division_slug,
                     recipient_groups=recipient_groups,
+                    excluded_user_ids=excluded_user_ids,
                 )
             except Exception as e:
                 settings.LOGGER.error(f"Email Error: {e}", exc_info=True)

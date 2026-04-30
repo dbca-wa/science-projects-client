@@ -88,17 +88,18 @@ def handle_comment_created(sender, instance, created, **kwargs):
                         f"{mentioned_user.get_full_name()}: {e}"
                     )
 
-        # Send new comment notifications to project team (excluding mentioned users)
-        try:
-            NotificationService.notify_new_comment(
-                document=instance.document,
-                comment=instance,
-                commenter=instance.user,
-            )
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send new comment team notification for comment {instance.pk}: {e}"
-            )
+        # Blanket team notifications disabled — only @mentioned users should
+        # receive comment emails. See notify_new_comment deprecation note.
+        # try:
+        #     NotificationService.notify_new_comment(
+        #         document=instance.document,
+        #         comment=instance,
+        #         commenter=instance.user,
+        #     )
+        # except Exception as e:
+        #     settings.LOGGER.error(
+        #         f"Failed to send new comment team notification for comment {instance.pk}: {e}"
+        #     )
 
         settings.LOGGER.info(
             f"Processed notifications for comment {instance.pk} "

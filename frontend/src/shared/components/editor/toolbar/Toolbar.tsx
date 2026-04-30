@@ -82,38 +82,40 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 
 		const isBusinessArea = mode === "businessArea";
 
-		const showHeadingSelect = mode === "full" || mode === "projectTitle";
+		const isFullOrGuide = mode === "full" || mode === "guide";
+
+		const showHeadingSelect = isFullOrGuide || mode === "projectTitle";
 		const disableHeadings = mode === "projectTitle";
 		const showLists =
-			mode === "full" || mode === "simple" || isProfileMode || isProgressReport;
-		const showLinks = mode === "full" || isProfileMode;
+			isFullOrGuide || mode === "simple" || isProfileMode || isProgressReport;
+		const showLinks = isFullOrGuide || isProfileMode;
 		const showBold =
-			mode === "full" ||
+			isFullOrGuide ||
 			mode === "simple" ||
 			mode === "minimal" ||
 			isBusinessArea ||
 			isProfileMode ||
 			isProgressReport;
 		const showUnderline =
-			mode === "full" || isProfileMode || isProgressReport || isBusinessArea;
+			isFullOrGuide || isProfileMode || isProgressReport || isBusinessArea;
 		const showSubscriptSuperscript =
-			mode === "full" ||
+			isFullOrGuide ||
 			isProfileMode ||
 			mode === "projectTitle" ||
 			isProgressReport ||
 			isBusinessArea;
 		const showClearFormatting =
-			mode === "full" ||
+			isFullOrGuide ||
 			isProfileMode ||
 			mode === "projectTitle" ||
 			isProgressReport ||
 			isBusinessArea;
-		const showIndentOutdent = mode === "full";
-		const showAlignment = mode === "full";
+		const showIndentOutdent = isFullOrGuide;
+		const showAlignment = isFullOrGuide;
 		const showStrikethrough = false; // Disabled for now
-		// const showStrikethrough = mode === "full";
-		const showTable = mode === "full";
-		const showImage = mode === "full";
+		// const showStrikethrough = isFullOrGuide;
+		const showTable = isFullOrGuide;
+		const showImage = mode === "guide";
 
 		// Cycle through alignment options
 		const cycleAlignment = () => {

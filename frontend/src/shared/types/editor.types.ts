@@ -6,6 +6,7 @@
 
 export type ToolbarMode =
 	| "full"
+	| "guide"
 	| "simple"
 	| "minimal"
 	| "none"

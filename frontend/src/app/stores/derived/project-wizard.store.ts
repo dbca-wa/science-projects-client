@@ -2,6 +2,7 @@ import { BaseStore, type BaseStoreState } from "@/app/stores/base.store";
 import { makeObservable, action, computed } from "mobx";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { logger } from "@/shared/services/logger.service";
+import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 
 /**
  * Form data interfaces for each wizard step
@@ -142,6 +143,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			setStepValidation: action,
 			validateCurrentStep: action,
 			validateAllSteps: action,
+			revalidateAllStepsFromData: action,
 			setProjectKind: action,
 			setSubmitting: action,
 			togglePreview: action,
@@ -425,41 +427,39 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		const leaderId = this.state.formData.projectDetails.project_leader;
 
 		if (!leaderId) {
-			// No leader selected — remove any existing leader flag
-			this.state.teamMembers = this.state.teamMembers.map((tm) =>
-				tm.isLeader ? { ...tm, isLeader: false } : tm
-			);
+			// No leader selected — remove the old leader from the team entirely
+			this.state.teamMembers = this.state.teamMembers
+				.filter((tm) => !tm.isLeader)
+				.map((tm, index) => ({ ...tm, position: index }));
 			return;
 		}
 
-		// Demote any existing leader
-		const updatedMembers = this.state.teamMembers.map((tm) =>
-			tm.isLeader ? { ...tm, isLeader: false } : tm
+		// Remove the old leader from the team (they'll be replaced by the new one)
+		const withoutOldLeader = this.state.teamMembers.filter(
+			(tm) => !tm.isLeader
 		);
 
-		// Check if the new leader is already in the team
-		const existingIndex = updatedMembers.findIndex(
+		// Check if the new leader is already in the team as a non-leader member
+		const existingIndex = withoutOldLeader.findIndex(
 			(tm) => tm.userId === leaderId
 		);
 
 		if (existingIndex >= 0) {
 			// Promote existing member to leader and move to position 0
-			updatedMembers[existingIndex] = {
-				...updatedMembers[existingIndex],
+			withoutOldLeader[existingIndex] = {
+				...withoutOldLeader[existingIndex],
 				isLeader: true,
 				role: "supervising",
 			};
-			// Move leader to front
-			const [leader] = updatedMembers.splice(existingIndex, 1);
-			updatedMembers.unshift(leader);
+			const [leader] = withoutOldLeader.splice(existingIndex, 1);
+			withoutOldLeader.unshift(leader);
 		} else {
-			// Add new leader at position 0 — displayName will be "Project Leader" as placeholder
-			// until the component resolves the actual name
-			updatedMembers.unshift({
+			// Add new leader at position 0 — name resolves via ResolvedDisplayName component
+			withoutOldLeader.unshift({
 				userId: leaderId,
 				role: "supervising",
 				isLeader: true,
-				displayName: "Project Leader",
+				displayName: "Loading...",
 				position: 0,
 				isStaff: true,
 				timeAllocation: 1.0,
@@ -467,7 +467,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		}
 
 		// Recalculate positions
-		this.state.teamMembers = updatedMembers.map((tm, index) => ({
+		this.state.teamMembers = withoutOldLeader.map((tm, index) => ({
 			...tm,
 			position: index,
 		}));
@@ -511,6 +511,90 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		);
 		logger.debug("Validated all steps", { allValid });
 		return allValid;
+	};
+
+	/**
+	 * Re-validate all steps from stored form data.
+	 * Called after draft restoration to set validation state for steps
+	 * whose components haven't mounted yet. Returns the index of the
+	 * first invalid step, or -1 if all are valid.
+	 */
+	revalidateAllStepsFromData = (): number => {
+		const formData = this.state.formData;
+
+		// Step 0: Base Information
+		const step0Errors: Record<string, string> = {};
+		if (isRichTextEmpty(formData.baseInformation.title)) {
+			step0Errors.title = "Title is required";
+		}
+		if (isRichTextEmpty(formData.baseInformation.description)) {
+			step0Errors.description = "Description is required";
+		}
+		if (
+			!formData.baseInformation.keywords ||
+			formData.baseInformation.keywords.length === 0
+		) {
+			step0Errors.keywords = "At least one keyword is required";
+		}
+		this.state.validation[0] = {
+			isValid: Object.keys(step0Errors).length === 0,
+			errors: step0Errors,
+		};
+
+		// Step 1: Project Details
+		const step1Errors: Record<string, string> = {};
+		if (!formData.projectDetails.business_area) {
+			step1Errors.business_area = "Business area is required";
+		}
+		if (!formData.projectDetails.start_date) {
+			step1Errors.start_date = "Start date is required";
+		}
+		if (!formData.projectDetails.project_leader) {
+			step1Errors.project_leader = "Project leader is required";
+		}
+		if (!formData.projectDetails.data_custodian) {
+			step1Errors.data_custodian = "Data custodian is required";
+		}
+		this.state.validation[1] = {
+			isValid: Object.keys(step1Errors).length === 0,
+			errors: step1Errors,
+		};
+
+		// Step 2: Location (no required fields — always valid)
+		this.state.validation[2] = { isValid: true, errors: {} };
+
+		// Step 3: External/Student Details (conditional)
+		if (this.state.projectKind === "external") {
+			const step3Errors: Record<string, string> = {};
+			if (!formData.externalDetails?.collaboration_with?.trim()) {
+				step3Errors.collaboration_with =
+					"At least one collaboration partner is required";
+			}
+			this.state.validation[3] = {
+				isValid: Object.keys(step3Errors).length === 0,
+				errors: step3Errors,
+			};
+		} else if (this.state.projectKind === "student") {
+			const step3Errors: Record<string, string> = {};
+			if (!formData.studentDetails?.organisation?.trim()) {
+				step3Errors.organisation = "Organisation is required";
+			}
+			if (!formData.studentDetails?.level?.trim()) {
+				step3Errors.level = "Level is required";
+			}
+			this.state.validation[3] = {
+				isValid: Object.keys(step3Errors).length === 0,
+				errors: step3Errors,
+			};
+		}
+
+		// Find first invalid step
+		for (let i = 0; i < this.totalSteps; i++) {
+			if (this.state.validation[i] && !this.state.validation[i].isValid) {
+				return i;
+			}
+		}
+		return -1;
 	};
 
 	/**
@@ -581,9 +665,17 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	 * Check if can navigate to next step
 	 */
 	get canGoToNextStep(): boolean {
-		return (
-			this.state.currentStep < this.totalSteps - 1 && this.isCurrentStepValid
-		);
+		// Can only proceed if the current step is valid AND all previous steps are valid
+		if (this.state.currentStep >= this.totalSteps - 1) return false;
+		if (!this.isCurrentStepValid) return false;
+
+		// Check all previous steps are valid too
+		for (let i = 0; i < this.state.currentStep; i++) {
+			const stepValidation = this.state.validation[i];
+			if (!stepValidation || !stepValidation.isValid) return false;
+		}
+
+		return true;
 	}
 
 	/**

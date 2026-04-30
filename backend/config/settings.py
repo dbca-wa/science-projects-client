@@ -352,13 +352,17 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         # General API rate limits
-        "anon": "200/hour",  # Anonymous users (login page, public endpoints)
-        "user": "1000/hour",  # Authenticated users (normal usage)
+        "anon": "2000/hour",  # Anonymous users per IP (public staff profiles, etc.)
+        "user": "5000/hour",  # Authenticated users (normal usage)
         # Specific endpoint rate limits (use custom throttle classes)
-        "burst": "30/minute",  # Burst protection for rapid requests
+        "burst": "60/minute",  # Burst protection for rapid requests
         "login": "5/minute",  # Login attempts (prevents brute force)
         "password_reset": "3/hour",  # Password reset requests
     },
+    # Reverse proxy support — tells DRF to read the real client IP from
+    # X-Forwarded-For instead of REMOTE_ADDR (which would be the proxy's IP).
+    # Set to the number of proxies in front of Django (typically 1 for nginx/ALB).
+    "NUM_PROXIES": 1,
 }
 
 # Log throttling status based on Redis availability

@@ -223,6 +223,14 @@ export default PendingTab;
 /*  Bump Stage Panel (PL / BAL tabs)                                   */
 /* ------------------------------------------------------------------ */
 
+interface BumpPreviewDocument {
+	document_id: number;
+	project_title: string;
+	project_id: number;
+	document_kind: string;
+	document_url: string;
+}
+
 interface BumpPreviewUser {
 	user_id: number;
 	name: string;
@@ -230,6 +238,8 @@ interface BumpPreviewUser {
 	as_project_lead_count: number;
 	as_ba_lead_count: number;
 	total: number;
+	as_project_lead: BumpPreviewDocument[];
+	as_ba_lead: BumpPreviewDocument[];
 }
 
 interface BumpPreviewResponse {
@@ -504,7 +514,10 @@ function BumpDialog({
 										<p className="font-medium">{u.name}</p>
 										<p className="text-xs text-muted-foreground">{u.email}</p>
 									</div>
-									<div className="text-right text-xs text-muted-foreground">
+									<div className="text-right text-xs text-muted-foreground space-y-0.5">
+										<p className="font-medium text-foreground">
+											{u.total} document{u.total !== 1 ? "s" : ""}
+										</p>
 										{u.as_project_lead_count > 0 && (
 											<p>{u.as_project_lead_count} as PL</p>
 										)}

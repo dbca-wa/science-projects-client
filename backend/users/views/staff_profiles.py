@@ -20,6 +20,7 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from config.helpers import send_email_with_embedded_image
 from projects.models import ProjectMember
 from projects.serializers import ProjectDataTableSerializer
 from users.models import PublicStaffProfile
@@ -70,7 +71,7 @@ class StaffProfiles(APIView):
         ) or request.query_params.get("search")
         show_hidden = request.query_params.get("showHidden", "false").lower() == "true"
 
-        # Phase 1: Fetch IT Assets data (cached for 5 minutes)
+        # Phase 1: Fetch IT Assets data (cached for 30 minutes)
         cache_key = "it_assets_data"
         it_asset_data_by_email = cache.get(cache_key)
 
@@ -80,7 +81,7 @@ class StaffProfiles(APIView):
                 response = requests.get(
                     api_url,
                     auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                    timeout=30,
+                    timeout=6,  # 6 seconds — fail fast, don't make users wait
                 )
                 if response.status_code == 200:
                     data = response.json()
@@ -89,17 +90,19 @@ class StaffProfiles(APIView):
                         for user_data in data
                         if "email" in user_data
                     }
-                    cache.set(cache_key, it_asset_data_by_email, 300)
+                    cache.set(cache_key, it_asset_data_by_email, 1800)  # 30 minutes
                 else:
                     settings.LOGGER.error(
                         f"Failed to fetch IT Assets data: {response.status_code} {response.text}"
                     )
                     it_asset_data_by_email = {}
-                    cache.set(cache_key, {}, 60)
+                    cache.set(
+                        cache_key, {}, 60
+                    )  # Cache empty for 1 minute before retry
             except Exception as e:
                 settings.LOGGER.error(f"IT Assets API error: {e}")
                 it_asset_data_by_email = {}
-                cache.set(cache_key, {}, 60)
+                cache.set(cache_key, {}, 60)  # Cache empty for 1 minute before retry
 
         it_assets_available = bool(it_asset_data_by_email)
 
@@ -507,29 +510,20 @@ class PublicEmailStaffMember(APIView):
             # Render the email template
             template_content = render_to_string(template_path, template_props)
 
-            if settings.ENVIRONMENT == "production":
-                try:
-                    from config.helpers import send_email_with_embedded_image
-
-                    send_email_with_embedded_image(
-                        recipient_email=to_email,
-                        subject="Staff Profile Message",
-                        html_content=template_content,
-                        from_email=from_email,
-                    )
-                    return Response({"ok": "Email sent"}, status=HTTP_200_OK)
-                except Exception as e:
-                    settings.LOGGER.error(
-                        msg=f"Email Error: {e}\n If this is a 'getaddrinfo' error, you are likely running outside of OIM's datacenters."
-                    )
-                    return Response(
-                        {"error": "Failed to send email. Please try again."}, status=400
-                    )
-            else:
-                # Development/staging - don't actually send
-                settings.LOGGER.info(msg=f"DEV: Would send email to {recipient_email}")
+            try:
+                send_email_with_embedded_image(
+                    recipient_email=to_email,
+                    subject="Staff Profile Message",
+                    html_content=template_content,
+                    from_email=from_email,
+                )
+                return Response({"ok": "Email sent"}, status=HTTP_200_OK)
+            except Exception as e:
+                settings.LOGGER.error(
+                    msg=f"Email Error: {e}\n If this is a 'getaddrinfo' error, you are likely running outside of OIM's datacenters."
+                )
                 return Response(
-                    {"ok": "Email would be sent (dev mode)"}, status=HTTP_200_OK
+                    {"error": "Failed to send email. Please try again."}, status=400
                 )
 
         except PublicStaffProfile.DoesNotExist:

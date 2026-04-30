@@ -9,6 +9,7 @@ import { Input } from "@/shared/components/ui/input";
 import type { ISimpleLocationData } from "@/shared/types/org.types";
 import { FieldError } from "../FieldError";
 import { shouldShowError } from "../validation-helpers";
+import { LocationSection } from "../../LocationSection";
 
 /**
  * LocationStep - Step 3 of project creation wizard
@@ -73,35 +74,9 @@ const LocationStep = observer(() => {
 		return allLocations.filter((loc) => formData.areas.includes(loc.id));
 	}, [allLocations, formData.areas]);
 
-	const handleLocationToggle = (locationId: number) => {
-		const isSelected = formData.areas.includes(locationId);
-
-		if (isSelected) {
-			wizardStore.setLocation({
-				areas: formData.areas.filter((id) => id !== locationId),
-			});
-		} else {
-			wizardStore.setLocation({
-				areas: [...formData.areas, locationId],
-			});
-		}
-	};
-
 	const handleLocationRemove = (locationId: number) => {
 		wizardStore.setLocation({
 			areas: formData.areas.filter((id) => id !== locationId),
-		});
-	};
-
-	const handleSelectAll = (locationIds: number[]) => {
-		const newAreas = [...new Set([...formData.areas, ...locationIds])];
-		wizardStore.setLocation({ areas: newAreas });
-	};
-
-	const handleDeselectAll = (locationIds: number[]) => {
-		const idsToRemove = new Set(locationIds);
-		wizardStore.setLocation({
-			areas: formData.areas.filter((id) => !idsToRemove.has(id)),
 		});
 	};
 
@@ -195,9 +170,8 @@ const LocationStep = observer(() => {
 									title="DBCA Districts"
 									locations={filteredDistricts}
 									selectedAreas={formData.areas}
-									onToggle={handleLocationToggle}
-									onSelectAll={handleSelectAll}
-									onDeselectAll={handleDeselectAll}
+									allLocationsInSection={dbcaDistricts}
+									onAreasChange={(areas) => wizardStore.setLocation({ areas })}
 								/>
 							</div>
 						)}
@@ -209,9 +183,8 @@ const LocationStep = observer(() => {
 									title="DBCA Regions"
 									locations={filteredRegions}
 									selectedAreas={formData.areas}
-									onToggle={handleLocationToggle}
-									onSelectAll={handleSelectAll}
-									onDeselectAll={handleDeselectAll}
+									allLocationsInSection={dbcaRegions}
+									onAreasChange={(areas) => wizardStore.setLocation({ areas })}
 								/>
 							</div>
 						)}
@@ -231,98 +204,3 @@ const LocationStep = observer(() => {
 });
 
 export { LocationStep };
-
-/** Section header and location list for a single area type */
-interface LocationSectionProps {
-	title: string;
-	locations: ISimpleLocationData[];
-	selectedAreas: number[];
-	onToggle: (locationId: number) => void;
-	onSelectAll: (locationIds: number[]) => void;
-	onDeselectAll: (locationIds: number[]) => void;
-}
-
-const LocationSection = ({
-	title,
-	locations,
-	selectedAreas,
-	onToggle,
-	onSelectAll,
-	onDeselectAll,
-}: LocationSectionProps) => {
-	const locationIds = locations.map((loc) => loc.id);
-	const allSelected =
-		locationIds.length > 0 &&
-		locationIds.every((id) => selectedAreas.includes(id));
-
-	const handleToggleAll = () => {
-		if (allSelected) {
-			onDeselectAll(locationIds);
-		} else {
-			onSelectAll(locationIds);
-		}
-	};
-
-	return (
-		<div>
-			<div className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-2 border-b flex items-center justify-between">
-				<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-					{title}
-				</span>
-				<button
-					type="button"
-					onClick={handleToggleAll}
-					className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-				>
-					{allSelected ? "Deselect All" : "Select All"}
-				</button>
-			</div>
-			<div className="divide-y">
-				{locations.map((location) => {
-					const isSelected = selectedAreas.includes(location.id);
-
-					return (
-						<button
-							key={location.id}
-							type="button"
-							onClick={() => onToggle(location.id)}
-							className={`
-								w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors
-								flex items-center justify-between gap-3
-								${isSelected ? "bg-primary/5" : ""}
-							`}
-						>
-							<div className="flex items-center gap-3 flex-1 min-w-0">
-								<div
-									className={`
-										flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center
-										${isSelected ? "bg-primary border-primary" : "border-muted-foreground/30"}
-									`}
-								>
-									{isSelected && (
-										<svg
-											className="w-3 h-3 text-primary-foreground"
-											fill="none"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth="2"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path d="M5 13l4 4L19 7" />
-										</svg>
-									)}
-								</div>
-								<div className="flex-1 min-w-0">
-									<div className="font-medium text-sm truncate">
-										{location.name}
-									</div>
-								</div>
-							</div>
-						</button>
-					);
-				})}
-			</div>
-		</div>
-	);
-};

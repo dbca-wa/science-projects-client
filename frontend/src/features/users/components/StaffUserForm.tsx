@@ -21,6 +21,7 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { Loader2, AlertCircle, Mail, AlertTriangle } from "lucide-react";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import { useCreateStaffUser } from "../hooks/useCreateStaffUser";
 import { useUserExistenceCheck } from "../hooks/useUserExistenceCheck";
 import {
@@ -88,15 +89,6 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 		if (!branches) return [];
 		return [...branches].sort((a, b) => a.name.localeCompare(b.name));
 	}, [branches]);
-
-	const sortedBusinessAreas = useMemo(() => {
-		if (!businessAreas) return [];
-		return [...businessAreas].sort((a, b) => {
-			if (a.is_active && !b.is_active) return -1;
-			if (!a.is_active && b.is_active) return 1;
-			return a.name.localeCompare(b.name);
-		});
-	}, [businessAreas]);
 
 	// Warn user about unsaved changes
 	useEffect(() => {
@@ -366,11 +358,9 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
-									{sortedBusinessAreas.map((ba) => (
-										<SelectItem key={ba.id} value={ba.id!.toString()}>
-											{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-										</SelectItem>
-									))}
+									<BusinessAreaSelectItems
+										businessAreas={businessAreas || []}
+									/>
 								</SelectContent>
 							</Select>
 							<FormMessage />

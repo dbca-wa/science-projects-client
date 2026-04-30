@@ -20,6 +20,8 @@ import {
 } from "@/shared/components/ui/select";
 import { Loader2, AlertCircle, Briefcase } from "lucide-react";
 import type { IBusinessArea } from "@/shared/types/org.types";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
+import { sortBusinessAreasByDisplayName } from "@/features/projects/utils/business-area.utils";
 import { BusinessAreaPreview } from "./BusinessAreaPreview";
 import { ProblematicProjectsTab } from "./ProblematicProjectsTab";
 import { UnapprovedDocumentsTab } from "./UnapprovedDocumentsTab";
@@ -158,10 +160,17 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 	// Show dropdown: superusers always, non-superusers only if leading 2+ BAs
 	const showDropdown = authStore.isSuperuser || businessAreas.length > 1;
 
-	// Auto-select first BA when data loads
+	// Auto-select first BA (sorted by display name) when data loads
 	useEffect(() => {
 		if (businessAreas && businessAreas.length > 0 && selectedBAId === null) {
-			setSelectedBAId(businessAreas[0].id!);
+			const sorted = sortBusinessAreasByDisplayName(
+				businessAreas.filter((ba) => ba.is_active)
+			);
+			if (sorted.length > 0 && sorted[0].id) {
+				setSelectedBAId(sorted[0].id);
+			} else {
+				setSelectedBAId(businessAreas[0].id!);
+			}
 		}
 	}, [businessAreas, selectedBAId]);
 
@@ -237,11 +246,7 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 							<SelectValue placeholder="Select business area" />
 						</SelectTrigger>
 						<SelectContent>
-							{businessAreas.map((ba) => (
-								<SelectItem key={ba.id} value={ba.id!.toString()}>
-									{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-								</SelectItem>
-							))}
+							<BusinessAreaSelectItems businessAreas={businessAreas} />
 						</SelectContent>
 					</Select>
 				)}

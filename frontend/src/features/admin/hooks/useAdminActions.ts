@@ -50,6 +50,7 @@ export const useOpenNewCycle = () => {
 			prepopulate?: boolean;
 			send_emails?: boolean;
 			recipient_groups?: string[];
+			excluded_user_ids?: number[];
 		}) => openNewCycle(data),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });

@@ -956,8 +956,13 @@ class NewCycleOpenPreview(APIView):
             if _is_valid(ba.leader):
                 users_with_roles.append((ba.leader, 3, "BA Lead"))
 
-        # All project leads and team members
-        all_projects = Project.objects.all()
+        # All project leads and team members — exclude terminated and completed projects
+        all_projects = Project.objects.exclude(
+            status__in=[
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ]
+        )
         if division_slug and last_report and last_report.division:
             all_projects = all_projects.filter(
                 business_area__division=last_report.division

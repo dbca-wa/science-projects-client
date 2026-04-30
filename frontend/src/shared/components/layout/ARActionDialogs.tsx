@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Label } from "@/shared/components/ui/label";
@@ -47,6 +47,9 @@ export const ARActionDialogs = ({
 	const [sendProjectLeads, setSendProjectLeads] = useState(false);
 	const [sendTeamMembers, setSendTeamMembers] = useState(false);
 
+	// Excluded user IDs for the new cycle email
+	const [excludedUserIds, setExcludedUserIds] = useState<number[]>([]);
+
 	const batchApproveMutation = useBatchApprove();
 	const batchApproveOldMutation = useBatchApproveOld();
 	const newCycleMutation = useOpenNewCycle();
@@ -78,6 +81,16 @@ export const ARActionDialogs = ({
 		sendTeamMembers && recipientPreview
 			? recipientPreview.recipients.team_members
 			: [];
+
+	const handleExcludeUser = useCallback((userId: number) => {
+		setExcludedUserIds((prev) =>
+			prev.includes(userId) ? prev : [...prev, userId]
+		);
+	}, []);
+
+	const handleRestoreUser = useCallback((userId: number) => {
+		setExcludedUserIds((prev) => prev.filter((id) => id !== userId));
+	}, []);
 
 	return (
 		<>
@@ -313,6 +326,9 @@ export const ARActionDialogs = ({
 							baLeads={filteredBaLeads}
 							projectLeads={filteredProjectLeads}
 							teamMembers={filteredTeamMembers}
+							excludedUserIds={excludedUserIds}
+							onExcludeUser={handleExcludeUser}
+							onRestoreUser={handleRestoreUser}
 						/>
 					)}
 
@@ -335,6 +351,8 @@ export const ARActionDialogs = ({
 										prepopulate,
 										send_emails: anySendGroup,
 										recipient_groups: anySendGroup ? selectedGroups : undefined,
+										excluded_user_ids:
+											excludedUserIds.length > 0 ? excludedUserIds : undefined,
 									},
 									{ onSuccess: onClose }
 								);

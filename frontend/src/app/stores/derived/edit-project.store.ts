@@ -39,7 +39,11 @@ interface EditProjectStoreState extends BaseStoreState {
 	projectId: number | null;
 	originalData: IEditProjectFormData | null;
 	formData: IEditProjectFormData;
-	activeTab: "basic-info" | "project-areas";
+	activeTab:
+		| "basic-info"
+		| "project-areas"
+		| "external-details"
+		| "student-details";
 	isSubmitting: boolean;
 }
 
@@ -114,16 +118,25 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 			title: project.title,
 			description: project.description || "",
 			image: getImageUrl(project.image) || null,
-			business_area: project.business_area?.id || 0,
-			service: details.base.service?.id || null,
+			// Handle business_area whether it's an object or a raw numeric ID
+			business_area:
+				typeof project.business_area === "number"
+					? project.business_area
+					: project.business_area?.id || 0,
+			// Handle service whether it's an object or a raw numeric ID
+			service: details.base
+				? typeof details.base.service === "number"
+					? details.base.service
+					: (details.base.service?.id ?? null)
+				: null,
 			start_date: project.start_date
 				? new Date(project.start_date).toISOString().split("T")[0]
 				: "",
 			end_date: project.end_date
 				? new Date(project.end_date).toISOString().split("T")[0]
 				: null,
-			project_leader: details.base.owner?.id || null,
-			data_custodian: details.base.data_custodian?.id || null,
+			project_leader: details.base?.owner?.id || null,
+			data_custodian: details.base?.data_custodian?.id || null,
 			keywords: project.keywords || "",
 			project_areas: project.areas?.map((area) => area.id) || [],
 			collaboration_with:
@@ -167,6 +180,8 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 
 		logger.info("EditProjectStore loaded project", {
 			projectId: project.id,
+			businessArea: formData.business_area,
+			service: formData.service,
 			imageFile: project.image?.file,
 			imageUrl: getImageUrl(project.image),
 		});
@@ -186,7 +201,9 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 	/**
 	 * Set active tab
 	 */
-	setActiveTab = (tab: "basic-info" | "project-areas") => {
+	setActiveTab = (
+		tab: "basic-info" | "project-areas" | "external-details" | "student-details"
+	) => {
 		this.state.activeTab = tab;
 		logger.debug("Set active tab", { tab });
 	};

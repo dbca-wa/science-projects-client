@@ -7,7 +7,6 @@ import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
 import { FormRichTextEditor } from "@/shared/components/editor/FormRichTextEditor";
 import { KeywordInput } from "@/shared/components/KeywordInput";
 import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
-import { FieldError } from "../FieldError";
 import { shouldShowError } from "../validation-helpers";
 import { SectionCard } from "../SectionCard";
 
@@ -145,10 +144,18 @@ const BaseInformationStep = observer(() => {
 
 	// Compute section completion states
 	const isImageComplete = formData.image !== null;
+	const isTitleValid = !isRichTextEmpty(formData.title);
+	const isDescriptionValid = !isRichTextEmpty(formData.description);
+	const isKeywordsValid = formData.keywords.length > 0;
 	const isContentComplete =
-		!isRichTextEmpty(formData.title) &&
-		!isRichTextEmpty(formData.description) &&
-		formData.keywords.length > 0;
+		isTitleValid && isDescriptionValid && isKeywordsValid;
+
+	// If the step was previously completed, show errors immediately (no need to touch fields)
+	const wasCompleted = wizardStore.state.completedSteps.has(stepIndex);
+	const showAllErrors = wasCompleted && !isContentComplete;
+
+	// Content section is "invalid" if it was complete but now has errors
+	const isContentInvalid = wasCompleted && !isContentComplete;
 
 	return (
 		<div className="space-y-6">
@@ -174,21 +181,28 @@ const BaseInformationStep = observer(() => {
 			<SectionCard
 				title="Project Details"
 				isComplete={isContentComplete}
+				isInvalid={isContentInvalid}
 				completionLabel="Project details section complete"
 			>
 				<div className="space-y-6">
 					{/* Title */}
 					<div className="space-y-2">
-						<Label htmlFor="title">
-							Project Title <span className="text-destructive">*</span>
-						</Label>
+						<div className="flex items-center gap-2">
+							<Label htmlFor="title">
+								Project Title <span className="text-destructive">*</span>
+							</Label>
+							{(showAllErrors ||
+								shouldShowError(wizardStore, "title", stepIndex)) &&
+								validation?.errors.title && (
+									<span className="text-xs text-destructive font-medium">
+										— {validation.errors.title}
+									</span>
+								)}
+						</div>
 						<StableTitleEditor
 							initialValue={formData.title}
 							onChange={handleTitleChange}
 						/>
-						{shouldShowError(wizardStore, "title", stepIndex) && (
-							<FieldError error={validation?.errors.title} />
-						)}
 						<p className="text-xs text-muted-foreground">
 							The project title with formatting if required (e.g. for taxonomic
 							names)
@@ -197,16 +211,22 @@ const BaseInformationStep = observer(() => {
 
 					{/* Description/Summary */}
 					<div className="space-y-2">
-						<Label htmlFor="description">
-							Project Summary <span className="text-destructive">*</span>
-						</Label>
+						<div className="flex items-center gap-2">
+							<Label htmlFor="description">
+								Project Summary <span className="text-destructive">*</span>
+							</Label>
+							{(showAllErrors ||
+								shouldShowError(wizardStore, "description", stepIndex)) &&
+								validation?.errors.description && (
+									<span className="text-xs text-destructive font-medium">
+										— {validation.errors.description}
+									</span>
+								)}
+						</div>
 						<StableDescriptionEditor
 							initialValue={formData.description}
 							onChange={handleDescriptionChange}
 						/>
-						{shouldShowError(wizardStore, "description", stepIndex) && (
-							<FieldError error={validation?.errors.description} />
-						)}
 						<p className="text-xs text-muted-foreground">
 							A concise project summary, or any additional useful information
 						</p>
@@ -214,18 +234,24 @@ const BaseInformationStep = observer(() => {
 
 					{/* Keywords */}
 					<div className="space-y-2">
-						<Label htmlFor="keywords">
-							Keywords <span className="text-destructive">*</span>
-						</Label>
+						<div className="flex items-center gap-2">
+							<Label htmlFor="keywords">
+								Keywords <span className="text-destructive">*</span>
+							</Label>
+							{(showAllErrors ||
+								shouldShowError(wizardStore, "keywords", stepIndex)) &&
+								validation?.errors.keywords && (
+									<span className="text-xs text-destructive font-medium">
+										— {validation.errors.keywords}
+									</span>
+								)}
+						</div>
 						<KeywordInput
 							keywords={formData.keywords}
 							onKeywordsChange={handleKeywordsChange}
 							placeholder="Type a keyword and press Enter (use ; for multiple)"
 							onBlur={() => handleFieldBlur("keywords")}
 						/>
-						{shouldShowError(wizardStore, "keywords", stepIndex) && (
-							<FieldError error={validation?.errors.keywords} />
-						)}
 						<p className="text-xs text-muted-foreground">
 							Add keywords to help others find your project. Use semicolons (;)
 							to add multiple keywords at once.

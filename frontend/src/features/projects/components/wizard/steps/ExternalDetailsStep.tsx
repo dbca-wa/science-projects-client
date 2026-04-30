@@ -86,7 +86,6 @@ const ExternalDetailsStep = observer(() => {
 	}
 
 	// Parse collaboration_with string into affiliations array on mount
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		const collaborationWith = formData?.collaboration_with || "";
 		if (collaborationWith && selectedAffiliations.length === 0) {
@@ -100,7 +99,6 @@ const ExternalDetailsStep = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const handleAffiliationsChange = useCallback(
 		(affiliations: IAffiliation[]) => {
 			setSelectedAffiliations(affiliations);
@@ -113,7 +111,6 @@ const ExternalDetailsStep = observer(() => {
 	);
 
 	// Validate on every form data change
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		if (!formData) return;
 
@@ -131,7 +128,6 @@ const ExternalDetailsStep = observer(() => {
 		wizardStore.setStepValidation(3, isValid, errors);
 	}, [formData?.collaboration_with, wizardStore, formData]);
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const handleBudgetChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			wizardStore.setExternalDetails({ budget: e.target.value });
@@ -139,7 +135,6 @@ const ExternalDetailsStep = observer(() => {
 		[wizardStore]
 	);
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const handleDescriptionChange = useCallback(
 		(html: string) => {
 			wizardStore.setExternalDetails({ external_description: html });
@@ -147,7 +142,6 @@ const ExternalDetailsStep = observer(() => {
 		[wizardStore]
 	);
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const handleAimsChange = useCallback(
 		(html: string) => {
 			wizardStore.setExternalDetails({ aims: html });

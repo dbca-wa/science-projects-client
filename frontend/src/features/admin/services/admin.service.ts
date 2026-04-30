@@ -300,6 +300,7 @@ export const openNewCycle = async (data?: {
 	prepopulate?: boolean;
 	send_emails?: boolean;
 	recipient_groups?: string[];
+	excluded_user_ids?: number[];
 }): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE, {
 		division: data?.division,
@@ -307,6 +308,7 @@ export const openNewCycle = async (data?: {
 		prepopulate: data?.prepopulate ?? false,
 		send_emails: data?.send_emails ?? false,
 		recipient_groups: data?.recipient_groups,
+		excluded_user_ids: data?.excluded_user_ids,
 	});
 };
 

@@ -46,6 +46,14 @@ const ProjectCreateWizardPage = observer(() => {
 			const restore = async () => {
 				const restored = await restoreDraft();
 				if (restored) {
+					// Re-validate all steps from stored data (components haven't mounted yet)
+					const firstInvalidStep = wizardStore.revalidateAllStepsFromData();
+
+					// Navigate to the first invalid step, or stay on the restored step
+					if (firstInvalidStep >= 0) {
+						wizardStore.goToStep(firstInvalidStep);
+					}
+
 					const hasImage =
 						wizardStore.state.formData.baseInformation.image !== null;
 					if (hasImage) {
@@ -60,7 +68,7 @@ const ProjectCreateWizardPage = observer(() => {
 						});
 					}
 				}
-				// Mark as ready regardless of whether a draft was found
+				// Mark as ready — step components will mount
 				setIsReady(true);
 			};
 			void restore();
