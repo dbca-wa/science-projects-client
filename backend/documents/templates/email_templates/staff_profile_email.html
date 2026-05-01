@@ -1,0 +1,22 @@
+{% load custom_filters %}
+{% include "email_templates/partials/_base_open.html" %}
+{% with email_title="Staff Profile Contact" %}
+  {% include "email_templates/partials/_header.html" %}
+{% endwith %}
+
+{% include "email_templates/partials/_greeting.html" %}
+
+<p style="font-size: 14px; line-height: 26px; margin: 16px 0; color: #4b5563;">
+  A member of the public has sent you a message via your staff profile listing.
+</p>
+
+{% with comment_label="Message:" comment_text=staff_message %}
+  {% include "email_templates/partials/_comment_box.html" %}
+{% endwith %}
+
+{% with action_url=reply_mailto action_text="Reply" action_subtext="Click the button above to reply directly to the sender." %}
+  {% include "email_templates/partials/_action_button.html" %}
+{% endwith %}
+
+{% include "email_templates/partials/_footer.html" %}
+{% include "email_templates/partials/_base_close.html" %}

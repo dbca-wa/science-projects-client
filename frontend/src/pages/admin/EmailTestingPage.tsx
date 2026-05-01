@@ -41,6 +41,7 @@ const EMAIL_TEMPLATES = [
 	{ name: "project_closed_email", label: "Project Closed" },
 	{ name: "project_reopened_email", label: "Project Reopened" },
 	{ name: "spms_link_email", label: "SPMS Invite" },
+	{ name: "staff_profile_email", label: "Staff Profile Contact" },
 ] as const;
 
 const EmailTestingPage = () => {

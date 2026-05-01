@@ -434,28 +434,26 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			return;
 		}
 
-		// Remove the old leader from the team (they'll be replaced by the new one)
-		const withoutOldLeader = this.state.teamMembers.filter(
-			(tm) => !tm.isLeader
+		// Demote the old leader(s) to regular members
+		const demoted = this.state.teamMembers.map((tm) =>
+			tm.isLeader ? { ...tm, isLeader: false } : tm
 		);
 
-		// Check if the new leader is already in the team as a non-leader member
-		const existingIndex = withoutOldLeader.findIndex(
-			(tm) => tm.userId === leaderId
-		);
+		// Check if the new leader is already in the team
+		const existingIndex = demoted.findIndex((tm) => tm.userId === leaderId);
 
 		if (existingIndex >= 0) {
 			// Promote existing member to leader and move to position 0
-			withoutOldLeader[existingIndex] = {
-				...withoutOldLeader[existingIndex],
+			demoted[existingIndex] = {
+				...demoted[existingIndex],
 				isLeader: true,
 				role: "supervising",
 			};
-			const [leader] = withoutOldLeader.splice(existingIndex, 1);
-			withoutOldLeader.unshift(leader);
+			const [leader] = demoted.splice(existingIndex, 1);
+			demoted.unshift(leader);
 		} else {
 			// Add new leader at position 0 — name resolves via ResolvedDisplayName component
-			withoutOldLeader.unshift({
+			demoted.unshift({
 				userId: leaderId,
 				role: "supervising",
 				isLeader: true,
@@ -467,7 +465,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		}
 
 		// Recalculate positions
-		this.state.teamMembers = withoutOldLeader.map((tm, index) => ({
+		this.state.teamMembers = demoted.map((tm, index) => ({
 			...tm,
 			position: index,
 		}));

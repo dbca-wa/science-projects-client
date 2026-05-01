@@ -498,13 +498,18 @@ class PublicEmailStaffMember(APIView):
             # Email details
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = [recipient_email]
-            template_path = "./email_templates/staff_profile_email.html"
+            template_path = "email_templates/staff_profile_email.html"
 
-            # Template context
+            sender_email = request.data.get("senderEmail")
+
+            # Template context — uses shared partials
             template_props = {
                 "recipient_name": recipient_name,
                 "staff_message": request.data.get("message"),
-                "public_users_listed_email": request.data.get("senderEmail"),
+                "public_users_listed_email": sender_email,
+                "reply_mailto": f"mailto:{sender_email}",
+                "logo_url": True,
+                "email_title": "Staff Profile Contact",
             }
 
             # Render the email template

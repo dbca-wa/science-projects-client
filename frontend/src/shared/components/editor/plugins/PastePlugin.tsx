@@ -52,8 +52,11 @@ export const PastePlugin = ({ stripBold = false }: PastePluginProps) => {
 					const selection = $getSelection();
 					if (!$isRangeSelection(selection)) return;
 
-					// Strip bold tags from the pasted HTML
-					const cleanedHTML = stripBoldTags(html);
+					// SECURITY: Sanitise clipboard HTML before processing to prevent XSS
+					const sanitisedHTML = sanitizeRichText(html);
+
+					// Strip bold tags from the sanitised HTML
+					const cleanedHTML = stripBoldTags(sanitisedHTML);
 
 					const parser = new DOMParser();
 					const dom = parser.parseFromString(cleanedHTML, "text/html");

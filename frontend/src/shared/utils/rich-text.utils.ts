@@ -92,7 +92,15 @@ export const isRichTextEmpty = (html: string | null | undefined): boolean => {
 	// Check against known empty patterns
 	if (EMPTY_HTML_PATTERNS.includes(trimmed)) return true;
 
-	// Strip all HTML tags and check if any text content remains
-	const textContent = trimmed.replace(/<[^>]*>/g, "").trim();
-	return textContent.length === 0;
+	// Strip all HTML tags and check if any text content remains.
+	// NOTE: This is NOT a security sanitiser — it's only used for emptiness detection.
+	// The result is compared to length === 0, never rendered as HTML.
+	// Using a loop to handle edge cases where nested/malformed tags could leave residue.
+	let textContent = trimmed;
+	let previous: string;
+	do {
+		previous = textContent;
+		textContent = textContent.replace(/<[^>]*>/g, "");
+	} while (textContent !== previous);
+	return textContent.trim().length === 0;
 };

@@ -443,3 +443,326 @@ describe("Location filtering — only dbcaregion and dbcadistrict pass through",
 		expect(locations).toHaveLength(0);
 	});
 });
+
+describe("ProjectWizardStore — project kind handling", () => {
+	it("should initialise external details when kind is external", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		expect(store.state.formData.externalDetails).not.toBeNull();
+		expect(store.state.formData.studentDetails).toBeNull();
+	});
+
+	it("should initialise student details when kind is student", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		expect(store.state.formData.studentDetails).not.toBeNull();
+		expect(store.state.formData.externalDetails).toBeNull();
+	});
+
+	it("should clear conditional details for science projects", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		store.setProjectKind("science");
+		expect(store.state.formData.externalDetails).toBeNull();
+		expect(store.state.formData.studentDetails).toBeNull();
+	});
+
+	it("should have 3 steps for science projects", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		expect(store.totalSteps).toBe(3);
+	});
+
+	it("should have 3 steps for core_function projects", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("core_function");
+		expect(store.totalSteps).toBe(3);
+	});
+
+	it("should have 4 steps for external projects", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		expect(store.totalSteps).toBe(4);
+	});
+
+	it("should have 4 steps for student projects", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		expect(store.totalSteps).toBe(4);
+	});
+});
+
+describe("ProjectWizardStore — step navigation", () => {
+	it("should start at step 0", () => {
+		const store = new ProjectWizardStore();
+		expect(store.state.currentStep).toBe(0);
+	});
+
+	it("should not go forward when current step is invalid", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		// Step 0 has no validation set — defaults to invalid
+		store.goToNextStep();
+		expect(store.state.currentStep).toBe(0);
+	});
+
+	it("should go forward when current step is valid", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		expect(store.state.currentStep).toBe(1);
+	});
+
+	it("should always allow going backward", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		expect(store.state.currentStep).toBe(1);
+		store.goToPreviousStep();
+		expect(store.state.currentStep).toBe(0);
+	});
+
+	it("should not go backward from step 0", () => {
+		const store = new ProjectWizardStore();
+		store.goToPreviousStep();
+		expect(store.state.currentStep).toBe(0);
+	});
+
+	it("should not go forward past last step", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science"); // 3 steps
+		store.setStepValidation(0, true);
+		store.setStepValidation(1, true);
+		store.goToNextStep(); // step 1
+		store.goToNextStep(); // step 2 (last)
+		store.setStepValidation(2, true);
+		store.goToNextStep(); // should stay at 2
+		expect(store.state.currentStep).toBe(2);
+	});
+
+	it("should mark step as completed when navigating forward", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		expect(store.state.completedSteps.has(0)).toBe(true);
+	});
+
+	it("goToStep should allow jumping to completed steps", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.goToNextStep(); // now at step 1, step 0 completed
+		store.goToStep(0); // jump back to step 0
+		expect(store.state.currentStep).toBe(0);
+	});
+
+	it("goToStep should not allow jumping to uncompleted future steps", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.goToStep(2); // step 1 not completed
+		expect(store.state.currentStep).toBe(0);
+	});
+});
+
+describe("ProjectWizardStore — validation", () => {
+	it("should set step validation", () => {
+		const store = new ProjectWizardStore();
+		store.setStepValidation(0, true);
+		expect(store.state.validation[0]).toEqual({ isValid: true, errors: {} });
+	});
+
+	it("should set step validation with errors", () => {
+		const store = new ProjectWizardStore();
+		store.setStepValidation(0, false, { title: "Required" });
+		expect(store.state.validation[0]).toEqual({
+			isValid: false,
+			errors: { title: "Required" },
+		});
+	});
+
+	it("isCurrentStepValid should reflect validation state", () => {
+		const store = new ProjectWizardStore();
+		expect(store.isCurrentStepValid).toBe(false); // no validation set
+		store.setStepValidation(0, true);
+		expect(store.isCurrentStepValid).toBe(true);
+	});
+
+	it("validateAllSteps should return false when any step is invalid", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.setStepValidation(1, false);
+		store.setStepValidation(2, true);
+		expect(store.validateAllSteps()).toBe(false);
+	});
+
+	it("validateAllSteps should return true when all steps are valid", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.setStepValidation(1, true);
+		store.setStepValidation(2, true);
+		expect(store.validateAllSteps()).toBe(true);
+	});
+
+	it("revalidateAllStepsFromData should detect missing required fields", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(0); // step 0 has empty title/description/keywords
+	});
+
+	it("revalidateAllStepsFromData should return -1 when all valid", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(-1);
+	});
+
+	it("revalidateAllStepsFromData should validate external details", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// External details missing collaboration_with
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(3); // step 3 = external details
+	});
+
+	it("revalidateAllStepsFromData should validate student details", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Student details missing organisation and level
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(3); // step 3 = student details
+	});
+});
+
+describe("ProjectWizardStore — computed properties", () => {
+	it("progressPercentage should reflect current step", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science"); // 3 steps
+		expect(store.progressPercentage).toBe(33); // step 0 of 3 = 33%
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		expect(store.progressPercentage).toBe(67); // step 1 of 3 = 67%
+	});
+
+	it("isLastStep should be true on final step", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science"); // 3 steps
+		expect(store.isLastStep).toBe(false);
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		store.setStepValidation(1, true);
+		store.goToNextStep();
+		expect(store.isLastStep).toBe(true);
+	});
+
+	it("canGoBack should be false at step 0", () => {
+		const store = new ProjectWizardStore();
+		expect(store.canGoBack).toBe(false);
+	});
+
+	it("canGoBack should be true at step 1+", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+		expect(store.canGoBack).toBe(true);
+	});
+});
+
+describe("ProjectWizardStore — resetWizard", () => {
+	it("should clear all form data and state", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Test" });
+		store.setProjectDetails({ business_area: 1 });
+		store.addTeamMember(makeMember({ userId: 1 }));
+		store.setStepValidation(0, true);
+		store.goToNextStep();
+
+		store.resetWizard();
+
+		expect(store.state.currentStep).toBe(0);
+		expect(store.state.formData.baseInformation.title).toBe("");
+		expect(store.state.teamMembers).toHaveLength(0);
+		expect(store.state.completedSteps.size).toBe(0);
+		expect(store.state.touchedSteps.size).toBe(0);
+		expect(store.state.touchedFields.size).toBe(0);
+		expect(store.state.isSubmitting).toBe(false);
+	});
+});
+
+describe("ProjectWizardStore — touched state tracking", () => {
+	it("should track touched steps", () => {
+		const store = new ProjectWizardStore();
+		store.markStepTouched(0);
+		expect(store.state.touchedSteps.has(0)).toBe(true);
+		expect(store.state.touchedSteps.has(1)).toBe(false);
+	});
+
+	it("should track touched fields", () => {
+		const store = new ProjectWizardStore();
+		store.markFieldTouched("title");
+		expect(store.state.touchedFields.has("title")).toBe(true);
+		expect(store.state.touchedFields.has("description")).toBe(false);
+	});
+});
+
+describe("ProjectWizardStore — form data setters", () => {
+	it("setExternalDetails should initialise null details", () => {
+		const store = new ProjectWizardStore();
+		store.setExternalDetails({ collaboration_with: "CSIRO" });
+		expect(store.state.formData.externalDetails?.collaboration_with).toBe(
+			"CSIRO"
+		);
+	});
+
+	it("setStudentDetails should initialise null details", () => {
+		const store = new ProjectWizardStore();
+		store.setStudentDetails({ organisation: "UWA" });
+		expect(store.state.formData.studentDetails?.organisation).toBe("UWA");
+	});
+
+	it("setLocation should update areas", () => {
+		const store = new ProjectWizardStore();
+		store.setLocation({ areas: [1, 2, 3] });
+		expect(store.state.formData.location.areas).toEqual([1, 2, 3]);
+	});
+});

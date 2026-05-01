@@ -1004,6 +1004,17 @@ class SendAllTestEmails(APIView):
                 "email_subject": "You have been invited to SPMS",
             },
         },
+        {
+            "name": "staff_profile_email",
+            "subject": "Staff Profile Message",
+            "context": {
+                "recipient_name": "Test User",
+                "staff_message": "Hello, I am interested in your research on fauna conservation. Could we discuss potential collaboration opportunities?",
+                "public_users_listed_email": "public.member@example.com",
+                "reply_mailto": "mailto:public.member@example.com",
+                "email_subject": "Staff Profile Contact",
+            },
+        },
     ]
 
     def post(self, req):
