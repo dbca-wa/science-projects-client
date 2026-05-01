@@ -1037,24 +1037,33 @@ class NewCycleOpenPreview(APIView):
 def _fetch_it_assets_emails(cache, http_requests):
     """
     Fetch the set of known emails from IT Assets API.
-    Results are cached for 5 minutes to avoid repeated calls.
+
+    Reuses the same cache key and data as the staff profiles directory
+    (``it_assets_data``) so a single API call serves both pages.
+    Cache duration: 30 minutes on success, 1 minute on failure — matching
+    the staff profiles caching strategy.
 
     Returns:
         tuple: (set of lowercase email strings, bool indicating API availability)
     """
-    cache_key = "new_cycle_it_assets_emails"
-    cached = cache.get(cache_key)
+    # First, try to use the shared staff profiles cache (full user data by email)
+    shared_cache_key = "it_assets_data"
+    shared_data = cache.get(shared_cache_key)
 
-    if cached is not None:
-        return cached
+    if shared_data is not None:
+        if shared_data:
+            emails = {email.lower() for email in shared_data.keys() if email}
+            return (emails, True)
+        else:
+            return (set(), False)
 
+    # Shared cache miss — fetch from IT Assets API and populate the shared cache
     try:
         api_url = settings.IT_ASSETS_URL
         if not api_url:
             settings.LOGGER.warning("IT Assets URL not configured")
-            result = (set(), False)
-            cache.set(cache_key, result, 60)
-            return result
+            cache.set(shared_cache_key, {}, 60)
+            return (set(), False)
 
         response = http_requests.get(
             api_url,
@@ -1064,27 +1073,26 @@ def _fetch_it_assets_emails(cache, http_requests):
 
         if response.status_code == 200:
             data = response.json()
-            emails = {
-                entry["email"].lower()
-                for entry in data
-                if "email" in entry and entry.get("email")
+            it_asset_data_by_email = {
+                user_data["email"]: user_data
+                for user_data in data
+                if "email" in user_data
             }
-            result = (emails, True)
-            cache.set(cache_key, result, 300)  # 5 minutes
-            return result
+            cache.set(shared_cache_key, it_asset_data_by_email, 1800)  # 30 minutes
+
+            emails = {email.lower() for email in it_asset_data_by_email.keys() if email}
+            return (emails, True)
         else:
             settings.LOGGER.error(
                 f"IT Assets API returned {response.status_code}: {response.text[:200]}"
             )
-            result = (set(), False)
-            cache.set(cache_key, result, 60)  # Retry after 1 minute
-            return result
+            cache.set(shared_cache_key, {}, 60)  # Retry after 1 minute
+            return (set(), False)
 
     except Exception as e:
         settings.LOGGER.error(f"IT Assets API error: {e}")
-        result = (set(), False)
-        cache.set(cache_key, result, 60)  # Retry after 1 minute
-        return result
+        cache.set(shared_cache_key, {}, 60)  # Retry after 1 minute
+        return (set(), False)
 
 
 class NewCycleEmailPreview(APIView):

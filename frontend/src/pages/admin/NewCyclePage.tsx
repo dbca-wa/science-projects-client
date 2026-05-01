@@ -14,6 +14,12 @@ import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Checkbox } from "@/shared/components/ui/checkbox";
+import {
+	Tabs,
+	TabsList,
+	TabsTrigger,
+	TabsContent,
+} from "@/shared/components/ui/tabs";
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
@@ -39,7 +45,7 @@ const GREEN_CHECKBOX =
 const GREEN_RADIO =
 	"border-gray-400 dark:border-gray-500 shadow-sm [&[data-state=checked]]:border-emerald-600 [&_svg]:fill-emerald-600";
 
-export default function NewCyclePage() {
+const NewCyclePage = () => {
 	useDocumentTitle("Open New Cycle");
 	const [store] = useState(() => new NewCycleStore());
 	const [showPreview, setShowPreview] = useState(false);
@@ -77,7 +83,7 @@ export default function NewCyclePage() {
 			</div>
 		</div>
 	);
-}
+};
 
 interface NewCyclePageContentProps {
 	store: NewCycleStore;
@@ -111,7 +117,10 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 	};
 
 	// Debounced custom message for email preview (300ms)
-	const [debouncedMessage, setDebouncedMessage] = useState("");
+	// Initialise with store values so restored drafts show immediately
+	const [debouncedMessage, setDebouncedMessage] = useState(
+		store.state.customMessage
+	);
 	const [debouncedMessages, setDebouncedMessages] = useState(
 		store.state.customMessages
 	);
@@ -521,12 +530,13 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 						</div>
 					)}
 					{!itAssetsAvailable && (
-						<div className="rounded-lg border shadow-sm p-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+						<div className="rounded-lg border shadow-sm p-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
 							<div className="flex items-start gap-3">
-								<Info className="size-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
-								<p className="text-sm text-blue-700 dark:text-blue-300">
-									IT Assets directory could not be reached. All recipients shown
-									as valid.
+								<Info className="size-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+								<p className="text-sm text-amber-700 dark:text-amber-300">
+									IT Assets directory could not be reached. All recipients are
+									shown as valid. Some users may not receive emails if their
+									accounts are no longer active in the DBCA directory.
 								</p>
 							</div>
 						</div>
@@ -582,6 +592,11 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 		team_members: "Team Members",
 	};
 
+	const showGroupTabs =
+		store.state.perGroupEnabled &&
+		store.state.customMessageEnabled &&
+		store.sendGroupCount > 1;
+
 	const previewPanel = (
 		<div className="sticky top-6">
 			<div className="space-y-4">
@@ -592,33 +607,46 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 					</p>
 				</div>
 
-				{/* Per-group tabs — only for checked groups when per-group custom message is on */}
-				{store.state.perGroupEnabled &&
-					store.state.customMessageEnabled &&
-					store.sendGroupCount > 1 && (
-						<div className="flex gap-1 border-b">
-							{store.checkedGroupKeys.map((key) => (
-								<button
-									key={key}
-									type="button"
-									onClick={() => store.setActivePreviewGroup(key)}
-									className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-										store.state.activePreviewGroup === key
-											? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-											: "border-transparent text-muted-foreground hover:text-foreground"
-									}`}
-								>
-									{GROUP_LABEL_MAP[key]}
-								</button>
-							))}
-						</div>
-					)}
-
 				{store.anySendGroup ? (
-					<NewCycleEmailPreview
-						customMessage={previewMessage || undefined}
-						divisionName={divisionName}
-					/>
+					showGroupTabs ? (
+						<Tabs
+							value={store.state.activePreviewGroup}
+							onValueChange={(v) =>
+								store.setActivePreviewGroup(
+									v as "ba_leads" | "project_leads" | "team_members"
+								)
+							}
+						>
+							<TabsList className="w-full">
+								{store.checkedGroupKeys.map((key) => (
+									<TabsTrigger
+										key={key}
+										value={key}
+										className="flex-1 text-base"
+									>
+										{GROUP_LABEL_MAP[key]}
+									</TabsTrigger>
+								))}
+							</TabsList>
+							{store.checkedGroupKeys.map((key) => (
+								<TabsContent key={key} value={key}>
+									<NewCycleEmailPreview
+										customMessage={
+											store.state.groupCustomEnabled[key]
+												? debouncedMessages[key] || undefined
+												: undefined
+										}
+										divisionName={divisionName}
+									/>
+								</TabsContent>
+							))}
+						</Tabs>
+					) : (
+						<NewCycleEmailPreview
+							customMessage={previewMessage || undefined}
+							divisionName={divisionName}
+						/>
+					)
 				) : (
 					<div className="flex items-center justify-center py-12 text-muted-foreground">
 						<p className="text-sm">
@@ -695,3 +723,5 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 		</>
 	);
 });
+
+export default NewCyclePage;

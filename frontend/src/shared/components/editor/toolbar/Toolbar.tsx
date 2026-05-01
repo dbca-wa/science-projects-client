@@ -27,13 +27,38 @@ import { ImageButton } from "./ImageButton";
 import { ToolbarDarkModeContext } from "./ToolbarContext";
 
 export const Toolbar: React.FC<ToolbarProps> = observer(
-	({ mode, disabled = false }) => {
+	({ mode, disabled = false, editorKey }) => {
 		const editorStore = useEditorStore();
 		const toolbarRef = useRef<HTMLDivElement>(null);
 
 		if (mode === "none") {
 			return null;
 		}
+
+		// Only show active formatting states when this toolbar's editor is the active one
+		const isActiveEditor =
+			!editorKey || editorStore.activeEditorKey === editorKey;
+
+		// Scoped state — only reflects formatting when this editor is active
+		const s = isActiveEditor
+			? editorStore.state
+			: {
+					isBold: false,
+					isItalic: false,
+					isUnderline: false,
+					isStrikethrough: false,
+					isSubscript: false,
+					isSuperscript: false,
+					canUndo: false,
+					canRedo: false,
+					blockType: "paragraph" as const,
+					isList: false,
+					listType: null as null,
+					isLink: false,
+					indentLevel: 0,
+					maxIndent: 7,
+					textAlignment: "left" as const,
+				};
 
 		// Arrow key navigation handler
 		const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -93,7 +118,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 			isProfileMode ||
 			isProgressReport ||
 			isNewCycle;
-		const showLinks = isFullOrGuide || isProfileMode || isNewCycle;
+		const showLinks = isFullOrGuide || isProfileMode;
 		const showBold =
 			isFullOrGuide ||
 			mode === "simple" ||
@@ -135,7 +160,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 				"right",
 				"justify",
 			];
-			const currentIndex = alignments.indexOf(editorStore.state.textAlignment);
+			const currentIndex = alignments.indexOf(s.textAlignment);
 			const nextIndex = (currentIndex + 1) % alignments.length;
 			editorStore.setTextAlignment(alignments[nextIndex]);
 		};
@@ -157,8 +182,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						aria-label="History"
 					>
 						<UndoRedoButtons
-							canUndo={editorStore.state.canUndo}
-							canRedo={editorStore.state.canRedo}
+							canUndo={s.canUndo}
+							canRedo={s.canRedo}
 							onUndo={editorStore.undo}
 							onRedo={editorStore.redo}
 							disabled={disabled}
@@ -176,28 +201,28 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						{showBold && (
 							<FormatButton
 								format="bold"
-								isActive={editorStore.state.isBold}
+								isActive={s.isBold}
 								onToggle={() => editorStore.toggleFormat("bold")}
 								disabled={disabled}
 							/>
 						)}
 						<FormatButton
 							format="italic"
-							isActive={editorStore.state.isItalic}
+							isActive={s.isItalic}
 							onToggle={() => editorStore.toggleFormat("italic")}
 							disabled={disabled}
 						/>
 						{showUnderline && (
 							<FormatButton
 								format="underline"
-								isActive={editorStore.state.isUnderline}
+								isActive={s.isUnderline}
 								onToggle={() => editorStore.toggleFormat("underline")}
 								disabled={disabled}
 							/>
 						)}
 						{showStrikethrough && (
 							<StrikethroughButton
-								isActive={editorStore.state.isStrikethrough}
+								isActive={s.isStrikethrough}
 								onToggle={() => editorStore.toggleFormat("strikethrough")}
 								disabled={disabled}
 							/>
@@ -207,12 +232,12 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						{showSubscriptSuperscript && (
 							<>
 								<SubscriptButton
-									isActive={editorStore.state.isSubscript}
+									isActive={s.isSubscript}
 									onToggle={() => editorStore.toggleFormat("subscript")}
 									disabled={disabled}
 								/>
 								<SuperscriptButton
-									isActive={editorStore.state.isSuperscript}
+									isActive={s.isSuperscript}
 									onToggle={() => editorStore.toggleFormat("superscript")}
 									disabled={disabled}
 								/>
@@ -227,17 +252,14 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						{/* In profile mode, list + link are in the same group */}
 						{isProfileMode && showLists && (
 							<UnifiedListButton
-								isList={editorStore.state.isList}
-								listType={editorStore.state.listType}
+								isList={s.isList}
+								listType={s.listType}
 								onCycleList={editorStore.toggleList}
 								disabled={disabled}
 							/>
 						)}
 						{isProfileMode && showLinks && (
-							<LinkButton
-								isActive={editorStore.state.isLink}
-								disabled={disabled}
-							/>
+							<LinkButton isActive={s.isLink} disabled={disabled} />
 						)}
 					</div>
 
@@ -252,7 +274,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					{/* Heading dropdown - in profile mode, H1/H2/H3 are disabled */}
 					{showHeadingSelect && (
 						<HeadingSelect
-							blockType={editorStore.state.blockType}
+							blockType={s.blockType}
 							onSetBlockType={editorStore.setBlockType}
 							disabled={disabled}
 							disableHeadings={disableHeadings}
@@ -262,8 +284,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					{/* List button - unified cycling button */}
 					{showLists && !isProfileMode && (
 						<UnifiedListButton
-							isList={editorStore.state.isList}
-							listType={editorStore.state.listType}
+							isList={s.isList}
+							listType={s.listType}
 							onCycleList={editorStore.toggleList}
 							disabled={disabled}
 						/>
@@ -274,14 +296,12 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						<>
 							<OutdentButton
 								onOutdent={editorStore.decreaseIndent}
-								canOutdent={editorStore.state.indentLevel > 0}
+								canOutdent={s.indentLevel > 0}
 								disabled={disabled}
 							/>
 							<IndentButton
 								onIndent={editorStore.increaseIndent}
-								canIndent={
-									editorStore.state.indentLevel < editorStore.state.maxIndent
-								}
+								canIndent={s.indentLevel < s.maxIndent}
 								disabled={disabled}
 							/>
 						</>
@@ -290,7 +310,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					{/* Alignment button */}
 					{showAlignment && (
 						<AlignmentButton
-							alignment={editorStore.state.textAlignment}
+							alignment={s.textAlignment}
 							onCycleAlignment={cycleAlignment}
 							disabled={disabled}
 						/>
@@ -302,10 +322,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					)}
 
 					{showLinks && !isProfileMode && (
-						<LinkButton
-							isActive={editorStore.state.isLink}
-							disabled={disabled}
-						/>
+						<LinkButton isActive={s.isLink} disabled={disabled} />
 					)}
 
 					{showTable && (

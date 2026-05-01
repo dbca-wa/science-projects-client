@@ -62,7 +62,6 @@ export function FloatingLinkToolbar({
 		toolbar === "full" ||
 		toolbar === "simple" ||
 		toolbar === "minimal" ||
-		toolbar === "newCycle" ||
 		isBusinessArea ||
 		isProfileMode ||
 		isProgressReport;

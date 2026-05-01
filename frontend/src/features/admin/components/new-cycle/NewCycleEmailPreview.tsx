@@ -3,7 +3,6 @@ import { Loader2 } from "lucide-react";
 import { useNewCycleEmailPreview } from "@/shared/hooks/queries/useBumpEmails";
 
 interface NewCycleEmailPreviewProps {
-	/** The custom message HTML to preview (already debounced by the parent) */
 	customMessage?: string;
 	divisionName: string;
 }
@@ -13,40 +12,74 @@ const DEFAULT_TEXT =
 
 /**
  * Email preview — renders the actual Django email template in an iframe.
- *
- * Fetches the full template HTML once on mount (with no custom message).
- * On subsequent custom message changes, updates ONLY the [data-custom-message]
- * element inside the iframe's DOM — no full iframe reload, no confetti replay.
+ * Fetches the template once, then injects custom message via DOM manipulation.
+ * Uses a minimum height with progressive resize to avoid the squished-iframe bug.
  */
 export const NewCycleEmailPreview = ({
 	customMessage,
 	divisionName,
 }: NewCycleEmailPreviewProps) => {
 	const iframeRef = useRef<HTMLIFrameElement>(null);
-	const [iframeLoaded, setIframeLoaded] = useState(false);
+	const [iframeReady, setIframeReady] = useState(false);
+	const [iframeHeight, setIframeHeight] = useState(1200);
+	const customMessageRef = useRef(customMessage);
+	customMessageRef.current = customMessage;
 
-	// Fetch the template once with no custom message (gets the default layout)
-	const { data, isLoading } = useNewCycleEmailPreview(
-		true,
-		"", // Always fetch with empty — we inject the custom message via DOM
-		divisionName
-	);
+	const { data, isLoading } = useNewCycleEmailPreview(true, "", divisionName);
 
-	const resizeIframe = useCallback(() => {
+	const measureHeight = useCallback(() => {
 		const iframe = iframeRef.current;
 		if (!iframe) return;
 		try {
 			const doc = iframe.contentDocument || iframe.contentWindow?.document;
-			if (doc?.body) {
-				iframe.style.height = "0px";
-				const height =
-					doc.documentElement.scrollHeight || doc.body.scrollHeight;
-				iframe.style.height = `${height + 16}px`;
+			if (!doc?.body) return;
+
+			// Temporarily collapse to measure true content height
+			// (scrollHeight includes the iframe's own height, causing growth loops)
+			const prevHeight = iframe.style.height;
+			iframe.style.height = "0px";
+			const h = doc.documentElement.scrollHeight;
+			if (h > 100) {
+				iframe.style.height = `${h}px`;
+				setIframeHeight(h);
+			} else {
+				// Measurement failed — restore previous
+				iframe.style.height = prevHeight;
 			}
 		} catch {
-			iframe.style.height = "900px";
+			// Cross-origin fallback
 		}
 	}, []);
+
+	const injectMessage = useCallback(
+		(msg: string | undefined) => {
+			const iframe = iframeRef.current;
+			if (!iframe) return;
+			try {
+				const doc = iframe.contentDocument || iframe.contentWindow?.document;
+				if (!doc) return;
+				const el = doc.querySelector("[data-custom-message]");
+				if (!el) return;
+
+				if (msg && msg.trim()) {
+					el.innerHTML = msg;
+					if (el.tagName === "P") {
+						(el as HTMLElement).style.textAlign = "left";
+					}
+				} else {
+					el.innerHTML = DEFAULT_TEXT;
+					if (el.tagName === "P") {
+						(el as HTMLElement).style.textAlign = "";
+					}
+				}
+				// Re-measure after content change
+				setTimeout(measureHeight, 50);
+			} catch {
+				// Cross-origin fallback
+			}
+		},
+		[measureHeight]
+	);
 
 	// Load the template into the iframe once
 	useEffect(() => {
@@ -54,55 +87,28 @@ export const NewCycleEmailPreview = ({
 		if (!iframe || !data?.html) return;
 
 		const handleLoad = () => {
-			setIframeLoaded(true);
-			resizeIframe();
-			setTimeout(resizeIframe, 200);
-			setTimeout(resizeIframe, 500);
+			setIframeReady(true);
+			injectMessage(customMessageRef.current);
+			measureHeight();
+			setTimeout(measureHeight, 100);
+			setTimeout(measureHeight, 300);
+			setTimeout(measureHeight, 600);
+			setTimeout(measureHeight, 1000);
 		};
 
 		iframe.addEventListener("load", handleLoad);
-		// Only set srcDoc once — subsequent updates go through DOM manipulation
-		if (!iframeLoaded) {
+		if (!iframeReady) {
 			iframe.srcdoc = data.html;
 		}
 
 		return () => iframe.removeEventListener("load", handleLoad);
-	}, [data?.html, iframeLoaded, resizeIframe]);
+	}, [data?.html, iframeReady, measureHeight, injectMessage]);
 
-	// Update just the custom message element inside the iframe — no full reload
+	// Update the custom message when it changes
 	useEffect(() => {
-		if (!iframeLoaded) return;
-		const iframe = iframeRef.current;
-		if (!iframe) return;
-
-		try {
-			const doc = iframe.contentDocument || iframe.contentWindow?.document;
-			if (!doc) return;
-
-			const messageEl = doc.querySelector("[data-custom-message]");
-			if (!messageEl) return;
-
-			if (customMessage && customMessage.trim()) {
-				// Replace with custom message content
-				messageEl.innerHTML = customMessage;
-				// Switch to div styling (left-aligned) if it was a <p>
-				if (messageEl.tagName === "P") {
-					(messageEl as HTMLElement).style.textAlign = "left";
-				}
-			} else {
-				// Restore default text
-				messageEl.innerHTML = DEFAULT_TEXT;
-				if (messageEl.tagName === "P") {
-					(messageEl as HTMLElement).style.textAlign = "";
-				}
-			}
-
-			// Resize after content change
-			resizeIframe();
-		} catch {
-			// Cross-origin — can't access iframe DOM
-		}
-	}, [customMessage, iframeLoaded, resizeIframe]);
+		if (!iframeReady) return;
+		injectMessage(customMessage);
+	}, [customMessage, iframeReady, injectMessage]);
 
 	if (isLoading) {
 		return (
@@ -118,9 +124,10 @@ export const NewCycleEmailPreview = ({
 		<iframe
 			ref={iframeRef}
 			title="Email preview"
-			className="w-full border rounded-lg bg-white"
+			className="w-full rounded-lg bg-white"
 			sandbox="allow-same-origin allow-scripts"
-			style={{ border: "none", overflow: "hidden" }}
+			scrolling="no"
+			style={{ height: iframeHeight, border: "none", overflow: "hidden" }}
 		/>
 	);
 };

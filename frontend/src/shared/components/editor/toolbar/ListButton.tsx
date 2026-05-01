@@ -24,8 +24,9 @@ export const ListButton: React.FC<ListButtonProps> = ({
 			type="button"
 			variant="ghost"
 			size="sm"
-			className={`h-8 w-8 p-0 ${isActive ? "bg-accent" : ""}`}
+			className={`h-8 w-8 p-0 ${isActive ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" : ""}`}
 			onClick={onToggle}
+			onMouseDown={(e) => e.preventDefault()}
 			disabled={disabled}
 			aria-label={label}
 			aria-pressed={isActive}

@@ -33,7 +33,11 @@ const EMPTY_HTML_PATTERNS = [
 const isHtmlEmpty = (html: string): boolean => {
 	const trimmed = html.trim();
 	if (EMPTY_HTML_PATTERNS.includes(trimmed)) return true;
-	return trimmed.replace(/<[^>]*>/g, "").trim().length === 0;
+	// Extract text content by creating a temporary element
+	// This is NOT a security sanitiser — actual sanitisation is done server-side via bleach
+	const div = document.createElement("div");
+	div.innerHTML = trimmed;
+	return (div.textContent ?? "").trim().length === 0;
 };
 
 const DEFAULT_STATE: Omit<
