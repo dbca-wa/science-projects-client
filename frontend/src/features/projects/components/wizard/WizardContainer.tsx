@@ -1,10 +1,17 @@
 import { observer } from "mobx-react-lite";
-import { useCreateProjectWizardStore } from "@/app/stores/store-context";
+import { useProjectWizardStore } from "@/app/stores/store-context";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { WizardStepper } from "./WizardStepper.tsx";
 import { WizardLayout } from "./WizardLayout.tsx";
 import { WizardNavigation } from "./WizardNavigation.tsx";
 import { WizardFormPanel } from "./WizardFormPanel.tsx";
 import { WizardPreviewPanel } from "./WizardPreviewPanel.tsx";
+import {
+	submitWizard,
+	type WizardSubmissionData,
+} from "../../services/wizard-submission.service";
+import { useCurrentUser } from "@/features/auth";
 
 interface WizardContainerProps {
 	onComplete: (projectId: number) => void;
@@ -23,56 +30,119 @@ interface WizardContainerProps {
  */
 export const WizardContainer = observer(
 	({ onComplete, onCancel }: WizardContainerProps) => {
-		const store = useCreateProjectWizardStore();
+		const wizardStore = useProjectWizardStore();
+		const queryClient = useQueryClient();
+		const { data: currentUser } = useCurrentUser();
 
 		const handleBack = () => {
-			store.previousStep();
+			wizardStore.previousStep();
+			// Scroll to top so the user sees the previous step from the beginning
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		};
 
 		const handleContinue = () => {
-			if (store.isLastStep) {
-				// Handle submission
+			// Mark the current step as touched so validation errors display
+			if (!wizardStore.isCurrentStepValid) {
+				wizardStore.markStepTouched(wizardStore.state.currentStep);
+			}
+
+			if (wizardStore.isLastStep) {
 				handleSubmit();
 			} else {
-				store.nextStep();
+				wizardStore.nextStep();
+				// Scroll to top so the user sees the new step from the beginning
+				window.scrollTo({ top: 0, behavior: "smooth" });
 			}
 		};
 
 		const handleSubmit = async () => {
 			// Validate all steps before submission
-			const isValid = store.validateAllSteps();
+			const isValid = wizardStore.validateAllSteps();
 			if (!isValid) {
 				return;
 			}
 
-			store.setSubmitting(true);
+			if (!currentUser?.id) {
+				wizardStore.setError("You must be logged in to create a project");
+				return;
+			}
+
+			wizardStore.setSubmitting(true);
+			const loadingToastId = toast.loading("Creating project...");
 
 			try {
-				// TODO: Implement actual project creation API call
-				// For now, just simulate success
-				await new Promise((resolve) => setTimeout(resolve, 1000));
+				const formData = wizardStore.state.formData;
+				const currentYear = new Date().getFullYear();
 
-				// Clear draft on success
-				store.clearDraft();
+				const submissionData: WizardSubmissionData = {
+					// Base information
+					title: formData.baseInformation.title,
+					description: formData.baseInformation.description,
+					keywords: formData.baseInformation.keywords,
+					image:
+						formData.baseInformation.image instanceof File
+							? formData.baseInformation.image
+							: null,
 
-				// Call onComplete with mock project ID
-				onComplete(1);
+					// Project details
+					business_area: formData.projectDetails.business_area,
+					departmental_service: formData.projectDetails.departmental_service,
+					start_date: formData.projectDetails.start_date,
+					end_date: formData.projectDetails.end_date,
+					project_leader: formData.projectDetails.project_leader,
+					data_custodian: formData.projectDetails.data_custodian,
+
+					// Location
+					areas: formData.location.areas,
+
+					// Metadata
+					projectKind: wizardStore.state.projectKind!,
+					creator: currentUser.id,
+					year: currentYear,
+
+					// Team members
+					teamMembers: wizardStore.state.teamMembers,
+
+					// Student details
+					organisation: formData.studentDetails?.organisation,
+					level: formData.studentDetails?.level,
+
+					// External details
+					collaboration_with: formData.externalDetails?.collaboration_with,
+					budget: formData.externalDetails?.budget,
+					external_description: formData.externalDetails?.external_description,
+					aims: formData.externalDetails?.aims,
+				};
+
+				const createdProject = await submitWizard(submissionData);
+
+				toast.dismiss(loadingToastId);
+
+				// Reset the wizard store to prevent duplicate submissions
+				wizardStore.resetWizard();
+
+				queryClient.invalidateQueries({ queryKey: ["projects"] });
+
+				onComplete(createdProject.id);
 			} catch (error) {
-				console.error("Failed to create project", error);
-				store.setError(
-					error instanceof Error ? error.message : "Failed to create project"
-				);
+				toast.dismiss(loadingToastId);
+
+				const message =
+					error instanceof Error ? error.message : "Failed to create project";
+				toast.error(`Could not create project: ${message}`);
+				wizardStore.setError(message);
 			} finally {
-				store.setSubmitting(false);
+				wizardStore.setSubmitting(false);
 			}
 		};
 
 		const handleTogglePreview = () => {
-			store.togglePreview();
+			wizardStore.togglePreview();
 		};
 
 		const handleStepClick = (stepIndex: number) => {
-			store.goToStep(stepIndex);
+			wizardStore.goToStep(stepIndex);
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		};
 
 		return (
@@ -80,10 +150,11 @@ export const WizardContainer = observer(
 				{/* Stepper */}
 				<div className="mb-6">
 					<WizardStepper
-						currentStep={store.state.currentStep}
-						totalSteps={store.totalSteps}
-						completedSteps={store.state.completedSteps}
-						projectKind={store.state.projectKind}
+						currentStep={wizardStore.state.currentStep}
+						totalSteps={wizardStore.totalSteps}
+						completedSteps={wizardStore.state.completedSteps}
+						validation={wizardStore.state.validation}
+						projectKind={wizardStore.state.projectKind!}
 						onStepClick={handleStepClick}
 					/>
 				</div>
@@ -93,17 +164,18 @@ export const WizardContainer = observer(
 					<WizardLayout
 						formPanel={
 							<WizardFormPanel
-								currentStep={store.state.currentStep}
-								projectKind={store.state.projectKind}
+								currentStep={wizardStore.state.currentStep}
+								projectKind={wizardStore.state.projectKind!}
 							/>
 						}
 						previewPanel={
 							<WizardPreviewPanel
-								formData={store.state.formData}
-								projectKind={store.state.projectKind}
+								formData={wizardStore.state.formData}
+								projectKind={wizardStore.state.projectKind}
+								teamMembers={wizardStore.state.teamMembers}
 							/>
 						}
-						showPreview={store.state.showPreview}
+						showPreview={wizardStore.state.showPreview}
 						onTogglePreview={handleTogglePreview}
 					/>
 				</div>
@@ -114,10 +186,15 @@ export const WizardContainer = observer(
 						onBack={handleBack}
 						onNext={handleContinue}
 						onCancel={onCancel}
-						canGoBack={store.canGoBack}
-						canGoNext={store.canGoForward}
-						isLastStep={store.isLastStep}
-						isSubmitting={store.state.isSubmitting}
+						canGoBack={wizardStore.canGoBack}
+						canGoNext={
+							wizardStore.isLastStep
+								? wizardStore.isCurrentStepValid &&
+									wizardStore.validateAllSteps()
+								: wizardStore.canGoForward
+						}
+						isLastStep={wizardStore.isLastStep}
+						isSubmitting={wizardStore.state.isSubmitting}
 					/>
 				</div>
 			</div>

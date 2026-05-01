@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/shared/components/ui/badge";
 import { Label } from "@/shared/components/ui/label";
@@ -199,15 +199,135 @@ const MultiSelectAffiliationCombobox = forwardRef<
 		_ref
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
+		const containerRef = useRef<HTMLDivElement>(null);
 		const [searchTerm, setSearchTerm] = useState("");
+		const [isOpen, setIsOpen] = useState(false);
+		const [highlightedIndex, setHighlightedIndex] = useState(-1);
+		const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+		const [debouncedTerm, setDebouncedTerm] = useState("");
+
+		// Debounce search input
+		useEffect(() => {
+			if (debounceTimerRef.current) {
+				clearTimeout(debounceTimerRef.current);
+			}
+			debounceTimerRef.current = setTimeout(() => {
+				setDebouncedTerm(searchTerm);
+			}, 300);
+			return () => {
+				if (debounceTimerRef.current) {
+					clearTimeout(debounceTimerRef.current);
+				}
+			};
+		}, [searchTerm]);
+
+		// Fetch affiliations based on debounced search term
+		const { data: searchResults = [] } = useQuery({
+			queryKey: ["affiliations", "search", debouncedTerm],
+			queryFn: async () => {
+				const result = await apiClient.get<{
+					affiliations: IAffiliation[];
+					total_results: number;
+					total_pages: number;
+				}>("agencies/affiliations", {
+					params: { searchTerm: debouncedTerm, page: 1 },
+				});
+				return result.affiliations || [];
+			},
+			enabled: debouncedTerm.trim().length >= 1,
+			staleTime: 10 * 60_000,
+		});
+
+		// Filter out already-selected affiliations
+		const filteredResults = searchResults.filter(
+			(result) => !values.some((v) => v.id === result.id)
+		);
+
+		// Check if the current search term matches an existing result (for "create new")
+		const exactMatch = searchResults.some(
+			(r) => r.name.toLowerCase() === searchTerm.trim().toLowerCase()
+		);
+		const alreadySelected = values.some(
+			(v) => v.name.toLowerCase() === searchTerm.trim().toLowerCase()
+		);
+		const showCreateOption =
+			searchTerm.trim().length > 0 && !exactMatch && !alreadySelected;
+
+		// Total items in dropdown (filtered results + optional create option)
+		const totalItems = filteredResults.length + (showCreateOption ? 1 : 0);
+
+		// Close dropdown when clicking outside
+		useEffect(() => {
+			const handleClickOutside = (e: MouseEvent) => {
+				if (
+					containerRef.current &&
+					!containerRef.current.contains(e.target as Node)
+				) {
+					setIsOpen(false);
+				}
+			};
+			document.addEventListener("mousedown", handleClickOutside);
+			return () =>
+				document.removeEventListener("mousedown", handleClickOutside);
+		}, []);
+
+		const handleSelectAffiliation = (affiliation: IAffiliation) => {
+			onChangeMultiple?.([...values, affiliation]);
+			setSearchTerm("");
+			setIsOpen(false);
+			setHighlightedIndex(-1);
+			inputRef.current?.focus();
+		};
+
+		const handleCreateNew = async () => {
+			try {
+				const titleCasedName = toTitleCase(searchTerm.trim());
+				const newAffiliation = await apiClient.post<IAffiliation>(
+					"agencies/affiliations",
+					{ name: titleCasedName }
+				);
+				handleSelectAffiliation(newAffiliation);
+			} catch {
+				// Silently fail — the user can retry
+			}
+		};
 
 		const handleRemoveAffiliation = (affiliation: IAffiliation) => {
 			if (!isEditable) return;
 			onChangeMultiple?.(values.filter((a) => a.id !== affiliation.id));
 		};
 
+		const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (!isOpen || totalItems === 0) return;
+
+			if (e.key === "ArrowDown") {
+				e.preventDefault();
+				setHighlightedIndex((prev) => (prev < totalItems - 1 ? prev + 1 : 0));
+			} else if (e.key === "ArrowUp") {
+				e.preventDefault();
+				setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : totalItems - 1));
+			} else if (e.key === "Enter" && highlightedIndex >= 0) {
+				e.preventDefault();
+				if (highlightedIndex < filteredResults.length) {
+					handleSelectAffiliation(filteredResults[highlightedIndex]);
+				} else if (showCreateOption) {
+					handleCreateNew();
+				}
+			} else if (e.key === "Escape") {
+				setIsOpen(false);
+				setHighlightedIndex(-1);
+			}
+		};
+
 		return (
-			<div className={cn("w-full", isRequired && "required", wrapperClassName)}>
+			<div
+				ref={containerRef}
+				className={cn(
+					"w-full relative",
+					isRequired && "required",
+					wrapperClassName
+				)}
+			>
 				{label && (
 					<Label className="mb-2">
 						{label} {isRequired && <span className="text-destructive">*</span>}
@@ -247,19 +367,76 @@ const MultiSelectAffiliationCombobox = forwardRef<
 						ref={inputRef}
 						type="text"
 						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
+						onChange={(e) => {
+							setSearchTerm(e.target.value);
+							if (e.target.value.trim().length > 0) {
+								setIsOpen(true);
+							}
+							setHighlightedIndex(-1);
+						}}
+						onFocus={() => {
+							if (searchTerm.trim().length > 0) {
+								setIsOpen(true);
+							}
+						}}
+						onKeyDown={handleKeyDown}
 						placeholder={placeholder}
 						autoComplete="off"
-						onFocus={() => {
-							// TODO: Implement dropdown for multi-select mode
-						}}
 						disabled={disabled}
 						autoFocus={autoFocus}
 						className={cn(showIcon && "pl-10", className)}
+						role="combobox"
+						aria-expanded={isOpen}
+						aria-haspopup="listbox"
 					/>
 				</div>
 
-				{/* TODO: Implement portal dropdown for multi-select */}
+				{/* Dropdown results */}
+				{isOpen && totalItems > 0 && (
+					<div
+						className="absolute z-50 mt-1 w-full bg-popover border rounded-md shadow-md max-h-60 overflow-y-auto"
+						role="listbox"
+					>
+						{filteredResults.map((affiliation, index) => (
+							<button
+								key={affiliation.id}
+								type="button"
+								role="option"
+								aria-selected={highlightedIndex === index}
+								className={cn(
+									"w-full text-left px-3 py-2 transition-colors flex items-center gap-2 cursor-pointer",
+									highlightedIndex === index && "bg-accent"
+								)}
+								onMouseEnter={() => setHighlightedIndex(index)}
+								onMouseDown={(e) => e.preventDefault()}
+								onClick={() => handleSelectAffiliation(affiliation)}
+							>
+								<Building2 className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+								<span className="text-sm truncate">{affiliation.name}</span>
+							</button>
+						))}
+						{showCreateOption && (
+							<button
+								type="button"
+								role="option"
+								aria-selected={highlightedIndex === filteredResults.length}
+								className={cn(
+									"w-full text-left px-3 py-2 transition-colors flex items-center gap-2 cursor-pointer border-t",
+									highlightedIndex === filteredResults.length && "bg-accent"
+								)}
+								onMouseEnter={() => setHighlightedIndex(filteredResults.length)}
+								onMouseDown={(e) => e.preventDefault()}
+								onClick={handleCreateNew}
+							>
+								<Building2 className="h-4 w-4 text-primary flex-shrink-0" />
+								<span className="text-sm">
+									Add &ldquo;{toTitleCase(searchTerm.trim())}&rdquo; as an
+									organisation
+								</span>
+							</button>
+						)}
+					</div>
+				)}
 
 				{helperText && (
 					<p className="text-sm text-muted-foreground mt-2">{helperText}</p>

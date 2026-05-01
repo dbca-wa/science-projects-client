@@ -11,7 +11,7 @@ import {
 import { CaretakerSection, CaretakerNotification } from "@/features/caretakers";
 import { CaretakerApprovalModal } from "@/features/caretakers/components/CaretakerApprovalModal";
 import { useMyProjects } from "@/features/projects/hooks/useMyProjects";
-import { ProjectsDataTable } from "@/features/projects/components/list/ProjectsDataTable";
+import { ProjectsDataTable } from "@/shared/components/projects/ProjectsDataTable";
 import { useMyProjectsStore } from "@/app/stores/store-context";
 import { observer } from "mobx-react-lite";
 import { FaQuestionCircle, FaDatabase, FaSearch } from "react-icons/fa";
@@ -198,7 +198,7 @@ const Dashboard = observer(() => {
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<DashboardActionCard
 									icon={<FaQuestionCircle className="w-5 h-5" />}
-									title="Guide"
+									title="Knowledge Base"
 									description="Learn how to use the system"
 									targetPath="/guide"
 									colorScheme="blue"

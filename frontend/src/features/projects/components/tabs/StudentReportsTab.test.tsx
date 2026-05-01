@@ -66,6 +66,16 @@ vi.mock("@/shared/components/ProjectSection", () => ({
 	),
 }));
 
+vi.mock("@/features/auth", () => ({
+	useCurrentUser: () => ({
+		data: { id: 1, is_superuser: true, is_staff: true },
+	}),
+}));
+
+vi.mock("@/features/projects/components/comments", () => ({
+	CommentSection: () => <div data-testid="comment-section" />,
+}));
+
 vi.mock("@/shared/components/YearSelector", () => ({
 	YearSelector: ({
 		years,

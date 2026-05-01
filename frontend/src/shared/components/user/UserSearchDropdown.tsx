@@ -1,4 +1,5 @@
 import { forwardRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import {
 	Avatar,
@@ -215,12 +216,10 @@ export const UserSearchDropdown = forwardRef<
 											last_name: inviteLastName.trim(),
 										},
 										{
-											onSuccess: (newUser) => {
-												setUserFunction(newUser.id);
-												if (setUserEmailFunction)
-													setUserEmailFunction(newUser.email);
-												if (setUserNameFunction)
-													setUserNameFunction(getUserDisplayName(newUser));
+											onSuccess: () => {
+												toast.success(
+													`Invitation sent to ${inviteFirstName.trim()} ${inviteLastName.trim()}`
+												);
 												setShowInviteForm(false);
 												setInviteEmail("");
 												setInviteFirstName("");

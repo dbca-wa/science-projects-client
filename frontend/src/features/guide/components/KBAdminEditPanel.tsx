@@ -482,7 +482,7 @@ const ArticleEditor = ({
 					<RichTextEditor
 						value={fieldContent}
 						onChange={onContentChange}
-						toolbar="full"
+						toolbar="guide"
 						placeholder="Write article content..."
 					/>
 					<div className="flex justify-end gap-2">

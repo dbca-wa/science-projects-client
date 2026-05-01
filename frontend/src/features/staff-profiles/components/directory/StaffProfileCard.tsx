@@ -67,6 +67,8 @@ const StaffProfileCard = ({ profile }: StaffProfileCardProps) => {
 						<img
 							src={avatarUrl}
 							alt={displayName}
+							width={70}
+							height={70}
 							className="size-[70px] rounded-full object-cover shrink-0 ring-2 ring-slate-100"
 							onError={() => setImgError(true)}
 						/>

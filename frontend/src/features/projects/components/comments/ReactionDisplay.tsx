@@ -146,7 +146,7 @@ function formatUserList(
  * Respects prefers-reduced-motion for animations.
  * When canInteract is false, displays reactions in view-only mode.
  *
- * Responsive behavior:
+ * Responsive behaviour:
  * - Wide (>380px): Shows all reactions inline
  * - Narrow (≤380px): Shows compact button with popover containing all reactions
  */

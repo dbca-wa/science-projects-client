@@ -43,6 +43,8 @@ class StudentReportCreateSerializer(serializers.ModelSerializer):
         model = StudentReport
         fields = [
             "document",
+            "project",
+            "report",
             "year",
             "progress_report",
         ]

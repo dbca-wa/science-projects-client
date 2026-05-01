@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import { useLocation } from "react-router";
 
 /**
- * Hook that smoothly scrolls to top on route change
+ * Hook that smoothly scrolls to top on genuine route navigation
  *
- * Automatically scrolls to the top of the page when the route changes.
+ * Automatically scrolls to the top of the page when the pathname changes.
  * Uses smooth scrolling for better UX.
  *
- * Triggers on both pathname changes (route navigation) and search param changes (pagination, filters).
+ * Only triggers on pathname changes (route navigation), NOT on search param
+ * or hash changes. This prevents unwanted scroll-to-top when opening modals,
+ * sheets, or changing filters/pagination.
  *
  * Note: This finds the scrollable container in AppLayout (the div with overflow-y-auto)
  * and scrolls that, not the window.
@@ -35,7 +37,7 @@ export const useScrollToTop = () => {
 				behavior: "smooth",
 			});
 		}
-	}, [location.pathname, location.search]);
+	}, [location.pathname]);
 
 	return null;
 };

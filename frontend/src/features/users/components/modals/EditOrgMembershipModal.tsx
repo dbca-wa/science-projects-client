@@ -32,6 +32,7 @@ import {
 } from "@/shared/components/ui/select";
 import { Button } from "@/shared/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 
 const membershipSchema = z.object({
 	branch: z.number().nullable().optional(),
@@ -164,15 +165,11 @@ export const EditOrgMembershipModal = observer(
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													<SelectItem value="0">None</SelectItem>
-													{businessAreas?.map((ba) => (
-														<SelectItem
-															key={ba.id}
-															value={ba.id?.toString() || "0"}
-														>
-															{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-														</SelectItem>
-													))}
+													<BusinessAreaSelectItems
+														businessAreas={businessAreas || []}
+														includeNone
+														noneLabel="None"
+													/>
 												</SelectContent>
 											</Select>
 											<FormMessage />

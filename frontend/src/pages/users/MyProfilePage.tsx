@@ -8,6 +8,7 @@ import {
 	ProfileSection,
 	MembershipSection,
 	PublicAppearanceSection,
+	PublicEmailSection,
 	InAppSearchSection,
 	StatusSection,
 	EditPersonalInformationModal,
@@ -335,6 +336,8 @@ const MyProfilePage = observer(() => {
 									user={user}
 									onClick={() => setIsToggleVisibilityModalOpen(true)}
 								/>
+
+								<PublicEmailSection user={user} />
 
 								<div className="text-sm text-muted-foreground text-center pt-4 border-t">
 									<p>

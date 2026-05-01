@@ -199,7 +199,7 @@ export const CommentMentionsPlugin = ({
 
 		const handleEnter = (event: KeyboardEvent | null) => {
 			if (filteredUsers[selectedIndex]) {
-				// CRITICAL: Prevent default Enter behavior to stop paragraph creation
+				// CRITICAL: Prevent default Enter behaviour to stop paragraph creation
 				if (event) {
 					event.preventDefault();
 					event.stopPropagation();
@@ -226,7 +226,7 @@ export const CommentMentionsPlugin = ({
 		};
 
 		const handleTab = (event: KeyboardEvent | null) => {
-			// Prevent default Tab behavior (focus change)
+			// Prevent default Tab behaviour (focus change)
 			if (event) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -405,7 +405,7 @@ const MentionDropdown = ({
 							}}
 							onMouseEnter={() => onHover(index)}
 							onKeyDown={(e) => {
-								// Prevent button's default Enter/Space behavior
+								// Prevent button's default Enter/Space behaviour
 								// since we handle it in the Lexical command handler
 								if (e.key === "Enter" || e.key === " ") {
 									e.preventDefault();

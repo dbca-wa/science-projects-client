@@ -19,6 +19,9 @@ import { NavigationButton } from "@/shared/components/navigation/NavigationButto
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, ArrowLeft, Mail, Loader2 } from "lucide-react";
+import { DeletionRequestBanner } from "@/features/projects/components/overview/DeletionRequestBanner";
+import { DeleteProjectModal } from "@/features/projects/components/modals/DeleteProjectModal";
+import { useCancelDeletionRequest } from "@/features/projects/hooks/useCancelDeletionRequest";
 import {
 	Select,
 	SelectContent,
@@ -82,13 +85,13 @@ export default function ProjectDetailPage({
 	);
 
 	// ALWAYS call useMemo hooks
-	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimisation hint
 	const userIsCaretakerOfProjectLeader = useMemo(() => {
 		if (!data?.project) return false;
 		return caretakerPerms.canActAsProjectLead(data.project);
 	}, [caretakerPerms, data?.project]);
 
-	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimisation hint
 	const userIsCaretakerOfBaLeader = useMemo(() => {
 		if (!data?.project?.business_area) return false;
 		return caretakerPerms.canActAsBusinessAreaLead(data.project.business_area);
@@ -102,11 +105,23 @@ export default function ProjectDetailPage({
 		);
 	}, [currentUser, data?.members, caretakerPerms]);
 
-	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimization hint
+	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimisation hint
 	const isBaLead = useMemo(() => {
 		if (!currentUser || !data?.project?.business_area?.leader) return false;
 		return currentUser.id === data.project.business_area.leader;
 	}, [currentUser, data?.project]);
+
+	// Deletion banner state and hooks
+	const [isDeletionBannerDeleteOpen, setIsDeletionBannerDeleteOpen] =
+		useState(false);
+	const cancelDeletionMutation = useCancelDeletionRequest(Number(id) || 0);
+
+	const handleBannerDeleteProject = () => setIsDeletionBannerDeleteOpen(true);
+	const handleBannerCancelRequest = () => {
+		if (data?.project?.deletion_request_id) {
+			cancelDeletionMutation.mutate(data.project.deletion_request_id);
+		}
+	};
 
 	// ALWAYS call useEffect
 	useEffect(() => {
@@ -114,23 +129,44 @@ export default function ProjectDetailPage({
 		const searchParams = new URLSearchParams(location.search);
 		const testConfetti = searchParams.get("confetti") === "true";
 
+		// Check sessionStorage to prevent re-trigger on page refresh
+		const confettiShownKey = `confetti-shown-${id}`;
+		const alreadyShown = sessionStorage.getItem(confettiShownKey) === "true";
+
 		if (
 			(state?.showSuccessAnimation || testConfetti) &&
 			!hasShownConfetti &&
+			!alreadyShown &&
 			data
 		) {
 			const timer = setTimeout(() => {
 				setHasShownConfetti(true);
+				sessionStorage.setItem(confettiShownKey, "true");
 				fireConfetti();
-			}, 100);
 
-			if (state?.showSuccessAnimation) {
-				window.history.replaceState({}, document.title);
-			}
+				// Clean up URL: strip query params and navigation state
+				window.history.replaceState({}, document.title, location.pathname);
+			}, 100);
 
 			return () => clearTimeout(timer);
 		}
-	}, [location.state, location.search, hasShownConfetti, data, fireConfetti]);
+
+		// If confetti param is present but already shown, clean up the URL silently
+		if (
+			(state?.showSuccessAnimation || testConfetti) &&
+			(hasShownConfetti || alreadyShown)
+		) {
+			window.history.replaceState({}, document.title, location.pathname);
+		}
+	}, [
+		location.state,
+		location.search,
+		location.pathname,
+		hasShownConfetti,
+		data,
+		fireConfetti,
+		id,
+	]);
 
 	// NOW we can do early returns - all hooks have been called
 	// Only show loading on INITIAL load, not on background refetch
@@ -239,6 +275,15 @@ export default function ProjectDetailPage({
 				{/* Breadcrumbs */}
 				<AutoBreadcrumb overrideItems={manualBreadcrumbs} />
 
+				{/* Deletion request banner — shown when project has a pending deletion request */}
+				<DeletionRequestBanner
+					project={project}
+					currentUser={currentUser ?? null}
+					userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+					onDeleteProject={handleBannerDeleteProject}
+					onCancelRequest={handleBannerCancelRequest}
+				/>
+
 				<Tabs value={selectedTab} onValueChange={handleTabChange}>
 					{/* Desktop: Horizontal tabs */}
 					<TabsList className="hidden w-full justify-start project:inline-flex">
@@ -327,6 +372,15 @@ export default function ProjectDetailPage({
 									project={project}
 									members={members}
 									projectId={project.id}
+									creator={undefined}
+									modifier={undefined}
+									userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+									userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+									userIsCaretakerOfProjectLeader={
+										userIsCaretakerOfProjectLeader
+									}
+									all_documents={documents}
+									isBaLead={isBaLead}
 								/>
 							</TabsContent>
 						)}
@@ -340,6 +394,15 @@ export default function ProjectDetailPage({
 									project={project}
 									members={members}
 									projectId={project.id}
+									creator={undefined}
+									modifier={undefined}
+									userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+									userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+									userIsCaretakerOfProjectLeader={
+										userIsCaretakerOfProjectLeader
+									}
+									all_documents={documents}
+									isBaLead={isBaLead}
 								/>
 							</TabsContent>
 						)}
@@ -363,6 +426,13 @@ export default function ProjectDetailPage({
 						</TabsContent>
 					)}
 				</Tabs>
+
+				{/* Delete Project Modal — triggered from the deletion request banner */}
+				<DeleteProjectModal
+					isOpen={isDeletionBannerDeleteOpen}
+					onClose={() => setIsDeletionBannerDeleteOpen(false)}
+					projectId={project.id}
+				/>
 			</div>
 		</PageTransition>
 	);

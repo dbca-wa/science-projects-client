@@ -10,13 +10,15 @@ interface RequestDeleteProjectParams {
 
 /**
  * Request project deletion (non-superuser)
+ * Creates an admin task via the adminoptions endpoint.
  */
 const requestDeleteProject = async ({
 	projectId,
 	reason,
 }: RequestDeleteProjectParams): Promise<void> => {
-	return apiClient.post<void>(`projects/${projectId}/request-deletion`, {
+	return apiClient.post<void>("adminoptions/tasks", {
 		action: "deleteproject",
+		project: projectId,
 		reason,
 	});
 };

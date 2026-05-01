@@ -139,6 +139,8 @@ const StaffHero = ({
 						<img
 							src={avatarUrl}
 							alt={`Profile of ${displayName}`}
+							width={160}
+							height={160}
 							className="size-40 rounded-lg object-cover pointer-events-none select-none"
 							onError={() => setImgError(true)}
 						/>
@@ -251,6 +253,8 @@ const StaffHero = ({
 						<img
 							src={avatarUrl}
 							alt={`Profile of ${displayName}`}
+							width={180}
+							height={180}
 							className="pointer-events-none mr-4 size-[180px] shrink-0 select-none rounded-lg object-cover"
 							onError={() => setImgError(true)}
 						/>

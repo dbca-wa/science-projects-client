@@ -15,8 +15,6 @@ import {
 	Briefcase,
 	Settings,
 	List,
-	CheckSquare,
-	RefreshCw,
 	Mail,
 	FlaskConical,
 } from "lucide-react";
@@ -171,7 +169,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/users/create-staff")}
+								onClick={() => navigateAndClose("/manage/create-staff")}
 							>
 								<span className="flex items-center gap-3">
 									<FaUserPlus className="text-xl" aria-hidden="true" />
@@ -247,7 +245,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/data")}
+								onClick={() => navigateAndClose("/manage/data")}
 							>
 								<span className="flex items-center gap-3">
 									<Database className="text-xl" aria-hidden="true" />
@@ -257,7 +255,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/emails")}
+								onClick={() => navigateAndClose("/manage/emails")}
 							>
 								<span className="flex items-center gap-3">
 									<Mail className="text-xl" aria-hidden="true" />
@@ -267,7 +265,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/email-testing")}
+								onClick={() => navigateAndClose("/manage/email-testing")}
 							>
 								<span className="flex items-center gap-3">
 									<FlaskConical className="text-xl" aria-hidden="true" />
@@ -282,7 +280,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/addresses")}
+								onClick={() => navigateAndClose("/manage/addresses")}
 							>
 								<span className="flex items-center gap-3">
 									<MapPin className="text-xl" aria-hidden="true" />
@@ -292,7 +290,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/affiliations")}
+								onClick={() => navigateAndClose("/manage/affiliations")}
 							>
 								<span className="flex items-center gap-3">
 									<Building className="text-xl" aria-hidden="true" />
@@ -302,7 +300,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/branches")}
+								onClick={() => navigateAndClose("/manage/branches")}
 							>
 								<span className="flex items-center gap-3">
 									<GitBranch className="text-xl" aria-hidden="true" />
@@ -312,7 +310,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/business-areas")}
+								onClick={() => navigateAndClose("/manage/business-areas")}
 							>
 								<span className="flex items-center gap-3">
 									<Briefcase className="text-xl" aria-hidden="true" />
@@ -322,7 +320,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/divisions")}
+								onClick={() => navigateAndClose("/manage/divisions")}
 							>
 								<span className="flex items-center gap-3">
 									<Settings className="text-xl" aria-hidden="true" />
@@ -332,7 +330,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/locations")}
+								onClick={() => navigateAndClose("/manage/locations")}
 							>
 								<span className="flex items-center gap-3">
 									<Globe className="text-xl" aria-hidden="true" />
@@ -342,7 +340,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/reports")}
+								onClick={() => navigateAndClose("/manage/reports")}
 							>
 								<span className="flex items-center gap-3">
 									<FileText className="text-xl" aria-hidden="true" />
@@ -352,7 +350,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/services")}
+								onClick={() => navigateAndClose("/manage/services")}
 							>
 								<span className="flex items-center gap-3">
 									<List className="text-xl" aria-hidden="true" />
@@ -367,31 +365,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/batch-approve-old")}
+								onClick={() => navigateAndClose("/reports/my-division")}
 							>
 								<span className="flex items-center gap-3">
-									<CheckSquare className="text-xl" aria-hidden="true" />
-									<span>Batch Approve Old Reports</span>
-								</span>
-							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/batch-approve")}
-							>
-								<span className="flex items-center gap-3">
-									<CheckSquare className="text-xl" aria-hidden="true" />
-									<span>Batch Approve Reports</span>
-								</span>
-							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/admin/new-cycle")}
-							>
-								<span className="flex items-center gap-3">
-									<RefreshCw className="text-xl" aria-hidden="true" />
-									<span>Open New Cycle</span>
+									<Settings className="text-xl" aria-hidden="true" />
+									<span>Division Actions</span>
 								</span>
 							</Button>
 						</div>
@@ -410,7 +388,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						>
 							<span className="flex items-center gap-3">
 								<BookOpen className="text-xl" aria-hidden="true" />
-								<span>Quick Guide</span>
+								<span>Knowledge Base</span>
 							</span>
 						</Button>
 

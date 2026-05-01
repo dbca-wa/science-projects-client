@@ -761,7 +761,6 @@
 	table-layout: fixed;
 	width: 100%;
 	margin: 1.5rem 0;
-	border: 2px solid rgb(209 213 219); /* gray-300 - visible border */
 }
 
 .dark .editor-table {
@@ -779,7 +778,7 @@
 
 /* Table cells - base styles */
 .editor-table-cell {
-	border: 1px solid rgb(209 213 219); /* gray-300 - visible border */
+	border: 1px solid #d1d5db; /* grey-300 — matches CanvaDocs */
 	min-width: 100px;
 	width: fit-content;
 	word-wrap: break-word;
@@ -1180,6 +1179,95 @@
 .editor-readonly .editor-textUnderlineStrikethrough-dark {
 	color: inherit;
 	text-decoration: underline line-through;
+}
+
+/* ============================================ */
+/* Table styles for display and read-only mode */
+/* ============================================ */
+
+/* Raw HTML tables rendered via dangerouslySetInnerHTML in RichTextDisplay,
+   and tables inside read-only Lexical editors. These elements lack the
+   Lexical theme classes so we target the HTML elements directly. */
+
+.editor-input-display table,
+.editor-readonly .editor-input-display table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	table-layout: fixed;
+	width: 100%;
+	margin: 1.5rem 0;
+}
+
+.dark .editor-input-display table,
+.dark .editor-readonly .editor-input-display table {
+	/* No outer border needed — cell borders handle everything */
+}
+
+.editor-input-display table tr,
+.editor-readonly .editor-input-display table tr {
+	border: none; /* Cell borders handle the grid lines */
+}
+
+.dark .editor-input-display table tr,
+.dark .editor-readonly .editor-input-display table tr {
+	border: none;
+}
+
+.editor-input-display table td,
+.editor-readonly .editor-input-display table td {
+	border: 1px solid #d1d5db; /* grey-300 — matches edit mode exactly */
+	min-width: 100px;
+	word-wrap: break-word;
+	vertical-align: top;
+	text-align: start;
+	padding: 0.5rem 0.75rem;
+	background-color: rgb(255 255 255); /* white */
+}
+
+.dark .editor-input-display table td,
+.dark .editor-readonly .editor-input-display table td {
+	background-color: rgb(31 41 55); /* grey-800 */
+	border-color: rgb(75 85 99); /* grey-600 — matches edit mode dark */
+}
+
+.editor-input-display table td p,
+.editor-readonly .editor-input-display table td p {
+	text-wrap: balance;
+	margin-bottom: 0.25rem;
+}
+
+.editor-input-display table td p:last-child,
+.editor-readonly .editor-input-display table td p:last-child {
+	margin-bottom: 0;
+}
+
+.editor-input-display table th,
+.editor-readonly .editor-input-display table th {
+	border: 1px solid #d1d5db; /* grey-300 — matches edit mode exactly */
+	min-width: 100px;
+	word-wrap: break-word;
+	vertical-align: top;
+	text-align: start;
+	padding: 0.5rem 0.75rem;
+	background-color: rgb(249 250 251); /* grey-50 */
+	font-weight: 600;
+}
+
+.dark .editor-input-display table th,
+.dark .editor-readonly .editor-input-display table th {
+	background-color: rgb(31 41 55); /* grey-800 */
+	border-color: rgb(75 85 99); /* grey-600 — matches edit mode dark */
+}
+
+.editor-input-display table th p,
+.editor-readonly .editor-input-display table th p {
+	text-wrap: balance;
+	margin-bottom: 0.25rem;
+}
+
+.editor-input-display table th p:last-child,
+.editor-readonly .editor-input-display table th p:last-child {
+	margin-bottom: 0;
 }
 
 /* ============================================ */

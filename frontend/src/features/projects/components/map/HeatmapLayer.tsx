@@ -80,7 +80,7 @@ function convertProjectsToHeatmapPoints(
  * - Configurable radius, blur, and color gradient
  * - Proper lifecycle management (creation, updates, cleanup)
  * - Memory leak prevention with proper layer removal
- * - Performance optimized with caching and memoization
+ * - Performance optimised with caching and memoisation
  * - Handles large datasets efficiently (1000+ projects)
  */
 export const HeatmapLayer = ({

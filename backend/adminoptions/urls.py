@@ -32,7 +32,6 @@ urlpatterns = [
     path("tasks/<int:pk>/cancel", views.CancelTask.as_view()),
     path("tasks/<int:pk>/respond", views.RespondToCaretakerRequest.as_view()),
     # Misc (Admin) ======================================================
-    path("send-test-email", views.SendTestEmail.as_view()),
     path("send-all-test-emails", views.SendAllTestEmails.as_view()),
     path("mergeusers", views.MergeUsers.as_view()),
     # Include the router URLs at the end to avoid conflicts

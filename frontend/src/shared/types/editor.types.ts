@@ -6,6 +6,7 @@
 
 export type ToolbarMode =
 	| "full"
+	| "guide"
 	| "simple"
 	| "minimal"
 	| "none"
@@ -45,6 +46,9 @@ export interface RichTextEditorProps {
 	"aria-label"?: string;
 	"aria-describedby"?: string;
 	"aria-invalid"?: boolean;
+
+	// Floating toolbar
+	floatingToolbar?: boolean;
 
 	// Link panel state callback
 	onLinkPanelChange?: (isOpen: boolean) => void;

@@ -367,7 +367,7 @@ function MultiProjectPopup({
  * - Max width: 300px for responsive design
  * - Keyboard accessible with proper focus management
  * - Escape key support to close popup
- * - Optimized with React.memo to prevent unnecessary re-renders
+ * - Optimised with React.memo to prevent unnecessary re-renders
  */
 const ProjectPopupComponent = ({ projects, onClose }: ProjectPopupProps) => {
 	if (projects.length === 1) {

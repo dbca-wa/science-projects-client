@@ -47,6 +47,8 @@ class ProgressReportCreateSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = [
             "document",
+            "project",
+            "report",
             "year",
             "context",
             "aims",

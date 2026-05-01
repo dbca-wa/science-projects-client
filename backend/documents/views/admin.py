@@ -484,6 +484,7 @@ class BatchApproveOld(APIView):
 
         # Optionally scope to a specific division
         division_slug = request.data.get("division")
+        send_notifications = request.data.get("send_notifications", False)
         if division_slug:
             division_report = (
                 AnnualReport.objects.filter(division__slug=division_slug)
@@ -494,15 +495,19 @@ class BatchApproveOld(APIView):
                 last_report = division_report
 
         # Get relevant documents — progress/student reports with PL and BAL approval granted
-        # Do NOT exclude completed projects: they may have an approved closure but still
-        # have an unapproved report that needs batch approval
         relevant_docs = (
             ProjectDocument.objects.filter(
                 Q(kind="studentreport") | Q(kind="progressreport"),
                 project_lead_approval_granted=True,
                 business_area_lead_approval_granted=True,
             )
-            .exclude(project__status="terminated")
+            .exclude(
+                project__status__in=[
+                    "suspended",
+                    "terminated",
+                    "completed",
+                ]
+            )
             .select_related("project")
             .prefetch_related(
                 "student_report_details",
@@ -592,6 +597,20 @@ class BatchApproveOld(APIView):
             settings.LOGGER.info(
                 msg=f"Reports have been batch approved for annual report documents before year: {last_report.year}"
             )
+
+            # Send notification emails if requested
+            if send_notifications and docs_to_update:
+                from ..services.notification_service import NotificationService
+
+                try:
+                    NotificationService.notify_batch_approved(
+                        docs_to_update, request.user
+                    )
+                except Exception as e:
+                    settings.LOGGER.error(
+                        f"Failed to send batch approval notifications: {e}"
+                    )
+
             return Response(
                 "Success",
                 HTTP_202_ACCEPTED,
@@ -617,6 +636,7 @@ class BatchApproveCurrent(APIView):
             )
 
         division_slug = request.data.get("division")
+        send_notifications = request.data.get("send_notifications", False)
 
         # Get the latest annual report (optionally for a specific division)
         if division_slug:
@@ -643,7 +663,15 @@ class BatchApproveCurrent(APIView):
                 directorate_approval_granted=False,
             )
             .exclude(status="approved")
-            .exclude(project__status="terminated")
+            .exclude(
+                project__status__in=[
+                    "suspended",
+                    "terminated",
+                    "completed",
+                    "closing",
+                    "closure_requested",
+                ]
+            )
             .select_related("project")
             .prefetch_related(
                 "student_report_details",
@@ -732,10 +760,229 @@ class BatchApproveCurrent(APIView):
         settings.LOGGER.info(
             msg=f"Batch approved {len(docs_to_update)} reports for year {last_report.year}"
         )
+
+        # Send notification emails if requested
+        if send_notifications and docs_to_update:
+            from ..services.notification_service import NotificationService
+
+            try:
+                NotificationService.notify_batch_approved(docs_to_update, request.user)
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send batch approval notifications: {e}"
+                )
+
         return Response(
             {"approved": len(docs_to_update)},
             HTTP_202_ACCEPTED,
         )
+
+
+def _deduplicate_by_highest_role(users_with_roles):
+    """
+    Given a list of (user, role_priority, role_label) tuples, return users
+    grouped by their highest role. Higher priority number wins.
+
+    Role priorities: BA Lead (3) > Project Lead (2) > Team Member (1)
+
+    Returns:
+        dict with keys 'ba_leads', 'project_leads', 'team_members',
+        each containing a list of {pk, name, email}.
+    """
+    best_role = {}  # pk → (priority, label, name, email)
+    for user, priority, label in users_with_roles:
+        if user.pk not in best_role or priority > best_role[user.pk][0]:
+            best_role[user.pk] = (
+                priority,
+                label,
+                f"{user.display_first_name} {user.display_last_name}",
+                user.email,
+            )
+
+    groups = {"ba_leads": [], "project_leads": [], "team_members": []}
+    role_to_group = {
+        "BA Lead": "ba_leads",
+        "Project Lead": "project_leads",
+        "Team Member": "team_members",
+    }
+
+    for pk, (priority, label, name, email) in best_role.items():
+        group_key = role_to_group.get(label, "team_members")
+        groups[group_key].append({"pk": pk, "name": name, "email": email})
+
+    return groups
+
+
+class BatchApproveCurrentPreview(APIView):
+    """
+    Preview recipients who would receive approval notification emails
+    for the current year's batch approve action.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        division_slug = request.query_params.get("division")
+
+        # Get the latest annual report
+        if division_slug:
+            last_report = (
+                AnnualReport.objects.filter(division__slug=division_slug)
+                .order_by("-year")
+                .first()
+            )
+        else:
+            last_report = AnnualReport.objects.order_by("-year").first()
+
+        if not last_report:
+            return Response(
+                {
+                    "recipients": {
+                        "ba_leads": [],
+                        "project_leads": [],
+                        "team_members": [],
+                    },
+                    "total_recipients": 0,
+                }
+            )
+
+        # Find stage-3 documents for the current year
+        relevant_docs = (
+            ProjectDocument.objects.filter(
+                Q(kind="studentreport") | Q(kind="progressreport"),
+                project_lead_approval_granted=True,
+                business_area_lead_approval_granted=True,
+                directorate_approval_granted=False,
+            )
+            .exclude(status="approved")
+            .exclude(project__status="terminated")
+            .select_related(
+                "project",
+                "project__business_area",
+                "project__business_area__leader",
+            )
+            .prefetch_related(
+                "student_report_details",
+                "progress_report_details",
+            )
+        )
+
+        if division_slug and last_report.division:
+            relevant_docs = relevant_docs.filter(
+                project__business_area__division=last_report.division
+            )
+
+        # Filter to current year only
+        current_year_docs = []
+        for doc in relevant_docs:
+            if doc.kind == "studentreport":
+                sr = doc.student_report_details.first()
+                if sr and sr.report == last_report:
+                    current_year_docs.append(doc)
+            elif doc.kind == "progressreport":
+                pr = doc.progress_report_details.first()
+                if pr and pr.report == last_report:
+                    current_year_docs.append(doc)
+
+        # Collect users with roles
+        users_with_roles = []
+        for doc in current_year_docs:
+            project = doc.project
+
+            # BA lead
+            ba = project.business_area
+            if ba and ba.leader and ba.leader.is_active and ba.leader.is_staff:
+                users_with_roles.append((ba.leader, 3, "BA Lead"))
+
+            # Project leads
+            for member in ProjectMember.objects.filter(
+                project=project, is_leader=True
+            ).select_related("user"):
+                if member.user.is_active and member.user.is_staff:
+                    users_with_roles.append((member.user, 2, "Project Lead"))
+
+            # Team members
+            for member in ProjectMember.objects.filter(
+                project=project, is_leader=False
+            ).select_related("user"):
+                if member.user.is_active and member.user.is_staff:
+                    users_with_roles.append((member.user, 1, "Team Member"))
+
+        groups = _deduplicate_by_highest_role(users_with_roles)
+        total = sum(len(v) for v in groups.values())
+
+        return Response({"recipients": groups, "total_recipients": total})
+
+
+class NewCycleOpenPreview(APIView):
+    """
+    Preview recipients who would receive new cycle open notification emails.
+    Returns BA leads, project leads, and team members — deduplicated by highest role.
+    All recipients must be active staff with @dbca.wa.gov.au emails.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from agencies.models import BusinessArea
+
+        division_slug = request.query_params.get("division")
+
+        if division_slug:
+            last_report = (
+                AnnualReport.objects.filter(division__slug=division_slug)
+                .order_by("-year")
+                .first()
+            )
+        else:
+            last_report = AnnualReport.objects.order_by("-year").first()
+
+        def _is_valid(user):
+            return (
+                user
+                and user.is_active
+                and user.is_staff
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
+
+        users_with_roles = []
+
+        # BA leads
+        bas = BusinessArea.objects.select_related("leader").all()
+        if division_slug and last_report and last_report.division:
+            bas = bas.filter(division=last_report.division)
+        for ba in bas:
+            if _is_valid(ba.leader):
+                users_with_roles.append((ba.leader, 3, "BA Lead"))
+
+        # All project leads and team members — exclude terminated and completed projects
+        all_projects = Project.objects.exclude(
+            status__in=[
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ]
+        )
+        if division_slug and last_report and last_report.division:
+            all_projects = all_projects.filter(
+                business_area__division=last_report.division
+            )
+
+        all_members = ProjectMember.objects.filter(
+            project__in=all_projects,
+        ).select_related("user")
+
+        for member in all_members:
+            if _is_valid(member.user):
+                if member.is_leader:
+                    users_with_roles.append((member.user, 2, "Project Lead"))
+                else:
+                    users_with_roles.append((member.user, 1, "Team Member"))
+
+        groups = _deduplicate_by_highest_role(users_with_roles)
+        total = sum(len(v) for v in groups.values())
+
+        return Response({"recipients": groups, "total_recipients": total})
 
 
 class FinalDocApproval(APIView):

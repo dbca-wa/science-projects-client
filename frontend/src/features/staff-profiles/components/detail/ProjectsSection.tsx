@@ -121,6 +121,8 @@ const ProjectSubsection = ({
 									<img
 										src={imageUrl ?? "/dbca.jpg"}
 										alt=""
+										width={48}
+										height={48}
 										className="size-full object-cover"
 										onError={(e) => {
 											(e.target as HTMLImageElement).src = "/dbca.jpg";

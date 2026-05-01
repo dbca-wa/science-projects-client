@@ -142,7 +142,9 @@ class TestInviteUser:
         response = api_client.post(users_urls.path("invite"), data, format="json")
         # Should succeed despite IT Assets being unavailable
         assert response.status_code == status.HTTP_201_CREATED
-        assert User.objects.filter(email="timeout.user@dbca.wa.gov.au").exists()
+        assert UserInvite.objects.filter(email="timeout.user@dbca.wa.gov.au").exists()
+        # No user account should be created — that happens on first visit
+        assert not User.objects.filter(email="timeout.user@dbca.wa.gov.au").exists()
 
     @patch("users.views.invite.http_requests.get")
     @patch("users.views.invite.NotificationService.send_spms_invite")
@@ -225,10 +227,10 @@ class TestInviteUser:
 
     @patch("users.views.invite.http_requests.get")
     @patch("users.views.invite.NotificationService.send_spms_invite")
-    def test_invite_success_creates_user_and_invite(
+    def test_invite_success_creates_invite_record(
         self, mock_send, mock_get, api_client, user, settings
     ):
-        """Successful invite creates user, invite record, and sends email"""
+        """Successful invite creates invite record and sends email (no user account)"""
         api_client.force_authenticate(user=user)
         settings.IT_ASSETS_URL = ""
         mock_send.return_value = None
@@ -240,14 +242,11 @@ class TestInviteUser:
         }
         response = api_client.post(users_urls.path("invite"), data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["email"] == "new.staff@dbca.wa.gov.au"
+        assert response.data["invited"] is True
 
-        # Verify user was created
-        new_user = User.objects.get(email="new.staff@dbca.wa.gov.au")
-        assert new_user.username == "new.staff"
-        assert new_user.display_first_name == "New"
-        assert new_user.display_last_name == "Staff"
-        assert new_user.is_staff is True
-        assert new_user.is_active is True
+        # No user account should be created — that happens on first visit
+        assert not User.objects.filter(email="new.staff@dbca.wa.gov.au").exists()
 
         # Verify invite record was created
         assert UserInvite.objects.filter(
@@ -259,15 +258,15 @@ class TestInviteUser:
 
     @patch("users.views.invite.http_requests.get")
     @patch("users.views.invite.NotificationService.send_spms_invite")
-    def test_invite_duplicate_username_handling(
+    def test_invite_duplicate_username_no_longer_relevant(
         self, mock_send, mock_get, api_client, user, settings
     ):
-        """When username already exists, appends counter"""
+        """Invite no longer creates users, so duplicate usernames are not an issue"""
         api_client.force_authenticate(user=user)
         settings.IT_ASSETS_URL = ""
         mock_send.return_value = None
 
-        # Create a user with the username that would be generated
+        # Create a user with the username that would have been generated
         User.objects.create_user(
             username="duplicate",
             email="other@example.com",
@@ -282,15 +281,16 @@ class TestInviteUser:
         response = api_client.post(users_urls.path("invite"), data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
 
-        new_user = User.objects.get(email="duplicate@dbca.wa.gov.au")
-        assert new_user.username == "duplicate1"
+        # Only invite record created, no user account
+        assert not User.objects.filter(email="duplicate@dbca.wa.gov.au").exists()
+        assert UserInvite.objects.filter(email="duplicate@dbca.wa.gov.au").exists()
 
     @patch("users.views.invite.http_requests.get")
     @patch("users.views.invite.NotificationService.send_spms_invite")
-    def test_invite_email_send_failure_still_creates_user(
+    def test_invite_email_send_failure_still_creates_invite(
         self, mock_send, mock_get, api_client, user, settings
     ):
-        """If email sending fails, user is still created"""
+        """If email sending fails, invite record is still created"""
         api_client.force_authenticate(user=user)
         settings.IT_ASSETS_URL = ""
         mock_send.side_effect = Exception("SMTP error")
@@ -302,7 +302,9 @@ class TestInviteUser:
         }
         response = api_client.post(users_urls.path("invite"), data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
-        assert User.objects.filter(email="email.fail@dbca.wa.gov.au").exists()
+        assert UserInvite.objects.filter(email="email.fail@dbca.wa.gov.au").exists()
+        # No user account created
+        assert not User.objects.filter(email="email.fail@dbca.wa.gov.au").exists()
 
     @patch("users.views.invite.http_requests.get")
     @patch("users.views.invite.NotificationService.send_spms_invite")
@@ -321,4 +323,4 @@ class TestInviteUser:
         }
         response = api_client.post(users_urls.path("invite"), data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
-        assert User.objects.filter(email="upper.case@dbca.wa.gov.au").exists()
+        assert UserInvite.objects.filter(email="upper.case@dbca.wa.gov.au").exists()

@@ -6,12 +6,14 @@ import type {
 	IProjectDocuments,
 } from "@/shared/types/project.types";
 import type { IUserData } from "@/shared/types/user.types";
+import { useCurrentUser } from "@/features/auth";
+import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { SetAreasModal } from "@/features/projects/components/modals/SetAreasModal";
 import { CreateProgressReportModal } from "@/features/projects/components/modals/CreateProgressReportModal";
-import { MethodologyImagePlaceholder } from "@/features/projects/components/placeholders/MethodologyImagePlaceholder";
+import { MethodologyImage } from "@/features/projects/components/MethodologyImage";
 import { ProjectPlanEndorsements } from "@/features/projects/components/ProjectPlanEndorsements";
 import { CommentSection } from "@/features/projects/components/comments";
 
@@ -50,6 +52,7 @@ export function ProjectPlanTab({
 	// Modal state for special actions
 	const [isSetAreasModalOpen, setIsSetAreasModalOpen] = useState(false);
 	const [isCreateReportModalOpen, setIsCreateReportModalOpen] = useState(false);
+	const { data: currentUser } = useCurrentUser();
 
 	if (!projectPlan) {
 		return (
@@ -59,8 +62,14 @@ export function ProjectPlanTab({
 		);
 	}
 
-	// TODO: Calculate edit permissions using canEditProject utility
-	const canEdit = true; // Temporarily true to see the button
+	const canEdit = calculateDocumentEditPermission({
+		currentUser,
+		members,
+		document: projectPlan.document,
+		isBaLead,
+		userIsCaretakerOfBaLeader,
+		userIsCaretakerOfAdmin,
+	});
 
 	return (
 		<>
@@ -176,8 +185,14 @@ export function ProjectPlanTab({
 						/>
 					</ProjectSection>
 
-					{/* Methodology Image - PLACEHOLDER */}
-					<MethodologyImagePlaceholder projectPlanId={projectPlan.id} />
+					{/* Methodology Image */}
+					<ProjectSection>
+						<MethodologyImage
+							methodologyImage={projectPlan.methodology_image}
+							projectPlanId={projectPlan.id}
+							canEdit={canEdit}
+						/>
+					</ProjectSection>
 
 					{/* Number of Voucher Specimens */}
 					{projectPlan.endorsements && (

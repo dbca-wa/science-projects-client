@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import {
 	FormControl,
 	FormField,
@@ -58,16 +59,6 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
 		if (!branches) return [];
 		return [...branches].sort((a, b) => a.name.localeCompare(b.name));
 	}, [branches]);
-
-	const sortedBusinessAreas = useMemo(() => {
-		if (!businessAreas) return [];
-		return [...businessAreas].sort((a, b) => {
-			// Sort: active first (alphabetically), then inactive (alphabetically)
-			if (a.is_active && !b.is_active) return -1;
-			if (!a.is_active && b.is_active) return 1;
-			return a.name.localeCompare(b.name);
-		});
-	}, [businessAreas]);
 
 	const sortedAffiliations = useMemo(() => {
 		if (!affiliations) return [];
@@ -163,11 +154,7 @@ export const MembershipFields = <T extends FieldValues & MembershipFieldsType>({
 							</FormControl>
 							<SelectContent>
 								<SelectItem value="none">None</SelectItem>
-								{sortedBusinessAreas.map((ba) => (
-									<SelectItem key={ba.id} value={ba.id!.toString()}>
-										{ba.is_active ? ba.name : `[INACTIVE] ${ba.name}`}
-									</SelectItem>
-								))}
+								<BusinessAreaSelectItems businessAreas={businessAreas || []} />
 							</SelectContent>
 						</Select>
 						<FormMessage />

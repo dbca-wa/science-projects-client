@@ -10,7 +10,7 @@ interface ZoomLevelProps {
  *
  * Positioned in the bottom-right corner of the map
  * Shows zoom as a multiplier where 1x = most zoomed out (minZoom = 5)
- * Each zoom level represents a 2x increase in scale (standard Leaflet behavior)
+ * Each zoom level represents a 2x increase in scale (standard Leaflet behaviour)
  * Animates with a "damage counter" style scale effect when zoom changes
  * Shown in both normal and fullscreen modes
  */

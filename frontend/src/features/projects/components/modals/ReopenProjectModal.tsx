@@ -54,6 +54,8 @@ export function ReopenProjectModal({
 	const reopenMutation = useReopenProject();
 	// eslint-disable-next-line react-hooks/incompatible-library
 	const confirmed = watch("confirmed");
+	const reason = watch("reason");
+	const canSubmit = confirmed && reason.length >= 10;
 
 	const onSubmit = (data: ReopenFormData) => {
 		reopenMutation.mutate(data.projectId, {
@@ -138,7 +140,7 @@ export function ReopenProjectModal({
 						<Button
 							type="submit"
 							variant="default"
-							disabled={reopenMutation.isPending}
+							disabled={!canSubmit || reopenMutation.isPending}
 							className="bg-green-600 hover:bg-green-700"
 						>
 							{reopenMutation.isPending ? "Reopening..." : "Open Project"}

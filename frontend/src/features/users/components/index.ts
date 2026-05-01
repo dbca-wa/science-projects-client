@@ -34,6 +34,9 @@ export { ProfileFields } from "./ProfileFields";
 export { MembershipFields } from "./MembershipFields";
 export { AccountFields } from "./AccountFields";
 
+// Profile sections
+export { PublicEmailSection } from "./profile/PublicEmailSection";
+
 // User actions
 export { UserAdminActionButtons } from "./UserAdminActionButtons";
 export { RequestMergeUserDialog } from "./RequestMergeUserDialog";

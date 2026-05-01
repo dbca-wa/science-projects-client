@@ -12,7 +12,7 @@ from rest_framework.exceptions import ParseError
 
 from agencies.models import Agency
 from contacts.models import UserContact
-from users.models import PublicStaffProfile, UserProfile, UserWork
+from users.models import PublicStaffProfile, UserInvite, UserProfile, UserWork
 
 # endregion ====================================================================================================
 
@@ -170,6 +170,25 @@ class DBCAMiddleware(MiddlewareMixin):
             settings.LOGGER.error(f"Error creating user: {str(e)}")
             raise ParseError("Failed to create user account. Please try again.")
 
+    @staticmethod
+    def _fulfil_invite(email):
+        """
+        Mark any pending invite for this email as accepted.
+        Called after a user account is created or found via SSO.
+        Gracefully handles the case where no invite exists.
+        """
+        try:
+            updated = UserInvite.objects.filter(
+                email__iexact=email, accepted=False
+            ).update(accepted=True)
+            if updated:
+                settings.LOGGER.info(
+                    f"Fulfilled {updated} pending invite(s) for {email}"
+                )
+        except Exception as e:
+            # Never block login over an invite record issue
+            settings.LOGGER.error(f"Error fulfilling invite for {email}: {e}")
+
     def save_request_meta_to_file(self, meta_data):
         # Create a temporary file using tempfile
         with tempfile.NamedTemporaryFile(
@@ -215,6 +234,9 @@ class DBCAMiddleware(MiddlewareMixin):
 
                 user.backend = "django.contrib.auth.backends.ModelBackend"
                 login(request, user)
+
+                # Fulfil any pending invite for this user
+                self._fulfil_invite(email)
 
         # Handling authenticated users (update last login)
         username = request.headers.get("remote-user")

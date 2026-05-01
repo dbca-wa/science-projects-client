@@ -142,6 +142,11 @@
 		user-select: none;
 	}
 
+	/* Improve downscaling quality for images rendered in small containers */
+	img {
+		image-rendering: -webkit-optimize-contrast;
+	}
+
 	.drawer-content {
 		padding-bottom: var(--keyboard-height);
 	}

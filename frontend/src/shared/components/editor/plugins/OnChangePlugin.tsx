@@ -11,6 +11,7 @@ import type { EditorState } from "lexical";
 
 interface OnChangePluginProps {
 	onChange?: (html: string) => void;
+	stripBold?: boolean;
 }
 
 /**
@@ -37,7 +38,18 @@ function normalizeHtml(html: string): string {
 	return trimmed;
 }
 
-export const OnChangePlugin: React.FC<OnChangePluginProps> = ({ onChange }) => {
+/**
+ * Strip bold formatting tags (<strong> and <b>) from HTML,
+ * preserving the inner content.
+ */
+function stripBoldTags(html: string): string {
+	return html.replace(/<\/?strong[^>]*>/gi, "").replace(/<\/?b[^>]*>/gi, "");
+}
+
+export const OnChangePlugin: React.FC<OnChangePluginProps> = ({
+	onChange,
+	stripBold = false,
+}) => {
 	const [editor] = useLexicalComposerContext();
 	const initialContent = useRef<string>("");
 	const hasStoredInitial = useRef(false);
@@ -80,11 +92,12 @@ export const OnChangePlugin: React.FC<OnChangePluginProps> = ({ onChange }) => {
 
 					// Always call onChange for any update after editor becomes editable
 					// This ensures undo/redo updates trigger onChange
-					onChange(html);
+					const output = stripBold ? stripBoldTags(html) : html;
+					onChange(output);
 				});
 			}
 		);
-	}, [editor, onChange]);
+	}, [editor, onChange, stripBold]);
 
 	return null;
 };

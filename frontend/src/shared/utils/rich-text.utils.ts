@@ -1,64 +1,106 @@
 /**
- * Rich Text Utilities
+ * Rich text content utilities
  *
- * Utilities for handling rich text content, including conversion
- * between plain text and HTML formats.
+ * Helpers for detecting plain text vs HTML, converting between formats,
+ * and checking whether rich text editor content is meaningfully populated.
  */
 
 /**
- * Checks if a string contains HTML tags
+ * Check if a string is plain text (no HTML tags).
+ * Only considers valid HTML tag names (letters, not arbitrary text in angle brackets).
  */
-export function isPlainText(text: string): boolean {
+export const isPlainText = (text: string): boolean => {
 	if (!text) return true;
-
-	// Check if string contains common HTML tags used in rich text
-	// This includes: p, div, span, strong, em, ul, ol, li, br, a, etc.
-	const commonHtmlTags =
-		/(<p[\s>]|<\/p>|<div[\s>]|<\/div>|<span[\s>]|<\/span>|<strong[\s>]|<\/strong>|<em[\s>]|<\/em>|<ul[\s>]|<\/ul>|<ol[\s>]|<\/ol>|<li[\s>]|<\/li>|<br[\s/>]|<a[\s>]|<\/a>|<h[1-6][\s>]|<\/h[1-6]>)/i;
-	return !commonHtmlTags.test(text);
-}
+	// Match opening/closing tags with valid HTML element names (e.g. <p>, <div>, </span>)
+	// but not arbitrary text like <tags> or <123>
+	return !/(<\/?\s*(?:p|div|span|br|h[1-6]|ul|ol|li|a|strong|em|b|i|u|table|tr|td|th|img|blockquote|pre|code|sub|sup|s|del|ins|mark|small|big|hr|section|article|header|footer|nav|aside|figure|figcaption|main|details|summary|dialog|template|slot|canvas|svg|video|audio|source|iframe|object|embed|form|input|textarea|select|button|label|fieldset|legend|datalist|output|option|optgroup|progress|meter|ruby|rt|rp|bdi|bdo|wbr|area|map|col|colgroup|caption|thead|tbody|tfoot|picture|time|data|address|abbr|cite|dfn|kbd|samp|var|q|dl|dt|dd|noscript|script|style|link|meta|base|head|body|html)\b[^>]*>)/i.test(
+		text
+	);
+};
 
 /**
- * Converts plain text to rich text HTML format
- * Wraps plain text in proper HTML structure for Lexical editor
+ * Escape HTML entities in a string for safe insertion into HTML.
  */
-export function convertPlainTextToRichText(text: string): string {
-	if (!text) return '<p class="editor-p-light"><span style=""></span></p>';
-
-	// If already has HTML tags, return as-is
-	if (!isPlainText(text)) {
-		return text;
-	}
-
-	// Escape HTML entities in plain text to prevent XSS
-	const escapedText = text
+const escapeHtml = (text: string): string => {
+	return text
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
+};
 
-	// Split by newlines and wrap each paragraph
-	const paragraphs = escapedText.split("\n").filter((line) => line.trim());
+/**
+ * Convert plain text to Lexical-compatible rich text HTML.
+ * If the input already contains HTML tags, returns it unchanged.
+ * Handles multi-line text by wrapping each line in a paragraph.
+ */
+export const convertPlainTextToRichText = (text: string): string => {
+	// If already HTML, return as-is
+	if (!isPlainText(text)) return text;
 
-	if (paragraphs.length === 0) {
+	// Handle empty string
+	if (!text) {
 		return '<p class="editor-p-light"><span style=""></span></p>';
 	}
 
-	// Wrap each paragraph in proper HTML structure
-	return paragraphs
+	// Split by newlines and wrap each line
+	const lines = text.split("\n");
+	return lines
 		.map(
-			(para) => `<p class="editor-p-light"><span style="">${para}</span></p>`
+			(line) =>
+				`<p class="editor-p-light"><span style="">${escapeHtml(line)}</span></p>`
 		)
 		.join("");
-}
+};
 
 /**
- * Ensures text is in rich text format
- * Converts plain text to rich text if needed
+ * Ensure a string is valid rich text HTML.
+ * Converts plain text to rich text if needed, leaves HTML unchanged.
  */
-export function ensureRichText(text: string): string {
-	if (!text) return '<p class="editor-p-light"><span style=""></span></p>';
+export const ensureRichText = (text: string): string => {
+	return convertPlainTextToRichText(text);
+};
 
-	return isPlainText(text) ? convertPlainTextToRichText(text) : text;
-}
+/**
+ * Common empty HTML patterns produced by Lexical when the editor has no content.
+ * These are treated as "empty" for validation purposes.
+ */
+const EMPTY_HTML_PATTERNS = [
+	"",
+	"<p></p>",
+	"<p><br></p>",
+	'<p class="editor-paragraph"><br></p>',
+	'<p class="editor-paragraph mb-2"><br></p>',
+	'<p class="editor-paragraph"></p>',
+	'<p class="editor-paragraph mb-2"></p>',
+	'<p class="editor-p-light"><span style=""></span></p>',
+];
+
+/**
+ * Check whether a rich text HTML string is effectively empty.
+ *
+ * Returns true if the content is null, undefined, whitespace-only,
+ * or matches any of the common empty HTML patterns produced by Lexical.
+ */
+export const isRichTextEmpty = (html: string | null | undefined): boolean => {
+	if (!html) return true;
+
+	const trimmed = html.trim();
+	if (trimmed.length === 0) return true;
+
+	// Check against known empty patterns
+	if (EMPTY_HTML_PATTERNS.includes(trimmed)) return true;
+
+	// Strip all HTML tags and check if any text content remains.
+	// NOTE: This is NOT a security sanitiser — it's only used for emptiness detection.
+	// The result is compared to length === 0, never rendered as HTML.
+	// Using a loop to handle edge cases where nested/malformed tags could leave residue.
+	let textContent = trimmed;
+	let previous: string;
+	do {
+		previous = textContent;
+		textContent = textContent.replace(/<[^>]*>/g, "");
+	} while (textContent !== previous);
+	return textContent.trim().length === 0;
+};

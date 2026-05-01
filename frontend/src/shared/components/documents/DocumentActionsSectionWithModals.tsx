@@ -155,7 +155,7 @@ export function DocumentActionsSectionWithModals({
 					documentPk: document.id,
 					reason: data.reason,
 					feedbackHTML: data.feedbackHTML,
-					// TODO: Email logic to be implemented later
+					// Send email preference from the modal
 					send_email: data.sendEmail,
 				},
 			},

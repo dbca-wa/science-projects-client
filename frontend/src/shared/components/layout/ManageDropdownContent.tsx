@@ -19,15 +19,19 @@ import {
 	Mail,
 } from "lucide-react";
 
+export type ARActionId = "batch-approve" | "batch-approve-old" | "new-cycle";
+
 interface ManageDropdownContentProps {
 	onClose: () => void;
 	isKeyStakeholder: boolean;
+	onARAction?: (actionId: ARActionId) => void;
 }
 
 interface MenuSection {
 	label: string;
 	items: Array<{
-		targetPath: string;
+		targetPath?: string;
+		actionId?: ARActionId;
 		icon: ReactNode;
 		label: string;
 	}>;
@@ -38,12 +42,12 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "Lists & Emails",
 		items: [
 			{
-				targetPath: "/admin/data",
+				targetPath: "/manage/data",
 				icon: <Database className="size-4" aria-hidden="true" />,
 				label: "Data Lists",
 			},
 			{
-				targetPath: "/admin/emails",
+				targetPath: "/manage/emails",
 				icon: <Mail className="size-4" aria-hidden="true" />,
 				label: "Email",
 			},
@@ -53,42 +57,42 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "CRUD",
 		items: [
 			{
-				targetPath: "/admin/addresses",
+				targetPath: "/manage/addresses",
 				icon: <MapPin className="size-4" aria-hidden="true" />,
 				label: "Addresses",
 			},
 			{
-				targetPath: "/admin/affiliations",
+				targetPath: "/manage/affiliations",
 				icon: <Building className="size-4" aria-hidden="true" />,
 				label: "Affiliations",
 			},
 			{
-				targetPath: "/admin/branches",
+				targetPath: "/manage/branches",
 				icon: <GitBranch className="size-4" aria-hidden="true" />,
 				label: "Branches",
 			},
 			{
-				targetPath: "/admin/business-areas",
+				targetPath: "/manage/business-areas",
 				icon: <Briefcase className="size-4" aria-hidden="true" />,
 				label: "Business Areas",
 			},
 			{
-				targetPath: "/admin/divisions",
+				targetPath: "/manage/divisions",
 				icon: <Settings className="size-4" aria-hidden="true" />,
 				label: "Divisions",
 			},
 			{
-				targetPath: "/admin/locations",
+				targetPath: "/manage/locations",
 				icon: <Globe className="size-4" aria-hidden="true" />,
 				label: "Locations",
 			},
 			{
-				targetPath: "/admin/reports",
+				targetPath: "/manage/reports",
 				icon: <FileText className="size-4" aria-hidden="true" />,
 				label: "Report Info",
 			},
 			{
-				targetPath: "/admin/services",
+				targetPath: "/manage/services",
 				icon: <List className="size-4" aria-hidden="true" />,
 				label: "Services",
 			},
@@ -98,17 +102,17 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "AR Actions",
 		items: [
 			{
-				targetPath: "/admin/batch-approve-old",
-				icon: <CheckSquare className="size-4" aria-hidden="true" />,
-				label: "Batch Approve Old Reports",
-			},
-			{
-				targetPath: "/admin/batch-approve",
+				actionId: "batch-approve",
 				icon: <CheckSquare className="size-4" aria-hidden="true" />,
 				label: "Batch Approve Reports",
 			},
 			{
-				targetPath: "/admin/new-cycle",
+				actionId: "batch-approve-old",
+				icon: <CheckSquare className="size-4" aria-hidden="true" />,
+				label: "Batch Approve Old Reports",
+			},
+			{
+				actionId: "new-cycle",
 				icon: <RefreshCw className="size-4" aria-hidden="true" />,
 				label: "Open New Cycle",
 			},
@@ -118,13 +122,13 @@ const MANAGE_SECTIONS: MenuSection[] = [
 
 /**
  * Manage dropdown content with grouped sections for admin navigation.
- * Follows the same keyboard navigation pattern as NavigationDropdownMenuContent.
- * Conditionally shows AR Actions and Report Info based on user role.
+ * AR Actions fire the onARAction callback so the parent can open modals.
  */
-export function ManageDropdownContent({
+export const ManageDropdownContent = ({
 	onClose,
 	isKeyStakeholder,
-}: ManageDropdownContentProps) {
+	onARAction,
+}: ManageDropdownContentProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -132,19 +136,16 @@ export function ManageDropdownContent({
 
 	const canAccessAR = authStore.isSuperuser || isKeyStakeholder;
 
-	// Filter sections based on user permissions
 	const filteredSections = useMemo(() => {
 		return MANAGE_SECTIONS.map((section) => {
-			// AR Actions section: only visible to superusers or key stakeholders
 			if (section.label === "AR Actions") {
 				return canAccessAR ? section : null;
 			}
-			// CRUD section: hide Report Info unless superuser or key stakeholder
 			if (section.label === "CRUD" && !canAccessAR) {
 				return {
 					...section,
 					items: section.items.filter(
-						(item) => item.targetPath !== "/admin/reports"
+						(item) => item.targetPath !== "/manage/reports"
 					),
 				};
 			}
@@ -187,12 +188,17 @@ export function ManageDropdownContent({
 		onClose();
 	};
 
-	// Pre-compute flat index for each item for keyboard navigation
-	const itemIndexMap = new Map<string, number>();
+	const handleAction = (actionId: ARActionId) => {
+		onClose();
+		onARAction?.(actionId);
+	};
+
+	// Pre-compute flat index for keyboard navigation
 	let idx = 0;
+	const itemIndexMap = new Map<string, number>();
 	for (const section of filteredSections) {
 		for (const item of section.items) {
-			itemIndexMap.set(item.targetPath, idx++);
+			itemIndexMap.set(item.targetPath ?? item.actionId ?? "", idx++);
 		}
 	}
 
@@ -204,7 +210,6 @@ export function ManageDropdownContent({
 		>
 			{filteredSections.map((section, sectionIdx) => (
 				<div key={section.label}>
-					{/* Divider before AR Actions section */}
 					{sectionIdx === filteredSections.length - 1 &&
 						filteredSections.length > 1 && (
 							<div className="my-1 border-t border-gray-200 dark:border-gray-700" />
@@ -217,15 +222,21 @@ export function ManageDropdownContent({
 					</div>
 
 					{section.items.map((item) => {
-						const isActive = isPathActive(item.targetPath);
-						const currentIndex = itemIndexMap.get(item.targetPath) ?? 0;
+						const key = item.targetPath ?? item.actionId ?? "";
+						const isNav = !!item.targetPath;
+						const isActive = isNav && isPathActive(item.targetPath!);
+						const currentIndex = itemIndexMap.get(key) ?? 0;
 
 						return (
 							<button
-								key={item.targetPath}
+								key={key}
 								ref={registerMenuItem(currentIndex)}
 								type="button"
-								onClick={(e) => handleNavigate(item.targetPath, e)}
+								onClick={(e) =>
+									isNav
+										? handleNavigate(item.targetPath!, e)
+										: handleAction(item.actionId!)
+								}
 								disabled={isActive}
 								className={cn(
 									"w-full text-left p-2.5 px-4 text-sm rounded flex items-center gap-2",
@@ -246,4 +257,4 @@ export function ManageDropdownContent({
 			))}
 		</div>
 	);
-}
+};

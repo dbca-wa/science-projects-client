@@ -63,10 +63,6 @@ export const createMockEndorsementTask = (
 	},
 	ae_endorsement_required: false,
 	ae_endorsement_provided: false,
-	bm_endorsement_required: false,
-	bm_endorsement_provided: false,
-	hc_endorsement_required: false,
-	hc_endorsement_provided: false,
 	...overrides,
 });
 

@@ -69,9 +69,6 @@ class EmailService:
                 subject=subject,
                 html_content=html_content,
             )
-            settings.LOGGER.info(
-                f"Email sent: {subject} to {', '.join(recipient_email)}"
-            )
             return True
         except Exception as e:
             settings.LOGGER.error(f"Email send failed: {e}")
@@ -121,6 +118,11 @@ class EmailService:
             "document": document,
             "actioning_user": actioning_user,
             "actioning_user_email": actioning_user.email,
+            "actioning_user_name": (
+                actioning_user.get_full_name()
+                if hasattr(actioning_user, "get_full_name")
+                else str(actioning_user)
+            ),
             **(additional_context or {}),
         }
 

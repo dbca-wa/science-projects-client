@@ -12,7 +12,14 @@ from django.http import HttpResponse
 from projects.models import ProjectMember
 
 # Project Imports --------------------
-from .models import KeywordTag, PublicStaffProfile, User, UserProfile, UserWork
+from .models import (
+    KeywordTag,
+    PublicStaffProfile,
+    User,
+    UserInvite,
+    UserProfile,
+    UserWork,
+)
 
 # endregion ===========================================
 
@@ -529,6 +536,133 @@ class UserWorkAdmin(admin.ModelAdmin):
                 "business_area",
             )
         )
+
+
+# endregion ===========================================
+
+
+# region Invite Admin =================================
+
+
+def mark_invites_accepted(model_admin, request, queryset):
+    """Mark selected invites as accepted (fulfilled)."""
+    count = queryset.update(accepted=True)
+    model_admin.message_user(request, f"{count} invite(s) marked as accepted.")
+
+
+mark_invites_accepted.short_description = "Mark selected as accepted (fulfilled)"
+
+
+def reset_invites_to_pending(model_admin, request, queryset):
+    """Reset selected invites back to pending (allows re-inviting)."""
+    count = queryset.update(accepted=False)
+    model_admin.message_user(request, f"{count} invite(s) reset to pending.")
+
+
+reset_invites_to_pending.short_description = "Reset selected to pending"
+
+
+def delete_all_fulfilled_invites(model_admin, request, queryset):
+    """Delete ALL fulfilled (accepted) invites from the database, regardless of selection."""
+    count, _ = UserInvite.objects.filter(accepted=True).delete()
+    model_admin.message_user(
+        request, f"Cleared {count} fulfilled invite(s) from the database."
+    )
+
+
+delete_all_fulfilled_invites.short_description = (
+    "Clear ALL fulfilled invites (ignores selection)"
+)
+
+
+def resend_invite_email(model_admin, request, queryset):
+    """Resend invitation emails for selected pending invites."""
+    from documents.services.notification_service import NotificationService
+    from users.views.invite import _InviteRecipient
+
+    sent = 0
+    skipped = 0
+    for invite in queryset.filter(accepted=False):
+        # Parse name from email (best effort)
+        local_part = invite.email.split("@")[0]
+        parts = local_part.replace(".", " ").split()
+        first_name = parts[0].title() if parts else ""
+        last_name = " ".join(p.title() for p in parts[1:]) if len(parts) > 1 else ""
+
+        recipient = _InviteRecipient(invite.email, first_name, last_name)
+        try:
+            NotificationService.send_spms_invite(
+                recipient, request.user, settings.SITE_URL
+            )
+            sent += 1
+        except Exception as e:
+            settings.LOGGER.error(f"Failed to resend invite to {invite.email}: {e}")
+            skipped += 1
+
+    msg = f"Resent {sent} invite email(s)."
+    if skipped:
+        msg += f" {skipped} failed."
+    model_admin.message_user(request, msg)
+
+
+resend_invite_email.short_description = (
+    "Resend invite email for selected (pending only)"
+)
+
+
+@admin.register(UserInvite)
+class UserInviteAdmin(admin.ModelAdmin):
+    list_display = [
+        "email",
+        "status_display",
+        "invited_by_display",
+        "invited_at",
+    ]
+
+    list_filter = [
+        "accepted",
+        ("invited_at", admin.DateFieldListFilter),
+    ]
+
+    search_fields = [
+        "email",
+        "invited_by__username",
+        "invited_by__first_name",
+        "invited_by__last_name",
+        "invited_by__email",
+    ]
+
+    readonly_fields = [
+        "invited_at",
+    ]
+
+    ordering = ["-invited_at"]
+
+    list_per_page = 50
+
+    actions = [
+        mark_invites_accepted,
+        reset_invites_to_pending,
+        delete_all_fulfilled_invites,
+        resend_invite_email,
+    ]
+
+    @admin.display(description="Status", ordering="accepted")
+    def status_display(self, obj):
+        return "Accepted" if obj.accepted else "Pending"
+
+    @admin.display(description="Invited By", ordering="invited_by__email")
+    def invited_by_display(self, obj):
+        if obj.invited_by:
+            name = (
+                f"{obj.invited_by.display_first_name or obj.invited_by.first_name} "
+                f"{obj.invited_by.display_last_name or obj.invited_by.last_name}"
+            ).strip()
+            return f"{name} ({obj.invited_by.email})" if name else obj.invited_by.email
+        return "—"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("invited_by")
 
 
 # endregion ===========================================

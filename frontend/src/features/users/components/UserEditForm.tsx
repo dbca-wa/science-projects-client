@@ -34,6 +34,7 @@ import { ImageUpload } from "@/shared/components/media";
 import { FormRichTextEditor } from "@/shared/components/editor";
 import { UnsavedChangesDialog } from "@/shared/components/editor/UnsavedChangesDialog";
 import { getImageUrl } from "@/shared/utils/image.utils";
+import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 import { useUserDetail } from "../hooks/useUserDetail";
 import {
@@ -600,15 +601,9 @@ export const UserEditForm = ({
 												</FormControl>
 												<SelectContent>
 													<SelectItem value="none">None</SelectItem>
-													{businessAreas
-														?.sort((a, b) => a.name.localeCompare(b.name))
-														.map((ba) => (
-															<SelectItem key={ba.id} value={ba.id!.toString()}>
-																{ba.is_active
-																	? ba.name
-																	: `[INACTIVE] ${ba.name}`}
-															</SelectItem>
-														))}
+													<BusinessAreaSelectItems
+														businessAreas={businessAreas || []}
+													/>
 												</SelectContent>
 											</Select>
 											<FormMessage />

@@ -121,6 +121,26 @@ vi.mock("@/features/projects/hooks/useGetProgressReportAvailableYears", () => ({
 	})),
 }));
 
+vi.mock("@/features/auth", () => ({
+	useCurrentUser: () => ({
+		data: { id: 1, is_superuser: true, is_staff: true },
+	}),
+}));
+
+vi.mock("@/features/projects/components/comments", () => ({
+	CommentSection: () => <div data-testid="comment-section" />,
+}));
+
+vi.mock("@/features/projects/components/MethodologyImage", () => ({
+	MethodologyImage: () => <div data-testid="methodology-image" />,
+}));
+
+vi.mock("@/features/projects/components/ProjectPlanEndorsements", () => ({
+	ProjectPlanEndorsements: () => (
+		<div data-testid="project-plan-endorsements" />
+	),
+}));
+
 // Test data
 const mockProject: IProjectData = {
 	id: 1,
@@ -182,29 +202,13 @@ const mockProjectPlan: IProjectPlan = {
 	related_projects: "<p>Test related projects</p>",
 	operating_budget: "<p>Test operating budget</p>",
 	operating_budget_external: "<p>Test operating budget external</p>",
-	involves_plants: false,
-	involves_animals: false,
 	endorsements: {
 		id: 1,
-		project_plan: 1,
 		no_specimens: "<p>Test specimens</p>",
 		data_management: "<p>Test data management</p>",
 		ae_endorsement_required: false,
 		ae_endorsement_provided: false,
-		bm_endorsement_required: false,
-		bm_endorsement_provided: false,
-		hc_endorsement_required: false,
-		hc_endorsement_provided: false,
-		dm_endorsement_required: false,
-		dm_endorsement_provided: false,
-		aec_pdf: {
-			id: 1,
-			file: "",
-			created_at: new Date(),
-			updated_at: new Date(),
-			creator: 1,
-			endorsement: 1,
-		},
+		aec_pdf: null,
 	},
 };
 

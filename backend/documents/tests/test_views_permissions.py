@@ -438,6 +438,7 @@ class TestConceptPlans:
 
         data = {
             "document": concept_plan_with_details.document.id,
+            "project": concept_plan_with_details.project.id,
             "background": "<p>New background</p>",
             "aims": "<p>New aims</p>",
             "outcome": "<p>New outcome</p>",
@@ -489,6 +490,7 @@ class TestConceptPlans:
 
         data = {
             "document": concept_plan.id,
+            "project": concept_plan.project.id,
             "background": "<p>Test</p>",
         }
 

@@ -24,7 +24,7 @@ interface ProjectMarkerProps {
  * - Accessible with proper ARIA labels
  * - Handles marker selection state for visual feedback
  * - Hovered markers get highest z-index (2000), selected markers get medium z-index (1000)
- * - Optimized with React.memo to prevent unnecessary re-renders
+ * - Optimised with React.memo to prevent unnecessary re-renders
  */
 const ProjectMarkerComponent = observer(
 	({ projects, position }: ProjectMarkerProps) => {

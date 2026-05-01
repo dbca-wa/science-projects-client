@@ -6,6 +6,8 @@ import type {
 	IProjectDocuments,
 } from "@/shared/types/project.types";
 import type { IUserData } from "@/shared/types/user.types";
+import { useCurrentUser } from "@/features/auth";
+import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
@@ -51,6 +53,7 @@ export function ProjectClosureTab({
 }: ProjectClosureTabProps) {
 	// Modal state for reopen project action
 	const [isReopenModalOpen, setIsReopenModalOpen] = useState(false);
+	const { data: currentUser } = useCurrentUser();
 
 	// Update mutation for intended_outcome
 	const updateIntendedOutcome = useUpdateContent({
@@ -66,8 +69,14 @@ export function ProjectClosureTab({
 		);
 	}
 
-	// TODO: Calculate edit permissions using canEditProject utility
-	const canEdit = true; // Temporarily true to see the button
+	const canEdit = calculateDocumentEditPermission({
+		currentUser,
+		members,
+		document: projectClosure.document,
+		isBaLead,
+		userIsCaretakerOfBaLeader,
+		userIsCaretakerOfAdmin,
+	});
 
 	// Handle intended outcome change
 	const handleIntendedOutcomeChange = (value: string) => {

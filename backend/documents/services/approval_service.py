@@ -48,16 +48,17 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_one(document, approver):
+    def approve_stage_one(document, approver, send_notifications=True):
         """
         Approve document at stage 1 (project lead)
 
         Args:
             document: ProjectDocument instance
             approver: User approving the document
+            send_notifications: Whether to send notification emails
 
         Raises:
-            PermissionDenied: If user not authorized
+            PermissionDenied: If user not authorised
         """
         # Check permission
         if not ApprovalService._can_approve_stage_one(document, approver):
@@ -68,25 +69,27 @@ class ApprovalService:
         document.project_lead_approval_granted = True
         document.save()
 
-        try:
-            NotificationService.notify_document_approved(document, approver)
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send stage 1 approval notification: {e}", exc_info=True
-            )
+        if send_notifications:
+            try:
+                NotificationService.notify_document_approved(document, approver)
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send stage 1 approval notification: {e}", exc_info=True
+                )
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_two(document, approver):
+    def approve_stage_two(document, approver, send_notifications=True):
         """
         Approve document at stage 2 (business area lead)
 
         Args:
             document: ProjectDocument instance
             approver: User approving the document
+            send_notifications: Whether to send notification emails
 
         Raises:
-            PermissionDenied: If user not authorized
+            PermissionDenied: If user not authorised
             ValidationError: If stage 1 not complete
         """
         # Check stage 1 complete
@@ -102,25 +105,27 @@ class ApprovalService:
         document.business_area_lead_approval_granted = True
         document.save()
 
-        try:
-            NotificationService.notify_document_approved(document, approver)
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send stage 2 approval notification: {e}", exc_info=True
-            )
+        if send_notifications:
+            try:
+                NotificationService.notify_document_approved(document, approver)
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send stage 2 approval notification: {e}", exc_info=True
+                )
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_three(document, approver):
+    def approve_stage_three(document, approver, send_notifications=True):
         """
         Approve document at stage 3 (directorate) - final approval
 
         Args:
             document: ProjectDocument instance
             approver: User approving the document
+            send_notifications: Whether to send notification emails
 
         Raises:
-            PermissionDenied: If user not authorized
+            PermissionDenied: If user not authorised
             ValidationError: If previous stages not complete
         """
         # Check previous stages complete
@@ -153,19 +158,23 @@ class ApprovalService:
             document.project.status = "active"
             document.project.save()
 
-        try:
-            NotificationService.notify_document_approved(document, approver)
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send stage 3 approval notification: {e}", exc_info=True
-            )
+        if send_notifications:
+            try:
+                NotificationService.notify_document_approved(document, approver)
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send stage 3 approval notification: {e}", exc_info=True
+                )
 
-        try:
-            NotificationService.notify_document_approved_directorate(document, approver)
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send directorate approval notification: {e}", exc_info=True
-            )
+            try:
+                NotificationService.notify_document_approved_directorate(
+                    document, approver
+                )
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send directorate approval notification: {e}",
+                    exc_info=True,
+                )
 
     @staticmethod
     @transaction.atomic
@@ -256,7 +265,7 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def batch_approve(documents, approver, stage):
+    def batch_approve(documents, approver, stage, send_notifications=True):
         """
         Batch approve multiple documents
 
@@ -264,6 +273,7 @@ class ApprovalService:
             documents: List of ProjectDocument instances
             approver: User approving the documents
             stage: Approval stage (1, 2, or 3)
+            send_notifications: Whether to send notification emails
 
         Returns:
             dict: Results with approved and failed documents
@@ -276,11 +286,17 @@ class ApprovalService:
         for document in documents:
             try:
                 if stage == 1:
-                    ApprovalService.approve_stage_one(document, approver)
+                    ApprovalService.approve_stage_one(
+                        document, approver, send_notifications=send_notifications
+                    )
                 elif stage == 2:
-                    ApprovalService.approve_stage_two(document, approver)
+                    ApprovalService.approve_stage_two(
+                        document, approver, send_notifications=send_notifications
+                    )
                 elif stage == 3:
-                    ApprovalService.approve_stage_three(document, approver)
+                    ApprovalService.approve_stage_three(
+                        document, approver, send_notifications=send_notifications
+                    )
                 else:
                     raise ValidationError(f"Invalid stage: {stage}")
 

@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import type { IProjectData, ProjectRoles } from "@/shared/types/project.types";
+import type { IProjectData } from "@/shared/types/project.types";
 import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { ProjectKindBadge } from "./ProjectKindBadge";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
-import { PROJECT_ROLE_CONFIG } from "@/shared/constants/project.constants";
+import { RoleBadge } from "./RoleBadge";
 import { cn } from "@/shared/lib/utils";
 
 /**
@@ -39,24 +39,10 @@ interface ProjectsDataTableProps {
 }
 
 /**
- * Role Text Component
- * Displays project role with color coding (text only, not badge)
- */
-function RoleText({ role }: { role: ProjectRoles }) {
-	const config = PROJECT_ROLE_CONFIG[role];
-
-	return (
-		<span className="text-sm font-medium" style={{ color: config.color }}>
-			{config.label}
-		</span>
-	);
-}
-
-/**
  * Project Image Component
  * Displays project image with loading and error states
  */
-function ProjectImage({ project }: { project: IProjectData }) {
+const ProjectImage = ({ project }: { project: IProjectData }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const [imageError, setImageError] = useState(false);
 	const imageUrl = getImageUrl(project.image);
@@ -88,7 +74,7 @@ function ProjectImage({ project }: { project: IProjectData }) {
 			)}
 		</div>
 	);
-}
+};
 
 /**
  * ProjectsDataTable Component
@@ -103,13 +89,13 @@ function ProjectImage({ project }: { project: IProjectData }) {
  * - Click/Ctrl+Click navigation support
  * - Custom empty state message
  */
-export function ProjectsDataTable({
+export const ProjectsDataTable = ({
 	projects,
 	columns: columnConfig,
 	defaultSort,
 	emptyMessage,
 	onProjectClick,
-}: ProjectsDataTableProps) {
+}: ProjectsDataTableProps) => {
 	// Build columns based on configuration
 	const columns = useMemo<ColumnDef<IProjectData>[]>(() => {
 		const cols: ColumnDef<IProjectData>[] = [];
@@ -178,7 +164,7 @@ export function ProjectsDataTable({
 					if (statusCompare !== 0) return statusCompare;
 					return a.title.localeCompare(b.title);
 				},
-				width: "auto",
+				width: "200px",
 				cell: (row) => (
 					<div className="flex items-center">
 						<ProjectStatusBadge status={row.status} />
@@ -215,13 +201,13 @@ export function ProjectsDataTable({
 					if (roleCompare !== 0) return roleCompare;
 					return a.title.localeCompare(b.title);
 				},
-				width: "auto",
+				width: "160px",
 				cell: (row) => {
 					const role = row.role;
 					return (
 						<div className="flex items-center">
 							{role ? (
-								<RoleText role={role} />
+								<RoleBadge role={role} />
 							) : (
 								<span className="text-sm text-muted-foreground">—</span>
 							)}
@@ -274,4 +260,4 @@ export function ProjectsDataTable({
 			ariaLabel="Projects table"
 		/>
 	);
-}
+};

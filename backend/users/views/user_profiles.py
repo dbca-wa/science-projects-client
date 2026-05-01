@@ -359,4 +359,10 @@ class UsersProjects(APIView):
             context={"request": request},
         )
 
-        return Response(serialized_projects.data, status=HTTP_200_OK)
+        # Inject the user's role into each serialised project
+        data = serialized_projects.data
+        for i, (_, role) in enumerate(projects_with_roles):
+            if i < len(data):
+                data[i]["role"] = role
+
+        return Response(data, status=HTTP_200_OK)

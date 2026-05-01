@@ -10,21 +10,6 @@ export function ExternalProjectSections({
 }: ExternalProjectSectionsProps) {
 	return (
 		<>
-			{/* Budget Section */}
-			{externalDetails.budget && (
-				<div className="pb-3">
-					<div className="flex items-center gap-2 mb-1">
-						<DollarSign className="h-5 w-5 text-muted-foreground" />
-						<p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-							Budget
-						</p>
-					</div>
-					<p className="text-base text-gray-600 dark:text-gray-400">
-						{externalDetails.budget}
-					</p>
-				</div>
-			)}
-
 			{/* Collaborators Section */}
 			{externalDetails.collaboration_with && (
 				<div className="pb-3">
@@ -36,6 +21,21 @@ export function ExternalProjectSections({
 					</div>
 					<p className="text-base text-gray-600 dark:text-gray-400">
 						{externalDetails.collaboration_with}
+					</p>
+				</div>
+			)}
+
+			{/* Budget Section */}
+			{externalDetails.budget && (
+				<div className="pb-3">
+					<div className="flex items-center gap-2 mb-1">
+						<DollarSign className="h-5 w-5 text-muted-foreground" />
+						<p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+							Budget
+						</p>
+					</div>
+					<p className="text-base text-gray-600 dark:text-gray-400">
+						{externalDetails.budget}
 					</p>
 				</div>
 			)}

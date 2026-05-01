@@ -582,7 +582,7 @@ class PublicStaffProfile(CommonModel):
             settings.LOGGER.error(
                 f"Request to IT Assets API timed out for profile {self.pk}"
             )
-            return self.email
+            return self.user.email
 
         if response.status_code != 200:
             if settings.IT_ASSETS_USER is None:
@@ -608,7 +608,7 @@ class PublicStaffProfile(CommonModel):
 
         if matching_record is not None:
             return matching_record["email"]
-        return self.email
+        return self.user.email
 
     def __str__(self) -> str:
         return f"Staff Profile | {f'{self.user.first_name} {self.user.last_name}' if self.user else 'No User'}"

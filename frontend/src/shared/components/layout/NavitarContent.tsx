@@ -12,6 +12,7 @@ import { User, Globe, LogOut, Moon, Sun, BookOpen, Mail } from "lucide-react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
+import { BiQuestionMark } from "react-icons/bi";
 
 interface NavitarContentProps {
 	onClose: () => void;
@@ -22,7 +23,7 @@ interface NavitarContentProps {
  * Captures MobX state on mount to prevent flickering during close animation
  * Implements WCAG 2.2 keyboard navigation with arrow keys and focus management
  */
-export default function NavitarContent({ onClose }: NavitarContentProps) {
+const NavitarContent = ({ onClose }: NavitarContentProps) => {
 	const navigate = useNavigate();
 	const authStore = useAuthStore();
 	const uiStore = useUIStore();
@@ -159,7 +160,7 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 							ref={registerMenuItem(3)}
 							type="button"
 							onClick={() => {
-								navigate("/admin/email-testing");
+								navigate("/manage/email-testing");
 								onClose();
 							}}
 							className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
@@ -196,8 +197,8 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 					role="menuitem"
 				>
 					<div className="flex gap-2 items-center">
-						<BookOpen className="h-4 w-4" aria-hidden="true" />
-						<span className="text-sm">Quick Guide</span>
+						<BiQuestionMark className="h-4 w-4" aria-hidden="true" />
+						<span className="text-sm">Knowledge Base</span>
 					</div>
 				</button>
 
@@ -215,23 +216,6 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 					<div className="flex gap-2 items-center">
 						<BookOpen className="h-4 w-4" aria-hidden="true" />
 						<span className="text-sm">Data Catalogue</span>
-					</div>
-				</button>
-
-				{/* Scientific Sites Register */}
-				<button
-					ref={registerMenuItem(6)}
-					type="button"
-					onClick={() => {
-						window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank");
-						onClose();
-					}}
-					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
-					role="menuitem"
-				>
-					<div className="flex gap-2 items-center">
-						<BookOpen className="h-4 w-4" aria-hidden="true" />
-						<span className="text-sm">Scientific Sites Register</span>
 					</div>
 				</button>
 			</div>
@@ -262,4 +246,6 @@ export default function NavitarContent({ onClose }: NavitarContentProps) {
 			</div>
 		</div>
 	);
-}
+};
+
+export default NavitarContent;

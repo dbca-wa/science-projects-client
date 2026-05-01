@@ -12,6 +12,8 @@ export default function BusinessAreaEditPage() {
 	useDocumentTitle("Edit Business Area");
 
 	const { data: myBusinessAreas, isLoading } = useMyBusinessAreas();
+
+	// For superusers with multiple BAs, show a selector; for BA leads, use their single BA
 	const businessArea = myBusinessAreas?.[0];
 
 	if (isLoading) {

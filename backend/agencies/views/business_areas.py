@@ -253,14 +253,17 @@ class BusinessAreaDetail(APIView):
 
 
 class MyBusinessAreas(APIView):
-    """Get business areas led by current user"""
+    """Get business areas led by current user (or all for superusers)"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        business_areas = BusinessArea.objects.filter(
-            leader=request.user.pk
-        ).select_related(
+        if request.user.is_superuser:
+            business_areas = BusinessArea.objects.all()
+        else:
+            business_areas = BusinessArea.objects.filter(leader=request.user.pk)
+
+        business_areas = business_areas.select_related(
             "division", "image", "leader", "finance_admin", "data_custodian"
         )
         serializer = TinyBusinessAreaSerializer(business_areas, many=True)

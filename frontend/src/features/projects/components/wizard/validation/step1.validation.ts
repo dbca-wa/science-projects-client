@@ -24,8 +24,8 @@ export function validateStep1(
 	// Validate title
 	if (!data.title || data.title.trim().length === 0) {
 		errors.title = "Title is required";
-	} else if (data.title.length > 500) {
-		errors.title = "Title must be 500 characters or less";
+	} else if (data.title.length > 150) {
+		errors.title = "Title must be 150 characters or less";
 	}
 
 	// Validate description

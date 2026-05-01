@@ -110,7 +110,7 @@ const ArticleContent = ({
 				<RichTextEditor
 					value={editContent}
 					onChange={setEditContent}
-					toolbar="full"
+					toolbar="guide"
 					placeholder="Write article content..."
 					minHeight="200px"
 				/>

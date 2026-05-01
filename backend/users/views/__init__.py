@@ -6,6 +6,7 @@ from .admin import SwitchAdmin, ToggleUserActive
 from .auth import ChangePassword, Login, Logout
 from .crud import DirectorateUsers, UserDetail, Users
 from .invite import InviteUser
+from .it_assets_search import ITAssetsSearch
 from .profile_entries import (
     StaffProfileEducationEntries,
     StaffProfileEducationEntryDetail,
@@ -100,4 +101,6 @@ __all__ = [
     "UsersProjects",
     # Invite
     "InviteUser",
+    # IT Assets Search
+    "ITAssetsSearch",
 ]

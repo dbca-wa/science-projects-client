@@ -5,6 +5,8 @@ import type {
 	IProjectDocuments,
 } from "@/shared/types/project.types";
 import type { IUserData } from "@/shared/types/user.types";
+import { useCurrentUser } from "@/features/auth";
+import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
@@ -38,6 +40,8 @@ export function ConceptPlanTab({
 	all_documents,
 	isBaLead,
 }: ConceptPlanTabProps) {
+	const { data: currentUser } = useCurrentUser();
+
 	if (!conceptPlan) {
 		return (
 			<div className="rounded-lg border bg-card p-6">
@@ -46,8 +50,14 @@ export function ConceptPlanTab({
 		);
 	}
 
-	// TODO: Calculate edit permissions using canEditProject utility
-	const canEdit = true; // Temporarily true to see the button
+	const canEdit = calculateDocumentEditPermission({
+		currentUser,
+		members,
+		document: conceptPlan.document,
+		isBaLead,
+		userIsCaretakerOfBaLeader,
+		userIsCaretakerOfAdmin,
+	});
 
 	return (
 		<DocumentTabLayout

@@ -157,8 +157,12 @@ class BatchApprove(APIView):
         documents = [DocumentService.get_document(doc_id) for doc_id in document_ids]
 
         # Delegate to service
+        send_notifications = request.data.get("send_notifications", True)
         results = ApprovalService.batch_approve(
-            documents=documents, approver=request.user, stage=int(stage)
+            documents=documents,
+            approver=request.user,
+            stage=int(stage),
+            send_notifications=send_notifications,
         )
 
         return Response(results, status=HTTP_200_OK)

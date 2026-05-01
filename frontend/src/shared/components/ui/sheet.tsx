@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/shared/lib/utils";
 import {
@@ -78,10 +79,11 @@ function Sheet({
 
 	if (!isVisible) return null;
 
-	return (
+	return createPortal(
 		<SheetContext.Provider value={{ onOpenChange, isClosing, shouldAnimate }}>
-			<div className="fixed inset-0 z-50">{children}</div>
-		</SheetContext.Provider>
+			<div className="fixed inset-0 z-[60]">{children}</div>
+		</SheetContext.Provider>,
+		document.body
 	);
 }
 
@@ -133,7 +135,7 @@ function SheetOverlay() {
 	return (
 		<div
 			className={cn(
-				"fixed inset-0 bg-black/50 z-49",
+				"fixed inset-0 bg-black/50 z-[59]",
 				shouldAnimate && "transition-opacity duration-300",
 				shouldAnimate && isOpening && "opacity-0",
 				shouldAnimate && isClosing && "opacity-0",
@@ -175,7 +177,7 @@ function SheetContent({
 		<>
 			<div
 				className={cn(
-					"fixed flex flex-col gap-4 bg-white dark:bg-gray-900 z-50",
+					"fixed flex flex-col gap-4 bg-white dark:bg-gray-900 z-[60]",
 					shouldAnimate && "transition-transform duration-300 ease-in-out",
 					side === "left" && [
 						"left-0 inset-y-0 h-full border-r-[1px] border-gray-300 dark:border-gray-700 shadow-[5px_0_15px_rgba(0,0,0,0.1)]",

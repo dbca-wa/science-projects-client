@@ -51,6 +51,23 @@ vi.mock("@/shared/components/ProjectSection", () => ({
 	}) => <div data-testid={`section-${title}`}>{children}</div>,
 }));
 
+vi.mock("@/features/auth", () => ({
+	useCurrentUser: () => ({
+		data: { id: 1, is_superuser: true, is_staff: true },
+	}),
+}));
+
+vi.mock("@/features/projects/components/comments", () => ({
+	CommentSection: () => <div data-testid="comment-section" />,
+}));
+
+vi.mock("@/shared/hooks/queries/useUpdateContent", () => ({
+	useUpdateContent: () => ({
+		mutate: vi.fn(),
+		isPending: false,
+	}),
+}));
+
 // Test data
 const mockProject: IProjectData = {
 	id: 1,

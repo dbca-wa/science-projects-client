@@ -57,6 +57,7 @@ export interface IMiniUser {
 export interface IUserMe {
 	staff_profile_id?: number;
 	public_email?: string;
+	public_email_on?: boolean;
 	custom_title?: string;
 	custom_title_on?: boolean;
 	staff_profile_hidden?: boolean;

@@ -106,6 +106,7 @@ RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install
     -o Acquire::Retries=4 --no-install-recommends \
     curl ca-certificates \
     gdebi \
+    libgif7 \
     && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \

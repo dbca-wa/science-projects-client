@@ -12,16 +12,21 @@ import { logger } from "@/shared/services/logger.service";
  */
 export interface IEditProjectFormData {
 	title: string;
+	description: string;
 	image: File | string | null;
 	business_area: number;
 	service: number | null;
 	start_date: string;
 	end_date: string | null;
+	project_leader: number | null;
 	data_custodian: number | null;
+	keywords: string;
 	project_areas: number[];
 	// External project fields
 	collaboration_with: string;
 	budget: string;
+	external_description: string;
+	aims: string;
 	// Student project fields
 	organisation: string;
 	level: string;
@@ -34,7 +39,11 @@ interface EditProjectStoreState extends BaseStoreState {
 	projectId: number | null;
 	originalData: IEditProjectFormData | null;
 	formData: IEditProjectFormData;
-	activeTab: "basic-info" | "project-areas";
+	activeTab:
+		| "basic-info"
+		| "project-areas"
+		| "external-details"
+		| "student-details";
 	isSubmitting: boolean;
 }
 
@@ -52,15 +61,20 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 			originalData: null,
 			formData: {
 				title: "",
+				description: "",
 				image: null,
 				business_area: 0,
 				service: null,
 				start_date: "",
 				end_date: null,
+				project_leader: null,
 				data_custodian: null,
+				keywords: "",
 				project_areas: [],
 				collaboration_with: "",
 				budget: "",
+				external_description: "",
+				aims: "",
 				organisation: "",
 				level: "",
 			},
@@ -102,16 +116,28 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 
 		const formData: IEditProjectFormData = {
 			title: project.title,
+			description: project.description || "",
 			image: getImageUrl(project.image) || null,
-			business_area: project.business_area?.id || 0,
-			service: details.base.service?.id || null,
+			// Handle business_area whether it's an object or a raw numeric ID
+			business_area:
+				typeof project.business_area === "number"
+					? project.business_area
+					: project.business_area?.id || 0,
+			// Handle service whether it's an object or a raw numeric ID
+			service: details.base
+				? typeof details.base.service === "number"
+					? details.base.service
+					: (details.base.service?.id ?? null)
+				: null,
 			start_date: project.start_date
 				? new Date(project.start_date).toISOString().split("T")[0]
 				: "",
 			end_date: project.end_date
 				? new Date(project.end_date).toISOString().split("T")[0]
 				: null,
-			data_custodian: details.base.data_custodian?.id || null,
+			project_leader: details.base?.owner?.id || null,
+			data_custodian: details.base?.data_custodian?.id || null,
+			keywords: project.keywords || "",
 			project_areas: project.areas?.map((area) => area.id) || [],
 			collaboration_with:
 				isExternalProject &&
@@ -124,6 +150,18 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 				details.external &&
 				!Array.isArray(details.external)
 					? details.external.budget || ""
+					: "",
+			external_description:
+				isExternalProject &&
+				details.external &&
+				!Array.isArray(details.external)
+					? details.external.description || ""
+					: "",
+			aims:
+				isExternalProject &&
+				details.external &&
+				!Array.isArray(details.external)
+					? details.external.aims || ""
 					: "",
 			organisation:
 				isStudentProject && details.student && !Array.isArray(details.student)
@@ -142,6 +180,8 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 
 		logger.info("EditProjectStore loaded project", {
 			projectId: project.id,
+			businessArea: formData.business_area,
+			service: formData.service,
 			imageFile: project.image?.file,
 			imageUrl: getImageUrl(project.image),
 		});
@@ -161,7 +201,9 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 	/**
 	 * Set active tab
 	 */
-	setActiveTab = (tab: "basic-info" | "project-areas") => {
+	setActiveTab = (
+		tab: "basic-info" | "project-areas" | "external-details" | "student-details"
+	) => {
 		this.state.activeTab = tab;
 		logger.debug("Set active tab", { tab });
 	};
@@ -248,15 +290,20 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 		this.state.originalData = null;
 		this.state.formData = {
 			title: "",
+			description: "",
 			image: null,
 			business_area: 0,
 			service: null,
 			start_date: "",
 			end_date: null,
+			project_leader: null,
 			data_custodian: null,
+			keywords: "",
 			project_areas: [],
 			collaboration_with: "",
 			budget: "",
+			external_description: "",
+			aims: "",
 			organisation: "",
 			level: "",
 		};

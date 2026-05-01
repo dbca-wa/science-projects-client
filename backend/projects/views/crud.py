@@ -19,6 +19,13 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 from common.utils.pagination import paginate_queryset
+from documents.models import ProjectDocument
+from documents.serializers import (
+    ConceptPlanCreateSerializer,
+    EndorsementCreateSerializer,
+    ProjectDocumentCreateSerializer,
+    ProjectPlanCreateSerializer,
+)
 from medias.models import ProjectPhoto
 
 from ..permissions.project_permissions import CanEditProject
@@ -210,6 +217,58 @@ class Projects(APIView):
                     return Response(
                         external_serializer.errors, status=HTTP_400_BAD_REQUEST
                     )
+
+            # Create initial project document and associated plan
+            # Non-external projects get a Concept Plan; external projects get a Project Plan
+            doc_kind = (
+                ProjectDocument.CategoryKindChoices.PROJECTPLAN
+                if kind == "external"
+                else ProjectDocument.CategoryKindChoices.CONCEPTPLAN
+            )
+
+            document_data = {
+                "old_id": 1,
+                "kind": doc_kind,
+                "status": "new",
+                "project": project.pk,
+                "creator": request.user.pk,
+                "modifier": request.user.pk,
+            }
+            doc_serializer = ProjectDocumentCreateSerializer(data=document_data)
+            if doc_serializer.is_valid():
+                doc = doc_serializer.save()
+
+                if kind == "external":
+                    # External projects get a Project Plan
+                    plan_data = {"document": doc.pk, "project": project.pk}
+                    plan_serializer = ProjectPlanCreateSerializer(data=plan_data)
+                    if plan_serializer.is_valid():
+                        plan = plan_serializer.save()
+                        # Create endorsement for the project plan
+                        endorsement_data = {"project_plan": plan.pk}
+                        endorsement_serializer = EndorsementCreateSerializer(
+                            data=endorsement_data
+                        )
+                        if endorsement_serializer.is_valid():
+                            endorsement_serializer.save()
+                    else:
+                        settings.LOGGER.error(
+                            f"Project Plan creation error: {plan_serializer.errors}"
+                        )
+                else:
+                    # Science, Core Function, and Student projects get a Concept Plan
+                    concept_data = {"document": doc.pk, "project": project.pk}
+                    concept_serializer = ConceptPlanCreateSerializer(data=concept_data)
+                    if concept_serializer.is_valid():
+                        concept_serializer.save()
+                    else:
+                        settings.LOGGER.error(
+                            f"Concept Plan creation error: {concept_serializer.errors}"
+                        )
+            else:
+                settings.LOGGER.error(
+                    f"Project Document creation error: {doc_serializer.errors}"
+                )
 
         # Return created project
         result_serializer = ProjectSerializer(project)

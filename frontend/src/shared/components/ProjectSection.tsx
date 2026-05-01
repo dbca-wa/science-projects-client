@@ -4,6 +4,7 @@ interface ProjectSectionProps {
 	children: React.ReactNode;
 	className?: string;
 	title?: string;
+	id?: string;
 }
 
 /**
@@ -23,9 +24,11 @@ export function ProjectSection({
 	children,
 	className,
 	title,
+	id,
 }: ProjectSectionProps) {
 	return (
 		<div
+			id={id}
 			className={cn(
 				"min-h-[100px] rounded-lg bg-[#EBF0F6] dark:bg-gray-800",
 				className

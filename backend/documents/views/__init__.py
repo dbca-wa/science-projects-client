@@ -5,10 +5,12 @@ Documents views
 # Admin views
 from .admin import (
     BatchApproveCurrent,
+    BatchApproveCurrentPreview,
     BatchApproveOld,
     DocumentSpawner,
     FinalDocApproval,
     GetPreviousReportsData,
+    NewCycleOpenPreview,
     ProjectDocsPendingMyActionAllStages,
     ReopenProject,
 )
@@ -155,6 +157,8 @@ __all__ = [
     "ReopenProject",
     "BatchApproveOld",
     "BatchApproveCurrent",
+    "BatchApproveCurrentPreview",
+    "NewCycleOpenPreview",
     "FinalDocApproval",
     # Annual report
     "Reports",
