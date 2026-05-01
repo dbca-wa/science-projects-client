@@ -23,4 +23,5 @@ export const DOCUMENT_ENDPOINTS = {
 
 	// New cycle
 	NEW_CYCLE_OPEN_PREVIEW: "documents/opennewcycle/preview",
+	NEW_CYCLE_EMAIL_PREVIEW: "documents/opennewcycle/email-preview",
 } as const;

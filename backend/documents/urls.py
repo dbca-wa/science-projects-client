@@ -108,6 +108,7 @@ urlpatterns = [
     path("batchapprovecurrent", views.BatchApproveCurrent.as_view()),
     path("batchapprovecurrent/preview", views.BatchApproveCurrentPreview.as_view()),
     path("opennewcycle/preview", views.NewCycleOpenPreview.as_view()),
+    path("opennewcycle/email-preview", views.NewCycleEmailPreview.as_view()),
     path("projectclosures/reopen/<int:pk>", views.ReopenProject.as_view()),
     # Actions (Project Docs - Sends emails) ========================================================
     path("notifications/mentions", views.SendMentionNotification.as_view()),

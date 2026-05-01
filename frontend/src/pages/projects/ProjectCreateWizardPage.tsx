@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { motion } from "framer-motion";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { WizardContainer } from "@/features/projects/components/wizard/WizardContainer";
 import { useWizardPersistence } from "@/features/projects/hooks/useWizardPersistence";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
+import { FormPreviewToggle } from "@/shared/components/layout/FormPreviewToggle";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { PageTransition } from "@/shared/components/PageTransition";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { toast } from "sonner";
-import { cn } from "@/shared/lib/utils";
 
 const PROJECT_TYPE_NAMES: Record<ProjectKind, string> = {
 	science: "Science Project",
@@ -139,64 +138,11 @@ const ProjectCreateWizardPage = observer(() => {
 						</div>
 
 						{/* Right: Preview toggle */}
-						<div className="3xl:hidden shrink-0">
-							<div className="relative inline-flex h-11 items-center justify-center rounded-xl p-1.5 bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-blue-950/40 dark:to-indigo-950/40 backdrop-blur-xl border border-blue-200/60 dark:border-blue-700/40 shadow-lg shadow-blue-100/50 dark:shadow-blue-900/20">
-								<motion.div
-									className="absolute h-8 rounded-lg"
-									initial={false}
-									animate={{
-										x: wizardStore.state.showPreview ? "100%" : "0%",
-									}}
-									transition={{
-										type: "spring",
-										stiffness: 300,
-										damping: 30,
-									}}
-									style={{
-										left: "6px",
-										top: "6px",
-										width: "calc(50% - 6px)",
-										background:
-											"linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.2) 100%)",
-										backdropFilter: "blur(16px) saturate(180%)",
-										WebkitBackdropFilter: "blur(16px) saturate(180%)",
-										border: "1px solid rgba(59, 130, 246, 0.3)",
-										boxShadow:
-											"0 8px 32px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(59, 130, 246, 0.1)",
-									}}
-								/>
-
-								<button
-									type="button"
-									onClick={() => wizardStore.setShowPreview(false)}
-									className={cn(
-										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
-										!wizardStore.state.showPreview
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-									)}
-									aria-pressed={!wizardStore.state.showPreview}
-									aria-label="Show form view"
-								>
-									Form
-								</button>
-
-								<button
-									type="button"
-									onClick={() => wizardStore.setShowPreview(true)}
-									className={cn(
-										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
-										wizardStore.state.showPreview
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-									)}
-									aria-pressed={wizardStore.state.showPreview}
-									aria-label="Show preview"
-								>
-									Preview
-								</button>
-							</div>
-						</div>
+						<FormPreviewToggle
+							showPreview={wizardStore.state.showPreview}
+							onShowForm={() => wizardStore.setShowPreview(false)}
+							onShowPreview={() => wizardStore.setShowPreview(true)}
+						/>
 					</div>
 				</div>
 

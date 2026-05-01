@@ -756,6 +756,8 @@ class NotificationService:
         division_slug=None,
         recipient_groups=None,
         excluded_user_ids=None,
+        custom_message=None,
+        custom_messages=None,
     ):
         """
         Send new cycle opened announcement emails.
@@ -769,6 +771,10 @@ class NotificationService:
             division_slug: Optional division slug to scope recipients.
             recipient_groups: List of groups to include, e.g. ["ba_leads", "project_leads", "team_members"].
                 If None, defaults to ["ba_leads", "project_leads"].
+            excluded_user_ids: List of user PKs to exclude from emails.
+            custom_message: Single HTML string to replace default email text for all groups.
+            custom_messages: Dict with keys 'ba_leads', 'project_leads', 'team_members',
+                each containing an HTML string. Takes precedence over custom_message.
         """
         from agencies.models import BusinessArea
         from projects.models import ProjectMember
@@ -861,10 +867,84 @@ class NotificationService:
             for pk in excluded_user_ids:
                 user_roles.pop(pk, None)
 
+        # Sanitise custom message(s) if provided
+        sanitised_message = None
+        sanitised_messages = None
+
+        if custom_messages and isinstance(custom_messages, dict):
+            import bleach
+
+            allowed_tags = [
+                "p",
+                "br",
+                "strong",
+                "em",
+                "u",
+                "s",
+                "a",
+                "ul",
+                "ol",
+                "li",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "blockquote",
+                "span",
+            ]
+            allowed_attrs = {"a": ["href", "target"], "span": ["style"]}
+            sanitised_messages = {}
+            for key in ("ba_leads", "project_leads", "team_members"):
+                raw = custom_messages.get(key, "")
+                if raw:
+                    sanitised_messages[key] = bleach.clean(
+                        raw, tags=allowed_tags, attributes=allowed_attrs, strip=True
+                    )
+        elif custom_message:
+            import bleach
+
+            allowed_tags = [
+                "p",
+                "br",
+                "strong",
+                "em",
+                "u",
+                "s",
+                "a",
+                "ul",
+                "ol",
+                "li",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "blockquote",
+                "span",
+            ]
+            allowed_attrs = {"a": ["href", "target"], "span": ["style"]}
+            sanitised_message = bleach.clean(
+                custom_message, tags=allowed_tags, attributes=allowed_attrs, strip=True
+            )
+
+        # Map role priority to group key for per-group message lookup
+        priority_to_group = {3: "ba_leads", 2: "project_leads", 1: "team_members"}
+
         # Send deduplicated emails
         for pk, (priority, name, email) in user_roles.items():
             email_subject = "SPMS: New Reporting Cycle Open"
             to_email = [email]
+
+            # Determine the custom message for this recipient
+            recipient_custom_message = None
+            if sanitised_messages:
+                group_key = priority_to_group.get(priority, "team_members")
+                recipient_custom_message = sanitised_messages.get(group_key)
+            elif sanitised_message:
+                recipient_custom_message = sanitised_message
 
             template_props = {
                 "email_subject": email_subject,
@@ -873,6 +953,7 @@ class NotificationService:
                 "financial_year_string": financial_year_string,
                 "recipient_name": name,
                 "site_url": settings.SITE_URL,
+                "custom_message": recipient_custom_message,
             }
 
             template_content = render_to_string(template_path, template_props)

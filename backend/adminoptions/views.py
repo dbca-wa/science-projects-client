@@ -226,6 +226,64 @@ class AdminControlsGuideContentUpdate(APIView):
         )
 
 
+class NewCycleDraft(APIView):
+    """
+    Save and load new cycle configuration defaults.
+    Stored as JSON on the AdminOptions singleton.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Load the saved new cycle draft from the database."""
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts or not admin_opts.new_cycle_draft:
+            return Response({"draft": None}, status=HTTP_200_OK)
+        return Response({"draft": admin_opts.new_cycle_draft}, status=HTTP_200_OK)
+
+    def post(self, request):
+        """Save the new cycle draft to the database."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can save new cycle defaults."},
+                status=HTTP_401_UNAUTHORIZED,
+            )
+
+        draft_data = request.data.get("draft")
+        if draft_data is None:
+            return Response(
+                {"error": "draft field is required"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts:
+            return Response(
+                {"error": "AdminOptions not configured"},
+                status=HTTP_404_NOT_FOUND,
+            )
+
+        admin_opts.new_cycle_draft = draft_data
+        admin_opts.save(update_fields=["new_cycle_draft"])
+
+        settings.LOGGER.info(f"{request.user} saved new cycle draft defaults")
+        return Response({"status": "draft saved"}, status=HTTP_200_OK)
+
+    def delete(self, request):
+        """Clear the saved new cycle draft."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can clear new cycle defaults."},
+                status=HTTP_401_UNAUTHORIZED,
+            )
+
+        admin_opts = AdminOptions.objects.first()
+        if admin_opts:
+            admin_opts.new_cycle_draft = {}
+            admin_opts.save(update_fields=["new_cycle_draft"])
+
+        return Response({"status": "draft cleared"}, status=HTTP_200_OK)
+
+
 # Add new viewsets for GuideSection and ContentField
 class GuideSectionViewSet(viewsets.ModelViewSet):
     """ViewSet for managing guide sections.

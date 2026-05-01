@@ -19,7 +19,11 @@
     <tr>
       <td style="padding: 24px; background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%); border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);">
         <p style="font-size: 16px; font-weight: 700; color: #1e40af; margin: 0 0 8px 0; letter-spacing: -0.3px;">A new reporting cycle is now open!</p>
-        <p style="font-size: 14px; line-height: 24px; color: #4b5563; margin: 0;">Please log in to SPMS to begin updating your project reports for this cycle.</p>
+        {% if custom_message %}
+        <div data-custom-message style="font-size: 14px; line-height: 24px; color: #4b5563; margin: 0; text-align: left;">{{ custom_message|safe }}</div>
+        {% else %}
+        <p data-custom-message style="font-size: 14px; line-height: 24px; color: #4b5563; margin: 0;">Please log in to SPMS to begin updating your project reports for this cycle.</p>
+        {% endif %}
       </td>
     </tr>
   </tbody>

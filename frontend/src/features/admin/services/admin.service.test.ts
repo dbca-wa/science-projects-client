@@ -358,6 +358,44 @@ describe("admin.service", () => {
 				})
 			);
 		});
+
+		it("openNewCycle should pass custom message fields", async () => {
+			(apiClient.post as Mock).mockResolvedValue(undefined);
+			await openNewCycle({
+				division: "bcs",
+				send_emails: true,
+				custom_message: "<p>Please update by Friday.</p>",
+			});
+			expect(apiClient.post).toHaveBeenCalledWith(
+				expect.stringContaining("opennewcycle"),
+				expect.objectContaining({
+					custom_message: "<p>Please update by Friday.</p>",
+				})
+			);
+		});
+
+		it("openNewCycle should pass per-group custom messages", async () => {
+			(apiClient.post as Mock).mockResolvedValue(undefined);
+			await openNewCycle({
+				division: "bcs",
+				send_emails: true,
+				custom_messages: {
+					ba_leads: "<p>BA message</p>",
+					project_leads: "<p>PL message</p>",
+					team_members: "<p>TM message</p>",
+				},
+			});
+			expect(apiClient.post).toHaveBeenCalledWith(
+				expect.stringContaining("opennewcycle"),
+				expect.objectContaining({
+					custom_messages: {
+						ba_leads: "<p>BA message</p>",
+						project_leads: "<p>PL message</p>",
+						team_members: "<p>TM message</p>",
+					},
+				})
+			);
+		});
 	});
 
 	describe("email testing", () => {
@@ -394,6 +432,37 @@ describe("admin.service", () => {
 					recipient_user_id: 1,
 					template_name: "bump_email",
 				})
+			);
+		});
+	});
+
+	describe("new cycle draft", () => {
+		it("getNewCycleDraft should GET the draft endpoint", async () => {
+			(apiClient.get as Mock).mockResolvedValue({ draft: null });
+			const { getNewCycleDraft } = await import("./admin.service");
+			await getNewCycleDraft();
+			expect(apiClient.get).toHaveBeenCalledWith(
+				expect.stringContaining("new-cycle-draft")
+			);
+		});
+
+		it("saveNewCycleDraft should POST draft data", async () => {
+			(apiClient.post as Mock).mockResolvedValue({ status: "draft saved" });
+			const { saveNewCycleDraft } = await import("./admin.service");
+			const draft = { prepopulateMode: "all", sendBaLeads: true };
+			await saveNewCycleDraft(draft);
+			expect(apiClient.post).toHaveBeenCalledWith(
+				expect.stringContaining("new-cycle-draft"),
+				{ draft }
+			);
+		});
+
+		it("clearNewCycleDraft should DELETE the draft", async () => {
+			(apiClient.delete as Mock).mockResolvedValue({ status: "draft cleared" });
+			const { clearNewCycleDraft } = await import("./admin.service");
+			await clearNewCycleDraft();
+			expect(apiClient.delete).toHaveBeenCalledWith(
+				expect.stringContaining("new-cycle-draft")
 			);
 		});
 	});

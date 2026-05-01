@@ -79,6 +79,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		const isProfileMode = mode === "profile" || mode === "staffProfile";
 		const isStaffProfileMode = mode === "staffProfile";
 		const isProgressReport = mode === "progressReport";
+		const isNewCycle = mode === "newCycle";
 
 		const isBusinessArea = mode === "businessArea";
 
@@ -87,17 +88,26 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		const showHeadingSelect = isFullOrGuide || mode === "projectTitle";
 		const disableHeadings = mode === "projectTitle";
 		const showLists =
-			isFullOrGuide || mode === "simple" || isProfileMode || isProgressReport;
-		const showLinks = isFullOrGuide || isProfileMode;
+			isFullOrGuide ||
+			mode === "simple" ||
+			isProfileMode ||
+			isProgressReport ||
+			isNewCycle;
+		const showLinks = isFullOrGuide || isProfileMode || isNewCycle;
 		const showBold =
 			isFullOrGuide ||
 			mode === "simple" ||
 			mode === "minimal" ||
 			isBusinessArea ||
 			isProfileMode ||
-			isProgressReport;
+			isProgressReport ||
+			isNewCycle;
 		const showUnderline =
-			isFullOrGuide || isProfileMode || isProgressReport || isBusinessArea;
+			isFullOrGuide ||
+			isProfileMode ||
+			isProgressReport ||
+			isBusinessArea ||
+			isNewCycle;
 		const showSubscriptSuperscript =
 			isFullOrGuide ||
 			isProfileMode ||

@@ -10,6 +10,7 @@ from .admin import (
     DocumentSpawner,
     FinalDocApproval,
     GetPreviousReportsData,
+    NewCycleEmailPreview,
     NewCycleOpenPreview,
     ProjectDocsPendingMyActionAllStages,
     ReopenProject,
@@ -159,6 +160,7 @@ __all__ = [
     "BatchApproveCurrent",
     "BatchApproveCurrentPreview",
     "NewCycleOpenPreview",
+    "NewCycleEmailPreview",
     "FinalDocApproval",
     # Annual report
     "Reports",

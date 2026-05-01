@@ -15,7 +15,8 @@ export type ToolbarMode =
 	| "projectTitle"
 	| "projectDescription"
 	| "progressReport"
-	| "businessArea";
+	| "businessArea"
+	| "newCycle";
 
 export interface RichTextEditorProps {
 	// Content

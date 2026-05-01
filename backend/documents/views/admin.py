@@ -917,13 +917,22 @@ class BatchApproveCurrentPreview(APIView):
 class NewCycleOpenPreview(APIView):
     """
     Preview recipients who would receive new cycle open notification emails.
+
     Returns BA leads, project leads, and team members — deduplicated by highest role.
+    Cross-references recipient emails against the IT Assets API to identify users
+    who won't receive emails because they don't exist in the DBCA directory.
+
     All recipients must be active staff with @dbca.wa.gov.au emails.
+    Only active business areas and active projects (excluding terminated/completed/closed)
+    are included.
     """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        import requests as http_requests
+        from django.core.cache import cache
+
         from agencies.models import BusinessArea
 
         division_slug = request.query_params.get("division")
@@ -948,15 +957,15 @@ class NewCycleOpenPreview(APIView):
 
         users_with_roles = []
 
-        # BA leads
-        bas = BusinessArea.objects.select_related("leader").all()
+        # BA leads — only from active (non-archived) business areas
+        bas = BusinessArea.objects.select_related("leader").filter(is_active=True)
         if division_slug and last_report and last_report.division:
             bas = bas.filter(division=last_report.division)
         for ba in bas:
             if _is_valid(ba.leader):
                 users_with_roles.append((ba.leader, 3, "BA Lead"))
 
-        # All project leads and team members — exclude terminated and completed projects
+        # Project leads and team members — exclude terminated and completed projects
         all_projects = Project.objects.exclude(
             status__in=[
                 Project.StatusChoices.COMPLETED,
@@ -980,9 +989,189 @@ class NewCycleOpenPreview(APIView):
                     users_with_roles.append((member.user, 1, "Team Member"))
 
         groups = _deduplicate_by_highest_role(users_with_roles)
-        total = sum(len(v) for v in groups.values())
 
-        return Response({"recipients": groups, "total_recipients": total})
+        # Batch-query IT Assets API to validate recipient emails
+        all_emails = set()
+        for group_users in groups.values():
+            for u in group_users:
+                all_emails.add(u["email"].lower())
+
+        it_assets_emails, it_assets_available = _fetch_it_assets_emails(
+            cache, http_requests
+        )
+
+        # Partition recipients into valid (in IT Assets) and not_in_it_assets
+        if it_assets_available:
+            valid_groups = {"ba_leads": [], "project_leads": [], "team_members": []}
+            invalid_groups = {"ba_leads": [], "project_leads": [], "team_members": []}
+
+            for group_key in ("ba_leads", "project_leads", "team_members"):
+                for user_entry in groups[group_key]:
+                    if user_entry["email"].lower() in it_assets_emails:
+                        valid_groups[group_key].append(user_entry)
+                    else:
+                        invalid_groups[group_key].append(user_entry)
+        else:
+            # IT Assets unavailable — treat all users as valid, set warning flag
+            valid_groups = groups
+            invalid_groups = {
+                "ba_leads": [],
+                "project_leads": [],
+                "team_members": [],
+            }
+
+        total_valid = sum(len(v) for v in valid_groups.values())
+        total_invalid = sum(len(v) for v in invalid_groups.values())
+
+        return Response(
+            {
+                "recipients": valid_groups,
+                "not_in_it_assets": invalid_groups,
+                "total_recipients": total_valid,
+                "total_not_in_it_assets": total_invalid,
+                "it_assets_available": it_assets_available,
+            }
+        )
+
+
+def _fetch_it_assets_emails(cache, http_requests):
+    """
+    Fetch the set of known emails from IT Assets API.
+    Results are cached for 5 minutes to avoid repeated calls.
+
+    Returns:
+        tuple: (set of lowercase email strings, bool indicating API availability)
+    """
+    cache_key = "new_cycle_it_assets_emails"
+    cached = cache.get(cache_key)
+
+    if cached is not None:
+        return cached
+
+    try:
+        api_url = settings.IT_ASSETS_URL
+        if not api_url:
+            settings.LOGGER.warning("IT Assets URL not configured")
+            result = (set(), False)
+            cache.set(cache_key, result, 60)
+            return result
+
+        response = http_requests.get(
+            api_url,
+            auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+            timeout=6,
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            emails = {
+                entry["email"].lower()
+                for entry in data
+                if "email" in entry and entry.get("email")
+            }
+            result = (emails, True)
+            cache.set(cache_key, result, 300)  # 5 minutes
+            return result
+        else:
+            settings.LOGGER.error(
+                f"IT Assets API returned {response.status_code}: {response.text[:200]}"
+            )
+            result = (set(), False)
+            cache.set(cache_key, result, 60)  # Retry after 1 minute
+            return result
+
+    except Exception as e:
+        settings.LOGGER.error(f"IT Assets API error: {e}")
+        result = (set(), False)
+        cache.set(cache_key, result, 60)  # Retry after 1 minute
+        return result
+
+
+class NewCycleEmailPreview(APIView):
+    """
+    Render the new cycle open email template with provided context and return HTML.
+    Used by the frontend to show a live preview of the email before sending.
+    The CID logo is inlined as a base64 data URL for browser rendering.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        import base64
+        import os
+        import re
+
+        import bleach
+        from django.template.loader import render_to_string
+
+        custom_message = request.data.get("custom_message", "")
+        recipient_name = request.data.get("recipient_name", "Recipient Name")
+        division_name = request.data.get("division_name", "")
+        financial_year_string = request.data.get("financial_year_string", "2025-2026")
+
+        # Sanitise custom message HTML
+        sanitised_message = None
+        if custom_message:
+            allowed_tags = [
+                "p",
+                "br",
+                "strong",
+                "em",
+                "u",
+                "s",
+                "a",
+                "ul",
+                "ol",
+                "li",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "blockquote",
+                "span",
+            ]
+            allowed_attrs = {"a": ["href", "target"], "span": ["style"]}
+            sanitised_message = bleach.clean(
+                custom_message, tags=allowed_tags, attributes=allowed_attrs, strip=True
+            )
+
+        actioning_user = request.user
+        actioning_user_name = (
+            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
+        )
+
+        template_props = {
+            "email_subject": "SPMS: New Reporting Cycle Open",
+            "actioning_user_email": actioning_user.email,
+            "actioning_user_name": actioning_user_name,
+            "financial_year_string": financial_year_string,
+            "recipient_name": recipient_name,
+            "division_name": division_name,
+            "site_url": settings.SITE_URL,
+            "custom_message": sanitised_message,
+            "logo_url": True,
+        }
+
+        template_path = "./email_templates/new_cycle_open_email.html"
+        html_content = render_to_string(template_path, template_props)
+
+        # Inline the CID logo as a base64 data URL for preview rendering
+        logo_path = os.path.join(
+            settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
+        )
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+            data_url = f"data:image/png;base64,{logo_b64}"
+            html_content = re.sub(
+                r'src=["\']cid:dbca-logo["\']',
+                f'src="{data_url}"',
+                html_content,
+            )
+
+        return Response({"html": html_content})
 
 
 class FinalDocApproval(APIView):

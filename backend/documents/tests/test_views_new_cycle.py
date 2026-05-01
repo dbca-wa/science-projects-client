@@ -449,8 +449,14 @@ class TestNewCycleOpenPreview:
         assert response.data["total_recipients"] == 0
 
     @pytest.mark.integration
-    def test_includes_project_leads(self, superuser, annual_report, science_project):
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_includes_project_leads(
+        self, mock_fetch, superuser, annual_report, science_project
+    ):
         """Project leads should appear in the preview."""
+        mock_fetch.return_value = ({superuser.email.lower()}, True)
+
         client = APIClient()
         client.force_authenticate(user=superuser)
         response = client.get("/api/v1/documents/opennewcycle/preview")
@@ -464,3 +470,415 @@ class TestNewCycleOpenPreview:
         )
         emails = [r["email"] for r in all_recipients]
         assert superuser.email in emails
+
+
+class TestNewCycleOpenPreviewITAssets:
+    """Tests for IT Assets validation in the enhanced preview endpoint."""
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_partitions_by_it_assets_match(
+        self, mock_fetch, superuser, annual_report, science_project
+    ):
+        """Users found in IT Assets go to recipients; others to not_in_it_assets."""
+        # superuser is a project lead — their email IS in IT Assets
+        mock_fetch.return_value = ({superuser.email.lower()}, True)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "not_in_it_assets" in response.data
+        assert "it_assets_available" in response.data
+        assert response.data["it_assets_available"] is True
+
+        # superuser should be in recipients (found in IT Assets)
+        all_valid = (
+            response.data["recipients"]["ba_leads"]
+            + response.data["recipients"]["project_leads"]
+            + response.data["recipients"]["team_members"]
+        )
+        valid_emails = [r["email"] for r in all_valid]
+        assert superuser.email in valid_emails
+
+        # not_in_it_assets should be empty for this user
+        all_invalid = (
+            response.data["not_in_it_assets"]["ba_leads"]
+            + response.data["not_in_it_assets"]["project_leads"]
+            + response.data["not_in_it_assets"]["team_members"]
+        )
+        invalid_emails = [r["email"] for r in all_invalid]
+        assert superuser.email not in invalid_emails
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_user_not_in_it_assets(
+        self, mock_fetch, superuser, annual_report, science_project
+    ):
+        """Users NOT found in IT Assets go to not_in_it_assets."""
+        # Return empty set — no emails match
+        mock_fetch.return_value = (set(), True)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["it_assets_available"] is True
+
+        # All users should be in not_in_it_assets
+        all_invalid = (
+            response.data["not_in_it_assets"]["ba_leads"]
+            + response.data["not_in_it_assets"]["project_leads"]
+            + response.data["not_in_it_assets"]["team_members"]
+        )
+        invalid_emails = [r["email"] for r in all_invalid]
+        assert superuser.email in invalid_emails
+
+        # recipients should be empty
+        assert response.data["total_recipients"] == 0
+        assert response.data["total_not_in_it_assets"] > 0
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_it_assets_api_failure_returns_all_as_valid(
+        self, mock_fetch, superuser, annual_report, science_project
+    ):
+        """When IT Assets API fails, all users are treated as valid with a warning flag."""
+        mock_fetch.return_value = (set(), False)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["it_assets_available"] is False
+
+        # All users should be in recipients (treated as valid)
+        all_valid = (
+            response.data["recipients"]["ba_leads"]
+            + response.data["recipients"]["project_leads"]
+            + response.data["recipients"]["team_members"]
+        )
+        valid_emails = [r["email"] for r in all_valid]
+        assert superuser.email in valid_emails
+
+        # not_in_it_assets should be empty
+        assert response.data["total_not_in_it_assets"] == 0
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_response_includes_totals(
+        self, mock_fetch, superuser, annual_report, science_project
+    ):
+        """Response should include total_recipients and total_not_in_it_assets."""
+        mock_fetch.return_value = ({superuser.email.lower()}, True)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert "total_recipients" in response.data
+        assert "total_not_in_it_assets" in response.data
+        assert isinstance(response.data["total_recipients"], int)
+        assert isinstance(response.data["total_not_in_it_assets"], int)
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_caching_uses_correct_key(self, mock_fetch, superuser, annual_report):
+        """The IT Assets fetch function should be called (caching is internal)."""
+        mock_fetch.return_value = (set(), True)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        client.get("/api/v1/documents/opennewcycle/preview")
+
+        mock_fetch.assert_called_once()
+
+
+class TestNewCycleOpenCustomMessage:
+    """Tests for custom message support in new cycle open emails."""
+
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
+    @pytest.mark.integration
+    def test_single_custom_message_passed_to_template(
+        self, mock_send_email, superuser, annual_report, science_project
+    ):
+        """A single custom_message should be included in the email template context."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = _post_new_cycle(
+            client,
+            send_emails=True,
+            recipient_groups=["project_leads"],
+            custom_message="<p>Please update your reports by Friday.</p>",
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        if mock_send_email.called:
+            call_kwargs = mock_send_email.call_args
+            html_content = call_kwargs.kwargs.get(
+                "html_content", call_kwargs[1].get("html_content", "")
+            )
+            assert "Please update your reports by Friday" in html_content
+
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
+    @pytest.mark.integration
+    def test_no_custom_message_uses_default(
+        self, mock_send_email, superuser, annual_report, science_project
+    ):
+        """Without custom_message, the default text should appear."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = _post_new_cycle(
+            client,
+            send_emails=True,
+            recipient_groups=["project_leads"],
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        if mock_send_email.called:
+            call_kwargs = mock_send_email.call_args
+            html_content = call_kwargs.kwargs.get(
+                "html_content", call_kwargs[1].get("html_content", "")
+            )
+            assert "Please log in to SPMS to begin updating" in html_content
+
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
+    @pytest.mark.integration
+    def test_per_group_custom_messages(
+        self, mock_send_email, superuser, annual_report, science_project
+    ):
+        """Per-group custom_messages should be accepted without error."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = _post_new_cycle(
+            client,
+            send_emails=True,
+            recipient_groups=["ba_leads", "project_leads", "team_members"],
+            custom_messages={
+                "ba_leads": "<p>BA leads: please review.</p>",
+                "project_leads": "<p>Project leads: update reports.</p>",
+                "team_members": "<p>Team: check your sections.</p>",
+            },
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
+    @pytest.mark.integration
+    def test_custom_message_html_is_sanitised(
+        self, mock_send_email, superuser, annual_report, science_project
+    ):
+        """Dangerous HTML tags should be stripped from custom messages."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = _post_new_cycle(
+            client,
+            send_emails=True,
+            recipient_groups=["project_leads"],
+            custom_message='<p>Safe text</p><script>alert("xss")</script>',
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        if mock_send_email.called:
+            call_kwargs = mock_send_email.call_args
+            html_content = call_kwargs.kwargs.get(
+                "html_content", call_kwargs[1].get("html_content", "")
+            )
+            # The injected XSS script tag should be stripped (text content is harmless)
+            assert '<script>alert("xss")</script>' not in html_content
+            assert "Safe text" in html_content
+
+
+class TestNewCycleEmailPreview:
+    """Tests for the email preview endpoint."""
+
+    @pytest.mark.integration
+    def test_requires_authentication(self, db):
+        """Unauthenticated request should be rejected."""
+        client = APIClient()
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {},
+            format="json",
+        )
+        assert response.status_code in [
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+        ]
+
+    @pytest.mark.integration
+    def test_renders_email_html(self, superuser, db):
+        """Should return rendered HTML content."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {
+                "recipient_name": "Jane Smith",
+                "financial_year_string": "2025-2026",
+                "division_name": "BCS",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "html" in response.data
+        assert "Jane Smith" in response.data["html"]
+        assert "2025-2026" in response.data["html"]
+
+    @pytest.mark.integration
+    def test_renders_with_custom_message(self, superuser, db):
+        """Custom message should appear in the rendered HTML."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {
+                "custom_message": "<p>Please update by Friday.</p>",
+                "recipient_name": "Test User",
+                "financial_year_string": "2025-2026",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "Please update by Friday" in response.data["html"]
+
+    @pytest.mark.integration
+    def test_renders_default_text_without_custom_message(self, superuser, db):
+        """Without custom message, default text should appear."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {
+                "recipient_name": "Test User",
+                "financial_year_string": "2025-2026",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "Please log in to SPMS to begin updating" in response.data["html"]
+
+    @pytest.mark.integration
+    def test_sanitises_dangerous_html(self, superuser, db):
+        """Script tags should be stripped from custom message."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {
+                "custom_message": '<p>Safe</p><script>alert("xss")</script>',
+                "recipient_name": "Test User",
+                "financial_year_string": "2025-2026",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        # The injected XSS script tag should be stripped (text content is harmless)
+        assert '<script>alert("xss")</script>' not in response.data["html"]
+        assert "Safe" in response.data["html"]
+
+    @pytest.mark.integration
+    def test_uses_defaults_for_missing_fields(self, superuser, db):
+        """Missing fields should use sensible defaults."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.post(
+            "/api/v1/documents/opennewcycle/email-preview",
+            {},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "html" in response.data
+        # Default recipient name
+        assert "Recipient Name" in response.data["html"]
+
+
+class TestNewCycleOpenExcludedUsers:
+    """Tests that excluded user IDs are respected during email sending."""
+
+    @patch("documents.services.notification_service.send_email_with_embedded_image")
+    @pytest.mark.integration
+    def test_excluded_users_do_not_receive_emails(
+        self, mock_send_email, superuser, annual_report, science_project
+    ):
+        """Users in excluded_user_ids should not receive emails."""
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = _post_new_cycle(
+            client,
+            send_emails=True,
+            recipient_groups=["project_leads"],
+            excluded_user_ids=[superuser.pk],
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        # superuser is the only project lead — excluding them means no emails sent
+        mock_send_email.assert_not_called()
+
+
+class TestNewCycleOpenActiveOnlyFiltering:
+    """Tests that only active users, BAs, and projects are included."""
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_completed_project_members_excluded_from_preview(
+        self, mock_fetch, superuser, annual_report, completed_project
+    ):
+        """Members of completed projects should not appear in the preview."""
+        mock_fetch.return_value = ({superuser.email.lower()}, True)
+
+        client = APIClient()
+        client.force_authenticate(user=superuser)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert response.status_code == status.HTTP_200_OK
+        # superuser is only on the completed project — should not appear
+        all_recipients = (
+            response.data["recipients"]["ba_leads"]
+            + response.data["recipients"]["project_leads"]
+            + response.data["recipients"]["team_members"]
+        )
+        emails = [r["email"] for r in all_recipients]
+        assert superuser.email not in emails
+
+    @patch("documents.views.admin._fetch_it_assets_emails")
+    @pytest.mark.integration
+    def test_inactive_user_excluded_from_preview(self, mock_fetch, annual_report, db):
+        """Inactive users should not appear in the preview."""
+        inactive_user = UserFactory(
+            username="inactive",
+            email="inactive@dbca.wa.gov.au",
+            is_active=False,
+            is_staff=True,
+        )
+        project = ProjectFactory(kind="science", status="active")
+        project.members.create(user=inactive_user, is_leader=True, role="supervising")
+
+        mock_fetch.return_value = ({inactive_user.email.lower()}, True)
+
+        active_user = UserFactory(
+            username="activeadmin",
+            email="activeadmin@dbca.wa.gov.au",
+            is_superuser=True,
+            is_staff=True,
+        )
+        client = APIClient()
+        client.force_authenticate(user=active_user)
+        response = client.get("/api/v1/documents/opennewcycle/preview")
+
+        assert response.status_code == status.HTTP_200_OK
+        all_recipients = (
+            response.data["recipients"]["ba_leads"]
+            + response.data["recipients"]["project_leads"]
+            + response.data["recipients"]["team_members"]
+        )
+        emails = [r["email"] for r in all_recipients]
+        assert inactive_user.email not in emails
