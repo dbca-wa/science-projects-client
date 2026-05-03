@@ -1,105 +1,32 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, useEffect, useRef } from "react";
 import { RichTextEditor } from "./RichTextEditor";
 import { WordCounter } from "./WordCounter";
+import { inlineEditStore } from "@/app/stores/InlineEditStore";
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
 
 export interface FormRichTextEditorProps extends Omit<
 	RichTextEditorProps,
 	"className"
 > {
-	/**
-	 * Word limit for the editor content
-	 */
 	wordLimit?: number;
-
-	/**
-	 * Whether to show the word limit counter
-	 */
 	showWordCounter?: boolean;
-
-	/**
-	 * Additional CSS classes for the container
-	 */
 	className?: string;
-
-	/**
-	 * Error message to display
-	 */
 	error?: string;
-
-	/**
-	 * Optional label to display inside the editor border
-	 * When provided, creates an integrated label-editor design
-	 */
 	label?: string;
-
-	/**
-	 * Optional description text to display below the label
-	 */
 	description?: string;
+	/** Initial value for dirty tracking — shows amber border when content differs */
+	initialValue?: string;
+	/** Unique ID for this editor instance (e.g. "about") — required with initialValue */
+	editorId?: string;
 }
 
 /**
- * FormRichTextEditor component
+ * FormRichTextEditor
  *
- * Rich text editor designed for React Hook Form integration.
- * Matches the visual design of InlineSaveEditor with borders, focus states, and padding.
- *
- * Features:
- * - Consistent visual design with InlineSaveEditor
- * - Word limit enforcement with counter
- * - Focus state styling
- * - Error state display
- * - Full toolbar with formatting options
- * - Accessible ARIA labels
- * - Optional integrated label and description
- *
- * Usage Patterns:
- *
- * 1. With external FormLabel (traditional React Hook Form pattern):
- * ```tsx
- * <FormField
- *   control={form.control}
- *   name="about"
- *   render={({ field }) => (
- *     <FormItem>
- *       <FormLabel>About</FormLabel>
- *       <FormControl>
- *         <FormRichTextEditor
- *           value={field.value || ""}
- *           onChange={field.onChange}
- *           placeholder="Tell us about yourself..."
- *           wordLimit={500}
- *         />
- *       </FormControl>
- *       <FormMessage />
- *     </FormItem>
- *   )}
- * />
- * ```
- *
- * 2. With integrated label (cleaner, more cohesive design):
- * ```tsx
- * <FormField
- *   control={form.control}
- *   name="about"
- *   render={({ field }) => (
- *     <FormItem>
- *       <FormControl>
- *         <FormRichTextEditor
- *           label="About"
- *           description="Tell us about yourself and your background"
- *           value={field.value || ""}
- *           onChange={field.onChange}
- *           placeholder="Start typing..."
- *           wordLimit={500}
- *         />
- *       </FormControl>
- *       <FormMessage />
- *     </FormItem>
- *   )}
- * />
- * ```
+ * Rich text editor for React Hook Form. Visual states match InlineSaveEditor:
+ * - Focused: blue border + blue bg on editor area
+ * - Dirty (unfocused): amber border + amber bg on editor area
+ * - Default: gray border, white bg
  */
 export const FormRichTextEditor = forwardRef<
 	HTMLDivElement,
@@ -118,23 +45,99 @@ export const FormRichTextEditor = forwardRef<
 			error,
 			label,
 			description,
+			initialValue,
+			editorId,
 			className = "",
 			...props
 		},
 		ref
 	) => {
 		const [linkPanelOpen, setLinkPanelOpen] = useState(false);
+		const [isFocused, setIsFocused] = useState(false);
+		const containerRef = useRef<HTMLDivElement>(null);
+
+		// Strip HTML for text-only comparison — same as InlineSaveEditor.
+		// Avoids false dirty detection from Lexical re-serialising HTML differently on focus.
+		const normaliseForComparison = (html: string) =>
+			html
+				.replace(/<[^>]*>/g, "")
+				.replace(/\s+/g, " ")
+				.trim();
+
+		// Dirty = text content differs from initial value
+		const isDirty =
+			initialValue !== undefined && editorId
+				? normaliseForComparison(value || "") !==
+					normaliseForComparison(initialValue)
+				: false;
+
+		// Track focus explicitly — same pattern as InlineSaveEditor
+		useEffect(() => {
+			const container = containerRef.current;
+			if (!container) return;
+
+			const handleFocusIn = () => setIsFocused(true);
+			const handleFocusOut = (e: FocusEvent) => {
+				if (!container.contains(e.relatedTarget as Node)) {
+					setIsFocused(false);
+				}
+			};
+
+			container.addEventListener("focusin", handleFocusIn);
+			container.addEventListener("focusout", handleFocusOut);
+			return () => {
+				container.removeEventListener("focusin", handleFocusIn);
+				container.removeEventListener("focusout", handleFocusOut);
+			};
+		}, []);
+
+		// Register with InlineEditStore when dirty — enables NavigationBlocker
+		useEffect(() => {
+			if (!editorId || initialValue === undefined) return;
+
+			if (isDirty) {
+				inlineEditStore.registerEditor({
+					contentType: editorId as never,
+					entityId: 0,
+					originalContent: initialValue,
+					elementRef: containerRef.current,
+				});
+				inlineEditStore.updateCurrentContent(editorId as never, 0, value || "");
+			} else {
+				inlineEditStore.unregisterEditor(editorId as never, 0);
+			}
+
+			return () => {
+				inlineEditStore.unregisterEditor(editorId as never, 0);
+			};
+		}, [isDirty, editorId, initialValue, value]);
+
+		// Merge forwarded ref with local containerRef
+		const setRefs = (el: HTMLDivElement | null) => {
+			containerRef.current = el;
+			if (typeof ref === "function") ref(el);
+			else if (ref)
+				(ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+		};
+
+		// Border + bg classes — matches InlineSaveEditor exactly:
+		// focused → blue border, blue bg on whole component
+		// dirty (not focused) → amber border + amber bg on whole component
+		// default → gray border, white bg
+		const containerClass = isFocused
+			? "border-2 border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/20"
+			: isDirty
+				? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/30"
+				: error
+					? "border-2 border-red-500 dark:border-red-600"
+					: "border-2 border-gray-300 dark:border-gray-600";
 
 		return (
 			<div
-				ref={ref}
-				className={`relative rounded-lg border-2 border-gray-300 dark:border-gray-600
-          focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20
-          transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800 ${
-						error ? "border-red-500 dark:border-red-600" : ""
-					} ${className}`}
+				ref={setRefs}
+				className={`relative rounded-lg shadow-sm overflow-hidden transition-all duration-300 ${containerClass} ${className}`}
 			>
-				{/* Integrated label and description */}
+				{/* Label/description header */}
 				{(label || description) && (
 					<div className="px-4 pt-4 pb-2 border-b border-gray-200 dark:border-gray-700">
 						{label && (
@@ -150,19 +153,22 @@ export const FormRichTextEditor = forwardRef<
 					</div>
 				)}
 
-				<RichTextEditor
-					value={value}
-					onChange={onChange}
-					placeholder={placeholder}
-					toolbar={toolbar}
-					floatingToolbar={floatingToolbar}
-					disabled={disabled}
-					wordLimit={wordLimit}
-					autoFocus={false}
-					className="bg-transparent"
-					onLinkPanelChange={setLinkPanelOpen}
-					{...props}
-				/>
+				{/* Editor area */}
+				<div className="transition-colors bg-white dark:bg-gray-900">
+					<RichTextEditor
+						value={value}
+						onChange={onChange}
+						placeholder={placeholder}
+						toolbar={toolbar}
+						floatingToolbar={floatingToolbar}
+						disabled={disabled}
+						wordLimit={wordLimit}
+						autoFocus={false}
+						className="bg-transparent"
+						onLinkPanelChange={setLinkPanelOpen}
+						{...props}
+					/>
+				</div>
 
 				{showWordCounter && !linkPanelOpen && (
 					<div className="flex items-center justify-between px-4 pb-4 pt-2 border-t border-gray-200 dark:border-gray-700">

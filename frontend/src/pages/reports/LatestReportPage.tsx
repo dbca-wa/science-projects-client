@@ -145,7 +145,9 @@ const LatestReportPage = observer(function LatestReportPage({
 
 	useDocumentTitle(titleText);
 
-	const handleTabChange = (value: string) => {
+	// Navigate to a tab route via onClick, not Radix's onValueChange
+	const navigateToTab = (value: string) => {
+		if (value === selectedTab) return;
 		const suffix = value === "details" ? "" : `/${value}`;
 		navigate(`/reports/details${suffix}`);
 	};
@@ -305,11 +307,15 @@ const LatestReportPage = observer(function LatestReportPage({
 				</div>
 			</div>
 
-			<Tabs value={selectedTab} onValueChange={handleTabChange}>
+			<Tabs value={selectedTab}>
 				{/* Desktop tabs */}
 				<TabsList className="hidden w-full justify-start sm:inline-flex">
 					{TABS.map((tab) => (
-						<TabsTrigger key={tab.value} value={tab.value}>
+						<TabsTrigger
+							key={tab.value}
+							value={tab.value}
+							onClick={() => navigateToTab(tab.value)}
+						>
 							{tab.label}
 						</TabsTrigger>
 					))}
@@ -317,7 +323,7 @@ const LatestReportPage = observer(function LatestReportPage({
 
 				{/* Mobile select */}
 				<div className="sm:hidden">
-					<Select value={selectedTab} onValueChange={handleTabChange}>
+					<Select value={selectedTab} onValueChange={navigateToTab}>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select a tab" />
 						</SelectTrigger>

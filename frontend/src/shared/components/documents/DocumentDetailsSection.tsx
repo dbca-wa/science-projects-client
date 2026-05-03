@@ -24,7 +24,7 @@ interface DetailRowProps {
 	children: React.ReactNode;
 }
 
-function DetailRow({ label, children }: DetailRowProps) {
+const DetailRow = ({ label, children }: DetailRowProps) => {
 	return (
 		<div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-start">
 			<span className="text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">
@@ -33,9 +33,9 @@ function DetailRow({ label, children }: DetailRowProps) {
 			<div className="text-sm min-w-0">{children}</div>
 		</div>
 	);
-}
+};
 
-function DocumentStatusBadge({ status }: { status: string }) {
+const DocumentStatusBadge = ({ status }: { status: string }) => {
 	const label = getDocumentStatusLabel(status);
 
 	// Use appropriate colour based on status
@@ -51,21 +51,33 @@ function DocumentStatusBadge({ status }: { status: string }) {
 	}
 
 	return <Badge className={colorClass}>{label}</Badge>;
-}
+};
 
-export function DocumentDetailsSection({
+export const DocumentDetailsSection = ({
 	document,
 	project,
 	typeSpecificId,
-}: DocumentDetailsSectionProps) {
+}: DocumentDetailsSectionProps) => {
 	const documentTypeIdLabel = getDocumentTypeIdLabel(document.kind);
 
 	// Fetch creator and modifier user data
-	const { data: creator } = useUserDetail(document.creator);
-	const { data: modifier } = useUserDetail(document.modifier);
+	const { data: creator, isLoading: creatorLoading } = useUserDetail(
+		document.creator || undefined
+	);
+	const { data: modifier, isLoading: modifierLoading } = useUserDetail(
+		document.modifier || undefined
+	);
 
-	const creatorName = creator ? getUserDisplayName(creator) : "Loading...";
-	const modifierName = modifier ? getUserDisplayName(modifier) : "Loading...";
+	const creatorName = creatorLoading
+		? "Loading..."
+		: creator
+			? getUserDisplayName(creator)
+			: "Unknown";
+	const modifierName = modifierLoading
+		? "Loading..."
+		: modifier
+			? getUserDisplayName(modifier)
+			: "Unknown";
 
 	return (
 		<Card className="gap-0 bg-[#EBF0F6] dark:bg-gray-700">
@@ -134,4 +146,4 @@ export function DocumentDetailsSection({
 			</CardContent>
 		</Card>
 	);
-}
+};

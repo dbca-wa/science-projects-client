@@ -72,7 +72,7 @@ class InviteUser(APIView):
                     api_url,
                     params={"email": email},
                     auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                    timeout=10,
+                    timeout=5,  # 5 seconds — fail fast
                 )
                 if response.status_code != 200 or not response.json():
                     return Response(

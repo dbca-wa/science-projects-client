@@ -18,7 +18,7 @@ import { Button } from "@/shared/components/ui/button";
 import { NavigationButton } from "@/shared/components/navigation/NavigationButton";
 import { AutoBreadcrumb } from "@/shared/components/navigation/AutoBreadcrumb";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { AlertCircle, ArrowLeft, Mail, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Mail, Loader2, Check } from "lucide-react";
 import { DeletionRequestBanner } from "@/features/projects/components/overview/DeletionRequestBanner";
 import { DeleteProjectModal } from "@/features/projects/components/modals/DeleteProjectModal";
 import { useCancelDeletionRequest } from "@/features/projects/hooks/useCancelDeletionRequest";
@@ -42,12 +42,30 @@ interface ProjectDetailPageProps {
 	selectedTab?: string;
 }
 
-export default function ProjectDetailPage({
-	selectedTab = "overview",
-}: ProjectDetailPageProps) {
-	const { id } = useParams<{ id: string }>();
+const VALID_TABS = [
+	"overview",
+	"concept",
+	"project",
+	"progress",
+	"student",
+	"closure",
+] as const;
+type ProjectTab = (typeof VALID_TABS)[number];
+
+const ProjectDetailPage = ({
+	selectedTab: _selectedTabProp,
+}: ProjectDetailPageProps) => {
+	const { id, tab } = useParams<{ id: string; tab?: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	// Derive active tab from the :tab URL param (single route: /projects/:id/:tab?)
+	// Falls back to "overview" when no tab segment is present
+	const selectedTab: ProjectTab =
+		tab && VALID_TABS.includes(tab as ProjectTab)
+			? (tab as ProjectTab)
+			: "overview";
+
 	const { data, isLoading, error } = useProject(id);
 	const { fireConfetti } = useConfetti();
 	const [hasShownConfetti, setHasShownConfetti] = useState(false);
@@ -136,7 +154,7 @@ export default function ProjectDetailPage({
 		if (
 			(state?.showSuccessAnimation || testConfetti) &&
 			!hasShownConfetti &&
-			!alreadyShown &&
+			(!alreadyShown || testConfetti) &&
 			data
 		) {
 			const timer = setTimeout(() => {
@@ -227,9 +245,12 @@ export default function ProjectDetailPage({
 	// Safe to destructure now
 	const { project, documents, details, members } = data;
 
-	// Handle tab change and navigate to the appropriate route
-	const handleTabChange = (value: string) => {
-		navigate(`/projects/${id}/${value}`);
+	// Navigate to a tab route. Called from onClick on each TabsTrigger, NOT from
+	// Radix's onValueChange (which double-fires and pushes duplicate history entries).
+	const navigateToTab = (value: string) => {
+		if (value !== selectedTab) {
+			navigate(`/projects/${id}/${value}`);
+		}
 	};
 
 	// Manual breadcrumbs with project title (sanitised to remove HTML)
@@ -239,33 +260,57 @@ export default function ProjectDetailPage({
 	];
 
 	// Determine which tabs to show based on available documents
+	// Include document status for status icons on tabs
+	const getDocStatus = (doc?: { document: { status: string } } | null) =>
+		doc?.document?.status;
+
+	// For report tabs, get the "worst" status (any non-approved = needs attention)
+	const getReportsStatus = (
+		reports?: Array<{ document: { status: string } }>
+	) => {
+		if (!reports || reports.length === 0) return undefined;
+		const allApproved = reports.every((r) => r.document.status === "approved");
+		if (allApproved) return "approved";
+		return "pending"; // At least one needs attention
+	};
+
 	const availableTabs = [
-		{ value: "overview", label: "Overview", show: true },
+		{
+			value: "overview",
+			label: "Overview",
+			show: true,
+			status: undefined as string | undefined,
+		},
 		{
 			value: "concept",
 			label: "Concept Plan",
 			show: !!documents?.concept_plan,
+			status: getDocStatus(documents?.concept_plan),
 		},
 		{
 			value: "project",
 			label: "Project Plan",
 			show: !!documents?.project_plan,
+			status: getDocStatus(documents?.project_plan),
 		},
 		{
 			value: "progress",
 			label: "Progress Reports",
 			show:
 				documents?.progress_reports && documents.progress_reports.length > 0,
+			status: getReportsStatus(documents?.progress_reports),
 		},
 		{
 			value: "student",
 			label: "Student Reports",
 			show: documents?.student_reports && documents.student_reports.length > 0,
+			status: getReportsStatus(documents?.student_reports),
 		},
 		{
 			value: "closure",
 			label: "Project Closure",
 			show: !!documents?.project_closure,
+			status: getDocStatus(documents?.project_closure),
 		},
 	].filter((tab) => tab.show);
 
@@ -280,30 +325,82 @@ export default function ProjectDetailPage({
 					project={project}
 					currentUser={currentUser ?? null}
 					userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+					isBaLead={isBaLead}
+					userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
 					onDeleteProject={handleBannerDeleteProject}
 					onCancelRequest={handleBannerCancelRequest}
 				/>
 
-				<Tabs value={selectedTab} onValueChange={handleTabChange}>
+				<Tabs value={selectedTab}>
 					{/* Desktop: Horizontal tabs */}
 					<TabsList className="hidden w-full justify-start project:inline-flex">
 						{availableTabs.map((tabItem) => (
-							<TabsTrigger key={tabItem.value} value={tabItem.value}>
-								{tabItem.label}
+							<TabsTrigger
+								key={tabItem.value}
+								value={tabItem.value}
+								onClick={() => navigateToTab(tabItem.value)}
+							>
+								<span className="inline-flex items-center gap-1.5">
+									{tabItem.label}
+									{tabItem.value === "overview" && (
+										<span className="inline-flex size-4 items-center justify-center rounded-full bg-blue-500">
+											<span className="text-[9px] font-bold text-white leading-none">
+												i
+											</span>
+										</span>
+									)}
+									{tabItem.value !== "overview" &&
+										tabItem.status === "approved" && (
+											<span className="inline-flex size-4 items-center justify-center rounded-full bg-emerald-500">
+												<Check
+													className="size-2.5 text-white animate-in zoom-in-50 duration-300"
+													strokeWidth={3}
+												/>
+											</span>
+										)}
+									{tabItem.value !== "overview" &&
+										tabItem.status &&
+										tabItem.status !== "approved" && (
+											<AlertCircle className="size-4 text-orange-600 dark:text-orange-400" />
+										)}
+								</span>
 							</TabsTrigger>
 						))}
 					</TabsList>
 
 					{/* Mobile: Shadcn Select dropdown */}
 					<div className="project:hidden">
-						<Select value={selectedTab} onValueChange={handleTabChange}>
+						<Select value={selectedTab} onValueChange={navigateToTab}>
 							<SelectTrigger className="w-full">
 								<SelectValue placeholder="Select a tab" />
 							</SelectTrigger>
 							<SelectContent>
 								{availableTabs.map((tabItem) => (
 									<SelectItem key={tabItem.value} value={tabItem.value}>
-										{tabItem.label}
+										<div className="flex items-center gap-2">
+											{tabItem.label}
+											{tabItem.value === "overview" && (
+												<span className="flex size-4 items-center justify-center rounded-full bg-blue-500">
+													<span className="text-[9px] font-bold text-white leading-none">
+														i
+													</span>
+												</span>
+											)}
+											{tabItem.value !== "overview" &&
+												tabItem.status === "approved" && (
+													<span className="flex size-4 items-center justify-center rounded-full bg-emerald-500">
+														<Check
+															className="size-2.5 text-white"
+															strokeWidth={3}
+														/>
+													</span>
+												)}
+											{tabItem.value !== "overview" &&
+												tabItem.status &&
+												tabItem.status !== "approved" && (
+													<AlertCircle className="size-4 text-orange-600 dark:text-orange-400" />
+												)}
+										</div>
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -436,4 +533,6 @@ export default function ProjectDetailPage({
 			</div>
 		</PageTransition>
 	);
-}
+};
+
+export default ProjectDetailPage;

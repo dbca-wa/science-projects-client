@@ -502,9 +502,14 @@ describe("ProjectPlanTab", () => {
 
 	describe("Edit Permissions", () => {
 		it("should pass canEdit prop to all editors", () => {
+			// Use a non-approved document so rich text editing is not locked
+			const editableProjectPlan = {
+				...mockProjectPlan,
+				document: { ...mockProjectPlan.document, status: "new" as const },
+			};
 			renderWithProviders(
 				<ProjectPlanTab
-					projectPlan={mockProjectPlan}
+					projectPlan={editableProjectPlan}
 					project={mockProject}
 					projectId={mockProject.id}
 					members={[]}

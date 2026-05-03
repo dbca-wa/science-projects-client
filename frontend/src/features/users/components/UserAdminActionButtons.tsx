@@ -103,6 +103,47 @@ export const UserAdminActionButtons = ({
 
 	// Dialog configurations
 	const getDialogConfig = (type: ConfirmDialogType) => {
+		// Build key roles warning for deactivate/delete
+		const hasKeyRoles =
+			(user.business_areas_led && user.business_areas_led.length > 0) ||
+			user.is_superuser;
+
+		const keyRolesWarning = hasKeyRoles ? (
+			<div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md">
+				<p className="font-semibold text-amber-800 dark:text-amber-200 text-sm mb-2">
+					This user holds key roles:
+				</p>
+				<ul className="list-disc list-inside space-y-1 text-sm text-amber-700 dark:text-amber-300">
+					{user.is_superuser && <li>System Administrator</li>}
+					{user.business_areas_led && user.business_areas_led.length > 0 && (
+						<li>
+							Business Area Lead for:{" "}
+							{user.business_areas_led.map((ba, idx) => {
+								const baName =
+									typeof ba === "object" && ba.name
+										? ba.name
+										: `BA #${typeof ba === "number" ? ba : ba.id}`;
+								const baId = typeof ba === "number" ? ba : ba.id;
+								return (
+									<span key={baId}>
+										{idx > 0 && ", "}
+										<a
+											href={`/manage/business-areas/${baId}/edit`}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="underline hover:text-amber-900 dark:hover:text-amber-100"
+										>
+											{baName}
+										</a>
+									</span>
+								);
+							})}
+						</li>
+					)}
+				</ul>
+			</div>
+		) : null;
+
 		switch (type) {
 			case "toggle-admin":
 				return {
@@ -124,8 +165,15 @@ export const UserAdminActionButtons = ({
 			case "deactivate":
 				return {
 					title: "Deactivate User?",
-					description:
-						"Are you sure you want to deactivate this user? They will lose access to SPMS but their data will be retained.",
+					description: (
+						<div className="space-y-2">
+							<p>
+								Are you sure you want to deactivate this user? They will lose
+								access to SPMS but their data will be retained.
+							</p>
+							{keyRolesWarning}
+						</div>
+					),
 					confirmText: "Deactivate",
 					variant: "destructive" as const,
 					onConfirm: handleDeactivate,
@@ -138,6 +186,7 @@ export const UserAdminActionButtons = ({
 							<p className="font-bold text-lg text-center">
 								Are you sure you want to delete this user?
 							</p>
+							{keyRolesWarning}
 							<ul className="list-disc list-inside space-y-1">
 								<li>They will be removed from all projects</li>
 								<li>

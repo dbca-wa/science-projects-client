@@ -40,16 +40,17 @@ class StaffProfileHeroDetail(APIView):
                 response = http_requests.get(
                     api_url,
                     auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                    timeout=10,
+                    timeout=5,  # 5 seconds — fail fast, don't make users wait
                 )
                 if response.status_code == 200:
                     raw_data = response.json()
                     it_asset_data_by_email = {
                         u["email"]: u for u in raw_data if "email" in u
                     }
-                    cache.set(cache_key, it_asset_data_by_email, 300)
+                    cache.set(cache_key, it_asset_data_by_email, 1800)  # 30 minutes
                 else:
                     it_asset_data_by_email = {}
+                    cache.set(cache_key, {}, 60)  # Cache empty for 1 minute
 
             user_email = profile.user.email
             it_data = it_asset_data_by_email.get(user_email)
@@ -65,6 +66,13 @@ class StaffProfileHeroDetail(APIView):
         except Exception as e:
             settings.LOGGER.error(f"IT Assets error in hero: {e}")
             data["it_asset_data"] = None
+            # Cache the failure for 1 minute to avoid repeated slow timeouts
+            try:
+                cache.set("it_assets_data", {}, 60)
+            except (
+                Exception
+            ):  # nosec B110 — cache failure in error handler is non-critical
+                pass
 
         return Response(data)
 

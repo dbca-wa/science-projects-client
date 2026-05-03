@@ -22,6 +22,7 @@ from .details import (
     StudentProjectAdditional,
     StudentProjectAdditionalDetail,
 )
+from .drafts import ProjectDraftDetail
 from .export import DownloadAllProjectsAsCSV, DownloadARProjectsAsCSV
 from .map import ProjectMap
 from .members import (
@@ -87,6 +88,8 @@ __all__ = [
     # Export
     "DownloadAllProjectsAsCSV",
     "DownloadARProjectsAsCSV",
+    # Drafts
+    "ProjectDraftDetail",
     # Utils
     "ProjectYears",
     "SuspendProject",

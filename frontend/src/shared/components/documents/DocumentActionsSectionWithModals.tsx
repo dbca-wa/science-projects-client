@@ -21,12 +21,73 @@ import {
 } from "@/shared/hooks/usePdfOperations";
 import { getCurrentApprovalStage } from "@/shared/utils/approval.utils";
 
+/**
+ * Determine which tab to navigate to after deleting a document.
+ * Navigates to the previous document in the lifecycle that still exists,
+ * falling back to overview if nothing else is available.
+ */
+const getPostDeleteTab = (
+	deletedDocumentType: DocumentType,
+	allDocuments?: IProjectDocuments
+): string => {
+	// Tab priority order (reverse lifecycle): closure → student → progress → project → concept → overview
+	// After deleting a document, go to the previous one that exists.
+	switch (deletedDocumentType) {
+		case "concept":
+			return "overview";
+		case "projectplan":
+			if (allDocuments?.concept_plan) return "concept";
+			return "overview";
+		case "progressreport":
+			// Check if other progress reports still exist (we're deleting one, so check count > 1)
+			if (
+				allDocuments?.progress_reports &&
+				allDocuments.progress_reports.length > 1
+			)
+				return "progress";
+			if (allDocuments?.project_plan) return "project";
+			if (allDocuments?.concept_plan) return "concept";
+			return "overview";
+		case "studentreport":
+			if (
+				allDocuments?.student_reports &&
+				allDocuments.student_reports.length > 1
+			)
+				return "student";
+			if (
+				allDocuments?.progress_reports &&
+				allDocuments.progress_reports.length > 0
+			)
+				return "progress";
+			if (allDocuments?.project_plan) return "project";
+			if (allDocuments?.concept_plan) return "concept";
+			return "overview";
+		case "projectclosure":
+			if (
+				allDocuments?.student_reports &&
+				allDocuments.student_reports.length > 0
+			)
+				return "student";
+			if (
+				allDocuments?.progress_reports &&
+				allDocuments.progress_reports.length > 0
+			)
+				return "progress";
+			if (allDocuments?.project_plan) return "project";
+			if (allDocuments?.concept_plan) return "concept";
+			return "overview";
+		default:
+			return "overview";
+	}
+};
+
 interface DocumentActionsSectionWithModalsProps {
 	document: IMainDoc;
 	project: IProjectData;
 	members: IProjectMember[] | null;
 	documentType: DocumentType;
 	canDelete: boolean;
+	locked?: boolean;
 	// Caretaker permissions
 	userIsCaretakerOfAdmin?: boolean;
 	userIsCaretakerOfBaLeader?: boolean;
@@ -37,6 +98,7 @@ interface DocumentActionsSectionWithModalsProps {
 	setToLastTab?: (tabToGoTo?: number) => void;
 	isBaLead?: boolean;
 	// Special action callbacks (passed through from parent)
+	onCreateConceptPlan?: () => void;
 	onCreateProgressReport?: () => void;
 	onSetAreas?: () => void;
 	onReopenProject?: () => void;
@@ -46,12 +108,13 @@ interface DocumentActionsSectionWithModalsProps {
 
 type DocumentAction = "approve" | "recall" | "send_back" | "reopen";
 
-export function DocumentActionsSectionWithModals({
+export const DocumentActionsSectionWithModals = ({
 	document,
 	project,
 	members,
 	documentType,
 	canDelete,
+	locked = false,
 	userIsCaretakerOfAdmin,
 	userIsCaretakerOfBaLeader,
 	userIsCaretakerOfProjectLeader,
@@ -59,10 +122,11 @@ export function DocumentActionsSectionWithModals({
 	documents,
 	setToLastTab,
 	isBaLead,
+	onCreateConceptPlan,
 	onCreateProgressReport,
 	onSetAreas,
 	onReopenProject,
-}: DocumentActionsSectionWithModalsProps) {
+}: DocumentActionsSectionWithModalsProps) => {
 	const navigate = useNavigate();
 
 	// Modal state
@@ -133,6 +197,7 @@ export function DocumentActionsSectionWithModals({
 		project_lead: 1,
 		business_area_lead: 2,
 		directorate: 3,
+		complete: 3, // Recall from "complete" = directorate recalling their approval
 	};
 
 	// Modal submit handlers
@@ -172,8 +237,10 @@ export function DocumentActionsSectionWithModals({
 		try {
 			await deleteDocumentMutation.mutateAsync(document.id);
 			setDeleteModalOpen(false);
-			// Navigate to project overview tab
-			navigate(`/projects/${project.id}/overview`);
+
+			// Navigate to the previous available document tab after deletion
+			const fallbackTab = getPostDeleteTab(documentType, all_documents);
+			navigate(`/projects/${project.id}/${fallbackTab}`);
 		} catch (error) {
 			console.error("Delete document error:", error);
 			// Error toast is handled by the mutation
@@ -188,6 +255,7 @@ export function DocumentActionsSectionWithModals({
 				members={members}
 				documentType={documentType}
 				canDelete={canDelete}
+				locked={locked}
 				userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
 				userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
 				userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
@@ -213,6 +281,7 @@ export function DocumentActionsSectionWithModals({
 				onDownloadPdf={handleDownloadPdf}
 				onGeneratePdf={handleGeneratePdf}
 				onDelete={handleDelete}
+				onCreateConceptPlan={onCreateConceptPlan}
 				onCreateProgressReport={onCreateProgressReport}
 				onSetAreas={onSetAreas}
 				onReopenProject={onReopenProject}
@@ -246,4 +315,4 @@ export function DocumentActionsSectionWithModals({
 			/>
 		</>
 	);
-}
+};

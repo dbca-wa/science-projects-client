@@ -91,8 +91,8 @@ class DocRecall(APIView):
         # Get document
         document = DocumentService.get_document(document_pk)
 
-        # Delegate to service
-        ApprovalService.recall(document, request.user, feedback_html)
+        # Delegate to service — pass stage so recall goes back exactly one step
+        ApprovalService.recall(document, request.user, feedback_html, stage=int(stage))
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)

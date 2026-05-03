@@ -206,9 +206,9 @@ export const adminUpdateUser = async (
  * @returns Whether email exists
  */
 export const checkEmailExists = async (email: string): Promise<boolean> => {
-	const response = await apiClient.post<{ exists: boolean }>(
+	const response = await apiClient.get<{ exists: boolean }>(
 		USER_ENDPOINTS.CHECK_EMAIL_EXISTS,
-		{ email }
+		{ params: { email } }
 	);
 	return response.exists;
 };
@@ -223,9 +223,9 @@ export const checkNameExists = async (
 	firstName: string,
 	lastName: string
 ): Promise<boolean> => {
-	const response = await apiClient.post<{ exists: boolean }>(
+	const response = await apiClient.get<{ exists: boolean }>(
 		USER_ENDPOINTS.CHECK_NAME_EXISTS,
-		{ first_name: firstName, last_name: lastName }
+		{ params: { first_name: firstName, last_name: lastName } }
 	);
 	return response.exists;
 };
@@ -282,10 +282,8 @@ export const requestMergeUsers = async (
 ): Promise<void> => {
 	await apiClient.post(USER_ENDPOINTS.REQUEST_MERGE, {
 		action: "mergeuser",
-		status: "pending",
-		requester: primaryUserId,
-		primaryUserId: primaryUserId,
-		secondaryUserIds: secondaryUserIds,
+		primary_user: primaryUserId,
+		secondary_users: secondaryUserIds,
 	});
 };
 

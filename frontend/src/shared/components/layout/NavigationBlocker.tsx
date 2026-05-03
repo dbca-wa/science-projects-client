@@ -1,24 +1,28 @@
 import { useBlocker } from "react-router";
 import { observer } from "mobx-react-lite";
 import { inlineEditStore } from "@/app/stores/InlineEditStore";
-import { UnsavedChangesDialog } from "../editor/UnsavedChangesDialog";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 /**
  * NavigationBlocker
  *
  * Blocks navigation when inline editors have unsaved changes.
- * Integrates InlineEditStore with React Router's navigation blocker.
+ * Instead of showing a modal dialog, it scrolls to the first unsaved editor
+ * and shows a toast notification. The user must save or discard each editor
+ * before navigation is allowed.
  *
- * Note: Browser-level navigation (refresh, close tab, back button) cannot show
- * custom dialogs due to browser security restrictions. The browser's default
- * "Leave site?" dialog will be shown instead.
- *
+ * Flow:
+ * 1. User tries to navigate with unsaved changes
+ * 2. Navigation is blocked
+ * 3. Page scrolls to the first unsaved editor
+ * 4. Toast shows: "You have unsaved changes in [editor name]"
+ * 5. User saves/discards that editor
+ * 6. If more unsaved editors remain, repeat on next navigation attempt
+ * 7. Once all editors are saved, navigation proceeds
  */
 export const NavigationBlocker = observer(() => {
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-	// Block navigation when there are unsaved changes
+	// Block ALL navigation when there are unsaved changes
 	const blocker = useBlocker(({ currentLocation, nextLocation }) => {
 		const hasChanges = inlineEditStore.hasUnsavedChanges;
 		const pathChanged = currentLocation.pathname !== nextLocation.pathname;
@@ -26,60 +30,48 @@ export const NavigationBlocker = observer(() => {
 		return hasChanges && pathChanged;
 	});
 
-	// Handle blocker state changes
+	// When navigation is blocked, scroll to the first unsaved editor and show a toast
 	useEffect(() => {
 		if (blocker.state === "blocked") {
-			setIsDialogOpen(true);
-		}
-	}, [blocker.state]);
+			const editors = inlineEditStore.editorsWithChanges;
+			const firstEditor = editors[0];
 
-	// Block browser-level navigation (tab close, refresh, back button)
-	// Note: We can only show the browser's default dialog, not our custom one
+			if (firstEditor) {
+				// Format a readable label from the contentType
+				const label = firstEditor.contentType
+					.replace(/-/g, " ")
+					.replace(/\b\w/g, (c) => c.toUpperCase());
+
+				// Scroll to and highlight the editor (works for both inline and form-based)
+				inlineEditStore.scrollToEditor(firstEditor.identifier);
+
+				toast.warning(`Unsaved changes in "${label}"`, {
+					description: "Save or discard your changes before navigating away.",
+					duration: 4000,
+				});
+			}
+
+			// Reset the blocker so the user can try again after saving
+			blocker.reset?.();
+		}
+	}, [blocker.state, blocker]);
+
+	// Block browser-level navigation (tab close, refresh)
+	// Shows the browser's native "Leave site?" dialog
 	useEffect(() => {
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			// Access the computed value directly each time (not captured in closure)
-			const hasChanges = inlineEditStore.hasUnsavedChanges;
-
-			if (hasChanges) {
-				// Standard way to trigger browser confirmation dialog
+			if (inlineEditStore.hasUnsavedChanges) {
 				e.preventDefault();
-				// Chrome requires returnValue to be set
 				e.returnValue = "";
 			}
 		};
 
 		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+	}, []);
 
-		return () => {
-			window.removeEventListener("beforeunload", handleBeforeUnload);
-		};
-	}, []); // Empty deps - handler accesses store directly
-
-	const handleProceed = () => {
-		setIsDialogOpen(false);
-		// Clear all active edits before proceeding
-		inlineEditStore.clearAll();
-		// Allow navigation to proceed
-		if (blocker.state === "blocked") {
-			blocker.proceed?.();
-		}
-	};
-
-	const handleCancel = () => {
-		setIsDialogOpen(false);
-		// Reset the blocker to stay on current page
-		if (blocker.state === "blocked") {
-			blocker.reset?.();
-		}
-	};
-
-	return (
-		<UnsavedChangesDialog
-			isOpen={isDialogOpen}
-			onProceed={handleProceed}
-			onCancel={handleCancel}
-		/>
-	);
+	// No UI to render — toast is shown imperatively
+	return null;
 });
 
 NavigationBlocker.displayName = "NavigationBlocker";

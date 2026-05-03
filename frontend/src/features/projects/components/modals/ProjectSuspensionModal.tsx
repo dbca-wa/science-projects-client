@@ -8,12 +8,14 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { useSuspendProject } from "../../hooks/useSuspendProject";
+import { getProjectStatusDisplay } from "@/shared/utils/project.utils";
 
 interface ProjectSuspensionModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	projectId: number;
 	currentStatus: string;
+	statusBeforeSuspend?: string | null;
 }
 
 export function ProjectSuspensionModal({
@@ -21,12 +23,17 @@ export function ProjectSuspensionModal({
 	onClose,
 	projectId,
 	currentStatus,
+	statusBeforeSuspend,
 }: ProjectSuspensionModalProps) {
 	const suspendMutation = useSuspendProject();
 
 	const isSuspended = currentStatus === "suspended";
 	const action = isSuspended ? "unsuspend" : "suspend";
 	const actionTitle = isSuspended ? "Unsuspend" : "Suspend";
+
+	// Determine the status that will be restored on unsuspend
+	const restoredStatus = statusBeforeSuspend || "active";
+	const restoredStatusDisplay = getProjectStatusDisplay(restoredStatus);
 
 	const handleSubmit = async () => {
 		try {
@@ -59,7 +66,7 @@ export function ProjectSuspensionModal({
 					<ul className="ml-6 list-disc space-y-2 text-sm">
 						<li>
 							{isSuspended
-								? "The project will become active, with the status set to 'active'"
+								? `The project's status will be restored to '${restoredStatusDisplay}'`
 								: "The project will become inactive, with the status set to 'suspended'"}
 						</li>
 						<li>
@@ -79,7 +86,7 @@ export function ProjectSuspensionModal({
 					<p className="mt-4 text-center text-sm font-bold text-blue-600 underline">
 						{isSuspended
 							? "You can suspend the project again at any time, immediately setting the status of the project to 'suspended'"
-							: "You can unsuspend the project again at any time, setting the status of the project to 'active'"}
+							: `You can unsuspend the project again at any time, restoring the project to its previous status`}
 					</p>
 				</div>
 

@@ -5,14 +5,12 @@
  */
 
 import { useState } from "react";
-import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { UserPlus, X } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useProjectTeam } from "../../hooks/useProjectTeam";
-import { useInviteTeamMember } from "../../hooks/useInviteTeamMember";
 import { TeamMemberGrid } from "./TeamMemberGrid";
-import { InviteTeamMemberModal } from "./InviteTeamMemberModal";
+import { InviteTeamMemberPanel } from "./InviteTeamMemberPanel";
 import type { IProjectMember } from "@/shared/types/project.types";
 
 interface ProjectTeamSectionProps {
@@ -24,34 +22,12 @@ export function ProjectTeamSection({
 	projectId,
 	canManageTeam,
 }: ProjectTeamSectionProps) {
-	const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+	const [isInvitePanelOpen, setIsInvitePanelOpen] = useState(false);
 	const { data: teamMembers, isLoading, error } = useProjectTeam(projectId);
-	const inviteMutation = useInviteTeamMember(projectId);
 
-	// Get existing member IDs for exclusion in invite modal
+	// Get existing member IDs for exclusion in invite panel
 	// Only exclude direct members, not caretakers (users can be both member and caretaker)
 	const excludeUserIds = teamMembers?.map((member) => member.user.id) ?? [];
-
-	const handleInvite = async (data: {
-		userId: number;
-		role: string;
-		timeAllocation: number;
-		shortCode: string;
-	}) => {
-		try {
-			await inviteMutation.mutateAsync({
-				user_id: data.userId,
-				role: data.role,
-				time_allocation: data.timeAllocation,
-			});
-			toast.success("Team member added successfully");
-			setIsInviteModalOpen(false);
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to add team member"
-			);
-		}
-	};
 
 	if (isLoading) {
 		return (
@@ -87,9 +63,22 @@ export function ProjectTeamSection({
 			<div className="flex items-center justify-between">
 				<h2 className="text-2xl font-semibold">Project Team</h2>
 				{canManageTeam && (
-					<Button onClick={() => setIsInviteModalOpen(true)} className="gap-2">
-						<UserPlus className="h-4 w-4" />
-						Invite Member
+					<Button
+						onClick={() => setIsInvitePanelOpen(!isInvitePanelOpen)}
+						variant={isInvitePanelOpen ? "outline" : "default"}
+						className="gap-2"
+					>
+						{isInvitePanelOpen ? (
+							<>
+								<X className="h-4 w-4" />
+								Cancel
+							</>
+						) : (
+							<>
+								<UserPlus className="h-4 w-4" />
+								Invite Member
+							</>
+						)}
 					</Button>
 				)}
 			</div>
@@ -103,26 +92,25 @@ export function ProjectTeamSection({
 				Business Area leads can click and drag a user to re-arrange order.
 			</p>
 
+			{/* Inline invite panel — expands between header and grid */}
+			{isInvitePanelOpen && canManageTeam && (
+				<InviteTeamMemberPanel
+					projectId={projectId}
+					excludeUserIds={excludeUserIds}
+					onClose={() => setIsInvitePanelOpen(false)}
+				/>
+			)}
+
 			{!hasMembers ? (
 				<EmptyState
 					canManageTeam={canManageTeam}
-					onInvite={() => setIsInviteModalOpen(true)}
+					onInvite={() => setIsInvitePanelOpen(true)}
 				/>
 			) : (
 				<TeamMemberGrid
 					members={teamMembers as unknown as IProjectMember[]}
 					projectId={projectId}
 					canManageTeam={canManageTeam}
-				/>
-			)}
-
-			{canManageTeam && (
-				<InviteTeamMemberModal
-					projectId={projectId}
-					isOpen={isInviteModalOpen}
-					onClose={() => setIsInviteModalOpen(false)}
-					excludeUserIds={excludeUserIds}
-					onInvite={handleInvite}
 				/>
 			)}
 		</section>

@@ -10,6 +10,63 @@ from django import template
 register = template.Library()
 
 
+@register.filter
+def split_commas(value):
+    """Split a comma-separated string into a list of trimmed items."""
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+@register.filter
+def team_rows(value):
+    """
+    Split a comma-separated team string into balanced rows for table display.
+    Returns a list of lists, where each inner list is a row of member names.
+    Avoids orphans (single member on last row) by choosing optimal column count.
+    """
+    if not value:
+        return []
+    members = [item.strip() for item in value.split(",") if item.strip()]
+    count = len(members)
+
+    if count <= 3:
+        # Single row
+        return [members]
+    if count <= 4:
+        # Two rows of 2
+        return [members[:2], members[2:]]
+
+    # For 5+ members, try columns 3 and 4, pick whichever avoids orphan
+    for cols in [4, 3]:
+        remainder = count % cols
+        if remainder != 1:  # Not an orphan
+            rows = []
+            for i in range(0, count, cols):
+                rows.append(members[i : i + cols])
+            return rows
+
+    # Fallback: use 4 columns (remainder 1 → merge last two rows)
+    cols = 4
+    rows = []
+    for i in range(0, count, cols):
+        rows.append(members[i : i + cols])
+    # Merge last row into second-to-last if orphan
+    if len(rows) > 1 and len(rows[-1]) == 1:
+        last = rows.pop()
+        rows[-1].extend(last)
+    return rows
+
+
+@register.filter
+def team_max_cols(value):
+    """Return the max number of columns needed for the team_rows layout."""
+    rows = team_rows(value)
+    if not rows:
+        return 1
+    return max(len(row) for row in rows)
+
+
 @register.simple_tag(takes_context=True)
 def store_page_number(context, project_title, page_number):
     if "page_numbers" not in context:

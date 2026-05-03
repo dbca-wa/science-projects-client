@@ -60,13 +60,13 @@ const EXTERNAL_ROLES = [
 	{ value: "student", label: "Supervised Student" },
 ];
 
-export function TeamMemberSheet({
+export const TeamMemberSheet = ({
 	member,
 	projectId,
 	isOpen,
 	onClose,
 	canManageTeam,
-}: TeamMemberSheetProps) {
+}: TeamMemberSheetProps) => {
 	const { mutate: updateMember, isPending: isUpdating } =
 		useUpdateTeamMember(projectId);
 	const { mutate: removeMember, isPending: isRemoving } =
@@ -191,7 +191,7 @@ export function TeamMemberSheet({
 									<SelectTrigger id="role" className="w-full">
 										<SelectValue placeholder="Select a Role" />
 									</SelectTrigger>
-									<SelectContent>
+									<SelectContent className="z-[70]">
 										{roleOptions.map((option) => (
 											<SelectItem key={option.value} value={option.value}>
 												{option.label}
@@ -266,4 +266,4 @@ export function TeamMemberSheet({
 			</SheetContent>
 		</Sheet>
 	);
-}
+};

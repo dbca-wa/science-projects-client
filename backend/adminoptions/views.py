@@ -474,7 +474,40 @@ class AdminTasks(APIView):
 
     def get(self, req):
         settings.LOGGER.info(msg=f"{req.user} is getting all admin tasks")
-        # Only return pending tasks (filter out cancelled, rejected, fulfilled)
+
+        # Clean up orphaned pending tasks where referenced users no longer exist
+        pending_tasks = AdminTask.objects.filter(status=AdminTask.TaskStatus.PENDING)
+        orphaned_pks = []
+        for task in pending_tasks:
+            # Check if primary_user was deleted (SET_NULL)
+            if (
+                task.action
+                in [
+                    AdminTask.ActionTypes.MERGEUSER,
+                    AdminTask.ActionTypes.SETCARETAKER,
+                ]
+                and task.primary_user is None
+            ):
+                orphaned_pks.append(task.pk)
+                continue
+
+            # Check if secondary_users reference deleted users
+            if task.secondary_users:
+                existing_count = User.objects.filter(
+                    pk__in=task.secondary_users
+                ).count()
+                if existing_count < len(task.secondary_users):
+                    orphaned_pks.append(task.pk)
+
+        if orphaned_pks:
+            settings.LOGGER.info(
+                f"Cleaning up {len(orphaned_pks)} orphaned admin task(s): {orphaned_pks}"
+            )
+            AdminTask.objects.filter(pk__in=orphaned_pks).update(
+                status=AdminTask.TaskStatus.CANCELLED
+            )
+
+        # Re-fetch after cleanup
         pending_tasks = AdminTask.objects.filter(status=AdminTask.TaskStatus.PENDING)
         ser = AdminTaskSerializer(
             pending_tasks,
@@ -562,6 +595,36 @@ class AdminTasks(APIView):
                 )
                 return Response(
                     "Users already have a pending merge user request",
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+            # Validate merge direction — cannot merge higher-privilege into lower-privilege
+            # Hierarchy: External(1) < Staff(2) < BA Lead(3) < Superuser(4)
+            # Sideways merges (same level) are allowed
+            try:
+                primary = User.objects.get(pk=data["primary_user"])
+                secondary_pks = data.get("secondary_users", [])
+
+                def get_level(u):
+                    if u.is_superuser:
+                        return 4
+                    if u.is_staff and u.business_areas_led.exists():
+                        return 3
+                    if u.is_staff:
+                        return 2
+                    return 1
+
+                primary_level = get_level(primary)
+                for sec_pk in secondary_pks:
+                    secondary = User.objects.get(pk=sec_pk)
+                    if get_level(secondary) > primary_level:
+                        return Response(
+                            "Cannot merge a higher-privilege user into a lower-privilege user.",
+                            status=HTTP_400_BAD_REQUEST,
+                        )
+            except User.DoesNotExist:
+                return Response(
+                    "One or more users not found.",
                     status=HTTP_400_BAD_REQUEST,
                 )
 

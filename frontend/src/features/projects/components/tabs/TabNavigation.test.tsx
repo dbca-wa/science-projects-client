@@ -11,11 +11,24 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProjectDetailPage from "@/pages/projects/ProjectDetailPage";
 import * as useProjectHook from "@/features/projects/hooks/useProject";
 import * as useCurrentUserHook from "@/features/auth";
+
+// Spy for capturing navigate calls
+const mockNavigate = vi.fn();
+
+// Mock react-router, keeping real components but overriding useNavigate
+vi.mock("react-router", async () => {
+	const actual = await vi.importActual("react-router");
+	return {
+		...actual,
+		useNavigate: () => mockNavigate,
+	};
+});
 
 // Mock hooks
 vi.mock("@/features/projects/hooks/useProject");
@@ -148,10 +161,7 @@ describe("Tab Navigation", () => {
 			<QueryClientProvider client={queryClient}>
 				<MemoryRouter initialEntries={[`/projects/123/${initialTab}`]}>
 					<Routes>
-						<Route
-							path="/projects/:id/:tab"
-							element={<ProjectDetailPage selectedTab={initialTab} />}
-						/>
+						<Route path="/projects/:id/:tab?" element={<ProjectDetailPage />} />
 					</Routes>
 				</MemoryRouter>
 			</QueryClientProvider>
@@ -300,10 +310,7 @@ describe("Tab Navigation", () => {
 			<QueryClientProvider client={queryClient}>
 				<MemoryRouter initialEntries={["/projects/123/concept"]}>
 					<Routes>
-						<Route
-							path="/projects/:id/:tab"
-							element={<ProjectDetailPage selectedTab="concept" />}
-						/>
+						<Route path="/projects/:id/:tab?" element={<ProjectDetailPage />} />
 					</Routes>
 				</MemoryRouter>
 			</QueryClientProvider>
@@ -369,5 +376,55 @@ describe("Tab Navigation", () => {
 		});
 
 		console.log("✓ Error state displays correctly");
+	});
+
+	/**
+	 * handleTabChange should call navigate with { replace: true }
+	 * so tab switches replace the history entry instead of pushing new ones
+	 */
+	it("should call navigate when switching tabs", async () => {
+		const user = userEvent.setup();
+		renderWithRouter("overview");
+
+		await waitFor(() => {
+			const tabs = screen.getAllByText("Overview");
+			expect(tabs.length).toBeGreaterThan(0);
+		});
+
+		// Click the Concept Plan tab (desktop TabsTrigger)
+		const conceptTab = screen.getAllByText("Concept Plan")[0];
+		await user.click(conceptTab);
+
+		// Verify navigate was called with the correct path (no replace — pushes to history for back button)
+		expect(mockNavigate).toHaveBeenCalledWith("/projects/123/concept");
+	});
+
+	/**
+	 * Overview tab should display the navy blue info icon
+	 */
+	it("should display the info icon on the Overview tab", async () => {
+		renderWithRouter("overview");
+
+		await waitFor(() => {
+			const tabs = screen.getAllByText("Overview");
+			expect(tabs.length).toBeGreaterThan(0);
+		});
+
+		// The info icon is rendered inside a navy blue circle (bg-blue-900) next to the Overview label.
+		// Find the Overview tab trigger elements and verify the icon container is present.
+		const overviewElements = screen.getAllByText("Overview");
+		const desktopOverviewTab = overviewElements[0];
+
+		// The parent span wraps both the label and the icon circle
+		const parentSpan = desktopOverviewTab.closest("span.inline-flex");
+		expect(parentSpan).not.toBeNull();
+
+		// The icon container is a sibling span with bg-blue-500 class
+		const iconContainer = parentSpan?.querySelector(".bg-blue-500");
+		expect(iconContainer).not.toBeNull();
+		expect(iconContainer).toBeInTheDocument();
+
+		// Verify the icon container is a rounded circle with the correct size
+		expect(iconContainer).toHaveClass("rounded-full", "size-4");
 	});
 });

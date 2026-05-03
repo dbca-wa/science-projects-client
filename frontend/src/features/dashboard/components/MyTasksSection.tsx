@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AdminCaretakerTasksDataTable } from "@/features/caretakers/components/AdminCaretakerTasksDataTable";
 import { EndorsementTasksDataTable } from "./EndorsementTasksDataTable";
 import { ProjectDeletionTasksDataTable } from "./ProjectDeletionTasksDataTable";
+import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { filterCaretakerTasks } from "../utils/dashboard.utils";
 import type { MyTasksSectionPhase1Props } from "../types/admin-tasks.types";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -112,6 +113,9 @@ export const MyTasksSection = ({
 	const projectDeletionTasks = adminTasks.filter(
 		(task) => task.action === "deleteproject"
 	);
+	const mergeUserTasks = adminTasks.filter(
+		(task) => task.action === "mergeuser"
+	);
 
 	// Filter endorsement tasks by type
 	const aecTasks = endorsementTasks?.aec || [];
@@ -139,6 +143,16 @@ export const MyTasksSection = ({
 					defaultOpen={true}
 				>
 					<ProjectDeletionTasksDataTable tasks={projectDeletionTasks} />
+				</TaskSection>
+			)}
+
+			{mergeUserTasks.length > 0 && (
+				<TaskSection
+					title="Merge User Requests"
+					count={mergeUserTasks.length}
+					defaultOpen={true}
+				>
+					<AdminTasksDataTable tasks={mergeUserTasks} />
 				</TaskSection>
 			)}
 

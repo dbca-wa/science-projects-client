@@ -45,7 +45,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
  * Includes tabbed navigation for SPMS Profile, Staff Profile, and Caretaker Mode
  * Supports direct URL navigation to tabs via /users/me/caretaker
  */
-const MyProfilePage = observer(() => {
+const MyProfilePage = observer(function MyProfilePage() {
 	useDocumentTitle("My Profile");
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -111,8 +111,10 @@ const MyProfilePage = observer(() => {
 		}
 	};
 
-	// Handle tab change - update URL without replacing history
-	const handleTabChange = (value: string) => {
+	// Navigate to a tab route. Called from onClick on each TabsTrigger, NOT from
+	// Radix's onValueChange (which double-fires and pushes duplicate history entries).
+	const navigateToTab = (value: string) => {
+		if (value === activeTab) return;
 		setActiveTab(value);
 		switch (value) {
 			case "caretaker":
@@ -273,21 +275,29 @@ const MyProfilePage = observer(() => {
 				</div>
 
 				{/* Tabs */}
-				<Tabs
-					value={activeTab}
-					className="w-full"
-					onValueChange={handleTabChange}
-				>
+				<Tabs value={activeTab} className="w-full">
 					<TabsList className="mb-6 w-full flex">
-						<TabsTrigger value="profile" className="flex-1">
+						<TabsTrigger
+							value="profile"
+							className="flex-1"
+							onClick={() => navigateToTab("profile")}
+						>
 							{showShortLabels ? "SPMS" : "SPMS Profile"}
 						</TabsTrigger>
 						{user?.is_staff && (
-							<TabsTrigger value="staff-profile" className="flex-1">
+							<TabsTrigger
+								value="staff-profile"
+								className="flex-1"
+								onClick={() => navigateToTab("staff-profile")}
+							>
 								{showShortLabels ? "Public" : "Public Profile"}
 							</TabsTrigger>
 						)}
-						<TabsTrigger value="caretaker" className="flex-1">
+						<TabsTrigger
+							value="caretaker"
+							className="flex-1"
+							onClick={() => navigateToTab("caretaker")}
+						>
 							{showShortLabels ? "Caretaker" : "Caretaker Mode"}
 						</TabsTrigger>
 					</TabsList>

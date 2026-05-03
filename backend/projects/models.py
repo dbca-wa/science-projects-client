@@ -108,6 +108,13 @@ class Project(CommonModel):
         choices=StatusChoices.choices,
         default=StatusChoices.NEW,
     )
+    status_before_suspend = models.CharField(
+        max_length=50,
+        choices=StatusChoices.choices,
+        blank=True,
+        null=True,
+        help_text="Stores the project's status before it was suspended, so it can be restored on unsuspension.",
+    )
     year = models.PositiveIntegerField(
         default=dt.today().year,
         help_text="The project year with four digits, e.g. 2014",
@@ -529,6 +536,30 @@ class ExternalProjectDetails(models.Model):
 
     def __str__(self) -> str:
         return f"{self.project} | {self.collaboration_with} "
+
+
+class ProjectDraft(CommonModel):
+    """Stores serialised wizard state for draft persistence."""
+
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="project_drafts",
+    )
+    project_kind = models.CharField(
+        max_length=50,
+        choices=Project.CategoryKindChoices.choices,
+    )
+    data = models.JSONField(default=dict)
+    current_step = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = (("user", "project_kind"),)
+        verbose_name = "Project Draft"
+        verbose_name_plural = "Project Drafts"
+
+    def __str__(self) -> str:
+        return f"Draft ({self.project_kind}) for {self.user}"
 
 
 # endregion ==============================================

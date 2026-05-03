@@ -25,7 +25,6 @@ Represents a caretaker relationship between two users.
 - `user` - User being caretaken for
 - `caretaker` - User acting as caretaker
 - `start_date` - When caretaking starts
-- `end_date` - When caretaking ends (nullable)
 - `reason` - Reason for caretaking
 - `created_at` - Creation timestamp
 
@@ -97,7 +96,6 @@ Users can respond to requests if:
 
 1. Cannot caretake for yourself
 2. Cannot create duplicate caretaker relationships
-3. End date must be after start date (if provided)
 
 ## Testing
 
@@ -119,8 +117,7 @@ caretaker = CaretakerService.create_caretaker({
     'user': user_id,
     'caretaker': caretaker_id,
     'reason': 'On leave',
-    'start_date': '2026-02-01',
-    'end_date': '2026-02-15'
+    'start_date': '2026-02-01'
 })
 ```
 

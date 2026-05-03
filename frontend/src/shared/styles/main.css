@@ -144,7 +144,8 @@
 
 	/* Improve downscaling quality for images rendered in small containers */
 	img {
-		image-rendering: -webkit-optimize-contrast;
+		image-rendering: smooth;
+		-ms-interpolation-mode: bicubic;
 	}
 
 	.drawer-content {
@@ -200,19 +201,85 @@
 		animation: pulse-border 2s ease-in-out infinite;
 	}
 
-	/* Editor highlight animation for navigation blocking */
+	/* Editor highlight animation for navigation blocking — shake + pulse */
+	@keyframes editor-shake {
+		0% {
+			transform: translateX(0);
+		}
+		4% {
+			transform: translateX(-16px);
+		}
+		8% {
+			transform: translateX(16px);
+		}
+		12% {
+			transform: translateX(-14px);
+		}
+		16% {
+			transform: translateX(14px);
+		}
+		20% {
+			transform: translateX(-12px);
+		}
+		24% {
+			transform: translateX(12px);
+		}
+		30% {
+			transform: translateX(-10px);
+		}
+		36% {
+			transform: translateX(10px);
+		}
+		42% {
+			transform: translateX(-8px);
+		}
+		48% {
+			transform: translateX(8px);
+		}
+		55% {
+			transform: translateX(-6px);
+		}
+		62% {
+			transform: translateX(6px);
+		}
+		70% {
+			transform: translateX(-4px);
+		}
+		78% {
+			transform: translateX(4px);
+		}
+		86% {
+			transform: translateX(-2px);
+		}
+		93% {
+			transform: translateX(2px);
+		}
+		100% {
+			transform: translateX(0);
+		}
+	}
+
 	@keyframes highlight-pulse {
 		0%,
 		100% {
-			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+			box-shadow: 0 0 0 0 rgba(234, 88, 12, 0);
 		}
 		50% {
-			box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+			box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.4);
 		}
 	}
 
 	.editor-highlight {
-		animation: highlight-pulse 1s ease-in-out 2;
+		animation:
+			editor-shake 1.5s ease-out,
+			highlight-pulse 1s ease-in-out 3;
+	}
+
+	/* Respect reduced motion preference */
+	@media (prefers-reduced-motion: reduce) {
+		.editor-highlight {
+			animation: highlight-pulse 1s ease-in-out 3;
+		}
 	}
 
 	/* Content diff highlighting styles */

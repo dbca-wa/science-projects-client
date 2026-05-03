@@ -131,17 +131,14 @@ export class InlineEditStore {
 		const identifier = `${contentType}:${entityId}`;
 
 		// Validate parameters
-		if (!contentType || !entityId) {
+		if (!contentType || entityId === undefined || entityId === null) {
 			console.error("Invalid editor registration parameters", params);
 			return;
 		}
 
-		// Handle duplicate registration - update existing entry
+		// Handle duplicate registration - update element ref but preserve content state
 		if (this.editorStates.has(identifier)) {
-			console.warn(`Editor ${identifier} already registered, updating state`);
 			const existing = this.editorStates.get(identifier)!;
-			existing.originalContent = originalContent;
-			existing.currentContent = originalContent;
 			existing.elementRef = elementRef;
 			return;
 		}
@@ -419,13 +416,16 @@ export class InlineEditStore {
 
 		const element = state.elementRef;
 
-		// Add highlight class
+		// Remove class first to force animation restart if already playing
+		element.classList.remove("editor-highlight");
+		// Force reflow so the browser registers the removal before re-adding
+		void element.offsetWidth;
 		element.classList.add("editor-highlight");
 
-		// Remove class after animation completes (2 seconds)
+		// Remove class after animation completes
 		setTimeout(() => {
 			element.classList.remove("editor-highlight");
-		}, 2000);
+		}, 3500);
 	};
 }
 

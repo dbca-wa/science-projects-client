@@ -443,9 +443,14 @@ describe("ProgressReportsTab", () => {
 
 	describe("Edit Permissions", () => {
 		it("should pass canEdit prop to editors", () => {
+			// Use non-approved documents so rich text editing is not locked
+			const editableReports = mockProgressReports.map((r) => ({
+				...r,
+				document: { ...r.document, status: "new" as const },
+			}));
 			renderWithProviders(
 				<ProgressReportsTab
-					progressReports={mockProgressReports}
+					progressReports={editableReports}
 					project={mockProject}
 					members={[]}
 					projectId={mockProject.id}

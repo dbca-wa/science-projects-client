@@ -19,3 +19,4 @@ export { useActivateUser } from "./useActivateUser";
 export { useDeactivateUser } from "./useDeactivateUser";
 export { useDeleteUser } from "./useDeleteUser";
 export { useRequestMergeUsers } from "./useRequestMergeUsers";
+export { usePendingMergeRequest } from "./usePendingMergeRequest";

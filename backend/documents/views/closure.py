@@ -3,6 +3,7 @@ Project closure views
 """
 
 from django.conf import settings
+from django.db import transaction
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,7 +17,12 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 from ..models import ProjectClosure
-from ..serializers import ProjectClosureSerializer, TinyProjectClosureSerializer
+from ..serializers import (
+    ProjectClosureCreateSerializer,
+    ProjectClosureSerializer,
+    ProjectDocumentCreateSerializer,
+    TinyProjectClosureSerializer,
+)
 
 
 class ProjectClosures(APIView):
@@ -37,13 +43,50 @@ class ProjectClosures(APIView):
     def post(self, request):
         """Create a new project closure"""
         settings.LOGGER.info(f"{request.user} is creating new project closure")
-        serializer = ProjectClosureSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            settings.LOGGER.error(f"{serializer.errors}")
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        project = request.data.get("project")
+        if not project:
+            return Response(
+                {"error": "'project' is required."},
+                HTTP_400_BAD_REQUEST,
+            )
 
-        project_closure = serializer.save()
+        with transaction.atomic():
+            # Create the parent ProjectDocument first
+            doc_ser = ProjectDocumentCreateSerializer(
+                data={
+                    "project": project,
+                    "kind": "projectclosure",
+                    "status": "new",
+                    "creator": request.user.pk,
+                    "modifier": request.user.pk,
+                }
+            )
+            if not doc_ser.is_valid():
+                settings.LOGGER.error(f"{doc_ser.errors}")
+                return Response(doc_ser.errors, status=HTTP_400_BAD_REQUEST)
+
+            project_document = doc_ser.save()
+
+            # Build closure data from request, linking to the new document and project
+            closure_data = {
+                "document": project_document.pk,
+                "project": project,
+                "reason": request.data.get("reason", ""),
+                "intended_outcome": request.data.get("intended_outcome", "completed"),
+                "scientific_outputs": request.data.get("scientific_outputs", ""),
+                "knowledge_transfer": request.data.get("knowledge_transfer", ""),
+                "data_location": request.data.get("data_location", ""),
+                "hardcopy_location": request.data.get("hardcopy_location", ""),
+                "backup_location": request.data.get("backup_location", ""),
+            }
+            closure_ser = ProjectClosureCreateSerializer(data=closure_data)
+            if not closure_ser.is_valid():
+                settings.LOGGER.error(f"{closure_ser.errors}")
+                return Response(closure_ser.errors, status=HTTP_400_BAD_REQUEST)
+
+            project_closure = closure_ser.save()
+
         return Response(
             TinyProjectClosureSerializer(project_closure).data,
             status=HTTP_201_CREATED,
@@ -129,7 +172,7 @@ class ProjectClosureDetail(APIView):
         )
 
     def delete(self, request, pk):
-        """Delete project closure"""
+        """Delete project closure and revert project status"""
         settings.LOGGER.info(f"{request.user} is deleting project closure {pk}")
 
         try:
@@ -137,5 +180,8 @@ class ProjectClosureDetail(APIView):
         except ProjectClosure.DoesNotExist:
             raise NotFound
 
-        project_closure.delete()
+        # Use DocumentService to handle status rollback
+        from ..services.document_service import DocumentService
+
+        DocumentService.delete_document(project_closure.document.pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)

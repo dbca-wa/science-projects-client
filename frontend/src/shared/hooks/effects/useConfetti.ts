@@ -61,20 +61,25 @@ export function useConfetti() {
 
 		const colors = getConfettiColors();
 
-		// Single burst like the original HomeConfetti
-		myConfetti({
-			particleCount: 100,
-			spread: 360,
-			origin: {
-				x: 0.5,
-				y: 0.4,
-			},
-			colors: colors,
-			ticks: 300, // Moderate lifetime - particles fall naturally in ~3-4 seconds
-			gravity: 1, // Normal gravity for natural fall speed
-			scalar: 1.2,
-			disableForReducedMotion: true,
-		});
+		// Multi-burst for wider coverage across the page
+		const bursts = [
+			{ x: 0.5, y: 0.15 }, // Centre-top
+			{ x: 0.25, y: 0.2 }, // Left
+			{ x: 0.75, y: 0.2 }, // Right
+		];
+
+		for (const origin of bursts) {
+			myConfetti({
+				particleCount: 80,
+				spread: 360,
+				origin,
+				colors,
+				ticks: 300,
+				gravity: 1,
+				scalar: 1.2,
+				disableForReducedMotion: true,
+			});
+		}
 
 		// Wait for particles to fall naturally before cleanup
 		// With ticks: 300 and gravity: 1, particles will take ~3-4 seconds to fall

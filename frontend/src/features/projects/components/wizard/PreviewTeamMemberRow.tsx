@@ -17,6 +17,8 @@ const ROLE_LABELS: Record<string, string> = {
 	technical: "Technical Officer",
 	academicsuper: "Academic Supervisor",
 	externalcol: "External Collaborator",
+	externalpeer: "External Peer",
+	student: "Supervised Student",
 	consulted: "Consulted Peer",
 	group: "Involved Group",
 };

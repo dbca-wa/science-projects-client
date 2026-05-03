@@ -14,6 +14,10 @@ import {
 	getFullUser,
 } from "@/shared/services/user.service";
 import type { IUserData } from "@/shared/types/user.types";
+import {
+	getSimpleUserTypeVariant,
+	UserTypeBadge,
+} from "@/shared/components/user";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 
@@ -67,6 +71,10 @@ export interface UserComboboxProps {
 	wrapperClassName?: string;
 	maxResults?: number; // Maximum number of results to display (default: 10)
 
+	// Create external user — when provided, shows a "Create external user" button
+	// in the dropdown when no results match the search query
+	onCreateExternalUser?: () => void;
+
 	// Accessibility
 	ariaLabel?: string; // Accessible name when label is not provided
 }
@@ -87,6 +95,7 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 			showIcon = false,
 			ariaLabel = "Search for a user", // Default accessible name
 			maxResults = 10, // Default to 10 results
+			onCreateExternalUser,
 			...props
 		},
 		ref
@@ -128,6 +137,10 @@ export const UserCombobox = forwardRef<UserComboboxRef, UserComboboxProps>(
 						isHighlighted={isHighlighted}
 					/>
 				)}
+				onCreateNewClick={onCreateExternalUser}
+				createNewClickLabel={
+					onCreateExternalUser ? "Create new external user" : undefined
+				}
 				icon={
 					showIcon ? (
 						<User className="size-4 text-gray-500 dark:text-gray-400" />
@@ -169,23 +182,13 @@ const SelectedUserDisplay = ({ user, onClear }: SelectedUserDisplayProps) => {
 					{user.display_last_name?.[0]}
 				</AvatarFallback>
 			</Avatar>
-			<span
-				className={cn(
-					"ml-2 text-sm truncate flex-1",
-					user.is_staff
-						? user.is_superuser
-							? "text-blue-500 dark:text-blue-400"
-							: "text-green-500 dark:text-green-400"
-						: "text-gray-500 dark:text-gray-200"
-				)}
-			>
-				{getUserDisplayName(user)}{" "}
-				{user.is_staff
-					? user.is_superuser
-						? "(Admin)"
-						: "(Staff)"
-					: "(External)"}
+			<span className="ml-2 text-sm truncate flex-1">
+				{getUserDisplayName(user)}
 			</span>
+			<UserTypeBadge
+				variant={getSimpleUserTypeVariant(!!user.is_staff, !!user.is_superuser)}
+				className="ml-1 flex-shrink-0"
+			/>
 
 			<Button
 				variant="ghost"
@@ -232,24 +235,14 @@ const UserMenuItem = ({ user, onSelect, isHighlighted }: UserMenuItemProps) => {
 					{user?.display_last_name?.[0]}
 				</AvatarFallback>
 			</Avatar>
-			<div className="flex items-center justify-start ml-3 h-full">
-				<span
-					className={cn(
-						"ml-2",
-						user.is_staff
-							? user.is_superuser
-								? "text-blue-500 dark:text-blue-300"
-								: "text-green-500 dark:text-green-300"
-							: "text-gray-500 dark:text-gray-400"
+			<div className="flex items-center gap-2 ml-3 h-full">
+				<span className="text-sm">{getUserDisplayName(user)}</span>
+				<UserTypeBadge
+					variant={getSimpleUserTypeVariant(
+						!!user.is_staff,
+						!!user.is_superuser
 					)}
-				>
-					{getUserDisplayName(user)}{" "}
-					{user.is_staff
-						? user.is_superuser
-							? "(Admin)"
-							: "(Staff)"
-						: "(External)"}
-				</span>
+				/>
 			</div>
 		</button>
 	);

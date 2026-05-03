@@ -2,7 +2,6 @@
 
 import { AppLayout } from "./AppLayout";
 import { useScrollToTop } from "@/shared/hooks/ui/useScrollToTop";
-import { NavigationBlocker } from "./NavigationBlocker";
 import { UserDataLoader } from "@/app/components/UserDataLoader";
 
 /**
@@ -11,18 +10,13 @@ import { UserDataLoader } from "@/app/components/UserDataLoader";
  *
  * Features:
  * - Loads user data at app level via UserDataLoader
- * - Renders AppLayout for all pages
- * - Includes NavigationBlocker for unsaved changes
+ * - Renders AppLayout for all pages (NavigationBlocker is rendered inside AppLayout)
  */
 export function Root() {
 	useScrollToTop();
 
 	return (
 		<UserDataLoader>
-			{/* Navigation blocker for unsaved editor changes */}
-			<NavigationBlocker />
-
-			{/* Render application layout */}
 			<AppLayout />
 		</UserDataLoader>
 	);

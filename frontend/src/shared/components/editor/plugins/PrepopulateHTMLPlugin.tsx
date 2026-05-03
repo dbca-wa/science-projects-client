@@ -17,6 +17,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $getRoot, $insertNodes } from "lexical";
 import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
+import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 
 interface PrepopulateHTMLPluginProps {
 	html?: string;
@@ -40,6 +41,10 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 			// - Event handler attribute variations
 			// - Dangerous URL protocols (javascript:, data:, vbscript:)
 			const sanitisedHTML = html ? sanitizeRichText(html) : "";
+
+			// Treat effectively empty HTML (e.g. "<p></p>") as truly empty
+			// so the editor starts clean and shows the placeholder
+			const effectiveHTML = isRichTextEmpty(sanitisedHTML) ? "" : sanitisedHTML;
 
 			// Store current scroll position
 			const scrollX = window.scrollX;
@@ -73,9 +78,9 @@ export const PrepopulateHTMLPlugin: React.FC<PrepopulateHTMLPluginProps> = ({
 						root.clear();
 
 						// Only insert nodes if there's content
-						if (sanitisedHTML) {
+						if (effectiveHTML) {
 							const parser = new DOMParser();
-							const dom = parser.parseFromString(sanitisedHTML, "text/html");
+							const dom = parser.parseFromString(effectiveHTML, "text/html");
 							const nodes = $generateNodesFromDOM(editor, dom);
 							$insertNodes(nodes);
 						}

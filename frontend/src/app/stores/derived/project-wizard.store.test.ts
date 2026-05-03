@@ -24,8 +24,8 @@ describe("ProjectWizardStore — addTeamMember", () => {
 		const store = new ProjectWizardStore();
 		store.addTeamMember(makeMember({ userId: 1 }));
 
-		expect(store.state.teamMembers).toHaveLength(1);
-		expect(store.state.teamMembers[0].userId).toBe(1);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers[0].userId).toBe(1);
 	});
 
 	it("should assign position based on current list length", () => {
@@ -33,8 +33,8 @@ describe("ProjectWizardStore — addTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 1 }));
 		store.addTeamMember(makeMember({ userId: 2 }));
 
-		expect(store.state.teamMembers[0].position).toBe(0);
-		expect(store.state.teamMembers[1].position).toBe(1);
+		expect(store.state.editingTeamMembers[0].position).toBe(0);
+		expect(store.state.editingTeamMembers[1].position).toBe(1);
 	});
 
 	it("should silently prevent duplicate userId", () => {
@@ -42,7 +42,7 @@ describe("ProjectWizardStore — addTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 1 }));
 		store.addTeamMember(makeMember({ userId: 1 }));
 
-		expect(store.state.teamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
 	});
 
 	it("should allow adding multiple distinct members", () => {
@@ -51,7 +51,7 @@ describe("ProjectWizardStore — addTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 2 }));
 		store.addTeamMember(makeMember({ userId: 3 }));
 
-		expect(store.state.teamMembers).toHaveLength(3);
+		expect(store.state.editingTeamMembers).toHaveLength(3);
 	});
 });
 
@@ -62,8 +62,8 @@ describe("ProjectWizardStore — removeTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 2 }));
 		store.removeTeamMember(2);
 
-		expect(store.state.teamMembers).toHaveLength(1);
-		expect(store.state.teamMembers[0].userId).toBe(1);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers[0].userId).toBe(1);
 	});
 
 	it("should not remove the project leader", () => {
@@ -72,8 +72,10 @@ describe("ProjectWizardStore — removeTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 2 }));
 		store.removeTeamMember(1);
 
-		expect(store.state.teamMembers).toHaveLength(2);
-		expect(store.state.teamMembers.find((m) => m.userId === 1)).toBeDefined();
+		expect(store.state.editingTeamMembers).toHaveLength(2);
+		expect(
+			store.state.editingTeamMembers.find((m) => m.userId === 1)
+		).toBeDefined();
 	});
 
 	it("should recalculate positions after removal", () => {
@@ -83,7 +85,9 @@ describe("ProjectWizardStore — removeTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 3 }));
 		store.removeTeamMember(2);
 
-		expect(store.state.teamMembers.map((m) => m.position)).toEqual([0, 1]);
+		expect(store.state.editingTeamMembers.map((m) => m.position)).toEqual([
+			0, 1,
+		]);
 	});
 
 	it("should be a no-op when userId does not exist", () => {
@@ -91,7 +95,7 @@ describe("ProjectWizardStore — removeTeamMember", () => {
 		store.addTeamMember(makeMember({ userId: 1 }));
 		store.removeTeamMember(999);
 
-		expect(store.state.teamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
 	});
 });
 
@@ -105,7 +109,9 @@ describe("ProjectWizardStore — reorderTeamMembers", () => {
 		// Move member at index 2 to index 1
 		store.reorderTeamMembers(2, 1);
 
-		expect(store.state.teamMembers.map((m) => m.userId)).toEqual([1, 3, 2]);
+		expect(store.state.editingTeamMembers.map((m) => m.userId)).toEqual([
+			1, 3, 2,
+		]);
 	});
 
 	it("should recalculate positions after reorder", () => {
@@ -116,7 +122,9 @@ describe("ProjectWizardStore — reorderTeamMembers", () => {
 
 		store.reorderTeamMembers(2, 1);
 
-		expect(store.state.teamMembers.map((m) => m.position)).toEqual([0, 1, 2]);
+		expect(store.state.editingTeamMembers.map((m) => m.position)).toEqual([
+			0, 1, 2,
+		]);
 	});
 
 	it("should prevent moving the leader away from position 0", () => {
@@ -128,8 +136,8 @@ describe("ProjectWizardStore — reorderTeamMembers", () => {
 		store.reorderTeamMembers(0, 2);
 
 		// Leader should still be at position 0
-		expect(store.state.teamMembers[0].userId).toBe(1);
-		expect(store.state.teamMembers[0].isLeader).toBe(true);
+		expect(store.state.editingTeamMembers[0].userId).toBe(1);
+		expect(store.state.editingTeamMembers[0].isLeader).toBe(true);
 	});
 
 	it("should prevent moving a non-leader to position 0", () => {
@@ -141,8 +149,8 @@ describe("ProjectWizardStore — reorderTeamMembers", () => {
 		store.reorderTeamMembers(2, 0);
 
 		// Leader should still be at position 0
-		expect(store.state.teamMembers[0].userId).toBe(1);
-		expect(store.state.teamMembers[0].isLeader).toBe(true);
+		expect(store.state.editingTeamMembers[0].userId).toBe(1);
+		expect(store.state.editingTeamMembers[0].isLeader).toBe(true);
 	});
 });
 
@@ -152,10 +160,10 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: 42 });
 		store.syncLeaderToTeam();
 
-		expect(store.state.teamMembers).toHaveLength(1);
-		expect(store.state.teamMembers[0].userId).toBe(42);
-		expect(store.state.teamMembers[0].isLeader).toBe(true);
-		expect(store.state.teamMembers[0].position).toBe(0);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers[0].userId).toBe(42);
+		expect(store.state.editingTeamMembers[0].isLeader).toBe(true);
+		expect(store.state.editingTeamMembers[0].position).toBe(0);
 	});
 
 	it("should promote an existing member to leader and move to position 0", () => {
@@ -166,9 +174,9 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: 20 });
 		store.syncLeaderToTeam();
 
-		expect(store.state.teamMembers[0].userId).toBe(20);
-		expect(store.state.teamMembers[0].isLeader).toBe(true);
-		expect(store.state.teamMembers[1].userId).toBe(10);
+		expect(store.state.editingTeamMembers[0].userId).toBe(20);
+		expect(store.state.editingTeamMembers[0].isLeader).toBe(true);
+		expect(store.state.editingTeamMembers[1].userId).toBe(10);
 	});
 
 	it("should demote the old leader when a new leader is set", () => {
@@ -179,10 +187,14 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: 2 });
 		store.syncLeaderToTeam();
 
-		const oldLeader = store.state.teamMembers.find((m) => m.userId === 1);
+		const oldLeader = store.state.editingTeamMembers.find(
+			(m) => m.userId === 1
+		);
 		expect(oldLeader?.isLeader).toBe(false);
 
-		const newLeader = store.state.teamMembers.find((m) => m.userId === 2);
+		const newLeader = store.state.editingTeamMembers.find(
+			(m) => m.userId === 2
+		);
 		expect(newLeader?.isLeader).toBe(true);
 	});
 
@@ -191,7 +203,7 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: 5 });
 		store.syncLeaderToTeam();
 
-		expect(store.state.teamMembers[0].role).toBe("supervising");
+		expect(store.state.editingTeamMembers[0].role).toBe("supervising");
 	});
 
 	it("should remove leader flag from all members when project_leader is null", () => {
@@ -202,7 +214,7 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: null });
 		store.syncLeaderToTeam();
 
-		expect(store.state.teamMembers.every((m) => !m.isLeader)).toBe(true);
+		expect(store.state.editingTeamMembers.every((m) => !m.isLeader)).toBe(true);
 	});
 
 	it("should recalculate positions after syncing leader", () => {
@@ -214,8 +226,10 @@ describe("ProjectWizardStore — syncLeaderToTeam", () => {
 		store.setProjectDetails({ project_leader: 3 });
 		store.syncLeaderToTeam();
 
-		expect(store.state.teamMembers.map((m) => m.position)).toEqual([0, 1, 2]);
-		expect(store.state.teamMembers[0].userId).toBe(3);
+		expect(store.state.editingTeamMembers.map((m) => m.position)).toEqual([
+			0, 1, 2,
+		]);
+		expect(store.state.editingTeamMembers[0].userId).toBe(3);
 	});
 });
 
@@ -237,11 +251,15 @@ describe("Auto-populate data custodian from project leader", () => {
 		store.setProjectDetails({ project_leader: leaderId });
 
 		// Simulate the auto-populate condition: custodian is null
-		expect(store.state.formData.projectDetails.data_custodian).toBeNull();
+		expect(
+			store.state.editingFormData.projectDetails.data_custodian
+		).toBeNull();
 
 		// Auto-populate
 		store.setProjectDetails({ data_custodian: leaderId });
-		expect(store.state.formData.projectDetails.data_custodian).toBe(leaderId);
+		expect(store.state.editingFormData.projectDetails.data_custodian).toBe(
+			leaderId
+		);
 	});
 
 	it("should not overwrite an existing non-null data_custodian", () => {
@@ -255,10 +273,10 @@ describe("Auto-populate data custodian from project leader", () => {
 		// Simulate the auto-populate condition check
 		const shouldAutoPopulate =
 			newLeader !== null &&
-			store.state.formData.projectDetails.data_custodian === null;
+			store.state.editingFormData.projectDetails.data_custodian === null;
 
 		expect(shouldAutoPopulate).toBe(false);
-		expect(store.state.formData.projectDetails.data_custodian).toBe(
+		expect(store.state.editingFormData.projectDetails.data_custodian).toBe(
 			existingCustodian
 		);
 	});
@@ -274,7 +292,7 @@ describe("Auto-populate data custodian from project leader", () => {
 
 		// User changes custodian
 		store.setProjectDetails({ data_custodian: differentCustodian });
-		expect(store.state.formData.projectDetails.data_custodian).toBe(
+		expect(store.state.editingFormData.projectDetails.data_custodian).toBe(
 			differentCustodian
 		);
 	});
@@ -292,7 +310,7 @@ describe("Auto-populate data custodian from project leader", () => {
 
 		const shouldAutoPopulate =
 			leaderId !== null &&
-			store.state.formData.projectDetails.data_custodian === null;
+			store.state.editingFormData.projectDetails.data_custodian === null;
 
 		expect(shouldAutoPopulate).toBe(true);
 	});
@@ -303,8 +321,8 @@ describe("Auto-populate data custodian from project leader", () => {
 		store.setProjectDetails({ project_leader: null });
 
 		const shouldAutoPopulate =
-			store.state.formData.projectDetails.project_leader !== null &&
-			store.state.formData.projectDetails.data_custodian === null;
+			store.state.editingFormData.projectDetails.project_leader !== null &&
+			store.state.editingFormData.projectDetails.data_custodian === null;
 
 		expect(shouldAutoPopulate).toBe(false);
 	});
@@ -448,23 +466,23 @@ describe("ProjectWizardStore — project kind handling", () => {
 	it("should initialise external details when kind is external", () => {
 		const store = new ProjectWizardStore();
 		store.setProjectKind("external");
-		expect(store.state.formData.externalDetails).not.toBeNull();
-		expect(store.state.formData.studentDetails).toBeNull();
+		expect(store.state.editingFormData.externalDetails).not.toBeNull();
+		expect(store.state.editingFormData.studentDetails).toBeNull();
 	});
 
 	it("should initialise student details when kind is student", () => {
 		const store = new ProjectWizardStore();
 		store.setProjectKind("student");
-		expect(store.state.formData.studentDetails).not.toBeNull();
-		expect(store.state.formData.externalDetails).toBeNull();
+		expect(store.state.editingFormData.studentDetails).not.toBeNull();
+		expect(store.state.editingFormData.externalDetails).toBeNull();
 	});
 
 	it("should clear conditional details for science projects", () => {
 		const store = new ProjectWizardStore();
 		store.setProjectKind("external");
 		store.setProjectKind("science");
-		expect(store.state.formData.externalDetails).toBeNull();
-		expect(store.state.formData.studentDetails).toBeNull();
+		expect(store.state.editingFormData.externalDetails).toBeNull();
+		expect(store.state.editingFormData.studentDetails).toBeNull();
 	});
 
 	it("should have 3 steps for science projects", () => {
@@ -647,6 +665,16 @@ describe("ProjectWizardStore — validation", () => {
 			project_leader: 10,
 			data_custodian: 11,
 		});
+		// Add an external team member to satisfy team validation
+		store.addTeamMember({
+			userId: 99,
+			role: "externalcol",
+			isLeader: false,
+			displayName: "External User",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
 		// External details missing collaboration_with
 		const firstInvalid = store.revalidateAllStepsFromData();
 		expect(firstInvalid).toBe(3); // step 3 = external details
@@ -666,9 +694,180 @@ describe("ProjectWizardStore — validation", () => {
 			project_leader: 10,
 			data_custodian: 11,
 		});
+		// Add a student team member to satisfy team validation
+		store.addTeamMember({
+			userId: 99,
+			role: "student",
+			isLeader: false,
+			displayName: "Student User",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
 		// Student details missing organisation and level
 		const firstInvalid = store.revalidateAllStepsFromData();
 		expect(firstInvalid).toBe(3); // step 3 = student details
+	});
+
+	it("revalidateAllStepsFromData should fail step 1 for student project without student role", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Add a team member but NOT with student role
+		store.addTeamMember({
+			userId: 99,
+			role: "consulted",
+			isLeader: false,
+			displayName: "Non-Student",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(1); // step 1 fails — no student role
+		expect(store.state.validation[1].errors.team_student).toBeDefined();
+	});
+
+	it("revalidateAllStepsFromData should pass step 1 for student project with student role", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		store.addTeamMember({
+			userId: 99,
+			role: "student",
+			isLeader: false,
+			displayName: "Student User",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
+		const firstInvalid = store.revalidateAllStepsFromData();
+		// Step 1 passes, step 3 (student details) should be first invalid
+		expect(firstInvalid).toBe(3);
+		expect(store.state.validation[1].errors.team_student).toBeUndefined();
+	});
+
+	it("revalidateAllStepsFromData should fail step 1 for external project without external user", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// No external team members added (leader is staff)
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(1); // step 1 fails — no external user
+		expect(store.state.validation[1].errors.team_external).toBeDefined();
+	});
+
+	it("revalidateAllStepsFromData should pass step 1 for science project without special members", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Science projects don't need special team members
+		const firstInvalid = store.revalidateAllStepsFromData();
+		expect(firstInvalid).toBe(-1); // all valid
+	});
+
+	it("addTeamMember should trigger revalidation", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Trigger initial validation
+		store.revalidateAllStepsFromData();
+		// Initially invalid — no student
+		expect(store.state.validation[1]?.isValid).toBe(false);
+
+		// Add student — should revalidate and become valid
+		store.addTeamMember({
+			userId: 99,
+			role: "student",
+			isLeader: false,
+			displayName: "Student",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
+		expect(store.state.validation[1]?.isValid).toBe(true);
+	});
+
+	it("updateTeamMemberRole should trigger revalidation", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Add member with wrong role
+		store.addTeamMember({
+			userId: 99,
+			role: "consulted",
+			isLeader: false,
+			displayName: "User",
+			position: 1,
+			isStaff: false,
+			timeAllocation: 0,
+		});
+		expect(store.state.validation[1]?.errors.team_student).toBeDefined();
+
+		// Change role to student — should revalidate
+		store.updateTeamMemberRole(99, "student");
+		expect(store.state.validation[1]?.errors.team_student).toBeUndefined();
+		expect(store.state.validation[1]?.isValid).toBe(true);
 	});
 });
 
@@ -720,8 +919,8 @@ describe("ProjectWizardStore — resetWizard", () => {
 		store.resetWizard();
 
 		expect(store.state.currentStep).toBe(0);
-		expect(store.state.formData.baseInformation.title).toBe("");
-		expect(store.state.teamMembers).toHaveLength(0);
+		expect(store.state.editingFormData.baseInformation.title).toBe("");
+		expect(store.state.editingTeamMembers).toHaveLength(0);
 		expect(store.state.completedSteps.size).toBe(0);
 		expect(store.state.touchedSteps.size).toBe(0);
 		expect(store.state.touchedFields.size).toBe(0);
@@ -749,20 +948,475 @@ describe("ProjectWizardStore — form data setters", () => {
 	it("setExternalDetails should initialise null details", () => {
 		const store = new ProjectWizardStore();
 		store.setExternalDetails({ collaboration_with: "CSIRO" });
-		expect(store.state.formData.externalDetails?.collaboration_with).toBe(
-			"CSIRO"
-		);
+		expect(
+			store.state.editingFormData.externalDetails?.collaboration_with
+		).toBe("CSIRO");
 	});
 
 	it("setStudentDetails should initialise null details", () => {
 		const store = new ProjectWizardStore();
 		store.setStudentDetails({ organisation: "UWA" });
-		expect(store.state.formData.studentDetails?.organisation).toBe("UWA");
+		expect(store.state.editingFormData.studentDetails?.organisation).toBe(
+			"UWA"
+		);
 	});
 
 	it("setLocation should update areas", () => {
 		const store = new ProjectWizardStore();
 		store.setLocation({ areas: [1, 2, 3] });
-		expect(store.state.formData.location.areas).toEqual([1, 2, 3]);
+		expect(store.state.editingFormData.location.areas).toEqual([1, 2, 3]);
+	});
+});
+
+describe("ProjectWizardStore — team validation for project kinds", () => {
+	it("should prevent duplicate team members", () => {
+		const store = new ProjectWizardStore();
+		store.addTeamMember(makeMember({ userId: 42 }));
+		store.addTeamMember(makeMember({ userId: 42 }));
+
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers[0].userId).toBe(42);
+	});
+
+	it("should fail validation for student project with external user (role=consulted) but no student role", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("student");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Add an external user with consulted role — not a student
+		store.addTeamMember(
+			makeMember({ userId: 99, role: "consulted", isStaff: false })
+		);
+
+		store.revalidateAllStepsFromData();
+
+		// Step 1 should be invalid because no team member has the student role
+		expect(store.state.validation[1].isValid).toBe(false);
+		expect(store.state.validation[1].errors.team_student).toBeDefined();
+	});
+
+	it("should fail validation for external project with only staff members", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Add only staff members — no external (non-staff, non-leader) member
+		store.addTeamMember(
+			makeMember({ userId: 20, role: "research", isStaff: true })
+		);
+		store.addTeamMember(
+			makeMember({ userId: 21, role: "technical", isStaff: true })
+		);
+
+		store.revalidateAllStepsFromData();
+
+		// Step 1 should be invalid — no external team member
+		expect(store.state.validation[1].isValid).toBe(false);
+		expect(store.state.validation[1].errors.team_external).toBeDefined();
+	});
+
+	it("should pass validation for external project with an external (non-staff) user", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("external");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// Add an external (non-staff, non-leader) member
+		store.addTeamMember(
+			makeMember({ userId: 99, role: "externalcol", isStaff: false })
+		);
+
+		store.revalidateAllStepsFromData();
+
+		// Step 1 should be valid — has an external member
+		expect(store.state.validation[1].isValid).toBe(true);
+		expect(store.state.validation[1].errors.team_external).toBeUndefined();
+	});
+
+	it("should pass validation for science project without special members", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// No special team members needed for science projects
+
+		store.revalidateAllStepsFromData();
+
+		expect(store.state.validation[1].isValid).toBe(true);
+	});
+
+	it("should pass validation for core_function project without special members", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("core_function");
+		store.setBaseInformation({
+			title: "Test",
+			description: "Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		// No special team members needed for core_function projects
+
+		store.revalidateAllStepsFromData();
+
+		expect(store.state.validation[1].isValid).toBe(true);
+	});
+});
+
+describe("ProjectWizardStore — split state: commitStep", () => {
+	it("should copy editingFormData to savedFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Editing Title" });
+
+		// Before commit, savedFormData should be empty
+		expect(store.state.savedFormData.baseInformation.title).toBe("");
+
+		store.commitStep();
+
+		expect(store.state.savedFormData.baseInformation.title).toBe(
+			"Editing Title"
+		);
+	});
+
+	it("should copy editingTeamMembers to savedTeamMembers", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.addTeamMember(makeMember({ userId: 1 }));
+
+		expect(store.state.savedTeamMembers).toHaveLength(0);
+
+		store.commitStep();
+
+		expect(store.state.savedTeamMembers).toHaveLength(1);
+		expect(store.state.savedTeamMembers[0].userId).toBe(1);
+	});
+
+	it("should deep copy — editing changes after commit should not affect saved", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Original" });
+		store.commitStep();
+
+		// Change editing after commit
+		store.setBaseInformation({ title: "Changed" });
+
+		// Saved should still be "Original"
+		expect(store.state.savedFormData.baseInformation.title).toBe("Original");
+		expect(store.state.editingFormData.baseInformation.title).toBe("Changed");
+	});
+});
+
+describe("ProjectWizardStore — split state: loadStepForEditing", () => {
+	it("should copy savedFormData to editingFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Editing" });
+		store.commitStep();
+
+		// Change editing
+		store.setBaseInformation({ title: "New Editing" });
+
+		// Load from saved
+		store.loadStepForEditing(0);
+
+		expect(store.state.editingFormData.baseInformation.title).toBe("Editing");
+	});
+
+	it("should copy savedTeamMembers to editingTeamMembers", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.addTeamMember(makeMember({ userId: 1 }));
+		store.commitStep();
+
+		// Add another member to editing
+		store.addTeamMember(makeMember({ userId: 2 }));
+		expect(store.state.editingTeamMembers).toHaveLength(2);
+
+		// Load from saved
+		store.loadStepForEditing(0);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+	});
+});
+
+describe("ProjectWizardStore — split state: isDirty", () => {
+	it("should be false when editing matches saved", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		expect(store.isDirty).toBe(false);
+	});
+
+	it("should be true when editing differs from saved", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Changed" });
+		expect(store.isDirty).toBe(true);
+	});
+
+	it("should be false after commitStep", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Changed" });
+		expect(store.isDirty).toBe(true);
+
+		store.commitStep();
+		expect(store.isDirty).toBe(false);
+	});
+
+	it("should detect team member changes", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.commitStep(); // sync both layers
+
+		store.addTeamMember(makeMember({ userId: 1 }));
+		expect(store.isDirty).toBe(true);
+	});
+});
+
+describe("ProjectWizardStore — split state: full reset", () => {
+	it("resetWizard should clear both editing and saved layers", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Test" });
+		store.commitStep();
+
+		store.resetWizard();
+
+		expect(store.state.editingFormData.baseInformation.title).toBe("");
+		expect(store.state.savedFormData.baseInformation.title).toBe("");
+		expect(store.state.editingTeamMembers).toHaveLength(0);
+		expect(store.state.savedTeamMembers).toHaveLength(0);
+	});
+
+	it("reset should clear everything including loading/error/initialised", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Test" });
+		store.setLoading(true);
+		store.setError("test error");
+
+		store.reset();
+
+		expect(store.state.editingFormData.baseInformation.title).toBe("");
+		expect(store.state.loading).toBe(false);
+		expect(store.state.error).toBeNull();
+		expect(store.state.initialised).toBe(false);
+	});
+});
+
+describe("ProjectWizardStore — editing state updates on keystroke, saved does NOT", () => {
+	it("should update editingFormData on setBaseInformation without affecting savedFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		store.setBaseInformation({ title: "Keystroke 1" });
+		expect(store.state.editingFormData.baseInformation.title).toBe(
+			"Keystroke 1"
+		);
+		expect(store.state.savedFormData.baseInformation.title).toBe("");
+
+		store.setBaseInformation({ title: "Keystroke 2" });
+		expect(store.state.editingFormData.baseInformation.title).toBe(
+			"Keystroke 2"
+		);
+		expect(store.state.savedFormData.baseInformation.title).toBe("");
+	});
+
+	it("should update editingFormData on setProjectDetails without affecting savedFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		store.setProjectDetails({ business_area: 5 });
+		expect(store.state.editingFormData.projectDetails.business_area).toBe(5);
+		expect(store.state.savedFormData.projectDetails.business_area).toBeNull();
+	});
+
+	it("should update editingFormData on setLocation without affecting savedFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		store.setLocation({ areas: [10, 20] });
+		expect(store.state.editingFormData.location.areas).toEqual([10, 20]);
+		expect(store.state.savedFormData.location.areas).toEqual([]);
+	});
+
+	it("should update editingTeamMembers on addTeamMember without affecting savedTeamMembers", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		store.addTeamMember(makeMember({ userId: 42 }));
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.savedTeamMembers).toHaveLength(0);
+	});
+});
+
+describe("ProjectWizardStore — Save and Continue commits editing to saved", () => {
+	it("goToNextStep should commit editing to saved before advancing", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.setBaseInformation({ title: "Step 0 Title" });
+		store.setStepValidation(0, true);
+
+		// Before advancing, saved is empty
+		expect(store.state.savedFormData.baseInformation.title).toBe("");
+
+		store.goToNextStep();
+
+		// After advancing, saved should have the committed data
+		expect(store.state.savedFormData.baseInformation.title).toBe(
+			"Step 0 Title"
+		);
+		expect(store.state.currentStep).toBe(1);
+	});
+
+	it("goToNextStep should commit team members before advancing", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+		store.addTeamMember(makeMember({ userId: 1 }));
+		store.setStepValidation(0, true);
+
+		store.goToNextStep();
+
+		expect(store.state.savedTeamMembers).toHaveLength(1);
+		expect(store.state.savedTeamMembers[0].userId).toBe(1);
+	});
+});
+
+describe("ProjectWizardStore — navigating back loads saved to editing", () => {
+	it("should restore editing from saved when loadStepForEditing is called after edits", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		// Set up and commit step 0
+		store.setBaseInformation({ title: "Committed Title" });
+		store.setBaseInformation({ description: "Committed Desc" });
+		store.commitStep();
+
+		// Make uncommitted changes
+		store.setBaseInformation({ title: "Uncommitted Title" });
+		expect(store.state.editingFormData.baseInformation.title).toBe(
+			"Uncommitted Title"
+		);
+
+		// Navigate back — load from saved
+		store.loadStepForEditing(0);
+
+		expect(store.state.editingFormData.baseInformation.title).toBe(
+			"Committed Title"
+		);
+		expect(store.state.editingFormData.baseInformation.description).toBe(
+			"Committed Desc"
+		);
+	});
+
+	it("should discard uncommitted team member changes on loadStepForEditing", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		store.addTeamMember(makeMember({ userId: 1 }));
+		store.commitStep();
+
+		// Add uncommitted member
+		store.addTeamMember(makeMember({ userId: 2 }));
+		store.addTeamMember(makeMember({ userId: 3 }));
+		expect(store.state.editingTeamMembers).toHaveLength(3);
+
+		// Load from saved
+		store.loadStepForEditing(0);
+		expect(store.state.editingTeamMembers).toHaveLength(1);
+		expect(store.state.editingTeamMembers[0].userId).toBe(1);
+	});
+});
+
+describe("ProjectWizardStore — final creation uses savedState", () => {
+	it("savedFormData should be the source of truth after commitStep, not editingFormData", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		// Fill in and commit
+		store.setBaseInformation({
+			title: "Final Title",
+			description: "Final Desc",
+			keywords: ["fauna"],
+		});
+		store.setProjectDetails({
+			business_area: 1,
+			start_date: new Date(),
+			project_leader: 10,
+			data_custodian: 11,
+		});
+		store.addTeamMember(
+			makeMember({ userId: 10, isLeader: true, role: "supervising" })
+		);
+		store.commitStep();
+
+		// Make post-commit edits (user is still typing but hasn't saved)
+		store.setBaseInformation({ title: "Unsaved Edit" });
+
+		// The creation payload should come from savedFormData
+		expect(store.state.savedFormData.baseInformation.title).toBe("Final Title");
+		expect(store.state.editingFormData.baseInformation.title).toBe(
+			"Unsaved Edit"
+		);
+
+		// savedTeamMembers is the source of truth
+		expect(store.state.savedTeamMembers).toHaveLength(1);
+		expect(store.state.savedTeamMembers[0].userId).toBe(10);
+	});
+
+	it("savedFormData should reflect the last committed state across multiple steps", () => {
+		const store = new ProjectWizardStore();
+		store.setProjectKind("science");
+
+		// Step 0: commit base info
+		store.setBaseInformation({ title: "My Project" });
+		store.commitStep();
+
+		// Step 1: commit project details
+		store.setProjectDetails({ business_area: 3 });
+		store.commitStep();
+
+		// Both steps' data should be in savedFormData
+		expect(store.state.savedFormData.baseInformation.title).toBe("My Project");
+		expect(store.state.savedFormData.projectDetails.business_area).toBe(3);
 	});
 });

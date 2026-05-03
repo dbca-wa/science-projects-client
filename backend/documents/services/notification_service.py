@@ -18,23 +18,49 @@ class NotificationService:
     """Business logic for document notifications"""
 
     @staticmethod
-    def notify_document_approved(document, approver):
+    def notify_document_approved(document, approver, stage=None):
         """
-        Notify relevant parties when document is approved
+        Notify the correct next approver when a document is approved at a stage.
+
+        Stage-specific routing:
+        - Stage 1 (PL approves) → email BA lead ("ready for your review")
+        - Stage 2 (BA lead approves) → email key stakeholder / approvers / directorate
+        - Stage 3 (directorate approves) → email project lead ("fully approved")
+
+        Falls back to generic document recipients if stage is not provided.
 
         Args:
             document: Approved document instance
             approver: User who approved the document
+            stage: The approval stage that was just completed (1, 2, or 3)
         """
-        recipients = NotificationService._get_document_recipients(document)
+        if stage is not None:
+            recipients = NotificationService._get_stage_approval_recipients(
+                document, int(stage)
+            )
+        else:
+            recipients = NotificationService._get_document_recipients(document)
+
+        if not recipients:
+            settings.LOGGER.warning(
+                f"No approval recipients found for document {document.pk} at stage {stage}"
+            )
+            return
+
+        # Use different notification type for final approval (stage 3)
+        notification_type = "approved"
+        email_subject = f"{document.kind.title()} Approved"
+
+        if stage == 3:
+            email_subject = f"{document.kind.title()} — Final Approval Granted"
 
         EmailService.send_document_notification(
-            notification_type="approved",
+            notification_type=notification_type,
             document=document,
             recipients=recipients,
             actioning_user=approver,
             additional_context={
-                "email_subject": f"{document.kind.title()} Approved",
+                "email_subject": email_subject,
             },
         )
 
@@ -1038,6 +1064,89 @@ class NotificationService:
                 "invite_link": invite_link,
             },
         )
+
+    @staticmethod
+    def _get_stage_approval_recipients(document, stage):
+        """
+        Get the correct recipient(s) for an approval notification based on stage.
+
+        - Stage 1 (PL approved) → BA lead should review next
+        - Stage 2 (BA lead approved) → key stakeholder / approvers / director
+        - Stage 3 (directorate approved) → project lead (final approval notification)
+
+        Returns:
+            List of dicts with 'name', 'email', 'kind'
+        """
+        recipients = []
+        seen_pks = set()
+
+        if stage == 1:
+            # PL approved → notify BA lead
+            ba = document.project.business_area
+            if ba and ba.leader and ba.leader.is_active:
+                recipients.append(
+                    {
+                        "name": ba.leader.get_full_name(),
+                        "email": ba.leader.email,
+                        "kind": "Business Area Leader",
+                    }
+                )
+
+        elif stage == 2:
+            # BA lead approved → notify directorate (key stakeholder, approvers, or director)
+            ba = document.project.business_area
+            if ba and ba.division:
+                division = ba.division
+                # Key stakeholder first
+                if (
+                    hasattr(division, "key_stakeholder")
+                    and division.key_stakeholder
+                    and division.key_stakeholder.is_active
+                ):
+                    ks = division.key_stakeholder
+                    recipients.append(
+                        {
+                            "name": ks.get_full_name(),
+                            "email": ks.email,
+                            "kind": "Key Stakeholder",
+                        }
+                    )
+                    seen_pks.add(ks.pk)
+                # Approvers
+                if hasattr(division, "approvers"):
+                    for approver in division.approvers.all():
+                        if approver.is_active and approver.pk not in seen_pks:
+                            recipients.append(
+                                {
+                                    "name": approver.get_full_name(),
+                                    "email": approver.email,
+                                    "kind": "Approver",
+                                }
+                            )
+                            seen_pks.add(approver.pk)
+                # Fallback to directorate BA lead (director) if no stakeholder/approvers
+                if not recipients and division.director and division.director.is_active:
+                    recipients.append(
+                        {
+                            "name": division.director.get_full_name(),
+                            "email": division.director.email,
+                            "kind": "Director",
+                        }
+                    )
+
+        elif stage == 3:
+            # Directorate approved → notify project lead (final approval)
+            for member in document.project.members.filter(is_leader=True):
+                if member.user.is_active:
+                    recipients.append(
+                        {
+                            "name": member.user.get_full_name(),
+                            "email": member.user.email,
+                            "kind": "Project Lead",
+                        }
+                    )
+
+        return recipients
 
     @staticmethod
     def _get_sent_back_recipient(document):

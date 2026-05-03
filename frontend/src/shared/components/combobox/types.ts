@@ -25,6 +25,11 @@ export interface BaseComboboxProps<T> {
 	onCreateNew?: (searchTerm: string) => Promise<T>;
 	createNewLabel?: (searchTerm: string) => string;
 
+	// Optional "create new" click handler (fire-and-forget, no loading state)
+	// Use this instead of onCreateNew when the creation happens in a modal
+	onCreateNewClick?: () => void;
+	createNewClickLabel?: string;
+
 	// UI customization
 	label?: string;
 	placeholder?: string;

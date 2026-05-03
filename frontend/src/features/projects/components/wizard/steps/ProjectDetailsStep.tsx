@@ -19,6 +19,7 @@ import { FieldError } from "../FieldError";
 import { shouldShowError } from "../validation-helpers";
 import { SectionCard } from "../SectionCard";
 import { WizardTeamSection } from "../WizardTeamSection";
+import { AlertCircle, Info } from "lucide-react";
 
 /**
  * ProjectDetailsStep - Step 2 of project creation wizard
@@ -33,14 +34,14 @@ import { WizardTeamSection } from "../WizardTeamSection";
  */
 const ProjectDetailsStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData.projectDetails;
+	const formData = wizardStore.state.editingFormData.projectDetails;
 	const validation = wizardStore.state.validation[1]; // Step 1 is Project Details
 	const stepIndex = 1;
 	const { data: businessAreas, isLoading: baLoading } = useBusinessAreas();
 	const { data: services, isLoading: servicesLoading } = useServices();
 	const leaderRef = useRef<UserComboboxRef>(null);
 	const custodianRef = useRef<UserComboboxRef>(null);
-	const teamMembers = wizardStore.state.teamMembers;
+	const teamMembers = wizardStore.state.editingTeamMembers;
 
 	const handleFieldBlur = useCallback(
 		(fieldName: string) => {
@@ -76,6 +77,23 @@ const ProjectDetailsStep = observer(() => {
 			errors.data_custodian = "Data custodian is required";
 		}
 
+		// Team member requirements based on project kind
+		const teamMembers = wizardStore.state.editingTeamMembers;
+		const projectKind = wizardStore.state.projectKind;
+		if (projectKind === "student") {
+			const hasStudent = teamMembers.some((m) => m.role === "student");
+			if (!hasStudent) {
+				errors.team_student =
+					"Student projects require at least one team member with the Supervised Student role";
+			}
+		} else if (projectKind === "external") {
+			const hasExternal = teamMembers.some((m) => !m.isStaff && !m.isLeader);
+			if (!hasExternal) {
+				errors.team_external =
+					"External projects require at least one external team member";
+			}
+		}
+
 		const isValid = Object.keys(errors).length === 0;
 		wizardStore.setStepValidation(1, isValid, errors);
 	}, [
@@ -85,6 +103,8 @@ const ProjectDetailsStep = observer(() => {
 		formData.project_leader,
 		formData.data_custodian,
 		wizardStore,
+		wizardStore.state.editingTeamMembers,
+		wizardStore.state.projectKind,
 	]);
 
 	const handleStartDateChange = (date: Date) => {
@@ -338,13 +358,73 @@ const ProjectDetailsStep = observer(() => {
 			</SectionCard>
 
 			{/* Team Members */}
-			<SectionCard
-				title="Team Members"
-				isComplete={teamMembers.length > 0}
-				completionLabel="Team members section complete"
-			>
-				<WizardTeamSection />
-			</SectionCard>
+			{(() => {
+				const projectKind = wizardStore.state.projectKind;
+				const hasTeamError =
+					!!validation?.errors.team_student ||
+					!!validation?.errors.team_external;
+				const hasStudent = teamMembers.some((m) => m.role === "student");
+				const hasAcademicSupervisor = teamMembers.some(
+					(m) => m.role === "academicsuper"
+				);
+				const hasExternal = teamMembers.some((m) => !m.isStaff && !m.isLeader);
+
+				// Determine completion: for student/external, must have required member type
+				const isTeamComplete =
+					projectKind === "student"
+						? hasStudent
+						: projectKind === "external"
+							? hasExternal
+							: teamMembers.length > 0;
+
+				return (
+					<SectionCard
+						title="Team Members"
+						isComplete={isTeamComplete}
+						isInvalid={hasTeamError && teamMembers.length > 0}
+						completionLabel="Team members section complete"
+					>
+						{/* Requirement message for student/external projects */}
+						{projectKind === "student" && !hasStudent && (
+							<div className="mb-4 flex gap-3 rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/20 px-4 py-3 text-sm text-orange-800 dark:text-orange-200">
+								<AlertCircle className="size-4 mt-0.5 shrink-0 text-orange-600 dark:text-orange-400" />
+								<p>
+									Student projects require at least one team member with the{" "}
+									<span className="font-semibold">Supervised Student</span>{" "}
+									role. Add an external user and assign them the student role.
+								</p>
+							</div>
+						)}
+						{projectKind === "external" && !hasExternal && (
+							<div className="mb-4 flex gap-3 rounded-lg border border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/20 px-4 py-3 text-sm text-orange-800 dark:text-orange-200">
+								<AlertCircle className="size-4 mt-0.5 shrink-0 text-orange-600 dark:text-orange-400" />
+								<p>
+									External projects require at least one{" "}
+									<span className="font-semibold">external team member</span>.
+									Search for an existing external user or create a new one.
+								</p>
+							</div>
+						)}
+
+						<WizardTeamSection />
+
+						{/* Suggestion: add academic supervisor for student projects */}
+						{projectKind === "student" &&
+							hasStudent &&
+							!hasAcademicSupervisor && (
+								<div className="mt-4 flex gap-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
+									<Info className="size-4 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+									<p>
+										Consider adding an{" "}
+										<span className="font-semibold">Academic Supervisor</span>{" "}
+										to the team. This is recommended for student projects but
+										not required.
+									</p>
+								</div>
+							)}
+					</SectionCard>
+				);
+			})()}
 		</div>
 	);
 });

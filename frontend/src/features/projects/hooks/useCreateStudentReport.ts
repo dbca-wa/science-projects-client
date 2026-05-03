@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "@/shared/services/api/client.service";
+import { useNavigate } from "react-router";
 import { extractUserFriendlyMessage } from "@/shared/utils/error.utils";
 
 interface CreateStudentReportParams {
@@ -38,17 +39,19 @@ const createStudentReport = async ({
  */
 export const useCreateStudentReport = () => {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	return useMutation({
 		mutationFn: createStudentReport,
-		onSuccess: (data, variables) => {
+		onSuccess: async (data, variables) => {
 			toast.success(`Student report for ${data.year} created successfully`);
 
-			// Invalidate queries
-			setTimeout(() => {
-				queryClient.invalidateQueries({
-					queryKey: ["projects", variables.projectId],
-				});
+			// Refetch project data and wait for it to complete — ensures
+			// the student reports tab exists before we navigate to it
+			await Promise.all([
+				queryClient.refetchQueries({
+					queryKey: ["projects", "detail", variables.projectId],
+				}),
 				queryClient.invalidateQueries({
 					queryKey: [
 						"projects",
@@ -56,8 +59,11 @@ export const useCreateStudentReport = () => {
 						"student-reports",
 						"available-years",
 					],
-				});
-			}, 350);
+				}),
+			]);
+
+			// Navigate to the student reports tab
+			navigate(`/projects/${variables.projectId}/student`);
 		},
 		onError: (error: Error) => {
 			const message = extractUserFriendlyMessage(

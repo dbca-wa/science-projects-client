@@ -18,9 +18,10 @@ interface DocumentTabLayoutProps {
 	project: IProjectData;
 	members: IProjectMember[] | null;
 	documentType: DocumentTypeWithUnderscores;
-	typeSpecificId?: number; // Optional: The ID of the specific document type (ConceptPlan.id, ProjectPlan.id, etc.)
+	typeSpecificId?: number;
 	canDelete?: boolean;
-	// New props for DocumentActionsSection
+	locked?: boolean;
+	// DocumentActionsSection props
 	creator?: IUserData | null;
 	modifier?: IUserData | null;
 	userIsCaretakerOfAdmin?: boolean;
@@ -29,6 +30,7 @@ interface DocumentTabLayoutProps {
 	all_documents?: IProjectDocuments;
 	isBaLead?: boolean;
 	// Special action callbacks (passed through to wrapper)
+	onCreateConceptPlan?: () => void;
 	onCreateProgressReport?: () => void;
 	onSetAreas?: () => void;
 	onReopenProject?: () => void;
@@ -44,13 +46,14 @@ interface DocumentTabLayoutProps {
  * - Mobile to XL: Details and Actions stacked at top, content in middle, Comments at bottom
  * - 2XL+: Details, Actions, and Comments in sticky sidebar on right (with independent scroll), content on left (scrollable)
  */
-export function DocumentTabLayout({
+export const DocumentTabLayout = ({
 	document,
 	project,
 	members,
 	documentType,
 	typeSpecificId,
 	canDelete = true,
+	locked = false,
 	creator,
 	// modifier,
 	userIsCaretakerOfAdmin,
@@ -58,12 +61,13 @@ export function DocumentTabLayout({
 	userIsCaretakerOfProjectLeader,
 	all_documents,
 	isBaLead,
+	onCreateConceptPlan,
 	onCreateProgressReport,
 	onSetAreas,
 	onReopenProject,
 	commentsSection,
 	children,
-}: DocumentTabLayoutProps) {
+}: DocumentTabLayoutProps) => {
 	// Convert underscore format to compact format for child components
 	const compactDocumentType = toCompactDocumentType(documentType);
 
@@ -82,12 +86,14 @@ export function DocumentTabLayout({
 					members={members}
 					documentType={compactDocumentType}
 					canDelete={canDelete}
+					locked={locked}
 					creator={creator}
 					userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
 					userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
 					userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
 					all_documents={all_documents}
 					isBaLead={isBaLead}
+					onCreateConceptPlan={onCreateConceptPlan}
 					onCreateProgressReport={onCreateProgressReport}
 					onSetAreas={onSetAreas}
 					onReopenProject={onReopenProject}
@@ -97,7 +103,7 @@ export function DocumentTabLayout({
 			{/* Main content area */}
 			<div className="grid gap-6 2xl:grid-cols-3">
 				{/* Left column: Document content (full width on mobile-XL, 2/3 on 2XL+) */}
-				<div className="2xl:col-span-2">{children}</div>
+				<div className="min-w-0 2xl:col-span-2">{children}</div>
 
 				{/* Right column: Details, Actions, and Comments (only visible on 2XL+, sticky positioning with scroll) */}
 				<div className="hidden 2xl:block">
@@ -113,12 +119,14 @@ export function DocumentTabLayout({
 							members={members}
 							documentType={compactDocumentType}
 							canDelete={canDelete}
+							locked={locked}
 							creator={creator}
 							userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
 							userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
 							userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
 							all_documents={all_documents}
 							isBaLead={isBaLead}
+							onCreateConceptPlan={onCreateConceptPlan}
 							onCreateProgressReport={onCreateProgressReport}
 							onSetAreas={onSetAreas}
 							onReopenProject={onReopenProject}
@@ -133,4 +141,4 @@ export function DocumentTabLayout({
 			<div className="2xl:hidden">{commentsSection}</div>
 		</div>
 	);
-}
+};

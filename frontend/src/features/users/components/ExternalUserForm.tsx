@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
@@ -13,7 +13,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { Loader2, AlertCircle, Mail } from "lucide-react";
+import { Loader2, AlertCircle, Mail, Check, X } from "lucide-react";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { useCreateExternalUser } from "../hooks/useCreateExternalUser";
 import { useUserExistenceCheck } from "../hooks/useUserExistenceCheck";
@@ -29,6 +29,44 @@ interface ExternalUserFormProps {
 	onCancel?: () => void;
 }
 
+/** Section card with validation state indicator */
+const FormSection = ({
+	title,
+	isComplete,
+	isInvalid,
+	children,
+}: {
+	title: string;
+	isComplete: boolean;
+	isInvalid?: boolean;
+	children: React.ReactNode;
+}) => (
+	<div
+		className={`rounded-lg border shadow-sm p-6 transition-colors ${
+			isInvalid
+				? "bg-red-50/50 dark:bg-red-950/20 border-red-300 dark:border-red-700"
+				: isComplete
+					? "bg-emerald-50/50 dark:bg-emerald-950/20"
+					: ""
+		}`}
+	>
+		<div className="flex items-center justify-between mb-4">
+			<h3 className="text-base font-semibold">{title}</h3>
+			{isInvalid && (
+				<div className="animate-in zoom-in-50 fade-in duration-300 flex items-center justify-center size-6 rounded-full bg-red-100 dark:bg-red-900/40">
+					<X className="size-4 text-red-600 dark:text-red-400" />
+				</div>
+			)}
+			{isComplete && !isInvalid && (
+				<div className="animate-in zoom-in-50 fade-in duration-300 flex items-center justify-center size-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40">
+					<Check className="size-4 text-emerald-600 dark:text-emerald-400" />
+				</div>
+			)}
+		</div>
+		{children}
+	</div>
+);
+
 /**
  * ExternalUserForm component
  * Form for creating external (non-DBCA) users
@@ -42,7 +80,7 @@ export const ExternalUserForm = ({
 
 	const form = useForm<ExternalUserCreateFormData>({
 		resolver: zodResolver(externalUserCreateSchema),
-		mode: "onBlur",
+		mode: "onChange",
 		defaultValues: {
 			firstName: "",
 			lastName: "",
@@ -74,17 +112,28 @@ export const ExternalUserForm = ({
 			emailValidator,
 		});
 
-	// Warn user about unsaved changes
-	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (form.formState.isDirty && !form.formState.isSubmitting) {
-				e.preventDefault();
-			}
-		};
+	// Section validation states
+	const nameErrors =
+		form.formState.errors.firstName || form.formState.errors.lastName;
+	const isNameComplete =
+		firstName.length >= 2 && lastName.length >= 2 && !nameErrors;
+	const isNameInvalid =
+		(form.formState.touchedFields.firstName ||
+			form.formState.touchedFields.lastName) &&
+		!!nameErrors;
 
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [form.formState.isDirty, form.formState.isSubmitting]);
+	const emailErrors =
+		form.formState.errors.email || form.formState.errors.confirmEmail;
+	const isEmailComplete =
+		email.length >= 5 &&
+		email === confirmEmail &&
+		!email.endsWith("@dbca.wa.gov.au") &&
+		!emailErrors &&
+		!emailExists;
+	const isEmailInvalid =
+		(form.formState.touchedFields.email ||
+			form.formState.touchedFields.confirmEmail) &&
+		(!!emailErrors || emailExists);
 
 	const onSubmit = async (data: ExternalUserCreateFormData) => {
 		if (emailExists) {
@@ -95,9 +144,7 @@ export const ExternalUserForm = ({
 		}
 
 		try {
-			// Sanitise form data before submission
 			const sanitisedData = sanitiseFormData(data, []);
-
 			const newUser = await createMutation.mutateAsync(sanitisedData);
 			if (onSuccess) {
 				onSuccess(newUser);
@@ -137,155 +184,161 @@ export const ExternalUserForm = ({
 					</AlertDescription>
 				</Alert>
 
-				{/* Name fields */}
-				<div className="grid gap-4 md:grid-cols-2">
-					{/* First Name */}
-					<FormField
-						control={form.control}
-						name="firstName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>First Name *</FormLabel>
-								<FormControl>
-									<Input
-										{...field}
-										placeholder="First Name"
-										maxLength={30}
-										disabled={isSubmitting}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* Last Name */}
-					<FormField
-						control={form.control}
-						name="lastName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Last Name *</FormLabel>
-								<FormControl>
-									<Input
-										{...field}
-										placeholder="Last Name"
-										maxLength={30}
-										disabled={isSubmitting}
-									/>
-								</FormControl>
-								<FormMessage />
-								{isCheckingName && (
-									<p className="text-sm text-blue-500 flex items-center gap-2">
-										<Loader2 className="size-3 animate-spin" />
-										Checking name...
-									</p>
-								)}
-								{nameExists && (
-									<p className="text-sm text-orange-500">
-										Warning: User with this name already exists.
-									</p>
-								)}
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				{/* Email fields */}
-				<div className="grid gap-4 md:grid-cols-2">
-					{/* Email */}
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Email *</FormLabel>
-								<FormControl>
-									<div className="relative">
-										<Mail className="absolute left-3 top-3 size-4 text-gray-400" />
+				{/* Name Section */}
+				<FormSection
+					title="Name"
+					isComplete={isNameComplete}
+					isInvalid={isNameInvalid}
+				>
+					<div className="grid gap-4 md:grid-cols-2 items-start">
+						<FormField
+							control={form.control}
+							name="firstName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>First Name *</FormLabel>
+									<FormControl>
 										<Input
 											{...field}
-											type="email"
-											placeholder="Email"
-											maxLength={50}
+											placeholder="First Name"
+											maxLength={30}
 											disabled={isSubmitting}
-											className="pl-10"
 										/>
+									</FormControl>
+									<div className="h-5">
+										<FormMessage />
 									</div>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					{/* Confirm Email */}
-					<FormField
-						control={form.control}
-						name="confirmEmail"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Confirm Email *</FormLabel>
-								<FormControl>
-									<div className="relative">
-										<Mail className="absolute left-3 top-3 size-4 text-gray-400" />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="lastName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Last Name *</FormLabel>
+									<FormControl>
 										<Input
 											{...field}
-											type="email"
-											placeholder="Confirm Email"
-											maxLength={50}
+											placeholder="Last Name"
+											maxLength={30}
 											disabled={isSubmitting}
-											className="pl-10"
 										/>
+									</FormControl>
+									<div className="h-5">
+										<FormMessage />
 									</div>
-								</FormControl>
-								<FormMessage />
-								{isCheckingEmail && (
-									<p className="text-sm text-blue-500 flex items-center gap-2">
-										<Loader2 className="size-3 animate-spin" />
-										Checking email...
-									</p>
-								)}
-								{emailExists && (
-									<p className="text-sm text-red-500">
-										User with this email already exists.
-									</p>
-								)}
-								{!emailExists &&
-									email.length >= 5 &&
-									email === confirmEmail &&
-									firstName.length > 1 &&
-									lastName.length > 1 &&
-									!email.endsWith("@dbca.wa.gov.au") && (
-										<p className="text-sm text-green-500">
-											All fields complete. Press Add User.
+									{isCheckingName && (
+										<p className="text-sm text-blue-500 flex items-center gap-2">
+											<Loader2 className="size-3 animate-spin" /> Checking
+											name...
 										</p>
 									)}
+									{nameExists && (
+										<p className="text-sm text-orange-500">
+											Warning: User with this name already exists.
+										</p>
+									)}
+								</FormItem>
+							)}
+						/>
+					</div>
+				</FormSection>
+
+				{/* Email Section */}
+				<FormSection
+					title="Email"
+					isComplete={isEmailComplete}
+					isInvalid={isEmailInvalid}
+				>
+					<div className="grid gap-4 md:grid-cols-2 items-start">
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Email *</FormLabel>
+									<FormControl>
+										<div className="relative">
+											<Mail className="absolute left-3 top-3 size-4 text-gray-400" />
+											<Input
+												{...field}
+												type="email"
+												placeholder="Email"
+												maxLength={50}
+												disabled={isSubmitting}
+												className="pl-10"
+											/>
+										</div>
+									</FormControl>
+									<div className="h-5">
+										<FormMessage />
+									</div>
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="confirmEmail"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Confirm Email *</FormLabel>
+									<FormControl>
+										<div className="relative">
+											<Mail className="absolute left-3 top-3 size-4 text-gray-400" />
+											<Input
+												{...field}
+												type="email"
+												placeholder="Confirm Email"
+												maxLength={50}
+												disabled={isSubmitting}
+												className="pl-10"
+											/>
+										</div>
+									</FormControl>
+									<div className="h-5">
+										<FormMessage />
+									</div>
+									{isCheckingEmail && (
+										<p className="text-sm text-blue-500 flex items-center gap-2">
+											<Loader2 className="size-3 animate-spin" /> Checking
+											email...
+										</p>
+									)}
+									{emailExists && (
+										<p className="text-sm text-red-500">
+											User with this email already exists.
+										</p>
+									)}
+								</FormItem>
+							)}
+						/>
+					</div>
+				</FormSection>
+
+				{/* Affiliation Section (optional) */}
+				<FormSection title="Affiliation" isComplete={false}>
+					<FormField
+						control={form.control}
+						name="affiliation"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Affiliation (Optional)</FormLabel>
+								<FormControl>
+									<AffiliationCombobox
+										value={field.value}
+										onChange={field.onChange}
+										placeholder="Search for an affiliation..."
+										helperText="Optionally select an affiliation for this user"
+										isEditable={true}
+										disabled={isSubmitting}
+									/>
+								</FormControl>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>
-				</div>
-
-				{/* Affiliation (optional) */}
-				<FormField
-					control={form.control}
-					name="affiliation"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Affiliation (Optional)</FormLabel>
-							<FormControl>
-								<AffiliationCombobox
-									value={field.value}
-									onChange={field.onChange}
-									placeholder="Search for an affiliation..."
-									helperText="Optionally select an affiliation for this user"
-									isEditable={true}
-									disabled={isSubmitting}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				</FormSection>
 
 				{/* Form Actions */}
 				<div className="flex gap-4 justify-end pt-4 border-t">
@@ -300,7 +353,11 @@ export const ExternalUserForm = ({
 					<Button
 						type="submit"
 						disabled={
-							isSubmitting || isCheckingEmail || isCheckingName || emailExists
+							isSubmitting ||
+							isCheckingEmail ||
+							isCheckingName ||
+							emailExists ||
+							!form.formState.isValid
 						}
 						className="bg-green-600 hover:bg-green-700 text-white"
 					>

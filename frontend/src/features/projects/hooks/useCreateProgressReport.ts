@@ -43,20 +43,17 @@ export const useCreateProgressReport = () => {
 
 	return useMutation({
 		mutationFn: createProgressReport,
-		onSuccess: (data, variables) => {
+		onSuccess: async (data, variables) => {
 			toast.success(`Progress report for ${data.year} created successfully`);
 
-			// Invalidate project query to refetch with new progress report
-			queryClient.invalidateQueries({
-				queryKey: ["projects", variables.projectId],
+			// Refetch project data and wait for it to complete — ensures
+			// the progress reports tab exists before we navigate to it
+			await queryClient.refetchQueries({
+				queryKey: ["projects", "detail", variables.projectId],
 			});
 
-			// Navigate to the new progress report tab
-			// The tab index will be determined by the project detail page
-			// based on the number of progress reports
-			navigate(`/projects/${variables.projectId}`, {
-				state: { scrollToProgressReports: true },
-			});
+			// Navigate to the progress reports tab
+			navigate(`/projects/${variables.projectId}/progress`);
 		},
 		onError: (error: Error) => {
 			const message = extractUserFriendlyMessage(

@@ -139,7 +139,14 @@ class DocumentService:
     @transaction.atomic
     def delete_document(pk, user):
         """
-        Delete document
+        Delete a document and revert the project status to the state it
+        would have been in before this document existed.
+
+        Status rollback map:
+        - Concept plan deleted → project status = "new"
+        - Project plan deleted → project status = "pending" (concept plan approved state)
+        - Progress/student report deleted → project status = "active" (project plan approved state)
+        - Project closure deleted → project status = "active"
 
         Args:
             pk: Document primary key
@@ -148,18 +155,105 @@ class DocumentService:
         document = DocumentService.get_document(pk)
         settings.LOGGER.info(f"{user} is deleting document {document}")
 
-        # If deleting a closure document, revert project status to "updating"
-        if document.kind == "projectclosure":
-            from projects.models import Project
+        project = document.project
+        kind = document.kind
+        previous_status = project.status
 
-            project = document.project
-            project.status = Project.StatusChoices.UPDATING
+        # Determine the correct rollback status
+        rollback_status = DocumentService._get_rollback_status(kind, project)
+
+        if rollback_status and rollback_status != previous_status:
+            pass
+
+            project.status = rollback_status
             project.save()
             settings.LOGGER.info(
-                f"Reverted project {project} status to 'updating' after deleting closure"
+                f"Reverted project {project.pk} status from '{previous_status}' "
+                f"to '{rollback_status}' after deleting {kind} document"
             )
 
         document.delete()
+
+    @staticmethod
+    def _get_rollback_status(document_kind, project):
+        """
+        Determine the project status to revert to when a document is deleted.
+
+        Rather than hardcoding a single rollback status per document kind,
+        this method examines the remaining documents on the project to
+        determine the correct state. It also respects suspension — if the
+        project is currently suspended, the status is not changed (the
+        status_before_suspend field is managed separately).
+
+        Args:
+            document_kind: The kind of document being deleted
+            project: The Project instance
+
+        Returns:
+            str: The status to revert to, or None if no change needed
+        """
+        from projects.models import Project
+
+        # Never change status of a suspended project — suspension is managed
+        # separately via status_before_suspend
+        if project.status == Project.StatusChoices.SUSPENDED:
+            return None
+
+        # For concept plan deletion: project goes back to "new"
+        if document_kind == ProjectDocument.CategoryKindChoices.CONCEPTPLAN:
+            return Project.StatusChoices.NEW
+
+        # For project plan deletion: revert to the state after concept plan approval
+        elif document_kind == ProjectDocument.CategoryKindChoices.PROJECTPLAN:
+            has_approved_concept = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+                status=ProjectDocument.StatusChoices.APPROVED,
+            ).exists()
+            return (
+                Project.StatusChoices.PENDING
+                if has_approved_concept
+                else Project.StatusChoices.NEW
+            )
+
+        # For progress/student report deletion: if project is in a closure-related
+        # or terminal state, don't touch it. Otherwise revert to "active".
+        elif document_kind in [
+            ProjectDocument.CategoryKindChoices.PROGRESSREPORT,
+            ProjectDocument.CategoryKindChoices.STUDENTREPORT,
+        ]:
+            if project.status in (
+                Project.StatusChoices.CLOSUREREQ,
+                Project.StatusChoices.CLOSING,
+                Project.StatusChoices.FINAL_UPDATE,
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ):
+                return None
+            return Project.StatusChoices.ACTIVE
+
+        # For closure deletion: determine the correct pre-closure state by
+        # checking what approved documents remain on the project
+        elif document_kind == ProjectDocument.CategoryKindChoices.PROJECTCLOSURE:
+            has_approved_project_plan = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+                status=ProjectDocument.StatusChoices.APPROVED,
+            ).exists()
+            if has_approved_project_plan:
+                return Project.StatusChoices.ACTIVE
+
+            has_approved_concept = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+                status=ProjectDocument.StatusChoices.APPROVED,
+            ).exists()
+            if has_approved_concept:
+                return Project.StatusChoices.PENDING
+
+            return Project.StatusChoices.NEW
+
+        return None
 
     @staticmethod
     def get_documents_pending_action(user, stage=None):

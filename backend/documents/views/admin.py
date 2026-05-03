@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -24,11 +25,16 @@ from users.models import User
 from ..models import (
     AnnualReport,
     ProgressReport,
+    ProjectClosure,
     ProjectDocument,
     StudentReport,
 )
 from ..serializers import (
+    ConceptPlanCreateSerializer,
+    EndorsementCreateSerializer,
+    ProjectDocumentCreateSerializer,
     ProjectDocumentSerializer,
+    ProjectPlanCreateSerializer,
     TinyProjectDocumentSerializer,
 )
 
@@ -316,11 +322,39 @@ class DocumentSpawner(APIView):
 
     def post(self, request):
         """Create a new document"""
-        kind = request.kind
-        ser = ProjectDocumentSerializer(
-            data={"kind": kind, "status": "new", "project": request.project}
-        )
+        kind = request.data.get("kind")
+        project = request.data.get("project")
+
+        if not kind or not project:
+            return Response(
+                {"error": "Both 'kind' and 'project' are required."},
+                HTTP_400_BAD_REQUEST,
+            )
+
+        # Progress reports and student reports have dedicated creation endpoints
+        if kind in ("progressreport", "studentreport"):
+            return Response(
+                {
+                    "error": (
+                        f"'{kind}' documents cannot be created via this endpoint. "
+                        "Please use the dedicated creation endpoint."
+                    )
+                },
+                HTTP_400_BAD_REQUEST,
+            )
+
         settings.LOGGER.info(msg=f"{request.user} is spawning document")
+
+        ser = ProjectDocumentCreateSerializer(
+            data={
+                "kind": kind,
+                "status": "new",
+                "project": project,
+                "creator": request.user.pk,
+                "modifier": request.user.pk,
+            }
+        )
+
         if ser.is_valid():
             with transaction.atomic():
                 try:
@@ -333,18 +367,67 @@ class DocumentSpawner(APIView):
                         {"error": "Failed to create document. Please try again."},
                         HTTP_400_BAD_REQUEST,
                     )
-                else:
-                    project_document.pk
-                    if kind == "concept":
-                        pass
-                    elif kind == "projectplan":
-                        pass
-                    elif kind == "progressreport":
-                        pass
-                    elif kind == "studentreport":
-                        pass
-                    elif kind == "projectclosure":
-                        pass
+
+                # Create the kind-specific detail record
+                if kind == "concept":
+                    concept_ser = ConceptPlanCreateSerializer(
+                        data={
+                            "document": project_document.pk,
+                            "project": project,
+                        }
+                    )
+                    if concept_ser.is_valid():
+                        concept_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create concept plan: {concept_ser.errors}"
+                        )
+                        raise Exception(
+                            f"ConceptPlan creation failed: {concept_ser.errors}"
+                        )
+
+                elif kind == "projectplan":
+                    plan_ser = ProjectPlanCreateSerializer(
+                        data={
+                            "document": project_document.pk,
+                            "project": project,
+                        }
+                    )
+                    if plan_ser.is_valid():
+                        plan = plan_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create project plan: {plan_ser.errors}"
+                        )
+                        raise Exception(
+                            f"ProjectPlan creation failed: {plan_ser.errors}"
+                        )
+
+                    endorsement_ser = EndorsementCreateSerializer(
+                        data={"project_plan": plan.pk}
+                    )
+                    if endorsement_ser.is_valid():
+                        endorsement_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create endorsement: {endorsement_ser.errors}"
+                        )
+                        raise Exception(
+                            f"Endorsement creation failed: {endorsement_ser.errors}"
+                        )
+
+                elif kind == "projectclosure":
+                    # ProjectClosureCreateSerializer doesn't include 'project' field,
+                    # so create the closure directly via the model
+                    ProjectClosure.objects.create(
+                        document=project_document,
+                        project_id=project,
+                    )
+
+                return Response(
+                    ProjectDocumentSerializer(project_document).data,
+                    HTTP_201_CREATED,
+                )
         else:
             settings.LOGGER.error(msg=f"{ser.errors}")
             return Response(

@@ -16,7 +16,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
-import { AlertCircle as _AlertCircle, Loader2 } from "lucide-react";
+import { FileText, Info, Loader2 } from "lucide-react";
 import { useCreateProgressReport } from "../../hooks/useCreateProgressReport";
 import { useGetProgressReportAvailableYears } from "../../hooks/useGetProgressReportAvailableYears";
 import type { IProjectData } from "@/shared/types/project.types";
@@ -27,11 +27,11 @@ interface CreateProgressReportModalProps {
 	project: IProjectData;
 }
 
-export function CreateProgressReportModal({
+export const CreateProgressReportModal = ({
 	isOpen,
 	onClose,
 	project,
-}: CreateProgressReportModalProps) {
+}: CreateProgressReportModalProps) => {
 	const [selectedYear, setSelectedYear] = useState<string>("");
 
 	// Fetch available years (only when modal is open)
@@ -44,9 +44,10 @@ export function CreateProgressReportModal({
 	const selectedReportId = useMemo(() => {
 		if (selectedYear && availableYears) {
 			const yearData = availableYears.find(
-				(item: { year: number; pk: number }) => Number(item.year) === Number(selectedYear)
+				(item: { year: number; id: number }) =>
+					Number(item.year) === Number(selectedYear)
 			);
-			return yearData?.pk || null;
+			return yearData?.id || null;
 		}
 		return null;
 	}, [selectedYear, availableYears]);
@@ -85,55 +86,71 @@ export function CreateProgressReportModal({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle>Create Progress Report</DialogTitle>
-					<DialogDescription>
-						Create a progress report for the selected year.
-					</DialogDescription>
+					<div className="flex items-center gap-3">
+						<div className="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950/40">
+							<FileText className="size-5 text-blue-600 dark:text-blue-400" />
+						</div>
+						<div>
+							<DialogTitle className="text-lg">
+								Create Progress Report
+							</DialogTitle>
+							<DialogDescription className="mt-0.5">
+								Add a new progress report for this project
+							</DialogDescription>
+						</div>
+					</div>
 				</DialogHeader>
 
 				{isLoadingYears ? (
-					<div className="flex items-center justify-center py-8">
-						<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+					<div className="flex items-center justify-center py-12">
+						<Loader2 className="size-8 animate-spin text-muted-foreground" />
 					</div>
 				) : hasNoAvailableYears ? (
-					<div className="py-4">
-						<p className="text-sm text-muted-foreground">
-							A progress report cannot be created for this project as it already
-							has reports for each available year.
+					<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 p-5">
+						<p className="text-sm text-amber-800 dark:text-amber-200">
+							No report years are available. This project already has progress
+							reports for every annual report year, or no annual reports exist
+							yet.
 						</p>
 					</div>
 				) : (
-					<div className="space-y-4">
-						{/* Info Box */}
-						<div className="rounded-lg bg-muted p-4">
-							<ul className="ml-6 list-disc space-y-2 text-sm">
-								<li>
-									This will create a progress report for the selected year.
-								</li>
-								<li>
-									Years will only appear based on whether an annual report
-									exists for that year.
-								</li>
-								<li>
-									Years which already have progress reports for this project
-									will not be selectable.
-								</li>
-							</ul>
+					<div className="space-y-5 pt-2">
+						{/* Explanation */}
+						<div className="flex gap-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-4">
+							<Info className="size-4 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+							<div className="space-y-1.5 text-sm text-blue-800 dark:text-blue-200">
+								<p>
+									Select a financial year to create a progress report. Only
+									years with an existing annual report are shown.
+								</p>
+								<p className="text-blue-600 dark:text-blue-400">
+									Years that already have a progress report for this project are
+									excluded.
+								</p>
+							</div>
 						</div>
 
 						{/* Year Selection */}
 						<div className="space-y-2">
-							<Label htmlFor="year-select">Report Year</Label>
+							<div className="flex items-center justify-between">
+								<Label htmlFor="year-select" className="text-sm font-semibold">
+									Financial Year
+								</Label>
+								<span className="text-xs text-muted-foreground">
+									{sortedYears.length} year{sortedYears.length !== 1 ? "s" : ""}{" "}
+									available
+								</span>
+							</div>
 							<Select value={selectedYear} onValueChange={setSelectedYear}>
-								<SelectTrigger id="year-select">
-									<SelectValue placeholder="Select a report year..." />
+								<SelectTrigger id="year-select" className="w-full h-11">
+									<SelectValue placeholder="Select a financial year..." />
 								</SelectTrigger>
 								<SelectContent>
 									{sortedYears.map((yearData) => (
 										<SelectItem
-											key={yearData.pk}
+											key={yearData.id}
 											value={yearData.year.toString()}
 										>
 											{formatYearDisplay(yearData.year)}
@@ -141,35 +158,37 @@ export function CreateProgressReportModal({
 									))}
 								</SelectContent>
 							</Select>
-							<p className="text-sm text-muted-foreground">
-								Select an annual report for this progress report
-							</p>
 						</div>
 					</div>
 				)}
 
-				<DialogFooter>
+				<DialogFooter className="gap-3 sm:gap-3">
+					<Button type="button" variant="outline" onClick={onClose}>
+						Cancel
+					</Button>
 					{!hasNoAvailableYears && (
-						<>
-							<Button type="button" variant="outline" onClick={onClose}>
-								Cancel
-							</Button>
-							<Button
-								onClick={handleCreate}
-								disabled={
-									createReportMutation.isPending ||
-									!selectedYear ||
-									!selectedReportId ||
-									isLoadingYears
-								}
-								className="bg-green-600 hover:bg-green-700"
-							>
-								{createReportMutation.isPending ? "Creating..." : "Create"}
-							</Button>
-						</>
+						<Button
+							onClick={handleCreate}
+							disabled={
+								createReportMutation.isPending ||
+								!selectedYear ||
+								!selectedReportId ||
+								isLoadingYears
+							}
+							className="bg-green-600 hover:bg-green-700"
+						>
+							{createReportMutation.isPending ? (
+								<>
+									<Loader2 className="mr-2 size-4 animate-spin" />
+									Creating...
+								</>
+							) : (
+								"Create Progress Report"
+							)}
+						</Button>
 					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

@@ -129,7 +129,7 @@ class ProgressReportDetail(APIView):
         )
 
     def delete(self, request, pk):
-        """Delete progress report"""
+        """Delete progress report and revert project status"""
         try:
             progress_report = ProgressReport.objects.get(pk=pk)
         except ProgressReport.DoesNotExist:
@@ -139,7 +139,10 @@ class ProgressReportDetail(APIView):
             f"{request.user} is deleting progress report {progress_report}"
         )
 
-        progress_report.delete()
+        # Use DocumentService to handle status rollback
+        from ..services.document_service import DocumentService
+
+        DocumentService.delete_document(progress_report.document.pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
 

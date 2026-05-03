@@ -2,11 +2,8 @@
 Business logic for caretaker request operations (via AdminTask)
 """
 
-from datetime import datetime
-
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from adminoptions.models import AdminTask
@@ -119,9 +116,7 @@ class CaretakerRequestService:
 
     @staticmethod
     @transaction.atomic
-    def create_request(
-        requester, user_id, caretaker_id, reason=None, end_date=None, notes=None
-    ):
+    def create_request(requester, user_id, caretaker_id, reason=None, notes=None):
         """
         Create a new caretaker request (AdminTask)
 
@@ -130,7 +125,6 @@ class CaretakerRequestService:
             user_id: ID of user to be caretaken for
             caretaker_id: ID of user to become caretaker
             reason: Optional reason
-            end_date: Optional end date
             notes: Optional notes
 
         Returns:
@@ -169,22 +163,6 @@ class CaretakerRequestService:
         if Caretaker.objects.filter(user=user, caretaker=caretaker).exists():
             raise ValidationError("User already has this caretaker")
 
-        # Validate end_date not in past
-        if end_date:
-            if isinstance(end_date, str):
-                try:
-                    end_date = datetime.fromisoformat(
-                        end_date.replace("Z", "+00:00")
-                    ).date()
-                except (ValueError, AttributeError) as e:
-                    settings.LOGGER.error(
-                        f"Invalid date format for caretaker request: {e}"
-                    )
-                    raise ValidationError({"end_date": "Invalid date format."})
-
-            if end_date < timezone.now().date():
-                raise ValidationError({"end_date": "End date cannot be in the past"})
-
         # Create AdminTask
         task = AdminTask.objects.create(
             action=AdminTask.ActionTypes.SETCARETAKER,
@@ -193,7 +171,6 @@ class CaretakerRequestService:
             primary_user=user,
             secondary_users=[caretaker_id],
             reason=reason,
-            end_date=end_date,
             notes=notes,
         )
 

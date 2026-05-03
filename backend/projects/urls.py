@@ -10,6 +10,7 @@ urlpatterns = [
     path("mine", views.MyProjects.as_view()),
     path("listofyears", views.ProjectYears.as_view()),
     path("smallsearch", views.SmallProjectSearch.as_view()),
+    path("drafts/<str:kind>", views.ProjectDraftDetail.as_view()),
     # Integer pk patterns come after string patterns
     path("<int:pk>", views.ProjectDetails.as_view()),
     path(

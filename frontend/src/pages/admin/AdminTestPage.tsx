@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { Loader2, FileDown } from "lucide-react";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Switch } from "@/shared/components/ui/switch";
 import { Label } from "@/shared/components/ui/label";
@@ -10,12 +12,20 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/shared/components/ui/card";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import { UserSearchDropdown } from "@/shared/components/user/UserSearchDropdown";
 import {
 	useEmailTestingSettings,
 	useUpdateEmailTestingSettings,
 	useSendAllTestEmails,
 } from "@/features/admin/hooks/useEmailTestingSettings";
+import { useGenerateTestPDF, useGenerateAllTestPDFs } from "@/features/admin/hooks/useTestPDF";
 
 /** All available email templates with human-readable labels */
 const EMAIL_TEMPLATES = [
@@ -44,10 +54,26 @@ const EMAIL_TEMPLATES = [
 	{ name: "staff_profile_email", label: "Staff Profile Contact" },
 ] as const;
 
-const EmailTestingPage = () => {
-	useDocumentTitle("Email Testing");
 
-	const { data: settings, isLoading } = useEmailTestingSettings();
+interface SectionCardProps {
+	title: string;
+	children: React.ReactNode;
+}
+
+const SectionCard = ({ title, children }: SectionCardProps) => (
+	<div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+		<div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+			<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+				{title}
+			</h2>
+		</div>
+		<div className="p-6">{children}</div>
+	</div>
+);
+
+
+const EmailTestingContent = () => {
+	const { data: settings } = useEmailTestingSettings();
 	const { mutate: updateSettings, isPending } = useUpdateEmailTestingSettings();
 	const { mutate: sendEmails, isPending: isSendingAll } =
 		useSendAllTestEmails();
@@ -104,23 +130,8 @@ const EmailTestingPage = () => {
 		);
 	};
 
-	if (isLoading) {
-		return (
-			<div className="container mx-auto space-y-6 p-6">
-				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-					Email Testing
-				</h1>
-				<p className="text-sm text-gray-500">Loading settings...</p>
-			</div>
-		);
-	}
-
 	return (
-		<div className="container mx-auto space-y-6 p-6">
-			<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-				Email Testing
-			</h1>
-
+		<div className="space-y-6">
 			{/* Status banner */}
 			{settings?.email_testing_mode && settings.email_test_user && (
 				<div className="rounded-md border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
@@ -273,4 +284,155 @@ const EmailTestingPage = () => {
 	);
 };
 
-export default EmailTestingPage;
+const DOCUMENT_KINDS = [
+	{ value: "concept", label: "Concept Plan" },
+	{ value: "projectplan", label: "Project Plan" },
+	{ value: "progressreport", label: "Progress Report" },
+	{ value: "studentreport", label: "Student Report" },
+	{ value: "projectclosure", label: "Project Closure" },
+] as const;
+
+const DocumentTestingContent = () => {
+	const [selectedKind, setSelectedKind] = useState("concept");
+	const generateMutation = useGenerateTestPDF();
+	const generateAllMutation = useGenerateAllTestPDFs();
+
+	const handleGenerate = () => {
+		generateMutation.mutate(selectedKind, {
+			onSuccess: (blob) => {
+				const url = URL.createObjectURL(blob);
+				try {
+					const a = document.createElement("a");
+					a.href = url;
+					a.download = `test-${selectedKind}.pdf`;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					toast.success("PDF downloaded");
+				} finally {
+					URL.revokeObjectURL(url);
+				}
+			},
+			onError: (error: Error) => {
+				toast.error(error.message || "PDF generation failed");
+			},
+		});
+	};
+
+	const handleGenerateAll = () => {
+		generateAllMutation.mutate(undefined, {
+			onSuccess: (blob) => {
+				const url = URL.createObjectURL(blob);
+				try {
+					const a = document.createElement("a");
+					a.href = url;
+					a.download = "test-pdfs-all.zip";
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					toast.success("All PDFs downloaded as ZIP");
+				} finally {
+					URL.revokeObjectURL(url);
+				}
+			},
+			onError: (error: Error) => {
+				toast.error(error.message || "PDF generation failed");
+			},
+		});
+	};
+
+	return (
+		<div className="space-y-4">
+			<p className="text-sm text-gray-500 dark:text-gray-400">
+				Generate test PDFs with mock data to preview document template designs.
+			</p>
+			<div className="flex items-end gap-4">
+				<div className="w-64 space-y-2">
+					<Label htmlFor="document-kind">Document Kind</Label>
+					<Select value={selectedKind} onValueChange={setSelectedKind}>
+						<SelectTrigger id="document-kind">
+							<SelectValue placeholder="Select document kind" />
+						</SelectTrigger>
+						<SelectContent>
+							{DOCUMENT_KINDS.map((kind) => (
+								<SelectItem key={kind.value} value={kind.value}>
+									{kind.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+				<Button
+					onClick={handleGenerate}
+					disabled={generateMutation.isPending || generateAllMutation.isPending}
+					className="gap-2"
+				>
+					{generateMutation.isPending ? (
+						<>
+							<Loader2 className="size-4 animate-spin" />
+							Generating...
+						</>
+					) : (
+						<>
+							<FileDown className="size-4" />
+							Generate PDF
+						</>
+					)}
+				</Button>
+				<Button
+					onClick={handleGenerateAll}
+					disabled={generateMutation.isPending || generateAllMutation.isPending}
+					variant="outline"
+					className="gap-2"
+				>
+					{generateAllMutation.isPending ? (
+						<>
+							<Loader2 className="size-4 animate-spin" />
+							Generating All...
+						</>
+					) : (
+						<>
+							<FileDown className="size-4" />
+							Generate All (ZIP)
+						</>
+					)}
+				</Button>
+			</div>
+		</div>
+	);
+};
+
+const AdminTestPage = () => {
+	useDocumentTitle("Admin Test Page");
+
+	const { isLoading } = useEmailTestingSettings();
+
+	if (isLoading) {
+		return (
+			<div className="container mx-auto space-y-6 p-6">
+				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+					Admin Test Page
+				</h1>
+				<p className="text-sm text-gray-500">Loading settings...</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className="container mx-auto space-y-6 p-6">
+			<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+				Admin Test Page
+			</h1>
+
+			<SectionCard title="Email Testing">
+				<EmailTestingContent />
+			</SectionCard>
+
+			<SectionCard title="Project Documents">
+				<DocumentTestingContent />
+			</SectionCard>
+		</div>
+	);
+};
+
+export default AdminTestPage;

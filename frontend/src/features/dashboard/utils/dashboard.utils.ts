@@ -121,16 +121,14 @@ export const buildAdminTaskDetails = (task: IAdminTask): string => {
 		return baseText;
 	}
 
+	if (action === "mergeuser" && secondary_users?.[0] && primary_user) {
+		const targetUser = secondary_users[0];
+		return `Merge ${targetUser.display_first_name} ${targetUser.display_last_name} into ${primary_user.display_first_name} ${primary_user.display_last_name}`;
+	}
+
 	if (action === "mergeuser" && secondary_users?.[0]) {
 		const targetUser = secondary_users[0];
-		const baseText = `Merge ${targetUser.display_first_name} ${targetUser.display_last_name} (ID: ${targetUser.id}) into requester's account`;
-
-		if (reason) {
-			const formattedReason = reason.charAt(0).toUpperCase() + reason.slice(1);
-			return `${formattedReason}: ${baseText}`;
-		}
-
-		return baseText;
+		return `Merge ${targetUser.display_first_name} ${targetUser.display_last_name} (ID: ${targetUser.id}) into requester's account`;
 	}
 
 	if (action === "deleteproject") {

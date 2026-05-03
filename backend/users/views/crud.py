@@ -48,7 +48,14 @@ class Users(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        user = UserService.create_user(serializer.validated_data)
+        # Extract UserWork fields that aren't on the User model
+        create_data = serializer.validated_data.copy()
+        if "branch" in request.data:
+            create_data["branch"] = request.data["branch"]
+        if "business_area" in request.data:
+            create_data["business_area"] = request.data["business_area"]
+
+        user = UserService.create_user(create_data)
         result = UserSerializer(user)
         return Response(result.data, status=HTTP_201_CREATED)
 

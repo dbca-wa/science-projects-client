@@ -67,7 +67,7 @@ StableAimsEditor.displayName = "StableAimsEditor";
  */
 const ExternalDetailsStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData.externalDetails;
+	const formData = wizardStore.state.editingFormData.externalDetails;
 	const validation = wizardStore.state.validation[3];
 	const stepIndex = 3;
 	const [selectedAffiliations, setSelectedAffiliations] = useState<

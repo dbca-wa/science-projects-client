@@ -56,6 +56,8 @@ export const BaseCombobox = forwardRef(
 			renderMenuItem,
 			onCreateNew,
 			createNewLabel,
+			onCreateNewClick,
+			createNewClickLabel,
 			label,
 			placeholder = "Search...",
 			helperText,
@@ -110,13 +112,15 @@ export const BaseCombobox = forwardRef(
 		// Click-away detection
 		useEffect(() => {
 			const handleClickOutside = (event: MouseEvent) => {
-				if (
-					wrapperRef.current &&
-					!wrapperRef.current.contains(event.target as Node)
-				) {
-					setIsMenuOpen(false);
-					setHighlightedIndex(-1);
-				}
+				const target = event.target as Node;
+				// Check if click is inside the wrapper
+				if (wrapperRef.current?.contains(target)) return;
+				// Check if click is inside the portal dropdown
+				const portal = (target as Element).closest?.("[data-combobox-portal]");
+				if (portal) return;
+
+				setIsMenuOpen(false);
+				setHighlightedIndex(-1);
 			};
 
 			if (isMenuOpen) {
@@ -213,6 +217,14 @@ export const BaseCombobox = forwardRef(
 			filteredItems.length === 0 &&
 			!isCreating;
 
+		// Fire-and-forget "create new" click (for modal-based creation)
+		const showCreateClickOption =
+			!showCreateOption &&
+			!!onCreateNewClick &&
+			!!createNewClickLabel &&
+			searchTerm.trim() !== "" &&
+			filteredItems.length === 0;
+
 		return (
 			<div
 				ref={wrapperRef}
@@ -285,7 +297,10 @@ export const BaseCombobox = forwardRef(
 					<div className="relative w-full">
 						<SearchResultsPortal
 							isOpen={
-								(filteredItems.length > 0 || showCreateOption) && isMenuOpen
+								(filteredItems.length > 0 ||
+									showCreateOption ||
+									showCreateClickOption) &&
+								isMenuOpen
 							}
 							inputRef={inputRef}
 							items={filteredItems}
@@ -298,6 +313,9 @@ export const BaseCombobox = forwardRef(
 							createNewLabel={createNewLabel ? createNewLabel(searchTerm) : ""}
 							onCreateNew={handleCreateNew}
 							isCreating={isCreating}
+							showCreateClickOption={showCreateClickOption}
+							createNewClickLabel={createNewClickLabel}
+							onCreateNewClick={onCreateNewClick}
 						/>
 					</div>
 				)}
@@ -335,6 +353,10 @@ interface SearchResultsPortalProps<T> {
 	createNewLabel: string;
 	onCreateNew: () => void;
 	isCreating: boolean;
+	// Fire-and-forget create (for modal-based creation)
+	showCreateClickOption?: boolean;
+	createNewClickLabel?: string;
+	onCreateNewClick?: () => void;
 }
 
 const SearchResultsPortal = <T,>({
@@ -350,11 +372,14 @@ const SearchResultsPortal = <T,>({
 	createNewLabel,
 	onCreateNew,
 	isCreating,
+	showCreateClickOption,
+	createNewClickLabel,
+	onCreateNewClick,
 }: SearchResultsPortalProps<T>) => {
 	const portalElement = useState<HTMLElement>(() => {
 		const el = document.createElement("div");
 		el.style.position = "fixed";
-		el.style.zIndex = "9999";
+		el.style.zIndex = "55";
 		return el;
 	})[0];
 	const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -468,13 +493,31 @@ const SearchResultsPortal = <T,>({
 						}}
 						onMouseEnter={() => onHighlightChange(items.length)}
 						className={cn(
-							"w-full text-left px-3 py-2 transition-colors border-t border-gray-200 dark:border-gray-600",
+							"w-full text-left px-3 py-2 transition-colors border-t border-gray-200 dark:border-gray-600 cursor-pointer",
 							highlightedIndex === items.length &&
 								"bg-gray-200 dark:bg-gray-600"
 						)}
 					>
 						<span className="text-green-600 dark:text-green-400 flex items-center gap-2 text-sm">
 							{isCreating ? "Creating..." : createNewLabel}
+						</span>
+					</button>
+				)}
+
+				{/* Fire-and-forget create option (for modal-based creation) */}
+				{showCreateClickOption && onCreateNewClick && (
+					<button
+						type="button"
+						onClick={onCreateNewClick}
+						onMouseEnter={() => onHighlightChange(items.length)}
+						className={cn(
+							"w-full text-left px-3 py-2 transition-colors border-t border-gray-200 dark:border-gray-600 cursor-pointer",
+							highlightedIndex === items.length &&
+								"bg-gray-200 dark:bg-gray-600"
+						)}
+					>
+						<span className="text-green-600 dark:text-green-400 flex items-center gap-2 text-sm">
+							{createNewClickLabel}
 						</span>
 					</button>
 				)}

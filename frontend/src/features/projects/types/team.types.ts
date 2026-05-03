@@ -68,6 +68,44 @@ export interface IUpdateTeamPositionsRequest {
 }
 
 /**
+ * Pending Invite
+ *
+ * A queued invite that hasn't been submitted yet.
+ * Lives in React component state within InviteTeamMemberPanel.
+ */
+export interface IPendingInvite {
+	/** Unique key for React rendering */
+	id: string;
+	/** The user being invited */
+	user: {
+		id: number;
+		display_first_name: string;
+		display_last_name: string;
+		is_staff: boolean;
+		is_superuser: boolean;
+		image: { file: string } | null;
+	};
+	/** Selected role value (e.g. "technical", "consulted") */
+	role: string;
+	/** Human-readable role label (e.g. "Technical Support") */
+	roleLabel: string;
+	/** FTE allocation 0-1 */
+	timeAllocation: number;
+	/** Optional short code */
+	shortCode: string;
+}
+
+/**
+ * Batch Invite Result
+ *
+ * Result of submitting multiple invites via Promise.allSettled.
+ */
+export interface IBatchInviteResult {
+	succeeded: IPendingInvite[];
+	failed: Array<{ invite: IPendingInvite; error: Error }>;
+}
+
+/**
  * Team Management Permissions
  *
  * Result of permission check indicating whether a user can manage the project team.

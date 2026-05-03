@@ -6,7 +6,7 @@ import threading
 
 from django.conf import settings
 from django.http import FileResponse
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -20,6 +20,7 @@ from ..models import AnnualReport
 from ..services.annual_report_service import AnnualReportGenerationService
 from ..services.document_service import DocumentService
 from ..services.pdf_service import PDFService
+from ..services.test_pdf_service import VALID_DOCUMENT_KINDS, TestPDFService
 
 NO_CACHE_HEADERS = "no-cache, no-store, must-revalidate"
 
@@ -233,3 +234,84 @@ class CancelReportDocGeneration(APIView):
             {"message": "No generation in progress"},
             status=HTTP_200_OK,
         )
+
+
+class TestPDFGeneration(APIView):
+    """Generate test PDF with mock data for a given document kind."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        """
+        Generate a test PDF using mock data.
+
+        Expects JSON body with ``document_kind`` (one of: concept,
+        projectplan, progressreport, studentreport, projectclosure).
+        Returns the PDF as a binary file download.
+        """
+        document_kind = request.data.get("document_kind")
+
+        if document_kind not in VALID_DOCUMENT_KINDS:
+            return Response(
+                {
+                    "error": (
+                        f"Invalid document_kind. "
+                        f"Must be one of: {', '.join(VALID_DOCUMENT_KINDS)}"
+                    )
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            pdf_content = TestPDFService.generate_test_pdf(document_kind)
+
+            from django.http import HttpResponse
+
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'attachment; filename="test-{document_kind}.pdf"'
+            )
+            response["Cache-Control"] = NO_CACHE_HEADERS
+            return response
+        except Exception as e:
+            settings.LOGGER.error(f"Test PDF generation failed: {e}")
+            return Response(
+                {"error": str(e)},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+
+class TestPDFGenerationAll(APIView):
+    """Generate test PDFs for all document kinds and return as a ZIP file."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        """
+        Generate test PDFs for all document kinds and return as a compressed ZIP.
+        """
+        import io
+        import zipfile
+
+        from django.http import HttpResponse
+
+        try:
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                for kind in VALID_DOCUMENT_KINDS:
+                    pdf_content = TestPDFService.generate_test_pdf(kind)
+                    zf.writestr(f"test-{kind}.pdf", pdf_content)
+
+            zip_buffer.seek(0)
+            response = HttpResponse(
+                zip_buffer.getvalue(), content_type="application/zip"
+            )
+            response["Content-Disposition"] = 'attachment; filename="test-pdfs-all.zip"'
+            response["Cache-Control"] = NO_CACHE_HEADERS
+            return response
+        except Exception as e:
+            settings.LOGGER.error(f"Test PDF generation (all) failed: {e}")
+            return Response(
+                {"error": str(e)},
+                status=HTTP_400_BAD_REQUEST,
+            )

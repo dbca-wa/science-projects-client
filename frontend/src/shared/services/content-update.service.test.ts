@@ -32,7 +32,7 @@ describe("content-update.service", () => {
 		(apiClient.patch as Mock).mockResolvedValue(undefined);
 		await updateExternalProjectField(10, "aims", "<p>Aims</p>");
 		expect(apiClient.patch).toHaveBeenCalledWith(
-			"documents/external_project_details/10",
+			"projects/external_project_details/10",
 			{ aims: "<p>Aims</p>" }
 		);
 	});

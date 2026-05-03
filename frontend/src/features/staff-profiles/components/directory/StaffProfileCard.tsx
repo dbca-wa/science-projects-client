@@ -64,14 +64,16 @@ const StaffProfileCard = ({ profile }: StaffProfileCardProps) => {
 				{/* Avatar + name row */}
 				<div className="flex items-center gap-3 mb-4">
 					{avatarUrl ? (
-						<img
-							src={avatarUrl}
-							alt={displayName}
-							width={70}
-							height={70}
-							className="size-[70px] rounded-full object-cover shrink-0 ring-2 ring-slate-100"
-							onError={() => setImgError(true)}
-						/>
+						<div className="size-[70px] rounded-full overflow-hidden shrink-0 ring-2 ring-slate-100">
+							<img
+								src={avatarUrl}
+								alt={displayName}
+								width={70}
+								height={70}
+								className="w-full h-full object-cover"
+								onError={() => setImgError(true)}
+							/>
+						</div>
 					) : (
 						<div className="size-[70px] rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-xl font-bold shrink-0 select-none ring-2 ring-slate-100">
 							{initials}

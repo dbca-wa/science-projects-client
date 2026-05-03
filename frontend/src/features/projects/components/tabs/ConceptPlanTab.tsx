@@ -6,11 +6,24 @@ import type {
 } from "@/shared/types/project.types";
 import type { IUserData } from "@/shared/types/user.types";
 import { useCurrentUser } from "@/features/auth";
+import { useNavigate } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/services/api/client.service";
+import { toast } from "sonner";
 import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
+import {
+	isConceptPlanLocked,
+	getEffectiveCanEdit,
+	getLockedMessage,
+} from "@/shared/utils/document-locking.utils";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { CommentSection } from "@/features/projects/components/comments";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { CheckCircle, ArrowRight, Plus, Loader2, Lock } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
 
 interface ConceptPlanTabProps {
 	conceptPlan: IConceptPlan | null;
@@ -27,7 +40,7 @@ interface ConceptPlanTabProps {
 	isBaLead?: boolean;
 }
 
-export function ConceptPlanTab({
+export const ConceptPlanTab = ({
 	conceptPlan,
 	project,
 	members,
@@ -39,8 +52,31 @@ export function ConceptPlanTab({
 	userIsCaretakerOfProjectLeader,
 	all_documents,
 	isBaLead,
-}: ConceptPlanTabProps) {
+}: ConceptPlanTabProps) => {
 	const { data: currentUser } = useCurrentUser();
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
+	const createProjectPlanMutation = useMutation({
+		mutationFn: async () => {
+			return apiClient.post(`documents/create-project-plan/${project.id}`);
+		},
+		onSuccess: () => {
+			toast.success("Project plan created");
+			queryClient.invalidateQueries({
+				queryKey: ["projects", "detail", project.id],
+			});
+			navigate(`/projects/${projectId}/project`);
+		},
+		onError: () => {
+			toast.error(
+				"Failed to create project plan. It may already exist — try refreshing the page."
+			);
+			queryClient.invalidateQueries({
+				queryKey: ["projects", "detail", project.id],
+			});
+		},
+	});
 
 	if (!conceptPlan) {
 		return (
@@ -50,7 +86,7 @@ export function ConceptPlanTab({
 		);
 	}
 
-	const canEdit = calculateDocumentEditPermission({
+	const canEditBase = calculateDocumentEditPermission({
 		currentUser,
 		members,
 		document: conceptPlan.document,
@@ -59,6 +95,18 @@ export function ConceptPlanTab({
 		userIsCaretakerOfAdmin,
 	});
 
+	const isApproved = conceptPlan.document.status === "approved";
+	const hasProjectPlan = !!all_documents?.project_plan;
+
+	// Lock editing if concept plan is approved and a project plan exists
+	const isLocked = isConceptPlanLocked(conceptPlan.document, all_documents);
+	const canEdit = getEffectiveCanEdit(
+		canEditBase,
+		conceptPlan.document,
+		isLocked
+	);
+	const lockedMessage = getLockedMessage(conceptPlan.document, isLocked);
+
 	return (
 		<DocumentTabLayout
 			document={conceptPlan.document}
@@ -66,7 +114,8 @@ export function ConceptPlanTab({
 			members={members}
 			documentType="concept_plan"
 			typeSpecificId={conceptPlan.id}
-			canDelete={true}
+			canDelete={!isLocked}
+			locked={isLocked}
 			creator={creator}
 			modifier={modifier}
 			userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
@@ -82,6 +131,73 @@ export function ConceptPlanTab({
 			}
 		>
 			<div className="space-y-6">
+				{/* Locked banner */}
+				{isLocked && (
+					<Alert className="border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+						<Lock className="size-4 text-gray-500 dark:text-gray-400" />
+						<AlertDescription className="text-gray-600 dark:text-gray-400">
+							This document is locked to preserve data integrity. The project
+							has progressed past this stage.
+						</AlertDescription>
+					</Alert>
+				)}
+
+				{/* Post-approval banner: concept plan approved */}
+				{isApproved && (
+					<Alert
+						className={cn(
+							hasProjectPlan
+								? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30"
+								: "border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30",
+							"items-center"
+						)}
+					>
+						{hasProjectPlan ? (
+							<CheckCircle className="size-4 text-emerald-600 dark:text-emerald-400" />
+						) : (
+							<Plus className="size-4 text-amber-600 dark:text-amber-400" />
+						)}
+						<AlertDescription className="flex items-center justify-between gap-4">
+							<span
+								className={
+									hasProjectPlan
+										? "text-emerald-800 dark:text-emerald-200"
+										: "text-amber-800 dark:text-amber-200"
+								}
+							>
+								{hasProjectPlan
+									? "This concept plan has been approved. A project plan has been created."
+									: "This concept plan has been approved but no project plan exists. Create one to continue the workflow."}
+							</span>
+							{hasProjectPlan ? (
+								<Button
+									size="sm"
+									variant="outline"
+									className="shrink-0 border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-950"
+									onClick={() => navigate(`/projects/${projectId}/project`)}
+								>
+									View Project Plan
+									<ArrowRight className="ml-1.5 size-3.5" />
+								</Button>
+							) : (
+								<Button
+									size="sm"
+									className="shrink-0 bg-amber-600 text-white hover:bg-amber-700"
+									onClick={() => createProjectPlanMutation.mutate()}
+									disabled={createProjectPlanMutation.isPending}
+								>
+									{createProjectPlanMutation.isPending ? (
+										<Loader2 className="mr-1.5 size-3.5 animate-spin" />
+									) : (
+										<Plus className="mr-1.5 size-3.5" />
+									)}
+									Create Project Plan
+								</Button>
+							)}
+						</AlertDescription>
+					</Alert>
+				)}
+
 				{/* Background */}
 				<ProjectSection>
 					<InlineSaveEditor
@@ -89,6 +205,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.background || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Background"
@@ -102,6 +219,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.aims || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Aims"
@@ -115,6 +233,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.outcome || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Expected Outcomes"
@@ -128,6 +247,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.collaborations || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Collaborations"
@@ -141,6 +261,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.strategic_context || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Strategic Context"
@@ -154,6 +275,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.staff_time_allocation || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Staff Time Allocation (FTE)"
@@ -167,6 +289,7 @@ export function ConceptPlanTab({
 						entityId={conceptPlan.id}
 						initialContent={conceptPlan.budget || ""}
 						canEdit={canEdit}
+						lockedMessage={lockedMessage}
 						wordLimit={500}
 						showWordLimitInLabel={true}
 						label="Indicative Operating Budget ($)"
@@ -175,4 +298,4 @@ export function ConceptPlanTab({
 			</div>
 		</DocumentTabLayout>
 	);
-}
+};

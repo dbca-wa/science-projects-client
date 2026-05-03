@@ -9,7 +9,7 @@
  * until the wizard is submitted.
  */
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
 	DndContext,
@@ -45,6 +45,11 @@ import { getImageUrl } from "@/shared/utils/image.utils";
 import type { IWizardTeamMember } from "@/app/stores/derived/project-wizard.store";
 import { useQuery } from "@tanstack/react-query";
 import { getFullUser } from "@/features/users/services/user.service";
+import { CreateExternalUserModal } from "@/features/users/components/CreateExternalUserModal";
+import {
+	UserTypeBadge,
+	getSimpleUserTypeVariant,
+} from "@/shared/components/user";
 
 /** All role options matching InviteTeamMemberModal */
 const ALL_ROLE_OPTIONS = [
@@ -52,7 +57,9 @@ const ALL_ROLE_OPTIONS = [
 	{ value: "research", label: "Research Scientist" },
 	{ value: "technical", label: "Technical Officer" },
 	{ value: "externalcol", label: "External Collaborator" },
+	{ value: "externalpeer", label: "External Peer" },
 	{ value: "academicsuper", label: "Academic Supervisor" },
+	{ value: "student", label: "Supervised Student" },
 	{ value: "consulted", label: "Consulted Peer" },
 	{ value: "group", label: "Involved Group" },
 ] as const;
@@ -63,7 +70,9 @@ const INTERNAL_ROLE_VALUES = new Set(["research", "technical"]);
 /** Roles available to external users */
 const EXTERNAL_ROLE_VALUES = new Set([
 	"externalcol",
+	"externalpeer",
 	"academicsuper",
+	"student",
 	"consulted",
 	"group",
 ]);
@@ -146,9 +155,10 @@ const SortableWizardMemberCard = ({
 				<div className="flex-shrink-0 w-4" aria-hidden="true" />
 			)}
 
-			{/* Name + leader badge */}
+			{/* Name + type badge + leader badge */}
 			<div className="flex items-center gap-2 min-w-0 flex-1">
 				<ResolvedDisplayName member={member} />
+				<UserTypeBadge variant={getSimpleUserTypeVariant(member.isStaff)} />
 				{member.isLeader && (
 					<span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 flex-shrink-0">
 						<Crown className="h-3 w-3" />
@@ -246,8 +256,9 @@ const ResolvedDisplayName = ({ member }: { member: IWizardTeamMember }) => {
 
 export const WizardTeamSection = observer(function WizardTeamSection() {
 	const wizardStore = useProjectWizardStore();
-	const teamMembers = wizardStore.state.teamMembers;
+	const teamMembers = wizardStore.state.editingTeamMembers;
 	const comboboxRef = useRef<UserComboboxRef>(null);
+	const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -346,6 +357,10 @@ export const WizardTeamSection = observer(function WizardTeamSection() {
 				excludeUserIds={excludeUserIds}
 				onlyInternal={false}
 				maxResults={5}
+				onCreateExternalUser={() => {
+					comboboxRef.current?.clearSelection();
+					setIsCreateUserModalOpen(true);
+				}}
 			/>
 
 			{/* Team member list with drag-and-drop */}
@@ -378,6 +393,25 @@ export const WizardTeamSection = observer(function WizardTeamSection() {
 					No team members added yet. Use the search above to add members.
 				</p>
 			)}
+
+			{/* Create External User Modal */}
+			<CreateExternalUserModal
+				isOpen={isCreateUserModalOpen}
+				onClose={() => setIsCreateUserModalOpen(false)}
+				onUserCreated={(user) => {
+					const displayName =
+						`${user.display_first_name} ${user.display_last_name}`.trim();
+					wizardStore.addTeamMember({
+						userId: user.id,
+						role: "consulted",
+						isLeader: false,
+						displayName: displayName || `User ${user.id}`,
+						position: teamMembers.length,
+						isStaff: !!user.is_staff,
+						timeAllocation: 0.0,
+					});
+				}}
+			/>
 		</div>
 	);
 });

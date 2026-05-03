@@ -11,6 +11,7 @@
 
 import React from "react";
 import type { RichTextDisplayProps } from "@/shared/types/editor.types";
+import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 import "@/shared/styles/editor.css";
 
 export const RichTextDisplay: React.FC<RichTextDisplayProps> = ({
@@ -18,7 +19,7 @@ export const RichTextDisplay: React.FC<RichTextDisplayProps> = ({
 	className = "",
 	emptyMessage = "No content",
 }) => {
-	if (!content || content.trim() === "") {
+	if (isRichTextEmpty(content)) {
 		return (
 			<div className={`${className} italic text-gray-500 dark:text-gray-400`}>
 				{emptyMessage}

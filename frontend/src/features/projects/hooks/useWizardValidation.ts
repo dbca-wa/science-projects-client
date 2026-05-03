@@ -26,7 +26,7 @@ export interface StepValidationResult {
  */
 export const useWizardValidation = () => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData;
+	const formData = wizardStore.state.editingFormData;
 	const projectKind = wizardStore.state.projectKind;
 
 	/**

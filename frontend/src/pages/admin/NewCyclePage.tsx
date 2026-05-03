@@ -9,6 +9,7 @@ import {
 	Info,
 	Save,
 	Download,
+	RotateCcw,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
@@ -114,6 +115,11 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 			store.importDraft(draftData.draft);
 			toast.success("Draft loaded from database");
 		}
+	};
+
+	const handleReset = () => {
+		store.reset();
+		toast.success("Form reset to defaults");
 	};
 
 	// Debounced custom message for email preview (300ms)
@@ -697,6 +703,15 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 						>
 							<Download className="size-4" />
 							Load Draft
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleReset}
+							className="gap-1.5 text-destructive hover:text-destructive"
+						>
+							<RotateCcw className="size-4" />
+							Reset
 						</Button>
 					</div>
 					<div className="flex items-center gap-4">

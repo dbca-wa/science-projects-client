@@ -8,6 +8,12 @@ import type {
 import type { IUserData } from "@/shared/types/user.types";
 import { useCurrentUser } from "@/features/auth";
 import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
+import {
+	isProjectPlanLocked,
+	isReportCreationLocked,
+	getEffectiveCanEdit,
+	getLockedMessage,
+} from "@/shared/utils/document-locking.utils";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
@@ -16,6 +22,9 @@ import { CreateProgressReportModal } from "@/features/projects/components/modals
 import { MethodologyImage } from "@/features/projects/components/MethodologyImage";
 import { ProjectPlanEndorsements } from "@/features/projects/components/ProjectPlanEndorsements";
 import { CommentSection } from "@/features/projects/components/comments";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import { Button } from "@/shared/components/ui/button";
+import { CheckCircle, Plus, Lock } from "lucide-react";
 
 interface ProjectPlanTabProps {
 	projectPlan: IProjectPlan | null;
@@ -34,7 +43,7 @@ interface ProjectPlanTabProps {
 	userData?: IUserData | null;
 }
 
-export function ProjectPlanTab({
+export const ProjectPlanTab = ({
 	projectPlan,
 	project,
 	members,
@@ -48,7 +57,7 @@ export function ProjectPlanTab({
 	all_documents,
 	isBaLead,
 	userData,
-}: ProjectPlanTabProps) {
+}: ProjectPlanTabProps) => {
 	// Modal state for special actions
 	const [isSetAreasModalOpen, setIsSetAreasModalOpen] = useState(false);
 	const [isCreateReportModalOpen, setIsCreateReportModalOpen] = useState(false);
@@ -62,7 +71,7 @@ export function ProjectPlanTab({
 		);
 	}
 
-	const canEdit = calculateDocumentEditPermission({
+	const canEditBase = calculateDocumentEditPermission({
 		currentUser,
 		members,
 		document: projectPlan.document,
@@ -70,6 +79,18 @@ export function ProjectPlanTab({
 		userIsCaretakerOfBaLeader,
 		userIsCaretakerOfAdmin,
 	});
+
+	// Lock editing if project plan is approved and progress reports exist
+	const isLocked = isProjectPlanLocked(projectPlan.document, all_documents);
+	const canEdit = getEffectiveCanEdit(
+		canEditBase,
+		projectPlan.document,
+		isLocked
+	);
+
+	// Lock report creation if project is terminated/completed or has approved closure
+	const isCreationLocked = isReportCreationLocked(project, all_documents);
+	const lockedMessage = getLockedMessage(projectPlan.document, isLocked);
 
 	return (
 		<>
@@ -79,7 +100,8 @@ export function ProjectPlanTab({
 				members={members}
 				documentType="project_plan"
 				typeSpecificId={projectPlan.id}
-				canDelete={true}
+				canDelete={!isLocked}
+				locked={isLocked}
 				creator={creator}
 				modifier={modifier}
 				userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
@@ -97,6 +119,40 @@ export function ProjectPlanTab({
 				}
 			>
 				<div className="space-y-6">
+					{/* Locked banner */}
+					{isLocked && (
+						<Alert className="border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+							<Lock className="size-4 text-gray-500 dark:text-gray-400" />
+							<AlertDescription className="text-gray-600 dark:text-gray-400">
+								This document is locked to preserve data integrity. The project
+								has progressed past this stage.
+							</AlertDescription>
+						</Alert>
+					)}
+
+					{/* Post-approval banner: project plan approved */}
+					{projectPlan.document.status === "approved" && (
+						<Alert className="border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30">
+							<CheckCircle className="size-4 text-emerald-600 dark:text-emerald-400" />
+							<AlertDescription className="flex items-center justify-between gap-4">
+								<span className="text-emerald-800 dark:text-emerald-200">
+									{isCreationLocked
+										? "This project plan has been fully approved. Report creation is locked because the project has been closed."
+										: "This project plan has been fully approved. You can now create progress reports."}
+								</span>
+								<Button
+									size="sm"
+									className="shrink-0 bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+									onClick={() => setIsCreateReportModalOpen(true)}
+									disabled={isCreationLocked}
+								>
+									<Plus className="mr-1.5 size-3.5" />
+									Create Progress Report
+								</Button>
+							</AlertDescription>
+						</Alert>
+					)}
+
 					{/* Endorsements - FIRST SECTION */}
 					{projectPlan.endorsements && (
 						<ProjectPlanEndorsements
@@ -105,6 +161,7 @@ export function ProjectPlanTab({
 							isBaLead={isBaLead}
 							userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
 							userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+							locked={isLocked || projectPlan.document.status === "approved"}
 						/>
 					)}
 
@@ -115,6 +172,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.background || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Background"
 						/>
 					</ProjectSection>
@@ -126,6 +184,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.aims || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Aims"
 						/>
 					</ProjectSection>
@@ -137,6 +196,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.outcome || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Expected Outcomes"
 						/>
 					</ProjectSection>
@@ -148,6 +208,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.knowledge_transfer || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Knowledge Transfer"
 						/>
 					</ProjectSection>
@@ -159,18 +220,8 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.project_tasks || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Project Tasks"
-						/>
-					</ProjectSection>
-
-					{/* Listed References */}
-					<ProjectSection>
-						<InlineSaveEditor
-							contentType="project-plan-listed-references"
-							entityId={projectPlan.id}
-							initialContent={projectPlan.listed_references || ""}
-							canEdit={canEdit}
-							label="Listed References"
 						/>
 					</ProjectSection>
 
@@ -181,6 +232,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.methodology || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Methodology"
 						/>
 					</ProjectSection>
@@ -202,6 +254,7 @@ export function ProjectPlanTab({
 								entityId={projectPlan.endorsements.id}
 								initialContent={projectPlan.endorsements.no_specimens || ""}
 								canEdit={canEdit}
+								lockedMessage={lockedMessage}
 								label="Number of Voucher Specimens"
 							/>
 						</ProjectSection>
@@ -215,6 +268,7 @@ export function ProjectPlanTab({
 								entityId={projectPlan.endorsements.id}
 								initialContent={projectPlan.endorsements.data_management || ""}
 								canEdit={canEdit}
+								lockedMessage={lockedMessage}
 								label="Data Management"
 							/>
 						</ProjectSection>
@@ -227,6 +281,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.related_projects || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Related Science Projects"
 						/>
 					</ProjectSection>
@@ -238,6 +293,7 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.operating_budget || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Consolidated Funds"
 						/>
 					</ProjectSection>
@@ -249,7 +305,20 @@ export function ProjectPlanTab({
 							entityId={projectPlan.id}
 							initialContent={projectPlan.operating_budget_external || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="External Funds"
+						/>
+					</ProjectSection>
+
+					{/* Listed References */}
+					<ProjectSection>
+						<InlineSaveEditor
+							contentType="project-plan-listed-references"
+							entityId={projectPlan.id}
+							initialContent={projectPlan.listed_references || ""}
+							canEdit={canEdit}
+							lockedMessage={lockedMessage}
+							label="Listed References"
 						/>
 					</ProjectSection>
 				</div>
@@ -270,4 +339,4 @@ export function ProjectPlanTab({
 			/>
 		</>
 	);
-}
+};

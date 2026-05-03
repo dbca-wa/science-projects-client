@@ -131,11 +131,12 @@ function TabsContent({
 	return (
 		<TabsPrimitive.Content
 			data-slot="tabs-content"
-			className={cn("flex-1 outline-none", className)}
+			className={cn("flex-1 outline-none min-w-0", className)}
 			{...props}
 		>
 			<motion.div
 				key={contentKey}
+				className="min-w-0"
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{

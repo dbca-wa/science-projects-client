@@ -71,6 +71,7 @@ class TinyProjectSerializer(ModelSerializer):
             "id",
             "title",
             "status",
+            "status_before_suspend",
             "kind",
             "year",
             "number",

@@ -26,16 +26,32 @@ class CheckEmailExists(APIView):
 
 
 class CheckNameExists(APIView):
-    """Check if username already exists"""
+    """Check if a user with the given first and last name already exists"""
 
     permission_classes = [AllowAny]
 
     def get(self, request):
+        first_name = request.query_params.get("first_name")
+        last_name = request.query_params.get("last_name")
+        # Legacy support: also accept "username" param
         username = request.query_params.get("username")
-        if not username:
-            return Response({"error": "Username parameter required"}, status=400)
 
-        exists = UserService.check_username_exists(username)
+        if username:
+            exists = UserService.check_username_exists(username)
+            return Response({"exists": exists})
+
+        if not first_name or not last_name:
+            return Response(
+                {"error": "first_name and last_name parameters required"},
+                status=400,
+            )
+
+        from users.models import User
+
+        exists = User.objects.filter(
+            display_first_name__iexact=first_name.strip(),
+            display_last_name__iexact=last_name.strip(),
+        ).exists()
         return Response({"exists": exists})
 
 

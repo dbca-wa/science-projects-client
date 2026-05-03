@@ -22,8 +22,11 @@ import type { IProgressReport, IMainDoc } from "@/shared/types/document.types";
 // Mock services
 vi.mock("@/shared/services/api/client.service", () => ({
 	apiClient: {
-		post: vi.fn(),
-		put: vi.fn(),
+		post: vi.fn().mockResolvedValue({}),
+		put: vi.fn().mockResolvedValue({}),
+		patch: vi.fn().mockResolvedValue({}),
+		get: vi.fn().mockResolvedValue({}),
+		delete: vi.fn().mockResolvedValue({}),
 	},
 }));
 vi.mock("sonner", () => ({

@@ -1594,7 +1594,7 @@ class TestDocRecall:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_recall.assert_called_once_with(
-            project_document, user, "Need to make changes"
+            project_document, user, "Need to make changes", stage=2
         )
         assert "id" in response.data
 
@@ -1618,7 +1618,7 @@ class TestDocRecall:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_recall.assert_called_once_with(project_document, user, "")
+        mock_recall.assert_called_once_with(project_document, user, "", stage=1)
 
     @pytest.mark.integration
     def test_doc_recall_missing_stage(self, api_client, user, project_document, db):

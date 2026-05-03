@@ -226,6 +226,41 @@ describe("NewCycleStore", () => {
 			store.reset();
 			expect(localStorage.getItem("spms_new_cycle_draft")).toBeNull();
 		});
+
+		it("should clear excluded users", () => {
+			store.excludeUser(1);
+			store.excludeUser(2);
+			store.excludeUser(3);
+			store.reset();
+			expect(store.state.excludedUserIds).toEqual([]);
+		});
+
+		it("should clear per-group custom messages", () => {
+			store.setPerGroupEnabled(true);
+			store.setGroupMessage("ba_leads", "<p>BA message</p>");
+			store.setGroupMessage("project_leads", "<p>PL message</p>");
+			store.reset();
+			expect(store.state.customMessages.ba_leads).toBe("");
+			expect(store.state.customMessages.project_leads).toBe("");
+			expect(store.state.customMessages.team_members).toBe("");
+			expect(store.state.perGroupEnabled).toBe(false);
+		});
+
+		it("should reset inclusion mode to default", () => {
+			store.setInclusionMode("active-only");
+			store.reset();
+			expect(store.state.inclusionMode).toBe("include");
+		});
+
+		it("should reset all send group flags", () => {
+			store.setSendBaLeads(true);
+			store.setSendProjectLeads(true);
+			store.setSendTeamMembers(true);
+			store.reset();
+			expect(store.state.sendBaLeads).toBe(false);
+			expect(store.state.sendProjectLeads).toBe(false);
+			expect(store.state.sendTeamMembers).toBe(false);
+		});
 	});
 
 	describe("exportDraft / importDraft", () => {

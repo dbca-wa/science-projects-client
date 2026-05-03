@@ -13,8 +13,11 @@ import type { IUserData } from "@/shared/types/user.types";
 const createStaffUser = async (
 	data: StaffUserCreateFormData
 ): Promise<IUserData> => {
-	const currentYear = new Date().getFullYear();
-	const username = `${data.firstName.toLowerCase()}${data.lastName.toLowerCase()}${currentYear}`;
+	// Use email as username for staff users — this matches the DBCA SSO
+	// middleware which looks up users by email. Using a generated username
+	// like "johndoe2026" would cause a duplicate account when the user
+	// logs in via SSO for the first time.
+	const username = data.email;
 
 	// Capitalize names after spaces and hyphens
 	const capitalizeAfterSpaceOrHyphen = (name: string) => {
@@ -31,11 +34,11 @@ const createStaffUser = async (
 	return apiClient.post<IUserData>(USER_ENDPOINTS.CREATE, {
 		username,
 		email: data.email,
-		firstName,
-		lastName,
-		isStaff: true,
+		first_name: firstName,
+		last_name: lastName,
+		is_staff: true,
 		branch: data.branch,
-		businessArea: data.businessArea,
+		business_area: data.businessArea,
 	});
 };
 

@@ -246,8 +246,8 @@ class MemberService:
         new_leader = MemberService.get_member(project_id, user_id)
         new_leader_position = new_leader.position or 100
 
-        # Get current leader(s) and their positions
-        current_leaders = ProjectMember.objects.filter(
+        # Get current leader(s) with user data for role assignment
+        current_leaders = ProjectMember.objects.select_related("user").filter(
             project_id=project_id, is_leader=True
         )
 
@@ -261,8 +261,14 @@ class MemberService:
             member.position = (member.position or 0) + 1
             member.save()
 
-        # Demote current leader(s) - they've already been shifted down by 1
-        current_leaders.update(is_leader=False)
+        # Demote current leader(s) — update role based on staff status
+        for leader in current_leaders:
+            leader.is_leader = False
+            if leader.user.is_staff:
+                leader.role = "research"  # Science Support
+            else:
+                leader.role = "consulted"  # Consulted Peer
+            leader.save()
 
         # Promote new leader to position 0
         new_leader.is_leader = True

@@ -45,6 +45,20 @@ class CaretakerRequestList(APIView):
         pending_requests = CaretakerRequestService.get_pending_requests_for_user(
             user_id
         )
+
+        # Clean up orphaned requests where primary_user was deleted (SET_NULL)
+        orphaned = pending_requests.filter(primary_user__isnull=True)
+        if orphaned.exists():
+            count = orphaned.count()
+            settings.LOGGER.info(
+                f"Cleaning up {count} orphaned caretaker request(s) with missing primary_user"
+            )
+            orphaned.update(status="cancelled")
+            # Re-fetch after cleanup
+            pending_requests = CaretakerRequestService.get_pending_requests_for_user(
+                user_id
+            )
+
         serializer = AdminTaskSerializer(pending_requests, many=True)
 
         return Response(serializer.data, status=HTTP_200_OK)
@@ -118,7 +132,6 @@ class CaretakerRequestCreate(APIView):
                 user_id=user_id,
                 caretaker_id=caretaker_id,
                 reason=request.data.get("reason"),
-                end_date=request.data.get("end_date"),
                 notes=request.data.get("notes"),
             )
 

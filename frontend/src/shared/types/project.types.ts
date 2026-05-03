@@ -95,6 +95,7 @@ export interface IProjectData {
 	tag?: string;
 	role?: ProjectRoles;
 	hidden_from_staff_profiles?: number[];
+	status_before_suspend?: ProjectStatus | null;
 }
 
 // Base Project Details

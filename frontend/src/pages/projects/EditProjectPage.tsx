@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useProject } from "@/features/projects/hooks/useProject";
 import { useUpdateProject } from "@/features/projects/hooks/useUpdateProject";
@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { inlineEditStore } from "@/app/stores/InlineEditStore";
 
 const EditProjectPage = observer(() => {
 	useDocumentTitle("Edit Project");
@@ -25,6 +26,7 @@ const EditProjectPage = observer(() => {
 	const updateMutation = useUpdateProject();
 	const { width } = useWindowSize();
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const formContainerRef = useRef<HTMLDivElement>(null);
 
 	// Check permissions
 	const hasEditPermission =
@@ -32,18 +34,33 @@ const EditProjectPage = observer(() => {
 			? canEditProject(currentUser, data.project)
 			: false;
 
-	// Warn on browser navigation if there are unsaved changes
+	// Register form dirty state with InlineEditStore for global NavigationBlocker
 	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (hasUnsavedChanges) {
-				e.preventDefault();
-				e.returnValue = "";
-			}
+		if (hasUnsavedChanges) {
+			inlineEditStore.registerEditor({
+				contentType: "project-edit-form" as never,
+				entityId: Number(id) || 0,
+				originalContent: "clean",
+				elementRef: formContainerRef.current,
+			});
+			inlineEditStore.updateCurrentContent(
+				"project-edit-form" as never,
+				Number(id) || 0,
+				"dirty"
+			);
+		} else {
+			inlineEditStore.unregisterEditor(
+				"project-edit-form" as never,
+				Number(id) || 0
+			);
+		}
+		return () => {
+			inlineEditStore.unregisterEditor(
+				"project-edit-form" as never,
+				Number(id) || 0
+			);
 		};
-
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [hasUnsavedChanges]);
+	}, [hasUnsavedChanges, id]);
 
 	// Redirect if unauthorized
 	useEffect(() => {
@@ -94,6 +111,10 @@ const EditProjectPage = observer(() => {
 
 	// Handle cancel
 	const handleCancel = () => {
+		inlineEditStore.unregisterEditor(
+			"project-edit-form" as never,
+			Number(id) || 0
+		);
 		navigate(`/projects/${id}/overview`);
 	};
 
@@ -160,14 +181,16 @@ const EditProjectPage = observer(() => {
 				</div>
 
 				{/* Edit Form */}
-				<EditProjectForm
-					project={project}
-					details={details}
-					onSubmit={handleSubmit}
-					onCancel={handleCancel}
-					isLoading={updateMutation.isPending}
-					onDirtyChange={setHasUnsavedChanges}
-				/>
+				<div ref={formContainerRef}>
+					<EditProjectForm
+						project={project}
+						details={details}
+						onSubmit={handleSubmit}
+						onCancel={handleCancel}
+						isLoading={updateMutation.isPending}
+						onDirtyChange={setHasUnsavedChanges}
+					/>
+				</div>
 			</div>
 		</PageTransition>
 	);

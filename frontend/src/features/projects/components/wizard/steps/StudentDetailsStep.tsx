@@ -26,7 +26,7 @@ import { shouldShowError } from "../validation-helpers";
  */
 const StudentDetailsStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData.studentDetails;
+	const formData = wizardStore.state.editingFormData.studentDetails;
 	const validation = wizardStore.state.validation[3]; // Step 3 is Student Details
 	const stepIndex = 3;
 	const [selectedAffiliations, setSelectedAffiliations] = useState<

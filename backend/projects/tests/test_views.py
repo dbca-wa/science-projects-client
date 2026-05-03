@@ -1353,7 +1353,7 @@ class TestSuspendProject:
 
     @pytest.mark.integration
     def test_suspend_project(self, api_client, user, project, db):
-        """Test suspending a project"""
+        """Test suspending a project saves the previous status"""
         # Arrange
         api_client.force_authenticate(user=user)
         project.status = "active"
@@ -1366,6 +1366,58 @@ class TestSuspendProject:
         assert response.status_code == status.HTTP_202_ACCEPTED
         project.refresh_from_db()
         assert project.status == "suspended"
+        assert project.status_before_suspend == "active"
+
+    @pytest.mark.integration
+    def test_unsuspend_project_restores_previous_status(
+        self, api_client, user, project, db
+    ):
+        """Test unsuspending restores the status from before suspension"""
+        # Arrange
+        api_client.force_authenticate(user=user)
+        project.status = "pending"
+        project.save()
+
+        # Suspend first
+        api_client.post(projects_urls.path(project.pk, "suspend"))
+        project.refresh_from_db()
+        assert project.status == "suspended"
+        assert project.status_before_suspend == "pending"
+
+        # Act — unsuspend
+        response = api_client.post(
+            projects_urls.path(project.pk, "suspend"),
+            {"suspend": False},
+            format="json",
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        project.refresh_from_db()
+        assert project.status == "pending"
+        assert project.status_before_suspend is None
+
+    @pytest.mark.integration
+    def test_unsuspend_project_legacy_fallback(self, api_client, user, project, db):
+        """Test unsuspending falls back to 'active' when no previous status is recorded"""
+        # Arrange — simulate legacy data: suspended with no status_before_suspend
+        api_client.force_authenticate(user=user)
+        project.status = "suspended"
+        project.status_before_suspend = None
+        project.save()
+
+        # Act
+        response = api_client.post(
+            projects_urls.path(project.pk, "suspend"),
+            {"suspend": False},
+            format="json",
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        project.refresh_from_db()
+        assert project.status == "active"
+        assert project.status_before_suspend is None
 
 
 class TestProjectDocs:

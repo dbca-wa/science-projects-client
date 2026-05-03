@@ -23,7 +23,9 @@ export const NewCycleEmailPreview = ({
 	const [iframeReady, setIframeReady] = useState(false);
 	const [iframeHeight, setIframeHeight] = useState(1200);
 	const customMessageRef = useRef(customMessage);
-	customMessageRef.current = customMessage;
+	useEffect(() => {
+		customMessageRef.current = customMessage;
+	}, [customMessage]);
 
 	const { data, isLoading } = useNewCycleEmailPreview(true, "", divisionName);
 

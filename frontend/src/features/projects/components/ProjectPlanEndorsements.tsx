@@ -22,17 +22,20 @@ interface ProjectPlanEndorsementsProps {
 	userIsCaretakerOfAdmin?: boolean;
 	userIsCaretakerOfBaLeader?: boolean;
 	refetchDocument?: () => void;
+	locked?: boolean;
 }
 
-export function ProjectPlanEndorsements({
+export const ProjectPlanEndorsements = ({
 	projectPlan,
 	userData,
 	isBaLead,
 	userIsCaretakerOfAdmin,
 	userIsCaretakerOfBaLeader,
-}: ProjectPlanEndorsementsProps) {
-	// Permissions logic
+	locked = false,
+}: ProjectPlanEndorsementsProps) => {
+	// Permissions logic — locked overrides all edit permissions
 	const canEdit = useMemo(() => {
+		if (locked) return false;
 		return (
 			userData?.is_superuser ||
 			userIsCaretakerOfAdmin ||
@@ -40,7 +43,13 @@ export function ProjectPlanEndorsements({
 			isBaLead ||
 			userIsCaretakerOfBaLeader
 		);
-	}, [userData, isBaLead, userIsCaretakerOfAdmin, userIsCaretakerOfBaLeader]);
+	}, [
+		userData,
+		isBaLead,
+		locked,
+		userIsCaretakerOfAdmin,
+		userIsCaretakerOfBaLeader,
+	]);
 
 	// State management
 	// Track local changes to ae_endorsement_required (checkbox state)
@@ -185,7 +194,7 @@ export function ProjectPlanEndorsements({
 							checked={aecEndorsementRequired}
 							onCheckedChange={(checked) => setLocalAecRequired(!!checked)}
 							disabled={!canEdit}
-							className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 dark:data-[state=checked]:bg-green-600"
+							className="size-5 border-2 border-gray-300 dark:border-gray-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 dark:data-[state=checked]:bg-green-600"
 						/>
 					</div>
 
@@ -207,16 +216,26 @@ export function ProjectPlanEndorsements({
 						<div>
 							{!canEdit ? (
 								<Badge
-									variant={aecEndorsementProvided ? "default" : "destructive"}
+									variant={
+										!aecEndorsementRequired
+											? "secondary"
+											: aecEndorsementProvided
+												? "default"
+												: "destructive"
+									}
 								>
-									{aecEndorsementProvided ? "Granted" : "Required"}
+									{!aecEndorsementRequired
+										? "Not Required"
+										: aecEndorsementProvided
+											? "Granted"
+											: "Required"}
 								</Badge>
 							) : (
 								<Switch
 									id="aec-provided"
 									checked={aecEndorsementProvided}
 									disabled={true}
-									className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-600"
+									className="border border-gray-500 dark:border-gray-500 data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-600"
 								/>
 							)}
 						</div>
@@ -289,4 +308,4 @@ export function ProjectPlanEndorsements({
 			</ProjectSection>
 		</>
 	);
-}
+};

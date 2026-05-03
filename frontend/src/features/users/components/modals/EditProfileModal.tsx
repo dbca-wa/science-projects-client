@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,7 +7,8 @@ import { getImageUrl } from "@/shared/utils/image.utils";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { ImageUpload } from "@/shared/components/media";
 import { FormRichTextEditor } from "@/shared/components/editor";
-import { UnsavedChangesDialog } from "@/shared/components/editor/UnsavedChangesDialog";
+import { inlineEditStore } from "@/app/stores/InlineEditStore";
+import { toast } from "sonner";
 import {
 	Dialog,
 	DialogContent,
@@ -44,10 +45,6 @@ interface EditProfileModalProps {
 
 export const EditProfileModal = observer(
 	({ isOpen, onClose, user }: EditProfileModalProps) => {
-		// const queryClient = useQueryClient();
-		const [isUnsavedDialogOpen, setIsUnsavedDialogOpen] = useState(false);
-		const [_pendingClose, setPendingClose] = useState(false);
-
 		const form = useForm<ProfileFormData>({
 			resolver: zodResolver(profileSchema),
 			defaultValues: {
@@ -71,51 +68,52 @@ export const EditProfileModal = observer(
 					about: user.about || "",
 					expertise: user.expertise || "",
 				});
-				setPendingClose(false);
 			}
 		}, [isOpen, user.image, user.about, user.expertise, form]);
 
-		// Block browser-level navigation when form is dirty
-
+		// Register form dirty state with InlineEditStore for global NavigationBlocker
 		useEffect(() => {
-			const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-				if (form.formState.isDirty && isOpen && !updateMutation.isSuccess) {
-					e.preventDefault();
-					e.returnValue = "";
-				}
+			const isDirty = form.formState.isDirty;
+			if (isDirty && isOpen) {
+				inlineEditStore.registerEditor({
+					contentType: "edit-profile-modal" as never,
+					entityId: user.id,
+					originalContent: "clean",
+					elementRef: null,
+				});
+				inlineEditStore.updateCurrentContent(
+					"edit-profile-modal" as never,
+					user.id,
+					"dirty"
+				);
+			} else {
+				inlineEditStore.unregisterEditor(
+					"edit-profile-modal" as never,
+					user.id
+				);
+			}
+			return () => {
+				inlineEditStore.unregisterEditor(
+					"edit-profile-modal" as never,
+					user.id
+				);
 			};
-
-			window.addEventListener("beforeunload", handleBeforeUnload);
-			return () =>
-				window.removeEventListener("beforeunload", handleBeforeUnload);
-		}, [form.formState.isDirty, isOpen, updateMutation.isSuccess]);
+		}, [form.formState.isDirty, isOpen, user.id]);
 
 		const handleSubmit = (data: ProfileFormData) => {
 			updateMutation.mutate(data);
 		};
 
 		const handleClose = () => {
-			// Check if form has unsaved changes
 			if (form.formState.isDirty && !updateMutation.isSuccess) {
-				setPendingClose(true);
-				setIsUnsavedDialogOpen(true);
-			} else {
-				form.reset();
-				onClose();
+				toast.warning("You have unsaved changes", {
+					description: "Save or discard your changes before closing.",
+					duration: 3000,
+				});
+				return; // Prevent close
 			}
-		};
-
-		// Dialog handlers for unsaved changes
-		const handleProceedClose = () => {
-			setIsUnsavedDialogOpen(false);
-			setPendingClose(false);
-			form.reset(); // Reset form to mark as not dirty
+			form.reset();
 			onClose();
-		};
-
-		const handleCancelClose = () => {
-			setIsUnsavedDialogOpen(false);
-			setPendingClose(false);
 		};
 
 		return (
@@ -220,12 +218,6 @@ export const EditProfileModal = observer(
 						</form>
 					</Form>
 				</DialogContent>
-
-				<UnsavedChangesDialog
-					isOpen={isUnsavedDialogOpen}
-					onProceed={handleProceedClose}
-					onCancel={handleCancelClose}
-				/>
 			</Dialog>
 		);
 	}

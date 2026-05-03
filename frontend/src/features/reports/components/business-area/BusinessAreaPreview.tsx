@@ -63,7 +63,7 @@ export function BusinessAreaPreview({ area }: BusinessAreaPreviewProps) {
 			{/* Banner preview card — clickable block */}
 			<div
 				className="relative rounded-lg overflow-hidden bg-muted/30 pb-8 cursor-pointer border border-transparent hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition-all"
-				onClick={() => navigate("/reports/business-area/edit")}
+				onClick={() => navigate(`/reports/business-area/edit?id=${area.id}`)}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
 			>

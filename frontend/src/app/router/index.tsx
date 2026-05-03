@@ -1,6 +1,11 @@
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { Suspense } from "react";
-import { Navigate, createBrowserRouter, type RouteObject } from "react-router";
+import {
+	Navigate,
+	createBrowserRouter,
+	useLocation,
+	type RouteObject,
+} from "react-router";
 
 import {
 	AdminRoute,
@@ -43,7 +48,6 @@ const withLayout = (config: RouteConfig, element: ReactNode) => {
 			return <ContentWrapper>{secured}</ContentWrapper>;
 
 		case "staffProfile":
-			// Staff routes are public, but this still composes correctly if they are later secured/disabled
 			return <StaffProfileLayout>{secured}</StaffProfileLayout>;
 
 		case "none":
@@ -52,49 +56,71 @@ const withLayout = (config: RouteConfig, element: ReactNode) => {
 	}
 };
 
+/**
+ * Build a wrapper Component (not a static element) for a route.
+ *
+ * The wrapper reads `useLocation()` and passes `key={location.pathname}` to
+ * the page component. This forces React to treat each URL as a distinct
+ * component instance, so back/forward navigation correctly remounts the page
+ * and hooks like useParams return updated values.
+ *
+ * See: https://stackoverflow.com/questions/32261441
+ */
+const buildRouteComponent = (config: RouteConfig): ComponentType => {
+	const PageComponent = config.component;
+	const props = config.componentProps ?? {};
+
+	if (config.layoutWrapper === "staffProfile") {
+		const Wrapper = () => {
+			const location = useLocation();
+			const secured = withAuth(
+				config,
+				<PageComponent key={location.pathname} {...props} />
+			);
+			return (
+				<Suspense fallback={<div className="min-h-screen bg-white" />}>
+					<StaffProfileLayout>{secured}</StaffProfileLayout>
+				</Suspense>
+			);
+		};
+		Wrapper.displayName = `StaffRoute(${config.name})`;
+		return Wrapper;
+	}
+
+	// All other routes: layout renders immediately, Suspense wraps the page
+	const Wrapper = () => {
+		const location = useLocation();
+		return withLayout(
+			config,
+			<Suspense fallback={<RouteLoader />}>
+				<PageComponent key={location.pathname} {...props} />
+			</Suspense>
+		) as React.ReactElement;
+	};
+	Wrapper.displayName = `Route(${config.name})`;
+	return Wrapper;
+};
+
 /** Convert a RouteConfig to a RouteObject
  * If `asChild` is true we:
  *   - make the path relative (strip leading '/')
  *   - turn "/" into an index route under its parent
+ *
+ * Uses the `Component` property instead of `element` so React Router creates
+ * a fresh element on each render — fixing back/forward navigation for routes
+ * that share the same page component (e.g. project detail tabs).
  */
 const toRouteObject = (config: RouteConfig, asChild = false): RouteObject => {
-	const Component = config.component;
+	const RouteComponent = buildRouteComponent(config);
 
-	// Staff profile routes: Suspense wraps the entire layout so nothing renders until ready
-	if (config.layoutWrapper === "staffProfile") {
-		const secured = withAuth(
-			config,
-			<Component {...(config.componentProps ?? {})} />
-		);
-		const element = (
-			<Suspense fallback={<div className="min-h-screen bg-white" />}>
-				<StaffProfileLayout>{secured}</StaffProfileLayout>
-			</Suspense>
-		);
-		const rawPath = config.path;
-		const path =
-			asChild && rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
-		return asChild && rawPath === "/"
-			? { index: true, element }
-			: { path, element };
-	}
-
-	// All other routes: Suspense wraps just the component, layout renders immediately
-	const element = withLayout(
-		config,
-		<Suspense fallback={<RouteLoader />}>
-			<Component {...(config.componentProps ?? {})} />
-		</Suspense>
-	);
-
-	// Normalize child path for nesting under Root
+	// Normalise child path for nesting under Root
 	const rawPath = config.path;
 	const path = asChild && rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
 
 	const route: RouteObject =
 		asChild && rawPath === "/"
-			? { index: true, element } // make Dashboard an index route under Root
-			: { path, element };
+			? { index: true, Component: RouteComponent }
+			: { path, Component: RouteComponent };
 
 	if (config.children?.length) {
 		route.children = config.children.map((child) => toRouteObject(child, true));
