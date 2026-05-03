@@ -310,8 +310,10 @@ class RemedyOpenClosed(APIView):
                     )
 
                 except Exception as e:
-                    failed.append({"project_id": pk, "error": str(e)})
-                    settings.LOGGER.error(f"Failed to remedy project {pk}: {e}")
+                    failed.append({"project_id": pk, "error": "Failed to process"})
+                    settings.LOGGER.error(
+                        f"Failed to remedy project {pk}: {e}", exc_info=True
+                    )
 
         return Response(
             {

@@ -23,6 +23,7 @@ import {
 } from "../hooks/useKnowledgeBase";
 import { toast } from "sonner";
 import type { IContentField } from "../types/guide.types";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 
 /** DBCA brand colours used for knowledge base accents and headings. */
 const DBCA = {
@@ -126,8 +127,7 @@ export const KBArticleSections = observer(function KBArticleSections({
 		? articles.filter((a) => {
 				const q = searchQuery.toLowerCase();
 				const titleMatch = (a.title ?? a.field_key).toLowerCase().includes(q);
-				const contentMatch = (a.description ?? "")
-					.replace(/<[^>]*>/g, "")
+				const contentMatch = sanitizeInput(a.description ?? "")
 					.toLowerCase()
 					.includes(q);
 				return titleMatch || contentMatch;

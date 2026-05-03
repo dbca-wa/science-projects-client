@@ -72,7 +72,7 @@ RUN python manage.py collectstatic --noinput
 RUN echo "Obfuscating Python source code..." \
     && python -m compileall -b -f . \
     && python -O -m compileall -b -f . \
-    && find . -name "*.py" -not -name "manage.py" -not -path "./*/migrations/*" -delete \
+    && find . -name "*.py" -not -name "manage.py" -not -path "./*/migrations/*" -not -path "./*/management/commands/*" -not -path "./*/management/*/__init__.py" -delete \
     && find . -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true \
     && find . -name "*.pyc" -path "*/__pycache__/*" -delete \
     && find . -type d -name "__pycache__" -exec rmdir {} + 2>/dev/null || true
