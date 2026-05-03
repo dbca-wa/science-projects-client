@@ -17,7 +17,6 @@ import { Label } from "@/shared/components/ui/label";
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -26,6 +25,7 @@ import {
 	useUpdateReportInfo,
 } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { useReportsForDivision } from "@/shared/hooks/queries/useReportsForDivision";
 import type { IAnnualReport } from "@/shared/types/report.types";
 
@@ -239,11 +239,7 @@ const CreateReportInfoForm = ({
 								<SelectValue placeholder="Select a division" />
 							</SelectTrigger>
 							<SelectContent>
-								{divisions?.map((div) => (
-									<SelectItem key={div.id} value={String(div.id)}>
-										{div.name}
-									</SelectItem>
-								))}
+								<DivisionSelectItems divisions={divisions ?? []} />
 							</SelectContent>
 						</Select>
 						{lockDivision && (
@@ -376,11 +372,7 @@ const EditReportInfoForm = ({
 								<SelectValue placeholder="Select a division" />
 							</SelectTrigger>
 							<SelectContent>
-								{divisions?.map((div) => (
-									<SelectItem key={div.id} value={String(div.id)}>
-										{div.name}
-									</SelectItem>
-								))}
+								<DivisionSelectItems divisions={divisions ?? []} />
 							</SelectContent>
 						</Select>
 						{lockDivision && (

@@ -31,23 +31,6 @@ export const getComments = async (documentId: number): Promise<IComment[]> => {
 };
 
 /**
- * Get a single comment by ID
- *
- * @param commentId - The comment ID
- * @returns The comment with full details including replies
- */
-export const getComment = async (commentId: number): Promise<IComment> => {
-	try {
-		return await apiClient.get<IComment>(COMMENT_ENDPOINTS.DETAIL(commentId));
-	} catch (error) {
-		throw new Error(
-			error instanceof Error ? error.message : "Failed to fetch comment",
-			{ cause: error }
-		);
-	}
-};
-
-/**
  * Create a new comment
  *
  * @param data - Comment creation data

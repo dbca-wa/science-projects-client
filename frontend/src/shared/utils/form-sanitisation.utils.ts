@@ -51,18 +51,3 @@ export function sanitiseFormData<T extends Record<string, unknown>>(
 
 	return sanitised;
 }
-
-/**
- * List of common rich text field names that should preserve HTML formatting.
- * These fields will be sanitised with sanitizeRichText instead of sanitizeInput.
- */
-export const COMMON_RICH_TEXT_FIELDS = [
-	"about",
-	"expertise",
-	"description",
-	"content",
-	"bio",
-	"notes",
-	"comments",
-	"message",
-] as const;

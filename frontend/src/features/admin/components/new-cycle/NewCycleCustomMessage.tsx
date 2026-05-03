@@ -10,8 +10,7 @@ interface NewCycleCustomMessageProps {
 	store: NewCycleStore;
 }
 
-const EDITOR_CLASS =
-	"rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800";
+const EDITOR_CLASS = "editor-standalone";
 
 const GROUP_LABELS: Record<string, string> = {
 	ba_leads: "Business Area Leads",

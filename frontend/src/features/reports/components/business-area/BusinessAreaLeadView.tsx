@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useMyBusinessAreas } from "../../hooks/useBusinessAreaLead";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {
 	Tabs,
@@ -21,7 +22,7 @@ import {
 import { Loader2, AlertCircle, Briefcase } from "lucide-react";
 import type { IBusinessArea } from "@/shared/types/org.types";
 import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
-import { sortBusinessAreasByDisplayName } from "@/features/projects/utils/business-area.utils";
+import { sortBusinessAreasByDisplayName } from "@/shared/utils/business-area.utils";
 import { BusinessAreaPreview } from "./BusinessAreaPreview";
 import { ProblematicProjectsTab } from "./ProblematicProjectsTab";
 import { UnapprovedDocumentsTab } from "./UnapprovedDocumentsTab";
@@ -139,6 +140,7 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 		error,
 	} = useMyBusinessAreas();
 	const { data: allBusinessAreas, isLoading: allLoading } = useBusinessAreas();
+	const { data: divisions } = useDivisions();
 	const authStore = useAuthStore();
 	const navigate = useNavigate();
 	const [selectedBAId, setSelectedBAId] = useState<number | null>(null);
@@ -246,7 +248,11 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 							<SelectValue placeholder="Select business area" />
 						</SelectTrigger>
 						<SelectContent>
-							<BusinessAreaSelectItems businessAreas={businessAreas} />
+							<BusinessAreaSelectItems
+								businessAreas={businessAreas}
+								filterByApprovers
+								divisions={divisions}
+							/>
 						</SelectContent>
 					</Select>
 				)}

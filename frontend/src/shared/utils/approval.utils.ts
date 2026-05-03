@@ -1,7 +1,4 @@
 import type { IMainDoc } from "@/shared/types/document.types";
-import type { IUserData } from "@/shared/types/user.types";
-import type { IProjectData } from "@/shared/types/project.types";
-import { isUserAtApprovalStage } from "./project-permissions.utils";
 
 /**
  * Approval State Utilities
@@ -61,29 +58,4 @@ export function getCurrentApprovalStage(document: IMainDoc): ApprovalStage {
 		return "business_area_lead";
 	if (!document.directorate_approval_granted) return "directorate";
 	return "complete";
-}
-
-/**
- * Check if user can approve at the current stage
- *
- * Determines if the user has permission to approve the document at its current approval stage.
- *
- * @param user - User to check permissions for
- * @param project - Project the document belongs to
- * @param document - Document to check approval permissions for
- * @returns true if user can approve at current stage
- */
-export function canApproveAtStage(
-	user: IUserData | null,
-	project: IProjectData,
-	document: IMainDoc
-): boolean {
-	if (!user) return false;
-
-	const stage = getCurrentApprovalStage(document);
-
-	// Can't approve if already complete
-	if (stage === "complete") return false;
-
-	return isUserAtApprovalStage(user, project, stage);
 }

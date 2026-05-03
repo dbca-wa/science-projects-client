@@ -12,7 +12,6 @@ vi.mock("../services/staff-profile.service", () => ({
 	getMyStaffProfile: vi.fn().mockResolvedValue({}),
 	getStaffProfileProjects: vi.fn().mockResolvedValue([]),
 	updateStaffProfileOverview: vi.fn().mockResolvedValue({}),
-	updateStaffProfileHero: vi.fn().mockResolvedValue({}),
 	toggleStaffProfileVisibility: vi.fn().mockResolvedValue({}),
 	getEmploymentEntries: vi.fn().mockResolvedValue([]),
 	createEmploymentEntry: vi.fn().mockResolvedValue({}),
@@ -51,22 +50,6 @@ describe("Staff profile hooks", () => {
 			() => mod.useStaffProfiles({ search: "", page: 1 }),
 			{ wrapper: createWrapper() }
 		);
-		expect(result.current.isLoading).toBeDefined();
-	});
-
-	it("useStaffProfileDetail should return a query", async () => {
-		const mod = await import("./useStaffProfileDetail");
-		const { result } = renderHook(() => mod.useStaffProfileDetail(1), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
-	it("useMyStaffProfile should return a query", async () => {
-		const mod = await import("./useMyStaffProfile");
-		const { result } = renderHook(() => mod.useMyStaffProfile(), {
-			wrapper: createWrapper(),
-		});
 		expect(result.current.isLoading).toBeDefined();
 	});
 
@@ -113,14 +96,6 @@ describe("Staff profile hooks", () => {
 	it("useUpdateOverview should return a mutation", async () => {
 		const mod = await import("./useStaffProfileMutations");
 		const { result } = renderHook(() => mod.useUpdateOverview(1), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.mutate).toBeDefined();
-	});
-
-	it("useUpdateHero should return a mutation", async () => {
-		const mod = await import("./useStaffProfileMutations");
-		const { result } = renderHook(() => mod.useUpdateHero(1), {
 			wrapper: createWrapper(),
 		});
 		expect(result.current.mutate).toBeDefined();

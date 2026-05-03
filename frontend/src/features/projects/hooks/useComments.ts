@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
 	getComments,
-	getComment,
 	createComment,
 	updateComment,
 	deleteComment,
@@ -45,27 +44,6 @@ export const useComments = (documentId: number | undefined) => {
 		staleTime: 30_000, // 30 seconds for dynamic data
 		enabled: !!documentId, // Only fetch if documentId is provided
 		refetchInterval: ENABLE_COMMENT_POLLING ? 30_000 : false, // Poll every 30 seconds if enabled
-	});
-};
-
-/**
- * Hook for fetching a single comment by ID
- * - Configured with 30 second stale time (dynamic data)
- * - Only enabled when commentId is provided
- * - Includes full comment details with replies
- *
- * @param commentId - Comment ID to fetch
- * @returns TanStack Query result with comment detail
- */
-export const useComment = (commentId: number | undefined) => {
-	return useQuery({
-		queryKey: commentKeys.detail(commentId as number),
-		queryFn: async () => {
-			const result = await getComment(commentId as number);
-			return result;
-		},
-		staleTime: 30_000, // 30 seconds for dynamic data
-		enabled: !!commentId, // Only fetch if commentId is provided
 	});
 };
 

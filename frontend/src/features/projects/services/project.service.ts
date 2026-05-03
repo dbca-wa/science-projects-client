@@ -245,15 +245,6 @@ export const getProjectsForMap = async (
 };
 
 /**
- * Get projects for a specific user (involved projects)
- */
-export const getInvolvedProjects = async (
-	userId: number
-): Promise<IProjectData[]> => {
-	return apiClient.get<IProjectData[]>(`users/${userId}/projects`);
-};
-
-/**
  * Get projects for the current authenticated user
  */
 export const getMyProjects = async (): Promise<IProjectData[]> => {

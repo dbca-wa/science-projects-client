@@ -65,7 +65,7 @@ const LocationsPage = lazy(() => import("@/pages/admin/LocationsPage"));
 const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
-const EmailsPage = lazy(() => import("@/pages/admin/EmailsPage"));
+const ApproversPage = lazy(() => import("@/pages/admin/ApproversPage"));
 const AdminTestPage = lazy(() => import("@/pages/admin/AdminTestPage"));
 const NewCyclePage = lazy(() => import("@/pages/admin/NewCyclePage"));
 
@@ -488,9 +488,9 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Email",
-		path: "/manage/emails",
-		component: EmailsPage,
+		name: "Approvers",
+		path: "/manage/approvers",
+		component: ApproversPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,

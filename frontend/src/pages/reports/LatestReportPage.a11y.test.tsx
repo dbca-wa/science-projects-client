@@ -8,7 +8,6 @@ import LatestReportPage from "./LatestReportPage";
 
 vi.mock("@/features/reports/hooks/useReports", () => ({
 	useLatestReport: () => ({ data: null, isLoading: false }),
-	useLatestYear: () => ({ data: { year: 2025 }, isLoading: false }),
 	useLatestProgressReports: () => ({ data: [], isLoading: false }),
 	useLatestStudentReports: () => ({ data: [], isLoading: false }),
 	useLatestInactiveReports: () => ({

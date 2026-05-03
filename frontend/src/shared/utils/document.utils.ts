@@ -1,5 +1,3 @@
-import type { IMainDoc } from "@/shared/types/document.types";
-
 /**
  * Document Utilities
  *
@@ -79,37 +77,6 @@ export function getDocumentTypeIdLabel(type: string): string {
 		projectclosure: "Project Closure ID",
 	};
 	return labels[type] || "Document Type ID";
-}
-
-/**
- * Get document type ID abbreviation
- *
- * @param type - Document type from API
- * @returns Document type abbreviation (e.g., "CP" for Concept Plan)
- */
-export function getDocumentTypeId(type: string): string {
-	const ids: Record<string, string> = {
-		concept: "CP",
-		projectplan: "PP",
-		progressreport: "PR",
-		studentreport: "SR",
-		projectclosure: "PC",
-	};
-	return ids[type] || "DOC";
-}
-
-/**
- * Format document ID for display
- *
- * Formats as: "{document_id} ({type_abbreviation})"
- * Example: "123 (CP)" for Concept Plan with ID 123
- *
- * @param document - Document to format ID for
- * @returns Formatted document ID string
- */
-export function formatDocumentId(document: IMainDoc): string {
-	const typeId = getDocumentTypeId(document.kind as DocumentType);
-	return `${document.id} (${typeId})`;
 }
 
 /**

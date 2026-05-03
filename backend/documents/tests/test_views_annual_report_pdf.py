@@ -247,8 +247,8 @@ class TestGetWithoutPDFs:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_excludes_reports_with_published_pdf(self, api_client):
-        """Reports that have a published PDF do not appear"""
+    def test_includes_reports_with_published_pdf_that_have_drafts(self, api_client):
+        """Reports with both draft and published PDFs still appear (drafts tab shows all drafts)"""
         user = UserFactory()
         report = AnnualReport.objects.create(
             year=2024,
@@ -263,7 +263,7 @@ class TestGetWithoutPDFs:
         response = api_client.get(documents_urls.path("reports", "withoutPDF"))
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 0
+        assert len(response.data) == 1
 
     @pytest.mark.django_db
     @pytest.mark.integration

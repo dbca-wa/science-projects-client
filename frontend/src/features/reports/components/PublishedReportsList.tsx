@@ -2,10 +2,7 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router";
-import {
-	usePublishedReports,
-	useLegacyReports,
-} from "@/features/reports/hooks/useReports";
+import { useAllReportPDFs } from "@/features/reports/hooks/useReports";
 import { Loader2, AlertCircle, Pencil, Scroll, BadgeCheck } from "lucide-react";
 import { AddOfficialPDFModal } from "./modals/AddOfficialPDFModal";
 import { AddLegacyPDFModal } from "./modals/AddLegacyPDFModal";
@@ -27,12 +24,12 @@ import {
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { getFinancialYearLabel } from "@/shared/utils/date.utils";
 import {
 	transformPublishedReports,
@@ -53,7 +50,7 @@ interface ReportCardProps {
 }
 
 /** Single report card — the entire card is a clickable link that opens the PDF */
-function ReportCard({
+const ReportCard = ({
 	fileUrl,
 	year,
 	isSuperuser,
@@ -63,7 +60,7 @@ function ReportCard({
 	isLegacy,
 	divisionSlug,
 	onUpdate,
-}: ReportCardProps) {
+}: ReportCardProps) => {
 	return (
 		<div className="group flex flex-col rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800">
 			{/* Clickable area — opens PDF in new tab */}
@@ -106,7 +103,7 @@ function ReportCard({
 			{!isSuperuser && <div className="pb-2" />}
 		</div>
 	);
-}
+};
 
 interface UpdateModalData {
 	pdfId: number;
@@ -117,7 +114,7 @@ interface UpdateModalData {
 }
 
 /** Grid of report cards */
-function ReportGrid({
+const ReportGrid = ({
 	reports,
 	isSuperuser,
 	onUpdate,
@@ -125,7 +122,7 @@ function ReportGrid({
 	reports: ReportItem[];
 	isSuperuser: boolean;
 	onUpdate: (data: UpdateModalData) => void;
-}) {
+}) => {
 	const sorted = [...reports].sort((a, b) => b.year - a.year);
 
 	if (sorted.length === 0) {
@@ -154,7 +151,7 @@ function ReportGrid({
 			))}
 		</div>
 	);
-}
+};
 
 /**
  * Fetches and displays annual report PDFs in a tabbed layout
@@ -179,19 +176,7 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 
 	const { data: divisions } = useDivisions();
 
-	const {
-		data: publishedReports,
-		isLoading: publishedLoading,
-		error: publishedError,
-	} = usePublishedReports();
-	const {
-		data: legacyReports,
-		isLoading: legacyLoading,
-		error: legacyError,
-	} = useLegacyReports();
-
-	const isLoading = publishedLoading || legacyLoading;
-	const error = publishedError || legacyError;
+	const { data: allReportData, isLoading, error } = useAllReportPDFs();
 
 	if (isLoading) {
 		return (
@@ -212,14 +197,16 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 		);
 	}
 
-	const published = publishedReports ?? [];
-	const legacy = legacyReports ?? [];
+	// Data is pre-categorised by the backend — no merging needed
+	const published = allReportData?.published ?? [];
+	const drafts = allReportData?.drafts ?? [];
+	const legacy = allReportData?.legacy ?? [];
 
 	const {
 		official,
 		unpublished,
 		legacy: legacyWithFiles,
-	} = transformPublishedReports(published, legacy);
+	} = transformPublishedReports(published, drafts, legacy);
 
 	/* Apply division filter across all tabs */
 	const filteredOfficial = filterReportsByDivision(official, selectedDivision);
@@ -256,12 +243,11 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 							<SelectValue placeholder="All Divisions" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="all">All Divisions</SelectItem>
-							{divisions?.map((d) => (
-								<SelectItem key={d.id} value={d.id.toString()}>
-									{d.name}
-								</SelectItem>
-							))}
+							<DivisionSelectItems
+								divisions={divisions ?? []}
+								includeAll
+								requireKeyStakeholder={false}
+							/>
 						</SelectContent>
 					</Select>
 					{isSuperuser && selectedTab === "official" && (

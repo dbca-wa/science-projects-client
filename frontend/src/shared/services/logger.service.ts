@@ -1,5 +1,5 @@
 // Simple logger service - just console logging with basic context
-export type LogLevel = "debug" | "info" | "warn" | "error" | "test";
+type LogLevel = "debug" | "info" | "warn" | "error" | "test";
 
 interface LogContext {
 	userId?: string | number;

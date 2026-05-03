@@ -21,7 +21,7 @@ export const PROJECT_ENDPOINTS = {
 	// Project plans
 	PROJECT_PLAN: (id: number | string) => `documents/projectplans/${id}`,
 	PROJECT_PLAN_ENDORSEMENT: (id: number | string) =>
-		`documents/projectplan_endorsements/${id}`,
+		`documents/projectplans/endorsements/${id}`,
 
 	// Progress reports
 	PROGRESS_REPORT: (id: number | string) => `documents/progressreports/${id}`,

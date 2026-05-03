@@ -1,13 +1,6 @@
 import type { IAdminTask } from "@/shared/types/admin.types";
 
-export type {
-	IAdminTask,
-	CaretakerTaskCardProps,
-} from "@/shared/types/admin.types";
-
-export interface AdminTaskCardProps {
-	task: IAdminTask;
-}
+export type { IAdminTask } from "@/shared/types/admin.types";
 
 export interface MyTasksSectionPhase1Props {
 	adminTasks: IAdminTask[];
@@ -17,8 +10,4 @@ export interface MyTasksSectionPhase1Props {
 	endorsementTasks?: import("../types/dashboard.types").EndorsementTasksResponse;
 	endorsementTasksLoading: boolean;
 	endorsementTasksError?: Error | null;
-}
-
-export interface SectionDividerProps {
-	title: string;
 }

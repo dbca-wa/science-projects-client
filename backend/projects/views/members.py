@@ -85,6 +85,10 @@ class ProjectMemberDetail(APIView):
         result_serializer = TinyProjectMemberSerializer(updated_member)
         return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 
+    def patch(self, request, project_id, user_id):
+        """Partial update project member — delegates to put with partial=True"""
+        return self.put(request, project_id, user_id)
+
     def delete(self, request, project_id, user_id):
         """Remove member from project"""
         settings.LOGGER.warning(

@@ -8,8 +8,6 @@ import BusinessAreasPage from "./BusinessAreasPage";
 
 vi.mock("@/features/admin/hooks/useBusinessAreas", () => ({
 	useBusinessAreas: () => ({ data: [], isLoading: false }),
-	useCreateBusinessArea: () => ({ mutate: vi.fn(), isPending: false }),
-	useUpdateBusinessArea: () => ({ mutate: vi.fn(), isPending: false }),
 	useDeleteBusinessArea: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 

@@ -12,24 +12,3 @@ export interface ICaretakerTasksResponse {
 	ba: IProjectDocument[];
 	directorate: IProjectDocument[];
 }
-
-/**
- * Client-side grouped tasks for a specific caretakee
- */
-export interface ICaretakerTask {
-	user: {
-		id: number;
-		display_first_name: string;
-		display_last_name: string;
-		email: string;
-		image: string | null;
-	};
-	tasks: IProjectDocument[];
-}
-
-/**
- * Grouped caretaker tasks by caretakee
- */
-export interface ICaretakerTasksByCaretakee {
-	[caretakeeId: string]: ICaretakerTask;
-}

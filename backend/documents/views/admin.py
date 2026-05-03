@@ -19,6 +19,7 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from projects.constants import ALLOWED_DOCUMENT_TYPES, AUTO_APPROVE_CLOSURE_KINDS
 from projects.models import Project, ProjectMember
 from users.models import User
 
@@ -343,6 +344,27 @@ class DocumentSpawner(APIView):
                 HTTP_400_BAD_REQUEST,
             )
 
+        # Validate the document kind is permitted for this project's kind
+        try:
+            project_instance = Project.objects.get(pk=project)
+        except Project.DoesNotExist:
+            return Response(
+                {"error": f"Project with pk {project} not found."},
+                HTTP_404_NOT_FOUND,
+            )
+
+        allowed_types = ALLOWED_DOCUMENT_TYPES.get(project_instance.kind, [])
+        if kind not in allowed_types:
+            return Response(
+                {
+                    "error": (
+                        f"{kind} documents are not permitted "
+                        f"for {project_instance.kind} projects."
+                    )
+                },
+                HTTP_400_BAD_REQUEST,
+            )
+
         settings.LOGGER.info(msg=f"{request.user} is spawning document")
 
         ser = ProjectDocumentCreateSerializer(
@@ -424,6 +446,14 @@ class DocumentSpawner(APIView):
                         project_id=project,
                     )
 
+                    # Auto-approve closures for non-science project kinds
+                    if project_instance.kind in AUTO_APPROVE_CLOSURE_KINDS:
+                        from ..services.approval_service import ApprovalService
+
+                        ApprovalService.auto_approve_closure(
+                            project_document, request.user
+                        )
+
                 return Response(
                     ProjectDocumentSerializer(project_document).data,
                     HTTP_201_CREATED,
@@ -475,7 +505,7 @@ class GetPreviousReportsData(APIView):
 
 
 class ReopenProject(APIView):
-    """Reopen a closed project (fixes typo from RepoenProject)"""
+    """Reopen a closed project by removing the closure document and restoring status"""
 
     permission_classes = [IsAuthenticated]
 
@@ -488,8 +518,93 @@ class ReopenProject(APIView):
             return None
         return obj
 
+    @staticmethod
+    def _determine_reopened_status(project):
+        """
+        Determine the correct project status after removing the closure document.
+        The status depends on the project kind and the state of its remaining documents.
+        """
+        kind = project.kind
+
+        if kind == Project.CategoryKindChoices.EXTERNAL:
+            # External projects have no workflow documents — always active
+            return Project.StatusChoices.ACTIVE
+
+        if kind == Project.CategoryKindChoices.STUDENT:
+            # Check for student reports (excluding the closure we're about to delete)
+            approved_report = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.STUDENTREPORT,
+                directorate_approval_granted=True,
+            ).exists()
+            if approved_report:
+                return Project.StatusChoices.ACTIVE
+
+            has_any_report = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.STUDENTREPORT,
+            ).exists()
+            if has_any_report:
+                return Project.StatusChoices.UPDATING
+
+            # No student reports — student projects start active
+            return Project.StatusChoices.ACTIVE
+
+        # Science and core_function: check workflow documents
+        has_approved_progress = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROGRESSREPORT,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_progress:
+            return Project.StatusChoices.ACTIVE
+
+        has_unapproved_progress = (
+            ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.PROGRESSREPORT,
+            )
+            .exclude(directorate_approval_granted=True)
+            .exists()
+        )
+        if has_unapproved_progress:
+            return Project.StatusChoices.UPDATING
+
+        has_approved_plan = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_plan:
+            return Project.StatusChoices.ACTIVE
+
+        has_plan = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+        ).exists()
+        if has_plan:
+            return Project.StatusChoices.PENDING
+
+        has_approved_concept = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_concept:
+            return Project.StatusChoices.PENDING
+
+        has_concept = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+        ).exists()
+        if has_concept:
+            return Project.StatusChoices.NEW
+
+        # No documents at all
+        return Project.StatusChoices.NEW
+
     def post(self, request, pk):
-        """Reopen a project"""
+        """Reopen a project by removing the closure and restoring appropriate status"""
         from ..services.notification_service import NotificationService
         from ..utils.helpers import get_current_maintainer_id
 
@@ -506,20 +621,21 @@ class ReopenProject(APIView):
 
                 if project_document is None:
                     project = Project.objects.filter(pk=pk).first()
-                    project.status = Project.StatusChoices.UPDATING
-                    project.save()
+                    if project:
+                        project.status = self._determine_reopened_status(project)
+                        project.save()
                 else:
-                    project_document.project.status = "updating"
-                    project_document.project.save()
-                    project = Project.objects.filter(
-                        pk=project_document.project.pk
-                    ).first()
+                    project = project_document.project
                     project_document.delete()
+                    # Refresh project from DB after deleting closure
+                    project = Project.objects.filter(pk=project.pk).first()
+                    if project:
+                        project.status = self._determine_reopened_status(project)
+                        project.save()
 
                 settings.LOGGER.info(msg="Sending project reopened email")
 
                 if project:
-                    # Send notification via service
                     NotificationService.notify_project_reopened(
                         project=project, reopener=request.user
                     )

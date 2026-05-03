@@ -2,7 +2,6 @@ import { apiClient } from "./api/client.service";
 import type {
 	IBusinessArea,
 	IBranch,
-	IAffiliation,
 	IDivision,
 } from "@/shared/types/org.types";
 
@@ -16,9 +15,6 @@ const ORG_ENDPOINTS = {
 	},
 	BRANCHES: {
 		LIST: "agencies/branches",
-	},
-	AFFILIATIONS: {
-		LIST: "agencies/affiliations",
 	},
 	AGENCIES: {
 		LIST: "agencies/list",
@@ -42,14 +38,6 @@ export const getAllBusinessAreas = async (): Promise<IBusinessArea[]> => {
  */
 export const getAllBranches = async (): Promise<IBranch[]> => {
 	return apiClient.get<IBranch[]>(ORG_ENDPOINTS.BRANCHES.LIST);
-};
-
-/**
- * Get all affiliations
- * @returns Array of all affiliations
- */
-export const getAllAffiliations = async (): Promise<IAffiliation[]> => {
-	return apiClient.get<IAffiliation[]>(ORG_ENDPOINTS.AFFILIATIONS.LIST);
 };
 
 /**

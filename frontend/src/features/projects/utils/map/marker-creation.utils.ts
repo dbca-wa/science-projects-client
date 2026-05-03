@@ -167,42 +167,6 @@ export const createProjectMarker = (
 };
 
 /**
- * Creates a marker specifically for a single project
- *
- * @param project - Single project data
- * @param coords - [latitude, longitude] coordinates
- * @param isSelected - Whether the project matches current filters
- * @returns Leaflet marker for single project
- */
-export const createSingleProjectMarker = (
-	project: IProjectData,
-	coords: [number, number],
-	isSelected: boolean = true
-): L.Marker => {
-	return createProjectMarker([project], coords, isSelected);
-};
-
-/**
- * Creates a marker for a cluster of projects
- *
- * @param projects - Array of projects in the cluster
- * @param coords - [latitude, longitude] coordinates (cluster centroid)
- * @param isSelected - Whether the cluster represents selected/filtered projects
- * @returns Leaflet marker for project cluster
- */
-export const createClusterMarker = (
-	projects: IProjectData[],
-	coords: [number, number],
-	isSelected: boolean = true
-): L.Marker => {
-	if (projects.length === 0) {
-		throw new Error("Cannot create cluster marker with empty projects array");
-	}
-
-	return createProjectMarker(projects, coords, isSelected);
-};
-
-/**
  * Determines marker size based on cluster count
  * Used for potential future enhancements with variable marker sizes
  *
@@ -219,21 +183,4 @@ export const getMarkerSize = (count: number) => {
 	} else {
 		return { size: 48, iconAnchor: [24, 24] };
 	}
-};
-
-/**
- * Creates a marker with custom size based on cluster count
- * Currently uses fixed size, but prepared for future enhancements
- *
- * @param projects - Array of projects at this location
- * @param coords - [latitude, longitude] coordinates
- * @param isSelected - Whether the marker represents selected/filtered projects
- * @returns Leaflet marker with appropriate size
- */
-export const createSizedMarker = (
-	projects: IProjectData[],
-	coords: [number, number],
-	isSelected: boolean = true
-): L.Marker => {
-	return createProjectMarker(projects, coords, isSelected, true);
 };

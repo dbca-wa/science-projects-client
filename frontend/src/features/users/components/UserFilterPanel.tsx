@@ -6,6 +6,8 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { filterBusinessAreasByKeyStakeholder } from "@/shared/utils/division-filter.utils";
 import { observer } from "mobx-react-lite";
 import type { UserSearchFilters } from "../types/user.types";
 import type { RoleFilter } from "@/app/stores/derived/user-search.store";
@@ -23,6 +25,7 @@ export const UserFilterPanel = observer(
 	({ filters, onFiltersChange }: FilterPanelProps) => {
 		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 			useBusinessAreas();
+		const { data: divisions } = useDivisions();
 
 		const handleRoleFilterChange = (value: string) => {
 			onFiltersChange({
@@ -38,9 +41,13 @@ export const UserFilterPanel = observer(
 			});
 		};
 
-		// Sort business areas by division
+		// Sort business areas by division, filtering out those without a key stakeholder
 		const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
-		const sortedBusinessAreas = businessAreas?.slice().sort((a, b) => {
+		const filteredBusinessAreas = filterBusinessAreasByKeyStakeholder(
+			businessAreas ?? [],
+			divisions
+		);
+		const sortedBusinessAreas = filteredBusinessAreas.slice().sort((a, b) => {
 			const aDivSlug =
 				typeof a.division === "object" && a.division?.slug
 					? a.division.slug

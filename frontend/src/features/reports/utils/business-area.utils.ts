@@ -114,18 +114,6 @@ export function isReportKind(kind: string): boolean {
 	return kind === "progressreport" || kind === "studentreport";
 }
 
-/** Format the waiting-on display text for a document */
-export function getWaitingOnLabel(
-	doc: IUnapprovedDoc,
-	currentUserId: number | undefined
-): string {
-	if (!doc.waiting_on) return "Unknown";
-	const { display_first_name, display_last_name, id, role } = doc.waiting_on;
-	const name = `${display_first_name} ${display_last_name}`;
-	const roleLabel = id === currentUserId ? "You" : role;
-	return `${name} (${roleLabel})`;
-}
-
 /** Sort unapproved documents by a given column and direction */
 export function sortUnapprovedDocs(
 	docs: IUnapprovedDoc[],

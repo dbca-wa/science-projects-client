@@ -13,6 +13,8 @@ import { useState, useMemo, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { filterBusinessAreasByKeyStakeholder } from "@/shared/utils/division-filter.utils";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { UserCombobox } from "@/shared/components/user";
@@ -46,6 +48,7 @@ export const ProjectFilters = observer(
 	}: ProjectFiltersProps) => {
 		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 			useBusinessAreas();
+		const { data: divisions } = useDivisions();
 
 		// Local state for immediate UI updates
 		const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
@@ -87,9 +90,13 @@ export const ProjectFilters = observer(
 			}
 		};
 
-		// Sort business areas by division
+		// Sort business areas by division, filtering out those without a key stakeholder
 		const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
-		const sortedBusinessAreas = businessAreas?.slice().sort((a, b) => {
+		const filteredBusinessAreas = filterBusinessAreasByKeyStakeholder(
+			businessAreas ?? [],
+			divisions
+		);
+		const sortedBusinessAreas = filteredBusinessAreas.slice().sort((a, b) => {
 			const aDivSlug =
 				typeof a.division === "object" && a.division?.slug
 					? a.division.slug

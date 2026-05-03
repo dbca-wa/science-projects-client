@@ -61,3 +61,55 @@ export interface IReportInfoForm {
 	student_intro?: string;
 	publications?: string;
 }
+
+// Data list types
+
+/** Unapproved project from the unapprovedFY endpoint */
+export interface IUnapprovedProject {
+	id: number;
+	title: string;
+	status: string;
+	kind: string;
+	year: number;
+	business_area: {
+		id: number;
+		name: string;
+	} | null;
+	created_at: string;
+	updated_at: string;
+}
+
+/** Problematic projects response from the problematic endpoint */
+export interface IProblematicProjectsData {
+	no_progress: IProblematicProject[];
+	inactive_lead_active_project: IProblematicProject[];
+	open_with_closure: IProblematicProject[];
+	memberless: IProblematicProject[];
+	leaderless: IProblematicProject[];
+	multiple_leaders: IProblematicProject[];
+	external_leaders: IProblematicProject[];
+	no_business_area: IProblematicProject[];
+}
+
+export interface IProblematicProject {
+	id: number;
+	title: string;
+	status: string;
+	kind: string;
+	year: number;
+	business_area: {
+		id: number;
+		name: string;
+	} | null;
+}
+
+/** Staff user entry from the users list endpoint */
+export interface IStaffUser {
+	id: number;
+	display_first_name: string | null;
+	display_last_name: string | null;
+	email: string;
+	is_active: boolean;
+	is_staff: boolean;
+	is_superuser: boolean;
+}

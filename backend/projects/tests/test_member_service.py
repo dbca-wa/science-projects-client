@@ -323,6 +323,5 @@ class TestPromoteToLeader:
         )
 
         assert result.is_leader is True
-        # The new leader keeps their existing role — the frontend/UI
-        # can update it separately if needed
-        assert result.role == "technical"
+        # Promoted leaders get the supervising role
+        assert result.role == "supervising"

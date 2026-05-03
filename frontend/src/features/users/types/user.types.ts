@@ -10,7 +10,8 @@ import type { RoleFilter } from "@/app/stores/derived/user-search.store";
  * and inferred from Zod schemas for type safety and validation consistency.
  *
  * Import from:
- * - UserCreateFormData from "@/features/users/schemas/userCreate.schema"
+ * - StaffUserCreateFormData from "@/features/users/schemas/staffUserCreate.schema"
+ * - ExternalUserCreateFormData from "@/features/users/schemas/externalUserCreate.schema"
  * - UserEditFormData from "@/features/users/schemas/userEdit.schema"
  * - Or from the barrel export: "@/features/users"
  */
@@ -31,12 +32,6 @@ export interface UserSearchFilters {
 	ignoreArray?: number[];
 }
 
-export interface UserSearchResponse {
-	users: IUserData[];
-	total_results: number;
-	total_pages: number;
-}
-
 // ============================================================================
 // COMPONENT PROPS (Feature-specific)
 // ============================================================================
@@ -50,25 +45,4 @@ export interface UserCardProps {
 export interface UserAvatarProps {
 	user: IUserData | IUserMe;
 	size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
-}
-
-export interface SearchBarProps {
-	value: string;
-	onChange: (value: string) => void;
-	placeholder?: string;
-}
-
-export interface FilterPanelProps {
-	filters: UserSearchFilters;
-	onFiltersChange: (filters: UserSearchFilters) => void;
-}
-
-export interface PaginationProps {
-	currentPage: number;
-	totalPages: number;
-	onPageChange: (page: number) => void;
-}
-
-export interface UserDetailSectionProps {
-	user: IUserData;
 }

@@ -32,9 +32,3 @@ export const ANIMATION_DURATIONS = {
 	/** Alert dialog - no animations (instant) */
 	ALERT_DIALOG: 0,
 } as const;
-
-/**
- * Type representing valid animation duration values
- */
-export type AnimationDuration =
-	(typeof ANIMATION_DURATIONS)[keyof typeof ANIMATION_DURATIONS];

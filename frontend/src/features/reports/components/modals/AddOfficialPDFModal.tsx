@@ -22,6 +22,7 @@ import {
 	useAddReportPDF,
 } from "@/features/reports/hooks/useReports";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 
 interface AddOfficialPDFModalProps {
 	isOpen: boolean;
@@ -99,11 +100,10 @@ export function AddOfficialPDFModal({
 								<SelectValue placeholder="Select a division" />
 							</SelectTrigger>
 							<SelectContent>
-								{divisions?.map((d) => (
-									<SelectItem key={d.id} value={String(d.id)}>
-										{d.name}
-									</SelectItem>
-								))}
+								<DivisionSelectItems
+									divisions={divisions ?? []}
+									requireKeyStakeholder={false}
+								/>
 							</SelectContent>
 						</Select>
 					</div>

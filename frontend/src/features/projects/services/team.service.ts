@@ -85,7 +85,7 @@ export const updateTeamMember = async (
 	data: IUpdateTeamMemberRequest
 ): Promise<ITeamMember> => {
 	try {
-		return await apiClient.put<ITeamMember>(
+		return await apiClient.patch<ITeamMember>(
 			TEAM_ENDPOINTS.UPDATE(projectId, userId),
 			data
 		);

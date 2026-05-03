@@ -20,58 +20,62 @@ interface TransformedReports {
 }
 
 /**
- * Transform raw published and legacy report data into categorised report items.
+ * Helper to map a raw report (from the backend) into a ReportItem.
+ * Uses the specified file field for the card URL.
+ */
+function mapReport(
+	report: Record<string, unknown>,
+	fileField: "published_file" | "draft_file"
+): ReportItem | null {
+	const pdf = report.pdf as {
+		id: number;
+		published_file: string | null;
+		draft_file: string | null;
+	} | null;
+	if (!pdf) return null;
+
+	const file = pdf[fileField];
+	if (!file) return null;
+
+	const division = report.division as {
+		id: number;
+		name: string;
+		slug?: string;
+	} | null;
+
+	return {
+		id: pdf.id,
+		year: (report.year as number) ?? 0,
+		fileUrl: getImageUrl(file) ?? file,
+		pdfId: pdf.id,
+		reportId: (report.id as number) ?? 0,
+		isPublished: fileField === "published_file",
+		isLegacy: false,
+		divisionId: division?.id ?? null,
+		divisionSlug: division?.slug ?? null,
+	};
+}
+
+/**
+ * Transform pre-categorised report data into ReportItem arrays for each tab.
  *
- * Published reports come from the backend as AnnualReport objects with a nested
- * `pdf` field. Legacy reports have `file` directly on the object.
+ * The backend returns three separate arrays (published, drafts, legacy).
+ * - Published tab shows reports using their published_file URL
+ * - Drafts tab shows reports using their draft_file URL
+ * - Legacy tab shows standalone uploaded PDFs from older years
  */
 export function transformPublishedReports(
 	publishedReports: unknown[],
+	draftReports: unknown[],
 	legacyReports: IAnnualReportPDF[]
 ): TransformedReports {
-	const allWithPDFs = publishedReports
-		.filter((r) => {
-			const report = r as Record<string, unknown>;
-			const pdf = report.pdf as Record<string, unknown> | null | undefined;
-			if (!pdf || typeof pdf !== "object") return false;
-			return (
-				("published_file" in pdf && !!pdf.published_file) ||
-				("draft_file" in pdf && !!pdf.draft_file)
-			);
-		})
-		.map((r) => {
-			const report = r as Record<string, unknown>;
-			const pdf = report.pdf as {
-				id: number;
-				published_file: string | null;
-				draft_file: string | null;
-			};
-			const division = report.division as {
-				id: number;
-				name: string;
-				slug?: string;
-			} | null;
-			const fileForCard = pdf.published_file || pdf.draft_file || "";
-			const fileUrl = getImageUrl(fileForCard) ?? fileForCard;
-			return {
-				id: pdf.id,
-				year: (report.year as number) ?? 0,
-				fileUrl,
-				isPublished: report.is_published === true,
-				pdfId: pdf.id,
-				reportId: (report.id as number) ?? 0,
-				isLegacy: false,
-				divisionId: division?.id ?? null,
-				divisionSlug: division?.slug ?? null,
-				hasPublishedFile: !!pdf.published_file,
-				hasDraftFile: !!pdf.draft_file,
-			};
-		});
+	const official = publishedReports
+		.map((r) => mapReport(r as Record<string, unknown>, "published_file"))
+		.filter((r): r is ReportItem => r !== null);
 
-	const official = allWithPDFs.filter((r) => r.hasPublishedFile);
-	const unpublished = allWithPDFs.filter(
-		(r) => r.hasDraftFile && !r.hasPublishedFile
-	);
+	const unpublished = draftReports
+		.map((r) => mapReport(r as Record<string, unknown>, "draft_file"))
+		.filter((r): r is ReportItem => r !== null);
 
 	const legacy = legacyReports
 		.filter((r) => !!r.file)

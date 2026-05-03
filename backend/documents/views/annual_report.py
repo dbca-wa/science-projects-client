@@ -321,12 +321,23 @@ class GetAvailableReportYearsForProgressReport(APIView):
 
 
 class GetWithoutPDFs(APIView):
-    """Get annual reports with draft PDFs but no published PDF (Drafts tab)"""
+    """Get annual reports with draft PDFs (Drafts tab).
+
+    Returns all reports that have a draft_file, regardless of whether
+    they also have a published_file. This allows users to see both
+    the draft and published versions.
+
+    NOTE: To re-enable filtering out published reports from drafts, add:
+        .filter(
+            Q(pdf__published_file__isnull=True) | Q(pdf__published_file=""),
+        )
+    after the .exclude(pdf__draft_file="") line.
+    """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        reports_drafts_only = (
+        reports_with_drafts = (
             AnnualReport.objects.select_related("division")
             .filter(
                 pdf__draft_file__isnull=False,
@@ -334,17 +345,61 @@ class GetWithoutPDFs(APIView):
             .exclude(
                 pdf__draft_file="",
             )
-            .filter(
-                Q(pdf__published_file__isnull=True) | Q(pdf__published_file=""),
-            )
         )
 
         serializer = TinyAnnualReportSerializer(
-            reports_drafts_only,
+            reports_with_drafts,
             context={"request": request},
             many=True,
         )
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class GetAllReportPDFs(APIView):
+    """Single endpoint returning all report PDFs pre-categorised for the tabs.
+
+    Returns { published: [...], drafts: [...], legacy: [...] } so the frontend
+    only needs one API call for the entire Published Reports page.
+
+    NOTE: To re-enable filtering out published reports from drafts, change the
+    drafts query to also filter with:
+        .filter(Q(pdf__published_file__isnull=True) | Q(pdf__published_file=""))
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Published: reports with a published_file
+        published_qs = (
+            AnnualReport.objects.select_related("division")
+            .filter(pdf__published_file__isnull=False)
+            .exclude(pdf__published_file="")
+        )
+
+        # Drafts: reports with a draft_file (includes those also published)
+        drafts_qs = (
+            AnnualReport.objects.select_related("division")
+            .filter(pdf__draft_file__isnull=False)
+            .exclude(pdf__draft_file="")
+        )
+
+        # Legacy: standalone uploaded PDFs from older years
+        legacy_qs = LegacyAnnualReportPDF.objects.all()
+
+        return Response(
+            {
+                "published": TinyAnnualReportSerializer(
+                    published_qs, context={"request": request}, many=True
+                ).data,
+                "drafts": TinyAnnualReportSerializer(
+                    drafts_qs, context={"request": request}, many=True
+                ).data,
+                "legacy": TinyLegacyAnnualReportPDFSerializer(
+                    legacy_qs, context={"request": request}, many=True
+                ).data,
+            },
+            status=HTTP_200_OK,
+        )
 
 
 class GetReportPDF(APIView):

@@ -243,7 +243,7 @@ export const RichTextEditor = React.forwardRef<
 						(ref as React.MutableRefObject<HTMLDivElement | null>).current =
 							node;
 				}}
-				className={`editor-container ${readOnly ? "editor-readonly" : ""} ${className}`}
+				className={`editor-container ${readOnly ? "editor-readonly" : ""} transition-all duration-300 ${className}`}
 			>
 				<LexicalComposer initialConfig={initialConfig}>
 					<LinkEditorProvider>

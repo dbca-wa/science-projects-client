@@ -362,16 +362,14 @@ export const Header = observer(() => {
 										</NavigationDropdownMenu>
 									)}
 
-									{/* Guide Button — page not yet created */}
-									{/*
-                <Button
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-                  onClick={() => navigate("/guide")}
-                >
-                  Guide
-                </Button>
-                */}
+									{/* Knowledge Base */}
+									<Button
+										variant="ghost"
+										className="text-white/70 hover:text-white hover:bg-white/10 select-none"
+										onClick={() => navigate("/guide")}
+									>
+										Guide
+									</Button>
 								</div>
 
 								{/* Right side - Navitar with name */}

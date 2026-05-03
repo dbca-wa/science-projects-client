@@ -270,9 +270,10 @@ class MemberService:
                 leader.role = "consulted"  # Consulted Peer
             leader.save()
 
-        # Promote new leader to position 0
+        # Promote new leader to position 0 with supervising role
         new_leader.is_leader = True
         new_leader.position = 0
+        new_leader.role = "supervising"
         new_leader.save()
 
         return new_leader

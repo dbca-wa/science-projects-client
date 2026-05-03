@@ -2,7 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router";
 import { useEffect, useState, useMemo } from "react";
 import { useProject } from "@/features/projects/hooks/useProject";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
-import { useCaretakerPermissions } from "@/features/caretakers/hooks/useCaretakerPermissions";
+import { useCaretakerPermissions } from "@/shared/hooks/useCaretakerPermissions";
 import { useCurrentUser } from "@/features/auth";
 import { isCaretakerOfAdmin } from "@/features/projects/utils/caretaker-admin.utils";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
@@ -37,6 +37,7 @@ import { StudentReportsTab } from "@/features/projects/components/tabs/StudentRe
 import { ProjectClosureTab } from "@/features/projects/components/tabs/ProjectClosureTab";
 import { useConfetti } from "@/shared/hooks/effects/useConfetti";
 import { PageTransition } from "@/shared/components/PageTransition";
+import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
 
 interface ProjectDetailPageProps {
 	selectedTab?: string;
@@ -284,32 +285,43 @@ const ProjectDetailPage = ({
 		{
 			value: "concept",
 			label: "Concept Plan",
-			show: !!documents?.concept_plan,
+			show:
+				isDocumentTypeAllowed(project.kind, "concept") &&
+				!!documents?.concept_plan,
 			status: getDocStatus(documents?.concept_plan),
 		},
 		{
 			value: "project",
 			label: "Project Plan",
-			show: !!documents?.project_plan,
+			show:
+				isDocumentTypeAllowed(project.kind, "projectplan") &&
+				!!documents?.project_plan,
 			status: getDocStatus(documents?.project_plan),
 		},
 		{
 			value: "progress",
 			label: "Progress Reports",
 			show:
-				documents?.progress_reports && documents.progress_reports.length > 0,
+				isDocumentTypeAllowed(project.kind, "progressreport") &&
+				documents?.progress_reports &&
+				documents.progress_reports.length > 0,
 			status: getReportsStatus(documents?.progress_reports),
 		},
 		{
 			value: "student",
 			label: "Student Reports",
-			show: documents?.student_reports && documents.student_reports.length > 0,
+			show:
+				isDocumentTypeAllowed(project.kind, "studentreport") &&
+				documents?.student_reports &&
+				documents.student_reports.length > 0,
 			status: getReportsStatus(documents?.student_reports),
 		},
 		{
 			value: "closure",
 			label: "Project Closure",
-			show: !!documents?.project_closure,
+			show:
+				isDocumentTypeAllowed(project.kind, "projectclosure") &&
+				!!documents?.project_closure,
 			status: getDocStatus(documents?.project_closure),
 		},
 	].filter((tab) => tab.show);

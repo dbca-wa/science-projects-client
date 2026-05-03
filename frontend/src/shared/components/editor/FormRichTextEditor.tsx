@@ -153,8 +153,8 @@ export const FormRichTextEditor = forwardRef<
 					</div>
 				)}
 
-				{/* Editor area */}
-				<div className="transition-colors bg-white dark:bg-gray-900">
+				{/* Editor area — transparent bg so parent's focus/dirty colour shows through */}
+				<div className="transition-colors">
 					<RichTextEditor
 						value={value}
 						onChange={onChange}
@@ -164,14 +164,14 @@ export const FormRichTextEditor = forwardRef<
 						disabled={disabled}
 						wordLimit={wordLimit}
 						autoFocus={false}
-						className="bg-transparent"
+						className="inline-save-editor"
 						onLinkPanelChange={setLinkPanelOpen}
 						{...props}
 					/>
 				</div>
 
 				{showWordCounter && !linkPanelOpen && (
-					<div className="flex items-center justify-between px-4 pb-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+					<div className="flex items-center justify-between px-4 pb-4 pt-2">
 						<WordCounter
 							content={value || ""}
 							limit={wordLimit}

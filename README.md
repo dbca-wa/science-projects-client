@@ -7,18 +7,70 @@
 ![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA%20Compliant-green)
 
 
-A project management and approval system for scientific research projects.
+A full-stack project management and approval system for scientific research at the Department of Biodiversity, Conservation and Attractions (DBCA), Western Australia. SPMS handles the complete lifecycle of science projects — from creation through multi-level document approval to annual reporting and PDF generation.
 
-## Key Features
+## Features
 
-- **Annual Report Generation** - PDF generation of annual reports with customisable templates (key deliverable)
-- **Rich Text Editor** - Bespoke editor for project documentation with formatting and media support
-- **Document Management** - Project wizard with related document generation and PDF export capabilities
-- **Caretaker System** - Workflow for temporary project ownership delegation with approval processes
-- **Email Notifications** - Automated notifications for project updates, tasks, and approvals workflow
-- **Team Collaboration** - Manage internal teams, external collaborators, and stakeholder relationships
-- **Role-Based Access Control** - Granular permissions for different user types and project roles
-- **Audit Trails** - Complete history of all project changes and activities
+### Project Management
+- **Project Creation Wizard** — Multi-step guided wizard with four project types (Science, Core Function, Student, External Partnership), server-side draft persistence, live preview panel, and per-step validation
+- **Project Editing** — Full edit form with permission-based access control, unsaved changes detection, and navigation blocking to prevent data loss
+- **Project Search and Filtering** — Paginated project listing with filters for business area, project kind, status, year, and assigned user. Includes saved search with localStorage persistence
+- **Interactive Project Map** — Leaflet-based map with circular markers, heatmap visualisation, GeoJSON region overlays, fullscreen mode with floating sidebar, and comprehensive filtering. Accessible with keyboard navigation
+
+### Document Workflows
+- **Multi-Level Approval System** — Documents progress through Team → Lead → Business Area Lead → Directorate approval stages with status tracking at each level
+- **Inline Rich Text Editing** — Lexical-based editor with formatting toolbar variants, image upload, @mentions, and document locking to prevent concurrent editing conflicts
+- **Document Types** — Concept Plans, Project Plans, Progress Reports, Student Reports, and Project Closures — each with type-specific workflows controlled by project kind
+- **PDF Generation** — Server-side PDF rendering via Prince for annual reports and project documents with customisable templates
+- **Batch Approvals** — Bulk document approval for business area leads and directorate with consolidated email notifications
+
+### Team and Collaboration
+- **Team Management** — Add/remove team members, promote to project lead, role-based permissions for document actions
+- **Comments and Reactions** — Threaded comment system with rich text, @mentions that trigger email notifications, and emoji reactions
+- **Caretaker System** — Request-based workflow for temporary project ownership delegation during leave or absence, with admin approval and full permission inheritance
+
+### Reports and Annual Reporting
+- **Published Reports** — Browse official, draft, and legacy annual reports with tabbed navigation
+- **Report Details** — View pending/approved projects, media assets, and print preview for the current reporting cycle
+- **Business Area Lead View** — Dedicated dashboard showing problematic projects, unapproved documents, and business area appearance editing
+- **My Division** — Key stakeholder view of divisional project status
+- **New Reporting Cycle** — Open new cycles with custom messaging, email preview, recipient management, and division year safeguards
+
+### User Management
+- **User Search** — Paginated user directory with role and business area filters, saved search, and quick-view detail sheet overlay
+- **User Profiles** — Tabbed profile page (SPMS Profile, Public Staff Profile, Caretaker Mode) with modal-based editing for personal information and organisational membership
+- **Invite System** — Search DBCA's IT Assets directory to invite internal staff users with confirmation dialog and automatic account provisioning
+- **External Users** — Add external collaborators for annual report reference
+
+### Staff Profiles (Public)
+- **Staff Directory** — Public-facing directory with search, pagination, and JSON-LD structured data for search engine optimisation
+- **Staff Profile Detail** — Hero section, tabbed content (About, Projects, CV/Background, Publications), in-place editing, and Person schema markup
+- **Visibility Controls** — Toggle public profile visibility and configure rerouted email addresses
+
+### Administration
+- **Data Lists** — Tabbed admin view for staff users, email lists, unapproved documents, problematic projects, and staff profiles
+- **Reference Data CRUD** — Full create/read/update/delete for addresses, affiliations, branches, business areas, divisions, locations, and services
+- **Admin Tasks Dashboard** — Centralised view of pending caretaker requests, project deletion requests, user merge requests, and endorsement tasks (AEC, BM, HC)
+- **Email Management** — Divisional email list configuration
+- **Admin Test Page** — Email delivery testing and document PDF generation testing
+
+### Knowledge Base
+- **Role-Based Guides** — Sections filtered by user role (all users, business area leads, key stakeholders, admins) with category grid and article accordion
+- **Search** — Debounced full-text search across all knowledge base articles
+- **Admin Editing** — Inline content editing for superusers with download capability
+- **Seed Command** — Management command to populate knowledge base with `update_or_create` upserts and `--clear` flag
+
+### Email Notifications
+- 17 email templates covering the full document lifecycle: submission, recall, send-back, approval (per level), batch approval, review requests, comment notifications, @mentions, project closure/reopening, new cycle announcements, staff profile updates, feedback receipt, and invitation links
+
+### System-Wide
+- **Dark Mode** — Toggle between light and dark themes with persistence
+- **Saved Search** — "Remember my search" across projects, users, and map pages with localStorage persistence
+- **Navigation Blocking** — Global blocker prevents losing unsaved form data across all edit pages
+- **Responsive Design** — Mobile-first layouts with breakpoint-based adaptations and mobile tab dropdowns
+- **Page Transitions** — Animated transitions with loading states
+- **Breadcrumb Navigation** — Automatic route-based breadcrumbs with manual override support
+- **Accessibility** — WCAG 2.2 Level AA compliance target with semantic HTML, ARIA attributes, keyboard navigation, and screen reader announcements
 
 ## Quick Start
 

@@ -3,12 +3,10 @@ export { useCaretakerTasks, caretakerTasksKeys } from "./useCaretakerTasks";
 export { useApproveCaretakerTask } from "./useApproveCaretakerTask";
 export { useRejectCaretakerTask } from "./useRejectCaretakerTask";
 
-// Caretaker permission hooks
-export { useCaretakerPermissions } from "./useCaretakerPermissions";
+// Caretaker permission hooks (moved to shared/hooks/useCaretakerPermissions.ts)
 
 // User caretaker request hooks
 export { useRequestCaretaker } from "./useRequestCaretaker";
-export { useRespondToCaretakerRequest } from "./useRespondToCaretakerRequest";
 export { useCancelCaretakerRequest } from "./useCancelCaretakerRequest";
 export { useRemoveCaretaker } from "./useRemoveCaretaker";
 export { useBecomeCaretaker } from "./useBecomeCaretaker";

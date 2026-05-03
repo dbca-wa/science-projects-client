@@ -17,11 +17,6 @@ export const getGuideSections = async (): Promise<IGuideSection[]> => {
 	return apiClient.get<IGuideSection[]>(GUIDE_ENDPOINTS.SECTIONS);
 };
 
-// Fetch a single guide section by ID
-export const getGuideSection = async (id: string): Promise<IGuideSection> => {
-	return apiClient.get<IGuideSection>(GUIDE_ENDPOINTS.SECTION_DETAIL(id));
-};
-
 // Create a new guide section
 export const createGuideSection = async (
 	data: IGuideSectionPayload

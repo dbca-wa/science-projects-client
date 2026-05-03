@@ -8,7 +8,6 @@ import MyDivisionPage from "./MyDivisionPage";
 
 vi.mock("@/features/reports/hooks/useReports", () => ({
 	useLatestReport: () => ({ data: null, isLoading: false }),
-	useLatestYear: () => ({ data: { year: 2025 }, isLoading: false }),
 	useReportsForDivision: () => ({ data: [], isLoading: false }),
 }));
 

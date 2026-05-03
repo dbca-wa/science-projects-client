@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import type { IUnapprovedDoc } from "../types/business-area.types";
 import {
 	getApprovalStage,
-	getWaitingOnLabel,
 	isReportKind,
 	sortUnapprovedDocs,
 	DOC_KIND_ORDER,
@@ -264,63 +263,6 @@ describe("isReportKind", () => {
 
 	it("returns false for projectclosure", () => {
 		expect(isReportKind("projectclosure")).toBe(false);
-	});
-});
-
-// ── getWaitingOnLabel ───────────────────────────────────────────────────────
-
-describe("getWaitingOnLabel", () => {
-	it("returns 'Unknown' when waiting_on is null", () => {
-		const doc = makeDoc({ waiting_on: null });
-		expect(getWaitingOnLabel(doc, 99)).toBe("Unknown");
-	});
-
-	it("returns name with Project Lead role for stage 1 docs", () => {
-		const doc = makeDoc({
-			waiting_on: {
-				id: 5,
-				display_first_name: "Jane",
-				display_last_name: "Smith",
-				role: "Project Lead",
-			},
-		});
-		expect(getWaitingOnLabel(doc, 99)).toBe("Jane Smith (Project Lead)");
-	});
-
-	it("returns name with '(You)' when waiting_on user matches currentUserId", () => {
-		const doc = makeDoc({
-			waiting_on: {
-				id: 42,
-				display_first_name: "Alice",
-				display_last_name: "Jones",
-				role: "Business Area Lead",
-			},
-		});
-		expect(getWaitingOnLabel(doc, 42)).toBe("Alice Jones (You)");
-	});
-
-	it("returns name with Business Area Lead role when not current user", () => {
-		const doc = makeDoc({
-			waiting_on: {
-				id: 7,
-				display_first_name: "Bob",
-				display_last_name: "Brown",
-				role: "Business Area Lead",
-			},
-		});
-		expect(getWaitingOnLabel(doc, 99)).toBe("Bob Brown (Business Area Lead)");
-	});
-
-	it("returns name with Directorate role for stage 3 docs", () => {
-		const doc = makeDoc({
-			waiting_on: {
-				id: 12,
-				display_first_name: "Carol",
-				display_last_name: "White",
-				role: "Directorate",
-			},
-		});
-		expect(getWaitingOnLabel(doc, 99)).toBe("Carol White (Directorate)");
 	});
 });
 

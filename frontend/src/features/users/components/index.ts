@@ -15,24 +15,16 @@ export { UserDetailSheet } from "./UserDetailSheet";
 export { Pagination } from "@/shared/components/Pagination";
 
 // User forms
-export { UserForm } from "./UserForm";
 export { UserEditForm } from "./UserEditForm";
 export { StaffUserForm } from "./StaffUserForm";
 export { ExternalUserForm } from "./ExternalUserForm";
 
 // User detail sections
-export { PersonalInfoSection } from "./PersonalInfoSection";
 export { PersonalInformationCard } from "./PersonalInformationCard";
 export { ProfileSection } from "./ProfileSection";
 export { MembershipSection } from "./MembershipSection";
 export { StatusSection } from "./StatusSection";
 export { PublicAppearanceSection } from "./PublicAppearanceSection";
-
-// User detail fields
-export { PersonalInfoFields } from "./PersonalInfoFields";
-export { ProfileFields } from "./ProfileFields";
-export { MembershipFields } from "./MembershipFields";
-export { AccountFields } from "./AccountFields";
 
 // Profile sections
 export { PublicEmailSection } from "./profile/PublicEmailSection";

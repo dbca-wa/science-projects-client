@@ -10,48 +10,6 @@ function getPurify() {
 }
 
 /**
- * Sanitises HTML content to prevent XSS attacks.
- * Removes potentially dangerous tags and attributes while preserving safe HTML.
- *
- * @param html - The HTML string to sanitise
- * @returns Sanitised HTML string safe for rendering
- *
- * @example
- * ```ts
- * const userInput = '<script>alert("XSS")</script><p>Safe content</p>';
- * const safe = sanitizeHtmlContent(userInput);
- * // Returns: '<p>Safe content</p>'
- * ```
- */
-export function sanitizeHtmlContent(html: string): string {
-	const purify = getPurify();
-	return purify.sanitize(html, {
-		ALLOWED_TAGS: [
-			"p",
-			"br",
-			"strong",
-			"em",
-			"u",
-			"h1",
-			"h2",
-			"h3",
-			"h4",
-			"h5",
-			"h6",
-			"ul",
-			"ol",
-			"li",
-			"a",
-			"blockquote",
-			"code",
-			"pre",
-		],
-		ALLOWED_ATTR: ["href", "target", "rel"],
-		ALLOW_DATA_ATTR: false,
-	});
-}
-
-/**
  * Sanitises plain text input by removing all HTML tags.
  * Use this for inputs that should never contain HTML.
  *

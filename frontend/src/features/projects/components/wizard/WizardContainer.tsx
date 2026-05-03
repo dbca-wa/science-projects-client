@@ -12,6 +12,7 @@ import {
 	type WizardSubmissionData,
 } from "../../services/wizard-submission.service";
 import { useCurrentUser } from "@/features/auth";
+import { FULL_WORKFLOW_KINDS } from "../../constants/allowedDocumentTypes";
 
 interface WizardContainerProps {
 	onComplete: (projectId: number) => void;
@@ -73,7 +74,11 @@ export const WizardContainer = observer(
 			wizardStore.commitStep();
 
 			wizardStore.setSubmitting(true);
-			const loadingToastId = toast.loading("Creating project...");
+			const projectKind = wizardStore.state.projectKind!;
+			const loadingMessage = FULL_WORKFLOW_KINDS.includes(projectKind)
+				? "Creating project and concept plan..."
+				: "Creating project...";
+			const loadingToastId = toast.loading(loadingMessage);
 
 			try {
 				// Use savedFormData as the source of truth for project creation

@@ -77,7 +77,7 @@ class ProjectAreaDetail(APIView):
 
 
 class AreasForProject(APIView):
-    """Get areas for a specific project"""
+    """Get and update areas for a specific project"""
 
     permission_classes = [IsAuthenticated]
 
@@ -88,3 +88,21 @@ class AreasForProject(APIView):
         area = AreaService.get_project_area(pk)
         serializer = ProjectAreaSerializer(area)
         return Response(serializer.data, status=HTTP_200_OK)
+
+    def put(self, request, pk):
+        """Update areas for project by project ID"""
+        settings.LOGGER.info(f"{request.user} is updating areas for project {pk}")
+
+        area = AreaService.get_project_area(pk)
+        serializer = ProjectAreaSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        updated_area = AreaService.update_area_by_pk(
+            pk=area.pk,
+            area_ids=serializer.validated_data.get("areas", []),
+            user=request.user,
+        )
+
+        result_serializer = ProjectAreaSerializer(updated_area)
+        return Response(result_serializer.data, status=HTTP_202_ACCEPTED)

@@ -4,3 +4,4 @@ export * from "./navigation.utils";
 export * from "./sanitise.utils";
 export * from "./form-sanitisation.utils";
 export * from "./user.utils";
+export * from "./caretaker.utils";

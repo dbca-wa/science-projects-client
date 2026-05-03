@@ -1283,3 +1283,64 @@
 /* ============================================ */
 /* Borderless variant (business area editor)   */
 /* ============================================ */
+
+/* ============================================ */
+/* Standalone editor variant                    */
+/* A self-contained editor with border, rounded */
+/* corners, and focus-within blue highlight.    */
+/* Use via className="editor-standalone" on     */
+/* <RichTextEditor>.                            */
+/* ============================================ */
+
+.editor-standalone {
+	border-radius: 0.5rem;
+	border: 2px solid rgb(209 213 219); /* gray-300 */
+	background-color: transparent;
+	transition: all 0.3s;
+	overflow: hidden;
+}
+
+.dark .editor-standalone {
+	border-color: rgb(75 85 99); /* gray-600 */
+	background-color: transparent;
+}
+
+.editor-standalone:focus-within {
+	border-color: rgb(59 130 246); /* blue-500 */
+	background-color: rgb(239 246 255); /* blue-50 */
+}
+
+.dark .editor-standalone:focus-within {
+	border-color: rgb(96 165 250); /* blue-400 */
+	background-color: rgb(23 37 84 / 0.2); /* blue-950/20 */
+}
+
+/* Make internals transparent so the parent bg shows through */
+.editor-standalone .editor-content-wrapper,
+.editor-standalone .editor-toolbar {
+	background-color: transparent;
+}
+
+.dark .editor-standalone .editor-content-wrapper,
+.dark .editor-standalone .editor-toolbar {
+	background-color: transparent;
+}
+
+/* ============================================ */
+/* Managed editor variant (inline-save-editor)  */
+/* Used inside InlineSaveEditor and             */
+/* FormRichTextEditor where the PARENT manages  */
+/* focus/dirty bg state. All internal bgs are   */
+/* transparent so the parent colour shows       */
+/* through toolbar, content, and footer.        */
+/* ============================================ */
+
+.inline-save-editor .editor-content-wrapper,
+.inline-save-editor .editor-toolbar {
+	background-color: transparent;
+}
+
+.dark .inline-save-editor .editor-content-wrapper,
+.dark .inline-save-editor .editor-toolbar {
+	background-color: transparent;
+}

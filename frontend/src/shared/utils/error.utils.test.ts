@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-	extractUserFriendlyMessage,
-	containsHtml,
-	getStatusMessage,
-} from "./error.utils";
+import { extractUserFriendlyMessage } from "./error.utils";
 
 describe("error.utils", () => {
 	describe("extractUserFriendlyMessage", () => {
@@ -114,53 +110,6 @@ describe("error.utils", () => {
 			} as unknown as Error;
 
 			expect(extractUserFriendlyMessage(error)).toBe("404 Not Found");
-		});
-	});
-
-	describe("containsHtml", () => {
-		it("should detect HTML tags", () => {
-			expect(containsHtml("<p>Hello</p>")).toBe(true);
-			expect(containsHtml("<div>Test</div>")).toBe(true);
-			expect(containsHtml("Plain text")).toBe(false);
-		});
-
-		it("should detect self-closing tags", () => {
-			expect(containsHtml("Image: <img />")).toBe(true);
-			expect(containsHtml("Break: <br/>")).toBe(true);
-		});
-
-		it("should not detect angle brackets in text", () => {
-			expect(containsHtml("5 < 10")).toBe(false);
-			expect(containsHtml("10 > 5")).toBe(false);
-		});
-	});
-
-	describe("getStatusMessage", () => {
-		it("should return message for common status codes", () => {
-			expect(getStatusMessage(400)).toBe(
-				"Invalid request. Please check your input."
-			);
-			expect(getStatusMessage(401)).toBe(
-				"You are not authorised. Please log in."
-			);
-			expect(getStatusMessage(403)).toBe(
-				"You don't have permission to perform this action."
-			);
-			expect(getStatusMessage(404)).toBe(
-				"The requested resource was not found."
-			);
-			expect(getStatusMessage(500)).toBe(
-				"Server error. Please try again later."
-			);
-		});
-
-		it("should return generic message for unknown status codes", () => {
-			expect(getStatusMessage(418)).toBe(
-				"An error occurred. Please try again."
-			);
-			expect(getStatusMessage(999)).toBe(
-				"An error occurred. Please try again."
-			);
 		});
 	});
 });

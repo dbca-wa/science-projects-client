@@ -41,6 +41,7 @@ import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
 import { UserCombobox } from "@/shared/components/user";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useServices } from "@/shared/hooks/queries/useServices";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
 import { useLocations } from "@/shared/hooks/queries/useLocations";
 import type {
@@ -115,6 +116,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 	// Fetch dropdown data
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
+	const { data: divisions } = useDivisions();
 	const { data: services, isLoading: isLoadingServices } = useServices();
 	const { data: _projectAreas, isLoading: isLoadingProjectAreas } =
 		useProjectAreas();
@@ -514,7 +516,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 															disabled={isLoading}
 															minHeight="150px"
 															aria-label="Project description"
-															className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+															className="editor-standalone"
 														/>
 													</FormControl>
 													<FormDescription>
@@ -599,6 +601,9 @@ export const EditProjectForm = observer(function EditProjectForm({
 														<SelectContent>
 															<BusinessAreaSelectItems
 																businessAreas={businessAreas || []}
+																filterByApprovers
+																divisions={divisions}
+																currentValue={field.value}
 															/>
 														</SelectContent>
 													</Select>
@@ -881,7 +886,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 																disabled={isLoading}
 																minHeight="150px"
 																aria-label="External project description"
-																className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+																className="editor-standalone"
 															/>
 														</FormControl>
 														<FormDescription>
@@ -909,7 +914,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 																disabled={isLoading}
 																minHeight="150px"
 																aria-label="External project aims"
-																className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+																className="editor-standalone"
 															/>
 														</FormControl>
 														<FormDescription>

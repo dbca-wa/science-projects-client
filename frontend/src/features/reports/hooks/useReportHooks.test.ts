@@ -35,7 +35,6 @@ vi.mock("../services/report.service", () => ({
 vi.mock("../services/business-area.service", () => ({
 	getProblematicProjects: vi.fn().mockResolvedValue({}),
 	getUnapprovedDocs: vi.fn().mockResolvedValue({}),
-	getBusinessAreaDetail: vi.fn().mockResolvedValue({}),
 	updateBusinessAreaLead: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -77,14 +76,6 @@ describe("Report hooks", () => {
 		expect(result.current.isLoading).toBeDefined();
 	});
 
-	it("useLatestYear should return a query", async () => {
-		const { useLatestYear } = await import("./useReports");
-		const { result } = renderHook(() => useLatestYear(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
 	it("useLatestReport should return a query", async () => {
 		const { useLatestReport } = await import("./useReports");
 		const { result } = renderHook(() => useLatestReport("bcs"), {
@@ -109,27 +100,11 @@ describe("Report hooks", () => {
 		expect(result.current.mutate).toBeDefined();
 	});
 
-	it("useBusinessAreaDetail should return a query", async () => {
-		const { useBusinessAreaDetail } = await import("./useBusinessAreaLead");
-		const { result } = renderHook(() => useBusinessAreaDetail(1), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
 	it("useUpdateBusinessAreaLead should return a mutation", async () => {
 		const { useUpdateBusinessAreaLead } = await import("./useBusinessAreaLead");
 		const { result } = renderHook(() => useUpdateBusinessAreaLead(), {
 			wrapper: createWrapper(),
 		});
 		expect(result.current.mutate).toBeDefined();
-	});
-
-	it("useReportMedia should return a query", async () => {
-		const { useLatestReportMedia } = await import("./useReports");
-		const { result } = renderHook(() => useLatestReportMedia(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
 	});
 });

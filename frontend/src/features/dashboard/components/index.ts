@@ -7,5 +7,3 @@ export { ProjectTeamDocumentsDataTable } from "./ProjectTeamDocumentsDataTable";
 export { BusinessAreaLeadDocumentsDataTable } from "./BusinessAreaLeadDocumentsDataTable";
 export { DirectorateDocumentsDataTable } from "./DirectorateDocumentsDataTable";
 export { AdminTasksDataTable } from "./AdminTasksDataTable";
-export { AdminTaskCard } from "./AdminTaskCard";
-export { SectionDivider } from "./SectionDivider";

@@ -36,7 +36,7 @@ vi.mock("@/features/auth");
 vi.mock("@/features/users/hooks/useUserDetail", () => ({
 	useUserDetail: () => ({ data: null }),
 }));
-vi.mock("@/features/caretakers/hooks/useCaretakerPermissions", () => ({
+vi.mock("@/shared/hooks/useCaretakerPermissions", () => ({
 	useCaretakerPermissions: () => ({
 		canActAsProjectLead: () => false,
 		canActAsBusinessAreaLead: () => false,
@@ -232,6 +232,16 @@ describe("Tab Navigation", () => {
 	 * Student reports tab should display correctly
 	 */
 	it("should display student reports tab when available", async () => {
+		// Override mock to use student kind (student reports are only shown for student projects)
+		vi.mocked(useProjectHook.useProject).mockReturnValue({
+			data: {
+				...mockProjectData,
+				project: { ...mockProjectData.project, kind: "student" },
+			},
+			isLoading: false,
+			error: null,
+		} as unknown as ReturnType<typeof useProjectHook.useProject>);
+
 		renderWithRouter("student");
 
 		await waitFor(() => {

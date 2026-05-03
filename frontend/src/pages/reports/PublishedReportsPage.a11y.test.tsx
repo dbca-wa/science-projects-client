@@ -10,6 +10,10 @@ vi.mock("@/features/reports/hooks/useReports", () => ({
 	usePublishedReports: () => ({ data: [], isLoading: false }),
 	useLegacyReports: () => ({ data: [], isLoading: false }),
 	useReportsWithoutPDF: () => ({ data: [], isLoading: false }),
+	useAllReportPDFs: () => ({
+		data: { published: [], drafts: [], legacy: [] },
+		isLoading: false,
+	}),
 	useAddReportPDF: () => ({ mutate: vi.fn(), isPending: false }),
 	useAddLegacyPDF: () => ({ mutate: vi.fn(), isPending: false }),
 	useUpdateReportPDF: () => ({ mutate: vi.fn(), isPending: false }),

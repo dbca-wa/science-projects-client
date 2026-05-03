@@ -13,7 +13,7 @@ from rest_framework.test import APIClient
 
 from common.tests.factories import BusinessAreaFactory, UserFactory
 from common.tests.test_helpers import projects_urls
-from documents.models import ConceptPlan, Endorsement, ProjectDocument, ProjectPlan
+from documents.models import ConceptPlan, ProjectDocument
 
 
 @pytest.mark.django_db
@@ -97,10 +97,10 @@ class TestWizardCreatesConceptPlanForCoreFunction:
 
 
 @pytest.mark.django_db
-class TestWizardCreatesConceptPlanForStudent:
-    """Student projects get a ConceptPlan via the wizard."""
+class TestWizardSkipsDocumentsForStudent:
+    """Student projects do not get initial documents — they use a simplified workflow."""
 
-    def test_student_project_creates_concept_plan(self):
+    def test_student_project_does_not_create_concept_plan(self):
         user = UserFactory()
         ba = BusinessAreaFactory()
         client = APIClient()
@@ -128,19 +128,14 @@ class TestWizardCreatesConceptPlanForStudent:
         doc = ProjectDocument.objects.filter(
             project_id=project_id, kind="concept"
         ).first()
-        assert doc is not None, "ConceptPlan document should be created"
-        assert doc.creator == user
-        assert doc.modifier == user
-
-        concept = ConceptPlan.objects.filter(document=doc).first()
-        assert concept is not None, "ConceptPlan detail should be created"
+        assert doc is None, "Student projects should not create a ConceptPlan"
 
 
 @pytest.mark.django_db
-class TestWizardCreatesProjectPlanForExternal:
-    """External projects get a ProjectPlan + Endorsement via the wizard."""
+class TestWizardSkipsDocumentsForExternal:
+    """External projects do not get initial documents — they use a simplified workflow."""
 
-    def test_external_project_creates_project_plan_and_endorsement(self):
+    def test_external_project_does_not_create_project_plan(self):
         user = UserFactory()
         ba = BusinessAreaFactory()
         client = APIClient()
@@ -168,12 +163,4 @@ class TestWizardCreatesProjectPlanForExternal:
         doc = ProjectDocument.objects.filter(
             project_id=project_id, kind="projectplan"
         ).first()
-        assert doc is not None, "ProjectPlan document should be created"
-        assert doc.creator == user
-        assert doc.modifier == user
-
-        plan = ProjectPlan.objects.filter(document=doc).first()
-        assert plan is not None, "ProjectPlan detail should be created"
-
-        endorsement = Endorsement.objects.filter(project_plan=plan).first()
-        assert endorsement is not None, "Endorsement should be created"
+        assert doc is None, "External projects should not create a ProjectPlan"

@@ -49,15 +49,3 @@ export function clusterProjects(
 
 	return clusters;
 }
-
-/**
- * Get cluster count display string
- *
- * For clusters with > 100 projects, displays "100+" instead of exact count.
- *
- * @param count - Number of projects in cluster
- * @returns Display string for cluster count
- */
-export function getClusterCountDisplay(count: number): string {
-	return count > 100 ? "100+" : count.toString();
-}

@@ -9,7 +9,6 @@ import {
 	getAllProjectYears,
 	getProjectsForMap,
 	getMyProjects,
-	getInvolvedProjects,
 } from "./project.service";
 import { apiClient } from "@/shared/services/api/client.service";
 
@@ -202,18 +201,6 @@ describe("project.service", () => {
 			const result = await getMyProjects();
 
 			expect(apiClient.get).toHaveBeenCalledWith("projects/mine");
-			expect(result).toEqual(mockProjects);
-		});
-	});
-
-	describe("getInvolvedProjects", () => {
-		it("should GET projects for a specific user", async () => {
-			const mockProjects = [{ id: 1 }];
-			(apiClient.get as Mock).mockResolvedValue(mockProjects);
-
-			const result = await getInvolvedProjects(42);
-
-			expect(apiClient.get).toHaveBeenCalledWith("users/42/projects");
 			expect(result).toEqual(mockProjects);
 		});
 	});

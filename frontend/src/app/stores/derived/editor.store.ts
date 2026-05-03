@@ -68,7 +68,6 @@ export type TextFormatType =
 	| "subscript"
 	| "superscript";
 
-export type ListType = "bullet" | "number" | "check";
 export type BlockType = EditorStoreState["blockType"];
 export type TextAlignment = "left" | "center" | "right" | "justify";
 
@@ -121,6 +120,7 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 			// Lexical toolbar actions
 			initLexicalEditor: action,
 			updateFormattingState: action,
+			clearFormattingState: action,
 			toggleFormat: action,
 			undo: action,
 			redo: action,
@@ -422,6 +422,25 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 				this.state.isLink = $isLinkNode(parent) || $isLinkNode(node);
 			}
 		});
+	};
+
+	/**
+	 * Clear all formatting state — used when no editor is focused
+	 * to prevent stale toolbar highlights
+	 */
+	clearFormattingState = () => {
+		this.state.isBold = false;
+		this.state.isItalic = false;
+		this.state.isUnderline = false;
+		this.state.isStrikethrough = false;
+		this.state.isSubscript = false;
+		this.state.isSuperscript = false;
+		this.state.isLink = false;
+		this.state.blockType = "paragraph";
+		this.state.isList = false;
+		this.state.listType = null;
+		this.state.isNumberedList = false;
+		this.state.isBulletList = false;
 	};
 
 	/**

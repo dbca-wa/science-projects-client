@@ -25,6 +25,7 @@ import type {
 } from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
 import { canEditProject } from "@/features/projects/utils/permissions";
+import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
 
 interface ProjectActionsDropdownProps {
 	project: IProjectData;
@@ -134,7 +135,7 @@ export const ProjectActionsDropdown = ({
 
 	// Check if concept plan can be created
 	const canCreateConceptPlan =
-		(project.kind === "science" || project.kind === "core_function") &&
+		isDocumentTypeAllowed(project.kind, "concept") &&
 		!isSuspended &&
 		!documents?.concept_plan;
 
@@ -144,20 +145,20 @@ export const ProjectActionsDropdown = ({
 	const projectPlanApproved =
 		documents?.project_plan?.document?.directorate_approval_granted;
 	const canCreateProgressReport =
-		(project.kind === "science" || project.kind === "core_function") &&
+		isDocumentTypeAllowed(project.kind, "progressreport") &&
 		!isSuspended &&
 		(!documents?.concept_plan || conceptPlanApproved) &&
 		projectPlanApproved;
 
 	// Check if student report can be created
-	const canCreateStudentReport = project.kind === "student" && !isSuspended;
+	const canCreateStudentReport =
+		isDocumentTypeAllowed(project.kind, "studentreport") && !isSuspended;
 
 	// Determine if we should show any report button
 	const showReportButton =
 		canCreateConceptPlan ||
 		canCreateStudentReport ||
-		project.kind === "science" ||
-		project.kind === "core_function";
+		isDocumentTypeAllowed(project.kind, "progressreport");
 
 	return (
 		<div className="relative">
@@ -192,9 +193,8 @@ export const ProjectActionsDropdown = ({
 								</DropdownMenuItem>
 							)}
 
-							{/* Create Progress Report - Only for science/core_function projects */}
-							{(project.kind === "science" ||
-								project.kind === "core_function") &&
+							{/* Create Progress Report - Only for kinds that allow progress reports */}
+							{isDocumentTypeAllowed(project.kind, "progressreport") &&
 								onCreateProgressReport && (
 									<DropdownMenuItem
 										onClick={
@@ -237,13 +237,15 @@ export const ProjectActionsDropdown = ({
 						</DropdownMenuItem>
 					)}
 
-					{/* Close Project - Show when no closure document and not in reopenable status */}
-					{canClose && onCloseProject && (
-						<DropdownMenuItem onClick={onCloseProject}>
-							<XCircle className="mr-2 h-4 w-4" />
-							<span>Close Project</span>
-						</DropdownMenuItem>
-					)}
+					{/* Close Project - Show when allowed for kind, no closure document, and not in reopenable status */}
+					{isDocumentTypeAllowed(project.kind, "projectclosure") &&
+						canClose &&
+						onCloseProject && (
+							<DropdownMenuItem onClick={onCloseProject}>
+								<XCircle className="mr-2 h-4 w-4" />
+								<span>Close Project</span>
+							</DropdownMenuItem>
+						)}
 
 					{/* Reopen Project - Show when has closure document and in reopenable status */}
 					{canReopen && onReopenProject && (

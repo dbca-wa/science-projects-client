@@ -2,10 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import L from "leaflet";
 import {
 	createProjectMarker,
-	createSingleProjectMarker,
-	createClusterMarker,
 	getMarkerSize,
-	createSizedMarker,
 	getMarkerColor,
 	getMarkerDensityLabel,
 	MARKER_COLORS,
@@ -317,43 +314,6 @@ describe("marker-creation", () => {
 		});
 	});
 
-	describe("createSingleProjectMarker", () => {
-		it("should create marker for single project", () => {
-			const coords: [number, number] = [-25, 122];
-			const marker = createSingleProjectMarker(mockProject, coords, true);
-
-			expect(L.marker).toHaveBeenCalledWith(coords, expect.any(Object));
-
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-			expect(icon.html).toContain(">1<");
-			expect(icon.html).toContain(`aria-label="Project: ${mockProject.title}"`);
-			expect(icon.html).toContain("#3b82f6"); // blue for single project
-		});
-	});
-
-	describe("createClusterMarker", () => {
-		it("should create marker for project cluster", () => {
-			const projects = [mockProject, { ...mockProject, id: 2 }];
-			const coords: [number, number] = [-25, 122];
-			const marker = createClusterMarker(projects, coords, true);
-
-			expect(L.marker).toHaveBeenCalledWith(coords, expect.any(Object));
-
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-			expect(icon.html).toContain(">2<");
-			expect(icon.html).toContain(
-				'aria-label="2 projects at this location (small cluster)"'
-			);
-			expect(icon.html).toContain("#10b981"); // green for small cluster
-		});
-
-		it("should throw error for empty projects array", () => {
-			expect(() => {
-				createClusterMarker([], [-25, 122], true);
-			}).toThrow("Cannot create cluster marker with empty projects array");
-		});
-	});
-
 	describe("getMarkerSize", () => {
 		it("should return correct size for single project", () => {
 			const size = getMarkerSize(1);
@@ -373,74 +333,6 @@ describe("marker-creation", () => {
 		it("should return correct size for large clusters", () => {
 			const size = getMarkerSize(75);
 			expect(size).toEqual({ size: 48, iconAnchor: [24, 24] });
-		});
-	});
-
-	describe("createSizedMarker", () => {
-		it("should create marker with appropriate size for cluster count", () => {
-			const projects = Array.from({ length: 25 }, (_, i) => ({
-				...mockProject,
-				id: i + 1,
-			}));
-			const marker = createSizedMarker(projects, [-25, 122], true);
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-
-			expect(icon.iconSize).toEqual([44, 44]);
-			expect(icon.iconAnchor).toEqual([22, 22]);
-			expect(icon.popupAnchor).toEqual([0, -12]); // -iconAnchor[1] + 10
-		});
-
-		it("should include size in HTML style", () => {
-			const projects = Array.from({ length: 25 }, (_, i) => ({
-				...mockProject,
-				id: i + 1,
-			}));
-			const marker = createSizedMarker(projects, [-25, 122], true);
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-
-			expect(icon.html).toContain("width: 44px");
-			expect(icon.html).toContain("height: 44px");
-		});
-
-		it("should use correct density-based color", () => {
-			const projects = Array.from({ length: 25 }, (_, i) => ({
-				...mockProject,
-				id: i + 1,
-			}));
-			const marker = createSizedMarker(projects, [-25, 122], true);
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-
-			expect(icon.html).toContain("#f59e0b"); // amber for medium cluster
-		});
-
-		it("should include density label in ARIA description", () => {
-			const projects = Array.from({ length: 25 }, (_, i) => ({
-				...mockProject,
-				id: i + 1,
-			}));
-			const marker = createSizedMarker(projects, [-25, 122], true);
-			const icon = marker.getIcon() as unknown as DivIconOptions;
-
-			expect(icon.html).toContain(
-				'aria-label="25 projects at this location (medium cluster)"'
-			);
-		});
-
-		it("should include higher z-index for selected markers in sized marker", () => {
-			const projects = Array.from({ length: 25 }, (_, i) => ({
-				...mockProject,
-				id: i + 1,
-			}));
-			const selectedMarker = createSizedMarker(projects, [-25, 122], true);
-			const unselectedMarker = createSizedMarker(projects, [-25, 122], false);
-
-			const selectedIcon =
-				selectedMarker.getIcon() as unknown as DivIconOptions;
-			const unselectedIcon =
-				unselectedMarker.getIcon() as unknown as DivIconOptions;
-
-			expect(selectedIcon.html).toContain("z-50");
-			expect(unselectedIcon.html).toContain("z-10");
 		});
 	});
 });

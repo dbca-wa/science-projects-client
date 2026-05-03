@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getAllBusinessAreas,
 	getAllBranches,
-	getAllAffiliations,
 	getDivisions,
 	getMyBusinessAreas,
 } from "./org.service";
@@ -27,12 +26,6 @@ describe("shared org.service", () => {
 		(apiClient.get as Mock).mockResolvedValue([]);
 		await getAllBranches();
 		expect(apiClient.get).toHaveBeenCalledWith("agencies/branches");
-	});
-
-	it("getAllAffiliations should GET from affiliations endpoint", async () => {
-		(apiClient.get as Mock).mockResolvedValue([]);
-		await getAllAffiliations();
-		expect(apiClient.get).toHaveBeenCalledWith("agencies/affiliations");
 	});
 
 	it("getDivisions should GET from divisions endpoint", async () => {

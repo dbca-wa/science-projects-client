@@ -20,6 +20,7 @@ import {
 import { useCurrentUser } from "@/features/auth";
 import { isUserAtApprovalStage } from "@/shared/utils/project-permissions.utils";
 import { findProjectLeader } from "@/shared/utils/team.utils";
+import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
 
 interface DocumentActionsSectionProps {
 	document: IMainDoc;
@@ -41,7 +42,7 @@ interface DocumentActionsSectionProps {
 	// Action callbacks
 	onSubmit?: () => void;
 	onApprove?: () => void;
-	onRecall?: () => void;
+	onRecall?: (stage: number) => void;
 	onSendBack?: () => void;
 	onDownloadPdf?: () => void;
 	onGeneratePdf?: () => void;
@@ -310,10 +311,9 @@ export const DocumentActionsSection = ({
 	}, [currentUser]);
 
 	// Special action button visibility
-	// Create Concept Plan: Show when no concept plan exists for science/core_function projects
+	// Create Concept Plan: Show when concept plans are allowed for this kind and none exists
 	const canCreateConceptPlan = useMemo(() => {
-		// Only for science and core_function projects
-		if (project.kind === "student" || project.kind === "external") return false;
+		if (!isDocumentTypeAllowed(project.kind, "concept")) return false;
 		// Only if no concept plan exists
 		if (all_documents?.concept_plan) return false;
 		// Permission check
@@ -334,6 +334,7 @@ export const DocumentActionsSection = ({
 
 	// Create Progress Report: Show for fully approved project plans with no progress reports
 	const canCreateProgressReport = useMemo(() => {
+		if (!isDocumentTypeAllowed(project.kind, "progressreport")) return false;
 		if (documentType !== "projectplan") return false;
 		if (
 			all_documents?.progress_reports &&
@@ -358,6 +359,7 @@ export const DocumentActionsSection = ({
 
 		return hasPermission;
 	}, [
+		project.kind,
 		documentType,
 		all_documents,
 		document,
@@ -469,7 +471,7 @@ export const DocumentActionsSection = ({
 									{/* Recall button - Blue (when BA lead approval is pending) */}
 									{canRecallProjectLeadApproval && onRecall && (
 										<Button
-											onClick={onRecall}
+											onClick={() => onRecall(1)}
 											variant="action-blue"
 											size="sm"
 											className="w-full"
@@ -517,7 +519,7 @@ export const DocumentActionsSection = ({
 									{/* Recall button - Blue (when directorate approval is pending) */}
 									{canRecallBusinessAreaApproval && onRecall && (
 										<Button
-											onClick={onRecall}
+											onClick={() => onRecall(2)}
 											variant="action-blue"
 											size="sm"
 											className="w-full"
@@ -565,7 +567,7 @@ export const DocumentActionsSection = ({
 									{/* Recall button - Blue (after directorate approval) */}
 									{canRecallDirectorateApproval && onRecall && (
 										<Button
-											onClick={onRecall}
+											onClick={() => onRecall(3)}
 											variant="action-blue"
 											size="sm"
 											className="w-full"

@@ -71,29 +71,3 @@ export function extractMentionedUsers(editor: LexicalEditor): number[] {
 
 	return userIds;
 }
-
-/**
- * Extract mentioned users from HTML string (for backward compatibility)
- *
- * Parses HTML and extracts user IDs from mention spans.
- * Used when working with HTML directly instead of editor state.
- *
- * @param html - HTML string containing mentions
- * @returns Array of unique user IDs
- */
-export function extractMentionedUsersFromHTML(html: string): number[] {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, "text/html");
-	const mentionSpans = doc.querySelectorAll("span[data-user-id]");
-
-	const userIds: number[] = [];
-
-	mentionSpans.forEach((span) => {
-		const userId = parseInt(span.getAttribute("data-user-id") || "0", 10);
-		if (userId && !userIds.includes(userId)) {
-			userIds.push(userId);
-		}
-	});
-
-	return userIds;
-}

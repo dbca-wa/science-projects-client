@@ -20,7 +20,6 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -46,6 +45,7 @@ import { compressImage } from "@/shared/utils/image-compression.utils";
 import { ACCEPTED_IMAGE_TYPES } from "@/shared/constants/image.constants";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useDivisions } from "../../hooks/useDivisions";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import {
 	useBusinessAreas,
 	useBusinessAreaDetail,
@@ -401,11 +401,10 @@ export function BusinessAreaPageForm({
 									<SelectValue placeholder="Select a division" />
 								</SelectTrigger>
 								<SelectContent>
-									{divisions.map((div) => (
-										<SelectItem key={div.id} value={String(div.id)}>
-											{div.name}
-										</SelectItem>
-									))}
+									<DivisionSelectItems
+										divisions={divisions}
+										requireKeyStakeholder={false}
+									/>
 								</SelectContent>
 							</Select>
 						)}

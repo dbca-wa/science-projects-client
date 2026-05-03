@@ -5,7 +5,7 @@
  * Matches UserDetailSheet design with project-specific role section.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -44,20 +44,26 @@ interface TeamMemberSheetProps {
 	isOpen: boolean;
 	onClose: () => void;
 	canManageTeam: boolean;
+	/** Project kind — needed to enforce last-student/last-external removal protection */
+	projectKind?: string;
+	/** All team members — needed to count students/externals for removal protection */
+	allMembers?: IProjectMember[];
 }
 
 // Role options based on staff status
 const STAFF_ROLES = [
-	{ value: "technical", label: "Technical Support" },
-	{ value: "research", label: "Science Support" },
+	{ value: "supervising", label: "Supervising Scientist", leaderOnly: true },
+	{ value: "technical", label: "Technical Support", leaderOnly: false },
+	{ value: "research", label: "Science Support", leaderOnly: false },
 ];
 
 const EXTERNAL_ROLES = [
-	{ value: "academicsuper", label: "Academic Supervisor" },
-	{ value: "consulted", label: "Consulted Peer" },
-	{ value: "externalcol", label: "External Collaborator" },
-	{ value: "group", label: "Involved Group" },
-	{ value: "student", label: "Supervised Student" },
+	{ value: "supervising", label: "Supervising Scientist", leaderOnly: true },
+	{ value: "academicsuper", label: "Academic Supervisor", leaderOnly: false },
+	{ value: "consulted", label: "Consulted Peer", leaderOnly: false },
+	{ value: "externalcol", label: "External Collaborator", leaderOnly: false },
+	{ value: "group", label: "Involved Group", leaderOnly: false },
+	{ value: "student", label: "Supervised Student", leaderOnly: false },
 ];
 
 export const TeamMemberSheet = ({
@@ -66,6 +72,8 @@ export const TeamMemberSheet = ({
 	isOpen,
 	onClose,
 	canManageTeam,
+	projectKind,
+	allMembers,
 }: TeamMemberSheetProps) => {
 	const { mutate: updateMember, isPending: isUpdating } =
 		useUpdateTeamMember(projectId);
@@ -81,17 +89,74 @@ export const TeamMemberSheet = ({
 		member.short_code?.toString() || ""
 	);
 
+	// Sync local state when member prop updates (e.g. after promote invalidates the query)
+	useEffect(() => {
+		setRole(member.role);
+		setTimeAllocation(member.time_allocation);
+		setShortCode(member.short_code?.toString() || "");
+	}, [
+		member.role,
+		member.time_allocation,
+		member.short_code,
+		member.is_leader,
+	]);
+
 	const isStaff = member.user.is_staff;
+	const isLeader = member.is_leader;
 	const roleOptions = isStaff ? STAFF_ROLES : EXTERNAL_ROLES;
 
+	// Determine if this member is the last student/external and cannot be removed
+	const isLastRequiredMember = (() => {
+		if (!projectKind || !allMembers) return false;
+
+		if (projectKind === "student") {
+			// Count members with student role
+			const studentMembers = allMembers.filter((m) => m.role === "student");
+			return member.role === "student" && studentMembers.length <= 1;
+		}
+
+		if (projectKind === "external") {
+			// Count external (non-staff) members
+			const externalMembers = allMembers.filter((m) => !m.user.is_staff);
+			return !member.user.is_staff && externalMembers.length <= 1;
+		}
+
+		return false;
+	})();
+
+	const canRemove = !isLeader && !isLastRequiredMember;
+	const removeTooltip = isLeader
+		? "Cannot remove project leader"
+		: isLastRequiredMember && projectKind === "student"
+			? "Cannot remove the last student from a student project"
+			: isLastRequiredMember && projectKind === "external"
+				? "Cannot remove the last external member from an external project"
+				: undefined;
+
+	// Lock role changes for leaders and for the last required member
+	// (changing role away from "student" would effectively remove the last student)
+	const isRoleLocked = isLeader || isLastRequiredMember;
+	const roleLockedReason = isLeader
+		? "Project leader role is managed via promote/demote"
+		: isLastRequiredMember && projectKind === "student"
+			? "Cannot change role — this is the only student in a student project"
+			: isLastRequiredMember && projectKind === "external"
+				? "Cannot change role — this is the only external member in an external project"
+				: undefined;
+
 	const handleSave = () => {
+		// For leaders or last-required members, don't include role in the update
+		const data: Record<string, unknown> = {
+			time_allocation: timeAllocation,
+		};
+		if (!isRoleLocked) {
+			data.role = role;
+		}
+
 		updateMember(
 			{
 				userId: member.user.id,
-				data: {
-					role,
-					time_allocation: timeAllocation,
-				},
+				data: data as { role?: string; time_allocation: number },
 			},
 			{
 				onSuccess: () => {
@@ -163,17 +228,15 @@ export const TeamMemberSheet = ({
 											<Button
 												variant="destructive"
 												onClick={handleRemove}
-												disabled={isRemoving || member.is_leader}
+												disabled={isRemoving || !canRemove}
 												className="w-full"
 											>
 												Remove from Project
 											</Button>
 										</div>
 									</TooltipTrigger>
-									{member.is_leader && (
-										<TooltipContent>
-											Cannot remove project leader
-										</TooltipContent>
+									{removeTooltip && (
+										<TooltipContent>{removeTooltip}</TooltipContent>
 									)}
 								</Tooltip>
 							</>
@@ -187,20 +250,27 @@ export const TeamMemberSheet = ({
 						<div className="space-y-4">
 							<div className="space-y-2">
 								<Label htmlFor="role">Project Role</Label>
-								<Select value={role || undefined} onValueChange={setRole}>
+								<Select
+									value={role || undefined}
+									onValueChange={setRole}
+									disabled={isRoleLocked}
+								>
 									<SelectTrigger id="role" className="w-full">
 										<SelectValue placeholder="Select a Role" />
 									</SelectTrigger>
 									<SelectContent className="z-[70]">
-										{roleOptions.map((option) => (
-											<SelectItem key={option.value} value={option.value}>
-												{option.label}
-											</SelectItem>
-										))}
+										{roleOptions
+											.filter((option) => isLeader || !option.leaderOnly)
+											.map((option) => (
+												<SelectItem key={option.value} value={option.value}>
+													{option.label}
+												</SelectItem>
+											))}
 									</SelectContent>
 								</Select>
 								<p className="text-sm text-muted-foreground">
-									The role this team member fills within this project
+									{roleLockedReason ||
+										"The role this team member fills within this project"}
 								</p>
 							</div>
 
@@ -242,9 +312,11 @@ export const TeamMemberSheet = ({
 								variant="default"
 								className="w-full"
 								onClick={handleSave}
-								disabled={isUpdating || !role}
+								disabled={isUpdating || (!isRoleLocked && !role)}
 							>
-								{!role ? "Please Select a Role" : "Save Changes"}
+								{!isRoleLocked && !role
+									? "Please Select a Role"
+									: "Save Changes"}
 							</Button>
 						</div>
 					</SectionContainer>

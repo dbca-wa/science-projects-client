@@ -5,10 +5,8 @@
 // User query hooks
 export { useUserSearch, userSearchKeys } from "./useUserSearch";
 export { useUserDetail, userDetailKeys } from "./useUserDetail";
-export { useCheckEmailUnique } from "./useCheckEmailUnique";
 
 // User mutation hooks
-export { useCreateUser } from "./useCreateUser";
 export { useCreateStaffUser } from "./useCreateStaffUser";
 export { useCreateExternalUser } from "./useCreateExternalUser";
 export { useUpdateUser } from "./useUpdateUser";

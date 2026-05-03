@@ -4,7 +4,6 @@ import { Button } from "@/shared/components/ui/button";
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -14,6 +13,7 @@ import { UserIdCell } from "../shared/UserIdCell";
 import { ReportInfoForm } from "./ReportInfoForm";
 import { useReportInfo, useDeleteReportInfo } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { filterByName } from "../../utils/crud.utils";
 import type { IAnnualReport } from "@/shared/types/report.types";
 
@@ -98,12 +98,11 @@ export const ReportInfoList = () => {
 							<SelectValue placeholder="All Divisions" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="all">All Divisions</SelectItem>
-							{divisions?.map((d) => (
-								<SelectItem key={d.id} value={d.id.toString()}>
-									{d.name}
-								</SelectItem>
-							))}
+							<DivisionSelectItems
+								divisions={divisions ?? []}
+								includeAll
+								requireKeyStakeholder={false}
+							/>
 						</SelectContent>
 					</Select>
 				}

@@ -42,3 +42,15 @@ export const triggerBlobDownload = (blob: Blob, filename: string): void => {
 	document.body.removeChild(link);
 	window.URL.revokeObjectURL(url);
 };
+
+/**
+ * Helper function to open a blob PDF in a new browser tab.
+ * The user can then download from the browser's PDF viewer if needed.
+ */
+export const openBlobInNewTab = (blob: Blob): void => {
+	const pdfBlob = new Blob([blob], { type: "application/pdf" });
+	const url = window.URL.createObjectURL(pdfBlob);
+	window.open(url, "_blank");
+	// Revoke after a delay to give the new tab time to load
+	setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+};
