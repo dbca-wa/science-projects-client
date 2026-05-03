@@ -3,6 +3,7 @@ import { RichTextEditor } from "./RichTextEditor";
 import { WordCounter } from "./WordCounter";
 import { inlineEditStore } from "@/app/stores/InlineEditStore";
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 
 export interface FormRichTextEditorProps extends Omit<
 	RichTextEditorProps,
@@ -59,10 +60,7 @@ export const FormRichTextEditor = forwardRef<
 		// Strip HTML for text-only comparison — same as InlineSaveEditor.
 		// Avoids false dirty detection from Lexical re-serialising HTML differently on focus.
 		const normaliseForComparison = (html: string) =>
-			html
-				.replace(/<[^>]*>/g, "")
-				.replace(/\s+/g, " ")
-				.trim();
+			sanitizeInput(html).replace(/\s+/g, " ").trim();
 
 		// Dirty = text content differs from initial value
 		const isDirty =

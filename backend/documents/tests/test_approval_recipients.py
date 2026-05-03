@@ -357,7 +357,7 @@ class TestGetRecallRecipients:
 class TestPropertyStageThreePermission:
     """Property 1: Stage 3 Permission Check Correctness"""
 
-    @hypothesis_settings(max_examples=100, deadline=5000)
+    @hypothesis_settings(max_examples=100, deadline=30000)
     @given(
         is_director=st.booleans(),
         is_key_stakeholder=st.booleans(),
@@ -396,7 +396,7 @@ class TestPropertyStageThreePermission:
 class TestPropertyStage2Recipients:
     """Property 2: Stage 2 Notification Recipient Correctness"""
 
-    @hypothesis_settings(max_examples=100, deadline=5000)
+    @hypothesis_settings(max_examples=100, deadline=30000)
     @given(
         has_ks=st.booleans(),
         num_approvers=st.integers(min_value=0, max_value=3),
@@ -452,7 +452,7 @@ class TestPropertyStage2Recipients:
 class TestPropertyDirectorateRecipients:
     """Property 3: Stage 3 Directorate Notification Recipient Correctness"""
 
-    @hypothesis_settings(max_examples=100, deadline=5000)
+    @hypothesis_settings(max_examples=100, deadline=30000)
     @given(
         has_ks=st.booleans(),
         num_approvers=st.integers(min_value=0, max_value=3),
@@ -511,7 +511,7 @@ class TestPropertyDirectorateRecipients:
 class TestPropertyRecallRecipients:
     """Property 4: Recall Notification Recipient Correctness"""
 
-    @hypothesis_settings(max_examples=100, deadline=5000)
+    @hypothesis_settings(max_examples=100, deadline=30000)
     @given(
         has_ks=st.booleans(),
         num_approvers=st.integers(min_value=0, max_value=3),

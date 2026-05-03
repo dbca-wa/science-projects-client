@@ -18,6 +18,7 @@ import { countWords } from "@/shared/utils/word-count.utils";
 import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 import type { ContentType } from "@/shared/types/inline-edit.types";
 import type { ToolbarMode } from "@/shared/types/editor.types";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 
 export interface InlineSaveEditorProps {
 	// Content configuration
@@ -177,10 +178,7 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 	// Handle content change — use normalised text comparison to avoid
 	// false positives from Lexical re-serialising the same content differently
 	const normaliseForComparison = (html: string) =>
-		html
-			.replace(/<[^>]*>/g, "")
-			.replace(/\s+/g, " ")
-			.trim();
+		sanitizeInput(html).replace(/\s+/g, " ").trim();
 
 	// Handle copying content to clipboard (for locked editors)
 	const handleCopyContent = useCallback(() => {
