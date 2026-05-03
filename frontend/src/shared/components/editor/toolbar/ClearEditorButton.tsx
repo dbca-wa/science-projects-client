@@ -17,6 +17,7 @@ export const ClearEditorButton: React.FC<ClearEditorButtonProps> = ({
 			type="button"
 			className="editor-toolbar-button"
 			onClick={onClear}
+			onMouseDown={(e) => e.preventDefault()}
 			disabled={disabled}
 			aria-label="Clear editor content"
 			title="Clear all content"

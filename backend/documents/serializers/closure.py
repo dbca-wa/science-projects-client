@@ -45,6 +45,7 @@ class ProjectClosureCreateSerializer(serializers.ModelSerializer):
         model = ProjectClosure
         fields = [
             "document",
+            "project",
             "reason",
             "intended_outcome",
             "scientific_outputs",

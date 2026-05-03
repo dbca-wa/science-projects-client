@@ -8,6 +8,8 @@ interface DeletionRequestBannerProps {
 	project: IProjectData;
 	currentUser: IUserMe | null;
 	userIsCaretakerOfAdmin: boolean;
+	isBaLead?: boolean;
+	userIsCaretakerOfBaLeader?: boolean;
 	onDeleteProject: () => void;
 	onCancelRequest: () => void;
 }
@@ -23,6 +25,8 @@ export function DeletionRequestBanner({
 	project,
 	currentUser,
 	userIsCaretakerOfAdmin,
+	isBaLead,
+	userIsCaretakerOfBaLeader,
 	onDeleteProject,
 	onCancelRequest,
 }: DeletionRequestBannerProps) {
@@ -30,7 +34,11 @@ export function DeletionRequestBanner({
 		return null;
 	}
 
-	const isAdmin = currentUser?.is_superuser || userIsCaretakerOfAdmin;
+	const canApprove =
+		currentUser?.is_superuser ||
+		userIsCaretakerOfAdmin ||
+		isBaLead ||
+		userIsCaretakerOfBaLeader;
 
 	return (
 		<Alert
@@ -43,7 +51,7 @@ export function DeletionRequestBanner({
 					Deletion Requested
 				</span>
 
-				{isAdmin && (
+				{canApprove && (
 					<div className="flex gap-2">
 						<Button variant="destructive" size="sm" onClick={onDeleteProject}>
 							Delete Project

@@ -8,10 +8,16 @@ import type {
 import type { IUserData } from "@/shared/types/user.types";
 import { useCurrentUser } from "@/features/auth";
 import { calculateDocumentEditPermission } from "@/features/projects/utils/permissions";
+import {
+	isRichTextLocked,
+	getEffectiveCanEdit,
+	getLockedMessage,
+} from "@/shared/utils/document-locking.utils";
 import { DocumentTabLayout } from "@/shared/components/documents";
 import { InlineSaveEditor } from "@/shared/components/editor";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { ReopenProjectModal } from "../modals/ReopenProjectModal";
+import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {
 	Select,
 	SelectContent,
@@ -20,6 +26,7 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { Label } from "@/shared/components/ui/label";
+import { Lock } from "lucide-react";
 import { useUpdateContent } from "@/shared/hooks/queries/useUpdateContent";
 import { CommentSection } from "@/features/projects/components/comments";
 
@@ -69,7 +76,7 @@ export function ProjectClosureTab({
 		);
 	}
 
-	const canEdit = calculateDocumentEditPermission({
+	const canEditBase = calculateDocumentEditPermission({
 		currentUser,
 		members,
 		document: projectClosure.document,
@@ -77,6 +84,15 @@ export function ProjectClosureTab({
 		userIsCaretakerOfBaLeader,
 		userIsCaretakerOfAdmin,
 	});
+
+	// Lock rich text editing when document is fully approved
+	const isLocked = isRichTextLocked(projectClosure.document);
+	const canEdit = getEffectiveCanEdit(
+		canEditBase,
+		projectClosure.document,
+		false
+	);
+	const lockedMessage = getLockedMessage(projectClosure.document, isLocked);
 
 	// Handle intended outcome change
 	const handleIntendedOutcomeChange = (value: string) => {
@@ -91,7 +107,8 @@ export function ProjectClosureTab({
 				members={members}
 				documentType="project_closure"
 				typeSpecificId={projectClosure.id}
-				canDelete={true}
+				canDelete={!isLocked}
+				locked={isLocked}
 				creator={creator}
 				modifier={modifier}
 				userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
@@ -108,6 +125,17 @@ export function ProjectClosureTab({
 				}
 			>
 				<div className="space-y-6">
+					{/* Locked banner */}
+					{isLocked && (
+						<Alert className="border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+							<Lock className="size-4 text-gray-500 dark:text-gray-400" />
+							<AlertDescription className="text-gray-600 dark:text-gray-400">
+								This document is locked because it has been fully approved.
+								Content can still be copied.
+							</AlertDescription>
+						</Alert>
+					)}
+
 					{/* Intended Outcome - SELECT component */}
 					<div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
 						<div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -142,6 +170,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.reason || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Reason"
 						/>
 					</ProjectSection>
@@ -153,6 +182,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.knowledge_transfer || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Knowledge Transfer"
 						/>
 					</ProjectSection>
@@ -164,6 +194,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.data_location || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Data Location"
 						/>
 					</ProjectSection>
@@ -175,6 +206,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.hardcopy_location || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Hardcopy Location"
 						/>
 					</ProjectSection>
@@ -186,6 +218,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.backup_location || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Backup Location"
 						/>
 					</ProjectSection>
@@ -197,6 +230,7 @@ export function ProjectClosureTab({
 							entityId={projectClosure.id}
 							initialContent={projectClosure.scientific_outputs || ""}
 							canEdit={canEdit}
+							lockedMessage={lockedMessage}
 							label="Scientific Outputs"
 						/>
 					</ProjectSection>

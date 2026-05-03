@@ -230,31 +230,43 @@ class GetAvailableReportYearsForStudentReport(APIView):
         """
         Returns list of reports with year and ID.
         Only returns years where a student report doesn't already exist for the project.
+        Filters to years from the project's inception year onwards (1 year prior allowed
+        for financial year alignment — e.g. project created in 2026 can report for FY24-25).
         """
-        if project_id:
-            all_student_reports = StudentReport.objects.filter(
-                document__project_id=project_id
-            ).all()
-            list_of_years_from_student_reports = list(
-                set([report.year for report in all_student_reports])
-            )
-            all_annual_report_years = AnnualReport.objects.values_list(
-                "year", flat=True
-            ).distinct()
+        from projects.models import Project
 
-            available_years = list(
-                set(all_annual_report_years) - set(list_of_years_from_student_reports)
-            )
-            available_reports = AnnualReport.objects.filter(year__in=available_years)
-
-            serializer = MiniAnnualReportSerializer(
-                available_reports,
-                many=True,
-                context={"request": request},
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
-        else:
+        if not project_id:
             raise NotFound
+
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise NotFound
+
+        # Get years that already have student reports for this project
+        existing_years = set(
+            StudentReport.objects.filter(document__project_id=project_id).values_list(
+                "year", flat=True
+            )
+        )
+
+        # Determine the earliest allowed year based on project inception
+        # Allow 1 year prior for financial year alignment
+        project_year = project.year if project.year else 2020
+        earliest_allowed_year = project_year - 1
+
+        # Filter: available years = annual report years - existing report years,
+        # and only years >= earliest_allowed_year
+        available_reports = AnnualReport.objects.filter(
+            year__gte=earliest_allowed_year
+        ).exclude(year__in=existing_years)
+
+        serializer = MiniAnnualReportSerializer(
+            available_reports,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class GetAvailableReportYearsForProgressReport(APIView):
@@ -266,31 +278,46 @@ class GetAvailableReportYearsForProgressReport(APIView):
         """
         Returns list of reports with year and ID.
         Only returns years where a progress report doesn't already exist for the project.
+        Filters to years from the project's inception year onwards (1 year prior allowed
+        for financial year alignment — e.g. project created in 2026 can report for FY24-25).
         """
-        if project_id:
-            all_progress_reports = ProgressReport.objects.filter(
-                document__project_id=project_id
-            ).all()
-            list_of_years_from_progress_reports = list(
-                set([report.year for report in all_progress_reports])
-            )
-            all_annual_report_years = AnnualReport.objects.values_list(
-                "year", flat=True
-            ).distinct()
+        from projects.models import Project
 
-            available_years = list(
-                set(all_annual_report_years) - set(list_of_years_from_progress_reports)
-            )
-            available_reports = AnnualReport.objects.filter(year__in=available_years)
-
-            serializer = MiniAnnualReportSerializer(
-                available_reports,
-                many=True,
-                context={"request": request},
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
-        else:
+        if not project_id:
             raise NotFound
+
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise NotFound
+
+        # Get years that already have progress reports for this project
+        existing_years = set(
+            ProgressReport.objects.filter(document__project_id=project_id).values_list(
+                "year", flat=True
+            )
+        )
+
+        # Get all annual report years
+        all_annual_reports = AnnualReport.objects.all()
+
+        # Determine the earliest allowed year based on project inception
+        # Allow 1 year prior for financial year alignment
+        project_year = project.year if project.year else 2020
+        earliest_allowed_year = project_year - 1
+
+        # Filter: available years = annual report years - existing report years,
+        # and only years >= earliest_allowed_year
+        available_reports = all_annual_reports.filter(
+            year__gte=earliest_allowed_year
+        ).exclude(year__in=existing_years)
+
+        serializer = MiniAnnualReportSerializer(
+            available_reports,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class GetWithoutPDFs(APIView):
@@ -591,7 +618,7 @@ class LatestYearsProgressReports(APIView):
         # Filter by the report's division if it has one
         active_docs = ProgressReport.objects.filter(
             Q(report=target_report) & Q(document__status="approved")
-        )
+        ).exclude(project__status="suspended")
         if target_report.division:
             active_docs = active_docs.filter(
                 project__business_area__division=target_report.division
@@ -631,7 +658,7 @@ class LatestYearsStudentReports(APIView):
         # Filter by the report's division if it has one
         active_docs = StudentReport.objects.filter(
             Q(report=target_report) & Q(document__status="approved")
-        )
+        ).exclude(project__status="suspended")
         if target_report.division:
             active_docs = active_docs.filter(
                 project__business_area__division=target_report.division

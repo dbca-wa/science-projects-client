@@ -22,8 +22,11 @@ import type { IProgressReport, IMainDoc } from "@/shared/types/document.types";
 // Mock services
 vi.mock("@/shared/services/api/client.service", () => ({
 	apiClient: {
-		post: vi.fn(),
-		put: vi.fn(),
+		post: vi.fn().mockResolvedValue({}),
+		put: vi.fn().mockResolvedValue({}),
+		patch: vi.fn().mockResolvedValue({}),
+		get: vi.fn().mockResolvedValue({}),
+		delete: vi.fn().mockResolvedValue({}),
 	},
 }));
 vi.mock("sonner", () => ({
@@ -127,7 +130,7 @@ describe("Document Save Operations", () => {
 		const mockResponse = { id: 111, year: 2026, project: 456 };
 		vi.mocked(apiClient.apiClient.post).mockResolvedValue(mockResponse);
 
-		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+		const refetchSpy = vi.spyOn(queryClient, "refetchQueries");
 
 		const { result } = renderHook(() => useCreateProgressReport(), { wrapper });
 
@@ -140,9 +143,9 @@ describe("Document Save Operations", () => {
 			expect(result.current.isSuccess).toBe(true);
 		});
 
-		// Verify query invalidation
-		expect(invalidateSpy).toHaveBeenCalledWith({
-			queryKey: ["projects", 456],
+		// Verify query refetch (hook uses refetchQueries, not invalidateQueries)
+		expect(refetchSpy).toHaveBeenCalledWith({
+			queryKey: ["projects", "detail", 456],
 		});
 
 		console.log("✓ Query invalidation triggers after save");

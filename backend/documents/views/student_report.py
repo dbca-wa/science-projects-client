@@ -128,7 +128,7 @@ class StudentReportDetail(APIView):
         )
 
     def delete(self, request, pk):
-        """Delete student report"""
+        """Delete student report and revert project status"""
         try:
             student_report = StudentReport.objects.get(pk=pk)
         except StudentReport.DoesNotExist:
@@ -136,7 +136,10 @@ class StudentReportDetail(APIView):
 
         settings.LOGGER.info(f"{request.user} is deleting {student_report}")
 
-        student_report.delete()
+        # Use DocumentService to handle status rollback
+        from ..services.document_service import DocumentService
+
+        DocumentService.delete_document(student_report.document.pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
 
 

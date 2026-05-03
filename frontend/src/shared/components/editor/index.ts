@@ -10,7 +10,6 @@ export { RichTextDisplay } from "./RichTextDisplay";
 export { FormRichTextEditor } from "./FormRichTextEditor";
 export { InlineSaveEditor } from "./InlineSaveEditor";
 export { WordCounter } from "./WordCounter";
-export { FormUnsavedChangesDialog } from "./FormUnsavedChangesDialog";
 
 // Types
 export type {

@@ -1,4 +1,4 @@
-import { makeObservable, action } from "mobx";
+import { makeObservable, action, observable } from "mobx";
 import { logger } from "@/shared/services/logger.service";
 import { BaseStore, type BaseStoreState } from "../base.store";
 import type { LexicalEditor } from "lexical";
@@ -75,6 +75,8 @@ export type TextAlignment = "left" | "center" | "right" | "justify";
 export class EditorStore extends BaseStore<EditorStoreState> {
 	private lexicalEditor: LexicalEditor | null = null;
 	private unregisterListeners: (() => void)[] = [];
+	/** Unique key identifying the currently active editor instance */
+	activeEditorKey: string | null = null;
 
 	constructor() {
 		super({
@@ -105,6 +107,8 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 		});
 
 		makeObservable(this, {
+			// Active editor tracking
+			activeEditorKey: observable,
 			// InlineSaveEditor actions
 			openEditor: action,
 			closeEditor: action,
@@ -277,13 +281,31 @@ export class EditorStore extends BaseStore<EditorStoreState> {
 	}
 
 	/**
-	 * Initialise Lexical editor and register command listeners
+	 * Initialise or switch to a Lexical editor instance.
+	 * When multiple editors exist on a page, this is called on focus
+	 * to make the focused editor the active one for toolbar commands.
+	 * Listeners are only registered once per editor instance.
 	 */
-	initLexicalEditor = (editor: LexicalEditor) => {
+	initLexicalEditor = (editor: LexicalEditor, editorKey?: string) => {
+		// Same editor — just refresh formatting state, don't re-register listeners
+		if (this.lexicalEditor === editor) {
+			this.activeEditorKey = editorKey ?? this.activeEditorKey;
+			this.updateFormattingState();
+			return;
+		}
+
+		// Different editor — clean up old listeners before switching
+		if (this.lexicalEditor) {
+			for (const unregister of this.unregisterListeners) {
+				unregister();
+			}
+			this.unregisterListeners = [];
+		}
+
 		this.lexicalEditor = editor;
+		this.activeEditorKey = editorKey ?? null;
 
 		// Register update listener to track ALL editor state changes
-		// This fires on format toggles, selection changes, content changes, etc.
 		const removeUpdateListener = editor.registerUpdateListener(
 			({ editorState: _editorState }) => {
 				this.updateFormattingState();

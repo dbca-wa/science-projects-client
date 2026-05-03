@@ -13,7 +13,7 @@ export const PROJECT_ENDPOINTS = {
 
 	// External project details
 	EXTERNAL_DETAIL: (id: number | string) =>
-		`documents/external_project_details/${id}`,
+		`projects/external_project_details/${id}`,
 
 	// Concept plans
 	CONCEPT_PLAN: (id: number | string) => `documents/conceptplans/${id}`,
@@ -31,6 +31,9 @@ export const PROJECT_ENDPOINTS = {
 
 	// Project closures
 	PROJECT_CLOSURE: (id: number | string) => `documents/projectclosures/${id}`,
+
+	// Drafts
+	DRAFT_DETAIL: (kind: string) => `projects/drafts/${kind}`,
 
 	// Methodology image
 	METHODOLOGY_IMAGE_LIST: "medias/methodology_photos",

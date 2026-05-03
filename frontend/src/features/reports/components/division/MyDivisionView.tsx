@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
 import { Loader2, RefreshCw, CheckSquare, Building, Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
@@ -224,6 +225,7 @@ const ARActionCards = ({
 	year: number;
 	divisionName: string;
 }) => {
+	const navigate = useNavigate();
 	const [arAction, setARAction] = useState<ARActionId | null>(null);
 
 	const fyString = `FY ${String(year - 1).slice(2)}-${String(year).slice(2)}`;
@@ -233,7 +235,7 @@ const ARActionCards = ({
 			<button
 				type="button"
 				className="action-card action-card-primary flex w-full flex-col items-center text-center p-6 sm:flex-row sm:items-center sm:text-left sm:gap-5 sm:p-6 md:py-12"
-				onClick={() => setARAction("new-cycle")}
+				onClick={() => navigate("/manage/new-cycle")}
 			>
 				<div className="rounded-full bg-blue-50 dark:bg-blue-950/50 p-3 mb-3 sm:mb-0 shrink-0">
 					<RefreshCw className="size-7 text-blue-600 dark:text-blue-400" />

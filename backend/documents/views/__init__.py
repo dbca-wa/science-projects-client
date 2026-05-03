@@ -10,6 +10,7 @@ from .admin import (
     DocumentSpawner,
     FinalDocApproval,
     GetPreviousReportsData,
+    NewCycleEmailPreview,
     NewCycleOpenPreview,
     ProjectDocsPendingMyActionAllStages,
     ReopenProject,
@@ -83,6 +84,8 @@ from .pdf import (
     CancelReportDocGeneration,
     DownloadAnnualReport,
     DownloadProjectDocument,
+    TestPDFGeneration,
+    TestPDFGenerationAll,
 )
 
 # Progress report views
@@ -94,7 +97,7 @@ from .progress_report import (
 )
 
 # Project plan views
-from .project_plan import ProjectPlanDetail, ProjectPlans
+from .project_plan import CreateProjectPlanFromConcept, ProjectPlanDetail, ProjectPlans
 
 # Student report views
 from .student_report import (
@@ -121,6 +124,8 @@ __all__ = [
     "DownloadAnnualReport",
     "BeginAnnualReportDocGeneration",
     "CancelReportDocGeneration",
+    "TestPDFGeneration",
+    "TestPDFGenerationAll",
     # Concept plan
     "ConceptPlans",
     "ConceptPlanDetail",
@@ -128,6 +133,7 @@ __all__ = [
     # Project plan
     "ProjectPlans",
     "ProjectPlanDetail",
+    "CreateProjectPlanFromConcept",
     # Progress report
     "ProgressReports",
     "ProgressReportDetail",
@@ -159,6 +165,7 @@ __all__ = [
     "BatchApproveCurrent",
     "BatchApproveCurrentPreview",
     "NewCycleOpenPreview",
+    "NewCycleEmailPreview",
     "FinalDocApproval",
     # Annual report
     "Reports",

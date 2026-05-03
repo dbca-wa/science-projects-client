@@ -22,7 +22,10 @@ interface ProjectKeywordsProps {
  * - 3 columns (xl): max 9 items
  * - 4 columns (2xl): max 12 items
  */
-export function ProjectKeywords({ keywords, className }: ProjectKeywordsProps) {
+export const ProjectKeywords = ({
+	keywords,
+	className,
+}: ProjectKeywordsProps) => {
 	const [showAll, setShowAll] = useState(false);
 	const { width } = useWindowSize();
 
@@ -77,10 +80,13 @@ export function ProjectKeywords({ keywords, className }: ProjectKeywordsProps) {
 			</div>
 			{hasMore && (
 				<Button
-					variant="ghost"
+					variant="outline"
 					size="sm"
-					onClick={() => setShowAll(!effectiveShowAll)}
-					className="self-start"
+					onClick={(e) => {
+						e.stopPropagation();
+						setShowAll(!effectiveShowAll);
+					}}
+					className="self-start text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/30"
 				>
 					{effectiveShowAll
 						? "Show Less"
@@ -89,4 +95,4 @@ export function ProjectKeywords({ keywords, className }: ProjectKeywordsProps) {
 			)}
 		</div>
 	);
-}
+};

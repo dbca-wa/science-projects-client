@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/shared/lib/utils";
 import { buttonVariants } from "./custom/buttonVariants";
@@ -77,10 +78,6 @@ function AlertDialogTrigger({
 	return <button onClick={handleClick}>{children}</button>;
 }
 
-function AlertDialogPortal({ children }: { children: React.ReactNode }) {
-	return <>{children}</>;
-}
-
 function AlertDialogOverlay() {
 	return <div className="fixed inset-0 z-[9998] bg-black/50" />;
 }
@@ -120,8 +117,9 @@ function AlertDialogContent({
 	// Return null when closed - prevents animation flicker
 	if (!open) return null;
 
-	return (
-		<AlertDialogPortal>
+	// Portal to document.body to escape parent stacking contexts (e.g. Sheet)
+	return createPortal(
+		<>
 			<AlertDialogOverlay />
 			<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
 				<div
@@ -140,7 +138,8 @@ function AlertDialogContent({
 					</AlertDialogTitleContext.Provider>
 				</div>
 			</div>
-		</AlertDialogPortal>
+		</>,
+		document.body
 	);
 }
 
@@ -250,7 +249,6 @@ function AlertDialogCancel({
 
 export {
 	AlertDialog,
-	AlertDialogPortal,
 	AlertDialogOverlay,
 	AlertDialogTrigger,
 	AlertDialogContent,

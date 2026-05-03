@@ -77,7 +77,7 @@ StableDescriptionEditor.displayName = "StableDescriptionEditor";
  */
 const BaseInformationStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData.baseInformation;
+	const formData = wizardStore.state.editingFormData.baseInformation;
 	const validation = wizardStore.state.validation[0];
 	const stepIndex = 0;
 

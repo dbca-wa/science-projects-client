@@ -57,6 +57,10 @@ urlpatterns = [
     path("conceptplans/<int:pk>", views.ConceptPlanDetail.as_view()),
     path("projectplans", views.ProjectPlans.as_view()),
     path("projectplans/<int:pk>", views.ProjectPlanDetail.as_view()),
+    path(
+        "create-project-plan/<int:project_pk>",
+        views.CreateProjectPlanFromConcept.as_view(),
+    ),
     path("progressreports", views.ProgressReports.as_view()),
     path("progressreports/<int:pk>", views.ProgressReportDetail.as_view()),
     path("studentreports", views.StudentReports.as_view()),
@@ -98,6 +102,9 @@ urlpatterns = [
         "generate_project_document/<int:pk>", views.BeginProjectDocGeneration.as_view()
     ),
     path("cancel_doc_gen/<int:pk>", views.CancelProjectDocGeneration.as_view()),
+    # Test PDF Generation ========================================================
+    path("test-pdf", views.TestPDFGeneration.as_view()),
+    path("test-pdf-all", views.TestPDFGenerationAll.as_view()),
     # ACTIONS (Sends emails) ========================================================
     path("sendbumpemails", views.SendBumpEmails.as_view()),
     path("sendbumpall", views.SendBumpAll.as_view()),
@@ -108,6 +115,7 @@ urlpatterns = [
     path("batchapprovecurrent", views.BatchApproveCurrent.as_view()),
     path("batchapprovecurrent/preview", views.BatchApproveCurrentPreview.as_view()),
     path("opennewcycle/preview", views.NewCycleOpenPreview.as_view()),
+    path("opennewcycle/email-preview", views.NewCycleEmailPreview.as_view()),
     path("projectclosures/reopen/<int:pk>", views.ReopenProject.as_view()),
     # Actions (Project Docs - Sends emails) ========================================================
     path("notifications/mentions", views.SendMentionNotification.as_view()),

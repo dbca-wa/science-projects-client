@@ -19,7 +19,7 @@ import {
 	Mail,
 } from "lucide-react";
 
-export type ARActionId = "batch-approve" | "batch-approve-old" | "new-cycle";
+export type ARActionId = "batch-approve" | "batch-approve-old";
 
 interface ManageDropdownContentProps {
 	onClose: () => void;
@@ -112,7 +112,7 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				label: "Batch Approve Old Reports",
 			},
 			{
-				actionId: "new-cycle",
+				targetPath: "/manage/new-cycle",
 				icon: <RefreshCw className="size-4" aria-hidden="true" />,
 				label: "Open New Cycle",
 			},

@@ -137,19 +137,25 @@ const Dashboard = observer(() => {
 	const myTasksCount = documentTasksCount;
 	const myProjectsCount = filteredProjects.length;
 
-	// Admin tasks count should include caretaker requests + project deletions + endorsements
+	// Admin tasks count should include caretaker requests + project deletions + merge requests + endorsements
 	const caretakerTasksCount = adminTasks.filter(
 		(task) => task.action === "setcaretaker"
 	).length;
 	const projectDeletionTasksCount = adminTasks.filter(
 		(task) => task.action === "deleteproject"
 	).length;
+	const mergeUserTasksCount = adminTasks.filter(
+		(task) => task.action === "mergeuser"
+	).length;
 	const endorsementTasksCount =
 		(endorsementTasks?.aec?.length || 0) +
 		(endorsementTasks?.bm?.length || 0) +
 		(endorsementTasks?.hc?.length || 0);
 	const adminTasksCount =
-		caretakerTasksCount + projectDeletionTasksCount + endorsementTasksCount;
+		caretakerTasksCount +
+		projectDeletionTasksCount +
+		mergeUserTasksCount +
+		endorsementTasksCount;
 
 	const handleProjectClick = (projectId: number, event: React.MouseEvent) => {
 		const url = `/projects/${projectId}/overview`;

@@ -81,6 +81,18 @@ class CreateProgressReport(APIView):
             year=year,
         )
 
+        # Set project status to "updating" (update requested)
+        from projects.models import Project
+
+        project = Project.objects.get(pk=project_id)
+        if project.status not in (
+            Project.StatusChoices.SUSPENDED,
+            Project.StatusChoices.COMPLETED,
+            Project.StatusChoices.TERMINATED,
+        ):
+            project.status = Project.StatusChoices.UPDATING
+            project.save()
+
         settings.LOGGER.info(
             f"{request.user} created progress report {progress_report.id} for project {project_id}"
         )
@@ -151,6 +163,18 @@ class CreateStudentReport(APIView):
             project_id=project_id,
             year=year,
         )
+
+        # Set project status to "updating" (update requested)
+        from projects.models import Project
+
+        project = Project.objects.get(pk=project_id)
+        if project.status not in (
+            Project.StatusChoices.SUSPENDED,
+            Project.StatusChoices.COMPLETED,
+            Project.StatusChoices.TERMINATED,
+        ):
+            project.status = Project.StatusChoices.UPDATING
+            project.save()
 
         settings.LOGGER.info(
             f"{request.user} created student report {student_report.id} for project {project_id}"

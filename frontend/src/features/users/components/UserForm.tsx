@@ -152,18 +152,6 @@ const CreateForm = ({
 		},
 	});
 
-	// Warn user about unsaved changes
-	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (form.formState.isDirty && !form.formState.isSubmitting) {
-				e.preventDefault();
-			}
-		};
-
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [form.formState.isDirty, form.formState.isSubmitting]);
-
 	const onSubmit = async (data: UserCreateFormData) => {
 		try {
 			// Sanitise form data before submission
@@ -302,18 +290,6 @@ const EditForm = ({
 			image: null,
 		},
 	});
-
-	// Warn user about unsaved changes
-	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (form.formState.isDirty && !form.formState.isSubmitting) {
-				e.preventDefault();
-			}
-		};
-
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [form.formState.isDirty, form.formState.isSubmitting]);
 
 	// Pre-populate form when user data loads
 	useEffect(() => {

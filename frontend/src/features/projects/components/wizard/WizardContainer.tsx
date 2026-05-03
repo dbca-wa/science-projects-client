@@ -49,6 +49,8 @@ export const WizardContainer = observer(
 			if (wizardStore.isLastStep) {
 				handleSubmit();
 			} else {
+				// Commit editing state to saved state before advancing
+				wizardStore.commitStep();
 				wizardStore.nextStep();
 				// Scroll to top so the user sees the new step from the beginning
 				window.scrollTo({ top: 0, behavior: "smooth" });
@@ -67,11 +69,15 @@ export const WizardContainer = observer(
 				return;
 			}
 
+			// Commit the final step before submission
+			wizardStore.commitStep();
+
 			wizardStore.setSubmitting(true);
 			const loadingToastId = toast.loading("Creating project...");
 
 			try {
-				const formData = wizardStore.state.formData;
+				// Use savedFormData as the source of truth for project creation
+				const formData = wizardStore.state.savedFormData;
 				const currentYear = new Date().getFullYear();
 
 				const submissionData: WizardSubmissionData = {
@@ -100,8 +106,8 @@ export const WizardContainer = observer(
 					creator: currentUser.id,
 					year: currentYear,
 
-					// Team members
-					teamMembers: wizardStore.state.teamMembers,
+					// Team members (from saved layer)
+					teamMembers: wizardStore.state.savedTeamMembers,
 
 					// Student details
 					organisation: formData.studentDetails?.organisation,
@@ -170,9 +176,9 @@ export const WizardContainer = observer(
 						}
 						previewPanel={
 							<WizardPreviewPanel
-								formData={wizardStore.state.formData}
+								formData={wizardStore.state.editingFormData}
 								projectKind={wizardStore.state.projectKind}
-								teamMembers={wizardStore.state.teamMembers}
+								teamMembers={wizardStore.state.editingTeamMembers}
 							/>
 						}
 						showPreview={wizardStore.state.showPreview}

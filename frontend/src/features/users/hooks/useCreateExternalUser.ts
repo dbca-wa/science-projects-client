@@ -31,9 +31,9 @@ const createExternalUser = async (
 	return apiClient.post<IUserData>(USER_ENDPOINTS.CREATE, {
 		username,
 		email: data.email,
-		firstName,
-		lastName,
-		isStaff: false,
+		first_name: firstName,
+		last_name: lastName,
+		is_staff: false,
 		affiliation: data.affiliation || null,
 	});
 };

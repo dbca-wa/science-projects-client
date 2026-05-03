@@ -195,7 +195,7 @@ class ProjectPlanDetail(APIView):
         )
 
     def delete(self, request, pk):
-        """Delete project plan"""
+        """Delete project plan and revert project status"""
         settings.LOGGER.info(
             f"{request.user} is deleting project plan details for {pk}"
         )
@@ -205,5 +205,75 @@ class ProjectPlanDetail(APIView):
         except ProjectPlan.DoesNotExist:
             raise NotFound
 
-        project_plan.delete()
+        # Use DocumentService to handle status rollback
+        from ..services.document_service import DocumentService
+
+        DocumentService.delete_document(project_plan.document.pk, request.user)
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class CreateProjectPlanFromConcept(APIView):
+    """
+    Create a project plan (with document and endorsement) for a project
+    whose concept plan has been approved.
+
+    This is the manual trigger for when the auto-creation didn't happen
+    or the project plan was deleted and needs to be recreated.
+
+    POST /documents/create-project-plan/<project_pk>
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, project_pk):
+        from projects.models import Project
+
+        from ..models import ProjectDocument
+        from ..services.approval_service import ApprovalService
+
+        settings.LOGGER.info(
+            f"{request.user} is manually creating project plan for project {project_pk}"
+        )
+
+        # Get the project
+        try:
+            project = Project.objects.get(pk=project_pk)
+        except Project.DoesNotExist:
+            return Response({"error": "Project not found"}, status=HTTP_400_BAD_REQUEST)
+
+        # Check if a project plan already exists
+        existing = ProjectDocument.objects.filter(
+            project=project,
+            kind="projectplan",
+        ).exists()
+        if existing:
+            return Response(
+                {"error": "A project plan already exists for this project"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        # Get the concept plan document to pass to the helper
+        concept_doc = ProjectDocument.objects.filter(
+            project=project,
+            kind="concept",
+        ).first()
+
+        if not concept_doc:
+            return Response(
+                {"error": "No concept plan found for this project"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            ApprovalService._create_project_plan_from_concept(concept_doc, request.user)
+        except Exception as e:
+            settings.LOGGER.error(f"Failed to create project plan: {e}", exc_info=True)
+            return Response(
+                {"error": "Failed to create project plan"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"message": "Project plan created successfully"},
+            status=HTTP_201_CREATED,
+        )

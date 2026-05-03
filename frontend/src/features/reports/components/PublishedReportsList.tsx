@@ -302,21 +302,32 @@ export const PublishedReportsList = observer(function PublishedReportsList({
 				</div>
 			</div>
 
-			<Tabs
-				value={selectedTab}
-				onValueChange={(value) => {
-					const routes: Record<string, string> = {
-						official: "/reports",
-						drafts: "/reports/drafts",
-						legacy: "/reports/legacy",
-					};
-					void navigate(routes[value] ?? "/reports");
-				}}
-			>
+			<Tabs value={selectedTab}>
 				<TabsList className="w-full justify-start">
-					<TabsTrigger value="official">Official</TabsTrigger>
-					<TabsTrigger value="drafts">Drafts</TabsTrigger>
-					<TabsTrigger value="legacy">Legacy</TabsTrigger>
+					<TabsTrigger
+						value="official"
+						onClick={() => {
+							if (selectedTab !== "official") navigate("/reports");
+						}}
+					>
+						Official
+					</TabsTrigger>
+					<TabsTrigger
+						value="drafts"
+						onClick={() => {
+							if (selectedTab !== "drafts") navigate("/reports/drafts");
+						}}
+					>
+						Drafts
+					</TabsTrigger>
+					<TabsTrigger
+						value="legacy"
+						onClick={() => {
+							if (selectedTab !== "legacy") navigate("/reports/legacy");
+						}}
+					>
+						Legacy
+					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="official">

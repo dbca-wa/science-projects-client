@@ -191,7 +191,14 @@ interface NewCyclePreviewResponse {
 		project_leads: RecipientUser[];
 		team_members: RecipientUser[];
 	};
+	not_in_it_assets: {
+		ba_leads: RecipientUser[];
+		project_leads: RecipientUser[];
+		team_members: RecipientUser[];
+	};
 	total_recipients: number;
+	total_not_in_it_assets: number;
+	it_assets_available: boolean;
 }
 
 /** Fetch recipient preview for the approve-all modal */
@@ -223,5 +230,32 @@ export const useNewCyclePreview = (enabled = false, division?: string) => {
 		queryFn: () => apiClient.get<NewCyclePreviewResponse>(endpoint),
 		enabled,
 		staleTime: 30_000,
+	});
+};
+
+interface EmailPreviewResponse {
+	html: string;
+}
+
+/** Fetch a rendered email preview for the new cycle announcement */
+export const useNewCycleEmailPreview = (
+	enabled: boolean,
+	customMessage: string,
+	divisionName: string
+) => {
+	return useQuery({
+		queryKey: ["new-cycle", "email-preview", divisionName],
+		queryFn: () =>
+			apiClient.post<EmailPreviewResponse>(
+				DOCUMENT_ENDPOINTS.NEW_CYCLE_EMAIL_PREVIEW,
+				{
+					custom_message: customMessage || undefined,
+					recipient_name: "Recipient Name",
+					division_name: divisionName,
+					financial_year_string: "2025-2026",
+				}
+			),
+		enabled,
+		staleTime: 5 * 60_000, // 5 minutes — template only changes on deploy
 	});
 };

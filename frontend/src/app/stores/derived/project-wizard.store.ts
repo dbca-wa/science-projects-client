@@ -53,6 +53,17 @@ export interface IWizardTeamMember {
 }
 
 /**
+ * Combined form data structure used by both editing and saved state layers.
+ */
+export interface IWizardFormData {
+	baseInformation: IBaseInformationData;
+	projectDetails: IProjectDetailsData;
+	location: ILocationData;
+	externalDetails: IExternalDetailsData | null;
+	studentDetails: IStudentDetailsData | null;
+}
+
+/**
  * Validation state for a step
  */
 export interface IStepValidation {
@@ -61,7 +72,69 @@ export interface IStepValidation {
 }
 
 /**
- * Wizard state interface
+ * Serialise form data for comparison, skipping File objects which
+ * cannot be meaningfully compared via JSON.stringify.
+ */
+function serialiseFormDataForComparison(formData: IWizardFormData): string {
+	return JSON.stringify(formData, (_key, value) => {
+		if (value instanceof File) {
+			return undefined;
+		}
+		return value;
+	});
+}
+
+/**
+ * Create a deep copy of form data. Uses structuredClone for value types,
+ * but preserves File references (they cannot be cloned).
+ */
+function deepCopyFormData(source: IWizardFormData): IWizardFormData {
+	const imageRef = source.baseInformation.image;
+	const cloned: IWizardFormData = {
+		baseInformation: {
+			...source.baseInformation,
+			keywords: [...source.baseInformation.keywords],
+			image: null,
+		},
+		projectDetails: { ...source.projectDetails },
+		location: { areas: [...source.location.areas] },
+		externalDetails: source.externalDetails
+			? { ...source.externalDetails }
+			: null,
+		studentDetails: source.studentDetails ? { ...source.studentDetails } : null,
+	};
+	// Preserve the File reference (Files are not cloneable)
+	cloned.baseInformation.image = imageRef;
+	return cloned;
+}
+
+/** Default empty form data used for initialisation and resets. */
+function createDefaultFormData(): IWizardFormData {
+	return {
+		baseInformation: {
+			title: "",
+			description: "",
+			keywords: [],
+			image: null,
+		},
+		projectDetails: {
+			start_date: null,
+			end_date: null,
+			business_area: null,
+			departmental_service: null,
+			project_leader: null,
+			data_custodian: null,
+		},
+		location: {
+			areas: [],
+		},
+		externalDetails: null,
+		studentDetails: null,
+	};
+}
+
+/**
+ * Wizard state interface — split into editing (transient) and saved (committed) layers.
  */
 interface ProjectWizardStoreState extends BaseStoreState {
 	currentStep: number;
@@ -69,14 +142,10 @@ interface ProjectWizardStoreState extends BaseStoreState {
 	completedSteps: Set<number>;
 	touchedSteps: Set<number>;
 	touchedFields: Set<string>;
-	formData: {
-		baseInformation: IBaseInformationData;
-		projectDetails: IProjectDetailsData;
-		location: ILocationData;
-		externalDetails: IExternalDetailsData | null;
-		studentDetails: IStudentDetailsData | null;
-	};
-	teamMembers: IWizardTeamMember[];
+	editingFormData: IWizardFormData;
+	savedFormData: IWizardFormData;
+	editingTeamMembers: IWizardTeamMember[];
+	savedTeamMembers: IWizardTeamMember[];
 	validation: Record<number, IStepValidation>;
 	isSubmitting: boolean;
 	showPreview: boolean;
@@ -84,7 +153,9 @@ interface ProjectWizardStoreState extends BaseStoreState {
 
 /**
  * ProjectWizardStore manages the state for the multi-step project creation wizard.
- * Uses MobX for client-side state management.
+ * Uses MobX for client-side state management with a split state pattern:
+ * - editingFormData / editingTeamMembers: transient, updates on every keystroke
+ * - savedFormData / savedTeamMembers: committed, updates only on explicit save
  */
 export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	constructor() {
@@ -94,28 +165,10 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			completedSteps: new Set<number>(),
 			touchedSteps: new Set<number>(),
 			touchedFields: new Set<string>(),
-			formData: {
-				baseInformation: {
-					title: "",
-					description: "",
-					keywords: [],
-					image: null,
-				},
-				projectDetails: {
-					start_date: null,
-					end_date: null,
-					business_area: null,
-					departmental_service: null,
-					project_leader: null,
-					data_custodian: null,
-				},
-				location: {
-					areas: [],
-				},
-				externalDetails: null,
-				studentDetails: null,
-			},
-			teamMembers: [],
+			editingFormData: createDefaultFormData(),
+			savedFormData: createDefaultFormData(),
+			editingTeamMembers: [],
+			savedTeamMembers: [],
 			validation: {},
 			isSubmitting: false,
 			showPreview: false,
@@ -153,6 +206,8 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			reorderTeamMembers: action,
 			updateTeamMemberRole: action,
 			syncLeaderToTeam: action,
+			commitStep: action,
+			loadStepForEditing: action,
 			reset: action,
 
 			// Computed
@@ -164,6 +219,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 			isCurrentStepValid: computed,
 			progressPercentage: computed,
 			totalSteps: computed,
+			isDirty: computed,
 		});
 	}
 
@@ -192,11 +248,12 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
-	 * Navigate to the next step
+	 * Navigate to the next step. Commits editing state before advancing.
 	 */
 	goToNextStep = () => {
 		if (this.canGoToNextStep) {
 			this.markStepCompleted(this.state.currentStep);
+			this.commitStep();
 			this.state.currentStep += 1;
 			logger.debug("Navigated to next step", {
 				currentStep: this.state.currentStep,
@@ -245,152 +302,165 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
-	 * Reset the wizard to initial state
+	 * Commit editing state to saved state (deep copy).
+	 * Called on "Save and Continue" before advancing to the next step.
+	 * Persists the committed state to localStorage for draft recovery.
+	 */
+	commitStep = () => {
+		this.state.savedFormData = deepCopyFormData(this.state.editingFormData);
+		this.state.savedTeamMembers = this.state.editingTeamMembers.map((tm) => ({
+			...tm,
+		}));
+		logger.debug("Committed editing state to saved state");
+	};
+
+	/**
+	 * Load saved state into editing state for the given step (deep copy).
+	 * Called when navigating to a step to populate the editing layer.
+	 */
+	loadStepForEditing = (_stepIndex: number) => {
+		this.state.editingFormData = deepCopyFormData(this.state.savedFormData);
+		this.state.editingTeamMembers = this.state.savedTeamMembers.map((tm) => ({
+			...tm,
+		}));
+		logger.debug("Loaded saved state into editing state", { _stepIndex });
+	};
+
+	/**
+	 * Reset the wizard to initial state.
+	 * Clears both editing and saved layers, all tracking sets, and projectKind.
 	 */
 	resetWizard = () => {
 		this.state.currentStep = 0;
+		this.state.projectKind = null;
 		this.state.completedSteps.clear();
 		this.state.touchedSteps.clear();
 		this.state.touchedFields.clear();
-		this.state.formData = {
-			baseInformation: {
-				title: "",
-				description: "",
-				keywords: [],
-				image: null,
-			},
-			projectDetails: {
-				start_date: null,
-				end_date: null,
-				business_area: null,
-				departmental_service: null,
-				project_leader: null,
-				data_custodian: null,
-			},
-			location: {
-				areas: [],
-			},
-			externalDetails: null,
-			studentDetails: null,
-		};
+		this.state.editingFormData = createDefaultFormData();
+		this.state.savedFormData = createDefaultFormData();
+		this.state.editingTeamMembers = [];
+		this.state.savedTeamMembers = [];
 		this.state.validation = {};
-		this.state.teamMembers = [];
 		this.state.isSubmitting = false;
 		this.state.showPreview = false;
 		logger.info("Wizard reset to initial state");
 	};
 
 	/**
-	 * Set base information form data
+	 * Set base information form data (updates editing layer)
 	 */
 	setBaseInformation = (data: Partial<IBaseInformationData>) => {
-		this.state.formData.baseInformation = {
-			...this.state.formData.baseInformation,
+		this.state.editingFormData.baseInformation = {
+			...this.state.editingFormData.baseInformation,
 			...data,
 		};
 		logger.debug("Updated base information", { data });
 	};
 
 	/**
-	 * Set project details form data
+	 * Set project details form data (updates editing layer)
 	 */
 	setProjectDetails = (data: Partial<IProjectDetailsData>) => {
-		this.state.formData.projectDetails = {
-			...this.state.formData.projectDetails,
+		this.state.editingFormData.projectDetails = {
+			...this.state.editingFormData.projectDetails,
 			...data,
 		};
 		logger.debug("Updated project details", { data });
 	};
 
 	/**
-	 * Set location form data
+	 * Set location form data (updates editing layer)
 	 */
 	setLocation = (data: Partial<ILocationData>) => {
-		this.state.formData.location = {
-			...this.state.formData.location,
+		this.state.editingFormData.location = {
+			...this.state.editingFormData.location,
 			...data,
 		};
 		logger.debug("Updated location", { data });
 	};
 
 	/**
-	 * Set external details form data
+	 * Set external details form data (updates editing layer)
 	 */
 	setExternalDetails = (data: Partial<IExternalDetailsData>) => {
-		if (!this.state.formData.externalDetails) {
-			this.state.formData.externalDetails = {
+		if (!this.state.editingFormData.externalDetails) {
+			this.state.editingFormData.externalDetails = {
 				collaboration_with: "",
 				budget: "",
 				external_description: "",
 				aims: "",
 			};
 		}
-		this.state.formData.externalDetails = {
-			...this.state.formData.externalDetails,
+		this.state.editingFormData.externalDetails = {
+			...this.state.editingFormData.externalDetails,
 			...data,
 		};
 		logger.debug("Updated external details", { data });
 	};
 
 	/**
-	 * Set student details form data
+	 * Set student details form data (updates editing layer)
 	 */
 	setStudentDetails = (data: Partial<IStudentDetailsData>) => {
-		if (!this.state.formData.studentDetails) {
-			this.state.formData.studentDetails = {
+		if (!this.state.editingFormData.studentDetails) {
+			this.state.editingFormData.studentDetails = {
 				organisation: "",
 				level: "",
 			};
 		}
-		this.state.formData.studentDetails = {
-			...this.state.formData.studentDetails,
+		this.state.editingFormData.studentDetails = {
+			...this.state.editingFormData.studentDetails,
 			...data,
 		};
 		logger.debug("Updated student details", { data });
 	};
 
 	/**
-	 * Add a team member to the wizard's team list.
+	 * Add a team member to the wizard's team list (editing layer).
 	 * Silently prevents duplicates (same userId).
 	 */
 	addTeamMember = (member: IWizardTeamMember) => {
-		const exists = this.state.teamMembers.some(
+		const exists = this.state.editingTeamMembers.some(
 			(tm) => tm.userId === member.userId
 		);
 		if (exists) return;
 
-		this.state.teamMembers = [
-			...this.state.teamMembers,
+		this.state.editingTeamMembers = [
+			...this.state.editingTeamMembers,
 			{
 				...member,
-				position: this.state.teamMembers.length,
+				position: this.state.editingTeamMembers.length,
 				isStaff: member.isStaff ?? false,
 				timeAllocation: member.timeAllocation ?? (member.isStaff ? 1.0 : 0.0),
 			},
 		];
 		logger.debug("Added team member", { userId: member.userId });
+		this.revalidateAllStepsFromData();
 	};
 
 	/**
-	 * Remove a team member from the wizard's team list.
+	 * Remove a team member from the wizard's team list (editing layer).
 	 * The project leader cannot be removed.
 	 */
 	removeTeamMember = (userId: number) => {
-		const member = this.state.teamMembers.find((tm) => tm.userId === userId);
+		const member = this.state.editingTeamMembers.find(
+			(tm) => tm.userId === userId
+		);
 		if (!member || member.isLeader) return;
 
-		this.state.teamMembers = this.state.teamMembers
+		this.state.editingTeamMembers = this.state.editingTeamMembers
 			.filter((tm) => tm.userId !== userId)
 			.map((tm, index) => ({ ...tm, position: index }));
 		logger.debug("Removed team member", { userId });
+		this.revalidateAllStepsFromData();
 	};
 
 	/**
-	 * Reorder team members via drag-and-drop.
+	 * Reorder team members via drag-and-drop (editing layer).
 	 * The leader is always pinned at position 0.
 	 */
 	reorderTeamMembers = (fromIndex: number, toIndex: number) => {
-		const members = [...this.state.teamMembers];
+		const members = [...this.state.editingTeamMembers];
 		const draggedMember = members[fromIndex];
 
 		// Prevent moving the leader away from position 0
@@ -401,7 +471,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		const [moved] = members.splice(fromIndex, 1);
 		members.splice(toIndex, 0, moved);
 
-		this.state.teamMembers = members.map((tm, index) => ({
+		this.state.editingTeamMembers = members.map((tm, index) => ({
 			...tm,
 			position: index,
 		}));
@@ -409,33 +479,34 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
-	 * Update the role of a team member.
+	 * Update the role of a team member (editing layer).
 	 */
 	updateTeamMemberRole = (userId: number, role: string) => {
-		this.state.teamMembers = this.state.teamMembers.map((tm) =>
+		this.state.editingTeamMembers = this.state.editingTeamMembers.map((tm) =>
 			tm.userId === userId ? { ...tm, role } : tm
 		);
 		logger.debug("Updated team member role", { userId, role });
+		this.revalidateAllStepsFromData();
 	};
 
 	/**
-	 * Synchronise the project leader into the team members list.
+	 * Synchronise the project leader into the team members list (editing layer).
 	 * Called when project_leader changes in the form data.
 	 * If the leader changes, the old leader entry is demoted and the new one is added/promoted.
 	 */
 	syncLeaderToTeam = () => {
-		const leaderId = this.state.formData.projectDetails.project_leader;
+		const leaderId = this.state.editingFormData.projectDetails.project_leader;
 
 		if (!leaderId) {
 			// No leader selected — remove the old leader from the team entirely
-			this.state.teamMembers = this.state.teamMembers
+			this.state.editingTeamMembers = this.state.editingTeamMembers
 				.filter((tm) => !tm.isLeader)
 				.map((tm, index) => ({ ...tm, position: index }));
 			return;
 		}
 
 		// Demote the old leader(s) to regular members
-		const demoted = this.state.teamMembers.map((tm) =>
+		const demoted = this.state.editingTeamMembers.map((tm) =>
 			tm.isLeader ? { ...tm, isLeader: false } : tm
 		);
 
@@ -465,7 +536,7 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		}
 
 		// Recalculate positions
-		this.state.teamMembers = demoted.map((tm, index) => ({
+		this.state.editingTeamMembers = demoted.map((tm, index) => ({
 			...tm,
 			position: index,
 		}));
@@ -512,13 +583,13 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
-	 * Re-validate all steps from stored form data.
+	 * Re-validate all steps from editing form data.
 	 * Called after draft restoration to set validation state for steps
 	 * whose components haven't mounted yet. Returns the index of the
 	 * first invalid step, or -1 if all are valid.
 	 */
 	revalidateAllStepsFromData = (): number => {
-		const formData = this.state.formData;
+		const formData = this.state.editingFormData;
 
 		// Step 0: Base Information
 		const step0Errors: Record<string, string> = {};
@@ -553,6 +624,23 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 		if (!formData.projectDetails.data_custodian) {
 			step1Errors.data_custodian = "Data custodian is required";
 		}
+
+		// Team member requirements based on project kind
+		const teamMembers = this.state.editingTeamMembers;
+		if (this.state.projectKind === "student") {
+			const hasStudent = teamMembers.some((m) => m.role === "student");
+			if (!hasStudent) {
+				step1Errors.team_student =
+					"Student projects require at least one team member with the Supervised Student role";
+			}
+		} else if (this.state.projectKind === "external") {
+			const hasExternal = teamMembers.some((m) => !m.isStaff && !m.isLeader);
+			if (!hasExternal) {
+				step1Errors.team_external =
+					"External projects require at least one external team member";
+			}
+		}
+
 		this.state.validation[1] = {
 			isValid: Object.keys(step1Errors).length === 0,
 			errors: step1Errors,
@@ -596,29 +684,38 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	};
 
 	/**
-	 * Set the project kind
+	 * Set the project kind. Initialises conditional sections on BOTH
+	 * editing and saved form data layers.
 	 */
 	setProjectKind = (kind: ProjectKind) => {
 		this.state.projectKind = kind;
 
 		// Initialise conditional form data based on project kind
 		if (kind === "external") {
-			this.state.formData.externalDetails = {
+			const externalDefaults: IExternalDetailsData = {
 				collaboration_with: "",
 				budget: "",
 				external_description: "",
 				aims: "",
 			};
-			this.state.formData.studentDetails = null;
+			this.state.editingFormData.externalDetails = { ...externalDefaults };
+			this.state.editingFormData.studentDetails = null;
+			this.state.savedFormData.externalDetails = { ...externalDefaults };
+			this.state.savedFormData.studentDetails = null;
 		} else if (kind === "student") {
-			this.state.formData.studentDetails = {
+			const studentDefaults: IStudentDetailsData = {
 				organisation: "",
 				level: "",
 			};
-			this.state.formData.externalDetails = null;
+			this.state.editingFormData.studentDetails = { ...studentDefaults };
+			this.state.editingFormData.externalDetails = null;
+			this.state.savedFormData.studentDetails = { ...studentDefaults };
+			this.state.savedFormData.externalDetails = null;
 		} else {
-			this.state.formData.externalDetails = null;
-			this.state.formData.studentDetails = null;
+			this.state.editingFormData.externalDetails = null;
+			this.state.editingFormData.studentDetails = null;
+			this.state.savedFormData.externalDetails = null;
+			this.state.savedFormData.studentDetails = null;
 		}
 
 		logger.info("Set project kind", { kind });
@@ -739,11 +836,30 @@ export class ProjectWizardStore extends BaseStore<ProjectWizardStoreState> {
 	}
 
 	/**
+	 * Whether the editing layer differs from the saved layer.
+	 * Compares form data (excluding File objects) and team members.
+	 */
+	get isDirty(): boolean {
+		const editingFormStr = serialiseFormDataForComparison(
+			this.state.editingFormData
+		);
+		const savedFormStr = serialiseFormDataForComparison(
+			this.state.savedFormData
+		);
+
+		if (editingFormStr !== savedFormStr) return true;
+
+		const editingTeamStr = JSON.stringify(this.state.editingTeamMembers);
+		const savedTeamStr = JSON.stringify(this.state.savedTeamMembers);
+
+		return editingTeamStr !== savedTeamStr;
+	}
+
+	/**
 	 * Reset store to initial state
 	 */
 	reset() {
 		this.resetWizard();
-		this.state.projectKind = null;
 		this.state.loading = false;
 		this.state.error = null;
 		this.state.initialised = false;

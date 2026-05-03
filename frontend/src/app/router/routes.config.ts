@@ -66,7 +66,7 @@ const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
 const EmailsPage = lazy(() => import("@/pages/admin/EmailsPage"));
-const EmailTestingPage = lazy(() => import("@/pages/admin/EmailTestingPage"));
+const AdminTestPage = lazy(() => import("@/pages/admin/AdminTestPage"));
 const NewCyclePage = lazy(() => import("@/pages/admin/NewCyclePage"));
 
 // Pages - Staff Profiles (lazy loaded)
@@ -333,70 +333,10 @@ export const PROJECT_ROUTES: RouteConfig[] = [
 		breadcrumbParent: "/projects/:id/overview",
 	},
 	{
-		name: "Project Overview",
-		path: "/projects/:id/overview",
+		name: "Project Detail",
+		path: "/projects/:id/:tab?",
 		iconKey: "projects",
 		component: ProjectDetailPage,
-		componentProps: { selectedTab: "overview" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Project Concept Plan",
-		path: "/projects/:id/concept",
-		iconKey: "projects",
-		component: ProjectDetailPage,
-		componentProps: { selectedTab: "concept" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Project Plan",
-		path: "/projects/:id/project",
-		iconKey: "projects",
-		component: ProjectDetailPage,
-		componentProps: { selectedTab: "project" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Progress Reports",
-		path: "/projects/:id/progress",
-		iconKey: "projects",
-		component: ProjectDetailPage,
-		componentProps: { selectedTab: "progress" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Student Reports",
-		path: "/projects/:id/student",
-		iconKey: "projects",
-		component: ProjectDetailPage,
-		componentProps: { selectedTab: "student" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Project Closure",
-		path: "/projects/:id/closure",
-		iconKey: "projects",
-		component: ProjectDetailPage,
-		componentProps: { selectedTab: "closure" },
-		requiresAuth: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Edit Project",
-		path: "/projects/:id/edit",
-		iconKey: "projects",
-		component: ProjectDetailPage, // TODO: Create ProjectEditPage
 		requiresAuth: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
@@ -557,9 +497,9 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Email Testing",
-		path: "/manage/email-testing",
-		component: EmailTestingPage,
+		name: "Admin Test Page",
+		path: "/manage/admin-testing",
+		component: AdminTestPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,

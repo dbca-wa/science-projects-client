@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Download, FileText, Trash2, Bell } from "lucide-react";
+import { Download, FileText, Trash2, Bell, Lock } from "lucide-react";
 import { useSendBump } from "@/shared/hooks/queries/useBumpEmails";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type {
@@ -27,6 +27,7 @@ interface DocumentActionsSectionProps {
 	members: IProjectMember[] | null;
 	documentType: DocumentType;
 	canDelete: boolean;
+	locked?: boolean;
 	// Caretaker permissions
 	userIsCaretakerOfAdmin?: boolean;
 	userIsCaretakerOfBaLeader?: boolean;
@@ -46,6 +47,7 @@ interface DocumentActionsSectionProps {
 	onGeneratePdf?: () => void;
 	onDelete?: () => void;
 	// Special action callbacks
+	onCreateConceptPlan?: () => void;
 	onCreateProgressReport?: () => void;
 	onSetAreas?: () => void;
 	onReopenProject?: () => void;
@@ -57,11 +59,11 @@ interface ApprovalStatusRowProps {
 	children?: React.ReactNode;
 }
 
-function ApprovalStatusRow({
+const ApprovalStatusRow = ({
 	label,
 	status,
 	children,
-}: ApprovalStatusRowProps) {
+}: ApprovalStatusRowProps) => {
 	const statusConfig = {
 		granted: {
 			text: "Granted",
@@ -90,14 +92,15 @@ function ApprovalStatusRow({
 			{children && <div className="flex flex-col gap-2">{children}</div>}
 		</div>
 	);
-}
+};
 
-export function DocumentActionsSection({
+export const DocumentActionsSection = ({
 	document,
 	project,
 	members,
 	documentType,
 	canDelete: _canDelete,
+	locked = false,
 	userIsCaretakerOfAdmin,
 	userIsCaretakerOfBaLeader,
 	userIsCaretakerOfProjectLeader,
@@ -113,10 +116,11 @@ export function DocumentActionsSection({
 	onDownloadPdf,
 	onGeneratePdf,
 	onDelete,
+	onCreateConceptPlan,
 	onCreateProgressReport,
 	onSetAreas,
 	onReopenProject,
-}: DocumentActionsSectionProps) {
+}: DocumentActionsSectionProps) => {
 	const { data: currentUser } = useCurrentUser();
 
 	const approvalState = useMemo(() => getApprovalState(document), [document]);
@@ -192,8 +196,9 @@ export function DocumentActionsSection({
 		userIsCaretakerOfProjectLeader,
 	]);
 
-	// Submit: Project lead can submit when approval required
+	// Submit: Project lead can submit when approval required (and not locked)
 	const canSubmit = useMemo(() => {
+		if (locked) return false;
 		const hasPermission =
 			currentUser?.is_superuser ||
 			userIsCaretakerOfAdmin ||
@@ -208,19 +213,22 @@ export function DocumentActionsSection({
 		isProjectLead,
 		isBaLead,
 		approvalState,
+		locked,
 		userIsCaretakerOfAdmin,
 		userIsCaretakerOfBaLeader,
 		userIsCaretakerOfProjectLeader,
 	]);
 
-	// Approve: Current stage approver can approve
+	// Approve: Current stage approver can approve (and not locked)
 	const canApprove = useMemo(() => {
+		if (locked) return false;
 		if (!currentUser || currentStage === "complete") return false;
 		return isUserAtApprovalStage(currentUser, project, currentStage);
-	}, [currentUser, project, currentStage]);
+	}, [currentUser, project, currentStage, locked]);
 
-	// Recall Project Lead: Project lead can recall when BA lead approval is pending
+	// Recall Project Lead: Project lead can recall when BA lead approval is pending (and not locked)
 	const canRecallProjectLeadApproval = useMemo(() => {
+		if (locked) return false;
 		const hasPermission =
 			currentUser?.is_superuser ||
 			userIsCaretakerOfAdmin ||
@@ -239,13 +247,15 @@ export function DocumentActionsSection({
 		isProjectLead,
 		isBaLead,
 		approvalState,
+		locked,
 		userIsCaretakerOfAdmin,
 		userIsCaretakerOfBaLeader,
 		userIsCaretakerOfProjectLeader,
 	]);
 
-	// Recall Business Area: BA lead can recall when directorate approval is pending
+	// Recall Business Area: BA lead can recall when directorate approval is pending (and not locked)
 	const canRecallBusinessAreaApproval = useMemo(() => {
+		if (locked) return false;
 		const hasPermission =
 			currentUser?.is_superuser ||
 			userIsCaretakerOfAdmin ||
@@ -261,12 +271,14 @@ export function DocumentActionsSection({
 		currentUser,
 		isBusinessAreaLead,
 		approvalState,
+		locked,
 		userIsCaretakerOfAdmin,
 		userIsCaretakerOfBaLeader,
 	]);
 
-	// Recall Directorate: Directorate approver can recall after approval
+	// Recall Directorate: Directorate approver can recall after approval (and not locked)
 	const canRecallDirectorateApproval = useMemo(() => {
+		if (locked) return false;
 		const hasPermission =
 			currentUser?.is_superuser ||
 			userIsCaretakerOfAdmin ||
@@ -277,11 +289,13 @@ export function DocumentActionsSection({
 		currentUser,
 		isDirectorateApprover,
 		approvalState,
+		locked,
 		userIsCaretakerOfAdmin,
 	]);
 
-	// Send Back: Approvers at BA lead or directorate stage can send back
+	// Send Back: Approvers at BA lead or directorate stage can send back (and not locked)
 	const canSendBackForRevision = useMemo(() => {
+		if (locked) return false;
 		if (
 			!currentUser ||
 			currentStage === "complete" ||
@@ -289,14 +303,35 @@ export function DocumentActionsSection({
 		)
 			return false;
 		return isUserAtApprovalStage(currentUser, project, currentStage);
-	}, [currentUser, project, currentStage]);
+	}, [currentUser, project, currentStage, locked]);
 
 	const canGeneratePdf = useMemo(() => {
-		if (!currentUser) return false;
-		return currentUser.is_superuser || isProjectLead;
-	}, [currentUser, isProjectLead]);
+		return !!currentUser;
+	}, [currentUser]);
 
 	// Special action button visibility
+	// Create Concept Plan: Show when no concept plan exists for science/core_function projects
+	const canCreateConceptPlan = useMemo(() => {
+		// Only for science and core_function projects
+		if (project.kind === "student" || project.kind === "external") return false;
+		// Only if no concept plan exists
+		if (all_documents?.concept_plan) return false;
+		// Permission check
+		const hasPermission =
+			currentUser?.is_superuser ||
+			userIsCaretakerOfAdmin ||
+			isProjectLead ||
+			userIsCaretakerOfProjectLeader;
+		return !!hasPermission;
+	}, [
+		project.kind,
+		all_documents?.concept_plan,
+		currentUser?.is_superuser,
+		userIsCaretakerOfAdmin,
+		isProjectLead,
+		userIsCaretakerOfProjectLeader,
+	]);
+
 	// Create Progress Report: Show for fully approved project plans with no progress reports
 	const canCreateProgressReport = useMemo(() => {
 		if (documentType !== "projectplan") return false;
@@ -384,8 +419,20 @@ export function DocumentActionsSection({
 					<CardTitle>Actions</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4 pt-0">
+					{/* Locked banner */}
+					{locked && (
+						<div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-3 py-2">
+							<Lock className="size-4 text-gray-500 dark:text-gray-400 shrink-0" />
+							<p className="text-xs text-gray-600 dark:text-gray-400">
+								This document is locked. The project has progressed past this
+								stage.
+							</p>
+						</div>
+					)}
 					{/* Approval Status Section with actions under each stage */}
-					<div className="rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3">
+					<div
+						className={`rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3 ${locked ? "opacity-50 pointer-events-none" : ""}`}
+					>
 						<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
 							Approval Status
 						</h3>
@@ -555,12 +602,27 @@ export function DocumentActionsSection({
 						)}
 
 					{/* Special Action Buttons Section */}
-					{(canCreateProgressReport || canSetAreas || canReopenProject) && (
+					{(canCreateConceptPlan ||
+						canCreateProgressReport ||
+						canSetAreas ||
+						canReopenProject) && (
 						<div className="rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3">
 							<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
 								Special Actions
 							</h3>
 							<div className="space-y-2">
+								{/* Create Concept Plan - Blue */}
+								{canCreateConceptPlan && onCreateConceptPlan && (
+									<Button
+										onClick={onCreateConceptPlan}
+										variant="action-blue"
+										size="sm"
+										className="w-full"
+									>
+										Create Concept Plan
+									</Button>
+								)}
+
 								{/* Create Progress Report - Orange */}
 								{canCreateProgressReport && onCreateProgressReport && (
 									<Button
@@ -659,10 +721,10 @@ export function DocumentActionsSection({
 			</Card>
 		</>
 	);
-}
+};
 
 /** Inline bump button for sending a reminder to the person whose action is required */
-function BumpButton({
+const BumpButton = ({
 	document,
 	project,
 	members,
@@ -672,7 +734,7 @@ function BumpButton({
 	project: IProjectData;
 	members: IProjectMember[] | null;
 	currentStage: string;
-}) {
+}) => {
 	const sendBump = useSendBump();
 
 	const targetUser = useMemo(() => {
@@ -740,4 +802,4 @@ function BumpButton({
 			{sendBump.isPending ? "Sending..." : `Remind ${targetUser.name}`}
 		</Button>
 	);
-}
+};

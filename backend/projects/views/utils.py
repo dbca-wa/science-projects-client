@@ -40,13 +40,18 @@ class SuspendProject(APIView):
         project = ProjectService.get_project(pk)
 
         if suspend:
-            # Suspend the project
+            # Save current status before suspending
             settings.LOGGER.info(f"{request.user} is suspending project: {project}")
+            project.status_before_suspend = project.status
             project.status = Project.StatusChoices.SUSPENDED
         else:
-            # Unsuspend the project
+            # Restore previous status, or fall back to "active" for legacy data
             settings.LOGGER.info(f"{request.user} is unsuspending project: {project}")
-            project.status = Project.StatusChoices.ACTIVE
+            if project.status_before_suspend:
+                project.status = project.status_before_suspend
+            else:
+                project.status = Project.StatusChoices.ACTIVE
+            project.status_before_suspend = None
 
         project.save()
         serializer = TinyProjectSerializer(project)

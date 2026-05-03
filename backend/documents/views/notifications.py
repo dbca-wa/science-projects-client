@@ -343,6 +343,8 @@ class NewCycleOpen(APIView):
         if should_email:
             recipient_groups = request.data.get("recipient_groups")
             excluded_user_ids = request.data.get("excluded_user_ids", [])
+            custom_message = request.data.get("custom_message")
+            custom_messages = request.data.get("custom_messages")
             try:
                 NotificationService.notify_new_cycle_open(
                     last_report=last_report,
@@ -350,6 +352,8 @@ class NewCycleOpen(APIView):
                     division_slug=division_slug,
                     recipient_groups=recipient_groups,
                     excluded_user_ids=excluded_user_ids,
+                    custom_message=custom_message,
+                    custom_messages=custom_messages,
                 )
             except Exception as e:
                 settings.LOGGER.error(f"Email Error: {e}", exc_info=True)

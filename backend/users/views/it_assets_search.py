@@ -53,7 +53,7 @@ class ITAssetsSearch(APIView):
             response = http_requests.get(
                 api_url,
                 auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
-                timeout=15,
+                timeout=6,  # 6 seconds — fail fast
             )
         except http_requests.RequestException as e:
             settings.LOGGER.error(f"IT Assets search failed: {e}")

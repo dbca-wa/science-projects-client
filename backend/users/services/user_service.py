@@ -359,7 +359,11 @@ class UserService:
     @transaction.atomic
     def create_user(data):
         """
-        Create new user
+        Create new user with associated records.
+
+        For staff users (is_staff=True), creates the same associated records
+        as the DBCA middleware: UserWork, UserProfile, UserContact, and
+        PublicStaffProfile. External users only get the base User record.
 
         Args:
             data: User data dict
@@ -369,15 +373,53 @@ class UserService:
         """
         settings.LOGGER.info(f"Creating user: {data.get('username')}")
 
+        first_name = data.get("first_name", "")
+        last_name = data.get("last_name", "")
+        is_staff = data.get("is_staff", False)
+
         user = User.objects.create_user(
             username=data["username"],
             email=data.get("email", ""),
             password=data.get("password", get_random_string(12)),
-            first_name=data.get("first_name", ""),
-            last_name=data.get("last_name", ""),
-            is_staff=data.get("is_staff", False),
+            first_name=first_name,
+            last_name=last_name,
+            display_first_name=first_name,
+            display_last_name=last_name,
+            is_staff=is_staff,
             is_superuser=data.get("is_superuser", False),
         )
+
+        # Staff users need associated records (matching dbca_middleware behaviour)
+        if is_staff:
+            from agencies.models import Agency
+            from contacts.models import UserContact
+            from users.models import PublicStaffProfile, UserProfile, UserWork
+
+            agency_instance = Agency.objects.first()
+            work_kwargs = {"user": user}
+            if agency_instance:
+                work_kwargs["agency"] = agency_instance
+
+            # Set branch and business area if provided
+            branch_id = data.get("branch")
+            business_area_id = data.get("business_area")
+            if branch_id:
+                work_kwargs["branch_id"] = branch_id
+            if business_area_id:
+                work_kwargs["business_area_id"] = business_area_id
+
+            UserWork.objects.create(**work_kwargs)
+            UserProfile.objects.create(user=user)
+            UserContact.objects.create(user=user)
+            PublicStaffProfile.objects.create(
+                user=user,
+                is_hidden=True,
+            )
+
+            settings.LOGGER.info(
+                f"Created associated records (UserWork, UserProfile, UserContact, "
+                f"PublicStaffProfile) for staff user {user.username}"
+            )
 
         return user
 

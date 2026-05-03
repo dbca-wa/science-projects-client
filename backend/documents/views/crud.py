@@ -68,12 +68,12 @@ class ProjectDocuments(APIView):
             from ..services.closure_service import ClosureService
 
             # Create closure with additional data from request
-            project_closure = ClosureService.create_closure(
+            document = ClosureService.create_closure(
                 user=request.user, project=project, data=request.data
             )
 
-            # Serialize and return the document
-            result = ProjectDocumentSerializer(project_closure.document)
+            # ClosureService.create_closure returns the ProjectDocument directly
+            result = ProjectDocumentSerializer(document)
             return Response(result.data, status=HTTP_201_CREATED)
 
         # Delegate to service for other document types

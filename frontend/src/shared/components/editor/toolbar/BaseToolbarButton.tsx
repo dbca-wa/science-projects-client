@@ -41,7 +41,7 @@ export const BaseToolbarButton: React.FC<BaseToolbarButtonProps> = ({
 	const activeClass = isActive
 		? isDark
 			? "bg-gray-200 text-gray-900 hover:bg-gray-300"
-			: "bg-accent"
+			: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
 		: "";
 
 	return (
@@ -53,6 +53,7 @@ export const BaseToolbarButton: React.FC<BaseToolbarButtonProps> = ({
 					size="sm"
 					className={`h-8 w-8 p-0 ${activeClass} ${className}`}
 					onClick={onClick}
+					onMouseDown={(e) => e.preventDefault()}
 					disabled={disabled}
 					aria-label={label}
 					aria-pressed={ariaPressed !== undefined ? ariaPressed : isActive}

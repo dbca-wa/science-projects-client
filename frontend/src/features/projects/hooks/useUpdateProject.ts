@@ -98,7 +98,7 @@ async function updateProject({
 				}
 			}
 			promises.push(
-				apiClient.put(`projects/${id}`, formData, {
+				apiClient.patch(`projects/${id}`, formData, {
 					headers: { "Content-Type": "multipart/form-data" },
 				})
 			);
@@ -108,7 +108,7 @@ async function updateProject({
 			if (typeof payload.image === "string") {
 				delete payload.image;
 			}
-			promises.push(apiClient.put(`projects/${id}`, payload));
+			promises.push(apiClient.patch(`projects/${id}`, payload));
 		}
 	}
 
@@ -129,7 +129,7 @@ async function updateProject({
 	// Update external project details
 	if (Object.keys(externalFields).length > 0 && externalDetailId) {
 		promises.push(
-			apiClient.put(
+			apiClient.patch(
 				`projects/external_project_details/${externalDetailId}`,
 				externalFields
 			)

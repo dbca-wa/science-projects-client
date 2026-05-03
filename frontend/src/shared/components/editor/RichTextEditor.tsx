@@ -5,7 +5,7 @@
  * Supports multiple toolbar configurations, word limits, and React Hook Form integration.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -214,6 +214,8 @@ export const RichTextEditor = React.forwardRef<
 			toolbar === "full" || toolbar === "profile" || toolbar === "staffProfile";
 		const stripBold = toolbar === "projectTitle";
 
+		const editorKey = useId();
+
 		const initialConfig = {
 			namespace: "RichTextEditor",
 			editable: shouldStartEditable, // Start editable if autoFocus or moveCursorToEnd
@@ -253,7 +255,11 @@ export const RichTextEditor = React.forwardRef<
 						>
 							{/* Toolbar - slides with editor content */}
 							{!readOnly && toolbar !== "none" && (
-								<Toolbar mode={toolbar} disabled={disabled} />
+								<Toolbar
+									mode={toolbar}
+									disabled={disabled}
+									editorKey={editorKey}
+								/>
 							)}
 
 							<div className="editor-content-wrapper">
@@ -321,7 +327,7 @@ export const RichTextEditor = React.forwardRef<
 						<ControlledValuePlugin value={value} />
 						{wordLimit && <WordCountPlugin wordLimit={wordLimit} />}
 						{/* EditorStore integration - must come after other plugins */}
-						<EditorStoreIntegrationPlugin />
+						<EditorStoreIntegrationPlugin editorKey={editorKey} />
 					</LinkEditorProvider>
 				</LexicalComposer>
 			</div>

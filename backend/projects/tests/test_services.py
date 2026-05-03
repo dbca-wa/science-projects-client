@@ -171,12 +171,17 @@ class TestProjectService:
 
     @pytest.mark.integration
     def test_suspend_project(self, project, user, db):
-        """Test suspending a project"""
+        """Test suspending a project saves the previous status"""
+        # Arrange
+        project.status = "active"
+        project.save()
+
         # Act
         suspended = ProjectService.suspend_project(project.pk, user)
 
         # Assert
         assert suspended.status == Project.StatusChoices.SUSPENDED
+        assert suspended.status_before_suspend == "active"
 
     @pytest.mark.integration
     def test_get_project_years(self, project, db):

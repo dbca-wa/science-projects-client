@@ -1,17 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { motion } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { WizardContainer } from "@/features/projects/components/wizard/WizardContainer";
 import { useWizardPersistence } from "@/features/projects/hooks/useWizardPersistence";
+import type { DraftSource } from "@/features/projects/hooks/useWizardPersistence";
+import {
+	useDraft,
+	useSaveDraft,
+	useDeleteDraft,
+} from "@/features/projects/hooks/useDraft";
+import { clearAllWizardState } from "@/features/projects/utils/wizard-cleanup.utils";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { PROJECT_KIND_COLORS } from "@/shared/constants/project-colors";
+import { FormPreviewToggle } from "@/shared/components/layout/FormPreviewToggle";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { PageTransition } from "@/shared/components/PageTransition";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { toast } from "sonner";
-import { cn } from "@/shared/lib/utils";
 
 const PROJECT_TYPE_NAMES: Record<ProjectKind, string> = {
 	science: "Science Project",
@@ -24,13 +31,27 @@ const ProjectCreateWizardPage = observer(() => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const wizardStore = useProjectWizardStore();
+	const queryClient = useQueryClient();
 	const projectKind = searchParams.get("kind") as ProjectKind | null;
-	const { clearDraft, restoreDraft } = useWizardPersistence();
+
+	// Server draft hooks
+	const { data: serverDraft, isLoading: isDraftLoading } =
+		useDraft(projectKind);
+	const saveDraftMutation = useSaveDraft(projectKind);
+	const deleteDraftMutation = useDeleteDraft(projectKind);
+
+	// Persistence hook with server integration
+	const { restoreDraft } = useWizardPersistence({
+		serverDraft: serverDraft ?? null,
+		onServerSave: (payload) => saveDraftMutation.mutate(payload),
+		onServerDelete: () => deleteDraftMutation.mutate(),
+	});
 
 	// Gate rendering until draft restoration is complete so that step
 	// components mount with the correct initial values (especially RTEs
 	// which use React.memo and only read initialValue on first mount).
 	const [isReady, setIsReady] = useState(false);
+	const hasRestoredRef = useRef(false);
 
 	// Dynamic document title based on project type
 	const projectTypeName = projectKind
@@ -38,14 +59,19 @@ const ProjectCreateWizardPage = observer(() => {
 		: "Project";
 	useDocumentTitle(`Create ${projectTypeName}`);
 
-	// Initialise wizard store with project kind and restore draft
+	// Initialise wizard store with project kind and restore draft.
+	// Waits for the server draft query to settle before attempting restore.
 	useEffect(() => {
+		if (isDraftLoading) return; // Wait for server draft query to finish
+		if (hasRestoredRef.current) return; // Prevent double-restoration
+
 		if (projectKind && PROJECT_TYPE_NAMES[projectKind]) {
+			hasRestoredRef.current = true;
 			wizardStore.setProjectKind(projectKind);
 
 			const restore = async () => {
-				const restored = await restoreDraft();
-				if (restored) {
+				const source: DraftSource = await restoreDraft();
+				if (source) {
 					// Re-validate all steps from stored data (components haven't mounted yet)
 					const firstInvalidStep = wizardStore.revalidateAllStepsFromData();
 
@@ -54,19 +80,18 @@ const ProjectCreateWizardPage = observer(() => {
 						wizardStore.goToStep(firstInvalidStep);
 					}
 
-					const hasImage =
-						wizardStore.state.formData.baseInformation.image !== null;
-					if (hasImage) {
-						toast.info("Draft restored", {
-							description:
-								"Your previous work has been restored, including the project image",
-							duration: 5000,
-						});
-					} else {
-						toast.info("Draft restored", {
-							description: "Your previous work has been restored",
-						});
-					}
+					// Source-specific toast messages
+					const sourceLabel =
+						source === "server"
+							? "from the server"
+							: source === "localStorage"
+								? "from local storage"
+								: "from this session";
+
+					toast.info("Draft restored", {
+						description: `Your previous work has been restored ${sourceLabel}`,
+						duration: 5000,
+					});
 				}
 				// Mark as ready — step components will mount
 				setIsReady(true);
@@ -75,7 +100,7 @@ const ProjectCreateWizardPage = observer(() => {
 		} else {
 			setIsReady(true);
 		}
-	}, [projectKind, wizardStore, restoreDraft]);
+	}, [projectKind, wizardStore, restoreDraft, isDraftLoading]);
 
 	// Redirect if no project kind
 	if (!projectKind || !PROJECT_TYPE_NAMES[projectKind]) {
@@ -86,9 +111,13 @@ const ProjectCreateWizardPage = observer(() => {
 	const handleComplete = (projectId: number) => {
 		toast.success("Project created successfully");
 
-		// Clear persisted draft and reset store to prevent duplicate submissions
-		clearDraft();
-		wizardStore.resetWizard();
+		// Clear all persistence layers (store, localStorage, sessionStorage, server, query cache)
+		clearAllWizardState({
+			wizardStore,
+			queryClient,
+			projectKind: projectKind!,
+			deleteServerDraft: () => deleteDraftMutation.mutate(),
+		});
 
 		// Navigate to the project page with confetti trigger
 		navigate(`/projects/${projectId}/overview`, {
@@ -97,8 +126,13 @@ const ProjectCreateWizardPage = observer(() => {
 	};
 
 	const handleCancel = () => {
-		clearDraft();
-		wizardStore.resetWizard();
+		// Clear all persistence layers (store, localStorage, sessionStorage, server, query cache)
+		clearAllWizardState({
+			wizardStore,
+			queryClient,
+			projectKind: projectKind!,
+			deleteServerDraft: () => deleteDraftMutation.mutate(),
+		});
 		navigate("/projects/create");
 	};
 
@@ -139,64 +173,11 @@ const ProjectCreateWizardPage = observer(() => {
 						</div>
 
 						{/* Right: Preview toggle */}
-						<div className="3xl:hidden shrink-0">
-							<div className="relative inline-flex h-11 items-center justify-center rounded-xl p-1.5 bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-blue-950/40 dark:to-indigo-950/40 backdrop-blur-xl border border-blue-200/60 dark:border-blue-700/40 shadow-lg shadow-blue-100/50 dark:shadow-blue-900/20">
-								<motion.div
-									className="absolute h-8 rounded-lg"
-									initial={false}
-									animate={{
-										x: wizardStore.state.showPreview ? "100%" : "0%",
-									}}
-									transition={{
-										type: "spring",
-										stiffness: 300,
-										damping: 30,
-									}}
-									style={{
-										left: "6px",
-										top: "6px",
-										width: "calc(50% - 6px)",
-										background:
-											"linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.2) 100%)",
-										backdropFilter: "blur(16px) saturate(180%)",
-										WebkitBackdropFilter: "blur(16px) saturate(180%)",
-										border: "1px solid rgba(59, 130, 246, 0.3)",
-										boxShadow:
-											"0 8px 32px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(59, 130, 246, 0.1)",
-									}}
-								/>
-
-								<button
-									type="button"
-									onClick={() => wizardStore.setShowPreview(false)}
-									className={cn(
-										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
-										!wizardStore.state.showPreview
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-									)}
-									aria-pressed={!wizardStore.state.showPreview}
-									aria-label="Show form view"
-								>
-									Form
-								</button>
-
-								<button
-									type="button"
-									onClick={() => wizardStore.setShowPreview(true)}
-									className={cn(
-										"relative z-10 inline-flex h-8 min-w-[80px] items-center justify-center rounded-lg px-5 text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer",
-										wizardStore.state.showPreview
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-									)}
-									aria-pressed={wizardStore.state.showPreview}
-									aria-label="Show preview"
-								>
-									Preview
-								</button>
-							</div>
-						</div>
+						<FormPreviewToggle
+							showPreview={wizardStore.state.showPreview}
+							onShowForm={() => wizardStore.setShowPreview(false)}
+							onShowPreview={() => wizardStore.setShowPreview(true)}
+						/>
 					</div>
 				</div>
 

@@ -97,19 +97,19 @@ describe("user.service", () => {
 	});
 
 	describe("checkEmailExists", () => {
-		it("should POST email and return boolean", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ exists: true });
+		it("should GET email and return boolean", async () => {
+			(apiClient.get as Mock).mockResolvedValue({ exists: true });
 
 			const result = await checkEmailExists("test@example.com");
 
-			expect(apiClient.post).toHaveBeenCalledWith("users/check-email-exists", {
-				email: "test@example.com",
+			expect(apiClient.get).toHaveBeenCalledWith("users/check-email-exists", {
+				params: { email: "test@example.com" },
 			});
 			expect(result).toBe(true);
 		});
 
 		it("should return false when email does not exist", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ exists: false });
+			(apiClient.get as Mock).mockResolvedValue({ exists: false });
 
 			const result = await checkEmailExists("new@example.com");
 			expect(result).toBe(false);
@@ -117,14 +117,13 @@ describe("user.service", () => {
 	});
 
 	describe("checkNameExists", () => {
-		it("should POST name and return boolean", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ exists: true });
+		it("should GET name and return boolean", async () => {
+			(apiClient.get as Mock).mockResolvedValue({ exists: true });
 
 			const result = await checkNameExists("John", "Doe");
 
-			expect(apiClient.post).toHaveBeenCalledWith("users/check-name-exists", {
-				first_name: "John",
-				last_name: "Doe",
+			expect(apiClient.get).toHaveBeenCalledWith("users/check-name-exists", {
+				params: { first_name: "John", last_name: "Doe" },
 			});
 			expect(result).toBe(true);
 		});
@@ -170,10 +169,8 @@ describe("user.service", () => {
 
 			expect(apiClient.post).toHaveBeenCalledWith("adminoptions/tasks", {
 				action: "mergeuser",
-				status: "pending",
-				requester: 1,
-				primaryUserId: 1,
-				secondaryUserIds: [2, 3],
+				primary_user: 1,
+				secondary_users: [2, 3],
 			});
 		});
 	});

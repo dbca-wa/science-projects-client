@@ -38,13 +38,14 @@ export const getBusinessAreaDetail = async (
 };
 
 /**
- * Update a business area (name, image, introduction) via FormData PUT
+ * Update a business area (name, image, introduction) via FormData PATCH
+ * Uses PATCH to only update the fields sent, preserving leader and other fields.
  */
 export const updateBusinessAreaLead = async (
 	id: number,
 	formData: FormData
 ): Promise<void> => {
-	await apiClient.put(BA_ENDPOINTS.DETAIL(id), formData, {
+	await apiClient.patch(BA_ENDPOINTS.DETAIL(id), formData, {
 		headers: { "Content-Type": "multipart/form-data" },
 	});
 };

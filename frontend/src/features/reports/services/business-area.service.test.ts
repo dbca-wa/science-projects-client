@@ -12,6 +12,7 @@ vi.mock("@/shared/services/api/client.service", () => ({
 		get: vi.fn(),
 		post: vi.fn(),
 		put: vi.fn(),
+		patch: vi.fn(),
 	},
 }));
 
@@ -41,12 +42,12 @@ describe("business-area.service", () => {
 		expect(result).toEqual({ id: 5, name: "BCS" });
 	});
 
-	it("updateBusinessAreaLead should PUT FormData", async () => {
-		(apiClient.put as Mock).mockResolvedValue(undefined);
+	it("updateBusinessAreaLead should PATCH FormData", async () => {
+		(apiClient.patch as Mock).mockResolvedValue(undefined);
 		const formData = new FormData();
 		formData.append("name", "Updated");
 		await updateBusinessAreaLead(5, formData);
-		expect(apiClient.put).toHaveBeenCalledWith(expect.any(String), formData, {
+		expect(apiClient.patch).toHaveBeenCalledWith(expect.any(String), formData, {
 			headers: { "Content-Type": "multipart/form-data" },
 		});
 	});

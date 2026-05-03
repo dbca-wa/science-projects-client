@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { inlineEditStore } from "@/app/stores/InlineEditStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,7 +33,7 @@ import {
 	AlertDialogTitle,
 } from "@/shared/components/ui/alert-dialog";
 import { AdjustImageModal } from "@/shared/components/media/AdjustImageModal";
-import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
+import { FormRichTextEditor } from "@/shared/components/editor/FormRichTextEditor";
 import { compressImage } from "@/shared/utils/image-compression.utils";
 import { ACCEPTED_IMAGE_TYPES } from "@/shared/constants/image.constants";
 import { getImageUrl } from "@/shared/utils/image.utils";
@@ -55,9 +56,9 @@ interface BusinessAreaEditFormProps {
  * Full-page form for editing a business area's name, image, and introduction.
  * Uses the same image card pattern as MediaTab for consistency.
  */
-export function BusinessAreaEditForm({
+export const BusinessAreaEditForm = ({
 	businessAreaId,
-}: BusinessAreaEditFormProps) {
+}: BusinessAreaEditFormProps) => {
 	const navigate = useNavigate();
 
 	const { data: myBAs, isLoading: isLoadingBA } = useMyBusinessAreas();
@@ -84,7 +85,7 @@ export function BusinessAreaEditForm({
 		register,
 		handleSubmit,
 		reset,
-		formState: { errors },
+		formState: { errors, isDirty: isNameDirty },
 	} = useForm<EditFormData>({
 		resolver: zodResolver(editSchema) as never,
 		defaultValues: { name: "" },
@@ -177,9 +178,6 @@ export function BusinessAreaEditForm({
 		}
 	};
 
-	// Editor focus/change tracking for border styling
-	const [isEditorFocused, setIsEditorFocused] = useState(false);
-
 	// Determine whether the introduction has meaningful content
 	const introHasContent =
 		introductionHtml.replace(/<[^>]*>/g, "").trim().length > 10;
@@ -214,14 +212,56 @@ export function BusinessAreaEditForm({
 	}, [existingBA]);
 
 	// Track whether introduction has unsaved changes
-	const [hasIntroChanges, setHasIntroChanges] = useState(false);
+	const [_hasIntroChanges, setHasIntroChanges] = useState(false);
 	useEffect(() => {
 		if (!initialised) return;
 		const original = originalIntroText.current ?? "";
 		setHasIntroChanges(normalise(introductionHtml) !== original);
 	}, [introductionHtml, initialised]);
 
-	const goBack = () => navigate("/reports/business-area");
+	const goBack = () => {
+		// Reset form state so dirty effects don't re-register after unregister
+		reset();
+		setImageFile(null);
+		setImagePreviewUrl(null);
+		setImageRemoved(false);
+		inlineEditStore.unregisterEditor("introduction" as never, 0);
+		inlineEditStore.unregisterEditor(
+			"business-area-form" as never,
+			businessAreaId
+		);
+		navigate("/reports/business-area");
+	};
+
+	// Register name/image dirty state with InlineEditStore for navigation blocking
+	const isFormDirty = isNameDirty || !!imageFile || imageRemoved;
+	const formRef = useRef<HTMLFormElement>(null);
+	useEffect(() => {
+		if (isFormDirty) {
+			inlineEditStore.registerEditor({
+				contentType: "business-area-form" as never,
+				entityId: businessAreaId,
+				originalContent: "clean",
+				elementRef: formRef.current,
+			});
+			inlineEditStore.updateCurrentContent(
+				"business-area-form" as never,
+				businessAreaId,
+				"dirty"
+			);
+		} else {
+			inlineEditStore.unregisterEditor(
+				"business-area-form" as never,
+				businessAreaId
+			);
+		}
+		return () => {
+			inlineEditStore.unregisterEditor(
+				"business-area-form" as never,
+				businessAreaId
+			);
+		};
+	}, [isFormDirty, businessAreaId]);
 
 	// Form submission
 	const onSubmit = (data: EditFormData) => {
@@ -275,6 +315,7 @@ export function BusinessAreaEditForm({
 			</div>
 
 			<form
+				ref={formRef}
 				onSubmit={handleSubmit(onSubmit as never)}
 				className="space-y-6"
 				id="ba-edit-form"
@@ -416,36 +457,18 @@ export function BusinessAreaEditForm({
 					)}
 				</div>
 
-				{/* Introduction — RichTextEditor with border styling matching InlineSaveEditor */}
+				{/* Introduction — uses FormRichTextEditor for consistent styling and dirty tracking */}
 				<div className="space-y-2">
-					<div
-						className={`rounded-lg overflow-hidden transition-all duration-300 border-2 ${
-							isEditorFocused
-								? "border-blue-500 dark:border-blue-400"
-								: hasIntroChanges
-									? "border-amber-500 dark:border-amber-400"
-									: "border-gray-200 dark:border-gray-700"
-						}`}
-						onFocus={() => setIsEditorFocused(true)}
-						onBlur={(e) => {
-							// Only blur if focus leaves the container entirely
-							if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-								setIsEditorFocused(false);
-							}
-						}}
-					>
-						<div className="px-6 pt-4 pb-1">
-							<span className="text-lg font-bold">Introduction</span>
-						</div>
-						<RichTextEditor
-							value={introductionHtml}
-							onChange={handleIntroChange}
-							toolbar="businessArea"
-							placeholder="A brief introduction for the annual report"
-							minHeight="150px"
-							aria-label="Business area introduction"
-						/>
-					</div>
+					<FormRichTextEditor
+						value={introductionHtml}
+						onChange={handleIntroChange}
+						toolbar="businessArea"
+						placeholder="A brief introduction for the annual report"
+						label="Introduction"
+						aria-label="Business area introduction"
+						initialValue={existingBA?.introduction ?? ""}
+						editorId="introduction"
+					/>
 					{!introHasContent && (
 						<p className="text-sm text-destructive">
 							Introduction must contain at least a few words
@@ -454,15 +477,15 @@ export function BusinessAreaEditForm({
 				</div>
 
 				{/* Actions */}
-				<div className="flex items-center gap-3 pt-4">
+				<div className="flex items-center justify-end gap-3 pt-4">
+					<Button type="button" variant="outline" onClick={goBack}>
+						Cancel
+					</Button>
 					<Button type="submit" disabled={!canSubmit}>
 						{updateMutation.isPending && (
 							<Loader2 className="mr-2 size-4 animate-spin" />
 						)}
 						Save
-					</Button>
-					<Button type="button" variant="outline" onClick={goBack}>
-						Cancel
 					</Button>
 				</div>
 			</form>
@@ -510,4 +533,4 @@ export function BusinessAreaEditForm({
 			</AlertDialog>
 		</div>
 	);
-}
+};

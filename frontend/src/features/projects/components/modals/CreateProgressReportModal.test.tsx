@@ -85,9 +85,9 @@ describe("CreateProgressReportModal", () => {
 
 		vi.mocked(useGetProgressReportAvailableYears).mockReturnValue({
 			data: [
-				{ pk: 1, year: 2024 },
-				{ pk: 2, year: 2023 },
-				{ pk: 3, year: 2022 },
+				{ id: 1, year: 2024 },
+				{ id: 2, year: 2023 },
+				{ id: 3, year: 2022 },
 			],
 			isLoading: false,
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -128,22 +128,22 @@ describe("CreateProgressReportModal", () => {
 		it("should display modal description", () => {
 			renderModal(true);
 
-			// Use getAllByText since this text appears in both description and info box
-			const descriptions = screen.getAllByText(/create a progress report for the selected year/i);
-			expect(descriptions.length).toBeGreaterThan(0);
+			expect(
+				screen.getByText(/add a new progress report for this project/i)
+			).toBeInTheDocument();
 		});
 
 		it("should display year select field", () => {
 			renderModal(true);
 
-			expect(screen.getByLabelText(/report year/i)).toBeInTheDocument();
+			expect(screen.getByLabelText(/financial year/i)).toBeInTheDocument();
 		});
 
 		it("should display create button", () => {
 			renderModal(true);
 
 			expect(
-				screen.getByRole("button", { name: /^create$/i })
+				screen.getByRole("button", { name: /create progress report/i })
 			).toBeInTheDocument();
 		});
 
@@ -160,15 +160,17 @@ describe("CreateProgressReportModal", () => {
 		it("should have no year selected initially", () => {
 			renderModal(true);
 
-			const yearSelect = screen.getByRole("combobox", { name: /report year/i });
-			expect(yearSelect).toHaveTextContent(/select a report year/i);
+			const yearSelect = screen.getByRole("combobox", {
+				name: /financial year/i,
+			});
+			expect(yearSelect).toHaveTextContent(/select a financial year/i);
 		});
 
 		it("should have create button disabled when year is not selected", () => {
 			renderModal(true);
 
 			const createButton = screen.getByRole("button", {
-				name: /^create$/i,
+				name: /create progress report/i,
 			});
 			expect(createButton).toBeDisabled();
 		});
@@ -177,7 +179,7 @@ describe("CreateProgressReportModal", () => {
 			renderModal(true);
 
 			const createButton = screen.getByRole("button", {
-				name: /^create$/i,
+				name: /create progress report/i,
 			});
 			expect(createButton).not.toHaveTextContent(/creating/i);
 		});
@@ -187,7 +189,9 @@ describe("CreateProgressReportModal", () => {
 		it("should display year select component", () => {
 			renderModal(true);
 
-			const yearSelect = screen.getByRole("combobox", { name: /report year/i });
+			const yearSelect = screen.getByRole("combobox", {
+				name: /financial year/i,
+			});
 			expect(yearSelect).toBeInTheDocument();
 		});
 
@@ -195,7 +199,7 @@ describe("CreateProgressReportModal", () => {
 			renderModal(true);
 
 			expect(
-				screen.getByText(/years will only appear based on whether an annual report exists/i)
+				screen.getByText(/only years with an existing annual report are shown/i)
 			).toBeInTheDocument();
 		});
 
@@ -203,7 +207,9 @@ describe("CreateProgressReportModal", () => {
 			renderModal(true);
 
 			expect(
-				screen.getByText(/select an annual report for this progress report/i)
+				screen.getByText(
+					/years that already have a progress report for this project are excluded/i
+				)
 			).toBeInTheDocument();
 		});
 	});
@@ -277,7 +283,7 @@ describe("CreateProgressReportModal", () => {
 		it("should have proper ARIA labels", () => {
 			renderModal(true);
 
-			expect(screen.getByLabelText(/report year/i)).toBeInTheDocument();
+			expect(screen.getByLabelText(/financial year/i)).toBeInTheDocument();
 		});
 
 		it("should have accessible dialog role", () => {

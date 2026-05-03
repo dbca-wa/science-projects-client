@@ -136,14 +136,16 @@ const StaffHero = ({
 				</div>
 				{avatarUrl && (
 					<div className="flex justify-center mb-3">
-						<img
-							src={avatarUrl}
-							alt={`Profile of ${displayName}`}
-							width={160}
-							height={160}
-							className="size-40 rounded-lg object-cover pointer-events-none select-none"
-							onError={() => setImgError(true)}
-						/>
+						<div className="size-40 rounded-lg overflow-hidden">
+							<img
+								src={avatarUrl}
+								alt={`Profile of ${displayName}`}
+								width={160}
+								height={160}
+								className="w-full h-full object-cover pointer-events-none select-none"
+								onError={() => setImgError(true)}
+							/>
+						</div>
 					</div>
 				)}
 				<div className="flex w-full flex-col items-center px-4 pb-2 text-center">
@@ -250,14 +252,16 @@ const StaffHero = ({
 				</div>
 				<div className="mt-4 flex">
 					{avatarUrl && (
-						<img
-							src={avatarUrl}
-							alt={`Profile of ${displayName}`}
-							width={180}
-							height={180}
-							className="pointer-events-none mr-4 size-[180px] shrink-0 select-none rounded-lg object-cover"
-							onError={() => setImgError(true)}
-						/>
+						<div className="mr-4 size-[180px] shrink-0 rounded-lg overflow-hidden">
+							<img
+								src={avatarUrl}
+								alt={`Profile of ${displayName}`}
+								width={180}
+								height={180}
+								className="w-full h-full object-cover pointer-events-none select-none"
+								onError={() => setImgError(true)}
+							/>
+						</div>
 					)}
 					<div className="flex w-full flex-col">
 						<p className="text-2xl font-semibold text-slate-900">

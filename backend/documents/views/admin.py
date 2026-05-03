@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -24,11 +25,16 @@ from users.models import User
 from ..models import (
     AnnualReport,
     ProgressReport,
+    ProjectClosure,
     ProjectDocument,
     StudentReport,
 )
 from ..serializers import (
+    ConceptPlanCreateSerializer,
+    EndorsementCreateSerializer,
+    ProjectDocumentCreateSerializer,
     ProjectDocumentSerializer,
+    ProjectPlanCreateSerializer,
     TinyProjectDocumentSerializer,
 )
 
@@ -316,11 +322,39 @@ class DocumentSpawner(APIView):
 
     def post(self, request):
         """Create a new document"""
-        kind = request.kind
-        ser = ProjectDocumentSerializer(
-            data={"kind": kind, "status": "new", "project": request.project}
-        )
+        kind = request.data.get("kind")
+        project = request.data.get("project")
+
+        if not kind or not project:
+            return Response(
+                {"error": "Both 'kind' and 'project' are required."},
+                HTTP_400_BAD_REQUEST,
+            )
+
+        # Progress reports and student reports have dedicated creation endpoints
+        if kind in ("progressreport", "studentreport"):
+            return Response(
+                {
+                    "error": (
+                        f"'{kind}' documents cannot be created via this endpoint. "
+                        "Please use the dedicated creation endpoint."
+                    )
+                },
+                HTTP_400_BAD_REQUEST,
+            )
+
         settings.LOGGER.info(msg=f"{request.user} is spawning document")
+
+        ser = ProjectDocumentCreateSerializer(
+            data={
+                "kind": kind,
+                "status": "new",
+                "project": project,
+                "creator": request.user.pk,
+                "modifier": request.user.pk,
+            }
+        )
+
         if ser.is_valid():
             with transaction.atomic():
                 try:
@@ -333,18 +367,67 @@ class DocumentSpawner(APIView):
                         {"error": "Failed to create document. Please try again."},
                         HTTP_400_BAD_REQUEST,
                     )
-                else:
-                    project_document.pk
-                    if kind == "concept":
-                        pass
-                    elif kind == "projectplan":
-                        pass
-                    elif kind == "progressreport":
-                        pass
-                    elif kind == "studentreport":
-                        pass
-                    elif kind == "projectclosure":
-                        pass
+
+                # Create the kind-specific detail record
+                if kind == "concept":
+                    concept_ser = ConceptPlanCreateSerializer(
+                        data={
+                            "document": project_document.pk,
+                            "project": project,
+                        }
+                    )
+                    if concept_ser.is_valid():
+                        concept_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create concept plan: {concept_ser.errors}"
+                        )
+                        raise Exception(
+                            f"ConceptPlan creation failed: {concept_ser.errors}"
+                        )
+
+                elif kind == "projectplan":
+                    plan_ser = ProjectPlanCreateSerializer(
+                        data={
+                            "document": project_document.pk,
+                            "project": project,
+                        }
+                    )
+                    if plan_ser.is_valid():
+                        plan = plan_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create project plan: {plan_ser.errors}"
+                        )
+                        raise Exception(
+                            f"ProjectPlan creation failed: {plan_ser.errors}"
+                        )
+
+                    endorsement_ser = EndorsementCreateSerializer(
+                        data={"project_plan": plan.pk}
+                    )
+                    if endorsement_ser.is_valid():
+                        endorsement_ser.save()
+                    else:
+                        settings.LOGGER.error(
+                            msg=f"Failed to create endorsement: {endorsement_ser.errors}"
+                        )
+                        raise Exception(
+                            f"Endorsement creation failed: {endorsement_ser.errors}"
+                        )
+
+                elif kind == "projectclosure":
+                    # ProjectClosureCreateSerializer doesn't include 'project' field,
+                    # so create the closure directly via the model
+                    ProjectClosure.objects.create(
+                        document=project_document,
+                        project_id=project,
+                    )
+
+                return Response(
+                    ProjectDocumentSerializer(project_document).data,
+                    HTTP_201_CREATED,
+                )
         else:
             settings.LOGGER.error(msg=f"{ser.errors}")
             return Response(
@@ -917,13 +1000,22 @@ class BatchApproveCurrentPreview(APIView):
 class NewCycleOpenPreview(APIView):
     """
     Preview recipients who would receive new cycle open notification emails.
+
     Returns BA leads, project leads, and team members — deduplicated by highest role.
+    Cross-references recipient emails against the IT Assets API to identify users
+    who won't receive emails because they don't exist in the DBCA directory.
+
     All recipients must be active staff with @dbca.wa.gov.au emails.
+    Only active business areas and active projects (excluding terminated/completed/closed)
+    are included.
     """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        import requests as http_requests
+        from django.core.cache import cache
+
         from agencies.models import BusinessArea
 
         division_slug = request.query_params.get("division")
@@ -948,15 +1040,15 @@ class NewCycleOpenPreview(APIView):
 
         users_with_roles = []
 
-        # BA leads
-        bas = BusinessArea.objects.select_related("leader").all()
+        # BA leads — only from active (non-archived) business areas
+        bas = BusinessArea.objects.select_related("leader").filter(is_active=True)
         if division_slug and last_report and last_report.division:
             bas = bas.filter(division=last_report.division)
         for ba in bas:
             if _is_valid(ba.leader):
                 users_with_roles.append((ba.leader, 3, "BA Lead"))
 
-        # All project leads and team members — exclude terminated and completed projects
+        # Project leads and team members — exclude terminated and completed projects
         all_projects = Project.objects.exclude(
             status__in=[
                 Project.StatusChoices.COMPLETED,
@@ -980,9 +1072,197 @@ class NewCycleOpenPreview(APIView):
                     users_with_roles.append((member.user, 1, "Team Member"))
 
         groups = _deduplicate_by_highest_role(users_with_roles)
-        total = sum(len(v) for v in groups.values())
 
-        return Response({"recipients": groups, "total_recipients": total})
+        # Batch-query IT Assets API to validate recipient emails
+        all_emails = set()
+        for group_users in groups.values():
+            for u in group_users:
+                all_emails.add(u["email"].lower())
+
+        it_assets_emails, it_assets_available = _fetch_it_assets_emails(
+            cache, http_requests
+        )
+
+        # Partition recipients into valid (in IT Assets) and not_in_it_assets
+        if it_assets_available:
+            valid_groups = {"ba_leads": [], "project_leads": [], "team_members": []}
+            invalid_groups = {"ba_leads": [], "project_leads": [], "team_members": []}
+
+            for group_key in ("ba_leads", "project_leads", "team_members"):
+                for user_entry in groups[group_key]:
+                    if user_entry["email"].lower() in it_assets_emails:
+                        valid_groups[group_key].append(user_entry)
+                    else:
+                        invalid_groups[group_key].append(user_entry)
+        else:
+            # IT Assets unavailable — treat all users as valid, set warning flag
+            valid_groups = groups
+            invalid_groups = {
+                "ba_leads": [],
+                "project_leads": [],
+                "team_members": [],
+            }
+
+        total_valid = sum(len(v) for v in valid_groups.values())
+        total_invalid = sum(len(v) for v in invalid_groups.values())
+
+        return Response(
+            {
+                "recipients": valid_groups,
+                "not_in_it_assets": invalid_groups,
+                "total_recipients": total_valid,
+                "total_not_in_it_assets": total_invalid,
+                "it_assets_available": it_assets_available,
+            }
+        )
+
+
+def _fetch_it_assets_emails(cache, http_requests):
+    """
+    Fetch the set of known emails from IT Assets API.
+
+    Reuses the same cache key and data as the staff profiles directory
+    (``it_assets_data``) so a single API call serves both pages.
+    Cache duration: 30 minutes on success, 1 minute on failure — matching
+    the staff profiles caching strategy.
+
+    Returns:
+        tuple: (set of lowercase email strings, bool indicating API availability)
+    """
+    # First, try to use the shared staff profiles cache (full user data by email)
+    shared_cache_key = "it_assets_data"
+    shared_data = cache.get(shared_cache_key)
+
+    if shared_data is not None:
+        if shared_data:
+            emails = {email.lower() for email in shared_data.keys() if email}
+            return (emails, True)
+        else:
+            return (set(), False)
+
+    # Shared cache miss — fetch from IT Assets API and populate the shared cache
+    try:
+        api_url = settings.IT_ASSETS_URL
+        if not api_url:
+            settings.LOGGER.warning("IT Assets URL not configured")
+            cache.set(shared_cache_key, {}, 60)
+            return (set(), False)
+
+        response = http_requests.get(
+            api_url,
+            auth=(settings.IT_ASSETS_USER, settings.IT_ASSETS_ACCESS_TOKEN),
+            timeout=6,
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            it_asset_data_by_email = {
+                user_data["email"]: user_data
+                for user_data in data
+                if "email" in user_data
+            }
+            cache.set(shared_cache_key, it_asset_data_by_email, 1800)  # 30 minutes
+
+            emails = {email.lower() for email in it_asset_data_by_email.keys() if email}
+            return (emails, True)
+        else:
+            settings.LOGGER.error(
+                f"IT Assets API returned {response.status_code}: {response.text[:200]}"
+            )
+            cache.set(shared_cache_key, {}, 60)  # Retry after 1 minute
+            return (set(), False)
+
+    except Exception as e:
+        settings.LOGGER.error(f"IT Assets API error: {e}")
+        cache.set(shared_cache_key, {}, 60)  # Retry after 1 minute
+        return (set(), False)
+
+
+class NewCycleEmailPreview(APIView):
+    """
+    Render the new cycle open email template with provided context and return HTML.
+    Used by the frontend to show a live preview of the email before sending.
+    The CID logo is inlined as a base64 data URL for browser rendering.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        import base64
+        import os
+        import re
+
+        import bleach
+        from django.template.loader import render_to_string
+
+        custom_message = request.data.get("custom_message", "")
+        recipient_name = request.data.get("recipient_name", "Recipient Name")
+        division_name = request.data.get("division_name", "")
+        financial_year_string = request.data.get("financial_year_string", "2025-2026")
+
+        # Sanitise custom message HTML
+        sanitised_message = None
+        if custom_message:
+            allowed_tags = [
+                "p",
+                "br",
+                "strong",
+                "em",
+                "u",
+                "s",
+                "a",
+                "ul",
+                "ol",
+                "li",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "blockquote",
+                "span",
+            ]
+            allowed_attrs = {"a": ["href", "target"], "span": ["style"]}
+            sanitised_message = bleach.clean(
+                custom_message, tags=allowed_tags, attributes=allowed_attrs, strip=True
+            )
+
+        actioning_user = request.user
+        actioning_user_name = (
+            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
+        )
+
+        template_props = {
+            "email_subject": "SPMS: New Reporting Cycle Open",
+            "actioning_user_email": actioning_user.email,
+            "actioning_user_name": actioning_user_name,
+            "financial_year_string": financial_year_string,
+            "recipient_name": recipient_name,
+            "division_name": division_name,
+            "site_url": settings.SITE_URL,
+            "custom_message": sanitised_message,
+            "logo_url": True,
+        }
+
+        template_path = "./email_templates/new_cycle_open_email.html"
+        html_content = render_to_string(template_path, template_props)
+
+        # Inline the CID logo as a base64 data URL for preview rendering
+        logo_path = os.path.join(
+            settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
+        )
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+            data_url = f"data:image/png;base64,{logo_b64}"
+            html_content = re.sub(
+                r'src=["\']cid:dbca-logo["\']',
+                f'src="{data_url}"',
+                html_content,
+            )
+
+        return Response({"html": html_content})
 
 
 class FinalDocApproval(APIView):

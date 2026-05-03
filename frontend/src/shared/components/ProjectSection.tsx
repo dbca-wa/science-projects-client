@@ -20,17 +20,17 @@ interface ProjectSectionProps {
  * - Minimum height for visual consistency
  * - Optional title prop for sections that need a heading
  */
-export function ProjectSection({
+export const ProjectSection = ({
 	children,
 	className,
 	title,
 	id,
-}: ProjectSectionProps) {
+}: ProjectSectionProps) => {
 	return (
 		<div
 			id={id}
 			className={cn(
-				"min-h-[100px] rounded-lg bg-[#EBF0F6] dark:bg-gray-800",
+				"min-h-[100px] min-w-0 rounded-lg bg-[#EBF0F6] dark:bg-gray-800",
 				className
 			)}
 		>
@@ -40,4 +40,4 @@ export function ProjectSection({
 			</div>
 		</div>
 	);
-}
+};

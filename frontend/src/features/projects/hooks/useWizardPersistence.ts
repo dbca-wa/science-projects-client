@@ -2,7 +2,32 @@ import { useEffect, useCallback, useRef } from "react";
 import { reaction } from "mobx";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { logger } from "@/shared/services/logger.service";
+import {
+	loadDraftFromLocalStorage,
+	saveDraftToLocalStorage,
+} from "@/features/projects/utils/draft-persistence.utils";
+import { compressImage } from "@/shared/utils/image-compression.utils";
 import type { ProjectKind } from "@/shared/types/project.types";
+import type { IDraftResponse, ISaveDraftPayload } from "./useDraft";
+
+/**
+ * Draft source indicates where the restored draft came from.
+ * Used by the page to show an appropriate toast message.
+ */
+export type DraftSource = "server" | "localStorage" | "sessionStorage" | null;
+
+/**
+ * Options for integrating server draft persistence.
+ * The page passes these in from the TanStack Query hooks.
+ */
+export interface IWizardPersistenceOptions {
+	/** Server draft data loaded by useDraft (may be null/undefined) */
+	serverDraft?: IDraftResponse | null;
+	/** Fire-and-forget server save — called after sessionStorage save */
+	onServerSave?: (payload: ISaveDraftPayload) => void;
+	/** Fire-and-forget server delete — called when clearing drafts */
+	onServerDelete?: () => void;
+}
 
 /**
  * Storage key for wizard persistence
@@ -16,8 +41,8 @@ const EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
 /**
  * Maximum size for base64-encoded image data (~2MB).
- * Base64 adds ~33% overhead, so a ~1.5MB image file becomes ~2MB in base64.
- * Prevents exceeding sessionStorage quotas (~5MB total).
+ * Base64 adds ~33% overhead, so a ~1MB file becomes ~1.33MB in base64.
+ * Images are compressed before persistence to ensure they fit within this limit.
  */
 const MAX_IMAGE_PERSISTENCE_SIZE = 2_097_152;
 
@@ -143,7 +168,10 @@ interface IPersistedWizardData {
  *
  * @returns Persistence functions and state
  */
-export const useWizardPersistence = () => {
+export const useWizardPersistence = (
+	options: IWizardPersistenceOptions = {}
+) => {
+	const { serverDraft, onServerSave, onServerDelete } = options;
 	const wizardStore = useProjectWizardStore();
 	const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	/** Prevents the MobX reaction from saving over the draft while restore is in progress */
@@ -171,14 +199,41 @@ export const useWizardPersistence = () => {
 		try {
 			// Convert image File to base64 if present
 			let imageData: IPersistedImageData | null = null;
-			const imageFile = wizardStore.state.formData.baseInformation.image;
+			const imageFile = wizardStore.state.editingFormData.baseInformation.image;
 
 			if (imageFile instanceof File) {
-				const base64 = await fileToBase64(imageFile);
+				let fileToConvert = imageFile;
+
+				// Compress the image if it would exceed the persistence size limit.
+				// The base64 encoding adds ~33% overhead, so target a file size that
+				// will fit comfortably: MAX_IMAGE_PERSISTENCE_SIZE / 1.4 ≈ 1.5MB.
+				const estimatedBase64Size = imageFile.size * 1.37;
+				if (estimatedBase64Size > MAX_IMAGE_PERSISTENCE_SIZE) {
+					try {
+						const targetMB = MAX_IMAGE_PERSISTENCE_SIZE / 1.37 / (1024 * 1024);
+						const result = await compressImage(imageFile, {
+							maxSizeMB: targetMB,
+							useWebWorker: true,
+						});
+						fileToConvert = result.file;
+						logger.debug("Compressed image for draft persistence", {
+							originalSize: imageFile.size,
+							compressedSize: result.file.size,
+							targetMB,
+						});
+					} catch (error) {
+						logger.warn("Failed to compress image for draft persistence", {
+							error: error instanceof Error ? error.message : String(error),
+						});
+					}
+				}
+
+				const base64 = await fileToBase64(fileToConvert);
 				if (base64) {
 					if (base64.length > MAX_IMAGE_PERSISTENCE_SIZE) {
+						// Even after compression the image is too large — skip it
 						logger.warn(
-							"Image exceeds maximum persistence size (~2MB), skipping image draft storage",
+							"Image still exceeds persistence limit after compression, skipping",
 							{
 								fileName: imageFile.name,
 								base64Length: base64.length,
@@ -208,7 +263,7 @@ export const useWizardPersistence = () => {
 				currentStep: wizardStore.state.currentStep,
 				completedSteps: Array.from(wizardStore.state.completedSteps),
 				imageData,
-				teamMembers: wizardStore.state.teamMembers.map((m) => ({
+				teamMembers: wizardStore.state.editingTeamMembers.map((m) => ({
 					userId: m.userId,
 					role: m.role,
 					isLeader: m.isLeader,
@@ -219,27 +274,31 @@ export const useWizardPersistence = () => {
 				})),
 				formData: {
 					baseInformation: {
-						title: wizardStore.state.formData.baseInformation.title,
-						description: wizardStore.state.formData.baseInformation.description,
-						keywords: wizardStore.state.formData.baseInformation.keywords,
+						title: wizardStore.state.editingFormData.baseInformation.title,
+						description:
+							wizardStore.state.editingFormData.baseInformation.description,
+						keywords:
+							wizardStore.state.editingFormData.baseInformation.keywords,
 					},
 					projectDetails: {
-						start_date: wizardStore.state.formData.projectDetails.start_date,
-						end_date: wizardStore.state.formData.projectDetails.end_date,
+						start_date:
+							wizardStore.state.editingFormData.projectDetails.start_date,
+						end_date: wizardStore.state.editingFormData.projectDetails.end_date,
 						business_area:
-							wizardStore.state.formData.projectDetails.business_area,
+							wizardStore.state.editingFormData.projectDetails.business_area,
 						departmental_service:
-							wizardStore.state.formData.projectDetails.departmental_service,
+							wizardStore.state.editingFormData.projectDetails
+								.departmental_service,
 						project_leader:
-							wizardStore.state.formData.projectDetails.project_leader,
+							wizardStore.state.editingFormData.projectDetails.project_leader,
 						data_custodian:
-							wizardStore.state.formData.projectDetails.data_custodian,
+							wizardStore.state.editingFormData.projectDetails.data_custodian,
 					},
 					location: {
-						areas: wizardStore.state.formData.location.areas,
+						areas: wizardStore.state.editingFormData.location.areas,
 					},
-					externalDetails: wizardStore.state.formData.externalDetails,
-					studentDetails: wizardStore.state.formData.studentDetails,
+					externalDetails: wizardStore.state.editingFormData.externalDetails,
+					studentDetails: wizardStore.state.editingFormData.studentDetails,
 				},
 			};
 
@@ -247,12 +306,49 @@ export const useWizardPersistence = () => {
 			logger.debug("Wizard draft saved to session storage", {
 				hasImage: imageData !== null,
 			});
+
+			// Also persist to localStorage for cross-session recovery (includes image)
+			if (wizardStore.state.projectKind) {
+				saveDraftToLocalStorage(wizardStore.state.projectKind, {
+					formData: wizardStore.state.editingFormData,
+					teamMembers: wizardStore.state.editingTeamMembers.map((m) => ({
+						userId: m.userId,
+						role: m.role,
+						isLeader: m.isLeader,
+						displayName: m.displayName,
+						position: m.position,
+						isStaff: m.isStaff,
+						timeAllocation: m.timeAllocation,
+					})),
+					currentStep: data.currentStep,
+					completedSteps: data.completedSteps,
+					projectKind: wizardStore.state.projectKind,
+					savedAt: new Date().toISOString(),
+					imageData,
+				});
+			}
+
+			// Fire-and-forget server save (non-blocking)
+			if (onServerSave && wizardStore.state.projectKind) {
+				// The server's `data` JSONField stores the full draft state
+				// (formData, teamMembers, completedSteps, imageData) for round-trip fidelity.
+				const serverPayloadData: Record<string, unknown> = {
+					formData: data.formData,
+					teamMembers: data.teamMembers,
+					completedSteps: data.completedSteps,
+					imageData,
+				};
+				onServerSave({
+					data: serverPayloadData,
+					current_step: data.currentStep,
+				});
+			}
 		} catch (error) {
 			logger.error("Failed to save wizard draft", {
 				errorMessage: error instanceof Error ? error.message : String(error),
 			});
 		}
-	}, [wizardStore]);
+	}, [wizardStore, onServerSave]);
 
 	/**
 	 * Save wizard data to session storage (debounced).
@@ -271,7 +367,7 @@ export const useWizardPersistence = () => {
 	}, [saveDraftSync]);
 
 	/**
-	 * Clear wizard draft from session storage
+	 * Clear wizard draft from session storage and server.
 	 */
 	const clearDraft = useCallback(() => {
 		try {
@@ -282,19 +378,193 @@ export const useWizardPersistence = () => {
 				errorMessage: error instanceof Error ? error.message : String(error),
 			});
 		}
-	}, []);
+
+		// Fire-and-forget server delete (non-blocking)
+		if (onServerDelete) {
+			onServerDelete();
+		}
+	}, [onServerDelete]);
 
 	/**
-	 * Restore wizard data from session storage.
-	 * Converts persisted base64 image data back to a File object.
+	 * Restore wizard data using a three-tier fallback strategy:
+	 * 1. Server draft (passed via options)
+	 * 2. localStorage draft (cross-session persistence)
+	 * 3. sessionStorage draft (same-session persistence)
+	 *
+	 * Returns the source of the restored draft, or null if nothing was found.
 	 */
-	const restoreDraft = useCallback(async (): Promise<boolean> => {
+	const restoreDraft = useCallback(async (): Promise<DraftSource> => {
 		isRestoringRef.current = true;
 		try {
+			// ── Tier 1: Server draft ──────────────────────────────────────
+			if (serverDraft) {
+				logger.info("Restoring wizard draft from server", {
+					projectKind: serverDraft.project_kind,
+					currentStep: serverDraft.current_step,
+				});
+
+				const serverData = serverDraft.data as Record<string, unknown>;
+				const formData = serverData.formData as
+					| IPersistedWizardData["formData"]
+					| undefined;
+				const teamMembers = serverData.teamMembers as
+					| IPersistedWizardData["teamMembers"]
+					| undefined;
+				const completedSteps = serverData.completedSteps as
+					| number[]
+					| undefined;
+				const serverImageData = serverData.imageData as
+					| IPersistedImageData
+					| null
+					| undefined;
+
+				if (formData) {
+					wizardStore.setProjectKind(serverDraft.project_kind);
+
+					wizardStore.setBaseInformation({
+						title: formData.baseInformation?.title ?? "",
+						description: formData.baseInformation?.description ?? "",
+						keywords: formData.baseInformation?.keywords ?? [],
+					});
+
+					// Restore image from base64 data URL if present in server draft
+					if (serverImageData) {
+						const restoredFile = await base64ToFile(
+							serverImageData.dataUrl,
+							serverImageData.fileName
+						);
+						if (restoredFile) {
+							wizardStore.setBaseInformation({ image: restoredFile });
+							logger.debug("Restored image from server draft", {
+								fileName: serverImageData.fileName,
+							});
+						} else {
+							logger.warn("Could not restore image from server draft");
+						}
+					}
+
+					wizardStore.setProjectDetails({
+						start_date: formData.projectDetails?.start_date
+							? new Date(formData.projectDetails.start_date)
+							: null,
+						end_date: formData.projectDetails?.end_date
+							? new Date(formData.projectDetails.end_date)
+							: null,
+						business_area: formData.projectDetails?.business_area ?? null,
+						departmental_service:
+							formData.projectDetails?.departmental_service ?? null,
+						project_leader: formData.projectDetails?.project_leader ?? null,
+						data_custodian: formData.projectDetails?.data_custodian ?? null,
+					});
+
+					wizardStore.setLocation({
+						areas: formData.location?.areas ?? [],
+					});
+
+					if (formData.externalDetails) {
+						wizardStore.setExternalDetails(formData.externalDetails);
+					}
+					if (formData.studentDetails) {
+						wizardStore.setStudentDetails(formData.studentDetails);
+					}
+				}
+
+				if (completedSteps && completedSteps.length > 0) {
+					for (const stepIndex of completedSteps) {
+						wizardStore.markStepCompleted(stepIndex);
+					}
+				}
+
+				if (teamMembers && teamMembers.length > 0) {
+					for (const member of teamMembers) {
+						wizardStore.addTeamMember(member);
+					}
+				}
+
+				wizardStore.goToStep(serverDraft.current_step);
+				return "server";
+			}
+
+			// ── Tier 2: localStorage draft ────────────────────────────────
+			const projectKind = wizardStore.state.projectKind;
+			if (projectKind) {
+				const localDraft = loadDraftFromLocalStorage(projectKind);
+				if (localDraft) {
+					logger.info("Restoring wizard draft from localStorage", {
+						projectKind: localDraft.projectKind,
+						currentStep: localDraft.currentStep,
+					});
+
+					wizardStore.setBaseInformation({
+						title: localDraft.formData.baseInformation.title,
+						description: localDraft.formData.baseInformation.description,
+						keywords: localDraft.formData.baseInformation.keywords,
+					});
+
+					// Restore image from base64 data URL if present
+					if (localDraft.imageData) {
+						const restoredFile = await base64ToFile(
+							localDraft.imageData.dataUrl,
+							localDraft.imageData.fileName
+						);
+						if (restoredFile) {
+							wizardStore.setBaseInformation({ image: restoredFile });
+							logger.debug("Restored image from localStorage draft", {
+								fileName: localDraft.imageData.fileName,
+							});
+						} else {
+							logger.warn("Could not restore image from localStorage draft");
+						}
+					}
+
+					wizardStore.setProjectDetails({
+						start_date: localDraft.formData.projectDetails.start_date
+							? new Date(localDraft.formData.projectDetails.start_date)
+							: null,
+						end_date: localDraft.formData.projectDetails.end_date
+							? new Date(localDraft.formData.projectDetails.end_date)
+							: null,
+						business_area: localDraft.formData.projectDetails.business_area,
+						departmental_service:
+							localDraft.formData.projectDetails.departmental_service,
+						project_leader: localDraft.formData.projectDetails.project_leader,
+						data_custodian: localDraft.formData.projectDetails.data_custodian,
+					});
+
+					wizardStore.setLocation(localDraft.formData.location);
+
+					if (localDraft.formData.externalDetails) {
+						wizardStore.setExternalDetails(localDraft.formData.externalDetails);
+					}
+					if (localDraft.formData.studentDetails) {
+						wizardStore.setStudentDetails(localDraft.formData.studentDetails);
+					}
+
+					if (
+						localDraft.completedSteps &&
+						localDraft.completedSteps.length > 0
+					) {
+						for (const stepIndex of localDraft.completedSteps) {
+							wizardStore.markStepCompleted(stepIndex);
+						}
+					}
+
+					if (localDraft.teamMembers && localDraft.teamMembers.length > 0) {
+						for (const member of localDraft.teamMembers) {
+							wizardStore.addTeamMember(member);
+						}
+					}
+
+					wizardStore.goToStep(localDraft.currentStep);
+					return "localStorage";
+				}
+			}
+
+			// ── Tier 3: sessionStorage draft (existing behaviour) ─────────
 			const stored = sessionStorage.getItem(STORAGE_KEY);
 			if (!stored) {
-				logger.debug("No wizard draft found in session storage");
-				return false;
+				logger.debug("No wizard draft found in any storage layer");
+				return null;
 			}
 
 			const data: IPersistedWizardData = JSON.parse(stored);
@@ -303,15 +573,14 @@ export const useWizardPersistence = () => {
 			if (isExpired(data.timestamp)) {
 				logger.info("Wizard draft has expired, clearing");
 				clearDraft();
-				return false;
+				return null;
 			}
 
-			// Restore wizard state
+			// Restore wizard state from sessionStorage
 			if (data.projectKind) {
 				wizardStore.setProjectKind(data.projectKind);
 			}
 
-			// Restore form data (without image first)
 			wizardStore.setBaseInformation({
 				title: data.formData.baseInformation.title,
 				description: data.formData.baseInformation.description,
@@ -353,21 +622,18 @@ export const useWizardPersistence = () => {
 				wizardStore.setStudentDetails(data.formData.studentDetails);
 			}
 
-			// Restore completed steps BEFORE navigating (goToStep checks completedSteps)
 			if (data.completedSteps && data.completedSteps.length > 0) {
 				for (const stepIndex of data.completedSteps) {
 					wizardStore.markStepCompleted(stepIndex);
 				}
 			}
 
-			// Restore team members
 			if (data.teamMembers && data.teamMembers.length > 0) {
 				for (const member of data.teamMembers) {
 					wizardStore.addTeamMember(member);
 				}
 			}
 
-			// Restore current step using the store action
 			wizardStore.goToStep(data.currentStep);
 
 			logger.info("Wizard draft restored from session storage", {
@@ -376,17 +642,17 @@ export const useWizardPersistence = () => {
 				hasImage: data.imageData !== null,
 			});
 
-			return true;
+			return "sessionStorage";
 		} catch (error) {
 			logger.error("Failed to restore wizard draft", {
 				errorMessage: error instanceof Error ? error.message : String(error),
 			});
 			clearDraft();
-			return false;
+			return null;
 		} finally {
 			isRestoringRef.current = false;
 		}
-	}, [wizardStore, isExpired, clearDraft]);
+	}, [wizardStore, isExpired, clearDraft, serverDraft]);
 
 	/**
 	 * Check if a draft exists
@@ -422,11 +688,11 @@ export const useWizardPersistence = () => {
 			// Data function — accesses all observables we want to track
 			() => {
 				const state = wizardStore.state;
-				const base = state.formData.baseInformation;
-				const details = state.formData.projectDetails;
-				const location = state.formData.location;
-				const ext = state.formData.externalDetails;
-				const stu = state.formData.studentDetails;
+				const base = state.editingFormData.baseInformation;
+				const details = state.editingFormData.projectDetails;
+				const location = state.editingFormData.location;
+				const ext = state.editingFormData.externalDetails;
+				const stu = state.editingFormData.studentDetails;
 
 				return {
 					projectKind: state.projectKind,
@@ -444,8 +710,8 @@ export const useWizardPersistence = () => {
 					project_leader: details.project_leader,
 					data_custodian: details.data_custodian,
 					areas: [...location.areas],
-					teamMemberCount: state.teamMembers.length,
-					teamMemberIds: state.teamMembers.map((m) => m.userId),
+					teamMemberCount: state.editingTeamMembers.length,
+					teamMemberIds: state.editingTeamMembers.map((m) => m.userId),
 					extCollab: ext?.collaboration_with,
 					extBudget: ext?.budget,
 					extDesc: ext?.external_description,

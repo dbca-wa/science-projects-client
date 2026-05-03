@@ -292,13 +292,20 @@ export const Header = observer(() => {
 										<NavigationDropdownMenuContent
 											label="Annual Report"
 											items={[
-												{
-													targetPath: "/reports/details",
-													icon: (
-														<FileText className="size-4" aria-hidden="true" />
-													),
-													label: "Report Details",
-												},
+												...(authStore.isSuperuser || isKeyStakeholder
+													? [
+															{
+																targetPath: "/reports/details",
+																icon: (
+																	<FileText
+																		className="size-4"
+																		aria-hidden="true"
+																	/>
+																),
+																label: "Report Details",
+															},
+														]
+													: []),
 												{
 													targetPath: "/reports",
 													icon: (

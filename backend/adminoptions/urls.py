@@ -34,6 +34,7 @@ urlpatterns = [
     # Misc (Admin) ======================================================
     path("send-all-test-emails", views.SendAllTestEmails.as_view()),
     path("mergeusers", views.MergeUsers.as_view()),
+    path("new-cycle-draft", views.NewCycleDraft.as_view()),
     # Include the router URLs at the end to avoid conflicts
     path("", include(router.urls)),
 ]

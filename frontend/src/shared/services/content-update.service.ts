@@ -9,7 +9,7 @@ import { apiClient } from "./api/client.service";
 const CONTENT_ENDPOINTS = {
 	PROJECT_DETAIL: (id: number | string) => `projects/${id}`,
 	EXTERNAL_DETAIL: (id: number | string) =>
-		`documents/external_project_details/${id}`,
+		`projects/external_project_details/${id}`,
 	CONCEPT_PLAN: (id: number | string) => `documents/conceptplans/${id}`,
 	PROJECT_PLAN: (id: number | string) => `documents/projectplans/${id}`,
 	PROJECT_PLAN_ENDORSEMENT: (id: number | string) =>

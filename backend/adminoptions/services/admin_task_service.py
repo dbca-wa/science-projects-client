@@ -42,21 +42,65 @@ class AdminTaskService:
         """
         Merge secondary users into the primary user.
 
-        Transfers project memberships (with role logic), document
-        creators/modifiers, comments, and deletes secondary users.
+        Transfers project memberships (with role and leadership logic),
+        document creators/modifiers, comments, and deletes secondary users.
 
-        This is the SINGLE source of truth for user merging — used by
-        both ApproveTask and MergeUsers views.
+        Privilege hierarchy (highest to lowest):
+            Superuser > BA Lead (staff with business_areas_led) > Staff > External
+
+        Merge direction rules:
+            - Can only merge a lower-privilege user INTO a higher-privilege user
+            - Cannot merge a superuser into anything
+            - Cannot merge staff into an external user
+            - Can merge external → staff/BA lead/admin
+            - Can merge staff → staff/BA lead/admin
+            - Can merge BA lead → admin
 
         Args:
-            primary_user: User instance to merge into.
-            secondary_users: Iterable of User instances to merge from.
+            primary_user: User instance to merge into (must be equal or higher privilege).
+            secondary_users: Iterable of User instances to merge from (deleted after merge).
+
+        Raises:
+            ValueError: If merge direction violates privilege hierarchy.
+            NotFound: If any secondary user does not exist in the database.
         """
+
+        def _get_privilege_level(user):
+            """Return numeric privilege level for merge direction validation."""
+            if user.is_superuser:
+                return 4  # Superuser
+            if user.is_staff and user.business_areas_led.exists():
+                return 3  # BA Lead
+            if user.is_staff:
+                return 2  # Staff
+            return 1  # External
+
+        # Validate that primary user is not also a secondary user
+        for secondary in secondary_users:
+            if secondary.pk == primary_user.pk:
+                raise ValueError("Primary user cannot also be a secondary user.")
+
+        # Validate that all secondary users actually exist in the database
+        for secondary in secondary_users:
+            if not User.objects.filter(pk=secondary.pk).exists():
+                raise NotFound(f"Secondary user with pk {secondary.pk} not found.")
+
+        # Validate merge direction — secondary must be equal or lower privilege than primary
+        primary_level = _get_privilege_level(primary_user)
+        for secondary in secondary_users:
+            secondary_level = _get_privilege_level(secondary)
+            if secondary_level > primary_level:
+                raise ValueError(
+                    f"Cannot merge a higher-privilege user into a lower-privilege user. "
+                    f"User {secondary.pk} (level {secondary_level}) cannot be merged "
+                    f"into user {primary_user.pk} (level {primary_level})."
+                )
+
         primary_is_staff = primary_user.is_staff
 
         for merging_user in secondary_users:
             # ========= HANDLE THE PROJECT MEMBERSHIPS =========
-            memberships = ProjectMember.objects.filter(user=merging_user)
+            memberships = list(ProjectMember.objects.filter(user=merging_user))
 
             for membership in memberships:
                 existing_membership = ProjectMember.objects.filter(
@@ -65,6 +109,11 @@ class AdminTaskService:
 
                 if existing_membership:
                     # Primary user already has a membership in this project
+                    # Transfer leadership if the secondary user was the leader
+                    if membership.is_leader and not existing_membership.is_leader:
+                        existing_membership.is_leader = True
+
+                    # Role resolution: supervising wins, then staff/non-staff rules
                     if (
                         membership.role == ProjectMember.RoleChoices.SUPERVISING
                         or existing_membership.role
@@ -94,14 +143,18 @@ class AdminTaskService:
                 else:
                     # No existing membership — transfer the secondary user's membership
                     membership.user = primary_user
+
+                    # Ensure role is appropriate for the primary user's staff status
                     if primary_is_staff:
-                        if membership.role in [
+                        if membership.role not in [
+                            ProjectMember.RoleChoices.SUPERVISING,
                             ProjectMember.RoleChoices.RESEARCH,
                             ProjectMember.RoleChoices.TECHNICAL,
                         ]:
-                            membership.role = membership.role
+                            # Non-staff role on a staff user — default to research
+                            membership.role = ProjectMember.RoleChoices.RESEARCH
                     else:
-                        if membership.role in [
+                        if membership.role not in [
                             ProjectMember.RoleChoices.EXTERNALCOL,
                             ProjectMember.RoleChoices.EXTERNALPEER,
                             ProjectMember.RoleChoices.ACADEMICSUPER,
@@ -109,7 +162,9 @@ class AdminTaskService:
                             ProjectMember.RoleChoices.CONSULTED,
                             ProjectMember.RoleChoices.GROUP,
                         ]:
-                            membership.role = membership.role
+                            # Staff role on a non-staff user — default to external collaborator
+                            membership.role = ProjectMember.RoleChoices.EXTERNALCOL
+
                     membership.save()
 
             # ========= HANDLE DOCUMENTS AND COMMENTS =========
@@ -120,6 +175,23 @@ class AdminTaskService:
                 modifier=primary_user
             )
             Comment.objects.filter(user=merging_user).update(user=primary_user)
+
+            # ========= CLEAN UP ORPHANED ADMIN TASKS =========
+            # Cancel any pending tasks where the merging user is referenced
+            # (caretaker requests, merge requests, etc.)
+            AdminTask.objects.filter(
+                status=AdminTask.TaskStatus.PENDING,
+                primary_user=merging_user,
+            ).update(status=AdminTask.TaskStatus.CANCELLED)
+
+            # Also cancel tasks where the merging user appears in secondary_users
+            pending_tasks = AdminTask.objects.filter(
+                status=AdminTask.TaskStatus.PENDING,
+                secondary_users__contains=[merging_user.pk],
+            )
+            for task in pending_tasks:
+                task.status = AdminTask.TaskStatus.CANCELLED
+                task.save()
 
             # ========= HANDLE DELETION =========
             merging_user.delete()
@@ -157,10 +229,17 @@ class AdminTaskService:
                     "Primary and single secondary users must be set to merge"
                 )
             user_to_merge_into = AdminTaskService.get_user(task.primary_user.pk)
+            settings.LOGGER.info(
+                f"Merging users: primary={user_to_merge_into.pk}, "
+                f"secondary_pks={task.secondary_users}"
+            )
             users_to_merge = [
                 AdminTaskService.get_user(u) for u in task.secondary_users
             ]
             AdminTaskService.merge_users(user_to_merge_into, users_to_merge)
+            settings.LOGGER.info(
+                f"Merge complete: secondary users deleted, data transferred to {user_to_merge_into.pk}"
+            )
 
         elif task.action == AdminTask.ActionTypes.SETCARETAKER:
             user_who_needs_caretaker = AdminTaskService.get_user(task.primary_user.pk)

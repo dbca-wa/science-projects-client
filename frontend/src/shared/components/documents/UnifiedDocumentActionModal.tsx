@@ -11,12 +11,11 @@ import {
 	DialogTitle,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertTriangle, Info } from "lucide-react";
-import { RichTextEditor } from "../editor/RichTextEditor";
+import { FormRichTextEditor } from "../editor/FormRichTextEditor";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type { IProjectData } from "@/shared/types/project.types";
 import type { DocumentType } from "@/shared/utils/document.utils";
@@ -94,14 +93,7 @@ export const UnifiedDocumentActionModal = ({
 	const [showEmailCheckbox] = useState(true);
 	const [feedbackHTML, setFeedbackHTML] = useState("");
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		watch,
-		setValue,
-		reset,
-	} = useForm<FormData>({
+	const { handleSubmit, watch, setValue, reset } = useForm<FormData>({
 		resolver: zodResolver(documentActionSchema),
 		defaultValues: {
 			comment: "",
@@ -267,12 +259,13 @@ export const UnifiedDocumentActionModal = ({
 			sendEmail: data.sendEmail,
 		};
 
-		// For recall and send_back, the rich text editor content is both the reason and the email feedback
+		// All actions use the rich text editor for comments/feedback
+		formData.comment = feedbackHTML || "";
+		formData.feedbackHTML = feedbackHTML || "";
+
+		// For recall and send_back, also set reason
 		if (action === "recall" || action === "send_back") {
 			formData.reason = feedbackHTML || "";
-			formData.feedbackHTML = feedbackHTML || "";
-		} else {
-			formData.comment = data.comment || "";
 		}
 
 		onSubmit(formData);
@@ -288,13 +281,13 @@ export const UnifiedDocumentActionModal = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>{getModalTitle()}</DialogTitle>
 					<DialogDescription>{getModalDescription()}</DialogDescription>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+				<form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
 					{/* Final Approval Info */}
 					{showFinalApprovalInfo && (
 						<Alert>
@@ -318,40 +311,15 @@ export const UnifiedDocumentActionModal = ({
 						</Alert>
 					)}
 
-					{/* Comment/Reason field */}
-					{action === "recall" || action === "send_back" ? (
-						/* Rich text editor for recall and send back — serves as both reason and email feedback */
-						<div className="space-y-2">
-							<Label>{getTextareaLabel()}</Label>
-							<div className="min-h-[120px]">
-								<RichTextEditor
-									value={feedbackHTML}
-									onChange={setFeedbackHTML}
-									toolbar="simple"
-									placeholder={getTextareaPlaceholder()}
-									minHeight="120px"
-									wordLimit={2000}
-								/>
-							</div>
-						</div>
-					) : (
-						/* Plain textarea for submit, approve, reopen */
-						<div className="space-y-2">
-							<Label htmlFor="comment">{getTextareaLabel()}</Label>
-							<Textarea
-								id="comment"
-								{...register("comment")}
-								placeholder={getTextareaPlaceholder()}
-								rows={4}
-								className="resize-none"
-							/>
-							{errors.comment && (
-								<p className="text-sm text-destructive">
-									{errors.comment.message}
-								</p>
-							)}
-						</div>
-					)}
+					{/* Rich text editor for all actions */}
+					<FormRichTextEditor
+						label={getTextareaLabel()}
+						value={feedbackHTML}
+						onChange={setFeedbackHTML}
+						toolbar="simple"
+						placeholder={getTextareaPlaceholder()}
+						wordLimit={2000}
+					/>
 
 					{/* Email Notification Checkbox */}
 					{showEmailCheckbox && (

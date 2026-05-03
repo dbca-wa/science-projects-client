@@ -20,7 +20,7 @@ import { LocationSection } from "../../LocationSection";
  */
 const LocationStep = observer(() => {
 	const wizardStore = useProjectWizardStore();
-	const formData = wizardStore.state.formData.location;
+	const formData = wizardStore.state.editingFormData.location;
 	const validation = wizardStore.state.validation[2]; // Step 2 is Location
 	const stepIndex = 2;
 	const { locationsLoading, dbcaRegions, dbcaDistricts } = useLocations();

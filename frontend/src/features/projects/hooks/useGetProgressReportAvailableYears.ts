@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/shared/services/api/client.service";
 
 interface AvailableYear {
-	pk: number;
+	id: number;
 	year: number;
 }
 

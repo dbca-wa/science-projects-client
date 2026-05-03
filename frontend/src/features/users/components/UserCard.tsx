@@ -1,6 +1,7 @@
 import { UserAvatar } from "./UserAvatar";
 import type { UserCardProps } from "../types/user.types";
 import { useNavigate } from "react-router";
+import { getUserTypeVariant, UserTypeBadge } from "@/shared/components/user";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 
 /**
@@ -39,32 +40,6 @@ export const UserCard = ({
 		displayName.length > 30
 			? `${displayName.substring(0, 30)}...`
 			: displayName;
-
-	// Get role/status text and colour based on hierarchy:
-	// Admin > Key Stakeholder > Approver > BA Lead > Staff > External
-	const getRoleInfo = (): { text: string; colorClass: string } => {
-		const isBALead =
-			user.business_areas_led && user.business_areas_led.length > 0;
-
-		if (user.is_superuser) {
-			return { text: "Admin", colorClass: "text-blue-600" };
-		}
-		if ("is_key_stakeholder" in user && user.is_key_stakeholder) {
-			return { text: "Key Stakeholder", colorClass: "text-purple-600" };
-		}
-		if ("is_approver" in user && user.is_approver) {
-			return { text: "Approver", colorClass: "text-indigo-600" };
-		}
-		if (isBALead) {
-			return { text: "BA Lead", colorClass: "text-orange-600" };
-		}
-		if (user.is_staff) {
-			return { text: "Staff", colorClass: "text-green-600" };
-		}
-		return { text: "External", colorClass: "text-gray-500" };
-	};
-
-	const roleInfo = getRoleInfo();
 
 	// Get branch or affiliation text
 	const getSecondaryText = () => {
@@ -117,12 +92,12 @@ export const UserCard = ({
 					) : (
 						<p className="font-bold text-left text-gray-600">{truncatedName}</p>
 					)}
-					<p className={`text-sm ${roleInfo.colorClass}`}>
-						{roleInfo.text}
+					<div className="flex items-center gap-2">
+						<UserTypeBadge variant={getUserTypeVariant(user)} />
 						{!user.is_active && (
-							<span className="text-red-600 font-bold"> (Inactive)</span>
+							<span className="text-xs text-red-600 font-bold">(Inactive)</span>
 						)}
-					</p>
+					</div>
 					<p className="text-xs text-gray-600 dark:text-gray-300">
 						{getSecondaryText()}
 					</p>

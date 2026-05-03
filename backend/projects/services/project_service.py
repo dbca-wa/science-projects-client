@@ -509,6 +509,7 @@ class ProjectService:
         """
         project = ProjectService.get_project(pk)
         settings.LOGGER.info(f"{user} is suspending project: {project}")
+        project.status_before_suspend = project.status
         project.status = Project.StatusChoices.SUSPENDED
         project.save()
         return project

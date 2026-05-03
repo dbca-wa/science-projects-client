@@ -18,9 +18,10 @@ import { formatAuthors } from "../../utils/authors/authors.utils";
 import { formatYearRange } from "../../utils/year.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { Info, Building2, Calendar, Layers } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/features/auth";
+import { useCaretakerPermissions } from "@/features/caretakers/hooks/useCaretakerPermissions";
 import { canEditProject } from "@/shared/utils/project-permissions.utils";
 import { checkTeamManagementPermissions } from "../../utils/permissions/team-permissions.utils";
 import { ProjectTeamSection } from "../team/ProjectTeamSection";
@@ -52,6 +53,48 @@ export function OverviewTab({
 }: OverviewTabProps) {
 	// Get current user for permission checks
 	const { data: currentUser } = useCurrentUser();
+	const caretakerPerms = useCaretakerPermissions();
+
+	// Compute role-based permissions for deletion
+	const isProjectLead = useMemo(() => {
+		if (!currentUser || !members) return false;
+		return members.some((m) => m.is_leader && m.user.id === currentUser.id);
+	}, [currentUser, members]);
+
+	const isBaLead = useMemo(() => {
+		if (!currentUser || !project.business_area?.leader) return false;
+		return currentUser.id === project.business_area.leader;
+	}, [currentUser, project.business_area]);
+
+	const userIsCaretakerOfProjectLeader = useMemo(() => {
+		return caretakerPerms.canActAsProjectLead(project);
+	}, [caretakerPerms, project]);
+
+	const userIsCaretakerOfBaLeader = useMemo(() => {
+		if (!project.business_area) return false;
+		return caretakerPerms.canActAsBusinessAreaLead(project.business_area);
+	}, [caretakerPerms, project.business_area]);
+
+	// Determine if user can directly delete (vs request deletion)
+	const canDirectDelete = useMemo(() => {
+		if (!currentUser) return false;
+		if (currentUser.is_superuser) return true;
+		if (isBaLead || userIsCaretakerOfBaLeader) return true;
+		if (isProjectLead || userIsCaretakerOfProjectLeader) {
+			const createdAt = new Date(project.created_at);
+			const sevenDaysAgo = new Date();
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			return createdAt >= sevenDaysAgo;
+		}
+		return false;
+	}, [
+		currentUser,
+		isBaLead,
+		userIsCaretakerOfBaLeader,
+		isProjectLead,
+		userIsCaretakerOfProjectLeader,
+		project.created_at,
+	]);
 
 	// Calculate team management permissions
 	const canManageTeam = currentUser
@@ -97,6 +140,23 @@ export function OverviewTab({
 	// Modal handlers
 	const handleCreateStudentReport = () => setIsCreateStudentReportOpen(true);
 	const handleCreateProgressReport = () => setIsCreateProgressReportOpen(true);
+
+	const handleCreateConceptPlan = async () => {
+		try {
+			const { apiClient } =
+				await import("@/shared/services/api/client.service");
+			await apiClient.post("documents/spawn", {
+				project: project.id,
+				kind: "concept",
+			});
+			const { toast } = await import("sonner");
+			toast.success("Concept plan created");
+			window.location.reload();
+		} catch {
+			const { toast } = await import("sonner");
+			toast.error("Failed to create concept plan");
+		}
+	};
 	const handleSuspendProject = () => setIsSuspendModalOpen(true);
 	const handleUnsuspendProject = () => setIsSuspendModalOpen(true); // Same modal
 	const handleCloseProject = () => setIsClosureModalOpen(true);
@@ -240,6 +300,11 @@ export function OverviewTab({
 							project={project}
 							documents={documents}
 							currentUser={currentUser ?? null}
+							isBaLead={isBaLead}
+							userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+							isProjectLead={isProjectLead}
+							userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
+							onCreateConceptPlan={handleCreateConceptPlan}
 							onCreateStudentReport={handleCreateStudentReport}
 							onCreateProgressReport={handleCreateProgressReport}
 							onSuspendProject={handleSuspendProject}
@@ -271,6 +336,7 @@ export function OverviewTab({
 								label="External Description"
 								placeholder="Enter external project description..."
 								emptyMessage="No external description available."
+								toolbar="projectTitle"
 							/>
 						</div>
 
@@ -284,6 +350,7 @@ export function OverviewTab({
 								label="External Aims"
 								placeholder="Enter external project aims..."
 								emptyMessage="No external aims available."
+								toolbar="projectTitle"
 							/>
 						</div>
 					</>
@@ -299,6 +366,7 @@ export function OverviewTab({
 								label="Description"
 								placeholder="Enter project description..."
 								emptyMessage="No description available."
+								toolbar="projectTitle"
 							/>
 						</div>
 					</>
@@ -345,6 +413,7 @@ export function OverviewTab({
 				onClose={() => setIsSuspendModalOpen(false)}
 				projectId={project.id}
 				currentStatus={project.status}
+				statusBeforeSuspend={project.status_before_suspend}
 			/>
 
 			{/* Project Closure Modal */}
@@ -372,8 +441,8 @@ export function OverviewTab({
 				/>
 			)}
 
-			{/* Delete Project Modal - Superuser only */}
-			{currentUser?.is_superuser && (
+			{/* Delete Project Modal — users who can directly delete */}
+			{canDirectDelete && (
 				<DeleteProjectModal
 					isOpen={isDeleteModalOpen}
 					onClose={() => setIsDeleteModalOpen(false)}
@@ -381,8 +450,8 @@ export function OverviewTab({
 				/>
 			)}
 
-			{/* Request Delete Project Modal - Non-superuser */}
-			{!currentUser?.is_superuser && (
+			{/* Request Delete Project Modal — users who cannot directly delete */}
+			{!canDirectDelete && (
 				<RequestDeleteProjectModal
 					isOpen={isRequestDeleteModalOpen}
 					onClose={() => setIsRequestDeleteModalOpen(false)}

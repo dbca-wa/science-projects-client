@@ -25,8 +25,9 @@ export const useRequestMergeUsers = () => {
 			// Dismiss loading toast
 			toast.dismiss();
 
-			// Invalidate user list cache
+			// Invalidate caches so the UI updates immediately
 			queryClient.invalidateQueries({ queryKey: ["users"] });
+			queryClient.invalidateQueries({ queryKey: ["adminTasks"] });
 
 			// Show success toast
 			toast.success("Request Made");

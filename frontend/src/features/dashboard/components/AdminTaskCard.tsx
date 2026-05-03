@@ -16,9 +16,9 @@ export const AdminTaskCard = ({ task }: AdminTaskCardProps) => {
 		}
 
 		if (e.ctrlKey || e.metaKey) {
-			window.open("/admin", "_blank");
+			window.open("/manage/data", "_blank");
 		} else {
-			navigate("/admin");
+			navigate("/manage/data");
 		}
 	};
 

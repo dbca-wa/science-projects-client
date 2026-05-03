@@ -58,7 +58,7 @@ function UserIdLink({ userId }: { userId: number }) {
 	return <UserLink userId={userId} displayName={getUserDisplayName(user)} />;
 }
 
-export function BusinessAreaList() {
+export const BusinessAreaList = () => {
 	const navigate = useNavigate();
 	const { data: businessAreas = [], isLoading, error } = useBusinessAreas();
 	const deleteMutation = useDeleteBusinessArea();
@@ -76,7 +76,7 @@ export function BusinessAreaList() {
 	};
 
 	const handleEdit = (item: IBusinessArea) => {
-		navigate(`/admin/business-areas/${item.id}/edit`);
+		navigate(`/manage/business-areas/${item.id}/edit`);
 	};
 
 	const handleDeleteConfirm = () => {
@@ -185,4 +185,4 @@ export function BusinessAreaList() {
 			/>
 		</>
 	);
-}
+};

@@ -47,7 +47,12 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 		divisions?.some((d) => d.key_stakeholder?.id === currentUser.id)
 	);
 
-	const navigateAndClose = (path: string) => {
+	const navigateAndClose = (path: string, e?: React.MouseEvent) => {
+		// Ctrl+click or Cmd+click opens in new tab
+		if (e && (e.ctrlKey || e.metaKey)) {
+			window.open(path, "_blank");
+			return;
+		}
 		onClose(); // Trigger close animation
 		handleNavigation(path); // Navigate
 	};
@@ -69,7 +74,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 					<Button
 						variant="ghost"
 						className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base flex-1 pl-6"
-						onClick={() => navigateAndClose("/users/me")}
+						onClick={(e) => navigateAndClose("/users/me", e)}
 					>
 						<span className="flex items-center gap-3">
 							<User className="text-xl" aria-hidden="true" />
@@ -87,8 +92,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base w-full pl-6"
-							onClick={() =>
-								navigateAndClose(`/staff/${authStore.user!.staff_profile_id}`)
+							onClick={(e) =>
+								navigateAndClose(
+									`/staff/${authStore.user!.staff_profile_id}`,
+									e
+								)
 							}
 						>
 							<span className="flex items-center gap-3">
@@ -111,7 +119,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/projects")}
+							onClick={(e) => navigateAndClose("/projects", e)}
 						>
 							<span className="flex items-center gap-3">
 								<CgBrowse className="text-xl" aria-hidden="true" />
@@ -121,7 +129,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/projects/map")}
+							onClick={(e) => navigateAndClose("/projects/map", e)}
 						>
 							<span className="flex items-center gap-3">
 								<FaMapMarkedAlt className="text-xl" aria-hidden="true" />
@@ -131,7 +139,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/projects/create")}
+							onClick={(e) => navigateAndClose("/projects/create", e)}
 						>
 							<span className="flex items-center gap-3">
 								<CgPlayListAdd className="text-xl" aria-hidden="true" />
@@ -148,7 +156,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/users")}
+							onClick={(e) => navigateAndClose("/users", e)}
 						>
 							<span className="flex items-center gap-3">
 								<ImUsers className="text-xl" aria-hidden="true" />
@@ -158,7 +166,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/users/create")}
+							onClick={(e) => navigateAndClose("/users/create", e)}
 						>
 							<span className="flex items-center gap-3">
 								<FaUserPlus className="text-xl" aria-hidden="true" />
@@ -169,7 +177,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/create-staff")}
+								onClick={(e) => navigateAndClose("/manage/create-staff", e)}
 							>
 								<span className="flex items-center gap-3">
 									<FaUserPlus className="text-xl" aria-hidden="true" />
@@ -184,20 +192,22 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<h2 className="px-3 py-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
 							Reports
 						</h2>
+						{(authStore.isSuperuser || isKeyStakeholder) && (
+							<Button
+								variant="ghost"
+								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
+								onClick={(e) => navigateAndClose("/reports/details", e)}
+							>
+								<span className="flex items-center gap-3">
+									<FileText className="text-xl" aria-hidden="true" />
+									<span>Report Details</span>
+								</span>
+							</Button>
+						)}
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/reports/details")}
-						>
-							<span className="flex items-center gap-3">
-								<FileText className="text-xl" aria-hidden="true" />
-								<span>Report Details</span>
-							</span>
-						</Button>
-						<Button
-							variant="ghost"
-							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/reports")}
+							onClick={(e) => navigateAndClose("/reports", e)}
 						>
 							<span className="flex items-center gap-3">
 								<Archive className="text-xl" aria-hidden="true" />
@@ -209,7 +219,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/reports/business-area")}
+								onClick={(e) => navigateAndClose("/reports/business-area", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Briefcase className="text-xl" aria-hidden="true" />
@@ -221,7 +231,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/reports/my-division")}
+								onClick={(e) => navigateAndClose("/reports/my-division", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Building className="text-xl" aria-hidden="true" />
@@ -245,7 +255,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/data")}
+								onClick={(e) => navigateAndClose("/manage/data", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Database className="text-xl" aria-hidden="true" />
@@ -255,7 +265,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/emails")}
+								onClick={(e) => navigateAndClose("/manage/emails", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Mail className="text-xl" aria-hidden="true" />
@@ -265,11 +275,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/email-testing")}
+								onClick={(e) => navigateAndClose("/manage/admin-testing", e)}
 							>
 								<span className="flex items-center gap-3">
 									<FlaskConical className="text-xl" aria-hidden="true" />
-									<span>Email Testing</span>
+									<span>Admin Testing</span>
 								</span>
 							</Button>
 
@@ -280,7 +290,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/addresses")}
+								onClick={(e) => navigateAndClose("/manage/addresses", e)}
 							>
 								<span className="flex items-center gap-3">
 									<MapPin className="text-xl" aria-hidden="true" />
@@ -290,7 +300,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/affiliations")}
+								onClick={(e) => navigateAndClose("/manage/affiliations", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Building className="text-xl" aria-hidden="true" />
@@ -300,7 +310,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/branches")}
+								onClick={(e) => navigateAndClose("/manage/branches", e)}
 							>
 								<span className="flex items-center gap-3">
 									<GitBranch className="text-xl" aria-hidden="true" />
@@ -310,7 +320,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/business-areas")}
+								onClick={(e) => navigateAndClose("/manage/business-areas", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Briefcase className="text-xl" aria-hidden="true" />
@@ -320,7 +330,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/divisions")}
+								onClick={(e) => navigateAndClose("/manage/divisions", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Settings className="text-xl" aria-hidden="true" />
@@ -330,7 +340,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/locations")}
+								onClick={(e) => navigateAndClose("/manage/locations", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Globe className="text-xl" aria-hidden="true" />
@@ -340,7 +350,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/reports")}
+								onClick={(e) => navigateAndClose("/manage/reports", e)}
 							>
 								<span className="flex items-center gap-3">
 									<FileText className="text-xl" aria-hidden="true" />
@@ -350,7 +360,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/manage/services")}
+								onClick={(e) => navigateAndClose("/manage/services", e)}
 							>
 								<span className="flex items-center gap-3">
 									<List className="text-xl" aria-hidden="true" />
@@ -365,7 +375,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={() => navigateAndClose("/reports/my-division")}
+								onClick={(e) => navigateAndClose("/reports/my-division", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Settings className="text-xl" aria-hidden="true" />
@@ -384,7 +394,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-							onClick={() => navigateAndClose("/guide")}
+							onClick={(e) => navigateAndClose("/guide", e)}
 						>
 							<span className="flex items-center gap-3">
 								<BookOpen className="text-xl" aria-hidden="true" />

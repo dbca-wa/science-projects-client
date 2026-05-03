@@ -90,6 +90,9 @@ class ProjectDocumentCreateSerializer(serializers.ModelSerializer):
         fields = [
             "project",
             "kind",
+            "status",
+            "creator",
+            "modifier",
         ]
 
 

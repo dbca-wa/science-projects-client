@@ -9,9 +9,15 @@
 	position: relative;
 	width: 100%;
 	max-width: 100%;
+	min-width: 0; /* Prevent flex/grid children from expanding beyond container */
 	scroll-margin-top: 0;
 	scroll-margin-bottom: 0;
 	/* No border-radius or overflow here - parent container handles it */
+}
+
+/* Read-only editor container — allow horizontal scroll for wide tables */
+.editor-container.editor-readonly {
+	overflow-x: auto;
 }
 
 /* Content wrapper - connects with toolbar */
@@ -44,6 +50,7 @@
 	overflow-x: auto;
 	overflow-y: auto;
 	max-width: 100%;
+	min-width: 0; /* Prevent flex/grid children from expanding beyond container */
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	scroll-margin-top: 0;
@@ -363,6 +370,9 @@
 	padding: 0;
 	cursor: default;
 	min-height: auto;
+	overflow-x: auto; /* Allow horizontal scroll for wide tables */
+	max-width: 100%;
+	min-width: 0;
 }
 
 /* ─── Display mode typography ─── */
@@ -756,7 +766,6 @@
 .editor-table {
 	border-collapse: collapse;
 	border-spacing: 0;
-	overflow-x: auto;
 	overflow-y: visible;
 	table-layout: fixed;
 	width: 100%;
@@ -1195,6 +1204,7 @@
 	border-spacing: 0;
 	table-layout: fixed;
 	width: 100%;
+	min-width: 400px; /* Ensure table has minimum width for readability */
 	margin: 1.5rem 0;
 }
 

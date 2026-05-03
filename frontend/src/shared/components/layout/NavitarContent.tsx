@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthStore, useUIStore } from "@/app/stores/store-context";
 import { useLogout } from "@/features/auth/hooks/useAuth";
+import { hasModifierKey } from "@/shared/utils/navigation.utils";
 import {
 	Avatar,
 	AvatarFallback,
@@ -28,6 +29,15 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 	const authStore = useAuthStore();
 	const uiStore = useUIStore();
 	const { mutate: logout } = useLogout();
+
+	const navigateOrOpen = (path: string, e: React.MouseEvent) => {
+		if (hasModifierKey(e.nativeEvent)) {
+			window.open(path, "_blank");
+		} else {
+			navigate(path);
+		}
+		onClose();
+	};
 	const { handleKeyDown, registerMenuItem, focusFirstItem } =
 		useMenuKeyboardNavigation(onClose);
 
@@ -78,9 +88,8 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 				<button
 					ref={registerMenuItem(0)}
 					type="button"
-					onClick={() => {
-						navigate("/users/me");
-						onClose();
+					onClick={(e) => {
+						navigateOrOpen("/users/me", e);
 					}}
 					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 					role="menuitem"
@@ -96,9 +105,11 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 					<button
 						ref={registerMenuItem(1)}
 						type="button"
-						onClick={() => {
-							navigate(`/staff/${snapshot.userData!.staff_profile_id}`);
-							onClose();
+						onClick={(e) => {
+							navigateOrOpen(
+								`/staff/${snapshot.userData!.staff_profile_id}`,
+								e
+							);
 						}}
 						className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 						role="menuitem"
@@ -155,20 +166,19 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 							</span>
 						</div>
 
-						{/* Email Testing */}
+						{/* Admin Testing */}
 						<button
 							ref={registerMenuItem(3)}
 							type="button"
-							onClick={() => {
-								navigate("/manage/email-testing");
-								onClose();
+							onClick={(e) => {
+								navigateOrOpen("/manage/admin-testing", e);
 							}}
 							className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 							role="menuitem"
 						>
 							<div className="flex gap-2 items-center">
 								<Mail className="h-4 w-4" aria-hidden="true" />
-								<span className="text-sm">Email Testing</span>
+								<span className="text-sm">Admin Testing</span>
 							</div>
 						</button>
 					</div>
@@ -189,9 +199,8 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 				<button
 					ref={registerMenuItem(4)}
 					type="button"
-					onClick={() => {
-						navigate("/guide");
-						onClose();
+					onClick={(e) => {
+						navigateOrOpen("/guide", e);
 					}}
 					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 					role="menuitem"

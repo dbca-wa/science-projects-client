@@ -1,397 +1,674 @@
+/* ============================================
+   PDF Template Styles — PrinceXML
+   Colour palette:
+     Navy blue:  #2A6096
+     Teal:       #01A7B2
+     Gold:       #FFC530
+     Dark teal:  #1E5456
+   ============================================ */
+
+/* ---- Page setup ---- */
+
+@page {
+    size: A4;
+    margin: 25mm 20mm 15mm 20mm;
+}
+
+@page coverpage {
+    margin: 0 !important;
+    @top-center { content: none; }
+    @bottom-center { content: none; }
+}
+
+@page main_pages {
+    @top-center {
+        content: element(running-header);
+    }
+    @bottom-left {
+        content: element(running-footer-title) !important;
+        vertical-align: middle !important;
+        font-size: 9px !important;
+        color: #6b7280 !important;
+        border-top: 0.5pt solid #e5e7eb !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    @bottom-right {
+        content: "Page " counter(page) " of " counter(pages) !important;
+        font-family: 'Red Hat Display', sans-serif !important;
+        font-size: 9px !important;
+        color: #6b7280 !important;
+        vertical-align: middle !important;
+        border-top: 0.5pt solid #e5e7eb !important;
+        padding-top: 6px !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+/* ---- Page assignment ---- */
+
 .coverpage_page {
-	page: coverpage;
-	prince-page-group: start;
+    page: coverpage;
+    prince-page-group: start;
 }
 
 .main_pages {
-	page: main_pages;
-	counter-reset: page 1 pages 1;
-	prince-page-group: start;
-	prince-start-page: right;
+    page: main_pages;
+    counter-reset: page 1 pages 1;
+    prince-page-group: start;
 }
 
-/* TABLES */
+/* ---- Base typography ---- */
+
+body {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #1f2937;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-family: Georgia, 'Libre Caslon', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2A6096;
+    margin: 0;
+}
+
+h2 {
+    font-family: Georgia, 'Libre Caslon', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1E5456;
+    margin-top: 30px;
+    margin-bottom: 14px;
+}
+
+p {
+    margin-bottom: 16px;
+}
+
+p br {
+    display: none;
+}
+
+/* ---- Cover page ---- */
+
+.cover-content {
+    padding: 50px 70px 20px;
+}
+
+.cover-doc-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #6b7280;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.cover-dept-service {
+    font-size: 10px;
+    color: #2A6096;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.cover-title {
+    font-family: Georgia, 'Libre Caslon', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2A6096;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 20px;
+    text-wrap: balance;
+    -prince-text-wrap: balance;
+}
+
+.cover-title-link {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+/* 4-colour bar — use table layout for PrinceXML compatibility */
+.colour-bar {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto 20px;
+    border-collapse: separate;
+    border-spacing: 8px 0;
+    table-layout: fixed;
+}
+
+.colour-bar td {
+    height: 6px;
+    padding: 0;
+    border: none;
+}
+
+.colour-bar-navy-td { background: #2A6096; }
+.colour-bar-teal-td { background: #01A7B2; }
+.colour-bar-gold-td { background: #FFC530; }
+.colour-bar-dark-teal-td { background: #1E5456; }
+
+.cover-date {
+    text-align: center;
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 42px;
+    margin-top: 16px;
+}
+
+/* ---- Cover image ---- */
+
+.cover-image-container {
+    width: 450px;
+    height: 324px;
+    margin: 0 auto 42px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cover-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+    outline: none;
+}
+
+/* ---- Approval timeline ---- */
+
+.approval-timeline {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.approval-timeline-inner {
+    display: inline-block;
+    width: 460px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 16px;
+    background: #fafbfc;
+    position: relative;
+}
+
+/* Background lines between circle centres — two separate lines */
+.approval-line-1 {
+    position: absolute;
+    top: 37px;
+    left: 16.67%;
+    width: 33.33%;
+    height: 4px;
+}
+
+.approval-line-2 {
+    position: absolute;
+    top: 37px;
+    left: 50%;
+    width: 33.33%;
+    height: 4px;
+}
+
+.approval-line-fill {
+    width: 100%;
+    height: 100%;
+}
+
+.approval-icons-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    position: relative;
+    z-index: 2;
+}
+
+.approval-icons-table td {
+    padding: 0 !important;
+    border: none !important;
+    text-align: center !important;
+    vertical-align: top !important;
+    width: 33.33% !important;
+}
+
+.approval-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    line-height: 42px;
+    font-size: 22px;
+    font-weight: 900;
+    border: 3px solid white;
+    vertical-align: middle;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 3;
+    background-clip: padding-box;
+}
+
+.approval-approved {
+    background: #2A6096;
+    color: white;
+    box-shadow: 0 2px 6px rgba(42, 96, 150, 0.3);
+}
+
+.approval-pending {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+
+.approval-exclamation {
+    font-size: 20px;
+    font-weight: 700;
+    color: #9ca3af;
+    line-height: 36px;
+    display: block;
+    margin-top: -3px;
+}
+
+.approval-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+    margin-top: 8px;
+}
+
+.approval-label-active { color: #374151; }
+.approval-label-inactive { color: #9ca3af; }
+
+.connector-active { background: #2A6096; }
+.connector-inactive { background: #d1d5db; }
+
+/* ---- Metadata grid ---- */
+
+.metadata-grid {
+    border: 1.5px solid rgba(42, 96, 150, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.metadata-row-two-col {
+    display: flex;
+}
+
+.metadata-cell {
+    padding: 12px 18px;
+    background: white;
+    flex: 1;
+}
+
+.metadata-cell-left {
+    border-right: 1px solid #e5e7eb;
+}
+
+.metadata-row-full {
+    padding: 12px 18px;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    text-align: center;
+}
+
+.metadata-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.metadata-label-navy { color: #2A6096; }
+.metadata-label-teal { color: #01A7B2; }
+.metadata-label-dark-teal { color: #1E5456; }
+
+.metadata-value {
+    font-size: 13px;
+    font-weight: 400;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.metadata-value-team {
+    text-align: center !important;
+}
+
+/* Team members table — invisible borders, evenly spaced in 3 columns */
+.team-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin-top: 4px;
+}
+
+.team-cell {
+    padding: 3px 6px !important;
+    border: none !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #1f2937 !important;
+    background: none !important;
+}
+
+/* ---- Running header ---- */
+
+.running-header {
+    position: running(running-header);
+}
+
+.running-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e5e7eb;
+    height: 45px !important;
+    overflow: hidden !important;
+}
+
+.running-header-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 45px !important;
+    overflow: hidden !important;
+}
+
+.header-logo {
+    width: 65px !important;
+    height: 65px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+    display: block !important;
+    margin-top: 0px !important;
+}
+
+.running-header-right {
+    text-align: right;
+}
+
+.header-doc-info {
+    font-size: 10px;
+    font-weight: 700;
+    color: #2A6096;
+    margin-bottom: 3px;
+}
+
+.header-business-area {
+    font-size: 9px;
+    color: #6b7280;
+}
+
+/* Thin colour bar — used in footer area */
+.colour-bar-thin-footer {
+    height: 2px;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    margin-bottom: 8px;
+}
+
+.colour-bar-thin-footer td {
+    height: 2px;
+    padding: 0;
+    border: none;
+}
+
+/* ---- Running footer ---- */
+
+.running-footer-title {
+    position: running(running-footer-title);
+    font-size: 9px;
+    color: #6b7280;
+}
+
+/* Colour bar above footer area */
+.footer-colour-bar {
+    position: running(footer-colour-bar);
+}
+
+.colour-bar-thin-footer {
+    height: 2px;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    margin-bottom: 8px;
+}
+
+.colour-bar-thin-footer td {
+    height: 2px;
+    padding: 0;
+    border: none;
+}
+
+/* ---- Content sections ---- */
+
+.content-section {
+    margin-bottom: 30px;
+    max-width: 100%;
+    /* Keep section title together with at least the first paragraph */
+    break-inside: auto;
+}
+
+.content-section-break {
+    /* No forced page break — let content flow naturally */
+}
+
+.section-title-container {
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-family: Georgia, 'Libre Caslon', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2A6096;
+    margin-bottom: 10px;
+}
+
+/* Section underline — thin 4-colour bar matching cover page */
+.section-title-underline {
+    width: 40%;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.section-title-underline td {
+    height: 3px;
+    padding: 0 !important;
+    border: none !important;
+    border-right: 4px solid white !important;
+}
+
+.section-title-underline td:last-child {
+    border-right: none !important;
+}
+
+.section-content {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #1f2937;
+    text-align: justify;
+    orphans: 4;
+    widows: 4;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.section-content p {
+    orphans: 4;
+    widows: 4;
+}
+
+.section-content ul,
+.section-content ol {
+    orphans: 4;
+    widows: 4;
+}
+
+/* First paragraph after a section title should stay with the title */
+.section-content p:first-child {
+    page-break-before: avoid;
+}
+
+.section-content * {
+    page-break-before: auto;
+}
+
+/* Override text alignment for tables */
+.section-content table,
+.section-content table * {
+    text-align: initial !important;
+}
+
+/* Methodology image */
+.meth-image-container {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.meth-image {
+    width: 100%;
+}
+
+/* ---- Tables ---- */
 
 .table-light {
-	border-collapse: separate;
-	border-spacing: 0;
-	width: 100%;
-	margin: 30px 0;
-	border: 1px solid #d1d5db;
-	border-radius: 4px;
-	overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
+    margin: 30px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-/* Ensure all table cells have no default borders */
 .table-light th,
 .table-light td {
-	border: none;
+    border: none;
 }
 
 .table-cell-light {
-	background-color: #ffffff;
-	outline: none;
-	min-width: 75px;
-	word-wrap: break-word;
-	padding: 12px 16px;
-	vertical-align: top;
-	text-align: start;
-	border-right: 1px solid #f3f4f6;
-	border-bottom: 1px solid #f3f4f6;
+    background-color: #ffffff;
+    outline: none;
+    min-width: 75px;
+    word-wrap: break-word;
+    padding: 12px 16px;
+    vertical-align: top;
+    text-align: start;
+    border-right: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f3f4f6;
 }
 
 .table-cell-header-light {
-	background-color: rgb(242, 243, 245);
-	text-align: start;
-	font-weight: 600;
-	color: rgb(46, 46, 46);
+    background-color: #f9fafb;
+    text-align: start;
+    font-weight: 700;
+    font-size: 9pt;
+    text-transform: uppercase;
+    color: #1f2937;
 }
 
 /* Remove right border from last cell in each row */
 .table-light th:last-child,
 .table-light td:last-child {
-	border-right: none;
+    border-right: none;
 }
 
 /* Remove bottom border from last row */
 .table-light tr:last-child th,
 .table-light tr:last-child td {
-	border-bottom: none;
+    border-bottom: none;
 }
 
 /* Rounded corners for first/last cells */
 .table-light tr:first-child th:first-child,
 .table-light tr:first-child td:first-child {
-	border-top-left-radius: 6px;
+    border-top-left-radius: 6px;
 }
 
 .table-light tr:first-child th:last-child,
 .table-light tr:first-child td:last-child {
-	border-top-right-radius: 6px;
+    border-top-right-radius: 6px;
 }
 
 .table-light tr:last-child th:first-child,
 .table-light tr:last-child td:first-child {
-	border-bottom-left-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
 
 .table-light tr:last-child th:last-child,
 .table-light tr:last-child td:last-child {
-	border-bottom-right-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
-/* First column (headers) styling */
+/* First column styling */
 .table-light th:first-child,
 .table-light td:first-child {
-	background-color: rgb(242, 243, 245);
-	font-weight: 600;
+    background-color: #f9fafb;
+    font-weight: 600;
 }
 
 /* Table paragraphs */
 .table-light p {
-	margin: 0;
-	padding: 0;
-	line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
 }
 
-/* Wide tables (7+ columns) - reduce padding and font size */
+/* Wide tables (7+ columns) */
 .table-light.table-wide {
-	font-size: 11px;
+    font-size: 11px;
 }
 
 .table-light.table-wide th,
 .table-light.table-wide td {
-	padding: 8px 10px;
-	min-width: 50px;
+    padding: 8px 10px;
+    min-width: 50px;
 }
 
 .table-light.table-wide .table-cell-light {
-	padding: 8px 10px;
-	min-width: 50px;
+    padding: 8px 10px;
+    min-width: 50px;
 }
 
-/* PROJECT DOCUMENT PAGE LAYOUT */
-
-.project_document_body {
-	max-width: 190mm;
-}
-
-/* PROJECT DOCUMENT COVER PAGE */
-
-.project_document_doc_kind_text {
-	font-size: 20px;
-	font-weight: 900;
-	line-height: 14px;
-	margin: 16px 0;
-	margin-top: 100px;
-	text-align: center;
-
-	/* font-family: "Red Hat Display"; */
-}
-
-.project_document_date_text {
-	font-size: 14px;
-	line-height: 14px;
-	margin-top: 16px;
-	text-align: center;
-	color: rgb(71, 71, 71);
-}
-
-.project_document_title_link {
-	text-decoration: none;
-}
-
-.project_document_title_h1 {
-	color: rgb(0, 102, 204);
-	font-size: 24px !important;
-	font-weight: 400;
-	padding: 0px;
-	padding-left: 60px;
-	padding-right: 60px;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	margin-left: 0px;
-	margin-right: 0px;
-	cursor: pointer;
-
-	text-align: center;
-	/* text-align: justify; */
-	/* text-justify: inter-word; */
-	/* text-wrap: balance;
-    -prince-text-wrap: balance; */
-}
-
-.project_document_project_image_container {
-	width: 500px;
-	height: 300px;
-	overflow: hidden;
-	border-radius: 25px;
-	margin: 36px auto;
-	/* margin: 0 auto; */
-	position: relative;
-}
-
-.project_document_project_image {
-	display: block;
-	outline: none;
-	border: none;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.project_document_service_h1 {
-	/* color: rgb(0, 0, 0); */
-	color: rgb(48, 48, 48);
-
-	font-size: 16px;
-	font-style: bold;
-	font-weight: 700;
-	text-align: center;
-	padding: 0px;
-	margin-top: 20px;
-	margin-bottom: 0;
-	/* margin-bottom: 30px;  */
-	margin-left: 0px;
-	margin-right: 0px;
-}
-
-p br {
-	display: none;
-}
-
-.project_document_business_area_h1 {
-	/* color: rgb(0, 0, 0); */
-	color: rgb(71, 71, 71);
-
-	font-size: 16px;
-	font-style: bold;
-	font-weight: 600;
-	text-align: center;
-	padding: 0px;
-	margin: 0px;
-	margin-bottom: 5px;
-}
-
-.project_document_tag_h1 {
-	/* color: rgb(0, 0, 0); */
-	color: rgb(71, 71, 71);
-
-	font-size: 14px;
-	font-weight: 700;
-	text-align: center;
-	padding: 0px;
-	margin: 0px;
-}
-
-.project_document_team_container {
-	/* justify-content: center; */
-}
-
-.project_document_team_h1 {
-	color: rgb(48, 48, 48);
-	font-size: 15px;
-	font-weight: 700;
-	text-align: center;
-	text-wrap: balance;
-
-	padding: 0px;
-	margin-top: 40px;
-	margin-bottom: 2px;
-	padding-bottom: 2px;
-	margin-left: 0px;
-	margin-right: 0px;
-}
-
-.project_document_team_member_text {
-	color: rgb(48, 48, 48);
-	/* background-color: red; */
-	padding: 0px;
-	margin: 0 180px;
-
-	font-size: 14px;
-	font-weight: 400;
-
-	text-align: center;
-
-	/* NOT SUPPORTED IN PRINCE */
-	/* text-wrap: balance;
-    -prince-text-wrap: balance;  */
-}
-
-.project_document_approvals_container {
-	justify-content: flex-end;
-	display: flex;
-	align-items: center;
-	/* padding-bottom: 25px; */
-	-prince-float: bottom;
-	-prince-float-reference: page;
-}
-
-.project_document_approvals_subcontainer {
-	display: flex;
-	align-items: flex-end;
-	flex-direction: column;
-}
-
-.project_document_approvals_row {
-	display: flex;
-	align-items: center;
-}
-
-.project_document_approvals_text {
-	font-size: 14px;
-	line-height: 14px;
-	margin: 0px;
-	color: rgb(75, 75, 75);
-	font-weight: 700;
-	text-align: right;
-}
-
-.project_document_approvals_svg_container {
-	margin-left: 8px;
-}
-
-.project_document_approvals_svg {
-	height: 25px;
-	width: 25px;
-}
-
-/* PROJECT DOCUMENT DATA */
-
-.project_document_data_container {
-	margin-top: 32px;
-	margin-bottom: 32px;
-	max-width: 190mm;
-	break-before: page;
-}
-
-.project_document_section_data_container {
-	text-align: left;
-	margin-bottom: 30px;
-	page-break-inside: avoid; /* Avoid breaking inside the elements */
-}
-
-.project_document_section_data_container * {
-	font-size: 14px;
-}
-
-.project_document_section_title_container {
-	page-break-inside: avoid; /* Prevent splitting the hr and title */
-}
-
-.project_document_section_h1_title {
-	color: rgb(46, 46, 46);
-	font-size: 18px;
-	font-weight: 700;
-	margin-bottom: 8px;
-}
-
-.project_document_section_h1_title_hr {
-	margin: 0;
-	padding: 0;
-	margin-bottom: -5px;
-	height: 0.01px;
-	background-color: #cccccc;
-	border: none;
-}
-.project_document_section_content_container * {
-	page-break-before: auto;
-	text-align: justify !important;
-}
-
-/* Override text alignment for tables and their children */
-.project_document_section_content_container table,
-.project_document_section_content_container table * {
-	text-align: initial !important; /* or left, center, right, depending on your preference */
-}
-
-.project_document_view_project_container {
-	text-align: right;
-	margin-top: 32px;
-	margin-bottom: 32px;
-}
-
-.project_document_view_project_link {
-	line-height: 100%;
-	text-decoration: none;
-	display: inline-block;
-	max-width: 100%;
-	background-color: rgb(0, 0, 0);
-	border-radius: 0.25rem;
-	color: rgb(255, 255, 255);
-	font-size: 12px;
-	font-weight: 600;
-	text-decoration-line: none;
-	text-align: center;
-	padding-left: 1.25rem;
-	padding-right: 1.25rem;
-	padding-top: 0.75rem;
-	padding-bottom: 0.75rem;
-	padding: 12px 20px 12px 20px;
-}
-
-.meth_image_container {
-	width: 100%;
-	overflow: hidden;
-	border-radius: 10px;
-	margin-top: 30px;
-}
-
-.meth_image {
-	width: 100%;
-}
-
-/* Lists */
+/* ---- Lists ---- */
 
 li {
-	padding-left: 1px !important; /* Adds some padding for readability */
-	line-height: 16px !important;
+    padding-left: 1px !important;
+    line-height: 16px !important;
+    margin-bottom: 8px;
 }
 
 ol,
 ul {
-	margin: 0 !important;
-	padding: 0 !important;
-	margin-top: 15px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 15px !important;
+    margin-left: 24px !important;
 }

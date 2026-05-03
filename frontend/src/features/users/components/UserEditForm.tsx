@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useBlocker } from "react-router";
+import { useNavigate } from "react-router";
 import {
 	Form,
 	FormControl,
@@ -32,7 +32,6 @@ import {
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import { ImageUpload } from "@/shared/components/media";
 import { FormRichTextEditor } from "@/shared/components/editor";
-import { UnsavedChangesDialog } from "@/shared/components/editor/UnsavedChangesDialog";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import { useUpdateUser } from "../hooks/useUpdateUser";
@@ -72,7 +71,6 @@ export const UserEditForm = ({
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
 	const { data: branches, isLoading: isLoadingBranches } = useBranches();
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	// Initialise form
 	const form = useForm<UserEditFormData>({
@@ -91,52 +89,6 @@ export const UserEditForm = ({
 			image: "",
 		},
 	});
-
-	// Block navigation when form has unsaved changes
-	const blocker = useBlocker(({ currentLocation, nextLocation }) => {
-		const isDirty = form.formState.isDirty;
-		const pathChanged = currentLocation.pathname !== nextLocation.pathname;
-
-		return isDirty && pathChanged && !updateMutation.isSuccess;
-	});
-
-	// Handle blocker state changes - synchronizing with React Router blocker
-	// This is necessary to show the unsaved changes dialog when navigation is blocked
-	useEffect(() => {
-		if (blocker.state === "blocked") {
-			// eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronizing with React Router blocker state
-			setIsDialogOpen(true);
-		}
-	}, [blocker.state]);
-
-	// Block browser-level navigation (tab close, refresh, back button)
-	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			if (form.formState.isDirty && !updateMutation.isSuccess) {
-				e.preventDefault();
-				e.returnValue = "";
-			}
-		};
-
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, [form.formState.isDirty, updateMutation.isSuccess]);
-
-	// Dialog handlers
-	const handleProceed = () => {
-		setIsDialogOpen(false);
-		form.reset(); // Reset form to mark as not dirty
-		if (blocker.state === "blocked") {
-			blocker.proceed?.();
-		}
-	};
-
-	const handleCancelDialog = () => {
-		setIsDialogOpen(false);
-		if (blocker.state === "blocked") {
-			blocker.reset?.();
-		}
-	};
 
 	// Pre-populate form when user data loads AND dropdown data has loaded
 	useEffect(() => {
@@ -683,12 +635,6 @@ export const UserEditForm = ({
 					</Button>
 				</div>
 			</form>
-
-			<UnsavedChangesDialog
-				isOpen={isDialogOpen}
-				onProceed={handleProceed}
-				onCancel={handleCancelDialog}
-			/>
 		</Form>
 	);
 };

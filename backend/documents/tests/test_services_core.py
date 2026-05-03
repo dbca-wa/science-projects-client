@@ -135,7 +135,7 @@ class TestDocumentService:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_delete_closure_document_reverts_status(self):
-        """Test deleting closure document reverts project status to updating"""
+        """Test deleting closure document reverts project status based on remaining documents"""
         # Arrange
         from documents.tests.factories import ProjectClosureFactory
         from projects.models import Project
@@ -143,6 +143,15 @@ class TestDocumentService:
         user = UserFactory()
         project_closure = ProjectClosureFactory()
         project = project_closure.document.project
+
+        # Create an approved project plan so the rollback target is "active"
+        ProjectDocument.objects.create(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+            status=ProjectDocument.StatusChoices.APPROVED,
+            creator=user,
+            modifier=user,
+        )
 
         # Set project status to closure_requested
         project.status = Project.StatusChoices.CLOSUREREQ
@@ -156,7 +165,7 @@ class TestDocumentService:
         # Assert
         assert not ProjectDocument.objects.filter(pk=document_pk).exists()
         project.refresh_from_db()
-        assert project.status == Project.StatusChoices.UPDATING
+        assert project.status == Project.StatusChoices.ACTIVE
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -508,7 +517,7 @@ class TestApprovalService:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_recall_resets_approvals(self):
-        """Test recall resets all approval flags"""
+        """Test recall at stage 2 only resets BA lead flag (goes back one step)"""
         # Arrange
         user = UserFactory()
         concept_plan = ConceptPlanFactory(
@@ -517,14 +526,58 @@ class TestApprovalService:
             document__business_area_lead_approval_granted=True,
         )
 
+        # Act — recall at stage 2 (BA lead level)
+        ApprovalService.recall(concept_plan.document, user, stage=2)
+
+        # Assert — only BA lead flag reset, project lead flag preserved
+        concept_plan.document.refresh_from_db()
+        assert concept_plan.document.project_lead_approval_granted is True
+        assert concept_plan.document.business_area_lead_approval_granted is False
+        assert concept_plan.document.directorate_approval_granted is False
+        assert concept_plan.document.status == ProjectDocument.StatusChoices.INAPPROVAL
+
+    @pytest.mark.django_db
+    @pytest.mark.integration
+    def test_recall_stage_3_only_resets_directorate(self):
+        """Test recall at stage 3 only resets directorate flag"""
+        # Arrange
+        user = UserFactory()
+        concept_plan = ConceptPlanFactory(
+            document__status=ProjectDocument.StatusChoices.APPROVED,
+            document__project_lead_approval_granted=True,
+            document__business_area_lead_approval_granted=True,
+            document__directorate_approval_granted=True,
+        )
+
         # Act
-        ApprovalService.recall(concept_plan.document, user)
+        ApprovalService.recall(concept_plan.document, user, stage=3)
+
+        # Assert
+        concept_plan.document.refresh_from_db()
+        assert concept_plan.document.project_lead_approval_granted is True
+        assert concept_plan.document.business_area_lead_approval_granted is True
+        assert concept_plan.document.directorate_approval_granted is False
+        assert concept_plan.document.status == ProjectDocument.StatusChoices.INAPPROVAL
+
+    @pytest.mark.django_db
+    @pytest.mark.integration
+    def test_recall_stage_1_resets_project_lead(self):
+        """Test recall at stage 1 only resets project lead flag"""
+        # Arrange
+        user = UserFactory()
+        concept_plan = ConceptPlanFactory(
+            document__status=ProjectDocument.StatusChoices.INAPPROVAL,
+            document__project_lead_approval_granted=True,
+            document__business_area_lead_approval_granted=False,
+        )
+
+        # Act
+        ApprovalService.recall(concept_plan.document, user, stage=1)
 
         # Assert
         concept_plan.document.refresh_from_db()
         assert concept_plan.document.project_lead_approval_granted is False
         assert concept_plan.document.business_area_lead_approval_granted is False
-        assert concept_plan.document.directorate_approval_granted is False
         assert concept_plan.document.status == ProjectDocument.StatusChoices.REVISING
 
     @pytest.mark.django_db

@@ -301,6 +301,12 @@ export const openNewCycle = async (data?: {
 	send_emails?: boolean;
 	recipient_groups?: string[];
 	excluded_user_ids?: number[];
+	custom_message?: string;
+	custom_messages?: {
+		ba_leads: string;
+		project_leads: string;
+		team_members: string;
+	};
 }): Promise<void> => {
 	return apiClient.post(ADMIN_ENDPOINTS.OPEN_NEW_CYCLE, {
 		division: data?.division,
@@ -309,6 +315,8 @@ export const openNewCycle = async (data?: {
 		send_emails: data?.send_emails ?? false,
 		recipient_groups: data?.recipient_groups,
 		excluded_user_ids: data?.excluded_user_ids,
+		custom_message: data?.custom_message,
+		custom_messages: data?.custom_messages,
 	});
 };
 
@@ -355,4 +363,23 @@ export const sendAllTestEmails = async (overrides?: {
 	results: Array<{ template: string; status?: string; error?: string }>;
 }> => {
 	return apiClient.post(ADMIN_ENDPOINTS.SEND_ALL_TEST_EMAILS, overrides ?? {});
+};
+
+// New cycle draft (database persistence)
+export interface NewCycleDraftResponse {
+	draft: Record<string, unknown> | null;
+}
+
+export const getNewCycleDraft = async (): Promise<NewCycleDraftResponse> => {
+	return apiClient.get<NewCycleDraftResponse>(ADMIN_ENDPOINTS.NEW_CYCLE_DRAFT);
+};
+
+export const saveNewCycleDraft = async (
+	draft: Record<string, unknown>
+): Promise<{ status: string }> => {
+	return apiClient.post(ADMIN_ENDPOINTS.NEW_CYCLE_DRAFT, { draft });
+};
+
+export const clearNewCycleDraft = async (): Promise<{ status: string }> => {
+	return apiClient.delete(ADMIN_ENDPOINTS.NEW_CYCLE_DRAFT);
 };

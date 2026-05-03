@@ -107,6 +107,12 @@ class AdminOptions(CommonModel):
         help_text="Stores all guide content with field keys as dictionary keys",
     )
 
+    new_cycle_draft = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Stores the saved new cycle configuration defaults (prepopulate mode, inclusion mode, recipient groups, custom messages)",
+    )
+
     # ADMIN
     guide_admin = models.TextField(
         blank=True,

@@ -236,9 +236,15 @@ class PDFService:
 
                 table.attrs["class"] = table_classes
 
+                # Remove <colgroup> elements — editor tables include these with
+                # fixed-width <col> tags that can cause overflow in PDF output
+                for colgroup in table.find_all("colgroup"):
+                    colgroup.decompose()
+
                 # COMPLETELY REPLACE table style (don't preserve anything)
+                # Use table-layout: fixed to force equal column distribution within 100% width
                 table.attrs["style"] = (
-                    "width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #d1d5db; border-radius: 8px;"
+                    "width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;"
                 )
 
                 # Get all rows to determine position
@@ -255,9 +261,9 @@ class PDFService:
                         # COMPLETELY REPLACE cell style (don't preserve old border styles)
                         # Start fresh with base styles
                         if column_count >= 7:
-                            cell_style = "padding: 8px 10px; font-size: 11px; vertical-align: top; text-align: start;"
+                            cell_style = "padding: 8px 10px; font-size: 11px; vertical-align: top; text-align: start; word-break: break-word; overflow: hidden;"
                         else:
-                            cell_style = "padding: 12px 16px; vertical-align: top; text-align: start;"
+                            cell_style = "padding: 12px 16px; vertical-align: top; text-align: start; word-break: break-word; overflow: hidden;"
 
                         # Add background color
                         if cell.name == "th" or cell_idx == 0:
@@ -417,13 +423,8 @@ class PDFService:
             return ""
 
         def get_formatted_datetime(dt):
-            """Format datetime for display"""
-            day_with_suffix = "{}".format(dt.day) + (
-                "th"
-                if 10 <= dt.day % 100 <= 20
-                else {1: "st", 2: "nd", 3: "rd"}.get(dt.day % 10, "th")
-            )
-            return dt.strftime(f"{day_with_suffix} %B, %Y @ %I:%M%p")
+            """Format datetime for display — e.g. '2 May 2026, 5:39 PM'"""
+            return dt.strftime("%-d %B %Y, %-I:%M %p")
 
         def get_document_kind_info(document):
             """Get document kind display information"""
@@ -472,7 +473,7 @@ class PDFService:
             "prince_css_path": os.path.join(
                 base_dir, "documents", "assets", "prince_project_document_styles.css"
             ),
-            "fonts_folder_path": os.path.join(base_dir, "documents", "assets"),
+            "fonts_folder_path": os.path.join(base_dir, "documents", "static", "fonts"),
             # Image paths
             "dbca_image_path": os.path.join(
                 base_dir, "documents", "assets", "BCSTransparent.png"
@@ -482,6 +483,11 @@ class PDFService:
             ),
             "no_image_path": os.path.join(
                 base_dir, "documents", "assets", "image_not_available.png"
+            ),
+            # Logo paths (for v2 template)
+            "dbca_logo_path": os.path.join(base_dir, "documents", "assets", "dbca.png"),
+            "bcs_logo_path": os.path.join(
+                base_dir, "documents", "assets", "BCSTransparent.png"
             ),
             # URLs
             "server_url": (
@@ -502,6 +508,9 @@ class PDFService:
             "project_title": get_inner_html(
                 apply_title_styling(document.project.title), "h1"
             ),
+            "plain_project_title": BeautifulSoup(
+                document.project.title or "", "html.parser"
+            ).get_text(),
             "project_status": document.project.status,
             "business_area_name": document.project.business_area.name,
             "departmental_service_name": get_departmental_service(document.project),
@@ -601,10 +610,6 @@ class PDFService:
                             "title": "Knowledge Transfer",
                             "data": apply_styling(details.knowledge_transfer),
                         },
-                        "listed_references": {
-                            "title": "References",
-                            "data": apply_styling(details.listed_references),
-                        },
                         "related_projects": {
                             "title": "Related Projects",
                             "data": apply_styling(details.related_projects),
@@ -616,6 +621,10 @@ class PDFService:
                         "external_funds": {
                             "title": "External Funds",
                             "data": apply_styling(details.operating_budget_external),
+                        },
+                        "listed_references": {
+                            "title": "References",
+                            "data": apply_styling(details.listed_references),
                         },
                     }
 

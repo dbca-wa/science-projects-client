@@ -2,10 +2,7 @@
 Tests for adminoptions views
 """
 
-from datetime import timedelta
-
 import pytest
-from django.utils import timezone
 from rest_framework import status
 
 from adminoptions.models import AdminOptions, AdminTask, ContentField, GuideSection
@@ -731,13 +728,11 @@ class TestAdminTasks:
         """Test creating set caretaker task"""
         # Arrange
         api_client.force_authenticate(user=user)
-        future_date = (timezone.now() + timedelta(days=30)).date()
         data = {
             "action": AdminTask.ActionTypes.SETCARETAKER,
             "primary_user": user.id,
             "secondary_users": [secondary_user.id],
             "reason": "Test caretaker",
-            "end_date": future_date.isoformat(),
         }
 
         # Act
@@ -755,13 +750,11 @@ class TestAdminTasks:
         """Test creating duplicate set caretaker task fails"""
         # Arrange
         api_client.force_authenticate(user=user)
-        future_date = (timezone.now() + timedelta(days=30)).date()
         data = {
             "action": AdminTask.ActionTypes.SETCARETAKER,
             "primary_user": admin_task_set_caretaker.primary_user.id,
             "secondary_users": admin_task_set_caretaker.secondary_users,
             "reason": "Test caretaker",
-            "end_date": future_date.isoformat(),
         }
 
         # Act
@@ -777,13 +770,11 @@ class TestAdminTasks:
         """Test creating set caretaker task when caretaker already exists fails"""
         # Arrange
         api_client.force_authenticate(user=user)
-        future_date = (timezone.now() + timedelta(days=30)).date()
         data = {
             "action": AdminTask.ActionTypes.SETCARETAKER,
             "primary_user": caretaker.user.id,
             "secondary_users": [caretaker.caretaker.id],
             "reason": "Test caretaker",
-            "end_date": future_date.isoformat(),
         }
 
         # Act

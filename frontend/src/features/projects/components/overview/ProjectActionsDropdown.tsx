@@ -10,6 +10,7 @@ import {
 	EyeOff,
 	Eye,
 } from "lucide-react";
+import { useMemo } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -29,7 +30,12 @@ interface ProjectActionsDropdownProps {
 	project: IProjectData;
 	documents?: IProjectDocuments | null;
 	currentUser: IUserMe | null;
+	isBaLead?: boolean;
+	userIsCaretakerOfBaLeader?: boolean;
+	isProjectLead?: boolean;
+	userIsCaretakerOfProjectLeader?: boolean;
 	onCreateStudentReport?: () => void;
+	onCreateConceptPlan?: () => void;
 	onCreateProgressReport?: () => void;
 	onSuspendProject?: () => void;
 	onUnsuspendProject?: () => void;
@@ -43,11 +49,16 @@ interface ProjectActionsDropdownProps {
 	isHiddenFromProfile?: boolean;
 }
 
-export function ProjectActionsDropdown({
+export const ProjectActionsDropdown = ({
 	project,
 	documents,
 	currentUser,
+	isBaLead,
+	userIsCaretakerOfBaLeader,
+	isProjectLead,
+	userIsCaretakerOfProjectLeader,
 	onCreateStudentReport,
+	onCreateConceptPlan,
 	onCreateProgressReport,
 	onSuspendProject,
 	onUnsuspendProject,
@@ -59,9 +70,34 @@ export function ProjectActionsDropdown({
 	onCancelDeletionRequest,
 	onHideProject,
 	isHiddenFromProfile,
-}: ProjectActionsDropdownProps) {
+}: ProjectActionsDropdownProps) => {
 	// Check if user can manage project
 	const hasManagePermission = canEditProject(currentUser, project);
+
+	// Determine if user can directly delete (vs request deletion)
+	// NOTE: All hooks must be called before any early returns
+	const canDirectDelete = useMemo(() => {
+		if (!currentUser) return false;
+		// Superusers can always delete
+		if (currentUser.is_superuser) return true;
+		// BA leads of the project's business area can delete
+		if (isBaLead || userIsCaretakerOfBaLeader) return true;
+		// Project leads can delete if project was created within last 7 days
+		if (isProjectLead || userIsCaretakerOfProjectLeader) {
+			const createdAt = new Date(project.created_at);
+			const sevenDaysAgo = new Date();
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			return createdAt >= sevenDaysAgo;
+		}
+		return false;
+	}, [
+		currentUser,
+		isBaLead,
+		userIsCaretakerOfBaLeader,
+		isProjectLead,
+		userIsCaretakerOfProjectLeader,
+		project.created_at,
+	]);
 
 	// Don't render if user doesn't have permission
 	if (!hasManagePermission) {
@@ -81,13 +117,26 @@ export function ProjectActionsDropdown({
 	const isReopenableStatus = [
 		"closure_requested",
 		"closing",
-		"closed",
 		"completed",
 		"terminated",
 	].includes(project.status);
 
-	const canReopen = hasClosureDocument && isReopenableStatus;
+	// Check if closure document has all three approval stages granted
+	const closureApproved =
+		documents?.project_closure?.document?.project_lead_approval_granted ===
+			true &&
+		documents?.project_closure?.document
+			?.business_area_lead_approval_granted === true &&
+		documents?.project_closure?.document?.directorate_approval_granted === true;
+
+	const canReopen = hasClosureDocument && isReopenableStatus && closureApproved;
 	const canClose = !hasClosureDocument && !isReopenableStatus;
+
+	// Check if concept plan can be created
+	const canCreateConceptPlan =
+		(project.kind === "science" || project.kind === "core_function") &&
+		!isSuspended &&
+		!documents?.concept_plan;
 
 	// Check if progress report can be created
 	const conceptPlanApproved =
@@ -105,6 +154,7 @@ export function ProjectActionsDropdown({
 
 	// Determine if we should show any report button
 	const showReportButton =
+		canCreateConceptPlan ||
 		canCreateStudentReport ||
 		project.kind === "science" ||
 		project.kind === "core_function";
@@ -131,6 +181,14 @@ export function ProjectActionsDropdown({
 								>
 									<FileText className="mr-2 h-4 w-4" />
 									<span>Create Student Report</span>
+								</DropdownMenuItem>
+							)}
+
+							{/* Create Concept Plan - Only for science/core_function without existing concept plan */}
+							{canCreateConceptPlan && onCreateConceptPlan && (
+								<DropdownMenuItem onClick={onCreateConceptPlan}>
+									<FileText className="mr-2 h-4 w-4" />
+									<span>Create Concept Plan</span>
 								</DropdownMenuItem>
 							)}
 
@@ -222,7 +280,7 @@ export function ProjectActionsDropdown({
 
 					{/* Delete/Request Deletion */}
 					<DropdownMenuSeparator />
-					{currentUser?.is_superuser && onDeleteProject ? (
+					{canDirectDelete && onDeleteProject ? (
 						<DropdownMenuItem
 							onClick={onDeleteProject}
 							className="text-destructive"
@@ -250,4 +308,4 @@ export function ProjectActionsDropdown({
 			</DropdownMenu>
 		</div>
 	);
-}
+};

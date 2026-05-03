@@ -32,9 +32,9 @@ BackgroundImage.displayName = "BackgroundImage";
 const ContentBox = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div
-			className={`my-6 min-h-[1000px] rounded-lg py-4 bg-white dark:bg-gray-900/90`}
+			className={`my-6 min-h-[1000px] min-w-0 rounded-lg py-4 bg-white dark:bg-gray-900/90`}
 		>
-			<div className="mx-4 sm:mx-6 md:mx-10 h-full min-h-screen py-4">
+			<div className="mx-4 sm:mx-6 md:mx-10 h-full min-h-screen min-w-0 py-4">
 				{children}
 			</div>
 		</div>
@@ -63,7 +63,7 @@ export function AppLayout() {
 				<main
 					id="main-content"
 					tabIndex={-1}
-					className="mx-4 sm:mx-6 md:mx-[10%] lg:mx-[15%] py-2 flex flex-col min-h-screen focus:outline-none"
+					className="mx-4 sm:mx-6 md:mx-[10%] lg:mx-[15%] py-2 flex flex-col min-h-screen min-w-0 focus:outline-none"
 				>
 					<ContentBox>
 						<Outlet />

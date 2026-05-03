@@ -96,6 +96,7 @@ class TinyUserSerializer(serializers.ModelSerializer):
     phone = serializers.SerializerMethodField()
     is_key_stakeholder = serializers.SerializerMethodField()
     is_approver = serializers.SerializerMethodField()
+    business_areas_led = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -121,6 +122,7 @@ class TinyUserSerializer(serializers.ModelSerializer):
             "date_joined",
             "is_key_stakeholder",
             "is_approver",
+            "business_areas_led",
         )
 
     def get_name(self, obj):
@@ -182,6 +184,11 @@ class TinyUserSerializer(serializers.ModelSerializer):
 
     def get_is_approver(self, obj):
         return obj.divisions_approver.exists()
+
+    def get_business_areas_led(self, obj):
+        if hasattr(obj, "business_areas_led"):
+            return MiniBASerializer(obj.business_areas_led.all(), many=True).data
+        return []
 
 
 class PrivateTinyUserSerializer(serializers.ModelSerializer):
