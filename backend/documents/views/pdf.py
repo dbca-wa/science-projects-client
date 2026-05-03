@@ -276,7 +276,7 @@ class TestPDFGeneration(APIView):
         except Exception as e:
             settings.LOGGER.error(f"Test PDF generation failed: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "PDF generation failed. Check server logs for details."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -312,6 +312,6 @@ class TestPDFGenerationAll(APIView):
         except Exception as e:
             settings.LOGGER.error(f"Test PDF generation (all) failed: {e}")
             return Response(
-                {"error": str(e)},
+                {"error": "PDF generation failed. Check server logs for details."},
                 status=HTTP_400_BAD_REQUEST,
             )
