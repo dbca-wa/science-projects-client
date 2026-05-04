@@ -162,7 +162,7 @@ class CaretakerTaskService:
     @staticmethod
     def analyze_caretakee_roles(caretaker_assignments):
         """
-        Analyze roles for all caretakees
+        Analyse roles for all caretakees
 
         Args:
             caretaker_assignments: List of Caretaker objects
@@ -170,6 +170,10 @@ class CaretakerTaskService:
         Returns:
             Dict with role information
         """
+        from django.db.models import Q
+
+        from agencies.models import Division
+
         caretakee_ids = [assignment.user.id for assignment in caretaker_assignments]
 
         # Single query for all lead memberships
@@ -186,24 +190,37 @@ class CaretakerTaskService:
             .values_list("user_id", flat=True)
         )
 
-        # Determine special roles
-        directorate_user_found = False
+        # Determine division roles and BA leader roles
         ba_leader_user_ids = set()
+        # Collect division IDs where any caretakee has a directorate role
+        directorate_division_ids = set()
+        has_superuser_caretakee = False
 
         for assignment in caretaker_assignments:
             user = assignment.user
-            user_ba = user.work.business_area if hasattr(user, "work") else None
 
-            # Check Directorate
-            if (user_ba and user_ba.name == "Directorate") or user.is_superuser:
-                directorate_user_found = True
+            # Check if superuser caretakee (sees all directorate docs)
+            if user.is_superuser:
+                has_superuser_caretakee = True
 
             # Check if BA leader
             if user.business_areas_led.exists():
                 ba_leader_user_ids.add(user.id)
 
+        # Get divisions where any caretakee has a directorate role
+        if not has_superuser_caretakee:
+            caretakee_divisions = Division.objects.filter(
+                Q(director_id__in=caretakee_ids)
+                | Q(key_stakeholder_id__in=caretakee_ids)
+                | Q(approvers__in=caretakee_ids)
+            ).distinct()
+            directorate_division_ids = set(
+                caretakee_divisions.values_list("pk", flat=True)
+            )
+
         return {
-            "directorate_user_found": directorate_user_found,
+            "has_superuser_caretakee": has_superuser_caretakee,
+            "directorate_division_ids": directorate_division_ids,
             "ba_leader_user_ids": ba_leader_user_ids,
             "project_lead_user_ids": lead_user_ids,
             "team_member_user_ids": team_user_ids,
@@ -239,24 +256,45 @@ class CaretakerTaskService:
         # Build document lists
         all_documents = []
 
-        # Directorate documents
+        # Directorate documents — scoped to caretakee's division roles
         directorate_documents = []
-        if roles["directorate_user_found"]:
-            directorate_documents = CaretakerTaskService.get_directorate_documents(
+        has_directorate_role = (
+            roles["has_superuser_caretakee"]
+            or len(roles["directorate_division_ids"]) > 0
+        )
+        if has_directorate_role:
+            directorate_docs_qs = CaretakerTaskService.get_directorate_documents(
                 active_projects
             )
 
-            # Filter out documents requesting user already has access to
-            requesting_user_ba = (
-                requesting_user.work.business_area
-                if hasattr(requesting_user, "work")
-                else None
-            )
-            requesting_user_is_directorate = (
-                requesting_user_ba and requesting_user_ba.name == "Directorate"
-            ) or requesting_user.is_superuser
+            # Superuser caretakee sees all; others see only their divisions
+            if not roles["has_superuser_caretakee"]:
+                directorate_docs_qs = directorate_docs_qs.filter(
+                    project__business_area__division__in=roles[
+                        "directorate_division_ids"
+                    ]
+                )
 
-            if requesting_user_is_directorate:
+            directorate_documents = list(directorate_docs_qs)
+
+            # Filter out documents requesting user already has access to
+            requesting_user_divisions = set()
+            if not requesting_user.is_superuser:
+                from django.db.models import Q
+
+                from agencies.models import Division
+
+                requesting_user_divisions = set(
+                    Division.objects.filter(
+                        Q(director=requesting_user)
+                        | Q(key_stakeholder=requesting_user)
+                        | Q(approvers=requesting_user)
+                    )
+                    .distinct()
+                    .values_list("pk", flat=True)
+                )
+
+            if requesting_user.is_superuser or requesting_user_divisions:
                 directorate_documents = []
 
             all_documents.extend(directorate_documents)

@@ -352,7 +352,6 @@ const Dashboard = observer(() => {
 										documentTasksError ? documentTasksErrorObj : null
 									}
 									isBusinessAreaLead={isBusinessAreaLead}
-									isSuperuser={isSuperuser}
 								/>
 							</TabsContent>
 

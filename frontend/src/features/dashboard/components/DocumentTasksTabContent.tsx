@@ -9,7 +9,6 @@ interface DocumentTasksTabContentProps {
 	documentTasksLoading: boolean;
 	documentTasksError?: Error | null;
 	isBusinessAreaLead: boolean;
-	isSuperuser: boolean;
 }
 
 export const DocumentTasksTabContent = ({
@@ -17,7 +16,6 @@ export const DocumentTasksTabContent = ({
 	documentTasksLoading,
 	documentTasksError,
 	isBusinessAreaLead,
-	isSuperuser,
 }: DocumentTasksTabContentProps) => {
 	if (documentTasksLoading) {
 		return (
@@ -81,8 +79,8 @@ export const DocumentTasksTabContent = ({
 				</CollapsibleCard>
 			)}
 
-			{/* Directorate Documents — only show if user is superuser AND has tasks */}
-			{isSuperuser && directorateTasks.length > 0 && (
+			{/* Directorate Documents — show to any user who has directorate tasks (backend handles role filtering) */}
+			{directorateTasks.length > 0 && (
 				<CollapsibleCard
 					title="Directorate Documents"
 					count={directorateTasks.length}

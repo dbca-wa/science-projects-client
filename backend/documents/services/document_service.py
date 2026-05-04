@@ -287,15 +287,27 @@ class DocumentService:
                 business_area_lead_approval_granted=False,
             )
         elif stage == 3:
-            # Stage 3: Directorate approval
+            # Stage 3: Directorate approval (director, key stakeholder, or approvers)
             documents = documents.filter(
-                project__business_area__division__director=user,
+                Q(project__business_area__division__director=user)
+                | Q(project__business_area__division__key_stakeholder=user)
+                | Q(project__business_area__division__approvers=user),
                 project_lead_approval_granted=True,
                 business_area_lead_approval_granted=True,
                 directorate_approval_granted=False,
             )
         else:
             # All stages
+            stage_3_role = (
+                Q(project__business_area__division__director=user)
+                | Q(project__business_area__division__key_stakeholder=user)
+                | Q(project__business_area__division__approvers=user)
+            )
+            stage_3_flags = Q(
+                project_lead_approval_granted=True,
+                business_area_lead_approval_granted=True,
+                directorate_approval_granted=False,
+            )
             documents = documents.filter(
                 Q(
                     project__members__user=user,
@@ -307,12 +319,7 @@ class DocumentService:
                     project_lead_approval_granted=True,
                     business_area_lead_approval_granted=False,
                 )
-                | Q(
-                    project__business_area__division__director=user,
-                    project_lead_approval_granted=True,
-                    business_area_lead_approval_granted=True,
-                    directorate_approval_granted=False,
-                )
+                | (stage_3_role & stage_3_flags)
             )
 
         # N+1 optimization

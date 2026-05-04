@@ -66,12 +66,20 @@ class ProjectDocsPendingMyActionAllStages(APIView):
         )
 
         if small_user_object:
-            # Handle users without work relationship
-            ba = getattr(small_user_object, "work", None)
-            ba = ba.business_area if ba else None
-            is_directorate = (
-                ba is not None and ba.name == "Directorate"
-            ) or request.user.is_superuser
+            # Determine directorate role — division-based, not business area name
+            from agencies.models import Division
+
+            if request.user.is_superuser:
+                has_directorate_role = True
+                user_division_ids = None  # Superuser sees all
+            else:
+                user_divisions = Division.objects.filter(
+                    Q(director=request.user)
+                    | Q(key_stakeholder=request.user)
+                    | Q(approvers=request.user)
+                ).distinct()
+                user_division_ids = list(user_divisions.values_list("pk", flat=True))
+                has_directorate_role = len(user_division_ids) > 0
 
             active_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY)
 
@@ -126,43 +134,43 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 documents.extend(docs_requiring_ba_attention)
                 ba_input_required.extend(docs_requiring_ba_attention)
 
-            # Directorate Filtering
-            if is_directorate:
-                # Use subquery for active project IDs instead of loading all into memory
-                directorate_project_ids = active_projects.values_list("id", flat=True)
+            # Directorate Filtering — scoped to user's division roles
+            if has_directorate_role:
+                # Base queryset: stage 3 documents from active projects
+                directorate_base = ProjectDocument.objects.exclude(
+                    status=ProjectDocument.StatusChoices.APPROVED
+                ).filter(
+                    project__in=active_projects.values_list("id", flat=True),
+                    business_area_lead_approval_granted=True,
+                    directorate_approval_granted=False,
+                )
 
-                # Fetch all documents requiring Directorate attention with optimised relationships
-                docs_requiring_directorate_attention = (
-                    ProjectDocument.objects.exclude(
-                        status=ProjectDocument.StatusChoices.APPROVED
+                # Superusers see all; others see only their divisions
+                if user_division_ids is not None:
+                    directorate_base = directorate_base.filter(
+                        project__business_area__division__in=user_division_ids
                     )
-                    .filter(
-                        project__in=directorate_project_ids,
-                        business_area_lead_approval_granted=True,
-                        directorate_approval_granted=False,
-                    )
-                    .select_related(
-                        "project",
-                        "project__business_area",
-                        "project__business_area__image",
-                        "project__business_area__division",
-                        "project__business_area__division__director",
-                        "project__business_area__division__approver",
-                        "project__business_area__leader",
-                        "project__business_area__caretaker",
-                        "project__business_area__finance_admin",
-                        "project__business_area__data_custodian",
-                        "project__image",
-                        "project__image__uploader",
-                        "pdf",
-                        "pdf__document",
-                        "pdf__project",
-                        "creator",
-                        "modifier",
-                    )
-                    .prefetch_related(
-                        "project__business_area__division__directorate_email_list",
-                    )
+
+                docs_requiring_directorate_attention = directorate_base.select_related(
+                    "project",
+                    "project__business_area",
+                    "project__business_area__image",
+                    "project__business_area__division",
+                    "project__business_area__division__director",
+                    "project__business_area__division__approver",
+                    "project__business_area__leader",
+                    "project__business_area__caretaker",
+                    "project__business_area__finance_admin",
+                    "project__business_area__data_custodian",
+                    "project__image",
+                    "project__image__uploader",
+                    "pdf",
+                    "pdf__document",
+                    "pdf__project",
+                    "creator",
+                    "modifier",
+                ).prefetch_related(
+                    "project__business_area__division__directorate_email_list",
                 )
 
                 # Append the documents to the respective lists
