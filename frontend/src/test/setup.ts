@@ -55,6 +55,13 @@ global.ResizeObserver = class ResizeObserver {
 	disconnect = vi.fn();
 };
 
+// Polyfill requestAnimationFrame / cancelAnimationFrame for jsdom
+if (typeof globalThis.requestAnimationFrame === "undefined") {
+	globalThis.requestAnimationFrame = (callback: FrameRequestCallback): number =>
+		setTimeout(() => callback(Date.now()), 0) as unknown as number;
+	globalThis.cancelAnimationFrame = (id: number): void => clearTimeout(id);
+}
+
 // Mock getBoundingClientRect for Lexical editor
 Element.prototype.getBoundingClientRect = vi.fn(() => ({
 	width: 0,
