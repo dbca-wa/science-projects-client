@@ -405,7 +405,7 @@ class TestPDFService:
             "project_status": "active",
             "project_kind": "science",
             "business_area_name": "Biodiversity and Conservation Science",
-            "departmental_service_name": "Species and Communities",
+            "division_name": "Biodiversity and Conservation Science",
             "team_as_string": (
                 "Dr. Sarah Mitchell (Lead), Dr. James Chen, Emma Thompson, "
                 "Michael Roberts, Dr. Lisa Anderson"

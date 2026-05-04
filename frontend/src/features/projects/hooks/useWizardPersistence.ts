@@ -140,7 +140,6 @@ interface IPersistedWizardData {
 			start_date: Date | null;
 			end_date: Date | null;
 			business_area: number | null;
-			departmental_service: number | null;
 			project_leader: number | null;
 			data_custodian: number | null;
 		};
@@ -286,9 +285,6 @@ export const useWizardPersistence = (
 						end_date: wizardStore.state.editingFormData.projectDetails.end_date,
 						business_area:
 							wizardStore.state.editingFormData.projectDetails.business_area,
-						departmental_service:
-							wizardStore.state.editingFormData.projectDetails
-								.departmental_service,
 						project_leader:
 							wizardStore.state.editingFormData.projectDetails.project_leader,
 						data_custodian:
@@ -451,8 +447,6 @@ export const useWizardPersistence = (
 							? new Date(formData.projectDetails.end_date)
 							: null,
 						business_area: formData.projectDetails?.business_area ?? null,
-						departmental_service:
-							formData.projectDetails?.departmental_service ?? null,
 						project_leader: formData.projectDetails?.project_leader ?? null,
 						data_custodian: formData.projectDetails?.data_custodian ?? null,
 					});
@@ -525,8 +519,6 @@ export const useWizardPersistence = (
 							? new Date(localDraft.formData.projectDetails.end_date)
 							: null,
 						business_area: localDraft.formData.projectDetails.business_area,
-						departmental_service:
-							localDraft.formData.projectDetails.departmental_service,
 						project_leader: localDraft.formData.projectDetails.project_leader,
 						data_custodian: localDraft.formData.projectDetails.data_custodian,
 					});
@@ -704,7 +696,6 @@ export const useWizardPersistence = (
 					keywords: [...base.keywords],
 					image: base.image,
 					business_area: details.business_area,
-					departmental_service: details.departmental_service,
 					start_date: details.start_date,
 					end_date: details.end_date,
 					project_leader: details.project_leader,

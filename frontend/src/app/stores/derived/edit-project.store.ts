@@ -15,7 +15,6 @@ export interface IEditProjectFormData {
 	description: string;
 	image: File | string | null;
 	business_area: number;
-	service: number | null;
 	start_date: string;
 	end_date: string | null;
 	project_leader: number | null;
@@ -64,7 +63,6 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 				description: "",
 				image: null,
 				business_area: 0,
-				service: null,
 				start_date: "",
 				end_date: null,
 				project_leader: null,
@@ -123,12 +121,6 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 				typeof project.business_area === "number"
 					? project.business_area
 					: project.business_area?.id || 0,
-			// Handle service whether it's an object or a raw numeric ID
-			service: details.base
-				? typeof details.base.service === "number"
-					? details.base.service
-					: (details.base.service?.id ?? null)
-				: null,
 			start_date: project.start_date
 				? new Date(project.start_date).toISOString().split("T")[0]
 				: "",
@@ -181,7 +173,6 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 		logger.info("EditProjectStore loaded project", {
 			projectId: project.id,
 			businessArea: formData.business_area,
-			service: formData.service,
 			imageFile: project.image?.file,
 			imageUrl: getImageUrl(project.image),
 		});
@@ -293,7 +284,6 @@ export class EditProjectStore extends BaseStore<EditProjectStoreState> {
 			description: "",
 			image: null,
 			business_area: 0,
-			service: null,
 			start_date: "",
 			end_date: null,
 			project_leader: null,

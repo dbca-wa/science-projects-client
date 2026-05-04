@@ -61,10 +61,10 @@
                 {{document_kind_string}}{% if financial_year_string %} &bull; {{financial_year_string}}{% endif %}
             </div>
 
-            <!-- Departmental service -->
+            <!-- Division -->
             <div class="cover-dept-service">
-                {% if departmental_service_name and departmental_service_name != "No Dept. Service" %}
-                    {{ departmental_service_name }}
+                {% if division_name %}
+                    {{ division_name }}
                 {% else %}
                     Biodiversity and Conservation Science
                 {% endif %}

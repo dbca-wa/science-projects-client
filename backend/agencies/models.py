@@ -223,27 +223,4 @@ class Division(CommonModel):
         verbose_name_plural = "Department Divisions"
 
 
-class DepartmentalService(CommonModel):
-    """
-    Model Definition for Departmental Services
-    """
-
-    name = models.CharField(max_length=320)
-    director = models.ForeignKey(
-        "users.User",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name="services_led",
-        help_text="The Service's Director",
-    )
-
-    class Meta:
-        verbose_name = "Departmental Service"
-        verbose_name_plural = "Departmental Services"
-
-    def __str__(self):
-        return f"Dept. Service: {self.name}"
-
-
 # endregion  =================================================================================================

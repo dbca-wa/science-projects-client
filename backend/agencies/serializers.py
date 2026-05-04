@@ -11,7 +11,6 @@ from .models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -116,24 +115,6 @@ class DivisionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Division
-        fields = "__all__"
-
-
-# endregion  =================================================================================================
-
-
-# region Departmental Service Serializers ====================================================================================================
-
-
-class TinyDepartmentalServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DepartmentalService
-        fields = ("id", "name", "director")
-
-
-class DepartmentalServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DepartmentalService
         fields = "__all__"
 
 

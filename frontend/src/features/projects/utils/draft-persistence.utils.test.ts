@@ -22,7 +22,6 @@ const makeDraft = (overrides: Partial<IDraftState> = {}): IDraftState => ({
 			start_date: new Date("2026-03-01T00:00:00.000Z"),
 			end_date: new Date("2027-03-01T00:00:00.000Z"),
 			business_area: 1,
-			departmental_service: 2,
 			project_leader: 10,
 			data_custodian: 11,
 		},

@@ -12,7 +12,6 @@ import type { ProjectKind } from "@/shared/types/project.types";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { useServices } from "@/shared/hooks/queries/useServices";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { useLocations } from "@/shared/hooks/queries/useLocations";
 import { ProjectStatusBadge } from "@/shared/components/projects/ProjectStatusBadge";
@@ -51,7 +50,6 @@ export const WizardPreviewPanel = observer(function WizardPreviewPanel({
 
 	// Fetch dropdown data for display
 	const { data: businessAreas } = useBusinessAreas();
-	const { data: services } = useServices();
 	const { dbcaRegions, dbcaDistricts } = useLocations();
 
 	// Fetch user data for team members
@@ -265,21 +263,6 @@ export const WizardPreviewPanel = observer(function WizardPreviewPanel({
 					</div>
 				</div>
 			)}
-
-			{/* Service */}
-			{debouncedFormData.projectDetails.departmental_service ? (
-				<div className="rounded-lg border shadow-sm p-5">
-					<h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-						Service
-					</h3>
-					<p className="text-base text-gray-600 dark:text-gray-400">
-						{services?.find(
-							(s) =>
-								s.id === debouncedFormData.projectDetails.departmental_service
-						)?.name || "Unknown service"}
-					</p>
-				</div>
-			) : null}
 
 			{/* Team Members */}
 			{teamMembers.length > 0 && (

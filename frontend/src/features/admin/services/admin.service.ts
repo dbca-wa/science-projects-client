@@ -7,7 +7,6 @@ import type {
 	IBusinessAreaUpdate,
 	IDivision,
 	IAffiliation,
-	IDepartmentalService,
 	IAddress,
 	ISimpleLocationData,
 	IBranchForm,
@@ -15,7 +14,6 @@ import type {
 	IAffiliationForm,
 	IDivisionForm,
 	ILocationForm,
-	IServiceForm,
 	IReportInfoForm,
 } from "../types/admin.types";
 import type { IAnnualReport } from "@/shared/types/report.types";
@@ -178,31 +176,6 @@ export const updateDivisionApprovers = async (
 		ADMIN_ENDPOINTS.DIVISION_EMAIL_LIST(divisionId),
 		{ approversList: userIds }
 	);
-};
-
-// Services
-export const getServices = async (): Promise<IDepartmentalService[]> => {
-	return apiClient.get<IDepartmentalService[]>(ADMIN_ENDPOINTS.SERVICES);
-};
-
-export const createService = async (
-	data: IServiceForm
-): Promise<IDepartmentalService> => {
-	return apiClient.post<IDepartmentalService>(ADMIN_ENDPOINTS.SERVICES, data);
-};
-
-export const updateService = async (
-	id: number,
-	data: IServiceForm
-): Promise<IDepartmentalService> => {
-	return apiClient.put<IDepartmentalService>(
-		ADMIN_ENDPOINTS.SERVICE_DETAIL(id),
-		data
-	);
-};
-
-export const deleteService = async (id: number): Promise<void> => {
-	return apiClient.delete(ADMIN_ENDPOINTS.SERVICE_DETAIL(id));
 };
 
 // Addresses

@@ -24,7 +24,6 @@ const makeBaseData = (
 	keywords: ["fauna", "survey"],
 	image: null,
 	business_area: 1,
-	departmental_service: 2,
 	start_date: new Date("2026-01-01"),
 	end_date: new Date("2026-12-31"),
 	project_leader: 10,
@@ -98,7 +97,6 @@ describe("wizard-submission.service", () => {
 					projectKind: "external",
 					collaboration_with: "CSIRO",
 					budget: "$50,000",
-					external_description: "External collab",
 					aims: "Research aims",
 				})
 			);
@@ -107,7 +105,6 @@ describe("wizard-submission.service", () => {
 			expect(formData.get("kind")).toBe("external");
 			expect(formData.get("collaborationWith")).toBe("CSIRO");
 			expect(formData.get("budget")).toBe("$50,000");
-			expect(formData.get("externalDescription")).toBe("External collab");
 			expect(formData.get("aims")).toBe("Research aims");
 		});
 

@@ -16,7 +16,6 @@ from .business_areas import (
     SetBusinessAreaActive,
 )
 from .divisions import DivisionDetail, DivisionEmailList, Divisions
-from .services import DepartmentalServiceDetail, DepartmentalServices
 
 __all__ = [
     # Affiliations
@@ -41,7 +40,4 @@ __all__ = [
     "Divisions",
     "DivisionDetail",
     "DivisionEmailList",
-    # Departmental Services
-    "DepartmentalServices",
-    "DepartmentalServiceDetail",
 ]

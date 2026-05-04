@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useCallback } from "react";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { useServices } from "@/shared/hooks/queries/useServices";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { Label } from "@/shared/components/ui/label";
 import {
@@ -26,7 +25,6 @@ import { AlertCircle, Info } from "lucide-react";
  * ProjectDetailsStep - Step 2 of project creation wizard
  *
  * Collects:
- * - Departmental Service (optional, dropdown)
  * - Business Area (required, dropdown)
  * - Start date (required)
  * - End date (required)
@@ -39,7 +37,6 @@ const ProjectDetailsStep = observer(() => {
 	const validation = wizardStore.state.validation[1]; // Step 1 is Project Details
 	const stepIndex = 1;
 	const { data: businessAreas, isLoading: baLoading } = useBusinessAreas();
-	const { data: services, isLoading: servicesLoading } = useServices();
 	const { data: divisions } = useDivisions();
 	const leaderRef = useRef<UserComboboxRef>(null);
 	const custodianRef = useRef<UserComboboxRef>(null);
@@ -124,10 +121,6 @@ const ProjectDetailsStep = observer(() => {
 		handleFieldBlur("business_area");
 	};
 
-	const handleDepartmentalServiceChange = (value: string) => {
-		wizardStore.setProjectDetails({ departmental_service: Number(value) });
-	};
-
 	const handleLeaderSelect = (userId: number | null) => {
 		wizardStore.setProjectDetails({ project_leader: userId });
 		handleFieldBlur("project_leader");
@@ -161,52 +154,13 @@ const ProjectDetailsStep = observer(() => {
 
 	return (
 		<div className="space-y-6">
-			{/* Business Area + Service */}
+			{/* Business Area */}
 			<SectionCard
-				title="Business Area & Service"
+				title="Business Area"
 				isComplete={isBusinessAreaComplete}
 				completionLabel="Business area section complete"
 			>
 				<div className="space-y-6">
-					{/* Departmental Service */}
-					<div className="space-y-2">
-						<Label htmlFor="departmental_service">
-							Departmental Service (Optional)
-						</Label>
-						<Select
-							value={formData.departmental_service?.toString()}
-							onValueChange={handleDepartmentalServiceChange}
-							disabled={servicesLoading}
-						>
-							<SelectTrigger id="departmental_service" className="text-base">
-								<SelectValue placeholder="Select a Departmental Service" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="0">None</SelectItem>
-								{servicesLoading ? (
-									<SelectItem value="loading" disabled>
-										Loading services...
-									</SelectItem>
-								) : (
-									services
-										?.slice()
-										.sort((a, b) => a.name.localeCompare(b.name))
-										.map((service) => (
-											<SelectItem
-												key={service.id}
-												value={service.id.toString()}
-											>
-												{service.name}
-											</SelectItem>
-										))
-								)}
-							</SelectContent>
-						</Select>
-						<p className="text-xs text-muted-foreground">
-							The DBCA service that this project delivers outputs to
-						</p>
-					</div>
-
 					{/* Business Area */}
 					<div className="space-y-2">
 						<Label htmlFor="business_area">

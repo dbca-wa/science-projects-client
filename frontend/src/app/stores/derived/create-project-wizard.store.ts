@@ -15,7 +15,6 @@ export interface CreateProjectFormData {
 
 	// Step 2: Project Details
 	business_area: number | null;
-	service: number | null;
 	start_date: string;
 	end_date: string | null;
 	data_custodian: number | null;
@@ -94,7 +93,6 @@ export class CreateProjectWizardStore extends BaseStore<CreateProjectWizardStore
 				keywords: [],
 				image: null,
 				business_area: null,
-				service: null,
 				start_date: "",
 				end_date: null,
 				data_custodian: null,
@@ -255,7 +253,6 @@ export class CreateProjectWizardStore extends BaseStore<CreateProjectWizardStore
 			Pick<
 				CreateProjectFormData,
 				| "business_area"
-				| "service"
 				| "start_date"
 				| "end_date"
 				| "data_custodian"
@@ -644,7 +641,6 @@ export class CreateProjectWizardStore extends BaseStore<CreateProjectWizardStore
 			keywords: [],
 			image: null,
 			business_area: null,
-			service: null,
 			start_date: "",
 			end_date: null,
 			data_custodian: null,

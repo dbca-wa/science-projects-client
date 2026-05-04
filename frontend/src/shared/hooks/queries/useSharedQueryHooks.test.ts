@@ -108,12 +108,4 @@ describe("Shared query hooks render", () => {
 		});
 		expect(result.current.isLoading).toBeDefined();
 	});
-
-	it("useServices should return a query", async () => {
-		const { useServices } = await import("./useServices");
-		const { result } = renderHook(() => useServices(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
 });

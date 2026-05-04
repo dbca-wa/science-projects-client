@@ -1502,9 +1502,6 @@ class TestDetailsServiceAdditional:
         # Arrange
         data_custodian = user_factory()
         site_custodian = user_factory()
-        from agencies.models import DepartmentalService
-
-        service = DepartmentalService.objects.create(name="Test Service")
 
         data = {
             "creator": user.pk,
@@ -1512,7 +1509,6 @@ class TestDetailsServiceAdditional:
             "owner": user.pk,
             "data_custodian": data_custodian.pk,
             "site_custodian": site_custodian.pk,
-            "service": service.pk,
         }
 
         # Act
@@ -1522,7 +1518,6 @@ class TestDetailsServiceAdditional:
         assert details.creator == user
         assert details.data_custodian == data_custodian
         assert details.site_custodian == site_custodian
-        assert details.service == service
 
     @pytest.mark.integration
     def test_create_project_details_with_model_instances(self, project, user, db):

@@ -11,31 +11,9 @@ import { FieldError } from "../FieldError";
 import { shouldShowError } from "../validation-helpers";
 
 /**
- * Stable RTE wrappers — memoised so they never re-render from parent
+ * Stable RTE wrapper — memoised so it never re-renders from parent
  * observer updates. Prevents Lexical focus loss.
  */
-const StableExternalDescEditor = memo(
-	({
-		initialValue,
-		onChange,
-	}: {
-		initialValue: string;
-		onChange: (html: string) => void;
-	}) => (
-		<RichTextEditor
-			value={initialValue}
-			onChange={onChange}
-			placeholder="Description specific to this external project..."
-			toolbar="projectDescription"
-			minHeight="150px"
-			aria-label="External project description"
-			className="editor-standalone"
-		/>
-	),
-	() => true
-);
-StableExternalDescEditor.displayName = "StableExternalDescEditor";
-
 const StableAimsEditor = memo(
 	({
 		initialValue,
@@ -79,7 +57,6 @@ const ExternalDetailsStep = observer(() => {
 		wizardStore.setExternalDetails({
 			collaboration_with: "",
 			budget: "",
-			external_description: "",
 			aims: "",
 		});
 		return null;
@@ -131,13 +108,6 @@ const ExternalDetailsStep = observer(() => {
 	const handleBudgetChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			wizardStore.setExternalDetails({ budget: e.target.value });
-		},
-		[wizardStore]
-	);
-
-	const handleDescriptionChange = useCallback(
-		(html: string) => {
-			wizardStore.setExternalDetails({ external_description: html });
 		},
 		[wizardStore]
 	);
@@ -199,18 +169,6 @@ const ExternalDetailsStep = observer(() => {
 				</div>
 				<p className="text-xs text-muted-foreground">
 					The estimated budget for the project in dollars
-				</p>
-			</div>
-
-			{/* External Description */}
-			<div className="space-y-2">
-				<Label htmlFor="external_description">Description (Optional)</Label>
-				<StableExternalDescEditor
-					initialValue={formData.external_description}
-					onChange={handleDescriptionChange}
-				/>
-				<p className="text-xs text-muted-foreground">
-					Description specific to this external project
 				</p>
 			</div>
 

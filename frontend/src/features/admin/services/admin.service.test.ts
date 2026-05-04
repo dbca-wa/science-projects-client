@@ -17,10 +17,6 @@ import {
 	createDivision,
 	updateDivision,
 	deleteDivision,
-	getServices,
-	createService,
-	updateService,
-	deleteService,
 	getAddresses,
 	createAddress,
 	updateAddress,
@@ -199,32 +195,6 @@ describe("admin.service", () => {
 		it("deleteDivision should DELETE", async () => {
 			(apiClient.delete as Mock).mockResolvedValue(undefined);
 			await deleteDivision(1);
-			expect(apiClient.delete).toHaveBeenCalled();
-		});
-	});
-
-	describe("services CRUD", () => {
-		it("getServices should GET all services", async () => {
-			(apiClient.get as Mock).mockResolvedValue([]);
-			await getServices();
-			expect(apiClient.get).toHaveBeenCalled();
-		});
-
-		it("createService should POST data", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ id: 1 });
-			await createService({ name: "New Service", director: null });
-			expect(apiClient.post).toHaveBeenCalled();
-		});
-
-		it("updateService should PUT data", async () => {
-			(apiClient.put as Mock).mockResolvedValue({ id: 1 });
-			await updateService(1, { name: "Updated", director: null });
-			expect(apiClient.put).toHaveBeenCalled();
-		});
-
-		it("deleteService should DELETE", async () => {
-			(apiClient.delete as Mock).mockResolvedValue(undefined);
-			await deleteService(1);
 			expect(apiClient.delete).toHaveBeenCalled();
 		});
 	});

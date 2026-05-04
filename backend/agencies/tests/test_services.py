@@ -10,7 +10,6 @@ from agencies.models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 from agencies.services.agency_service import AgencyService
@@ -805,75 +804,3 @@ class TestDivisionService:
 
         # Assert
         assert not Division.objects.filter(id=division_id).exists()
-
-
-class TestDepartmentalServiceService:
-    """Tests for departmental service operations"""
-
-    @pytest.mark.unit
-    def test_list_departmental_services(self, departmental_service, db):
-        """Test listing departmental services"""
-        # Act
-        services = AgencyService.list_departmental_services()
-
-        # Assert
-        assert services.count() == 1
-        assert departmental_service in services
-
-    @pytest.mark.unit
-    def test_get_departmental_service(self, departmental_service, db):
-        """Test getting departmental service by ID"""
-        # Act
-        result = AgencyService.get_departmental_service(departmental_service.id)
-
-        # Assert
-        assert result == departmental_service
-
-    @pytest.mark.unit
-    def test_get_departmental_service_not_found(self, db):
-        """Test getting non-existent service raises NotFound"""
-        # Act & Assert
-        with pytest.raises(NotFound, match="Departmental service 999 not found"):
-            AgencyService.get_departmental_service(999)
-
-    @pytest.mark.integration
-    def test_create_departmental_service(self, user, db):
-        """Test creating departmental service"""
-        # Arrange
-        data = {
-            "name": "New Service",
-            "director": user,
-        }
-
-        # Act
-        service = AgencyService.create_departmental_service(user, data)
-
-        # Assert
-        assert service.id is not None
-        assert service.name == "New Service"
-
-    @pytest.mark.integration
-    def test_update_departmental_service(self, departmental_service, user, db):
-        """Test updating departmental service"""
-        # Arrange
-        data = {"name": "Updated Service"}
-
-        # Act
-        updated = AgencyService.update_departmental_service(
-            departmental_service.id, user, data
-        )
-
-        # Assert
-        assert updated.name == "Updated Service"
-
-    @pytest.mark.integration
-    def test_delete_departmental_service(self, departmental_service, user, db):
-        """Test deleting departmental service"""
-        # Arrange
-        service_id = departmental_service.id
-
-        # Act
-        AgencyService.delete_departmental_service(service_id, user)
-
-        # Assert
-        assert not DepartmentalService.objects.filter(id=service_id).exists()

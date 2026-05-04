@@ -447,17 +447,14 @@ class PDFService:
             }
             return kind_map.get(project.kind, [project.kind, project.kind.upper()])
 
-        def get_departmental_service(project):
-            """Get departmental service name"""
-            from projects.models import ProjectDetail
-
+        def get_division_name(project):
+            """Get division name from the project's business area"""
             try:
-                details = ProjectDetail.objects.get(project=project)
-                if details.service:
-                    return details.service.name
-            except ProjectDetail.DoesNotExist:
+                if project.business_area and project.business_area.division:
+                    return project.business_area.division.name
+            except (AttributeError, TypeError):
                 pass
-            return "No Dept. Service"
+            return "Biodiversity and Conservation Science"
 
         # Build base context with paths
         base_dir = settings.BASE_DIR
@@ -513,7 +510,7 @@ class PDFService:
             ).get_text(),
             "project_status": document.project.status,
             "business_area_name": document.project.business_area.name,
-            "departmental_service_name": get_departmental_service(document.project),
+            "division_name": get_division_name(document.project),
             "team_as_string": get_project_team(document.project),
             # Document info
             "project_kind": get_project_kind_info(document.project)[0],

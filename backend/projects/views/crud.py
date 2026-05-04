@@ -175,7 +175,6 @@ class Projects(APIView):
                 "creator": data.get("creator"),
                 "modifier": data.get("creator"),
                 "owner": data.get("creator"),
-                "service": data.get("departmentalService"),
                 "data_custodian": data.get("dataCustodian"),
             }
             detail_serializer = ProjectDetailSerializer(data=detail_data)
@@ -289,7 +288,6 @@ class ProjectDetails(APIView):
                 "owner",
                 "data_custodian",
                 "site_custodian",
-                "service",
             ).get(project=project)
             base_data = ProjectDetailViewSerializer(base_detail).data
         except ProjectDetail.DoesNotExist:

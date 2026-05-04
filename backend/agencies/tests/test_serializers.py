@@ -9,14 +9,12 @@ from agencies.serializers import (
     AgencySerializer,
     BranchSerializer,
     BusinessAreaSerializer,
-    DepartmentalServiceSerializer,
     DivisionSerializer,
     MiniBASerializer,
     MiniBranchSerializer,
     TinyAgencySerializer,
     TinyBranchSerializer,
     TinyBusinessAreaSerializer,
-    TinyDepartmentalServiceSerializer,
     TinyDivisionSerializer,
 )
 
@@ -477,51 +475,3 @@ class TestTinyDivisionSerializer:
         assert len(result) == 1
         assert result[0]["id"] == user1.id
         assert result[0]["email"] == user1.email
-
-
-class TestDepartmentalServiceSerializer:
-    """Tests for DepartmentalServiceSerializer"""
-
-    @pytest.mark.unit
-    def test_serialization(self, departmental_service, db):
-        """Test serializing a departmental service"""
-        # Arrange & Act
-        serializer = DepartmentalServiceSerializer(departmental_service)
-
-        # Assert
-        assert serializer.data["id"] == departmental_service.id
-        assert serializer.data["name"] == departmental_service.name
-        assert serializer.data["director"] == departmental_service.director.id
-
-    @pytest.mark.integration
-    def test_deserialization_valid(self, user, db):
-        """Test deserializing valid departmental service data"""
-        # Arrange
-        data = {
-            "name": "New Service",
-            "director": user.id,
-        }
-
-        # Act
-        serializer = DepartmentalServiceSerializer(data=data)
-
-        # Assert
-        assert serializer.is_valid()
-        service = serializer.save()
-        assert service.name == "New Service"
-        assert service.director == user
-
-
-class TestTinyDepartmentalServiceSerializer:
-    """Tests for TinyDepartmentalServiceSerializer"""
-
-    @pytest.mark.unit
-    def test_serialization(self, departmental_service, db):
-        """Test serializing departmental service with tiny serializer"""
-        # Arrange & Act
-        serializer = TinyDepartmentalServiceSerializer(departmental_service)
-
-        # Assert
-        assert serializer.data["id"] == departmental_service.id
-        assert serializer.data["name"] == departmental_service.name
-        assert serializer.data["director"] == departmental_service.director.id

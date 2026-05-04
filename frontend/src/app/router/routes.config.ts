@@ -62,7 +62,6 @@ const BusinessAreaEditPage = lazy(
 );
 const DivisionsPage = lazy(() => import("@/pages/admin/DivisionsPage"));
 const LocationsPage = lazy(() => import("@/pages/admin/LocationsPage"));
-const ServicesPage = lazy(() => import("@/pages/admin/ServicesPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
 const ApproversPage = lazy(() => import("@/pages/admin/ApproversPage"));
@@ -583,15 +582,6 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		component: ReportInfoPage,
 		requiresAuth: true,
 		requiresKeyStakeholder: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Services",
-		path: "/manage/services",
-		component: ServicesPage,
-		requiresAuth: true,
-		requiresAdmin: true,
 		showInSidebar: false,
 		layoutWrapper: "content",
 	},
