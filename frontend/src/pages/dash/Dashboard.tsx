@@ -24,9 +24,18 @@ import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
+import {
+	Tabs,
+	TabsList,
+	TabsTrigger,
+	TabsContent,
+} from "@/shared/components/ui/tabs";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { Loader2, AlertCircle, Search } from "lucide-react";
-import { motion } from "framer-motion";
+
+const TAB_ADMIN = "admin";
+const TAB_DOCUMENTS = "documents";
+const TAB_PROJECTS = "projects";
 
 /** Grid that goes full-width for a single child, 2-col for multiple */
 const ActionCardGrid = ({ children }: { children: React.ReactNode }) => {
@@ -41,7 +50,7 @@ const ActionCardGrid = ({ children }: { children: React.ReactNode }) => {
 };
 
 /**
- * Dashboard - Main landing page after authentication
+ * Dashboard — Main landing page after authentication
  */
 const Dashboard = observer(() => {
 	useDocumentTitle("Dashboard");
@@ -50,7 +59,7 @@ const Dashboard = observer(() => {
 	const navigate = useNavigate();
 	const myProjectsStore = useMyProjectsStore();
 
-	// Modal state - controlled by URL
+	// Modal state — controlled by URL
 	const selectedTaskId = searchParams.get("caretaker_task");
 	const isModalOpen = !!selectedTaskId;
 
@@ -59,7 +68,6 @@ const Dashboard = observer(() => {
 	const wasLoadingRef = useRef(false);
 
 	useEffect(() => {
-		// Only track loading if modal should be open (direct link/refresh to /?caretaker_task=X)
 		if (isLoading && isModalOpen) {
 			wasLoadingRef.current = true;
 		}
@@ -67,12 +75,10 @@ const Dashboard = observer(() => {
 
 	useEffect(() => {
 		if (isModalOpen && !isLoading) {
-			// Only delay if we just finished loading WITH modal open (refresh/direct link to /?caretaker_task=X)
-			// If wasLoadingRef is false, user clicked from table (no delay needed)
 			const delay = wasLoadingRef.current ? 600 : 0;
 			const timer = setTimeout(() => {
 				setShouldShowModal(true);
-				wasLoadingRef.current = false; // Reset after first use
+				wasLoadingRef.current = false;
 			}, delay);
 			return () => clearTimeout(timer);
 		} else if (!isModalOpen) {
@@ -80,10 +86,23 @@ const Dashboard = observer(() => {
 		}
 	}, [isModalOpen, isLoading]);
 
-	const [activeTab, setActiveTab] = useState<number>(() => {
-		const tabParam = searchParams.get("tab");
-		return tabParam ? parseInt(tabParam, 10) : 0;
-	});
+	const isSuperuser = user?.is_superuser === true;
+
+	// Derive active tab from URL search params
+	const tabParam = searchParams.get("tab");
+	const defaultTab = isSuperuser ? TAB_ADMIN : TAB_DOCUMENTS;
+	const activeTab = tabParam || defaultTab;
+
+	const handleTabChange = (value: string) => {
+		setSearchParams(
+			(prev) => {
+				const next = new URLSearchParams(prev);
+				next.set("tab", value);
+				return next;
+			},
+			{ replace: true }
+		);
+	};
 
 	const {
 		data: adminTasks = [],
@@ -93,7 +112,6 @@ const Dashboard = observer(() => {
 		refetch: refetchAdminTasks,
 	} = useAdminTasks();
 
-	// Fetch endorsement tasks
 	const {
 		data: endorsementTasks,
 		isLoading: endorsementTasksLoading,
@@ -101,7 +119,6 @@ const Dashboard = observer(() => {
 		error: endorsementTasksErrorObj,
 	} = useEndorsementTasks();
 
-	// Fetch document tasks
 	const {
 		data: documentTasks,
 		isLoading: documentTasksLoading,
@@ -109,7 +126,6 @@ const Dashboard = observer(() => {
 		error: documentTasksErrorObj,
 	} = useDocumentTasks();
 
-	// Fetch my projects
 	const {
 		data: myProjects = [],
 		isLoading: myProjectsLoading,
@@ -117,15 +133,12 @@ const Dashboard = observer(() => {
 		error: myProjectsErrorObj,
 	} = useMyProjects();
 
-	// Filter projects using MobX store
 	const filteredProjects = myProjectsStore.getFilteredProjects(myProjects);
 
 	const firstName =
 		user?.display_first_name || user?.first_name || user?.username || "User";
 
-	// Check if user is a business area lead
 	const isBusinessAreaLead = (user?.business_areas_led?.length ?? 0) > 0;
-	const isSuperuser = user?.is_superuser === true;
 
 	// Calculate task counts
 	const documentTasksCount =
@@ -137,7 +150,6 @@ const Dashboard = observer(() => {
 	const myTasksCount = documentTasksCount;
 	const myProjectsCount = filteredProjects.length;
 
-	// Admin tasks count should include caretaker requests + project deletions + merge requests + endorsements
 	const caretakerTasksCount = adminTasks.filter(
 		(task) => task.action === "setcaretaker"
 	).length;
@@ -257,15 +269,6 @@ const Dashboard = observer(() => {
 									colorScheme="blue"
 									delay={0.3}
 								/>
-
-								{/* <DashboardActionCard
-									icon={<TbWorldWww className="w-5 h-5" />}
-									title="Scientific Sites Register"
-									description="Browse scientific sites"
-									href="https://scientificsites.dpaw.wa.gov.au/"
-									colorScheme="blue"
-									delay={0.35}
-								/> */}
 							</ActionCardGrid>
 						</div>
 
@@ -279,240 +282,169 @@ const Dashboard = observer(() => {
 							</p>
 						</div>
 
-						{/* Caretaker Notification - Shows if user has active caretakers */}
+						{/* Caretaker Notification */}
 						{user && user.caretakers && user.caretakers.length > 0 && (
 							<CaretakerNotification caretakers={user.caretakers} />
 						)}
 
 						{/* Tasks & Projects Tabs */}
-						<div className="">
-							{/* Tab Navigation */}
-							<div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 relative">
-								{/* Admin Tab (superuser only) - First tab */}
-								{user?.is_superuser && (
-									<button
-										onClick={() => setActiveTab(0)}
-										className={`relative flex-1 px-2 sm:px-4 md:px-6 py-3 md:py-4 font-semibold text-sm md:text-base transition-all cursor-pointer ${
-											activeTab === 0
-												? "text-blue-600 dark:text-blue-400"
-												: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-										}`}
-									>
-										<div className="flex items-center justify-center gap-1 sm:gap-2">
-											<span>Admin</span>
-											{adminTasksCount > 0 && (
-												<span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[22px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold text-white bg-red-600 rounded-full">
-													{adminTasksCount}
-												</span>
-											)}
-										</div>
-									</button>
+						<Tabs
+							value={activeTab}
+							onValueChange={handleTabChange}
+							className="w-full mt-2"
+						>
+							<TabsList className="w-full flex">
+								{isSuperuser && (
+									<TabsTrigger value={TAB_ADMIN} className="flex-1">
+										<span>Admin</span>
+										{adminTasksCount > 0 && (
+											<span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-600 rounded-full">
+												{adminTasksCount}
+											</span>
+										)}
+									</TabsTrigger>
 								)}
+								<TabsTrigger value={TAB_DOCUMENTS} className="flex-1">
+									<span className="hidden sm:inline">Documents</span>
+									<span className="sm:hidden">Docs</span>
+									{myTasksCount > 0 && (
+										<span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+											{myTasksCount}
+										</span>
+									)}
+								</TabsTrigger>
+								<TabsTrigger value={TAB_PROJECTS} className="flex-1">
+									<span className="hidden sm:inline">My Projects</span>
+									<span className="sm:hidden">Projects</span>
+									{myProjectsCount > 0 && (
+										<span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+											{myProjectsCount}
+										</span>
+									)}
+								</TabsTrigger>
+							</TabsList>
 
-								{/* Documents Tab */}
-								<button
-									onClick={() => setActiveTab(user?.is_superuser ? 1 : 0)}
-									className={`relative flex-1 px-2 sm:px-4 md:px-6 py-3 md:py-4 font-semibold text-sm md:text-base transition-all cursor-pointer ${
-										activeTab === (user?.is_superuser ? 1 : 0)
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-									}`}
-								>
-									<div className="flex items-center justify-center gap-1 sm:gap-2">
-										<span className="hidden sm:inline">Documents</span>
-										<span className="sm:hidden">Docs</span>
-										{myTasksCount > 0 && (
-											<span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[22px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold text-white bg-blue-600 rounded-full">
-												{myTasksCount}
-											</span>
-										)}
-									</div>
-								</button>
+							{/* Admin Panel */}
+							{isSuperuser && (
+								<TabsContent value={TAB_ADMIN}>
+									<MyTasksSection
+										adminTasks={adminTasks}
+										adminTasksLoading={adminTasksLoading}
+										adminTasksError={
+											adminTasksError ? adminTasksErrorObj : null
+										}
+										refetchAdminTasks={refetchAdminTasks}
+										endorsementTasks={endorsementTasks}
+										endorsementTasksLoading={endorsementTasksLoading}
+										endorsementTasksError={
+											endorsementTasksError ? endorsementTasksErrorObj : null
+										}
+									/>
+								</TabsContent>
+							)}
 
-								{/* My Projects Tab */}
-								<button
-									onClick={() => setActiveTab(user?.is_superuser ? 2 : 1)}
-									className={`relative flex-1 px-2 sm:px-4 md:px-6 py-3 md:py-4 font-semibold text-sm md:text-base transition-all cursor-pointer ${
-										activeTab === (user?.is_superuser ? 2 : 1)
-											? "text-blue-600 dark:text-blue-400"
-											: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-									}`}
-								>
-									<div className="flex items-center justify-center gap-1 sm:gap-2">
-										<span className="hidden sm:inline">My Projects</span>
-										<span className="sm:hidden">Projects</span>
-										{myProjectsCount > 0 && (
-											<span className="inline-flex items-center justify-center min-w-[20px] sm:min-w-[22px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold text-white bg-blue-600 rounded-full">
-												{myProjectsCount}
-											</span>
-										)}
-									</div>
-								</button>
-
-								{/* Active tab indicator - positioned absolutely at bottom of tab bar */}
-								<motion.div
-									layoutId="activeTab"
-									className="absolute bottom-0 h-0.5 bg-blue-600 dark:bg-blue-400"
-									style={{
-										left: user?.is_superuser
-											? `${(activeTab / 3) * 100}%`
-											: `${(activeTab / 2) * 100}%`,
-										width: user?.is_superuser ? "33.333%" : "50%",
-									}}
-									transition={{ type: "spring", stiffness: 500, damping: 30 }}
+							{/* Documents Panel */}
+							<TabsContent value={TAB_DOCUMENTS}>
+								<DocumentTasksTabContent
+									documentTasks={documentTasks}
+									documentTasksLoading={documentTasksLoading}
+									documentTasksError={
+										documentTasksError ? documentTasksErrorObj : null
+									}
+									isBusinessAreaLead={isBusinessAreaLead}
+									isSuperuser={isSuperuser}
 								/>
-							</div>
+							</TabsContent>
 
-							{/* Tab Content */}
-							<div>
-								{/* Admin Panel - First panel for superusers */}
-								{activeTab === 0 && user?.is_superuser && (
-									<motion.div
-										initial={{ opacity: 0, y: 10 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: -10 }}
-										transition={{ duration: 0.2 }}
-									>
-										<MyTasksSection
-											adminTasks={adminTasks}
-											adminTasksLoading={adminTasksLoading}
-											adminTasksError={
-												adminTasksError ? adminTasksErrorObj : null
-											}
-											refetchAdminTasks={refetchAdminTasks}
-											endorsementTasks={endorsementTasks}
-											endorsementTasksLoading={endorsementTasksLoading}
-											endorsementTasksError={
-												endorsementTasksError ? endorsementTasksErrorObj : null
-											}
-										/>
-									</motion.div>
-								)}
-
-								{/* Documents Panel */}
-								{activeTab === (user?.is_superuser ? 1 : 0) && (
-									<motion.div
-										initial={{ opacity: 0, y: 10 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: -10 }}
-										transition={{ duration: 0.2 }}
-									>
-										<DocumentTasksTabContent
-											documentTasks={documentTasks}
-											documentTasksLoading={documentTasksLoading}
-											documentTasksError={
-												documentTasksError ? documentTasksErrorObj : null
-											}
-											isBusinessAreaLead={isBusinessAreaLead}
-											isSuperuser={isSuperuser}
-										/>
-									</motion.div>
-								)}
-
-								{/* My Projects Panel */}
-								{activeTab === (user?.is_superuser ? 2 : 1) && (
-									<motion.div
-										initial={{ opacity: 0, y: 10 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, y: -10 }}
-										transition={{ duration: 0.2 }}
-										className="space-y-4"
-									>
-										{/* Filter Controls */}
-										<div className="space-y-3">
-											{/* Search input - matches ProjectFilters style */}
-											<div className="relative w-full">
-												<Input
-													type="text"
-													placeholder="Search projects by name, keyword, or tag..."
-													value={myProjectsStore.state.searchTerm}
-													onChange={(e) =>
-														myProjectsStore.setSearchTerm(e.target.value)
-													}
-													variant="search"
-													className="pl-10 text-sm rounded-md"
-												/>
-												<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
-											</div>
-
-											{/* Bottom row: Hide Inactive checkbox and Search Controls */}
-											<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-												{/* Left side: Hide Inactive checkbox */}
-												<div className="flex items-center space-x-2">
-													<Checkbox
-														id="hideInactive"
-														checked={myProjectsStore.state.filters.hideInactive}
-														onCheckedChange={(checked) =>
-															myProjectsStore.setHideInactive(
-																checked as boolean
-															)
-														}
-													/>
-													<Label
-														htmlFor="hideInactive"
-														className="text-sm font-normal cursor-pointer whitespace-nowrap"
-													>
-														Hide Inactive
-													</Label>
-												</div>
-
-												{/* Right side: Remember my search and Clear button */}
-												<div className="flex justify-center">
-													<SearchControls
-														saveSearch={myProjectsStore.state.saveSearch}
-														onToggleSaveSearch={() =>
-															myProjectsStore.toggleSaveSearch()
-														}
-														filterCount={myProjectsStore.filterCount}
-														onClearFilters={() =>
-															myProjectsStore.resetFilters()
-														}
-														className="flex gap-3 items-center"
-													/>
-												</div>
-											</div>
+							{/* My Projects Panel */}
+							<TabsContent value={TAB_PROJECTS}>
+								<div className="space-y-4">
+									{/* Filter Controls */}
+									<div className="space-y-3">
+										<div className="relative w-full">
+											<Input
+												type="text"
+												placeholder="Search projects by name, keyword, or tag..."
+												value={myProjectsStore.state.searchTerm}
+												onChange={(e) =>
+													myProjectsStore.setSearchTerm(e.target.value)
+												}
+												variant="search"
+												className="pl-10 text-sm rounded-md"
+											/>
+											<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-600 dark:text-blue-400" />
 										</div>
 
-										{/* Projects Table */}
-										{myProjectsLoading ? (
-											<div className="flex items-center justify-center min-h-[200px]">
-												<Loader2 className="size-8 animate-spin text-blue-600" />
+										<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+											<div className="flex items-center space-x-2">
+												<Checkbox
+													id="hideInactive"
+													checked={myProjectsStore.state.filters.hideInactive}
+													onCheckedChange={(checked) =>
+														myProjectsStore.setHideInactive(checked as boolean)
+													}
+												/>
+												<Label
+													htmlFor="hideInactive"
+													className="text-sm font-normal cursor-pointer whitespace-nowrap"
+												>
+													Hide Inactive
+												</Label>
 											</div>
-										) : myProjectsError ? (
-											<Alert variant="destructive">
-												<AlertCircle className="size-4" />
-												<AlertDescription>
-													Failed to load projects:{" "}
-													{myProjectsErrorObj?.message || "Unknown error"}
-												</AlertDescription>
-											</Alert>
-										) : (
-											<ProjectsDataTable
-												projects={filteredProjects}
-												columns={{
-													title: true,
-													image: true,
-													kind: false,
-													status: true,
-													businessArea: false,
-													role: true,
-													createdAt: false,
-												}}
-												defaultSort="title"
-												emptyMessage={
-													myProjectsStore.state.filters.hideInactive
-														? "You aren't associated with any active projects"
-														: "You aren't associated with any projects"
-												}
-												onProjectClick={handleProjectClick}
-											/>
-										)}
-									</motion.div>
-								)}
-							</div>
-						</div>
 
-						{/* Caretaker Section - Standalone after "Your Work" */}
+											<div className="flex justify-center">
+												<SearchControls
+													saveSearch={myProjectsStore.state.saveSearch}
+													onToggleSaveSearch={() =>
+														myProjectsStore.toggleSaveSearch()
+													}
+													filterCount={myProjectsStore.filterCount}
+													onClearFilters={() => myProjectsStore.resetFilters()}
+													className="flex gap-3 items-center"
+												/>
+											</div>
+										</div>
+									</div>
+
+									{/* Projects Table */}
+									{myProjectsLoading ? (
+										<div className="flex items-center justify-center min-h-[200px]">
+											<Loader2 className="size-8 animate-spin text-blue-600" />
+										</div>
+									) : myProjectsError ? (
+										<Alert variant="destructive">
+											<AlertCircle className="size-4" />
+											<AlertDescription>
+												Failed to load projects:{" "}
+												{myProjectsErrorObj?.message || "Unknown error"}
+											</AlertDescription>
+										</Alert>
+									) : (
+										<ProjectsDataTable
+											projects={filteredProjects}
+											columns={{
+												title: true,
+												image: true,
+												kind: false,
+												status: true,
+												businessArea: false,
+												role: true,
+												createdAt: false,
+											}}
+											defaultSort="title"
+											emptyMessage={
+												myProjectsStore.state.filters.hideInactive
+													? "You aren't associated with any active projects"
+													: "You aren't associated with any projects"
+											}
+											onProjectClick={handleProjectClick}
+										/>
+									)}
+								</div>
+							</TabsContent>
+						</Tabs>
+
+						{/* Caretaker Section */}
 						{user && (
 							<CaretakerSection
 								userId={user.id}
@@ -523,7 +455,7 @@ const Dashboard = observer(() => {
 				)}
 			</PageTransition>
 
-			{/* Caretaker Approval Modal - Outside PageTransition to avoid animation conflicts */}
+			{/* Caretaker Approval Modal */}
 			<CaretakerApprovalModal
 				taskId={selectedTaskId ? Number(selectedTaskId) : null}
 				open={shouldShowModal}

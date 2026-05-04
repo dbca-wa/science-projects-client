@@ -56,17 +56,24 @@ describe("ProblematicProjectsTab", () => {
 		expect(content).toContain("downloadProjectsAsTxt");
 	});
 
-	it("has collapsible sections with chevron toggle", () => {
-		expect(content).toContain("ChevronDown");
-		expect(content).toContain("isExpanded");
-		expect(content).toContain("Collapse section");
-		expect(content).toContain("Expand section");
+	it("uses shared CollapsibleCard for collapsible sections", () => {
+		expect(content).toContain("CollapsibleCard");
+		expect(content).toContain("@/shared/components/CollapsibleCard");
 	});
 
-	it("has tooltips on the collapse toggle", () => {
-		expect(content).toContain("Tooltip");
-		expect(content).toContain("TooltipTrigger");
-		expect(content).toContain("TooltipContent");
+	it("CollapsibleCard has chevron toggle, tooltips, and accessibility", () => {
+		const collapsibleCard = readFileSync(
+			join(__dirname, "../../../../shared/components/CollapsibleCard.tsx"),
+			"utf-8"
+		);
+		expect(collapsibleCard).toContain("ChevronDown");
+		expect(collapsibleCard).toContain("isExpanded");
+		expect(collapsibleCard).toContain("Collapse section");
+		expect(collapsibleCard).toContain("Expand section");
+		expect(collapsibleCard).toContain("Tooltip");
+		expect(collapsibleCard).toContain("TooltipTrigger");
+		expect(collapsibleCard).toContain("TooltipContent");
+		expect(collapsibleCard).toContain("aria-expanded");
 	});
 
 	it("open/closed remedy has status selector", () => {

@@ -1,15 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { Loader2, AlertCircle, ChevronDown, Download } from "lucide-react";
+import { Loader2, AlertCircle, Download } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
-import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardContent,
-} from "@/shared/components/ui/card";
 import {
 	Select,
 	SelectContent,
@@ -25,11 +18,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/shared/components/ui/dialog";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
 import { DataTable, type ColumnDef } from "@/shared/components/DataTable";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import {
@@ -286,7 +274,9 @@ const RemedyConfirmDialog = ({
 	</Dialog>
 );
 
-/** Collapsible category section with caret toggle, count badge, and action button */
+import { CollapsibleCard } from "@/shared/components/CollapsibleCard";
+
+/** Collapsible category section using shared CollapsibleCard with action buttons */
 const CategorySection = ({
 	category,
 	projects,
@@ -300,82 +290,45 @@ const CategorySection = ({
 	onRemedy?: () => void;
 	onDownload?: () => void;
 }) => {
-	const [isExpanded, setIsExpanded] = useState(false);
+	const actionButtons = (
+		<>
+			{category.actionType === "remedy" && projects.length > 0 && onRemedy && (
+				<Button variant="default" size="sm" onClick={onRemedy}>
+					Remedy
+				</Button>
+			)}
+			{category.actionType === "download" &&
+				projects.length > 0 &&
+				onDownload && (
+					<Button variant="outline" size="sm" onClick={onDownload}>
+						<Download className="mr-1.5 size-3.5" />
+						Download TXT List
+					</Button>
+				)}
+		</>
+	);
 
 	return (
-		<Card>
-			<CardHeader className="pb-0">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={() => setIsExpanded((prev) => !prev)}
-									className="flex items-center gap-2 text-left cursor-pointer hover:opacity-80 transition-opacity"
-									aria-expanded={isExpanded}
-									aria-label={
-										isExpanded
-											? `Collapse ${category.label}`
-											: `Expand ${category.label}`
-									}
-								>
-									<span
-										className="transition-transform duration-200"
-										style={{
-											display: "inline-flex",
-											transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
-										}}
-									>
-										<ChevronDown className="size-4 text-muted-foreground" />
-									</span>
-									<CardTitle className="text-base">{category.label}</CardTitle>
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="top">
-								{isExpanded ? "Collapse section" : "Expand section"}
-							</TooltipContent>
-						</Tooltip>
-						<Badge variant="secondary">{projects.length}</Badge>
-					</div>
-					<div className="flex items-center gap-2">
-						{category.actionType === "remedy" &&
-							projects.length > 0 &&
-							onRemedy && (
-								<Button variant="default" size="sm" onClick={onRemedy}>
-									Remedy
-								</Button>
-							)}
-						{category.actionType === "download" &&
-							projects.length > 0 &&
-							onDownload && (
-								<Button variant="outline" size="sm" onClick={onDownload}>
-									<Download className="mr-1.5 size-3.5" />
-									Download TXT List
-								</Button>
-							)}
-					</div>
-				</div>
-			</CardHeader>
-			{isExpanded && (
-				<CardContent className="pt-4">
-					{projects.length === 0 ? (
-						<p className="py-4 text-center text-sm text-muted-foreground">
-							No projects in this category
-						</p>
-					) : (
-						<DataTable
-							data={projects}
-							columns={columns}
-							getRowKey={(row) => row.id}
-							defaultSort={{ column: "title", direction: "asc" }}
-							emptyMessage="No projects in this category."
-							ariaLabel={`${category.label} table`}
-						/>
-					)}
-				</CardContent>
+		<CollapsibleCard
+			title={category.label}
+			count={projects.length}
+			actions={actionButtons}
+		>
+			{projects.length === 0 ? (
+				<p className="py-4 text-center text-sm text-muted-foreground">
+					No projects in this category
+				</p>
+			) : (
+				<DataTable
+					data={projects}
+					columns={columns}
+					getRowKey={(row) => row.id}
+					defaultSort={{ column: "title", direction: "asc" }}
+					emptyMessage="No projects in this category."
+					ariaLabel={`${category.label} table`}
+				/>
 			)}
-		</Card>
+		</CollapsibleCard>
 	);
 };
 

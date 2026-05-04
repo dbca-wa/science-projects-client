@@ -1,3 +1,4 @@
+export { CollapsibleCard } from "../../../shared/components/CollapsibleCard";
 export { DashboardActionCard } from "./DashboardActionCard";
 export { MyTasksSection } from "./MyTasksSection";
 export { DocumentTasksTabContent } from "./DocumentTasksTabContent";
