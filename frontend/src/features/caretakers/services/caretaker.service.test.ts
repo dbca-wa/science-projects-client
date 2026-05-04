@@ -1,16 +1,12 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getCaretakerCheck,
-	getCaretakers,
-	getCaretaker,
 	requestCaretaker,
 	getPendingCaretakerRequests,
 	getOutgoingCaretakerRequests,
 	approveCaretakerRequest,
 	rejectCaretakerRequest,
 	cancelCaretakerRequest,
-	respondToCaretakerRequest,
-	adminSetCaretaker,
 	deleteCaretaker,
 } from "./caretaker.service";
 import { apiClient } from "@/shared/services/api/client.service";
@@ -38,30 +34,6 @@ describe("caretaker.service", () => {
 
 			expect(apiClient.get).toHaveBeenCalledWith("caretakers/check");
 			expect(result).toEqual(mockResponse);
-		});
-	});
-
-	describe("getCaretakers", () => {
-		it("should GET all caretaker relationships", async () => {
-			const mockCaretakers = [{ id: 1 }];
-			(apiClient.get as Mock).mockResolvedValue(mockCaretakers);
-
-			const result = await getCaretakers();
-
-			expect(apiClient.get).toHaveBeenCalledWith("caretakers/list");
-			expect(result).toEqual(mockCaretakers);
-		});
-	});
-
-	describe("getCaretaker", () => {
-		it("should GET caretaker by ID", async () => {
-			const mockCaretaker = { id: 5 };
-			(apiClient.get as Mock).mockResolvedValue(mockCaretaker);
-
-			const result = await getCaretaker(5);
-
-			expect(apiClient.get).toHaveBeenCalledWith("caretakers/5");
-			expect(result).toEqual(mockCaretaker);
 		});
 	});
 
@@ -152,53 +124,6 @@ describe("caretaker.service", () => {
 			expect(apiClient.post).toHaveBeenCalledWith(
 				"caretakers/requests/10/cancel"
 			);
-		});
-	});
-
-	describe("respondToCaretakerRequest", () => {
-		it("should POST approve action to respond endpoint", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ message: "Approved" });
-
-			const result = await respondToCaretakerRequest({
-				taskId: 10,
-				action: "approve",
-			});
-
-			expect(apiClient.post).toHaveBeenCalledWith(
-				"/adminoptions/tasks/10/respond",
-				{ action: "approve" }
-			);
-			expect(result).toEqual({ message: "Approved" });
-		});
-
-		it("should POST reject action to respond endpoint", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ message: "Rejected" });
-
-			await respondToCaretakerRequest({ taskId: 10, action: "reject" });
-
-			expect(apiClient.post).toHaveBeenCalledWith(
-				"/adminoptions/tasks/10/respond",
-				{ action: "reject" }
-			);
-		});
-	});
-
-	describe("adminSetCaretaker", () => {
-		it("should POST to admin-set endpoint", async () => {
-			const mockCaretaker = { id: 1 };
-			(apiClient.post as Mock).mockResolvedValue(mockCaretaker);
-
-			const result = await adminSetCaretaker({
-				user_id: 1,
-				caretaker_id: 2,
-				reason: "other",
-			});
-
-			expect(apiClient.post).toHaveBeenCalledWith(
-				"caretakers/admin-set",
-				expect.objectContaining({ user_id: 1, caretaker_id: 2 })
-			);
-			expect(result).toEqual(mockCaretaker);
 		});
 	});
 

@@ -3,40 +3,31 @@ import { toast } from "sonner";
 import {
 	downloadPdf,
 	generatePdf,
-	triggerBlobDownload,
+	openBlobInNewTab,
 } from "../services/pdf.service";
 import type { DocumentType } from "@/shared/utils/document.utils";
 import { extractUserFriendlyMessage } from "@/shared/utils/error.utils";
 
 /**
  * Hook for downloading PDF for a document
- *
- * @param documentType - Type of document (concept_plan, project_plan, etc.)
- * @param documentId - ID of the document
+ * Opens the PDF in a new browser tab instead of downloading directly.
  */
 export const useDownloadPdf = () => {
 	return useMutation({
 		mutationFn: async ({
 			documentType,
 			documentId,
-			filename,
 		}: {
 			documentType: DocumentType;
 			documentId: number;
-			filename: string;
+			filename?: string;
 		}) => {
 			const blob = await downloadPdf(documentType, documentId);
-			triggerBlobDownload(blob, filename);
+			openBlobInNewTab(blob);
 			return { success: true };
 		},
-		onSuccess: () => {
-			toast.success("PDF downloaded successfully");
-		},
 		onError: (error: Error) => {
-			const message = extractUserFriendlyMessage(
-				error,
-				"Failed to download PDF"
-			);
+			const message = extractUserFriendlyMessage(error, "Failed to open PDF");
 			toast.error(message);
 		},
 	});
@@ -44,10 +35,7 @@ export const useDownloadPdf = () => {
 
 /**
  * Hook for generating new PDF for a document
- * Generates the PDF and automatically downloads it
- *
- * @param documentType - Type of document (concept_plan, project_plan, etc.)
- * @param documentId - ID of the document
+ * Generates the PDF and opens it in a new browser tab.
  */
 export const useGeneratePdf = () => {
 	const queryClient = useQueryClient();
@@ -56,20 +44,19 @@ export const useGeneratePdf = () => {
 		mutationFn: async ({
 			documentType,
 			documentId,
-			filename,
 			projectId,
 		}: {
 			documentType: DocumentType;
 			documentId: number;
-			filename: string;
+			filename?: string;
 			projectId?: number;
 		}) => {
 			const blob = await generatePdf(documentType, documentId);
-			triggerBlobDownload(blob, filename);
+			openBlobInNewTab(blob);
 			return { success: true, projectId };
 		},
 		onSuccess: (_data, variables) => {
-			toast.success("PDF generated and downloaded successfully");
+			toast.success("PDF generated successfully");
 			// Invalidate project detail so document.pdf updates and download button becomes active
 			if (variables.projectId) {
 				queryClient.invalidateQueries({

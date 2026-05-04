@@ -33,6 +33,7 @@ import {
 import { Loader2, AlertCircle, Plus } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { ReportInfoForm } from "@/features/admin/components/report-info/ReportInfoForm";
 
 const DetailsTab = lazy(
@@ -192,11 +193,7 @@ const LatestReportPage = observer(function LatestReportPage({
 									<SelectValue placeholder="Select division" />
 								</SelectTrigger>
 								<SelectContent>
-									{divisions.map((div) => (
-										<SelectItem key={div.id} value={div.slug}>
-											{div.slug}
-										</SelectItem>
-									))}
+									<DivisionSelectItems divisions={divisions} valueAsSlug />
 								</SelectContent>
 							</Select>
 						)}
@@ -264,11 +261,7 @@ const LatestReportPage = observer(function LatestReportPage({
 								<SelectValue placeholder="Select division" />
 							</SelectTrigger>
 							<SelectContent>
-								{divisions.map((div) => (
-									<SelectItem key={div.id} value={div.slug}>
-										{div.slug}
-									</SelectItem>
-								))}
+								<DivisionSelectItems divisions={divisions} valueAsSlug />
 							</SelectContent>
 						</Select>
 					)}

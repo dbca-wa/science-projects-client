@@ -30,7 +30,6 @@ import { DivisionYearSafeguard } from "@/features/admin/components/actions/Divis
 import {
 	useOpenNewCycle,
 	useNewCycleDraft,
-	useSaveNewCycleDraft,
 } from "@/features/admin/hooks/useAdminActions";
 import { useNewCyclePreview } from "@/shared/hooks/queries/useBumpEmails";
 import { NewCycleRecipientSection } from "@/features/admin/components/new-cycle/NewCycleRecipientSection";
@@ -101,13 +100,12 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 }: NewCyclePageContentProps) {
 	const { mutate, isPending } = useOpenNewCycle();
 	const { data: draftData } = useNewCycleDraft();
-	const saveDraftMutation = useSaveNewCycleDraft();
 
 	const hasSavedDraft =
 		!!draftData?.draft && Object.keys(draftData.draft).length > 0;
 
 	const handleSaveDraft = () => {
-		saveDraftMutation.mutate(store.exportDraft());
+		toast.info("Draft saving is not currently available");
 	};
 
 	const handleLoadDraft = () => {
@@ -688,7 +686,6 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 							variant="outline"
 							size="sm"
 							onClick={handleSaveDraft}
-							disabled={saveDraftMutation.isPending}
 							className="gap-1.5"
 						>
 							<Save className="size-4" />

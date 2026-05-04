@@ -20,6 +20,7 @@ from .admin import (
 from .annual_report import (  # BeginAnnualReportDocGeneration,  # Removed duplicate - use the one from pdf.py
     FullLatestReport,
     GenerationProgressSSE,
+    GetAllReportPDFs,
     GetAvailableReportYearsForProgressReport,
     GetAvailableReportYearsForStudentReport,
     GetCompletedReports,
@@ -178,6 +179,7 @@ __all__ = [
     "GetReportPDFStatus",
     "GetWithPDFs",
     "GetLegacyPDFs",
+    "GetAllReportPDFs",
     "GetCompletedReports",
     "BeginAnnualReportDocGeneration",
     "LatestYearsProgressReports",

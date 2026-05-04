@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	updateStaffProfileOverview,
-	updateStaffProfileHero,
 	toggleStaffProfileVisibility,
 	createEmploymentEntry,
 	updateEmploymentEntry,
@@ -28,19 +27,6 @@ export const useUpdateOverview = (pk: number) => {
 			});
 			queryClient.invalidateQueries({
 				queryKey: ["staffProfiles", "detail", pk],
-			});
-		},
-	});
-};
-
-export const useUpdateHero = (pk: number) => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: (data: Partial<Record<string, unknown>>) =>
-			updateStaffProfileHero(pk, data),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["staffProfiles", "hero", pk],
 			});
 		},
 	});

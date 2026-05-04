@@ -3,7 +3,6 @@ export {
 	type IDocumentTaskWithLevel,
 	formatProjectCode,
 	getDocumentUrlPath,
-	getTaskLevelConfig,
 	sortTasksByLevel,
 	sortTasksByDocumentKind,
 	combineProjectLevelTasks,

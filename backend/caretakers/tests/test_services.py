@@ -289,7 +289,8 @@ class TestCaretakerTaskService:
         # Assert
         assert user.id in roles["project_lead_user_ids"]
         assert user.id not in roles["team_member_user_ids"]
-        assert not roles["directorate_user_found"]
+        assert not roles["has_superuser_caretakee"]
+        assert len(roles["directorate_division_ids"]) == 0
         assert len(roles["ba_leader_user_ids"]) == 0
 
     @pytest.mark.django_db
@@ -318,7 +319,8 @@ class TestCaretakerTaskService:
         # Assert
         assert user.id in roles["team_member_user_ids"]
         assert user.id not in roles["project_lead_user_ids"]
-        assert not roles["directorate_user_found"]
+        assert not roles["has_superuser_caretakee"]
+        assert len(roles["directorate_division_ids"]) == 0
         assert len(roles["ba_leader_user_ids"]) == 0
 
     @pytest.mark.django_db
@@ -338,28 +340,33 @@ class TestCaretakerTaskService:
 
         # Assert
         assert user.id in roles["ba_leader_user_ids"]
-        assert not roles["directorate_user_found"]
+        assert not roles["has_superuser_caretakee"]
+        assert len(roles["directorate_division_ids"]) == 0
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_analyze_caretakee_roles_directorate_by_ba(self, db, directorate_user):
-        """Test analyze_caretakee_roles identifies Directorate users by BA"""
+    def test_analyze_caretakee_roles_directorate_by_division_role(self, db):
+        """Test analyze_caretakee_roles identifies users with division roles"""
         # Arrange
+        from common.tests.factories import DivisionFactory
+
+        user = UserFactory()
+        division = DivisionFactory(director=user)
+
         caretaker = UserFactory()
-        assignment = Caretaker.objects.create(
-            user=directorate_user, caretaker=caretaker
-        )
+        assignment = Caretaker.objects.create(user=user, caretaker=caretaker)
 
         # Act
         roles = CaretakerTaskService.analyze_caretakee_roles([assignment])
 
         # Assert
-        assert roles["directorate_user_found"] is True
+        assert not roles["has_superuser_caretakee"]
+        assert division.pk in roles["directorate_division_ids"]
 
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_analyze_caretakee_roles_directorate_by_superuser(self, db):
-        """Test analyze_caretakee_roles identifies superusers as Directorate"""
+        """Test analyze_caretakee_roles identifies superusers"""
         # Arrange
         user = UserFactory(is_superuser=True)
         caretaker = UserFactory()
@@ -369,7 +376,7 @@ class TestCaretakerTaskService:
         roles = CaretakerTaskService.analyze_caretakee_roles([assignment])
 
         # Assert
-        assert roles["directorate_user_found"] is True
+        assert roles["has_superuser_caretakee"] is True
 
     @pytest.mark.django_db
     @pytest.mark.integration
@@ -471,7 +478,7 @@ class TestCaretakerTaskService:
 
         # Assert
         assert len(tasks["caretaker_assignments"]) == 1
-        assert tasks["roles"]["directorate_user_found"] is True
+        assert tasks["roles"]["has_superuser_caretakee"] is True
         assert len(tasks["directorate_documents"]) == 1
         assert tasks["directorate_documents"][0].pk == doc.pk
 

@@ -69,19 +69,3 @@ export interface IUnapprovedDocsResponse {
 		unlinked: IUnapprovedDoc[];
 	};
 }
-
-/** Document approval level union type */
-export type DocTaskType = "team" | "lead" | "ba" | "directorate";
-
-/** Flattened row for the unapproved documents data table */
-export interface IUnapprovedDocRow extends IUnapprovedDoc {
-	taskType: DocTaskType;
-}
-
-/** Document kind union type */
-export type DocKind =
-	| "concept"
-	| "projectplan"
-	| "progressreport"
-	| "studentreport"
-	| "projectclosure";

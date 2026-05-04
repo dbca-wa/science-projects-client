@@ -18,6 +18,7 @@ import { countWords } from "@/shared/utils/word-count.utils";
 import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 import type { ContentType } from "@/shared/types/inline-edit.types";
 import type { ToolbarMode } from "@/shared/types/editor.types";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 
 export interface InlineSaveEditorProps {
 	// Content configuration
@@ -177,10 +178,7 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 	// Handle content change — use normalised text comparison to avoid
 	// false positives from Lexical re-serialising the same content differently
 	const normaliseForComparison = (html: string) =>
-		html
-			.replace(/<[^>]*>/g, "")
-			.replace(/\s+/g, " ")
-			.trim();
+		sanitizeInput(html).replace(/\s+/g, " ").trim();
 
 	// Handle copying content to clipboard (for locked editors)
 	const handleCopyContent = useCallback(() => {
@@ -460,32 +458,27 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 					ref={containerRef}
 					className={`relative rounded-lg shadow-sm overflow-hidden transition-all duration-300 ${
 						isFocused
-							? "border-2 border-blue-500 dark:border-blue-400"
+							? "border-2 border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/20"
 							: hasChanges
-								? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/30"
-								: "border-2 border-gray-300 dark:border-gray-600"
+								? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50/50 dark:bg-amber-950/20"
+								: "border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"
 					}`}
 				>
-					{/* Header section with label */}
+					{/* Header section with label — bg is transparent so parent state colour shows */}
 					{label && (
 						<div
 							className={`flex items-center justify-between ${
 								compact
 									? "px-6 pt-4 pb-1"
-									: "px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
+									: "px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50"
 							}`}
 						>
 							<div>{renderLabel()}</div>
 						</div>
 					)}
 
-					{/* Editor content with focus styling */}
-					<div
-						ref={editorContainerRef}
-						className={`transition-colors bg-white dark:bg-gray-900 ${
-							isFocused ? "bg-blue-50 dark:bg-blue-950/20" : ""
-						}`}
-					>
+					{/* Editor content — bg is transparent via inline-save-editor CSS class */}
+					<div ref={editorContainerRef}>
 						<RichTextEditor
 							ref={editorRef}
 							value={editedContent}
@@ -495,7 +488,7 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 							toolbar={toolbarProp}
 							wordLimit={wordLimit}
 							limitCanBePassed={limitCanBePassed}
-							className="bg-white"
+							className="inline-save-editor"
 							autoFocus={true}
 							moveCursorToEnd={true}
 							aria-label={`Edit ${typeof label === "string" ? label : "content"}`}

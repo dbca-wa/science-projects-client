@@ -30,6 +30,8 @@ interface TeamMemberCardProps {
 	projectId: number;
 	canManageTeam: boolean;
 	isDragging?: boolean;
+	projectKind?: string;
+	allMembers?: IProjectMember[];
 }
 
 export function TeamMemberCard({
@@ -37,6 +39,8 @@ export function TeamMemberCard({
 	projectId,
 	canManageTeam,
 	isDragging = false,
+	projectKind,
+	allMembers,
 }: TeamMemberCardProps) {
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -148,6 +152,8 @@ export function TeamMemberCard({
 				isOpen={isSheetOpen}
 				onClose={() => setIsSheetOpen(false)}
 				canManageTeam={canManageTeam}
+				projectKind={projectKind}
+				allMembers={allMembers}
 			/>
 		</>
 	);

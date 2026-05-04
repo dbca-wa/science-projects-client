@@ -577,6 +577,27 @@ class ApprovalService:
         return False
 
     @staticmethod
+    def auto_approve_closure(document, user):
+        """
+        Auto-approve a closure document for non-science projects.
+        Sets all three approval flags and transitions the project status.
+        Does not send notification emails.
+        """
+
+        with transaction.atomic():
+            document.project_lead_approval_granted = True
+            document.business_area_lead_approval_granted = True
+            document.directorate_approval_granted = True
+            document.status = ProjectDocument.StatusChoices.APPROVED
+            document.save()
+
+            project = document.project
+            closure = document.project_closure_details.first()
+            if closure and closure.intended_outcome:
+                project.status = closure.intended_outcome
+                project.save()
+
+    @staticmethod
     def get_approval_stage(document):
         """
         Get current approval stage for document based on approval boolean flags.

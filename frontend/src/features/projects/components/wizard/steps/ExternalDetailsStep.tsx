@@ -29,7 +29,7 @@ const StableExternalDescEditor = memo(
 			toolbar="projectDescription"
 			minHeight="150px"
 			aria-label="External project description"
-			className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+			className="editor-standalone"
 		/>
 	),
 	() => true
@@ -51,7 +51,7 @@ const StableAimsEditor = memo(
 			toolbar="projectDescription"
 			minHeight="150px"
 			aria-label="External project aims"
-			className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+			className="editor-standalone"
 		/>
 	),
 	() => true

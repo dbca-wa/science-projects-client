@@ -53,7 +53,7 @@ const StableDescriptionEditor = memo(
 			toolbar="projectDescription"
 			minHeight="200px"
 			aria-label="Project summary"
-			className="rounded-lg border-2 border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:bg-blue-50 dark:focus-within:bg-blue-950/20 transition-all duration-300 bg-white dark:bg-gray-800"
+			className="editor-standalone"
 		/>
 	),
 	// Never re-render — the RTE handles its own content internally

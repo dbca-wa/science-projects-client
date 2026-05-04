@@ -68,7 +68,7 @@ describe("usePdfOperations", () => {
 			it("should call downloadPdf service with correct parameters", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.downloadPdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useDownloadPdf(), { wrapper });
 
@@ -83,10 +83,10 @@ describe("usePdfOperations", () => {
 				});
 			});
 
-			it("should trigger blob download with correct filename", async () => {
+			it("should open blob in new tab after download", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.downloadPdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useDownloadPdf(), { wrapper });
 
@@ -97,37 +97,14 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(pdfService.triggerBlobDownload).toHaveBeenCalledWith(
-						mockBlob,
-						"project-plan.pdf"
-					);
-				});
-			});
-
-			it("should show success toast on successful download", async () => {
-				const mockBlob = new Blob(["test"], { type: "application/pdf" });
-				(pdfService.downloadPdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
-
-				const { result } = renderHook(() => useDownloadPdf(), { wrapper });
-
-				result.current.mutate({
-					documentType: "concept",
-					documentId: 123,
-					filename: "test.pdf",
-				});
-
-				await waitFor(() => {
-					expect(toast.success).toHaveBeenCalledWith(
-						"PDF downloaded successfully"
-					);
+					expect(pdfService.openBlobInNewTab).toHaveBeenCalledWith(mockBlob);
 				});
 			});
 
 			it("should set isSuccess to true after successful download", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.downloadPdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useDownloadPdf(), { wrapper });
 
@@ -157,11 +134,11 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(toast.error).toHaveBeenCalledWith("Download failed");
+					expect(toast.error).toHaveBeenCalled();
 				});
 			});
 
-			it("should show generic error message when error has no message", async () => {
+			it("should show fallback error message when error has no message", async () => {
 				(pdfService.downloadPdf as Mock).mockRejectedValue(new Error());
 
 				const { result } = renderHook(() => useDownloadPdf(), { wrapper });
@@ -173,7 +150,7 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(toast.error).toHaveBeenCalledWith("Failed to download PDF");
+					expect(toast.error).toHaveBeenCalledWith("Failed to open PDF");
 				});
 			});
 
@@ -233,7 +210,7 @@ describe("usePdfOperations", () => {
 			it("should call generatePdf service with correct parameters", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -251,7 +228,7 @@ describe("usePdfOperations", () => {
 			it("should show success toast on successful generation", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -263,15 +240,15 @@ describe("usePdfOperations", () => {
 
 				await waitFor(() => {
 					expect(toast.success).toHaveBeenCalledWith(
-						"PDF generated and downloaded successfully"
+						"PDF generated successfully"
 					);
 				});
 			});
 
-			it("should trigger blob download with correct filename", async () => {
+			it("should open blob in new tab after generation", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -282,17 +259,14 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(pdfService.triggerBlobDownload).toHaveBeenCalledWith(
-						mockBlob,
-						"test.pdf"
-					);
+					expect(pdfService.openBlobInNewTab).toHaveBeenCalledWith(mockBlob);
 				});
 			});
 
 			it("should set isSuccess to true after successful generation", async () => {
 				const mockBlob = new Blob(["test"], { type: "application/pdf" });
 				(pdfService.generatePdf as Mock).mockResolvedValue(mockBlob);
-				(pdfService.triggerBlobDownload as Mock).mockImplementation(() => {});
+				(pdfService.openBlobInNewTab as Mock).mockImplementation(() => {});
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });
 
@@ -322,11 +296,11 @@ describe("usePdfOperations", () => {
 				});
 
 				await waitFor(() => {
-					expect(toast.error).toHaveBeenCalledWith("Generation failed");
+					expect(toast.error).toHaveBeenCalled();
 				});
 			});
 
-			it("should show generic error message when error has no message", async () => {
+			it("should show fallback error message when error has no message", async () => {
 				(pdfService.generatePdf as Mock).mockRejectedValue(new Error());
 
 				const { result } = renderHook(() => useGeneratePdf(), { wrapper });

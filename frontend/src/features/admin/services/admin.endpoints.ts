@@ -37,8 +37,18 @@ export const ADMIN_ENDPOINTS = {
 	OPEN_NEW_CYCLE: "documents/opennewcycle",
 
 	// Data lists
-	UNAPPROVED_DOCS: "agencies/business_areas/unapproved_docs",
-	PROBLEMATIC_PROJECTS: "agencies/business_areas/problematic_projects",
+	UNAPPROVED_DOCS: "projects/unapprovedFY",
+	PROBLEMATIC_PROJECTS: "projects/problematic",
+
+	// Remedy endpoints
+	REMEDY_OPEN_CLOSED: "projects/remedy/open_closed",
+	REMEDY_MEMBERLESS: "projects/remedy/memberless",
+	REMEDY_LEADERLESS: "projects/remedy/leaderless",
+	REMEDY_MULTIPLE_LEADERS: "projects/remedy/multiple_leaders",
+	REMEDY_EXTERNAL_LEADERS: "projects/remedy/external_leaders",
+
+	// User/staff data lists
+	USERS_LIST: "users/list",
 
 	// Admin options (email testing settings)
 	ADMIN_OPTIONS_DETAIL: (pk: number) => `adminoptions/${pk}`,

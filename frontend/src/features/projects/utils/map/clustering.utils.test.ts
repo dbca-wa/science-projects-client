@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { clusterProjects, getClusterCountDisplay } from "./clustering.utils";
+import { clusterProjects } from "./clustering.utils";
 import type { ProjectWithCoords } from "@/features/projects/types/map.types";
 import type { IProjectData } from "@/shared/types/project.types";
 
@@ -193,27 +193,6 @@ describe("clustering", () => {
 			expect(result.size).toBe(1);
 			const cluster = Array.from(result.values())[0];
 			expect(cluster.projects).toHaveLength(1000);
-		});
-	});
-
-	describe("getClusterCountDisplay", () => {
-		it("should return exact count for small numbers", () => {
-			expect(getClusterCountDisplay(1)).toBe("1");
-			expect(getClusterCountDisplay(5)).toBe("5");
-			expect(getClusterCountDisplay(50)).toBe("50");
-			expect(getClusterCountDisplay(99)).toBe("99");
-			expect(getClusterCountDisplay(100)).toBe("100");
-		});
-
-		it("should return '100+' for counts over 100", () => {
-			expect(getClusterCountDisplay(101)).toBe("100+");
-			expect(getClusterCountDisplay(500)).toBe("100+");
-			expect(getClusterCountDisplay(1000)).toBe("100+");
-			expect(getClusterCountDisplay(9999)).toBe("100+");
-		});
-
-		it("should handle edge cases", () => {
-			expect(getClusterCountDisplay(0)).toBe("0");
 		});
 	});
 });

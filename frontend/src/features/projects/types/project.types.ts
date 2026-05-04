@@ -18,17 +18,6 @@ export type {
 } from "@/shared/types/project.types";
 
 /**
- * Project filter options
- */
-export interface IProjectFilters {
-	status?: string[];
-	kind?: string[];
-	year?: number;
-	businessArea?: number;
-	search?: string;
-}
-
-/**
  * Edit project form data
  */
 export interface EditProjectFormData {

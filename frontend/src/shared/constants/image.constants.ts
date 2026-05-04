@@ -32,37 +32,3 @@ export const MAX_IMAGE_SIZE_MB = 1;
 
 /** Maximum width or height in pixels */
 export const MAX_IMAGE_DIMENSION = 1920;
-
-/** Type for accepted image MIME types */
-export type AcceptedImageType = (typeof ACCEPTED_IMAGE_TYPES)[number];
-
-/**
- * Variant-specific configurations
- *
- * These can be used to override defaults for specific use cases
- */
-export interface ImageCompressionConfig {
-	acceptedTypes: readonly string[];
-	maxSizeMB: number;
-	maxDimension: number;
-}
-
-/** Default compression configuration */
-export const DEFAULT_COMPRESSION_CONFIG: ImageCompressionConfig = {
-	acceptedTypes: ACCEPTED_IMAGE_TYPES,
-	maxSizeMB: MAX_IMAGE_SIZE_MB,
-	maxDimension: MAX_IMAGE_DIMENSION,
-};
-
-/**
- * Variant-specific overrides (if needed in the future)
- *
- * Example: Thumbnails might need smaller dimensions
- */
-export const COMPRESSION_VARIANTS = {
-	default: DEFAULT_COMPRESSION_CONFIG,
-	avatar: DEFAULT_COMPRESSION_CONFIG,
-	project: DEFAULT_COMPRESSION_CONFIG,
-	banner: DEFAULT_COMPRESSION_CONFIG,
-	// Future variants can be added here
-} as const;

@@ -18,7 +18,6 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("../services/user.service", () => ({
-	createUser: vi.fn().mockResolvedValue({ id: 1, username: "new" }),
 	deleteUser: vi.fn().mockResolvedValue(undefined),
 	activateUser: vi.fn().mockResolvedValue(undefined),
 	deactivateUser: vi.fn().mockResolvedValue(undefined),
@@ -43,17 +42,6 @@ const createWrapper = () => {
 };
 
 describe("User mutation hooks", () => {
-	describe("useCreateUser", () => {
-		it("should return a mutation function", async () => {
-			const { useCreateUser } = await import("./useCreateUser");
-			const { result } = renderHook(() => useCreateUser(), {
-				wrapper: createWrapper(),
-			});
-			expect(result.current.mutate).toBeDefined();
-			expect(result.current.mutateAsync).toBeDefined();
-		});
-	});
-
 	describe("useDeleteUser", () => {
 		it("should return a mutation function", async () => {
 			const { useDeleteUser } = await import("./useDeleteUser");
@@ -101,32 +89,6 @@ describe("User mutation hooks", () => {
 				wrapper: createWrapper(),
 			});
 			expect(result.current.mutate).toBeDefined();
-		});
-	});
-
-	describe("useCreateUser — mutation execution", () => {
-		it("should call createUser service on mutate", async () => {
-			const { createUser } = await import("../services/user.service");
-			const { useCreateUser } = await import("./useCreateUser");
-
-			const { result } = renderHook(() => useCreateUser(), {
-				wrapper: createWrapper(),
-			});
-
-			act(() => {
-				result.current.mutate({
-					username: "testuser",
-					email: "test@example.com",
-					firstName: "Test",
-					lastName: "User",
-				});
-			});
-
-			await waitFor(() => {
-				expect(createUser).toHaveBeenCalledWith(
-					expect.objectContaining({ username: "testuser" })
-				);
-			});
 		});
 	});
 

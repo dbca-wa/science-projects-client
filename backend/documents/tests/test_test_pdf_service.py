@@ -4,7 +4,7 @@ Tests for TestPDFService — mock context generation and validation.
 
 import pytest
 
-from documents.services.test_pdf_service import (
+from documents.services.pdf_test_service import (
     DOCUMENT_KIND_MAP,
     VALID_DOCUMENT_KINDS,
     TestPDFService,

@@ -21,56 +21,6 @@ export const getCaretakerCheck = async (): Promise<ICaretakerResponse> => {
 };
 
 /**
- * Check caretaker status for the current user (alias for compatibility)
- */
-export const checkCaretaker = getCaretakerCheck;
-
-// ============================================================================
-// CARETAKER RELATIONSHIPS (CRUD)
-// ============================================================================
-
-/**
- * Get all caretakers
- * @returns Array of all caretaker relationships
- */
-export const getCaretakers = async (): Promise<ICaretaker[]> => {
-	return apiClient.get<ICaretaker[]>(CARETAKER_ENDPOINTS.LIST);
-};
-
-/**
- * Get a specific caretaker by ID
- * @param id - Caretaker relationship ID
- * @returns Caretaker relationship details
- */
-export const getCaretaker = async (id: number): Promise<ICaretaker> => {
-	return apiClient.get<ICaretaker>(CARETAKER_ENDPOINTS.DETAIL(id));
-};
-
-/**
- * Create a new caretaker relationship (admin only)
- * @param data - Caretaker relationship data
- * @returns Created caretaker relationship
- */
-export const createCaretaker = async (
-	data: ICaretakerRequest
-): Promise<ICaretaker> => {
-	return apiClient.post<ICaretaker>(CARETAKER_ENDPOINTS.CREATE, data);
-};
-
-/**
- * Update an existing caretaker relationship
- * @param id - Caretaker relationship ID
- * @param data - Partial caretaker data to update
- * @returns Updated caretaker relationship
- */
-export const updateCaretaker = async (
-	id: number,
-	data: Partial<ICaretakerRequest>
-): Promise<ICaretaker> => {
-	return apiClient.patch<ICaretaker>(CARETAKER_ENDPOINTS.UPDATE(id), data);
-};
-
-/**
  * Delete a caretaker relationship
  * @param id - Caretaker relationship ID
  */
@@ -156,34 +106,4 @@ export const rejectCaretakerRequest = async (
  */
 export const cancelCaretakerRequest = async (taskId: number): Promise<void> => {
 	await apiClient.post(CARETAKER_ENDPOINTS.REQUESTS_CANCEL(taskId));
-};
-
-/**
- * Respond to a caretaker request (approve or reject)
- * Allows the requested caretaker to directly approve or reject the request
- * @param params - Task ID and action (approve or reject)
- */
-export const respondToCaretakerRequest = async (params: {
-	taskId: number;
-	action: "approve" | "reject";
-}): Promise<{ message: string }> => {
-	return apiClient.post<{ message: string }>(
-		`/adminoptions/tasks/${params.taskId}/respond`,
-		{ action: params.action }
-	);
-};
-
-// ============================================================================
-// ADMIN ACTIONS
-// ============================================================================
-
-/**
- * Admin: Set caretaker for a user (bypasses approval workflow)
- * @param data - Caretaker relationship data
- * @returns Created caretaker relationship
- */
-export const adminSetCaretaker = async (
-	data: ICaretakerRequest
-): Promise<ICaretaker> => {
-	return apiClient.post<ICaretaker>(CARETAKER_ENDPOINTS.ADMIN_SET, data);
 };

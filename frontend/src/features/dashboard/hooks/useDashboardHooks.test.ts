@@ -7,8 +7,6 @@ import { dashboardKeys } from "./useDashboardTasks";
 vi.mock("../services/dashboard.service", () => ({
 	getDocumentTasks: vi.fn().mockResolvedValue({ documents: [] }),
 	getEndorsementTasks: vi.fn().mockResolvedValue({ endorsements: [] }),
-	getMyProjects: vi.fn().mockResolvedValue([]),
-	getAdminTasks: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock("@/shared/services/admin.service", () => ({
@@ -60,14 +58,6 @@ describe("Dashboard hooks", () => {
 	it("useEndorsementTasks should return a query", async () => {
 		const { useEndorsementTasks } = await import("./useDashboardTasks");
 		const { result } = renderHook(() => useEndorsementTasks(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
-	it("useMyProjects should return a query", async () => {
-		const { useMyProjects } = await import("./useDashboardTasks");
-		const { result } = renderHook(() => useMyProjects(), {
 			wrapper: createWrapper(),
 		});
 		expect(result.current.isLoading).toBeDefined();

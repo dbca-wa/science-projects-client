@@ -20,6 +20,7 @@ import { ProjectKindBadge } from "@/shared/components/projects/ProjectKindBadge"
 import { formatYearRange } from "@/features/projects/utils/year.utils";
 import { Building2, Calendar, Users } from "lucide-react";
 import { PreviewTeamMemberRow } from "./PreviewTeamMemberRow";
+import { STUDY_LEVEL_LABELS } from "../../constants/studyLevels";
 
 interface WizardFormData {
 	baseInformation: IBaseInformationData;
@@ -347,7 +348,9 @@ export const WizardPreviewPanel = observer(function WizardPreviewPanel({
 						</p>
 						{debouncedFormData.studentDetails.level && (
 							<p className="text-base text-gray-600 dark:text-gray-400 mt-1">
-								Level: {debouncedFormData.studentDetails.level}
+								Level:{" "}
+								{STUDY_LEVEL_LABELS[debouncedFormData.studentDetails.level] ||
+									debouncedFormData.studentDetails.level}
 							</p>
 						)}
 					</div>

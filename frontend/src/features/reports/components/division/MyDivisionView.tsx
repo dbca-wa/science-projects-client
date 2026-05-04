@@ -15,6 +15,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { useAuthStore } from "@/app/stores/store-context";
@@ -38,8 +39,10 @@ export const MyDivisionView = observer(function MyDivisionView() {
 
 	const availableDivisions = useMemo(() => {
 		if (!allDivisions || !currentUser) return [];
-		if (authStore.isSuperuser) return allDivisions;
-		return allDivisions.filter((d) => d.key_stakeholder?.id === currentUser.id);
+		const filtered = authStore.isSuperuser
+			? allDivisions
+			: allDivisions.filter((d) => d.key_stakeholder?.id === currentUser.id);
+		return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
 	}, [allDivisions, currentUser, authStore.isSuperuser]);
 
 	useEffect(() => {
@@ -112,11 +115,10 @@ export const MyDivisionView = observer(function MyDivisionView() {
 									<SelectValue placeholder="Select division" />
 								</SelectTrigger>
 								<SelectContent>
-									{availableDivisions.map((d) => (
-										<SelectItem key={d.id} value={d.slug}>
-											{d.slug}
-										</SelectItem>
-									))}
+									<DivisionSelectItems
+										divisions={availableDivisions}
+										valueAsSlug
+									/>
 								</SelectContent>
 							</Select>
 						)}

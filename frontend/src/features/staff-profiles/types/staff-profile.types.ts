@@ -104,47 +104,6 @@ export interface IStaffCVData {
 	education_entries: IEducationEntry[];
 }
 
-// Full profile (from StaffProfileSerializer)
-export interface IStaffProfileFull {
-	id: number;
-	user: {
-		id: number;
-		first_name: string;
-		last_name: string;
-		email: string | null;
-	};
-	avatar: { file: string } | null;
-	work: {
-		id: number;
-		role: string | null;
-		business_area: { id: number; name: string } | null;
-	} | null;
-	about: string | null;
-	expertise: string | null;
-	keywords: IKeywordTag[];
-	employment_entries: IEmploymentEntry[];
-	education_entries: IEducationEntry[];
-	is_hidden: boolean;
-	custom_title: string | null;
-	custom_title_on: boolean;
-	public_email: string | null;
-	public_email_on: boolean;
-}
-
-// Check staff profile response (from CheckStaffProfileAndReturnDataAndActiveState)
-export interface ICheckStaffProfileResponse {
-	exists: boolean;
-	is_active: boolean;
-	profile: IStaffProfileFull | null;
-}
-
-// DOI Publication
-export interface IDOIPublication {
-	id: number;
-	user: number;
-	doi: string;
-}
-
 // Staff profile projects response (from ProjectDataTableSerializer)
 export interface IStaffProfileProject {
 	id: number;

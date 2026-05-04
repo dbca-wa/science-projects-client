@@ -3,13 +3,10 @@ import { toast } from "sonner";
 import {
 	getBusinessAreas,
 	getBusinessAreaDetail,
-	createBusinessArea,
 	createBusinessAreaFormData,
-	updateBusinessArea,
 	updateBusinessAreaFormData,
 	deleteBusinessArea,
 } from "../services/admin.service";
-import type { IBusinessAreaUpdate } from "../types/admin.types";
 
 /**
  * Fetch all business areas
@@ -33,24 +30,6 @@ export const useBusinessAreaDetail = (id: number | undefined) =>
 	});
 
 /**
- * Create a new business area (JSON payload)
- */
-export const useCreateBusinessArea = () => {
-	const queryClient = useQueryClient();
-
-	return useMutation({
-		mutationFn: createBusinessArea,
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["business-areas"] });
-			toast.success("Business area created successfully");
-		},
-		onError: (error: Error) => {
-			toast.error(error.message || "Failed to create business area");
-		},
-	});
-};
-
-/**
  * Create a new business area using FormData (for image uploads)
  */
 export const useCreateBusinessAreaFormData = () => {
@@ -64,25 +43,6 @@ export const useCreateBusinessAreaFormData = () => {
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to create business area");
-		},
-	});
-};
-
-/**
- * Update an existing business area (JSON payload)
- */
-export const useUpdateBusinessArea = () => {
-	const queryClient = useQueryClient();
-
-	return useMutation({
-		mutationFn: ({ id, data }: { id: number; data: IBusinessAreaUpdate }) =>
-			updateBusinessArea(id, data),
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["business-areas"] });
-			toast.success("Business area updated successfully");
-		},
-		onError: (error: Error) => {
-			toast.error(error.message || "Failed to update business area");
 		},
 	});
 };

@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-	sanitiseFormData,
-	COMMON_RICH_TEXT_FIELDS,
-} from "./form-sanitisation.utils";
+import { sanitiseFormData } from "./form-sanitisation.utils";
 
 describe("form-sanitisation.utils", () => {
 	describe("sanitiseFormData", () => {
@@ -125,46 +122,6 @@ describe("form-sanitisation.utils", () => {
 			expect(result.name).toBe("John");
 			expect(result.age).toBe(25);
 			expect(result.about).toContain("<p>");
-		});
-	});
-
-	describe("COMMON_RICH_TEXT_FIELDS", () => {
-		it("should contain expected field names", () => {
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("about");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("expertise");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("description");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("content");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("bio");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("notes");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("comments");
-			expect(COMMON_RICH_TEXT_FIELDS).toContain("message");
-		});
-
-		it("should be readonly", () => {
-			// TypeScript should enforce this at compile time
-			// This test just verifies the array exists
-			expect(Array.isArray(COMMON_RICH_TEXT_FIELDS)).toBe(true);
-			expect(COMMON_RICH_TEXT_FIELDS.length).toBeGreaterThan(0);
-		});
-
-		it("should work with sanitiseFormData", () => {
-			const data = {
-				about: "<p>About <script>alert(1)</script></p>",
-				expertise: "<p>Skills <script>alert(1)</script></p>",
-				name: "John",
-			};
-
-			// Use COMMON_RICH_TEXT_FIELDS to specify rich text fields
-			const richTextFields = COMMON_RICH_TEXT_FIELDS.filter(
-				(field) => field in data
-			);
-			const result = sanitiseFormData(data, richTextFields);
-
-			expect(result.about).toContain("<p>");
-			expect(result.about).not.toContain("script");
-			expect(result.expertise).toContain("<p>");
-			expect(result.expertise).not.toContain("script");
-			expect(result.name).toBe("John");
 		});
 	});
 });

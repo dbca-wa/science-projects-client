@@ -112,14 +112,6 @@ describe("Project hook query keys", () => {
 });
 
 describe("Project mutation hooks", () => {
-	it("useCreateProject should return a mutation", async () => {
-		const { useCreateProject } = await import("./useCreateProject");
-		const { result } = renderHook(() => useCreateProject(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.mutate).toBeDefined();
-	});
-
 	it("useUpdateProject should return a mutation", async () => {
 		const { useUpdateProject } = await import("./useUpdateProject");
 		const { result } = renderHook(() => useUpdateProject(), {
@@ -147,14 +139,6 @@ describe("Project mutation hooks", () => {
 	it("useSetProjectStatus should return a mutation", async () => {
 		const { useSetProjectStatus } = await import("./useSetProjectStatus");
 		const { result } = renderHook(() => useSetProjectStatus(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.mutate).toBeDefined();
-	});
-
-	it("useInviteTeamMember should return a mutation", async () => {
-		const { useInviteTeamMember } = await import("./useInviteTeamMember");
-		const { result } = renderHook(() => useInviteTeamMember(1), {
 			wrapper: createWrapper(),
 		});
 		expect(result.current.mutate).toBeDefined();

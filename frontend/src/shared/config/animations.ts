@@ -44,20 +44,6 @@ export const fadeInVariants: Variants = {
 };
 
 /**
- * Scale bounce animation variants for reactions and counts
- * Used when reaction counts change or reactions are added
- */
-export const scaleBounceVariants: Variants = {
-	initial: {
-		scale: 1,
-	},
-	bounce: {
-		scale: [1, 1.3, 1],
-		transition: springConfig,
-	},
-};
-
-/**
  * Hover scale animation variants for interactive elements
  * Used for buttons, reaction types, and clickable items
  */

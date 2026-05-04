@@ -15,7 +15,7 @@ import {
 	Briefcase,
 	Settings,
 	List,
-	Mail,
+	CircleCheckBig,
 	FlaskConical,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
@@ -248,9 +248,9 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 								Manage
 							</h2>
 
-							{/* Lists & Emails */}
+							{/* Lists & Approvers */}
 							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
-								Lists & Emails
+								Lists & Approvers
 							</p>
 							<Button
 								variant="ghost"
@@ -265,11 +265,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/emails", e)}
+								onClick={(e) => navigateAndClose("/manage/approvers", e)}
 							>
 								<span className="flex items-center gap-3">
-									<Mail className="text-xl" aria-hidden="true" />
-									<span>Email</span>
+									<CircleCheckBig className="text-xl" aria-hidden="true" />
+									<span>Approvers</span>
 								</span>
 							</Button>
 							<Button

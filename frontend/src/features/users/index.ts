@@ -13,23 +13,13 @@ export * from "./hooks";
 export type {
 	UserSearchParams,
 	UserSearchFilters,
-	UserSearchResponse,
 	UserCardProps,
 	UserAvatarProps,
-	SearchBarProps,
-	FilterPanelProps,
-	PaginationProps,
-	UserDetailSectionProps,
 } from "./types";
 
 // Schemas (exports both schemas and their inferred types)
 // These are the canonical form data types - use these instead of manual interfaces
-export {
-	userCreateSchema,
-	userEditSchema,
-	type UserCreateFormData,
-	type UserEditFormData,
-} from "./schemas";
+export { userEditSchema, type UserEditFormData } from "./schemas";
 
 // Note: caretakerRequestSchema moved to @/features/caretakers/schemas
 

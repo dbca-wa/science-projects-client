@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getGuideSections,
-	getGuideSection,
 	createGuideSection,
 	updateGuideSection,
 	deleteGuideSection,
@@ -31,12 +30,6 @@ describe("guide.service", () => {
 		expect(apiClient.get).toHaveBeenCalledWith(
 			expect.stringContaining("guide-sections")
 		);
-	});
-
-	it("getGuideSection should GET section by ID", async () => {
-		(apiClient.get as Mock).mockResolvedValue({ id: "abc" });
-		const result = await getGuideSection("abc");
-		expect(result).toEqual({ id: "abc" });
 	});
 
 	it("createGuideSection should POST section data", async () => {

@@ -6,7 +6,6 @@
  */
 
 export { NavigationButton } from "./NavigationButton";
-export { NavigationDropdownMenuItem } from "./NavigationDropdownMenuItem";
 export { Breadcrumb } from "./Breadcrumb";
 export { AutoBreadcrumb } from "./AutoBreadcrumb";
 

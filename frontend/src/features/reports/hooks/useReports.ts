@@ -3,13 +3,12 @@ import { toast } from "sonner";
 import {
 	getPublishedReports,
 	getLegacyReports,
-	getLatestYear,
+	getAllReportPDFs,
 	getLatestReport,
 	getReportDetail,
 	getLatestProgressReports,
 	getLatestStudentReports,
 	getLatestInactiveReports,
-	getLatestReportMedia,
 	getReportMedia,
 	approveReport,
 	getReportPDFStatus,
@@ -47,12 +46,13 @@ export const useLegacyReports = () =>
 	});
 
 /**
- * Fetch the latest reporting year
+ * Fetch all report PDFs in a single call — returns { published, drafts, legacy }.
+ * Use this instead of separate usePublishedReports + useLegacyReports + useReportsWithoutPDF.
  */
-export const useLatestYear = () =>
+export const useAllReportPDFs = () =>
 	useQuery({
-		queryKey: ["reports", "latest-year"],
-		queryFn: getLatestYear,
+		queryKey: ["reports", "all-pdfs"],
+		queryFn: getAllReportPDFs,
 		staleTime: 5 * 60_000,
 	});
 
@@ -125,16 +125,6 @@ export const useLatestInactiveReports = (reportId?: number) =>
 		queryFn: () => getLatestInactiveReports(reportId),
 		staleTime: 5 * 60_000,
 		enabled: !!reportId,
-	});
-
-/**
- * Fetch media items for the latest annual report
- */
-export const useLatestReportMedia = () =>
-	useQuery({
-		queryKey: ["reports", "media"],
-		queryFn: getLatestReportMedia,
-		staleTime: 5 * 60_000,
 	});
 
 /**

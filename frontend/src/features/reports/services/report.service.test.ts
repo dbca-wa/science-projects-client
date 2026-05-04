@@ -2,13 +2,11 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getPublishedReports,
 	getLegacyReports,
-	getLatestYear,
 	getLatestReport,
 	getReportDetail,
 	getLatestProgressReports,
 	getLatestStudentReports,
 	getLatestInactiveReports,
-	getLatestReportMedia,
 	getReportMedia,
 	getReportPDFStatus,
 	generateReportPDF,
@@ -64,12 +62,6 @@ describe("report.service", () => {
 		);
 	});
 
-	it("getLatestYear should GET from latest year endpoint", async () => {
-		(apiClient.get as Mock).mockResolvedValue({ year: 2025 });
-		const result = await getLatestYear();
-		expect(result).toEqual({ year: 2025 });
-	});
-
 	it("getLatestReport should GET latest report, optionally with division", async () => {
 		(apiClient.get as Mock).mockResolvedValue({ year: 2025 });
 		await getLatestReport("bcs");
@@ -99,12 +91,6 @@ describe("report.service", () => {
 	it("getLatestInactiveReports should GET inactive reports", async () => {
 		(apiClient.get as Mock).mockResolvedValue({ progress: [], student: [] });
 		await getLatestInactiveReports();
-		expect(apiClient.get).toHaveBeenCalled();
-	});
-
-	it("getLatestReportMedia should GET media for latest report", async () => {
-		(apiClient.get as Mock).mockResolvedValue([]);
-		await getLatestReportMedia();
 		expect(apiClient.get).toHaveBeenCalled();
 	});
 

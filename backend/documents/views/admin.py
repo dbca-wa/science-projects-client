@@ -19,6 +19,7 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from projects.constants import ALLOWED_DOCUMENT_TYPES, AUTO_APPROVE_CLOSURE_KINDS
 from projects.models import Project, ProjectMember
 from users.models import User
 
@@ -65,12 +66,20 @@ class ProjectDocsPendingMyActionAllStages(APIView):
         )
 
         if small_user_object:
-            # Handle users without work relationship
-            ba = getattr(small_user_object, "work", None)
-            ba = ba.business_area if ba else None
-            is_directorate = (
-                ba is not None and ba.name == "Directorate"
-            ) or request.user.is_superuser
+            # Determine directorate role — division-based, not business area name
+            from agencies.models import Division
+
+            if request.user.is_superuser:
+                has_directorate_role = True
+                user_division_ids = None  # Superuser sees all
+            else:
+                user_divisions = Division.objects.filter(
+                    Q(director=request.user)
+                    | Q(key_stakeholder=request.user)
+                    | Q(approvers=request.user)
+                ).distinct()
+                user_division_ids = list(user_divisions.values_list("pk", flat=True))
+                has_directorate_role = len(user_division_ids) > 0
 
             active_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY)
 
@@ -125,43 +134,43 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 documents.extend(docs_requiring_ba_attention)
                 ba_input_required.extend(docs_requiring_ba_attention)
 
-            # Directorate Filtering
-            if is_directorate:
-                # Use subquery for active project IDs instead of loading all into memory
-                directorate_project_ids = active_projects.values_list("id", flat=True)
+            # Directorate Filtering — scoped to user's division roles
+            if has_directorate_role:
+                # Base queryset: stage 3 documents from active projects
+                directorate_base = ProjectDocument.objects.exclude(
+                    status=ProjectDocument.StatusChoices.APPROVED
+                ).filter(
+                    project__in=active_projects.values_list("id", flat=True),
+                    business_area_lead_approval_granted=True,
+                    directorate_approval_granted=False,
+                )
 
-                # Fetch all documents requiring Directorate attention with optimised relationships
-                docs_requiring_directorate_attention = (
-                    ProjectDocument.objects.exclude(
-                        status=ProjectDocument.StatusChoices.APPROVED
+                # Superusers see all; others see only their divisions
+                if user_division_ids is not None:
+                    directorate_base = directorate_base.filter(
+                        project__business_area__division__in=user_division_ids
                     )
-                    .filter(
-                        project__in=directorate_project_ids,
-                        business_area_lead_approval_granted=True,
-                        directorate_approval_granted=False,
-                    )
-                    .select_related(
-                        "project",
-                        "project__business_area",
-                        "project__business_area__image",
-                        "project__business_area__division",
-                        "project__business_area__division__director",
-                        "project__business_area__division__approver",
-                        "project__business_area__leader",
-                        "project__business_area__caretaker",
-                        "project__business_area__finance_admin",
-                        "project__business_area__data_custodian",
-                        "project__image",
-                        "project__image__uploader",
-                        "pdf",
-                        "pdf__document",
-                        "pdf__project",
-                        "creator",
-                        "modifier",
-                    )
-                    .prefetch_related(
-                        "project__business_area__division__directorate_email_list",
-                    )
+
+                docs_requiring_directorate_attention = directorate_base.select_related(
+                    "project",
+                    "project__business_area",
+                    "project__business_area__image",
+                    "project__business_area__division",
+                    "project__business_area__division__director",
+                    "project__business_area__division__approver",
+                    "project__business_area__leader",
+                    "project__business_area__caretaker",
+                    "project__business_area__finance_admin",
+                    "project__business_area__data_custodian",
+                    "project__image",
+                    "project__image__uploader",
+                    "pdf",
+                    "pdf__document",
+                    "pdf__project",
+                    "creator",
+                    "modifier",
+                ).prefetch_related(
+                    "project__business_area__division__directorate_email_list",
                 )
 
                 # Append the documents to the respective lists
@@ -343,6 +352,27 @@ class DocumentSpawner(APIView):
                 HTTP_400_BAD_REQUEST,
             )
 
+        # Validate the document kind is permitted for this project's kind
+        try:
+            project_instance = Project.objects.get(pk=project)
+        except Project.DoesNotExist:
+            return Response(
+                {"error": f"Project with pk {project} not found."},
+                HTTP_404_NOT_FOUND,
+            )
+
+        allowed_types = ALLOWED_DOCUMENT_TYPES.get(project_instance.kind, [])
+        if kind not in allowed_types:
+            return Response(
+                {
+                    "error": (
+                        f"{kind} documents are not permitted "
+                        f"for {project_instance.kind} projects."
+                    )
+                },
+                HTTP_400_BAD_REQUEST,
+            )
+
         settings.LOGGER.info(msg=f"{request.user} is spawning document")
 
         ser = ProjectDocumentCreateSerializer(
@@ -424,6 +454,14 @@ class DocumentSpawner(APIView):
                         project_id=project,
                     )
 
+                    # Auto-approve closures for non-science project kinds
+                    if project_instance.kind in AUTO_APPROVE_CLOSURE_KINDS:
+                        from ..services.approval_service import ApprovalService
+
+                        ApprovalService.auto_approve_closure(
+                            project_document, request.user
+                        )
+
                 return Response(
                     ProjectDocumentSerializer(project_document).data,
                     HTTP_201_CREATED,
@@ -475,7 +513,7 @@ class GetPreviousReportsData(APIView):
 
 
 class ReopenProject(APIView):
-    """Reopen a closed project (fixes typo from RepoenProject)"""
+    """Reopen a closed project by removing the closure document and restoring status"""
 
     permission_classes = [IsAuthenticated]
 
@@ -488,8 +526,93 @@ class ReopenProject(APIView):
             return None
         return obj
 
+    @staticmethod
+    def _determine_reopened_status(project):
+        """
+        Determine the correct project status after removing the closure document.
+        The status depends on the project kind and the state of its remaining documents.
+        """
+        kind = project.kind
+
+        if kind == Project.CategoryKindChoices.EXTERNAL:
+            # External projects have no workflow documents — always active
+            return Project.StatusChoices.ACTIVE
+
+        if kind == Project.CategoryKindChoices.STUDENT:
+            # Check for student reports (excluding the closure we're about to delete)
+            approved_report = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.STUDENTREPORT,
+                directorate_approval_granted=True,
+            ).exists()
+            if approved_report:
+                return Project.StatusChoices.ACTIVE
+
+            has_any_report = ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.STUDENTREPORT,
+            ).exists()
+            if has_any_report:
+                return Project.StatusChoices.UPDATING
+
+            # No student reports — student projects start active
+            return Project.StatusChoices.ACTIVE
+
+        # Science and core_function: check workflow documents
+        has_approved_progress = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROGRESSREPORT,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_progress:
+            return Project.StatusChoices.ACTIVE
+
+        has_unapproved_progress = (
+            ProjectDocument.objects.filter(
+                project=project,
+                kind=ProjectDocument.CategoryKindChoices.PROGRESSREPORT,
+            )
+            .exclude(directorate_approval_granted=True)
+            .exists()
+        )
+        if has_unapproved_progress:
+            return Project.StatusChoices.UPDATING
+
+        has_approved_plan = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_plan:
+            return Project.StatusChoices.ACTIVE
+
+        has_plan = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
+        ).exists()
+        if has_plan:
+            return Project.StatusChoices.PENDING
+
+        has_approved_concept = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+            directorate_approval_granted=True,
+        ).exists()
+        if has_approved_concept:
+            return Project.StatusChoices.PENDING
+
+        has_concept = ProjectDocument.objects.filter(
+            project=project,
+            kind=ProjectDocument.CategoryKindChoices.CONCEPTPLAN,
+        ).exists()
+        if has_concept:
+            return Project.StatusChoices.NEW
+
+        # No documents at all
+        return Project.StatusChoices.NEW
+
     def post(self, request, pk):
-        """Reopen a project"""
+        """Reopen a project by removing the closure and restoring appropriate status"""
         from ..services.notification_service import NotificationService
         from ..utils.helpers import get_current_maintainer_id
 
@@ -506,20 +629,21 @@ class ReopenProject(APIView):
 
                 if project_document is None:
                     project = Project.objects.filter(pk=pk).first()
-                    project.status = Project.StatusChoices.UPDATING
-                    project.save()
+                    if project:
+                        project.status = self._determine_reopened_status(project)
+                        project.save()
                 else:
-                    project_document.project.status = "updating"
-                    project_document.project.save()
-                    project = Project.objects.filter(
-                        pk=project_document.project.pk
-                    ).first()
+                    project = project_document.project
                     project_document.delete()
+                    # Refresh project from DB after deleting closure
+                    project = Project.objects.filter(pk=project.pk).first()
+                    if project:
+                        project.status = self._determine_reopened_status(project)
+                        project.save()
 
                 settings.LOGGER.info(msg="Sending project reopened email")
 
                 if project:
-                    # Send notification via service
                     NotificationService.notify_project_reopened(
                         project=project, reopener=request.user
                     )

@@ -16,7 +16,7 @@ import {
 	CheckSquare,
 	RefreshCw,
 	FileText,
-	Mail,
+	CircleCheckBig,
 } from "lucide-react";
 
 export type ARActionId = "batch-approve" | "batch-approve-old";
@@ -39,7 +39,7 @@ interface MenuSection {
 
 const MANAGE_SECTIONS: MenuSection[] = [
 	{
-		label: "Lists & Emails",
+		label: "Lists & Approvers",
 		items: [
 			{
 				targetPath: "/manage/data",
@@ -47,9 +47,9 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				label: "Data Lists",
 			},
 			{
-				targetPath: "/manage/emails",
-				icon: <Mail className="size-4" aria-hidden="true" />,
-				label: "Email",
+				targetPath: "/manage/approvers",
+				icon: <CircleCheckBig className="size-4" aria-hidden="true" />,
+				label: "Approvers",
 			},
 		],
 	},

@@ -8,6 +8,8 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { ChevronDown, X, Check } from "lucide-react";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { filterBusinessAreasByKeyStakeholder } from "@/shared/utils/division-filter.utils";
 import type { IBusinessArea } from "@/shared/types/org.types";
 
 interface BusinessAreaMultiSelectProps {
@@ -52,16 +54,21 @@ export const BusinessAreaMultiSelect = observer(
 	}: BusinessAreaMultiSelectProps) => {
 		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 			useBusinessAreas();
+		const { data: divisions } = useDivisions();
 		const [isOpen, setIsOpen] = useState(false);
 		const [focusedIndex, setFocusedIndex] = useState(0);
 		const menuItemsRef = useRef<(HTMLElement | null)[]>([]);
 		const preventCloseRef = useRef(false);
 
-		// Sort business areas alphabetically
+		// Filter to BAs with key stakeholder divisions, then sort alphabetically
 		const sortedBusinessAreas = useMemo(() => {
 			if (!businessAreas) return [];
-			return [...businessAreas].sort((a, b) => a.name.localeCompare(b.name));
-		}, [businessAreas]);
+			const filtered = filterBusinessAreasByKeyStakeholder(
+				businessAreas,
+				divisions
+			);
+			return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+		}, [businessAreas, divisions]);
 
 		// Total number of menu items (2 buttons + business areas)
 		const totalItems = 2 + sortedBusinessAreas.length;

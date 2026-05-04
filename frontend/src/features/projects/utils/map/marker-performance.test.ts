@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createProjectMarker, createClusterMarker } from "./marker-creation.utils";
+import { createProjectMarker } from "./marker-creation.utils";
 import type { IProjectData } from "@/shared/types/project.types";
 
 // Type guard for DivIcon options (since we're mocking divIcon to return options)
@@ -78,7 +78,7 @@ describe("marker-creation performance", () => {
 			const projects = Array.from({ length: projectCount }, (_, j) =>
 				createMockProject(i * 100 + j)
 			);
-			createClusterMarker(projects, [-25 + i * 0.02, 122 + i * 0.02], true);
+			createProjectMarker(projects, [-25 + i * 0.02, 122 + i * 0.02], true);
 		}
 
 		const endTime = performance.now();
@@ -95,7 +95,7 @@ describe("marker-creation performance", () => {
 		const projects = Array.from({ length: 1000 }, (_, i) =>
 			createMockProject(i)
 		);
-		createClusterMarker(projects, [-25, 122], true);
+		createProjectMarker(projects, [-25, 122], true);
 
 		const endTime = performance.now();
 		const duration = endTime - startTime;

@@ -1,11 +1,8 @@
-import type {
-	IAdminTask,
-	ISecondaryUserData,
-} from "@/shared/types/admin.types";
+import type { IAdminTask } from "@/shared/types/admin.types";
 import type { IUserData } from "@/shared/types/user.types";
 
 // Re-export shared types for backward compatibility
-export type { IAdminTask, ISecondaryUserData };
+export type { IAdminTask };
 
 // ============================================================================
 // CARETAKER TYPES
@@ -64,17 +61,6 @@ export type { ICaretakerRequest } from "@/shared/types/caretaker.types";
 // FORM TYPES
 // ============================================================================
 
-/**
- * Form data for caretaker request form
- * Used by RequestCaretakerForm component
- */
-export interface ICaretakerRequestFormData {
-	reason: "leave" | "resignation" | "other";
-	endDate: Date | null;
-	notes: string | undefined;
-	caretakerUserId: number | undefined;
-}
-
 // ============================================================================
 // COMPONENT PROPS
 // ============================================================================
@@ -89,11 +75,6 @@ export interface IPendingCaretakerRequestProps {
 	onCancel: () => void;
 }
 
-export interface IBecomeCaretakerRequestProps {
-	request: IAdminTask;
-	onResponse?: () => void;
-}
-
 export interface IActiveCaretakerProps {
 	caretaker: ICaretaker;
 	onRemove: () => void;
@@ -101,9 +82,4 @@ export interface IActiveCaretakerProps {
 
 export interface ICaretakeesTableProps {
 	caretakees: ICaretakee[];
-}
-
-export interface ICaretakerUserSearchProps {
-	onSelect: (userId: number) => void;
-	excludeUserIds: number[];
 }

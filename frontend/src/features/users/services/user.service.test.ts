@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
-	getMe,
-	getUsers,
-	createUser,
 	checkEmailExists,
 	checkNameExists,
 	toggleAdminStatus,
@@ -38,62 +35,6 @@ vi.mock("@/shared/services/user.service", () => ({
 describe("user.service", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-	});
-
-	describe("getMe", () => {
-		it("should GET current user from me endpoint", async () => {
-			const mockUser = { id: 1, username: "me" };
-			(apiClient.get as Mock).mockResolvedValue(mockUser);
-
-			const result = await getMe();
-
-			expect(apiClient.get).toHaveBeenCalledWith("users/me");
-			expect(result).toEqual(mockUser);
-		});
-	});
-
-	describe("getUsers", () => {
-		it("should GET all users from list endpoint", async () => {
-			const mockUsers = [{ id: 1 }, { id: 2 }];
-			(apiClient.get as Mock).mockResolvedValue(mockUsers);
-
-			const result = await getUsers();
-
-			expect(apiClient.get).toHaveBeenCalledWith("users/list");
-			expect(result).toEqual(mockUsers);
-		});
-	});
-
-	describe("createUser", () => {
-		it("should POST user data to create endpoint", async () => {
-			const mockCreated = { id: 3, username: "newuser" };
-			(apiClient.post as Mock).mockResolvedValue(mockCreated);
-
-			const formData = {
-				username: "newuser",
-				email: "new@example.com",
-				firstName: "New",
-				lastName: "User",
-				isStaff: true,
-				branch: 1,
-				businessArea: 2,
-				affiliation: 3,
-			};
-
-			const result = await createUser(formData);
-
-			expect(apiClient.post).toHaveBeenCalledWith("users/list", {
-				username: "newuser",
-				email: "new@example.com",
-				firstName: "New",
-				lastName: "User",
-				isStaff: true,
-				branch: 1,
-				businessArea: 2,
-				affiliation: 3,
-			});
-			expect(result).toEqual(mockCreated);
-		});
 	});
 
 	describe("checkEmailExists", () => {

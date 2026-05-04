@@ -3,6 +3,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useProjectWizardStore } from "@/app/stores/store-context";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useServices } from "@/shared/hooks/queries/useServices";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { Label } from "@/shared/components/ui/label";
 import {
 	Select,
@@ -39,6 +40,7 @@ const ProjectDetailsStep = observer(() => {
 	const stepIndex = 1;
 	const { data: businessAreas, isLoading: baLoading } = useBusinessAreas();
 	const { data: services, isLoading: servicesLoading } = useServices();
+	const { data: divisions } = useDivisions();
 	const leaderRef = useRef<UserComboboxRef>(null);
 	const custodianRef = useRef<UserComboboxRef>(null);
 	const teamMembers = wizardStore.state.editingTeamMembers;
@@ -226,6 +228,8 @@ const ProjectDetailsStep = observer(() => {
 								) : (
 									<BusinessAreaSelectItems
 										businessAreas={businessAreas || []}
+										filterByApprovers
+										divisions={divisions}
 									/>
 								)}
 							</SelectContent>

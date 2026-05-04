@@ -118,13 +118,4 @@ describe("Caretaker mutation hooks", () => {
 		});
 		expect(result.current.mutate).toBeDefined();
 	});
-
-	it("useRespondToCaretakerRequest should return a mutation", async () => {
-		const { useRespondToCaretakerRequest } =
-			await import("./useRespondToCaretakerRequest");
-		const { result } = renderHook(() => useRespondToCaretakerRequest(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.mutate).toBeDefined();
-	});
 });

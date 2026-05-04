@@ -383,3 +383,97 @@ export const saveNewCycleDraft = async (
 export const clearNewCycleDraft = async (): Promise<{ status: string }> => {
 	return apiClient.delete(ADMIN_ENDPOINTS.NEW_CYCLE_DRAFT);
 };
+
+// Data list services
+import type {
+	IUnapprovedProject,
+	IProblematicProjectsData,
+	IStaffUser,
+} from "../types/admin.types";
+
+export const getUnapprovedDocs = async (): Promise<IUnapprovedProject[]> => {
+	return apiClient.get<IUnapprovedProject[]>(ADMIN_ENDPOINTS.UNAPPROVED_DOCS);
+};
+
+export const getProblematicProjects =
+	async (): Promise<IProblematicProjectsData> => {
+		return apiClient.get<IProblematicProjectsData>(
+			ADMIN_ENDPOINTS.PROBLEMATIC_PROJECTS
+		);
+	};
+
+/** Paginated user list response from the users/list endpoint */
+interface IUserListResponse {
+	users: IStaffUser[];
+	total_results: number;
+	total_pages: number;
+}
+
+export const getStaffUsers = async (): Promise<IStaffUser[]> => {
+	const response = await apiClient.get<IUserListResponse>(
+		`${ADMIN_ENDPOINTS.USERS_LIST}?only_staff=true`
+	);
+	return response.users;
+};
+
+export const getStaffEmailList = async (): Promise<IStaffUser[]> => {
+	const response = await apiClient.get<IUserListResponse>(
+		`${ADMIN_ENDPOINTS.USERS_LIST}?only_staff=true`
+	);
+	return response.users;
+};
+
+// Remedy service functions
+
+export interface IRemedyResponse {
+	successful: number;
+	failed?: number;
+	skipped?: number;
+	details?: Array<Record<string, unknown>>;
+}
+
+export const remedyOpenClosed = async (data: {
+	projects: number[];
+	status: "active" | "suspended" | "completed" | "terminated";
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_OPEN_CLOSED,
+		data
+	);
+};
+
+export const remedyMemberless = async (data: {
+	projects: number[];
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_MEMBERLESS,
+		data
+	);
+};
+
+export const remedyLeaderless = async (data: {
+	projects: number[];
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_LEADERLESS,
+		data
+	);
+};
+
+export const remedyMultipleLeaders = async (data: {
+	projects: number[];
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_MULTIPLE_LEADERS,
+		data
+	);
+};
+
+export const remedyExternalLeaders = async (data: {
+	projects: number[];
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_EXTERNAL_LEADERS,
+		data
+	);
+};

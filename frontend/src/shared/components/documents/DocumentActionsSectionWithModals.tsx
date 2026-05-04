@@ -134,6 +134,7 @@ export const DocumentActionsSectionWithModals = ({
 	const [currentAction, setCurrentAction] = useState<DocumentAction | null>(
 		null
 	);
+	const [recallStage, setRecallStage] = useState<number | null>(null);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	// Mutations
@@ -153,8 +154,9 @@ export const DocumentActionsSectionWithModals = ({
 		setActionModalOpen(true);
 	};
 
-	const handleRecall = () => {
+	const handleRecall = (stage: number) => {
 		setCurrentAction("recall");
+		setRecallStage(stage);
 		setActionModalOpen(true);
 	};
 
@@ -209,18 +211,23 @@ export const DocumentActionsSectionWithModals = ({
 	}) => {
 		if (!currentAction) return;
 
+		// For recall, use the explicit stage from the button that was clicked.
+		// For other actions, derive from the current approval state.
 		const currentStage = getCurrentApprovalStage(document);
+		const stage =
+			currentAction === "recall" && recallStage != null
+				? recallStage
+				: (STAGE_MAP[currentStage] ?? 1);
 
 		documentActionMutation.mutate(
 			{
 				documentId: document.id,
 				data: {
 					action: currentAction,
-					stage: STAGE_MAP[currentStage] ?? 1,
+					stage,
 					documentPk: document.id,
 					reason: data.reason,
 					feedbackHTML: data.feedbackHTML,
-					// Send email preference from the modal
 					send_email: data.sendEmail,
 				},
 			},
@@ -228,6 +235,7 @@ export const DocumentActionsSectionWithModals = ({
 				onSuccess: () => {
 					setActionModalOpen(false);
 					setCurrentAction(null);
+					setRecallStage(null);
 				},
 			}
 		);

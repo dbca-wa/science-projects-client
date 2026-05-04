@@ -1,14 +1,17 @@
 import { Search } from "lucide-react";
 import { Input } from "@/shared/components/ui/input";
+import type { ReactNode } from "react";
 
 interface KBHeroSearchProps {
 	searchQuery: string;
 	onSearchChange: (query: string) => void;
+	children?: ReactNode;
 }
 
 export const KBHeroSearch = ({
 	searchQuery,
 	onSearchChange,
+	children,
 }: KBHeroSearchProps) => {
 	return (
 		<section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 px-6 py-12 text-white shadow-lg sm:px-10 sm:py-16">
@@ -35,6 +38,9 @@ export const KBHeroSearch = ({
 						aria-label="Search knowledge base articles"
 					/>
 				</div>
+
+				{/* Optional children — e.g. admin edit button */}
+				{children}
 			</div>
 		</section>
 	);

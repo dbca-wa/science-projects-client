@@ -39,6 +39,9 @@ export const REPORT_ENDPOINTS = {
 	REPORTS_WITHOUT_PDF: "documents/reports/withoutPDF",
 	REPORTS_LIST: "documents/reports",
 
+	// Combined endpoint — returns { published, drafts, legacy } in one call
+	ALL_REPORT_PDFS: "documents/reports/all-pdfs",
+
 	// Upload endpoints
 	ADD_REPORT_PDF: "medias/report_pdfs",
 	ADD_LEGACY_PDF: "medias/legacy_report_pdfs",

@@ -1,3 +1,4 @@
+export { CollapsibleCard } from "../../../shared/components/CollapsibleCard";
 export { DashboardActionCard } from "./DashboardActionCard";
 export { MyTasksSection } from "./MyTasksSection";
 export { DocumentTasksTabContent } from "./DocumentTasksTabContent";
@@ -7,5 +8,3 @@ export { ProjectTeamDocumentsDataTable } from "./ProjectTeamDocumentsDataTable";
 export { BusinessAreaLeadDocumentsDataTable } from "./BusinessAreaLeadDocumentsDataTable";
 export { DirectorateDocumentsDataTable } from "./DirectorateDocumentsDataTable";
 export { AdminTasksDataTable } from "./AdminTasksDataTable";
-export { AdminTaskCard } from "./AdminTaskCard";
-export { SectionDivider } from "./SectionDivider";

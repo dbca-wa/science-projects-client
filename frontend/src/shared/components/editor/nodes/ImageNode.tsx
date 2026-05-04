@@ -21,7 +21,7 @@ import { ImageComponent } from "./ImageComponent";
 
 export type ImageAlignment = "left" | "center" | "right" | "full";
 
-export interface ImagePayload {
+interface ImagePayload {
 	src: string;
 	altText: string;
 	width?: string;

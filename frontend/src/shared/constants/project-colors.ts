@@ -58,35 +58,3 @@ export const CONFETTI_COLOR_SCHEMES = {
  */
 export const ACTIVE_CONFETTI_SCHEME: keyof typeof CONFETTI_COLOR_SCHEMES =
 	"FUN_COLOURS";
-
-/**
- * Document Status Badge Variants
- * Maps document status values to shadcn badge variants
- */
-export const DOCUMENT_STATUS_VARIANTS = {
-	draft: "draft",
-	new: "draft",
-	revising: "pending",
-	inreview: "inreview",
-	inapproval: "inreview",
-	approved: "approved",
-	pending_approval: "pending",
-	requires_revision: "denied",
-} as const;
-
-/**
- * Approval Status Badge Variants
- * Maps approval status values to shadcn badge variants
- */
-export const APPROVAL_STATUS_VARIANTS = {
-	pending: "pending",
-	approved: "approved",
-	denied: "denied",
-	not_required: "secondary",
-} as const;
-
-export type ProjectKindColorKey = keyof typeof PROJECT_KIND_COLORS;
-export type ProjectStatusColorKey = keyof typeof PROJECT_STATUS_COLORS;
-export type ConfettiColorScheme = keyof typeof CONFETTI_COLOR_SCHEMES;
-export type DocumentStatusKey = keyof typeof DOCUMENT_STATUS_VARIANTS;
-export type ApprovalStatusKey = keyof typeof APPROVAL_STATUS_VARIANTS;

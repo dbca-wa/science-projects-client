@@ -24,11 +24,21 @@ export const getLegacyReports = async (): Promise<IAnnualReportPDF[]> => {
 };
 
 /**
- * Fetch the latest reporting year.
- * The backend returns a full serialised report — we extract the year.
+ * Response shape from the combined all-pdfs endpoint.
+ * Each array is pre-categorised by the backend — no frontend merging needed.
  */
-export const getLatestYear = async (): Promise<IAnnualReport> => {
-	return apiClient.get<IAnnualReport>(REPORT_ENDPOINTS.LATEST_YEAR);
+export interface AllReportPDFsResponse {
+	published: IAnnualReportPDF[];
+	drafts: IAnnualReportPDF[];
+	legacy: IAnnualReportPDF[];
+}
+
+/**
+ * Fetch all report PDFs in a single call, pre-categorised into
+ * published, drafts, and legacy arrays.
+ */
+export const getAllReportPDFs = async (): Promise<AllReportPDFsResponse> => {
+	return apiClient.get<AllReportPDFsResponse>(REPORT_ENDPOINTS.ALL_REPORT_PDFS);
 };
 
 /**
@@ -107,13 +117,6 @@ export interface IReportMedia {
 }
 
 /**
- * Fetch media items for the latest annual report
- */
-export const getLatestReportMedia = async (): Promise<IReportMedia[]> => {
-	return apiClient.get<IReportMedia[]>(REPORT_ENDPOINTS.LATEST_REPORT_MEDIA);
-};
-
-/**
  * Fetch media items for a specific annual report by ID
  */
 export const getReportMedia = async (
@@ -177,24 +180,6 @@ export const getReportPDFStatus = async (
 	return apiClient.get<IReportPDFStatus>(
 		REPORT_ENDPOINTS.REPORT_PDF_STATUS(pk)
 	);
-};
-
-/** PDF data returned when fetching a generated report PDF */
-export interface IReportPDFData {
-	pdf_data: string; // base64-encoded PDF
-	draft_file: string | null;
-	published_file: string | null;
-	report: {
-		id: number;
-		pdf_generation_in_progress: boolean;
-	};
-}
-
-/**
- * Fetch the generated PDF data for a report
- */
-export const getReportPDF = async (pk: number): Promise<IReportPDFData> => {
-	return apiClient.get<IReportPDFData>(REPORT_ENDPOINTS.REPORT_PDF_DATA(pk));
 };
 
 /**

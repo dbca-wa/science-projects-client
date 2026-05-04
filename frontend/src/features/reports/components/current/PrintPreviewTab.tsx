@@ -30,7 +30,7 @@ import { useAuthStore } from "@/app/stores/store-context";
  * Print Preview tab — PDF generation with SSE progress,
  * preview via iframe, and download for the current annual report.
  */
-export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
+const PrintPreviewTab = ({ report }: { report: IAnnualReport }) => {
 	const queryClient = useQueryClient();
 	const authStore = useAuthStore();
 	const { data: pdfData, isLoading, refetch } = useReportPDF(report.id);
@@ -276,7 +276,7 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 					<iframe
 						src={fileUrl!}
 						title={`${report.year} Annual Report PDF`}
-						className="h-[500px] w-full sm:h-[700px] lg:h-[900px]"
+						className="h-[70vh] w-full sm:h-[80vh] lg:h-[85vh]"
 						onError={handleIframeError}
 					/>
 				) : hasPDF && iframeError ? (
@@ -311,4 +311,6 @@ export default function PrintPreviewTab({ report }: { report: IAnnualReport }) {
 			/>
 		</div>
 	);
-}
+};
+
+export default PrintPreviewTab;

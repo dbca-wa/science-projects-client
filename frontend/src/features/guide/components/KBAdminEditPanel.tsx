@@ -527,12 +527,20 @@ const ArticleEditor = ({
 
 // ─── Main Admin Edit Panel ───────────────────────────────────────────────────
 
-export const KBAdminEditPanel = observer(() => {
+export const KBAdminEditPanel = observer(function KBAdminEditPanel({
+	isEditMode,
+	onToggleEditMode,
+}: {
+	isEditMode: boolean;
+	onToggleEditMode: () => void;
+}) {
 	const authStore = useAuthStore();
-	const [isEditMode, setIsEditMode] = useState(false);
 	const { data: sections } = useGuideSections();
 	const createSection = useCreateGuideSection();
 	const reorderSections = useReorderGuideSections();
+	const [addSectionDialogOpen, setAddSectionDialogOpen] = useState(false);
+	const [newSectionTitle, setNewSectionTitle] = useState("");
+	const [newSectionError, setNewSectionError] = useState("");
 
 	// Only render for admin/superuser
 	if (!authStore.isSuperuser) return null;
@@ -540,18 +548,45 @@ export const KBAdminEditPanel = observer(() => {
 	const activeSections = sections?.filter((s) => s.is_active) ?? [];
 
 	const handleAddSection = () => {
-		const id = slugify(`section-${Date.now()}`);
+		setNewSectionTitle("");
+		setNewSectionError("");
+		setAddSectionDialogOpen(true);
+	};
+
+	const handleConfirmAddSection = () => {
+		const trimmed = newSectionTitle.trim();
+		if (!trimmed) {
+			setNewSectionError("Section title is required");
+			return;
+		}
+		const id = slugify(trimmed);
+		if (!id) {
+			setNewSectionError(
+				"Title must contain at least one alphanumeric character"
+			);
+			return;
+		}
+		const allSections = sections ?? [];
+		if (allSections.some((s) => s.id === id)) {
+			setNewSectionError(`A section with slug "${id}" already exists`);
+			return;
+		}
 		createSection.mutate(
 			{
 				id,
-				title: "New Section",
+				title: trimmed,
 				description: "",
 				icon: "book-open",
 				order: activeSections.length,
 				is_active: true,
 				content_fields: [],
 			},
-			{ onSuccess: () => toast.success("Section created") }
+			{
+				onSuccess: () => {
+					toast.success("Section created");
+					setAddSectionDialogOpen(false);
+				},
+			}
 		);
 	};
 
@@ -568,41 +603,38 @@ export const KBAdminEditPanel = observer(() => {
 	};
 
 	return (
-		<div className="space-y-4">
-			{/* Edit mode toggle */}
-			<div className="flex items-center justify-end">
-				<Button
-					variant={isEditMode ? "default" : "outline"}
-					size="sm"
-					className="gap-2"
-					onClick={() => setIsEditMode(!isEditMode)}
-				>
-					<Pencil className="h-4 w-4" />
-					{isEditMode ? "Done Editing" : "Edit Knowledge Base"}
-				</Button>
-			</div>
-
-			{/* Edit panel */}
+		<div id="kb-admin-edit-panel" className="space-y-4 scroll-mt-24">
+			{/* Admin edit panel — visible when edit mode is active */}
 			{isEditMode && (
 				<div className="space-y-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-950/20">
 					<div className="flex items-center justify-between">
 						<h2 className="text-sm font-semibold text-blue-700 dark:text-blue-400">
 							Admin Edit Mode
 						</h2>
-						<Button
-							variant="outline"
-							size="sm"
-							className="gap-1"
-							onClick={handleAddSection}
-							disabled={createSection.isPending}
-						>
-							{createSection.isPending ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<Plus className="h-4 w-4" />
-							)}
-							Add Section
-						</Button>
+						<div className="flex items-center gap-2">
+							<Button
+								variant="outline"
+								size="sm"
+								className="gap-1"
+								onClick={handleAddSection}
+								disabled={createSection.isPending}
+							>
+								{createSection.isPending ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<Plus className="h-4 w-4" />
+								)}
+								Add Section
+							</Button>
+							<Button
+								variant="default"
+								size="sm"
+								className="gap-2"
+								onClick={onToggleEditMode}
+							>
+								Done Editing
+							</Button>
+						</div>
 					</div>
 
 					{activeSections.map((section, index) => (
@@ -623,6 +655,71 @@ export const KBAdminEditPanel = observer(() => {
 					)}
 				</div>
 			)}
+
+			{/* Add section dialog — prompts for title, generates slug */}
+			<Dialog
+				open={addSectionDialogOpen}
+				onOpenChange={setAddSectionDialogOpen}
+			>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Add New Section</DialogTitle>
+						<DialogDescription>
+							Enter a title for the new section. A URL-friendly slug will be
+							generated automatically.
+						</DialogDescription>
+					</DialogHeader>
+					<div className="space-y-3 py-2">
+						<div className="space-y-1.5">
+							<Label htmlFor="new-section-title">Section Title</Label>
+							<Input
+								id="new-section-title"
+								value={newSectionTitle}
+								onChange={(e) => {
+									setNewSectionTitle(e.target.value);
+									setNewSectionError("");
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.preventDefault();
+										handleConfirmAddSection();
+									}
+								}}
+								placeholder="e.g. Getting Started"
+								autoFocus
+							/>
+							{newSectionTitle.trim() && (
+								<p className="text-xs text-muted-foreground">
+									Slug:{" "}
+									<code className="bg-muted px-1 rounded">
+										{slugify(newSectionTitle.trim())}
+									</code>
+								</p>
+							)}
+							{newSectionError && (
+								<p className="text-xs text-destructive">{newSectionError}</p>
+							)}
+						</div>
+					</div>
+					<DialogFooter>
+						<Button
+							variant="outline"
+							onClick={() => setAddSectionDialogOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={handleConfirmAddSection}
+							disabled={createSection.isPending}
+						>
+							{createSection.isPending ? (
+								<Loader2 className="h-4 w-4 animate-spin mr-2" />
+							) : null}
+							Create Section
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 });

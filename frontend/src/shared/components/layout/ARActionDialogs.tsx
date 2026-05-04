@@ -13,7 +13,7 @@ import {
 import {
 	useBatchApprove,
 	useBatchApproveOld,
-} from "@/features/admin/hooks/useAdminActions";
+} from "@/shared/hooks/queries/useBumpEmails";
 import type { ARActionId } from "./ManageDropdownContent";
 
 interface ARActionDialogsProps {

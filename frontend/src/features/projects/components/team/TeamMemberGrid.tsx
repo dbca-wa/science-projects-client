@@ -31,12 +31,14 @@ interface TeamMemberGridProps {
 	members: IProjectMember[];
 	projectId: number;
 	canManageTeam: boolean;
+	projectKind?: string;
 }
 
 export function TeamMemberGrid({
 	members,
 	projectId,
 	canManageTeam,
+	projectKind,
 }: TeamMemberGridProps) {
 	const { mutate: updatePositions } = useUpdateTeamPositions(projectId);
 
@@ -114,6 +116,8 @@ export function TeamMemberGrid({
 						member={member}
 						projectId={projectId}
 						canManageTeam={false}
+						projectKind={projectKind}
+						allMembers={members}
 					/>
 				))}
 			</div>
@@ -138,6 +142,8 @@ export function TeamMemberGrid({
 							member={member}
 							projectId={projectId}
 							canManageTeam={true}
+							projectKind={projectKind}
+							allMembers={members}
 						/>
 					))}
 				</div>

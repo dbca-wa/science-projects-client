@@ -198,16 +198,18 @@ export const InviteMemberForm = ({
 				</>
 			)}
 
-			{/* Add Button */}
-			<Button
-				onClick={handleAdd}
-				disabled={!canAdd}
-				variant="secondary"
-				className="gap-2"
-			>
-				<UserPlus className="h-4 w-4" />
-				Add to List
-			</Button>
+			{/* Add Button — right-aligned for discoverability */}
+			<div className="flex justify-end">
+				<Button
+					onClick={handleAdd}
+					disabled={!canAdd}
+					variant="default"
+					className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+				>
+					<UserPlus className="h-4 w-4" />
+					Add to List
+				</Button>
+			</div>
 		</div>
 	);
 };

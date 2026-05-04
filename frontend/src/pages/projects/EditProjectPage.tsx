@@ -99,6 +99,13 @@ const EditProjectPage = observer(() => {
 			},
 			{
 				onSuccess: () => {
+					// Unregister from InlineEditStore BEFORE navigating
+					// to prevent the navigation blocker from firing
+					setHasUnsavedChanges(false);
+					inlineEditStore.unregisterEditor(
+						"project-edit-form" as never,
+						Number(id) || 0
+					);
 					toast.success("Project updated successfully");
 					navigate(`/projects/${id}`);
 				},

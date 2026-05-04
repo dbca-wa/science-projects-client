@@ -142,30 +142,6 @@ export const useBatchApproveCurrent = () => {
 	});
 };
 
-/** Batch approve older (prior-year) progress/student reports */
-export const useBatchApproveOld = () => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
-			apiClient.post<string>(DOCUMENT_ENDPOINTS.BATCH_APPROVE_OLD, data),
-		onSuccess: async () => {
-			toast.success("Prior-year reports approved");
-			await queryClient.invalidateQueries({
-				queryKey: ["reports", "inactive"],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: ["reports", "progress"],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: ["reports", "students"],
-			});
-		},
-		onError: (error: Error) => {
-			toast.error(error.message || "Failed to batch approve old reports");
-		},
-	});
-};
-
 /* ------------------------------------------------------------------ */
 /*  Recipient Preview Hooks                                            */
 /* ------------------------------------------------------------------ */
@@ -257,5 +233,45 @@ export const useNewCycleEmailPreview = (
 			),
 		enabled,
 		staleTime: 5 * 60_000, // 5 minutes — template only changes on deploy
+	});
+};
+
+/** Batch approve current reports (all divisions or specific division) */
+export const useBatchApprove = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
+			apiClient.post("documents/batchapprovecurrent", {
+				division: data?.division,
+				send_notifications: data?.send_notifications ?? false,
+			}),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
+			await queryClient.invalidateQueries({ queryKey: ["reports"] });
+			toast.success("Reports batch approved successfully");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to batch approve reports");
+		},
+	});
+};
+
+/** Batch approve old reports */
+export const useBatchApproveOld = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data?: { division?: string; send_notifications?: boolean }) =>
+			apiClient.post("documents/batchapproveold", {
+				division: data?.division,
+				send_notifications: data?.send_notifications ?? false,
+			}),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
+			await queryClient.invalidateQueries({ queryKey: ["reports"] });
+			toast.success("Old reports batch approved successfully");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to batch approve old reports");
+		},
 	});
 };

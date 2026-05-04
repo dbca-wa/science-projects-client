@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
 	Tabs,
 	TabsList,
@@ -12,43 +12,38 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
+import { Badge } from "@/shared/components/ui/badge";
 import { UnapprovedDocsTab } from "./UnapprovedDocsTab";
 import { ProblematicProjectsTab } from "./ProblematicProjectsTab";
-import { EmailListTab } from "./EmailListTab";
-import { StaffProfileListTab } from "./StaffProfileListTab";
-import { StaffUsersTab } from "./StaffUsersTab";
+import {
+	useUnapprovedDocs,
+	useProblematicProjects,
+} from "../../hooks/useDataLists";
 
-const TAB_CONFIG = [
-	{
-		value: "unapproved-docs",
-		label: "Unapproved Docs",
-		shortLabel: "Unapproved",
-	},
-	{
-		value: "problematic-projects",
-		label: "Problematic Projects",
-		shortLabel: "Problematic",
-	},
-	{ value: "email-list", label: "Email List", shortLabel: "Email List" },
-	{
-		value: "staff-profiles",
-		label: "Staff Profile List",
-		shortLabel: "Profiles",
-	},
-	{ value: "staff-users", label: "Staff Users", shortLabel: "Staff Users" },
-] as const;
-
-type TabValue = (typeof TAB_CONFIG)[number]["value"];
+type TabValue = "unapproved-docs" | "problematic-projects";
 
 /**
  * Tabbed interface for admin data lists.
  * Tabs are lazily loaded on first visit and retained to avoid re-fetching.
+ * Each tab shows a count badge with the number of issues.
  */
 export const DataListsTabs = () => {
 	const [activeTab, setActiveTab] = useState<TabValue>("unapproved-docs");
 	const [loadedTabs, setLoadedTabs] = useState(
 		new Set<TabValue>(["unapproved-docs"])
 	);
+
+	const { data: unapprovedDocs } = useUnapprovedDocs();
+	const { data: problematicData } = useProblematicProjects();
+
+	const unapprovedCount = unapprovedDocs?.length ?? 0;
+	const problematicCount = useMemo(() => {
+		if (!problematicData) return 0;
+		return Object.values(problematicData).reduce(
+			(sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+			0
+		);
+	}, [problematicData]);
 
 	const handleTabChange = (value: string) => {
 		const tab = value as TabValue;
@@ -65,12 +60,26 @@ export const DataListsTabs = () => {
 		<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
 			{/* Desktop tabs */}
 			<TabsList className="hidden w-full justify-start md:inline-flex">
-				{TAB_CONFIG.map((tab) => (
-					<TabsTrigger key={tab.value} value={tab.value}>
-						<span className="xl:hidden">{tab.shortLabel}</span>
-						<span className="hidden xl:inline">{tab.label}</span>
-					</TabsTrigger>
-				))}
+				<TabsTrigger value="unapproved-docs">
+					<span className="flex items-center gap-2">
+						Unapproved Docs
+						{unapprovedCount > 0 && (
+							<Badge variant="secondary" className="h-5 min-w-5 px-1.5 text-xs">
+								{unapprovedCount}
+							</Badge>
+						)}
+					</span>
+				</TabsTrigger>
+				<TabsTrigger value="problematic-projects">
+					<span className="flex items-center gap-2">
+						Problematic Projects
+						{problematicCount > 0 && (
+							<Badge variant="secondary" className="h-5 min-w-5 px-1.5 text-xs">
+								{problematicCount}
+							</Badge>
+						)}
+					</span>
+				</TabsTrigger>
 			</TabsList>
 
 			{/* Mobile dropdown */}
@@ -80,11 +89,12 @@ export const DataListsTabs = () => {
 						<SelectValue placeholder="Select a tab" />
 					</SelectTrigger>
 					<SelectContent>
-						{TAB_CONFIG.map((tab) => (
-							<SelectItem key={tab.value} value={tab.value}>
-								{tab.label}
-							</SelectItem>
-						))}
+						<SelectItem value="unapproved-docs">
+							Unapproved Docs ({unapprovedCount})
+						</SelectItem>
+						<SelectItem value="problematic-projects">
+							Problematic Projects ({problematicCount})
+						</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>
@@ -94,15 +104,6 @@ export const DataListsTabs = () => {
 			</TabsContent>
 			<TabsContent value="problematic-projects">
 				{loadedTabs.has("problematic-projects") && <ProblematicProjectsTab />}
-			</TabsContent>
-			<TabsContent value="email-list">
-				{loadedTabs.has("email-list") && <EmailListTab />}
-			</TabsContent>
-			<TabsContent value="staff-profiles">
-				{loadedTabs.has("staff-profiles") && <StaffProfileListTab />}
-			</TabsContent>
-			<TabsContent value="staff-users">
-				{loadedTabs.has("staff-users") && <StaffUsersTab />}
 			</TabsContent>
 		</Tabs>
 	);

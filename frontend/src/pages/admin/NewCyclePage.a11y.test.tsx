@@ -9,9 +9,7 @@ import NewCyclePage from "./NewCyclePage";
 vi.mock("@/features/admin/hooks/useAdminActions", () => ({
 	useOpenNewCycle: () => ({ mutate: vi.fn(), isPending: false }),
 	useBatchApprove: () => ({ mutate: vi.fn(), isPending: false }),
-	useBatchApproveOld: () => ({ mutate: vi.fn(), isPending: false }),
 	useNewCycleDraft: () => ({ data: { draft: null }, isLoading: false }),
-	useSaveNewCycleDraft: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@/shared/hooks/queries/useBumpEmails", () => ({

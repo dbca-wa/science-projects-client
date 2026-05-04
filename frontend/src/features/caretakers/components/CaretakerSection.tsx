@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useMemo } from "react";
 import type { ICaretakerSimpleUserData } from "@/shared/types/user.types";
 import { CaretakeesTable } from "./CaretakeesTable";
 import { CaretakerDocumentsTabContent } from "./CaretakerDocumentsTabContent";
@@ -11,8 +10,17 @@ import { useOutgoingCaretakerRequests } from "../hooks/useOutgoingCaretakerReque
 import { Loader2, AlertCircle, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
-
 import { Separator } from "@/shared/components/ui/separator";
+import {
+	Tabs,
+	TabsList,
+	TabsTrigger,
+	TabsContent,
+} from "@/shared/components/ui/tabs";
+
+const TAB_CARETAKING = "caretaking";
+const TAB_DOCUMENTS = "documents";
+const TAB_REQUESTS = "requests";
 
 interface CaretakerSectionProps {
 	userId: number;
@@ -20,14 +28,13 @@ interface CaretakerSectionProps {
 }
 
 /**
- * Standalone section for all caretaker-related functionality
- * Shows tabs for: Caretaking For, Documents, Requests
+ * Standalone section for all caretaker-related functionality.
+ * Shows tabs for: Caretaking For, Documents, Requests.
  */
 export const CaretakerSection = ({
 	userId,
 	caretakees,
 }: CaretakerSectionProps) => {
-	// Fetch caretaker document tasks
 	const {
 		data: caretakerTasks,
 		isLoading: tasksLoading,
@@ -35,7 +42,6 @@ export const CaretakerSection = ({
 		error: tasksErrorObj,
 	} = useCaretakerTasks(userId);
 
-	// Fetch incoming caretaker requests (someone wants YOU to be THEIR caretaker)
 	const {
 		data: incomingRequests,
 		isLoading: requestsLoading,
@@ -44,86 +50,60 @@ export const CaretakerSection = ({
 		refetch: refetchRequests,
 	} = usePendingCaretakerRequests(userId);
 
-	// Fetch outgoing caretaker requests (YOU want someone to be YOUR caretaker)
 	const { data: outgoingRequests, isLoading: outgoingLoading } =
 		useOutgoingCaretakerRequests(userId);
 
-	// Calculate counts (use 0 while loading to avoid flicker)
 	const caretakeesCount = caretakees.length;
 	const documentTasksCount = caretakerTasks?.all?.length || 0;
 	const requestsCount =
 		(incomingRequests?.length || 0) + (outgoingRequests?.length || 0);
 
-	// Determine which tabs to show based on whether user is caretaking for anyone
 	const hasCaretakees = caretakeesCount > 0;
-	const showCaretakeesTab = hasCaretakees;
-	const showDocumentsTab = hasCaretakees; // Only show if caretaking for someone
-	const showRequestsTab = true; // Always show (might have requests even without caretakees)
 
-	// Build tab array dynamically - memoize to prevent re-renders
+	// Build tab config dynamically
 	const tabs = useMemo(() => {
-		const tabArray = [];
-		if (showCaretakeesTab)
+		const tabArray: {
+			value: string;
+			label: string;
+			shortLabel: string;
+			count: number;
+			badgeColor: string;
+		}[] = [];
+		if (hasCaretakees) {
 			tabArray.push({
-				id: 0,
+				value: TAB_CARETAKING,
 				label: "Caretaking For",
 				shortLabel: "Users",
 				count: caretakeesCount,
+				badgeColor: "bg-blue-600",
 			});
-		if (showDocumentsTab)
 			tabArray.push({
-				id: 1,
+				value: TAB_DOCUMENTS,
 				label: "Documents",
 				shortLabel: "Docs",
 				count: documentTasksCount,
+				badgeColor: "bg-blue-600",
 			});
-		if (showRequestsTab)
-			tabArray.push({
-				id: 2,
-				label: "Requests",
-				shortLabel: "Requests",
-				count: requestsCount,
-			});
+		}
+		tabArray.push({
+			value: TAB_REQUESTS,
+			label: "Requests",
+			shortLabel: "Requests",
+			count: requestsCount,
+			badgeColor: "bg-red-600",
+		});
 		return tabArray;
-	}, [
-		showCaretakeesTab,
-		showDocumentsTab,
-		showRequestsTab,
-		caretakeesCount,
-		documentTasksCount,
-		requestsCount,
-	]);
+	}, [hasCaretakees, caretakeesCount, documentTasksCount, requestsCount]);
 
-	// Initialise activeTab - if no caretakees, default to Requests tab (which will be index 0)
-	const [activeTab, setActiveTab] = useState<number>(() => {
-		// If no caretakees, Requests tab will be the only tab (index 0)
-		// If has caretakees, default to first tab (Caretaking For at index 0)
-		return 0;
-	});
+	const defaultTab = hasCaretakees ? TAB_CARETAKING : TAB_REQUESTS;
 
-	// Ensure activeTab is valid
-	const validActiveTab = activeTab < tabs.length ? activeTab : 0;
-
-	// Show section if ANY of these conditions are true:
-	// 1. Has caretakees (will show all 3 tabs)
-	// 2. Has incoming or outgoing requests (will show only Requests tab)
-	// 3. Has document tasks (will show Documents tab if caretaking)
 	const hasContent =
 		caretakeesCount > 0 || requestsCount > 0 || documentTasksCount > 0;
-
-	// Don't render section if no content (even while loading)
-	// This prevents showing an empty section that will just disappear
 	const isLoading = tasksLoading || requestsLoading || outgoingLoading;
 
-	// Hide section if:
-	// - Not loading AND no content, OR
-	// - Loading but we already know there's no caretakees and no way to have content
 	if (!isLoading && !hasContent) {
 		return null;
 	}
-
-	// If loading and no caretakees, we might still have requests, so show loading state
-	// If loading and has caretakees, definitely show the section
 
 	return (
 		<div className="space-y-6">
@@ -140,164 +120,114 @@ export const CaretakerSection = ({
 			</div>
 
 			{/* Tabs */}
-			<div>
-				{/* Tab Navigation */}
-				<div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 relative">
-					{tabs.map((tab, index) => (
-						<button
-							key={tab.id}
-							onClick={() => setActiveTab(index)}
-							className={`relative flex-1 px-2 sm:px-4 md:px-6 py-3 md:py-4 font-semibold text-sm md:text-base transition-all cursor-pointer ${
-								validActiveTab === index
-									? "text-blue-600 dark:text-blue-400"
-									: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-							}`}
-						>
-							<div className="flex items-center justify-center gap-1 sm:gap-2">
-								<span className="hidden sm:inline">{tab.label}</span>
-								<span className="sm:hidden">{tab.shortLabel}</span>
-								{tab.count > 0 && (
-									<span
-										className={`inline-flex items-center justify-center min-w-[20px] sm:min-w-[22px] h-5 sm:h-6 px-1.5 sm:px-2 text-xs font-bold text-white rounded-full ${
-											tab.id === 2 ? "bg-red-600" : "bg-blue-600"
-										}`}
-									>
-										{tab.count}
-									</span>
-								)}
-							</div>
-						</button>
+			<Tabs defaultValue={defaultTab} className="w-full mt-2">
+				<TabsList className="w-full flex">
+					{tabs.map((tab) => (
+						<TabsTrigger key={tab.value} value={tab.value} className="flex-1">
+							<span className="hidden sm:inline">{tab.label}</span>
+							<span className="sm:hidden">{tab.shortLabel}</span>
+							{tab.count > 0 && (
+								<span
+									className={`ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white rounded-full ${tab.badgeColor}`}
+								>
+									{tab.count}
+								</span>
+							)}
+						</TabsTrigger>
 					))}
+				</TabsList>
 
-					{/* Active tab indicator */}
-					<motion.div
-						layoutId="caretakerActiveTab"
-						className="absolute bottom-0 h-0.5 bg-blue-600 dark:bg-blue-400"
-						style={{
-							left: `${(validActiveTab / tabs.length) * 100}%`,
-							width: `${100 / tabs.length}%`,
-						}}
-						transition={{ type: "spring", stiffness: 500, damping: 30 }}
-					/>
-				</div>
+				{/* Caretaking For Tab */}
+				{hasCaretakees && (
+					<TabsContent value={TAB_CARETAKING} className="overflow-visible">
+						<CaretakeesTable caretakees={caretakees} />
+					</TabsContent>
+				)}
 
-				{/* Tab Content */}
-				<div className="min-h-[400px] overflow-visible">
-					{/* Caretaking For Tab */}
-					{tabs[validActiveTab]?.id === 0 && (
-						<motion.div
-							key="caretakees-tab"
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
-							transition={{ duration: 0.2 }}
-							className="overflow-visible"
-						>
-							<CaretakeesTable caretakees={caretakees} />
-						</motion.div>
-					)}
+				{/* Documents Tab */}
+				{hasCaretakees && (
+					<TabsContent value={TAB_DOCUMENTS}>
+						<CaretakerDocumentsTabContent
+							caretakerTasks={caretakerTasks}
+							caretakerTasksLoading={tasksLoading}
+							caretakerTasksError={tasksError ? tasksErrorObj : null}
+						/>
+					</TabsContent>
+				)}
 
-					{/* Documents Tab */}
-					{tabs[validActiveTab]?.id === 1 && (
-						<motion.div
-							key="documents-tab"
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
-							transition={{ duration: 0.2 }}
-						>
-							<CaretakerDocumentsTabContent
-								caretakerTasks={caretakerTasks}
-								caretakerTasksLoading={tasksLoading}
-								caretakerTasksError={tasksError ? tasksErrorObj : null}
+				{/* Requests Tab */}
+				<TabsContent value={TAB_REQUESTS}>
+					<div className="space-y-6">
+						{/* Incoming Requests Section */}
+						<div>
+							<h3 className="text-lg font-semibold mb-2">
+								Incoming Caretaker Requests
+							</h3>
+							<p className="text-sm text-muted-foreground mb-4">
+								Requests to become someone else's caretaker.
+							</p>
+							{requestsLoading ? (
+								<div className="flex items-center justify-center py-12">
+									<div className="text-center space-y-4">
+										<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
+										<div className="text-lg font-medium text-muted-foreground">
+											Loading requests...
+										</div>
+									</div>
+								</div>
+							) : requestsError ? (
+								<Alert variant="destructive">
+									<AlertCircle className="size-4" />
+									<AlertDescription className="flex items-center justify-between">
+										<span>
+											Failed to load requests:{" "}
+											{requestsErrorObj?.message || "Unknown error"}
+										</span>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => refetchRequests()}
+										>
+											Retry
+										</Button>
+									</AlertDescription>
+								</Alert>
+							) : incomingRequests && incomingRequests.length > 0 ? (
+								<div className="space-y-4">
+									{incomingRequests.map((request) => (
+										<PendingCaretakerRequest
+											key={request.id}
+											request={request}
+											onCancel={() => refetchRequests()}
+										/>
+									))}
+								</div>
+							) : (
+								<Alert>
+									<Info className="h-4 w-4" />
+									<AlertDescription>
+										No incoming caretaker requests.
+									</AlertDescription>
+								</Alert>
+							)}
+						</div>
+
+						<Separator className="my-6" />
+
+						{/* Outgoing Requests Section */}
+						<div>
+							<h3 className="text-lg font-semibold mb-2">Outgoing Requests</h3>
+							<p className="text-sm text-muted-foreground mb-4">
+								Requests you made for someone to be your caretaker.
+							</p>
+							<OutgoingRequestsList
+								userId={userId}
+								onRequestChange={() => refetchRequests()}
 							/>
-						</motion.div>
-					)}
-
-					{/* Requests Tab */}
-					{tabs[validActiveTab]?.id === 2 && (
-						<motion.div
-							key="requests-tab"
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
-							transition={{ duration: 0.2 }}
-						>
-							<div className="space-y-6">
-								{/* Incoming Requests Section */}
-								<div>
-									<h3 className="text-lg font-semibold mb-2">
-										Incoming Caretaker Requests
-									</h3>
-									<p className="text-sm text-muted-foreground mb-4">
-										Requests to become someone else's caretaker.
-									</p>
-									{requestsLoading ? (
-										<div className="flex items-center justify-center py-12">
-											<div className="text-center space-y-4">
-												<Loader2 className="size-12 mx-auto animate-spin text-blue-600" />
-												<div className="text-lg font-medium text-muted-foreground">
-													Loading requests...
-												</div>
-											</div>
-										</div>
-									) : requestsError ? (
-										<Alert variant="destructive">
-											<AlertCircle className="size-4" />
-											<AlertDescription className="flex items-center justify-between">
-												<span>
-													Failed to load requests:{" "}
-													{requestsErrorObj?.message || "Unknown error"}
-												</span>
-												<Button
-													variant="outline"
-													size="sm"
-													onClick={() => refetchRequests()}
-												>
-													Retry
-												</Button>
-											</AlertDescription>
-										</Alert>
-									) : incomingRequests && incomingRequests.length > 0 ? (
-										<div className="space-y-4">
-											{incomingRequests.map((request) => (
-												<PendingCaretakerRequest
-													key={request.id}
-													request={request}
-													onCancel={() => refetchRequests()}
-												/>
-											))}
-										</div>
-									) : (
-										<Alert>
-											<Info className="h-4 w-4" />
-											<AlertDescription>
-												No incoming caretaker requests.
-											</AlertDescription>
-										</Alert>
-									)}
-								</div>
-
-								<Separator className="my-6" />
-
-								{/* Outgoing Requests Section */}
-								<div>
-									<h3 className="text-lg font-semibold mb-2">
-										Outgoing Requests
-									</h3>
-									<p className="text-sm text-muted-foreground mb-4">
-										Requests you made for someone to be your caretaker.
-									</p>
-									<OutgoingRequestsList
-										userId={userId}
-										onRequestChange={() => refetchRequests()}
-									/>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</div>
-			</div>
+						</div>
+					</div>
+				</TabsContent>
+			</Tabs>
 		</div>
 	);
 };

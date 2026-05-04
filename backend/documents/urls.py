@@ -19,6 +19,7 @@ urlpatterns = [
     path("reports/withoutPDF", views.GetWithoutPDFs.as_view()),
     path("reports/withPDF", views.GetWithPDFs.as_view()),
     path("reports/legacyPDF", views.GetLegacyPDFs.as_view()),
+    path("reports/all-pdfs", views.GetAllReportPDFs.as_view()),
     path("reports/pdf/<int:pk>", views.GetReportPDF.as_view()),
     path("reports/pdf/<int:pk>/status", views.GetReportPDFStatus.as_view()),
     path("reports/<int:pk>/publish", views.PublishReportPDF.as_view()),

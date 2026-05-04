@@ -20,7 +20,7 @@ from ..models import AnnualReport
 from ..services.annual_report_service import AnnualReportGenerationService
 from ..services.document_service import DocumentService
 from ..services.pdf_service import PDFService
-from ..services.test_pdf_service import VALID_DOCUMENT_KINDS, TestPDFService
+from ..services.pdf_test_service import VALID_DOCUMENT_KINDS, TestPDFService
 
 NO_CACHE_HEADERS = "no-cache, no-store, must-revalidate"
 

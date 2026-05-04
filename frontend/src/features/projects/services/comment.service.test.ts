@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getComments,
-	getComment,
 	createComment,
 	updateComment,
 	deleteComment,
@@ -39,17 +38,6 @@ describe("comment.service", () => {
 			(apiClient.get as Mock).mockRejectedValue(new Error("Network error"));
 
 			await expect(getComments(100)).rejects.toThrow("Network error");
-		});
-	});
-
-	describe("getComment", () => {
-		it("should GET a single comment by ID", async () => {
-			const mockComment = { id: 1, text: "Hello" };
-			(apiClient.get as Mock).mockResolvedValue(mockComment);
-
-			const result = await getComment(1);
-
-			expect(result).toEqual(mockComment);
 		});
 	});
 

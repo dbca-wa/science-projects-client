@@ -6,11 +6,9 @@ import { apiClient } from "@/shared/services/api/client.service";
 import { STAFF_PROFILE_ENDPOINTS } from "./staff-profile.endpoints";
 import type {
 	IStaffProfileListResponse,
-	IStaffProfileFull,
 	IStaffProfileHeroData,
 	IStaffOverviewData,
 	IStaffCVData,
-	ICheckStaffProfileResponse,
 	IEmploymentEntry,
 	IEducationEntry,
 	IEmploymentEntryFormData,
@@ -37,13 +35,6 @@ export const getStaffProfiles = async (params: {
 	return apiClient.get<IStaffProfileListResponse>(url);
 };
 
-// Profile detail
-export const getStaffProfile = async (
-	pk: number
-): Promise<IStaffProfileFull> => {
-	return apiClient.get<IStaffProfileFull>(STAFF_PROFILE_ENDPOINTS.DETAIL(pk));
-};
-
 // Profile sections
 export const getStaffProfileHero = async (
 	pk: number
@@ -61,20 +52,6 @@ export const getStaffProfileOverview = async (
 
 export const getStaffProfileCV = async (pk: number): Promise<IStaffCVData> => {
 	return apiClient.get<IStaffCVData>(STAFF_PROFILE_ENDPOINTS.CV(pk));
-};
-
-// Check staff profile
-export const checkStaffProfile = async (
-	userPk: number
-): Promise<ICheckStaffProfileResponse> => {
-	return apiClient.get<ICheckStaffProfileResponse>(
-		`${STAFF_PROFILE_ENDPOINTS.CHECK(userPk)}?user_id=${userPk}`
-	);
-};
-
-// Current user's profile
-export const getMyStaffProfile = async (): Promise<IStaffProfileFull> => {
-	return apiClient.get<IStaffProfileFull>(STAFF_PROFILE_ENDPOINTS.MY_PROFILE());
 };
 
 // Projects for staff profile
@@ -97,17 +74,6 @@ export const updateStaffProfileOverview = async (
 	);
 };
 
-// Update hero section
-export const updateStaffProfileHero = async (
-	pk: number,
-	data: Partial<IStaffProfileHeroData>
-): Promise<IStaffProfileHeroData> => {
-	return apiClient.put<IStaffProfileHeroData>(
-		STAFF_PROFILE_ENDPOINTS.HERO(pk),
-		data
-	);
-};
-
 // Toggle visibility
 export const toggleStaffProfileVisibility = async (
 	pk: number
@@ -115,15 +81,6 @@ export const toggleStaffProfileVisibility = async (
 	return apiClient.post<{ is_hidden: boolean }>(
 		STAFF_PROFILE_ENDPOINTS.TOGGLE_VISIBILITY(pk),
 		{}
-	);
-};
-
-// Employment entries
-export const getEmploymentEntries = async (
-	profileId: number
-): Promise<IEmploymentEntry[]> => {
-	return apiClient.get<IEmploymentEntry[]>(
-		STAFF_PROFILE_ENDPOINTS.EMPLOYMENT_ENTRIES(profileId)
 	);
 };
 
@@ -149,15 +106,6 @@ export const updateEmploymentEntry = async (
 
 export const deleteEmploymentEntry = async (pk: number): Promise<void> => {
 	return apiClient.delete<void>(STAFF_PROFILE_ENDPOINTS.EMPLOYMENT_ENTRY(pk));
-};
-
-// Education entries
-export const getEducationEntries = async (
-	profileId: number
-): Promise<IEducationEntry[]> => {
-	return apiClient.get<IEducationEntry[]>(
-		STAFF_PROFILE_ENDPOINTS.EDUCATION_ENTRIES(profileId)
-	);
 };
 
 export const createEducationEntry = async (

@@ -20,37 +20,3 @@ export const BREAKPOINTS = {
 	"3xl": 2200, // 2K standard - transition to 4 columns
 	"4xl": 3200, // Ultra-wide - transition to 6 columns
 } as const;
-
-export type BreakpointKey = keyof typeof BREAKPOINTS;
-
-/**
- * Get current breakpoint based on window width
- * Returns standard breakpoints only (excludes custom breakpoints like modal-lg)
- */
-export function getCurrentBreakpoint(
-	width: number
-): Exclude<BreakpointKey, "modal-lg"> {
-	if (width >= BREAKPOINTS["4xl"]) return "4xl";
-	if (width >= BREAKPOINTS["3xl"]) return "3xl";
-	if (width >= BREAKPOINTS["2xl"]) return "2xl";
-	if (width >= BREAKPOINTS.xl) return "xl";
-	if (width >= BREAKPOINTS.lg) return "lg";
-	if (width >= BREAKPOINTS.md) return "md";
-	if (width >= BREAKPOINTS.sm) return "sm";
-	if (width >= BREAKPOINTS["2xs"]) return "2xs";
-	return "2xs"; // Default to smallest
-}
-
-/**
- * Check if width is at or above a breakpoint
- */
-export function isAtLeast(width: number, breakpoint: BreakpointKey): boolean {
-	return width >= BREAKPOINTS[breakpoint];
-}
-
-/**
- * Check if width is below a breakpoint
- */
-export function isBelow(width: number, breakpoint: BreakpointKey): boolean {
-	return width < BREAKPOINTS[breakpoint];
-}

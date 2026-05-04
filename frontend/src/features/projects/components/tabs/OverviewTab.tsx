@@ -21,7 +21,7 @@ import { Info, Building2, Calendar, Layers } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/features/auth";
-import { useCaretakerPermissions } from "@/features/caretakers/hooks/useCaretakerPermissions";
+import { useCaretakerPermissions } from "@/shared/hooks/useCaretakerPermissions";
 import { canEditProject } from "@/shared/utils/project-permissions.utils";
 import { checkTeamManagementPermissions } from "../../utils/permissions/team-permissions.utils";
 import { ProjectTeamSection } from "../team/ProjectTeamSection";
@@ -385,6 +385,7 @@ export function OverviewTab({
 				<ProjectTeamSection
 					projectId={project.id}
 					canManageTeam={canManageTeam}
+					projectKind={project.kind}
 				/>
 			</ProjectSection>
 

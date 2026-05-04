@@ -29,7 +29,7 @@ export type DocumentAction =
 	| "reopen";
 
 // Approval stages
-export type ApprovalStage =
+type ApprovalStage =
 	| "project_lead"
 	| "business_area_lead"
 	| "directorate"

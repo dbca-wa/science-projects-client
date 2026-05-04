@@ -48,15 +48,6 @@ export const getDocumentUrlPath = (kind: DocumentKind): string => {
 };
 
 /**
- * Get task level configuration
- * @param level Task level
- * @returns Task level configuration object
- */
-export const getTaskLevelConfig = (level: TaskLevel) => {
-	return TASK_LEVEL_CONFIG[level];
-};
-
-/**
  * Sort tasks by task level (team → lead → ba → directorate)
  * @param tasks Array of document tasks with levels
  * @returns Sorted array

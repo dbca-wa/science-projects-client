@@ -11,45 +11,9 @@ export {
 	getFullUser,
 } from "@/shared/services/user.service";
 
-/**
- * Get current authenticated user
- * @returns Current user data
- */
-export const getMe = async (): Promise<IUserData> => {
-	return apiClient.get<IUserData>(USER_ENDPOINTS.ME);
-};
-
-/**
- * Get all users (without pagination)
- * @returns Array of all users
- */
-export const getUsers = async (): Promise<IUserData[]> => {
-	return apiClient.get<IUserData[]>(USER_ENDPOINTS.LIST);
-};
-
 // ============================================================================
 // USER MUTATIONS (Phase 2 - Create/Edit)
 // ============================================================================
-
-/**
- * Create a new user
- * @param data - User creation form data
- * @returns Created user data
- */
-export const createUser = async (
-	data: import("../schemas/userCreate.schema").UserCreateFormData
-): Promise<IUserData> => {
-	return apiClient.post<IUserData>(USER_ENDPOINTS.CREATE, {
-		username: data.username,
-		email: data.email,
-		firstName: data.firstName,
-		lastName: data.lastName,
-		isStaff: data.isStaff || false,
-		branch: data.branch,
-		businessArea: data.businessArea,
-		affiliation: data.affiliation,
-	});
-};
 
 /**
  * Update user personal information

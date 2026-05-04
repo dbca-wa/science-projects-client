@@ -36,9 +36,9 @@ export interface CreateProjectFormData {
 }
 
 /**
- * Validation state for a step
+ * Validation state for a step (internal)
  */
-export interface StepValidation {
+interface StepValidation {
 	isValid: boolean;
 	errors: Record<string, string>;
 }

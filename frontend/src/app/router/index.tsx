@@ -155,8 +155,12 @@ export const router = createBrowserRouter([
 		children: [
 			...PROTECTED_CHILDREN,
 
-			// Legacy redirect for dashboard
+			// Legacy redirects
 			{ path: "dashboard", element: <Navigate to="/" replace /> },
+			{
+				path: "manage/emails",
+				element: <Navigate to="/manage/approvers" replace />,
+			},
 		],
 	},
 ]);

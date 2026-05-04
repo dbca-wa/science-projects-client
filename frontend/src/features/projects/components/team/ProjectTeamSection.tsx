@@ -16,11 +16,13 @@ import type { IProjectMember } from "@/shared/types/project.types";
 interface ProjectTeamSectionProps {
 	projectId: number;
 	canManageTeam: boolean;
+	projectKind?: string;
 }
 
 export function ProjectTeamSection({
 	projectId,
 	canManageTeam,
+	projectKind,
 }: ProjectTeamSectionProps) {
 	const [isInvitePanelOpen, setIsInvitePanelOpen] = useState(false);
 	const { data: teamMembers, isLoading, error } = useProjectTeam(projectId);
@@ -111,6 +113,7 @@ export function ProjectTeamSection({
 					members={teamMembers as unknown as IProjectMember[]}
 					projectId={projectId}
 					canManageTeam={canManageTeam}
+					projectKind={projectKind}
 				/>
 			)}
 		</section>

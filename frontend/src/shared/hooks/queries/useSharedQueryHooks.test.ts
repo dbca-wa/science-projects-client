@@ -8,7 +8,6 @@ import { businessAreasKeys } from "./useBusinessAreas";
 vi.mock("@/shared/services/org.service", () => ({
 	getAllBusinessAreas: vi.fn().mockResolvedValue([]),
 	getAllBranches: vi.fn().mockResolvedValue([]),
-	getAllAffiliations: vi.fn().mockResolvedValue([]),
 	getDivisions: vi.fn().mockResolvedValue([]),
 	getMyBusinessAreas: vi.fn().mockResolvedValue([]),
 }));
@@ -28,10 +27,6 @@ vi.mock("@/shared/services/report.service", () => ({
 vi.mock("@/shared/services/user.service", () => ({
 	getFullUser: vi.fn().mockResolvedValue({ id: 1 }),
 	getUsersBasedOnSearchTerm: vi.fn().mockResolvedValue({ users: [] }),
-}));
-
-vi.mock("@/features/projects/services/project.service", () => ({
-	getInvolvedProjects: vi.fn().mockResolvedValue([]),
 }));
 
 const createWrapper = () => {

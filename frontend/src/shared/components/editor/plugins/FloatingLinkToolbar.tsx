@@ -13,6 +13,7 @@ import {
 	$isRangeSelection,
 	$isTextNode,
 	SELECTION_CHANGE_COMMAND,
+	FORMAT_TEXT_COMMAND,
 } from "lexical";
 import { $isLinkNode } from "@lexical/link";
 import {
@@ -24,7 +25,6 @@ import {
 	Superscript,
 	RemoveFormatting,
 } from "lucide-react";
-import { useEditorStore } from "@/app/stores/store-context";
 import { useLinkEditor } from "../toolbar/link-editor.utils";
 import type { ToolbarMode } from "@/shared/types/editor.types";
 
@@ -36,13 +36,12 @@ interface FloatingLinkToolbarProps {
 const TOOLBAR_HEIGHT = 36;
 const TOOLBAR_GAP = 10;
 
-export function FloatingLinkToolbar({
+export const FloatingLinkToolbar = ({
 	showLinks,
 	toolbar = "full",
-}: FloatingLinkToolbarProps) {
+}: FloatingLinkToolbarProps) => {
 	const [editor] = useLexicalComposerContext();
 	const linkEditor = useLinkEditor();
-	const editorStore = useEditorStore();
 	const [position, setPosition] = useState<{
 		top: number;
 		left: number;
@@ -51,6 +50,13 @@ export function FloatingLinkToolbar({
 	const [visible, setVisible] = useState(false);
 	const toolbarRef = useRef<HTMLDivElement>(null);
 	const mouseIsDown = useRef(false);
+
+	// Local formatting state — tracked from this editor's selection, not the shared store
+	const [isBold, setIsBold] = useState(false);
+	const [isItalic, setIsItalic] = useState(false);
+	const [isUnderline, setIsUnderline] = useState(false);
+	const [isSubscript, setIsSubscript] = useState(false);
+	const [isSuperscript, setIsSuperscript] = useState(false);
 
 	// Determine which buttons are visible based on toolbar mode
 	// Mirrors the main Toolbar component's visibility logic
@@ -111,6 +117,13 @@ export function FloatingLinkToolbar({
 		const parent = node.getParent();
 		const onLink = $isLinkNode(node) || (parent != null && $isLinkNode(parent));
 		setIsOnLink(onLink);
+
+		// Read formatting state from this editor's selection
+		setIsBold(selection.hasFormat("bold"));
+		setIsItalic(selection.hasFormat("italic"));
+		setIsUnderline(selection.hasFormat("underline"));
+		setIsSubscript(selection.hasFormat("subscript"));
+		setIsSuperscript(selection.hasFormat("superscript"));
 	}, [editor]);
 
 	const updatePosition = useCallback(() => {
@@ -275,7 +288,7 @@ export function FloatingLinkToolbar({
 		!position ||
 		!visible ||
 		linkEditor?.state.isOpen ||
-		visibleButtonCount === 0
+		visibleButtonCount <= 1
 	) {
 		return null;
 	}
@@ -307,10 +320,10 @@ export function FloatingLinkToolbar({
 			{showBold && (
 				<button
 					type="button"
-					className={btnClass(editorStore.state.isBold)}
-					onClick={() => editorStore.toggleFormat("bold")}
+					className={btnClass(isBold)}
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
 					aria-label="Bold"
-					aria-pressed={editorStore.state.isBold}
+					aria-pressed={isBold}
 				>
 					<Bold className="h-3.5 w-3.5" />
 				</button>
@@ -318,10 +331,10 @@ export function FloatingLinkToolbar({
 			{showItalic && (
 				<button
 					type="button"
-					className={btnClass(editorStore.state.isItalic)}
-					onClick={() => editorStore.toggleFormat("italic")}
+					className={btnClass(isItalic)}
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
 					aria-label="Italic"
-					aria-pressed={editorStore.state.isItalic}
+					aria-pressed={isItalic}
 				>
 					<Italic className="h-3.5 w-3.5" />
 				</button>
@@ -329,10 +342,12 @@ export function FloatingLinkToolbar({
 			{showUnderline && (
 				<button
 					type="button"
-					className={btnClass(editorStore.state.isUnderline)}
-					onClick={() => editorStore.toggleFormat("underline")}
+					className={btnClass(isUnderline)}
+					onClick={() =>
+						editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
+					}
 					aria-label="Underline"
-					aria-pressed={editorStore.state.isUnderline}
+					aria-pressed={isUnderline}
 				>
 					<Underline className="h-3.5 w-3.5" />
 				</button>
@@ -347,19 +362,23 @@ export function FloatingLinkToolbar({
 				<>
 					<button
 						type="button"
-						className={btnClass(editorStore.state.isSubscript)}
-						onClick={() => editorStore.toggleFormat("subscript")}
+						className={btnClass(isSubscript)}
+						onClick={() =>
+							editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
+						}
 						aria-label="Subscript"
-						aria-pressed={editorStore.state.isSubscript}
+						aria-pressed={isSubscript}
 					>
 						<Subscript className="h-3.5 w-3.5" />
 					</button>
 					<button
 						type="button"
-						className={btnClass(editorStore.state.isSuperscript)}
-						onClick={() => editorStore.toggleFormat("superscript")}
+						className={btnClass(isSuperscript)}
+						onClick={() =>
+							editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
+						}
 						aria-label="Superscript"
-						aria-pressed={editorStore.state.isSuperscript}
+						aria-pressed={isSuperscript}
 					>
 						<Superscript className="h-3.5 w-3.5" />
 					</button>
@@ -392,4 +411,4 @@ export function FloatingLinkToolbar({
 			)}
 		</div>
 	);
-}
+};

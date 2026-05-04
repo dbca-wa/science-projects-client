@@ -1299,19 +1299,58 @@ class NotificationService:
     @staticmethod
     def _get_directorate_recipients(document):
         """
-        Get directorate-level recipients for document notifications
+        Get directorate-level recipients for document notifications.
+
+        Includes key stakeholder (if active), all active approvers, and the
+        director — with deduplication. Logs a warning if no recipients found.
 
         Returns:
             List of dicts with 'name', 'email', 'kind'
         """
         recipients = []
+        seen_pks = set()
 
-        # Add directorate contacts
         if hasattr(document, "project") and document.project.business_area:
             ba = document.project.business_area
             if hasattr(ba, "division") and ba.division:
                 division = ba.division
-                if hasattr(division, "director") and division.director:
+
+                # Key stakeholder
+                if (
+                    hasattr(division, "key_stakeholder")
+                    and division.key_stakeholder
+                    and division.key_stakeholder.is_active
+                ):
+                    ks = division.key_stakeholder
+                    recipients.append(
+                        {
+                            "name": ks.get_full_name(),
+                            "email": ks.email,
+                            "kind": "Key Stakeholder",
+                        }
+                    )
+                    seen_pks.add(ks.pk)
+
+                # Approvers
+                if hasattr(division, "approvers"):
+                    for approver in division.approvers.all():
+                        if approver.is_active and approver.pk not in seen_pks:
+                            recipients.append(
+                                {
+                                    "name": approver.get_full_name(),
+                                    "email": approver.email,
+                                    "kind": "Approver",
+                                }
+                            )
+                            seen_pks.add(approver.pk)
+
+                # Director
+                if (
+                    hasattr(division, "director")
+                    and division.director
+                    and division.director.is_active
+                    and division.director.pk not in seen_pks
+                ):
                     recipients.append(
                         {
                             "name": division.director.get_full_name(),
@@ -1319,6 +1358,12 @@ class NotificationService:
                             "kind": "Director",
                         }
                     )
+                    seen_pks.add(division.director.pk)
+
+        if not recipients:
+            settings.LOGGER.warning(
+                f"No directorate recipients found for document {document.pk}"
+            )
 
         return recipients
 

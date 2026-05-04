@@ -1,19 +1,14 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getStaffProfiles,
-	getStaffProfile,
 	getStaffProfileHero,
 	getStaffProfileOverview,
 	getStaffProfileCV,
-	getMyStaffProfile,
 	getStaffProfileProjects,
 	updateStaffProfileOverview,
-	updateStaffProfileHero,
 	toggleStaffProfileVisibility,
-	getEmploymentEntries,
 	createEmploymentEntry,
 	deleteEmploymentEntry,
-	getEducationEntries,
 	createEducationEntry,
 	deleteEducationEntry,
 	emailStaffMember,
@@ -43,12 +38,6 @@ describe("staff-profile.service", () => {
 		expect(calledUrl).toContain("page=2");
 	});
 
-	it("getStaffProfile should GET profile by pk", async () => {
-		(apiClient.get as Mock).mockResolvedValue({ id: 5 });
-		const result = await getStaffProfile(5);
-		expect(result).toEqual({ id: 5 });
-	});
-
 	it("getStaffProfileHero should GET hero data", async () => {
 		(apiClient.get as Mock).mockResolvedValue({ name: "Test" });
 		await getStaffProfileHero(5);
@@ -69,14 +58,6 @@ describe("staff-profile.service", () => {
 		expect(apiClient.get).toHaveBeenCalledWith(expect.stringContaining("cv"));
 	});
 
-	it("getMyStaffProfile should GET current user profile", async () => {
-		(apiClient.get as Mock).mockResolvedValue({ id: 1 });
-		await getMyStaffProfile();
-		expect(apiClient.get).toHaveBeenCalledWith(
-			expect.stringContaining("mypublicprofile")
-		);
-	});
-
 	it("getStaffProfileProjects should GET projects for user", async () => {
 		(apiClient.get as Mock).mockResolvedValue([]);
 		await getStaffProfileProjects(5);
@@ -94,27 +75,10 @@ describe("staff-profile.service", () => {
 		);
 	});
 
-	it("updateStaffProfileHero should PUT hero data", async () => {
-		(apiClient.put as Mock).mockResolvedValue({});
-		await updateStaffProfileHero(5, {});
-		expect(apiClient.put).toHaveBeenCalledWith(
-			expect.stringContaining("hero"),
-			{}
-		);
-	});
-
 	it("toggleStaffProfileVisibility should POST to toggle endpoint", async () => {
 		(apiClient.post as Mock).mockResolvedValue({ is_hidden: false });
 		const result = await toggleStaffProfileVisibility(5);
 		expect(result).toEqual({ is_hidden: false });
-	});
-
-	it("getEmploymentEntries should GET entries for profile", async () => {
-		(apiClient.get as Mock).mockResolvedValue([]);
-		await getEmploymentEntries(5);
-		expect(apiClient.get).toHaveBeenCalledWith(
-			expect.stringContaining("employment")
-		);
 	});
 
 	it("createEmploymentEntry should POST entry data", async () => {
@@ -138,14 +102,6 @@ describe("staff-profile.service", () => {
 		await deleteEmploymentEntry(10);
 		expect(apiClient.delete).toHaveBeenCalledWith(
 			expect.stringContaining("10")
-		);
-	});
-
-	it("getEducationEntries should GET entries for profile", async () => {
-		(apiClient.get as Mock).mockResolvedValue([]);
-		await getEducationEntries(5);
-		expect(apiClient.get).toHaveBeenCalledWith(
-			expect.stringContaining("education")
 		);
 	});
 

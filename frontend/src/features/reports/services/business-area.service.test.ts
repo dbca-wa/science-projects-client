@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
 	getProblematicProjects,
 	getUnapprovedDocs,
-	getBusinessAreaDetail,
 	updateBusinessAreaLead,
 } from "./business-area.service";
 import { apiClient } from "@/shared/services/api/client.service";
@@ -34,12 +33,6 @@ describe("business-area.service", () => {
 		expect(apiClient.post).toHaveBeenCalledWith(expect.any(String), {
 			baArray: [5],
 		});
-	});
-
-	it("getBusinessAreaDetail should GET business area by ID", async () => {
-		(apiClient.get as Mock).mockResolvedValue({ id: 5, name: "BCS" });
-		const result = await getBusinessAreaDetail(5);
-		expect(result).toEqual({ id: 5, name: "BCS" });
 	});
 
 	it("updateBusinessAreaLead should PATCH FormData", async () => {

@@ -1,48 +1,7 @@
 import { describe, it, expect } from "vitest";
-import {
-	sanitizeHtmlContent,
-	sanitizeInput,
-	sanitizeUrl,
-	sanitizeRichText,
-} from "./sanitise.utils";
+import { sanitizeInput, sanitizeUrl, sanitizeRichText } from "./sanitise.utils";
 
 describe("sanitise.utils", () => {
-	describe("sanitizeHtmlContent", () => {
-		it("should remove script tags", () => {
-			const malicious = '<script>alert("XSS")</script><p>Safe content</p>';
-			const result = sanitizeHtmlContent(malicious);
-			expect(result).toBe("<p>Safe content</p>");
-			expect(result).not.toContain("script");
-		});
-
-		it("should remove event handlers", () => {
-			const malicious = "<p onclick=\"alert('XSS')\">Click me</p>";
-			const result = sanitizeHtmlContent(malicious);
-			expect(result).toBe("<p>Click me</p>");
-			expect(result).not.toContain("onclick");
-		});
-
-		it("should preserve safe HTML tags", () => {
-			const safe = "<p>Hello <strong>world</strong> with <em>emphasis</em></p>";
-			const result = sanitizeHtmlContent(safe);
-			expect(result).toContain("<p>");
-			expect(result).toContain("<strong>");
-			expect(result).toContain("<em>");
-		});
-
-		it("should allow safe links", () => {
-			const safe = '<a href="https://example.com">Link</a>';
-			const result = sanitizeHtmlContent(safe);
-			expect(result).toContain('<a href="https://example.com">');
-		});
-
-		it("should remove javascript: protocol from links", () => {
-			const malicious = "<a href=\"javascript:alert('XSS')\">Click</a>";
-			const result = sanitizeHtmlContent(malicious);
-			expect(result).not.toContain("javascript:");
-		});
-	});
-
 	describe("sanitizeInput", () => {
 		it("should remove all HTML tags", () => {
 			const input = "<script>alert('XSS')</script>Hello";
@@ -116,7 +75,7 @@ describe("sanitise.utils", () => {
 	});
 
 	describe("sanitizeRichText", () => {
-		it("should allow more tags than sanitizeHtmlContent", () => {
+		it("should allow more tags than basic sanitisation", () => {
 			const richText =
 				'<div><span class="highlight">Text</span><img src="image.jpg" alt="Image" /></div>';
 			const result = sanitizeRichText(richText);

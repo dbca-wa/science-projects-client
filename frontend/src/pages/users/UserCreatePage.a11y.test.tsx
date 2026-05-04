@@ -22,10 +22,6 @@ vi.mock("@/features/users/hooks/useUserExistenceCheck", () => ({
 	}),
 }));
 
-vi.mock("@/shared/hooks/queries/useAffiliations", () => ({
-	useAffiliations: () => ({ data: [], isLoading: false }),
-}));
-
 describe("UserCreatePage - Accessibility", () => {
 	it("should have no accessibility violations", async () => {
 		const { container } = renderPage(<UserCreatePage />);

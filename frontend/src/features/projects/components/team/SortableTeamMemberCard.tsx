@@ -17,12 +17,16 @@ interface SortableTeamMemberCardProps {
 	member: IProjectMember;
 	projectId: number;
 	canManageTeam: boolean;
+	projectKind?: string;
+	allMembers?: IProjectMember[];
 }
 
 export function SortableTeamMemberCard({
 	member,
 	projectId,
 	canManageTeam,
+	projectKind,
+	allMembers,
 }: SortableTeamMemberCardProps) {
 	const {
 		attributes,
@@ -87,6 +91,8 @@ export function SortableTeamMemberCard({
 					projectId={projectId}
 					canManageTeam={canManageTeam}
 					isDragging={isDragging}
+					projectKind={projectKind}
+					allMembers={allMembers}
 				/>
 			</div>
 		</div>

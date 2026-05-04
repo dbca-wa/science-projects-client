@@ -13,6 +13,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
+import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
 import { useDivisions } from "../../hooks/useDivisions";
 import { useCurrentUser } from "@/features/auth";
 import { useAuthStore } from "@/app/stores/store-context";
@@ -48,11 +49,13 @@ export const DivisionYearSafeguard = ({
 	const [selectedYear, setSelectedYear] = useState<number | null>(null);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 
-	// Filter divisions based on user role
+	// Filter divisions based on user role and sort alphabetically
 	const availableDivisions = useMemo(() => {
 		if (!allDivisions || !currentUser) return [];
-		if (authStore.isSuperuser) return allDivisions;
-		return allDivisions.filter((d) => d.key_stakeholder?.id === currentUser.id);
+		const filtered = authStore.isSuperuser
+			? allDivisions
+			: allDivisions.filter((d) => d.key_stakeholder?.id === currentUser.id);
+		return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
 	}, [allDivisions, currentUser, authStore.isSuperuser]);
 
 	// Auto-select first available division (defaults to first in list)
@@ -120,11 +123,10 @@ export const DivisionYearSafeguard = ({
 									<SelectValue placeholder="Select division" />
 								</SelectTrigger>
 								<SelectContent>
-									{availableDivisions.map((d) => (
-										<SelectItem key={d.id} value={d.slug}>
-											{d.name}
-										</SelectItem>
-									))}
+									<DivisionSelectItems
+										divisions={availableDivisions}
+										valueAsSlug
+									/>
 								</SelectContent>
 							</Select>
 						)}

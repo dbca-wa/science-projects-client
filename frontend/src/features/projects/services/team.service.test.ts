@@ -14,6 +14,7 @@ vi.mock("@/shared/services/api/client.service", () => ({
 		get: vi.fn(),
 		post: vi.fn(),
 		put: vi.fn(),
+		patch: vi.fn(),
 		delete: vi.fn(),
 	},
 }));
@@ -90,13 +91,13 @@ describe("team.service", () => {
 	});
 
 	describe("updateTeamMember", () => {
-		it("should PUT updated data to member endpoint", async () => {
+		it("should PATCH updated data to member endpoint", async () => {
 			const mockUpdated = { user: { id: 5 }, role: "technical" };
-			(apiClient.put as Mock).mockResolvedValue(mockUpdated);
+			(apiClient.patch as Mock).mockResolvedValue(mockUpdated);
 
 			const result = await updateTeamMember(42, 5, { role: "technical" });
 
-			expect(apiClient.put).toHaveBeenCalledWith(
+			expect(apiClient.patch).toHaveBeenCalledWith(
 				"/projects/project_members/42/5",
 				{ role: "technical" }
 			);

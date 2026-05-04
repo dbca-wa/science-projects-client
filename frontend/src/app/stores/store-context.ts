@@ -69,8 +69,6 @@ export const useEditorStore = () => useStore().editorStore;
 export const useUserSearchStore = () => useStore().userSearchStore;
 export const useProjectSearchStore = () => useStore().projectSearchStore;
 export const useProjectWizardStore = () => useStore().projectWizardStore;
-export const useCreateProjectWizardStore = () =>
-	useStore().createProjectWizardStore;
 export const useEditProjectStore = () => useStore().editProjectStore;
 export const useProjectMapStore = () => useStore().projectMapStore;
 export const useMyProjectsStore = () => useStore().myProjectsStore;

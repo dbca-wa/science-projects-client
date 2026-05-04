@@ -44,16 +44,6 @@ export interface IUserData {
 	date_joined?: Date;
 }
 
-export interface IMiniUser {
-	id: number;
-	first_name: string | null;
-	last_name: string | null;
-	username: string;
-	email: string;
-	is_active: boolean;
-	is_superuser: boolean;
-}
-
 export interface IUserMe {
 	staff_profile_id?: number;
 	public_email?: string;
@@ -100,30 +90,6 @@ export interface IMemberUserDetails extends IUserData {
 }
 
 // ============================================================================
-// USER PROFILE TYPES
-// ============================================================================
-
-export interface IPersonalInformation {
-	display_first_name: string | null;
-	display_last_name: string | null;
-	first_name: string | null;
-	last_name: string | null;
-	email: string;
-	title: string;
-	phone: string;
-	fax: string;
-}
-
-export interface IProfile {
-	image: {
-		file: string;
-		user: IUserData;
-	};
-	about: string;
-	expertise: string;
-}
-
-// ============================================================================
 // CARETAKER TYPES
 // ============================================================================
 
@@ -138,76 +104,4 @@ export interface ICaretakerSimpleUserData {
 	end_date: Date | null;
 	caretakers: ICaretakerSimpleUserData[];
 	caretaking_for: ICaretakerSimpleUserData[];
-}
-
-export interface ICaretakerRequestObject {
-	id: number;
-	action: string;
-	created_at: Date;
-	end_date: Date | null;
-	notes: string | null;
-	primary_user: {
-		id: number;
-		display_first_name: string;
-		display_last_name: string;
-		image: IImageData;
-	};
-	reason: string | null;
-	secondary_users: {
-		id: number;
-		display_first_name: string;
-		display_last_name: string;
-		image: IImageData;
-	}[];
-	status: string;
-}
-
-export interface ICheckCaretakerStatus {
-	caretaker_request_object: ICaretakerRequestObject | null;
-	become_caretaker_request_object: ICaretakerRequestObject | null;
-	caretaker_object: ICaretakerObject | null;
-}
-
-export interface ICaretakerObject {
-	id: number;
-	caretaker_obj_id?: number;
-	user:
-		| number
-		| {
-				id: number;
-				display_first_name: string;
-				display_last_name: string;
-				image: string;
-		  };
-	caretaker: {
-		id: number;
-		display_first_name: string;
-		display_last_name: string;
-		image: IImageData;
-	};
-	end_date: Date | null;
-	reason: string | null;
-	notes: string | null;
-}
-
-export interface ICaretakerSubsections {
-	userData: IUserMe;
-	refetchCaretakerData: () => void;
-	caretakerData: ICheckCaretakerStatus;
-}
-
-export interface ICaretakerPermissions {
-	userIsCaretakerOfMember: boolean;
-	userIsCaretakerOfProjectLeader: boolean;
-	userIsCaretakerOfBaLeader: boolean;
-	userIsCaretakerOfAdmin: boolean;
-}
-
-// ============================================================================
-// SHARED QUERY/FILTER TYPES
-// ============================================================================
-
-export interface IUserSearchFilters {
-	roleFilter?: string;
-	businessArea?: string | number;
 }

@@ -20,7 +20,7 @@ const PROJECT_TYPES = [
 		requirements: [
 			"Requires approval through SPMS",
 			"Requires annual progress reporting",
-			"Requires closure form to close",
+			"Requires full closure form approval process to close",
 		],
 		icon: FlaskConical,
 		color: PROJECT_KIND_COLORS.science,
@@ -33,7 +33,7 @@ const PROJECT_TYPES = [
 		requirements: [
 			"Requires prior approval by Executive Director",
 			"Requires annual progress reporting",
-			"Immediate closure without closure form",
+			"Immediate approval for closure",
 		],
 		icon: Briefcase,
 		color: PROJECT_KIND_COLORS.core_function,
@@ -46,7 +46,7 @@ const PROJECT_TYPES = [
 		requirements: [
 			"Requires prior approval by Executive Director",
 			"Requires annual progress reporting",
-			"Immediate closure without closure form",
+			"Immediate approval for closure",
 		],
 		icon: GraduationCap,
 		color: PROJECT_KIND_COLORS.student,
@@ -59,7 +59,7 @@ const PROJECT_TYPES = [
 		requirements: [
 			"Requires prior approval by Executive Director",
 			"Project details automatically included in annual reporting",
-			"Immediate closure without closure form",
+			"Immediate approval for closure",
 		],
 		icon: Users,
 		color: PROJECT_KIND_COLORS.external,

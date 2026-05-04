@@ -13,7 +13,7 @@ const CONTENT_ENDPOINTS = {
 	CONCEPT_PLAN: (id: number | string) => `documents/conceptplans/${id}`,
 	PROJECT_PLAN: (id: number | string) => `documents/projectplans/${id}`,
 	PROJECT_PLAN_ENDORSEMENT: (id: number | string) =>
-		`documents/projectplan_endorsements/${id}`,
+		`documents/projectplans/endorsements/${id}`,
 	PROGRESS_REPORT: (id: number | string) => `documents/progressreports/${id}`,
 	STUDENT_REPORT: (id: number | string) => `documents/studentreports/${id}`,
 	PROJECT_CLOSURE: (id: number | string) => `documents/projectclosures/${id}`,

@@ -142,6 +142,3 @@ export interface ICommentUpdate {
 	/** User IDs mentioned in the comment using @mention syntax (optional) */
 	mentioned_user_ids?: number[];
 }
-
-// Alias for backward compatibility
-export type IMention = ICommentMention;

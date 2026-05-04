@@ -81,14 +81,3 @@ export const GEOJSON_PATHS: Record<GeoJSONLayerType, string> = {
 	ibra: "/data/optimized/optimized_IBRA_DATA.geojson",
 	imcra: "/data/optimized/optimized_IMCRA_DATA.geojson",
 };
-
-/**
- * Layer colors for GeoJSON boundaries
- */
-export const LAYER_COLORS: Record<GeoJSONLayerType, string> = {
-	dbcaRegions: "#3b82f6", // blue
-	dbcaDistricts: "#10b981", // green
-	nrm: "#f59e0b", // amber
-	ibra: "#8b5cf6", // purple
-	imcra: "#ef4444", // red
-};
