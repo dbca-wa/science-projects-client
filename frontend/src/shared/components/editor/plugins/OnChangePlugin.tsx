@@ -54,7 +54,6 @@ export const OnChangePlugin: React.FC<OnChangePluginProps> = ({
 	const initialContent = useRef<string>("");
 	const hasStoredInitial = useRef(false);
 	const becameEditableOnce = useRef(false);
-	const becameEditableAt = useRef<number>(0);
 
 	useEffect(() => {
 		if (!onChange) return;
@@ -88,14 +87,6 @@ export const OnChangePlugin: React.FC<OnChangePluginProps> = ({
 					if (tags.has("becoming-editable") || !becameEditableOnce.current) {
 						initialContent.current = normalizedHtml;
 						becameEditableOnce.current = true;
-						becameEditableAt.current = Date.now();
-						return;
-					}
-
-					// Skip onChange for 50ms after becoming editable to avoid
-					// spurious dirty detection from Lexical's internal normalisation
-					if (Date.now() - becameEditableAt.current < 50) {
-						initialContent.current = normalizedHtml;
 						return;
 					}
 
