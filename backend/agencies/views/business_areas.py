@@ -251,6 +251,10 @@ class BusinessAreaDetail(APIView):
         ba.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def patch(self, request, pk):
+        """Partial update — delegates to put (which already uses partial=True)"""
+        return self.put(request, pk)
+
 
 class MyBusinessAreas(APIView):
     """Get business areas led by current user (or all for superusers)"""

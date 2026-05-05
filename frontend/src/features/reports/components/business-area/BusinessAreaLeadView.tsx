@@ -177,9 +177,9 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 	}, [businessAreas, selectedBAId]);
 
 	const selectedArea =
-		businessAreas?.find((ba) => ba.id === selectedBAId) ??
-		businessAreas?.[0] ??
-		null;
+		selectedBAId !== null
+			? (businessAreas?.find((ba) => ba.id === selectedBAId) ?? null)
+			: null;
 
 	// Redirect ordinary users away from restricted tabs
 	useEffect(() => {
