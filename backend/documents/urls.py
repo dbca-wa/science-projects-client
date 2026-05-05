@@ -123,6 +123,10 @@ urlpatterns = [
     path("actions/approve", views.DocApproval.as_view(), name="document-approve"),
     path("actions/recall", views.DocRecall.as_view(), name="document-recall"),
     path("actions/send_back", views.DocSendBack.as_view(), name="document-send-back"),
+    path(
+        "projectdocuments/<int:pk>/action-recipients",
+        views.ActionRecipients.as_view(),
+    ),
     # Helper ========================================================
     path("downloadProjectDocument/<int:pk>", views.DownloadProjectDocument.as_view()),
     # Publications ========================================================

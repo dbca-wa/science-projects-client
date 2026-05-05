@@ -2,7 +2,7 @@
  * Toolbar Component
  *
  * Formatting controls for the rich text editor.
- * Supports multiple modes: full, simple, minimal, none.
+ * Pure renderer of TOOLBAR_CONFIGS — no embedded knowledge of what a mode allows.
  * Uses EditorStore for state management.
  */
 
@@ -25,6 +25,7 @@ import { StrikethroughButton } from "./StrikethroughButton";
 import { TableButton } from "./TableButton";
 import { ImageButton } from "./ImageButton";
 import { ToolbarDarkModeContext } from "./ToolbarContext";
+import { TOOLBAR_CONFIGS } from "./toolbar-configs";
 
 export const Toolbar: React.FC<ToolbarProps> = observer(
 	({ mode, disabled = false, editorKey }) => {
@@ -34,6 +35,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		if (mode === "none") {
 			return null;
 		}
+
+		const config = TOOLBAR_CONFIGS[mode];
 
 		// Only show active formatting states when this toolbar's editor is the active one
 		const isActiveEditor =
@@ -100,57 +103,8 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 			buttons[nextIndex]?.focus();
 		};
 
-		// Define what features are available in each mode
-		const isProfileMode = mode === "profile" || mode === "staffProfile";
-		const isStaffProfileMode = mode === "staffProfile";
-		const isProgressReport = mode === "progressReport";
-		const isNewCycle = mode === "newCycle";
-
-		const isBusinessArea = mode === "businessArea";
-
-		const isFullOrGuide = mode === "full" || mode === "guide";
-
-		const showHeadingSelect = isFullOrGuide || mode === "projectTitle";
-		const disableHeadings = mode === "projectTitle";
-		const showLists =
-			isFullOrGuide ||
-			mode === "simple" ||
-			isProfileMode ||
-			isProgressReport ||
-			isNewCycle;
-		const showLinks = isFullOrGuide || isProfileMode;
-		const showBold =
-			isFullOrGuide ||
-			mode === "simple" ||
-			mode === "minimal" ||
-			isBusinessArea ||
-			isProfileMode ||
-			isProgressReport ||
-			isNewCycle;
-		const showUnderline =
-			isFullOrGuide ||
-			isProfileMode ||
-			isProgressReport ||
-			isBusinessArea ||
-			isNewCycle;
-		const showSubscriptSuperscript =
-			isFullOrGuide ||
-			isProfileMode ||
-			mode === "projectTitle" ||
-			isProgressReport ||
-			isBusinessArea;
-		const showClearFormatting =
-			isFullOrGuide ||
-			isProfileMode ||
-			mode === "projectTitle" ||
-			isProgressReport ||
-			isBusinessArea;
-		const showIndentOutdent = isFullOrGuide;
-		const showAlignment = isFullOrGuide;
-		const showStrikethrough = false; // Disabled for now
-		// const showStrikethrough = isFullOrGuide;
-		const showTable = isFullOrGuide;
-		const showImage = mode === "guide";
+		// Profile mode has a different layout: lists and links in the formatting group
+		const isProfileLayout = mode === "profile";
 
 		// Cycle through alignment options
 		const cycleAlignment = () => {
@@ -166,10 +120,10 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 		};
 
 		return (
-			<ToolbarDarkModeContext.Provider value={isStaffProfileMode}>
+			<ToolbarDarkModeContext.Provider value={false}>
 				<div
 					ref={toolbarRef}
-					className={`editor-toolbar ${isStaffProfileMode ? "profile-toolbar-dark bg-gray-900 text-white rounded-t-md py-1 px-1 shadow-md" : ""}`}
+					className="editor-toolbar"
 					role="toolbar"
 					aria-label="Text formatting"
 					aria-orientation="horizontal"
@@ -198,7 +152,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						role="group"
 						aria-label="Text formatting"
 					>
-						{showBold && (
+						{config.formatting.bold && (
 							<FormatButton
 								format="bold"
 								isActive={s.isBold}
@@ -212,7 +166,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 							onToggle={() => editorStore.toggleFormat("italic")}
 							disabled={disabled}
 						/>
-						{showUnderline && (
+						{config.formatting.underline && (
 							<FormatButton
 								format="underline"
 								isActive={s.isUnderline}
@@ -220,7 +174,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 								disabled={disabled}
 							/>
 						)}
-						{showStrikethrough && (
+						{config.formatting.strikethrough && (
 							<StrikethroughButton
 								isActive={s.isStrikethrough}
 								onToggle={() => editorStore.toggleFormat("strikethrough")}
@@ -229,7 +183,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						)}
 
 						{/* Subscript/Superscript buttons */}
-						{showSubscriptSuperscript && (
+						{config.formatting.subscript && (
 							<>
 								<SubscriptButton
 									isActive={s.isSubscript}
@@ -245,12 +199,12 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 						)}
 
 						{/* Clear formatting button */}
-						{showClearFormatting && (
+						{config.features.clearFormatting && (
 							<ClearFormattingButton disabled={disabled} />
 						)}
 
 						{/* In profile mode, list + link are in the same group */}
-						{isProfileMode && showLists && (
+						{isProfileLayout && config.blocks.lists && (
 							<UnifiedListButton
 								isList={s.isList}
 								listType={s.listType}
@@ -258,31 +212,32 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 								disabled={disabled}
 							/>
 						)}
-						{isProfileMode && showLinks && (
+						{isProfileLayout && config.features.links && (
 							<LinkButton isActive={s.isLink} disabled={disabled} />
 						)}
 					</div>
 
 					{/* Separator — only for non-profile modes */}
-					{!isProfileMode &&
-						(showHeadingSelect ||
-							showLists ||
-							showLinks ||
-							showIndentOutdent ||
-							showAlignment) && <div className="editor-toolbar-separator" />}
+					{!isProfileLayout &&
+						(config.blocks.headings ||
+							config.blocks.lists ||
+							config.features.links ||
+							config.features.indentOutdent ||
+							config.features.alignment) && (
+							<div className="editor-toolbar-separator" />
+						)}
 
-					{/* Heading dropdown - in profile mode, H1/H2/H3 are disabled */}
-					{showHeadingSelect && (
+					{/* Heading dropdown */}
+					{config.blocks.headings && (
 						<HeadingSelect
 							blockType={s.blockType}
 							onSetBlockType={editorStore.setBlockType}
 							disabled={disabled}
-							disableHeadings={disableHeadings}
 						/>
 					)}
 
 					{/* List button - unified cycling button */}
-					{showLists && !isProfileMode && (
+					{config.blocks.lists && !isProfileLayout && (
 						<UnifiedListButton
 							isList={s.isList}
 							listType={s.listType}
@@ -292,7 +247,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					)}
 
 					{/* Indent/Outdent buttons */}
-					{showIndentOutdent && (
+					{config.features.indentOutdent && (
 						<>
 							<OutdentButton
 								onOutdent={editorStore.decreaseIndent}
@@ -308,7 +263,7 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					)}
 
 					{/* Alignment button */}
-					{showAlignment && (
+					{config.features.alignment && (
 						<AlignmentButton
 							alignment={s.textAlignment}
 							onCycleAlignment={cycleAlignment}
@@ -317,22 +272,23 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					)}
 
 					{/* Link and Table buttons */}
-					{((showLinks && !isProfileMode) || showTable) && (
+					{((config.features.links && !isProfileLayout) ||
+						config.blocks.tables) && (
 						<div className="editor-toolbar-separator" />
 					)}
 
-					{showLinks && !isProfileMode && (
+					{config.features.links && !isProfileLayout && (
 						<LinkButton isActive={s.isLink} disabled={disabled} />
 					)}
 
-					{showTable && (
+					{config.blocks.tables && (
 						<TableButton
 							onInsertTable={editorStore.insertTable}
 							disabled={disabled}
 						/>
 					)}
 
-					{showImage && <ImageButton disabled={disabled} />}
+					{config.features.images && <ImageButton disabled={disabled} />}
 				</div>
 			</ToolbarDarkModeContext.Provider>
 		);

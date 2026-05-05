@@ -2,6 +2,9 @@
 Documents views
 """
 
+# Action recipient views
+from .actions import ActionRecipients
+
 # Admin views
 from .admin import (
     BatchApproveCurrent,
@@ -118,6 +121,7 @@ __all__ = [
     "DocRecall",
     "DocSendBack",
     "BatchApprove",
+    "ActionRecipients",
     # PDF
     "DownloadProjectDocument",
     "BeginProjectDocGeneration",

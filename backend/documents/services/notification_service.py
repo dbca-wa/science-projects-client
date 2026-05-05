@@ -18,7 +18,7 @@ class NotificationService:
     """Business logic for document notifications"""
 
     @staticmethod
-    def notify_document_approved(document, approver, stage=None):
+    def notify_document_approved(document, approver, stage=None, feedback_html=""):
         """
         Notify the correct next approver when a document is approved at a stage.
 
@@ -33,6 +33,7 @@ class NotificationService:
             document: Approved document instance
             approver: User who approved the document
             stage: The approval stage that was just completed (1, 2, or 3)
+            feedback_html: Optional comment/feedback HTML to include in email
         """
         if stage is not None:
             recipients = NotificationService._get_stage_approval_recipients(
@@ -54,14 +55,18 @@ class NotificationService:
         if stage == 3:
             email_subject = f"{document.kind.title()} — Final Approval Granted"
 
+        additional_context = {
+            "email_subject": email_subject,
+        }
+        if feedback_html:
+            additional_context["feedback_html"] = feedback_html
+
         EmailService.send_document_notification(
             notification_type=notification_type,
             document=document,
             recipients=recipients,
             actioning_user=approver,
-            additional_context={
-                "email_subject": email_subject,
-            },
+            additional_context=additional_context,
         )
 
     @staticmethod

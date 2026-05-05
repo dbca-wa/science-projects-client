@@ -12,6 +12,19 @@
   <strong style="color: #1f2937;">&#x27;{% spaceless %}{{ plain_project_name|extract_text_content }}{% endspaceless %}&#x27;</strong>{% endif %}.
 </p>
 
+{% if feedback_html %}
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:24px;margin-bottom:24px;border-radius:12px;overflow:hidden">
+  <tbody>
+    <tr>
+      <td style="padding:16px;background-color:#eff6ff">
+        <h2 style="color:#1f2937;font-size:16px;font-weight:600;margin-top:0;margin-bottom:8px">Comment from {{ actioning_user_name }}:</h2>
+        <div style="font-size:14px;line-height:26px;color:#4b5563">{{ feedback_html|safe }}</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{% endif %}
+
 {% with action_url=document_url|default:site_url action_text="View Document" action_subtext="You can view the document by clicking the button above." %}
   {% include "email_templates/partials/_action_button.html" %}
 {% endwith %}

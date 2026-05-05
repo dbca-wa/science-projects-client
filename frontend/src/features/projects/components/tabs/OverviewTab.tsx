@@ -334,7 +334,7 @@ export function OverviewTab({
 						label="Description"
 						placeholder="Enter project description..."
 						emptyMessage="No description available."
-						toolbar="projectTitle"
+						toolbar="simple"
 					/>
 				</div>
 
@@ -349,7 +349,7 @@ export function OverviewTab({
 							label="Aims"
 							placeholder="Enter project aims..."
 							emptyMessage="No aims available."
-							toolbar="projectTitle"
+							toolbar="simple"
 						/>
 					</div>
 				)}

@@ -265,13 +265,16 @@ def sanitise_feedback_html(html: str) -> str:
 
     Only allows basic formatting tags (bold, italic, lists, links, paragraphs).
     Strips all other HTML including scripts, iframes, etc.
+    Returns empty string if the content is effectively empty (just empty paragraphs).
 
     Args:
         html: Raw HTML string from the rich text editor
 
     Returns:
-        Sanitised HTML string safe for email templates
+        Sanitised HTML string safe for email templates, or empty string if no meaningful content
     """
+    import re
+
     import bleach
 
     if not html:
@@ -280,4 +283,14 @@ def sanitise_feedback_html(html: str) -> str:
     ALLOWED_TAGS = ["p", "strong", "em", "ul", "ol", "li", "a", "br"]
     ALLOWED_ATTRS = {"a": ["href", "target"]}
 
-    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
+    sanitised = bleach.clean(
+        html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True
+    )
+
+    # Check if the sanitised content is effectively empty
+    # Strip all HTML tags and whitespace to see if there's actual text content
+    text_only = re.sub(r"<[^>]+>", "", sanitised).strip()
+    if not text_only:
+        return ""
+
+    return sanitised

@@ -210,7 +210,7 @@ export function StudentReportsTab({
 							wordLimit={300}
 							showWordLimitInLabel={true}
 							label="Progress Report"
-							toolbar="progressReport"
+							toolbar="report"
 						/>
 					</ProjectSection>
 				</div>

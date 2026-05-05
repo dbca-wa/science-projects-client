@@ -8,6 +8,20 @@ import type { IProjectData } from "@/shared/types/project.types";
 
 expect.extend(toHaveNoViolations);
 
+// Mock useCurrentUser to avoid needing full auth context
+vi.mock("@/features/auth", () => ({
+	useCurrentUser: () => ({ data: { id: 1, is_superuser: true } }),
+}));
+
+// Mock useActionRecipients to avoid needing full query context
+vi.mock("@/shared/hooks/queries/useActionRecipients", () => ({
+	useActionRecipients: () => ({
+		data: null,
+		isLoading: false,
+		isError: false,
+	}),
+}));
+
 // Helper to create mock project
 function createMockProject(
 	overrides: Partial<IProjectData> = {}

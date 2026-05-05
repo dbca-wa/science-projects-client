@@ -1435,7 +1435,7 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user)
+        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
         assert "id" in response.data
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_two")
@@ -1458,7 +1458,7 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user)
+        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_three")
     @patch("documents.services.document_service.DocumentService.get_document")
@@ -1480,7 +1480,7 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user)
+        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
 
     @pytest.mark.integration
     def test_doc_approval_missing_stage(self, api_client, user, project_document, db):

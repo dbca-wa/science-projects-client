@@ -2,7 +2,6 @@ import base64
 import os
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
 
 
 def get_logo_url():
@@ -233,22 +232,51 @@ def send_email_with_embedded_image(
     if from_email is None:
         from_email = settings.DEFAULT_FROM_EMAIL
 
-    # Create message
-    msg = EmailMultiAlternatives(
-        subject,
-        # Plain text fallback
-        "Please view this email in an HTML-compatible email client.",
-        from_email,
-        recipient_email,
+    # Build the email with correct MIME nesting for CID images.
+    #
+    # The correct structure for HTML emails with inline images is:
+    #   multipart/related (root)
+    #     ├── multipart/alternative
+    #     │     ├── text/plain
+    #     │     └── text/html
+    #     └── image/png (CID attachment)
+    #
+    # Django's EmailMultiAlternatives with mixed_subtype="related" produces
+    # a flat structure that some email clients (Outlook) don't handle correctly.
+    # Instead, we build the message manually using Python's email library to
+    # ensure proper nesting.
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    # Root: multipart/related
+    msg_root = MIMEMultipart("related")
+    msg_root["Subject"] = subject
+    msg_root["From"] = from_email
+    msg_root["To"] = (
+        ", ".join(recipient_email)
+        if isinstance(recipient_email, list)
+        else recipient_email
     )
+    msg_root.preamble = "This is a multi-part message in MIME format."
 
-    # Attach HTML alternative
-    msg.attach_alternative(html_content, "text/html")
+    # Alternative part: contains plain text and HTML
+    msg_alternative = MIMEMultipart("alternative")
+    msg_root.attach(msg_alternative)
 
-    # Set mixed_subtype to "related" so CID inline images work
-    msg.mixed_subtype = "related"
+    # Plain text fallback
+    msg_text = MIMEText(
+        "Please view this email in an HTML-compatible email client.",
+        "plain",
+        "utf-8",
+    )
+    msg_alternative.attach(msg_text)
 
-    # Attach the DBCA logo as an inline CID image
+    # HTML content
+    msg_html = MIMEText(html_content, "html", "utf-8")
+    msg_alternative.attach(msg_html)
+
+    # Attach the DBCA logo as an inline CID image (sibling of alternative part)
     logo_path = os.path.join(
         settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
     )
@@ -257,15 +285,35 @@ def send_email_with_embedded_image(
             logo_img = MIMEImage(f.read(), _subtype="png")
             logo_img.add_header("Content-ID", "<dbca-logo>")
             logo_img.add_header("Content-Disposition", "inline", filename="dbca.png")
-            msg.attach(logo_img)
+            msg_root.attach(logo_img)
     else:
         settings.LOGGER.warning(f"DBCA logo not found at {logo_path}")
 
-    # Send the message
-    msg.send()
+    # Send via SMTP directly (bypasses Django's email backend abstraction
+    # to ensure the MIME structure is preserved exactly as built).
+    # In console mode (local dev), log instead of sending.
+    try:
+        backend = getattr(settings, "EMAIL_BACKEND", "")
+        is_console = "console" in backend
 
-    # Clear summary log covering all scenarios
-    backend = settings.EMAIL_BACKEND
+        if is_console:
+            # In console/dev mode, just log the message details
+            settings.LOGGER.info(
+                f"[CONSOLE MODE] Would send email: Subject='{subject}', "
+                f"To={msg_root['To']}"
+            )
+        else:
+            email_host = getattr(settings, "EMAIL_HOST", "mail-relay.lan.fyi")
+            email_port = getattr(settings, "EMAIL_PORT", 587)
+
+            with smtplib.SMTP(email_host, email_port) as smtp:
+                smtp.send_message(msg_root)
+    except Exception as e:
+        settings.LOGGER.error(f"Failed to send email via SMTP: {e}", exc_info=True)
+        raise
+
+    # Summary log
+    backend = getattr(settings, "EMAIL_BACKEND", "")
     is_console = "console" in backend
     recipients_str = (
         ", ".join(recipient_email)

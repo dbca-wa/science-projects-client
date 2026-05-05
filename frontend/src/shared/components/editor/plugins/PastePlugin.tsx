@@ -1,11 +1,19 @@
 /**
  * PastePlugin
  *
- * Handles paste events from Microsoft Word documents.
- * Converts Word HTML to Lexical nodes while stripping unsupported formatting.
+ * Handles paste events including Microsoft Word documents.
+ * Strips disallowed content based on the editor's toolbar mode configuration.
  *
  * Security: All pasted HTML is sanitised using DOMPurify before processing
  * to prevent XSS attacks. This protects against malicious content in clipboard.
+ *
+ * Flow:
+ * 1. Detect paste event
+ * 2. Get HTML from clipboard
+ * 3. Sanitise with DOMPurify (sanitizeRichText)
+ * 4. If Word content: clean Word HTML (cleanWordHTML)
+ * 5. Strip disallowed content based on mode (stripDisallowedContent)
+ * 6. Parse to DOM, generate Lexical nodes, insert
  */
 
 import { useEffect } from "react";
@@ -14,63 +22,118 @@ import { PASTE_COMMAND, COMMAND_PRIORITY_HIGH } from "lexical";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $insertNodes, $getSelection, $isRangeSelection } from "lexical";
 import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
+import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
+import type { ToolbarMode } from "@/shared/types/editor.types";
 
 interface PastePluginProps {
-	stripBold?: boolean;
+	mode?: ToolbarMode;
 }
 
 /**
- * Strip bold formatting tags (<strong> and <b>) from HTML,
- * preserving the inner content.
+ * Strips disallowed content from a parsed DOM document based on the toolbar mode.
+ *
+ * Walks the DOM and converts or removes elements that are not permitted
+ * by the given mode's configuration. This ensures pasted content conforms
+ * to the editor's allowed formatting and block types.
  */
-function stripBoldTags(html: string): string {
-	return html.replace(/<\/?strong[^>]*>/gi, "").replace(/<\/?b[^>]*>/gi, "");
+function stripDisallowedContent(doc: Document, mode: ToolbarMode): Document {
+	const config = TOOLBAR_CONFIGS[mode];
+
+	// Strip lists: convert <ul>, <ol>, <li> to <p> tags (preserve text content)
+	if (!config.blocks.lists) {
+		const listItems = doc.querySelectorAll("li");
+		listItems.forEach((li) => {
+			const p = doc.createElement("p");
+			p.innerHTML = li.innerHTML;
+			li.replaceWith(p);
+		});
+		// Remove any remaining <ul> and <ol> wrappers, promoting children
+		const lists = doc.querySelectorAll("ul, ol");
+		lists.forEach((list) => {
+			const fragment = doc.createDocumentFragment();
+			while (list.firstChild) {
+				fragment.appendChild(list.firstChild);
+			}
+			list.replaceWith(fragment);
+		});
+	}
+
+	// Strip tables: extract text from cells as <p> tags (one per cell, row order)
+	if (!config.blocks.tables) {
+		const tables = doc.querySelectorAll("table");
+		tables.forEach((table) => {
+			const fragment = doc.createDocumentFragment();
+			const cells = table.querySelectorAll("td, th");
+			cells.forEach((cell) => {
+				const textContent = cell.textContent?.trim();
+				if (textContent) {
+					const p = doc.createElement("p");
+					p.textContent = textContent;
+					fragment.appendChild(p);
+				}
+			});
+			table.replaceWith(fragment);
+		});
+	}
+
+	// Strip headings: convert <h1>-<h6> to <p> tags (preserve inner HTML)
+	if (!config.blocks.headings) {
+		const headings = doc.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		headings.forEach((heading) => {
+			const p = doc.createElement("p");
+			p.innerHTML = heading.innerHTML;
+			heading.replaceWith(p);
+		});
+	}
+
+	// Strip bold: unwrap <strong> and <b> tags (preserve inner content)
+	if (!config.formatting.bold) {
+		const boldElements = doc.querySelectorAll("strong, b");
+		boldElements.forEach((el) => {
+			const fragment = doc.createDocumentFragment();
+			while (el.firstChild) {
+				fragment.appendChild(el.firstChild);
+			}
+			el.replaceWith(fragment);
+		});
+	}
+
+	// Strip underline: unwrap <u> tags (preserve inner content)
+	if (!config.formatting.underline) {
+		const underlineElements = doc.querySelectorAll("u");
+		underlineElements.forEach((el) => {
+			const fragment = doc.createDocumentFragment();
+			while (el.firstChild) {
+				fragment.appendChild(el.firstChild);
+			}
+			el.replaceWith(fragment);
+		});
+	}
+
+	// Strip links: unwrap <a> tags (preserve link text, discard href)
+	if (!config.features.links) {
+		const links = doc.querySelectorAll("a");
+		links.forEach((el) => {
+			const fragment = doc.createDocumentFragment();
+			while (el.firstChild) {
+				fragment.appendChild(el.firstChild);
+			}
+			el.replaceWith(fragment);
+		});
+	}
+
+	// Strip images: remove <img> tags entirely
+	if (!config.features.images) {
+		const images = doc.querySelectorAll("img");
+		images.forEach((img) => img.remove());
+	}
+
+	return doc;
 }
 
-export const PastePlugin = ({ stripBold = false }: PastePluginProps) => {
+export const PastePlugin = ({ mode = "full" }: PastePluginProps) => {
 	const [editor] = useLexicalComposerContext();
 
-	// Handle bold stripping for all pasted HTML content
-	useEffect(() => {
-		if (!stripBold) return;
-
-		return editor.registerCommand(
-			PASTE_COMMAND,
-			(event: ClipboardEvent) => {
-				const clipboardData = event.clipboardData;
-				if (!clipboardData) return false;
-
-				const html = clipboardData.getData("text/html");
-				if (!html) return false;
-
-				// Only intercept if the pasted HTML contains bold tags
-				if (!/<\/?(?:strong|b)\b[^>]*>/i.test(html)) return false;
-
-				event.preventDefault();
-
-				editor.update(() => {
-					const selection = $getSelection();
-					if (!$isRangeSelection(selection)) return;
-
-					// SECURITY: Sanitise clipboard HTML before processing to prevent XSS
-					const sanitisedHTML = sanitizeRichText(html);
-
-					// Strip bold tags from the sanitised HTML
-					const cleanedHTML = stripBoldTags(sanitisedHTML);
-
-					const parser = new DOMParser();
-					const dom = parser.parseFromString(cleanedHTML, "text/html");
-					const nodes = $generateNodesFromDOM(editor, dom);
-					$insertNodes(nodes);
-				});
-
-				return true;
-			},
-			// Use CRITICAL priority so this runs before the Word paste handler
-			4
-		);
-	}, [editor, stripBold]);
-
 	useEffect(() => {
 		return editor.registerCommand(
 			PASTE_COMMAND,
@@ -81,35 +144,32 @@ export const PastePlugin = ({ stripBold = false }: PastePluginProps) => {
 				const html = clipboardData.getData("text/html");
 				if (!html) return false;
 
-				// Check if it's from Word (contains Word-specific metadata)
-				const isFromWord =
-					html.includes("urn:schemas-microsoft-com:office:word") ||
-					html.includes("mso-") ||
-					html.includes("MsoNormal");
-
-				if (!isFromWord) return false;
-
 				event.preventDefault();
 
 				editor.update(() => {
 					const selection = $getSelection();
 					if (!$isRangeSelection(selection)) return;
 
-					// SECURITY: Sanitise clipboard HTML first to prevent XSS attacks
-					// This removes script tags, event handlers, and dangerous protocols
-					const sanitisedHTML = sanitizeRichText(html);
+					// Step 1: Sanitise clipboard HTML to prevent XSS attacks
+					let processedHTML = sanitizeRichText(html);
 
-					// Clean Word HTML (remove Word-specific formatting)
-					const cleanedHTML = cleanWordHTML(sanitisedHTML);
+					// Step 2: If Word content, clean Word-specific formatting
+					const isFromWord =
+						html.includes("urn:schemas-microsoft-com:office:word") ||
+						html.includes("mso-") ||
+						html.includes("MsoNormal");
 
-					// Parse cleaned HTML
+					if (isFromWord) {
+						processedHTML = cleanWordHTML(processedHTML);
+					}
+
+					// Step 3: Strip disallowed content based on mode
 					const parser = new DOMParser();
-					const dom = parser.parseFromString(cleanedHTML, "text/html");
+					const dom = parser.parseFromString(processedHTML, "text/html");
+					stripDisallowedContent(dom, mode);
 
-					// Generate Lexical nodes from DOM
+					// Step 4: Generate Lexical nodes from the cleaned DOM and insert
 					const nodes = $generateNodesFromDOM(editor, dom);
-
-					// Insert nodes at selection
 					$insertNodes(nodes);
 				});
 
@@ -117,13 +177,17 @@ export const PastePlugin = ({ stripBold = false }: PastePluginProps) => {
 			},
 			COMMAND_PRIORITY_HIGH
 		);
-	}, [editor]);
+	}, [editor, mode]);
 
 	return null;
 };
 
 /**
- * Clean Word HTML by removing unsupported formatting
+ * Clean Word HTML by removing unsupported formatting.
+ *
+ * Strips Word-specific XML namespaces, metadata, styles, and classes
+ * while preserving the semantic HTML structure (lists, headings, etc.)
+ * so that mode-aware stripping can evaluate them correctly.
  */
 function cleanWordHTML(html: string): string {
 	// Remove Word-specific XML namespaces and metadata

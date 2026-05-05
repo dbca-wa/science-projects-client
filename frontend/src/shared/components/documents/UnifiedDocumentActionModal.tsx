@@ -14,8 +14,11 @@ import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
-import { AlertTriangle, Info } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
+import { AlertTriangle, Info, Mail } from "lucide-react";
 import { FormRichTextEditor } from "../editor/FormRichTextEditor";
+import { useActionRecipients } from "@/shared/hooks/queries/useActionRecipients";
+import { useCurrentUser } from "@/features/auth";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type { IProjectData } from "@/shared/types/project.types";
 import type { DocumentType } from "@/shared/utils/document.utils";
@@ -47,6 +50,24 @@ function formatDocumentType(documentType: DocumentType): string {
 		projectclosure: "project closure",
 	};
 	return mapping[documentType] || documentType;
+}
+
+/**
+ * Map approval stage string to numeric stage for the API.
+ * For recall on fully-approved documents, treat as stage 3 (directorate).
+ */
+function getNumericStage(stage: ApprovalStage, action?: string): number | null {
+	if (stage === "complete") {
+		// Fully approved — recall means directorate is recalling (stage 3)
+		if (action === "recall") return 3;
+		return null;
+	}
+	const stageMap: Record<string, number | null> = {
+		project_lead: 1,
+		business_area_lead: 2,
+		directorate: 3,
+	};
+	return stageMap[stage] ?? null;
 }
 
 interface UnifiedDocumentActionModalProps {
@@ -84,7 +105,7 @@ export const UnifiedDocumentActionModal = ({
 	onClose,
 	action,
 	documentType,
-	document: _document,
+	document: doc,
 	project: _project,
 	currentStage,
 	onSubmit,
@@ -92,6 +113,26 @@ export const UnifiedDocumentActionModal = ({
 }: UnifiedDocumentActionModalProps) => {
 	const [showEmailCheckbox] = useState(true);
 	const [feedbackHTML, setFeedbackHTML] = useState("");
+
+	// Current user — needed to determine if email checkbox can be toggled
+	const { data: currentUser } = useCurrentUser();
+	const canToggleEmail =
+		currentUser?.is_superuser === true ||
+		currentStage === "directorate" ||
+		currentStage === "complete";
+
+	// Fetch recipients for actions that send emails (not "reopen")
+	const numericStage = getNumericStage(currentStage, action);
+	const shouldFetchRecipients = action !== "reopen" && !!numericStage;
+	const {
+		data: recipientsData,
+		isLoading: recipientsLoading,
+		isError: recipientsError,
+	} = useActionRecipients(
+		shouldFetchRecipients ? doc.id : null,
+		shouldFetchRecipients ? action : null,
+		shouldFetchRecipients ? numericStage : null
+	);
 
 	const { handleSubmit, watch, setValue, reset } = useForm<FormData>({
 		resolver: zodResolver(documentActionSchema),
@@ -190,6 +231,14 @@ export const UnifiedDocumentActionModal = ({
 	};
 
 	const getEmailCheckboxLabel = (): string => {
+		// Use actual recipient names when available
+		if (recipientsData?.recipients && recipientsData.recipients.length > 0) {
+			const names = recipientsData.recipients
+				.map((r) => `${r.name} (${r.email})`)
+				.join(", ");
+			return `Send email notification to ${names}`;
+		}
+
 		switch (action) {
 			case "submit":
 				return "Send email notification to Business Area Lead";
@@ -321,19 +370,82 @@ export const UnifiedDocumentActionModal = ({
 						wordLimit={2000}
 					/>
 
+					{/* Recipient Display */}
+					{shouldFetchRecipients && (
+						<div className="space-y-2">
+							{recipientsLoading && (
+								<div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-2">
+									<Skeleton className="h-4 w-32" />
+									<Skeleton className="h-4 w-48" />
+								</div>
+							)}
+
+							{recipientsError && (
+								<Alert>
+									<Info className="h-4 w-4" />
+									<AlertDescription>
+										Unable to load recipients. You may still proceed.
+									</AlertDescription>
+								</Alert>
+							)}
+
+							{recipientsData?.warning && (
+								<Alert variant="destructive">
+									<AlertTriangle className="h-4 w-4" />
+									<AlertDescription>{recipientsData.warning}</AlertDescription>
+								</Alert>
+							)}
+
+							{recipientsData?.recipients &&
+								recipientsData.recipients.length > 0 && (
+									<div className="rounded-lg border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20 p-4">
+										<div className="flex items-center gap-2 mb-3">
+											<Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+											<p className="text-sm font-semibold text-blue-900 dark:text-blue-200">
+												{recipientsData.role_label}
+											</p>
+										</div>
+										<div className="space-y-2">
+											{recipientsData.recipients.map((r, i) => (
+												<div
+													key={i}
+													className="flex items-center gap-2 rounded-md bg-white dark:bg-gray-800/60 px-3 py-2 border border-gray-100 dark:border-gray-700/50"
+												>
+													<div className="flex-1 min-w-0">
+														<p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+															{r.name}
+														</p>
+														<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+															{r.email}
+														</p>
+													</div>
+													{r.role && (
+														<span className="shrink-0 inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">
+															{r.role}
+														</span>
+													)}
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+						</div>
+					)}
+
 					{/* Email Notification Checkbox */}
 					{showEmailCheckbox && (
 						<div className="flex items-center space-x-2">
 							<Checkbox
 								id="sendEmail"
 								checked={sendEmail}
+								disabled={!canToggleEmail}
 								onCheckedChange={(checked) =>
 									setValue("sendEmail", checked as boolean)
 								}
 							/>
 							<Label
 								htmlFor="sendEmail"
-								className="text-sm font-normal cursor-pointer"
+								className={`text-sm font-normal ${canToggleEmail ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
 							>
 								{getEmailCheckboxLabel()}
 							</Label>
@@ -352,7 +464,7 @@ export const UnifiedDocumentActionModal = ({
 						<Button
 							type="submit"
 							className={getActionButtonColor()}
-							disabled={isSubmitting}
+							disabled={isSubmitting || !!recipientsData?.warning}
 						>
 							{isSubmitting ? "Processing..." : getActionButtonText()}
 						</Button>

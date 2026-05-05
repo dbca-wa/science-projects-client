@@ -2,6 +2,8 @@
 Tests for user views
 """
 
+from unittest.mock import patch
+
 import pytest
 from rest_framework import status
 
@@ -820,8 +822,9 @@ class TestStaffProfileAdvancedViews:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == []
 
+    @patch("smtplib.SMTP")
     def test_public_email_staff_member_dev_mode(
-        self, api_client, staff_profile, db, settings
+        self, mock_smtp, api_client, staff_profile, db, settings
     ):
         """Test sending public email to staff member in dev mode"""
         # Arrange

@@ -15,12 +15,9 @@ import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { HeadingNode } from "@lexical/rich-text";
-import { ListNode, ListItemNode } from "@lexical/list";
-import { LinkNode, AutoLinkNode } from "@lexical/link";
-import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ImageNode } from "./nodes/ImageNode";
+import { getNodesForMode } from "./toolbar/toolbar-nodes";
+import { TOOLBAR_CONFIGS } from "./toolbar/toolbar-configs";
 
 import type { RichTextEditorProps } from "@/shared/types/editor.types";
 import { cn } from "@/shared/lib/utils";
@@ -41,7 +38,6 @@ import { ListMaxIndentPlugin } from "./plugins/ListMaxIndentPlugin";
 import { RemoveEmptyListItemsPlugin } from "./plugins/RemoveEmptyListItemsPlugin";
 import { EditorStoreIntegrationPlugin } from "./plugins/EditorStoreIntegrationPlugin";
 import { MoveCursorToEndPlugin } from "./plugins/MoveCursorToEndPlugin";
-import { BoldBlockPlugin } from "./plugins/BoldBlockPlugin";
 import { Toolbar } from "./toolbar/Toolbar";
 import { LinkEditorProvider } from "./toolbar/LinkEditorContext";
 import { useLinkEditor } from "./toolbar/link-editor.utils";
@@ -210,9 +206,7 @@ export const RichTextEditor = React.forwardRef<
 		const shouldBeEditable = !readOnly && !disabled;
 		const shouldStartEditable =
 			shouldBeEditable && (autoFocus || moveCursorToEnd);
-		const showLinks =
-			toolbar === "full" || toolbar === "profile" || toolbar === "staffProfile";
-		const stripBold = toolbar === "projectTitle";
+		const showLinks = TOOLBAR_CONFIGS[toolbar].features.links;
 
 		const editorKey = useId();
 
@@ -221,17 +215,7 @@ export const RichTextEditor = React.forwardRef<
 			editable: shouldStartEditable, // Start editable if autoFocus or moveCursorToEnd
 			theme: editorTheme,
 			onError: handleError,
-			nodes: [
-				HeadingNode,
-				ListNode,
-				ListItemNode,
-				LinkNode,
-				AutoLinkNode,
-				TableNode,
-				TableCellNode,
-				TableRowNode,
-				ImageNode,
-			],
+			nodes: getNodesForMode(toolbar),
 		};
 
 		return (
@@ -312,15 +296,11 @@ export const RichTextEditor = React.forwardRef<
 						<EditableOnInteractionPlugin shouldBeEditable={shouldBeEditable} />
 						<SubscriptSuperscriptPlugin />
 						<SaveOnCtrlSPlugin onSave={onSave} />
-						<PastePlugin stripBold={stripBold} />
-						<BoldBlockPlugin enabled={stripBold} />
+						<PastePlugin mode={toolbar} />
 						{!readOnly && <ConditionalDragDrop />}
 						{autoFocus && <AutoFocusPlugin />}
 						{moveCursorToEnd && <MoveCursorToEndPlugin />}
-						<OnChangePlugin
-							onChange={handleContentChange}
-							stripBold={stripBold}
-						/>
+						<OnChangePlugin onChange={handleContentChange} />
 						{/* PrepopulateHTMLPlugin handles initial content loading ONCE */}
 						<PrepopulateHTMLPlugin html={value} />
 						{/* ControlledValuePlugin handles subsequent value prop changes (Clear, Reset, etc.) */}
