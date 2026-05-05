@@ -1140,9 +1140,11 @@ class SendAllTestEmails(APIView):
 
     def post(self, req):
         import base64 as b64mod
+        import smtplib
         from email.mime.image import MIMEImage
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
 
-        from django.core.mail import EmailMultiAlternatives
         from django.template.loader import render_to_string
 
         admin_opts = AdminOptions.objects.first()
@@ -1265,15 +1267,27 @@ class SendAllTestEmails(APIView):
 
             subject = f"[TEST] {tmpl['subject']}"
 
-            # Build email message with CID
-            msg = EmailMultiAlternatives(
-                subject,
+            # Build email with correct MIME nesting for CID images.
+            # Structure: multipart/related > multipart/alternative > text + html
+            # This ensures Outlook and other clients render inline images correctly.
+            msg_root = MIMEMultipart("related")
+            msg_root["Subject"] = subject
+            msg_root["From"] = settings.DEFAULT_FROM_EMAIL
+            msg_root["To"] = test_user.email
+            msg_root.preamble = "This is a multi-part message in MIME format."
+
+            msg_alternative = MIMEMultipart("alternative")
+            msg_root.attach(msg_alternative)
+
+            msg_text = MIMEText(
                 "Please view this email in an HTML-compatible email client.",
-                settings.DEFAULT_FROM_EMAIL,
-                [test_user.email],
+                "plain",
+                "utf-8",
             )
-            msg.attach_alternative(html_content, "text/html")
-            msg.mixed_subtype = "related"
+            msg_alternative.attach(msg_text)
+
+            msg_html = MIMEText(html_content, "html", "utf-8")
+            msg_alternative.attach(msg_html)
 
             if logo_data:
                 logo_img = MIMEImage(logo_data, _subtype="png")
@@ -1281,11 +1295,24 @@ class SendAllTestEmails(APIView):
                 logo_img.add_header(
                     "Content-Disposition", "inline", filename="dbca.png"
                 )
-                msg.attach(logo_img)
+                msg_root.attach(logo_img)
 
-            # Send the email
+            # Send via SMTP directly (preserves MIME structure exactly as built)
             try:
-                msg.send()
+                backend = getattr(settings, "EMAIL_BACKEND", "")
+                is_console = "console" in backend
+
+                if is_console:
+                    settings.LOGGER.info(
+                        f"[CONSOLE MODE] Would send test email: "
+                        f"Subject='{subject}', To={test_user.email}"
+                    )
+                else:
+                    email_host = getattr(settings, "EMAIL_HOST", "mail-relay.lan.fyi")
+                    email_port = getattr(settings, "EMAIL_PORT", 587)
+
+                    with smtplib.SMTP(email_host, email_port) as smtp:
+                        smtp.send_message(msg_root)
             except Exception as e:
                 settings.LOGGER.warning(f"Failed to send {tmpl['name']}: {e}")
 
@@ -1306,7 +1333,7 @@ class SendAllTestEmails(APIView):
                 # Save EML preview
                 eml_path = os.path.join(preview_dir, f"{tmpl['name']}.eml")
                 with open(eml_path, "wb") as f:
-                    f.write(msg.message().as_bytes())
+                    f.write(msg_root.as_bytes())
 
             results.append({"template": tmpl["name"], "status": "ok"})
 

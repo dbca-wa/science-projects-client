@@ -81,10 +81,10 @@ class TestSendAllTestEmails:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_sends_all_templates(
-        self, mock_send, superuser, admin_opts_with_test_user, db
+        self, mock_smtp, superuser, admin_opts_with_test_user, db
     ):
         """Should render and send all templates."""
         from rest_framework.test import APIClient
@@ -97,10 +97,10 @@ class TestSendAllTestEmails:
         # Should have sent multiple templates
         assert len(response.data["results"]) > 10
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_sends_single_template(
-        self, mock_send, superuser, admin_opts_with_test_user, db
+        self, mock_smtp, superuser, admin_opts_with_test_user, db
     ):
         """Should send only the specified template."""
         from rest_framework.test import APIClient
@@ -116,10 +116,10 @@ class TestSendAllTestEmails:
         assert len(response.data["results"]) == 1
         assert response.data["results"][0]["template"] == "bump_email"
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_invalid_template_name(
-        self, mock_send, superuser, admin_opts_with_test_user, db
+        self, mock_smtp, superuser, admin_opts_with_test_user, db
     ):
         """Should return error for non-existent template."""
         from rest_framework.test import APIClient
@@ -133,10 +133,10 @@ class TestSendAllTestEmails:
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_staff_profile_email_included(
-        self, mock_send, superuser, admin_opts_with_test_user, db
+        self, mock_smtp, superuser, admin_opts_with_test_user, db
     ):
         """Staff profile email should be in the template list."""
         from rest_framework.test import APIClient
@@ -152,10 +152,10 @@ class TestSendAllTestEmails:
         assert response.data["results"][0]["template"] == "staff_profile_email"
         assert response.data["results"][0]["status"] == "ok"
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_user_overrides_applied(
-        self, mock_send, superuser, admin_opts_with_test_user, db
+        self, mock_smtp, superuser, admin_opts_with_test_user, db
     ):
         """User overrides should be applied to template context."""
         from rest_framework.test import APIClient

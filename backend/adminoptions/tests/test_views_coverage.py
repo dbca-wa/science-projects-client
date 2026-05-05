@@ -430,9 +430,9 @@ class TestSendAllTestEmails:
         response = api_client.post(adminoptions_urls.path("send-all-test-emails"))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     def test_send_all_test_emails_success(
-        self, mock_send, api_client, admin_user, settings, db
+        self, mock_smtp, api_client, admin_user, settings, db
     ):
         """POST renders and sends all email templates"""
         api_client.force_authenticate(user=admin_user)
@@ -447,16 +447,15 @@ class TestSendAllTestEmails:
             email_test_user=admin_user,
         )
         settings.DEBUG = True
-        mock_send.return_value = 1
 
         response = api_client.post(adminoptions_urls.path("send-all-test-emails"))
         assert response.status_code == status.HTTP_200_OK
         assert "results" in response.data
         assert len(response.data["results"]) > 0
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     def test_send_all_test_emails_with_user_overrides(
-        self, mock_send, api_client, admin_user, settings, db
+        self, mock_smtp, api_client, admin_user, settings, db
     ):
         """POST with recipient and actioner overrides"""
         api_client.force_authenticate(user=admin_user)
@@ -484,7 +483,6 @@ class TestSendAllTestEmails:
             email_test_user=admin_user,
         )
         settings.DEBUG = True
-        mock_send.return_value = 1
 
         data = {
             "recipient_user_id": recipient.id,
@@ -495,9 +493,9 @@ class TestSendAllTestEmails:
         )
         assert response.status_code == status.HTTP_200_OK
 
-    @patch("django.core.mail.EmailMultiAlternatives.send")
+    @patch("smtplib.SMTP")
     def test_send_all_test_emails_with_invalid_user_overrides(
-        self, mock_send, api_client, admin_user, settings, db
+        self, mock_smtp, api_client, admin_user, settings, db
     ):
         """POST with non-existent user overrides still works"""
         api_client.force_authenticate(user=admin_user)
@@ -512,7 +510,6 @@ class TestSendAllTestEmails:
             email_test_user=admin_user,
         )
         settings.DEBUG = True
-        mock_send.return_value = 1
 
         data = {
             "recipient_user_id": 99999,

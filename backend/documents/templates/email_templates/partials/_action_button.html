@@ -1,5 +1,7 @@
 {% comment %}
-Email action button partial — renders a centred gradient blue button with optional subtext.
+Email action button partial — renders a centred blue button with optional subtext.
+Uses a solid background-color with gradient enhancement for modern clients.
+Includes VML fallback for Outlook desktop (Word rendering engine).
 
 Required context:
   - action_url: the URL the button links to
@@ -12,7 +14,15 @@ Optional context:
   <tbody>
     <tr>
       <td align="center">
-        <a href="{{ action_url }}" class="spms-action-button" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff !important; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; text-align: center; letter-spacing: -0.3px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" target="_blank"><span style="color: #ffffff;">{{ action_text }}</span></a>
+        <!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ action_url }}" style="height:46px;v-text-anchor:middle;width:220px;" arcsize="17%" strokecolor="#1d4ed8" fillcolor="#2563eb">
+          <w:anchorlock/>
+          <center style="color:#ffffff;font-family:'Segoe UI',sans-serif;font-size:15px;font-weight:600;">{{ action_text }}</center>
+        </v:roundrect>
+        <![endif]-->
+        <!--[if !mso]><!-->
+        <a href="{{ action_url }}" class="spms-action-button" style="display: inline-block; background-color: #2563eb; background-image: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff !important; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; text-align: center; letter-spacing: -0.3px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);" target="_blank"><span style="color: #ffffff;">{{ action_text }}</span></a>
+        <!--<![endif]-->
       </td>
     </tr>
   </tbody>
