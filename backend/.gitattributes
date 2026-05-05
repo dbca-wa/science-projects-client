@@ -2,7 +2,7 @@
 * text eol=lf
 
 # Binary files must not have line-ending conversion applied.
-# The wildcard rule above would corrupt these by stripping \r bytes.
+# The wildcard rule above seems to corrupt these by stripping \r bytes.
 # Images
 *.png binary
 *.jpg binary
