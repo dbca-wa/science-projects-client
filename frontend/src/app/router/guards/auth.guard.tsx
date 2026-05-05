@@ -9,11 +9,29 @@ import { toast } from "sonner";
 /** Division slugs that grant AR admin access to key stakeholders */
 const AR_ENABLED_DIVISION_SLUGS = ["BCS"];
 
+const IS_LOCAL_DEV = import.meta.env.DEV;
+
+/**
+ * UnauthenticatedFallback - Shows a blank page in non-dev environments.
+ * In staging/production, SSO handles authentication automatically.
+ * If the backend is down, the user sees a clean white page instead of
+ * a login form. They can refresh when ready.
+ */
+const UnauthenticatedFallback = () => {
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300" />
+		</div>
+	);
+};
+
 /**
  * Protected Route Guard
  * - Checks if auth store is initialised
  * - Shows loading spinner while initialising
- * - Redirects to login if not authenticated
+ * - In non-dev environments: shows blank recovery page if not authenticated
+ *   (SSO handles re-auth, or backend may be temporarily down)
+ * - In local dev: redirects to login page
  * - Preserves original location in redirect state
  * - Renders children if authenticated
  */
@@ -31,9 +49,14 @@ export const ProtectedRoute = observer(
 			);
 		}
 
-		// Redirect to login if not authenticated, preserving the original location
+		// Not authenticated
 		if (!authStore.isAuthenticated) {
-			return <Navigate to="/login" state={{ from: location }} replace />;
+			// In local dev, redirect to login form
+			if (IS_LOCAL_DEV) {
+				return <Navigate to="/login" state={{ from: location }} replace />;
+			}
+			// In staging/production, show blank page (SSO handles re-auth)
+			return <UnauthenticatedFallback />;
 		}
 
 		// Render children if authenticated
@@ -52,8 +75,10 @@ export const AdminRoute = observer(
 		const location = useLocation();
 
 		if (!authStore.isAuthenticated) {
-			// Not logged in - redirect to login
-			return <Navigate to="/login" state={{ from: location }} replace />;
+			if (IS_LOCAL_DEV) {
+				return <Navigate to="/login" state={{ from: location }} replace />;
+			}
+			return <UnauthenticatedFallback />;
 		}
 
 		// Wait for user data to be loaded
@@ -123,7 +148,10 @@ export const AdminOrKeyStakeholderRoute = observer(
 		const location = useLocation();
 
 		if (!authStore.isAuthenticated) {
-			return <Navigate to="/login" state={{ from: location }} replace />;
+			if (IS_LOCAL_DEV) {
+				return <Navigate to="/login" state={{ from: location }} replace />;
+			}
+			return <UnauthenticatedFallback />;
 		}
 
 		if (!authStore.user) {

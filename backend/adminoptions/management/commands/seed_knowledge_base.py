@@ -126,7 +126,7 @@ class Command(BaseCommand):
                 '<p class="editor-paragraph mb-2">'
                 '<span style="white-space: pre-wrap;">Welcome to the new SPMS. '
                 "The system has been overhauled to improve UX. "
-                "List of new features and update:</span></p>"
+                "List of new features and updates:</span></p>"
                 '<ul class="editor-ul editor-ul1">'
                 '<li value="1" class="editor-li">'
                 '<span style="white-space: pre-wrap;">Project Creation Wizard! '

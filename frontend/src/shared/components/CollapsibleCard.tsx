@@ -7,11 +7,6 @@ import {
 	CardTitle,
 	CardContent,
 } from "@/shared/components/ui/card";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
 
 interface CollapsibleCardProps {
 	title: string;
@@ -38,36 +33,25 @@ export const CollapsibleCard = ({
 		<Card>
 			<CardHeader className="pb-0">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={() => setIsExpanded((prev) => !prev)}
-									className="flex items-center gap-2 text-left cursor-pointer hover:opacity-80 transition-opacity"
-									aria-expanded={isExpanded}
-									aria-label={
-										isExpanded ? `Collapse ${title}` : `Expand ${title}`
-									}
-								>
-									<span
-										className="transition-transform duration-200"
-										style={{
-											display: "inline-flex",
-											transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
-										}}
-									>
-										<ChevronDown className="size-4 text-muted-foreground" />
-									</span>
-									<CardTitle className="text-base">{title}</CardTitle>
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="top">
-								{isExpanded ? "Collapse section" : "Expand section"}
-							</TooltipContent>
-						</Tooltip>
+					<button
+						type="button"
+						onClick={() => setIsExpanded((prev) => !prev)}
+						className="flex items-center gap-2 text-left cursor-pointer hover:bg-accent/50 rounded-md -ml-2 pl-2 pr-3 py-1 transition-colors flex-1 min-w-0"
+						aria-expanded={isExpanded}
+						aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
+					>
+						<span
+							className="transition-transform duration-200"
+							style={{
+								display: "inline-flex",
+								transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+							}}
+						>
+							<ChevronDown className="size-4 text-muted-foreground" />
+						</span>
+						<CardTitle className="text-base">{title}</CardTitle>
 						<Badge variant="secondary">{count}</Badge>
-					</div>
+					</button>
 					{actions && <div className="flex items-center gap-2">{actions}</div>}
 				</div>
 			</CardHeader>

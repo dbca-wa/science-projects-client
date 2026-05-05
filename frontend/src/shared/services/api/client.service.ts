@@ -72,6 +72,12 @@ export class ApiClientService {
 							logger.error("Access forbidden (403)", {
 								data: error.response.data,
 							});
+							// Only trigger unauthorised for session expiry (not permission denied)
+							// A 403 with no CSRF cookie means session expired
+							if (!Cookie.get("spmscsrf")) {
+								logger.warn("No CSRF cookie with 403 - session expired");
+								await this.handleUnauthorised();
+							}
 							break;
 						case 404:
 							logger.error("Resource not found", {
@@ -89,7 +95,8 @@ export class ApiClientService {
 							});
 					}
 				} else if (error.request) {
-					logger.error("No response from server");
+					// Network error - server unreachable. Do NOT trigger logout.
+					logger.error("No response from server (network error)");
 				} else {
 					logger.error("Request error", { message: error.message });
 				}
