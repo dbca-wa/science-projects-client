@@ -6,17 +6,15 @@
 
 export type ToolbarMode =
 	| "full"
-	| "guide"
+	| "document"
+	| "report"
 	| "simple"
 	| "minimal"
-	| "none"
 	| "profile"
-	| "staffProfile"
-	| "projectTitle"
-	| "projectDescription"
-	| "progressReport"
 	| "businessArea"
-	| "newCycle";
+	| "newCycle"
+	| "guide"
+	| "none";
 
 export interface RichTextEditorProps {
 	// Content

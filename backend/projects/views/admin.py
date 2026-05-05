@@ -38,10 +38,18 @@ class UnapprovedThisFY(APIView):
             .select_related(
                 "business_area",
                 "business_area__division",
+                "business_area__division__director",
+                "business_area__division__key_stakeholder",
+                "business_area__leader",
+                "business_area__image",
+                "image",
+                "image__uploader",
             )
             .prefetch_related(
                 "members",
                 "members__user",
+                "business_area__division__approvers",
+                "business_area__division__directorate_email_list",
             )
         )
 

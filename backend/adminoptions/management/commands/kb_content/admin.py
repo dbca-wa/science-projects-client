@@ -22,7 +22,8 @@ def get_admin_articles():
                 "common issues.</li>"
                 "<li><strong>Approvers:</strong> Manage divisional key stakeholders "
                 "and approvers for the document approval workflow.</li>"
-                "<li><strong>Admin Testing:</strong> Test email delivery and document "
+                "<li><strong>Communications:</strong> Manage the homepage banner, "
+                "send announcements, test email delivery, and document "
                 "PDF generation.</li>"
                 "<li><strong>Reference Data:</strong> Manage branches, divisions, "
                 "business areas, services, locations, affiliations, and addresses.</li>"
@@ -128,6 +129,93 @@ def get_admin_articles():
                 "<p>The Admin tab also shows endorsement tasks (AEC, BM, HC) that "
                 "require action. See the <strong>System Features → Endorsement Tasks</strong> "
                 "article for details.</p>"
+            ),
+        },
+        {
+            "field_key": "admin-testing",
+            "title": "Communications Page",
+            "order": 4,
+            "description": (
+                "<h2>Communications Page</h2>"
+                "<p>The Communications page (<strong>Manage → Communications</strong>) "
+                "provides tools for managing user communications and testing system features. "
+                "It has four tabs:</p>"
+                "<h3>Banner</h3>"
+                "<p>Configure the homepage banner that appears on the dashboard for all "
+                "users. Toggle it on, write your message, and save.</p>"
+                "<h3>Emails</h3>"
+                "<p>Test all email templates by sending them to a designated test user. "
+                "Enable <strong>Testing Mode</strong> and select a test user — all "
+                "system emails will be redirected to that user. You can then send "
+                "individual templates or all templates at once to verify they render "
+                "correctly.</p>"
+                "<p>Optionally set a <strong>Recipient</strong> and <strong>Actioner</strong> "
+                "user to see realistic names in the email content.</p>"
+                f"{screenshot('Communications page Emails tab with testing mode enabled')}"
+                "<h3>Announcements</h3>"
+                "<p>Send announcement emails to selected recipient groups without "
+                "opening a new reporting cycle. See the dedicated article below.</p>"
+                "<h3>Documents</h3>"
+                "<p>Generate test PDFs for each document type (Concept Plan, Project "
+                "Plan, Progress Report, Student Report, Project Closure) using mock "
+                "data. Useful for verifying PDF template changes without needing real "
+                "project data.</p>"
+                f"{screenshot('Communications page Documents tab with PDF generation controls')}"
+            ),
+        },
+        {
+            "field_key": "admin-announcements",
+            "title": "Sending Announcements",
+            "order": 5,
+            "description": (
+                "<h2>Sending Announcements</h2>"
+                "<p>The Announcements tab (<strong>Manage → Communications → "
+                "Announcements</strong>) lets you send announcement emails to users "
+                "without opening a new reporting cycle.</p>"
+                "<h3>How to Send an Announcement</h3>"
+                "<ol>"
+                "<li>Set the <strong>Email Subject</strong> (defaults to "
+                "'SPMS: Announcement').</li>"
+                "<li>Select recipient groups: Business Area Leads, Project Leads, "
+                "and/or Project Team members.</li>"
+                "<li>Review the recipient list — you can exclude individual users "
+                "by clicking the X next to their name.</li>"
+                "<li>Write your announcement message using the rich text editor.</li>"
+                "<li>Preview the email to verify how it will appear.</li>"
+                "<li>Click <strong>Send Announcement</strong> and confirm in the "
+                "dialog.</li>"
+                "</ol>"
+                "<p>Recipients are deduplicated by highest role (BA Lead > Project "
+                "Lead > Team Member), so no user receives duplicate emails.</p>"
+                f"{screenshot('Announcements tab showing recipient selection and message editor')}"
+                "<p><strong>Note:</strong> When email testing mode is enabled, "
+                "announcement emails are also redirected to the test user.</p>"
+            ),
+        },
+        {
+            "field_key": "admin-homepage-banner",
+            "title": "Homepage Banner",
+            "order": 6,
+            "description": (
+                "<h2>Homepage Banner</h2>"
+                "<p>The Banner tab (<strong>Manage → Communications → Banner</strong>) "
+                "lets you display a message on the dashboard for all users.</p>"
+                "<h3>Setting Up the Banner</h3>"
+                "<ol>"
+                "<li>Toggle <strong>Show Banner</strong> on.</li>"
+                "<li>Write your message using the rich text editor. You can use "
+                "bold, italic, links, and bullet points.</li>"
+                "<li>Click <strong>Save</strong>.</li>"
+                "</ol>"
+                "<p>The banner appears below the welcome message on the dashboard, "
+                "above the Quick Actions section. All authenticated users see it.</p>"
+                f"{screenshot('Homepage banner displayed on the dashboard below the welcome message')}"
+                "<h3>Disabling the Banner</h3>"
+                "<p>Toggle <strong>Show Banner</strong> off and save. The banner "
+                "disappears immediately for all users.</p>"
+                "<p><strong>Tip:</strong> Use the banner for time-sensitive "
+                "announcements like system maintenance windows, deadline reminders, "
+                "or new feature introductions.</p>"
             ),
         },
     ]

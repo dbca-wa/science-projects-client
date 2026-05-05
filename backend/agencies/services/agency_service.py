@@ -75,7 +75,7 @@ class AgencyService:
     def get_agency(pk):
         """Get agency by ID"""
         try:
-            return Agency.objects.get(pk=pk)
+            return Agency.objects.select_related("image").get(pk=pk)
         except Agency.DoesNotExist:
             raise NotFound(f"Agency {pk} not found")
 
@@ -154,7 +154,7 @@ class AgencyService:
     def get_branch(pk):
         """Get branch by ID"""
         try:
-            return Branch.objects.get(pk=pk)
+            return Branch.objects.select_related("manager").get(pk=pk)
         except Branch.DoesNotExist:
             raise NotFound(f"Branch {pk} not found")
 
@@ -190,37 +190,46 @@ class AgencyService:
     # Business Area operations
     @staticmethod
     def list_business_areas():
-        """List all business areas with optimized queries"""
+        """List all business areas with optimised queries"""
         return (
             BusinessArea.objects.select_related(
                 "division",
                 "division__director",
                 "division__approver",
+                "division__key_stakeholder",
                 "leader",
                 "caretaker",
                 "finance_admin",
                 "data_custodian",
+                "image",
             )
-            .prefetch_related("division__directorate_email_list")
+            .prefetch_related(
+                "division__directorate_email_list",
+                "division__approvers",
+            )
             .order_by("name")
         )
 
     @staticmethod
     def get_business_area(pk):
-        """Get business area by ID with optimized queries"""
+        """Get business area by ID with optimised queries"""
         try:
             return (
                 BusinessArea.objects.select_related(
                     "division",
                     "division__director",
                     "division__approver",
+                    "division__key_stakeholder",
                     "leader",
                     "caretaker",
                     "finance_admin",
                     "data_custodian",
                     "image",
                 )
-                .prefetch_related("division__directorate_email_list")
+                .prefetch_related(
+                    "division__directorate_email_list",
+                    "division__approvers",
+                )
                 .get(pk=pk)
             )
         except BusinessArea.DoesNotExist:
@@ -267,9 +276,20 @@ class AgencyService:
 
     @staticmethod
     def get_division(pk):
-        """Get division by ID"""
+        """Get division by ID with optimised queries"""
         try:
-            return Division.objects.get(pk=pk)
+            return (
+                Division.objects.select_related(
+                    "director",
+                    "approver",
+                    "key_stakeholder",
+                )
+                .prefetch_related(
+                    "approvers",
+                    "directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except Division.DoesNotExist:
             raise NotFound(f"Division {pk} not found")
 

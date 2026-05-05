@@ -113,6 +113,16 @@ class AdminOptions(CommonModel):
         help_text="Stores the saved new cycle configuration defaults (prepopulate mode, inclusion mode, recipient groups, custom messages)",
     )
 
+    show_homepage_message = models.BooleanField(
+        default=False,
+        help_text="When enabled, displays a banner message on the dashboard for all users",
+    )
+    homepage_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="HTML content for the dashboard banner message (from rich text editor)",
+    )
+
     # ADMIN
     guide_admin = models.TextField(
         blank=True,

@@ -1,2 +1,41 @@
 # Auto detect text files and perform LF normalization
 * text eol=lf
+
+# Binary files must not have line-ending conversion applied.
+# The wildcard rule above seems to corrupt these by stripping \r bytes.
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.webp binary
+*.tif binary
+*.tiff binary
+*.svg text eol=lf
+
+# Fonts
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.otf binary
+
+# Documents and archives
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.7z binary
+
+# Database files
+*.sqlite3 binary
+*.db binary
+*.dat binary
+
+# Audio/video (unlikely but future-proof)
+*.mp3 binary
+*.mp4 binary
+*.wav binary

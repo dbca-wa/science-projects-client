@@ -32,6 +32,8 @@ import {
 } from "@/shared/components/ui/tabs";
 import { SearchControls } from "@/shared/components/SearchControls";
 import { Loader2, AlertCircle, Search } from "lucide-react";
+import { useHomepageBanner } from "@/features/admin/hooks/useHomepageBanner";
+import { HomepageBanner } from "@/features/admin/components/shared/HomepageBanner";
 
 const TAB_ADMIN = "admin";
 const TAB_DOCUMENTS = "documents";
@@ -111,6 +113,8 @@ const Dashboard = observer(() => {
 		error: adminTasksErrorObj,
 		refetch: refetchAdminTasks,
 	} = useAdminTasks();
+
+	const { data: bannerData } = useHomepageBanner();
 
 	const {
 		data: endorsementTasks,
@@ -207,6 +211,12 @@ const Dashboard = observer(() => {
 								for science project planning, approval and reporting.
 							</p>
 						</div>
+
+						{/* Homepage Banner */}
+						{bannerData?.show_homepage_message &&
+							bannerData?.homepage_message && (
+								<HomepageBanner message={bannerData.homepage_message} />
+							)}
 
 						{/* Quick Actions Grid */}
 						<div>

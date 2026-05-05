@@ -32,7 +32,7 @@ import {
 	useNewCycleDraft,
 } from "@/features/admin/hooks/useAdminActions";
 import { useNewCyclePreview } from "@/shared/hooks/queries/useBumpEmails";
-import { NewCycleRecipientSection } from "@/features/admin/components/new-cycle/NewCycleRecipientSection";
+import { RecipientSection } from "@/features/admin/components/shared/RecipientSection";
 import { NewCycleCustomMessage } from "@/features/admin/components/new-cycle/NewCycleCustomMessage";
 import { NewCycleEmailPreview } from "@/features/admin/components/new-cycle/NewCycleEmailPreview";
 import { NewCycleStore } from "@/app/stores/derived/new-cycle.store";
@@ -452,7 +452,7 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 					</div>
 					<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 						{store.state.sendBaLeads && (
-							<NewCycleRecipientSection
+							<RecipientSection
 								title="Business Area Leads"
 								users={recipientPreview.recipients.ba_leads}
 								excludedUserIds={store.state.excludedUserIds}
@@ -461,7 +461,7 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 							/>
 						)}
 						{store.state.sendProjectLeads && (
-							<NewCycleRecipientSection
+							<RecipientSection
 								title="Project Leads"
 								users={recipientPreview.recipients.project_leads}
 								excludedUserIds={store.state.excludedUserIds}
@@ -470,7 +470,7 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 							/>
 						)}
 						{store.state.sendTeamMembers && (
-							<NewCycleRecipientSection
+							<RecipientSection
 								title="Team Members"
 								users={recipientPreview.recipients.team_members}
 								excludedUserIds={store.state.excludedUserIds}

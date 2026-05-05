@@ -7,6 +7,8 @@ from django.db import transaction
 from django.db.models import Q
 from rest_framework.exceptions import NotFound
 
+from common.query_helpers import optimise_document_qs
+
 from ..models import ProjectDocument
 
 
@@ -32,17 +34,7 @@ class DocumentService:
             documents = DocumentService._apply_filters(documents, filters)
 
         # N+1 query optimization
-        documents = documents.select_related(
-            "project",
-            "project__business_area",
-            "project__business_area__division",
-            "project__business_area__leader",
-            "creator",
-            "modifier",
-        ).prefetch_related(
-            "project__members",
-            "project__members__user",
-        )
+        documents = optimise_document_qs(documents)
 
         return documents.distinct()
 
@@ -61,20 +53,8 @@ class DocumentService:
             NotFound: If document does not exist
         """
         try:
-            return (
-                ProjectDocument.objects.select_related(
-                    "project",
-                    "project__business_area",
-                    "project__business_area__division",
-                    "project__business_area__leader",
-                    "creator",
-                    "modifier",
-                )
-                .prefetch_related(
-                    "project__members",
-                    "project__members__user",
-                )
-                .get(pk=pk)
+            return optimise_document_qs(ProjectDocument.objects.filter(pk=pk)).get(
+                pk=pk
             )
         except ProjectDocument.DoesNotExist:
             raise NotFound(f"Document {pk} not found")
@@ -323,14 +303,7 @@ class DocumentService:
             )
 
         # N+1 optimization
-        documents = documents.select_related(
-            "project",
-            "project__business_area",
-            "creator",
-        ).prefetch_related(
-            "project__members",
-            "project__members__user",
-        )
+        documents = optimise_document_qs(documents)
 
         return documents.distinct()
 

@@ -48,17 +48,20 @@ def mock_admin_opts_normal(db):
 class TestSendEmailWithEmbeddedImage:
     """Tests for the send_email_with_embedded_image function."""
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @patch("os.path.exists", return_value=False)
     @pytest.mark.integration
     def test_normal_mode_sends_to_original_recipient(
-        self, mock_exists, mock_email_cls, mock_admin_opts_normal
+        self, mock_exists, mock_smtp_cls, mock_admin_opts_normal
     ):
         """In normal mode, email goes to the original recipient."""
         from config.helpers import send_email_with_embedded_image
 
-        mock_msg = MagicMock()
-        mock_email_cls.return_value = mock_msg
+        mock_smtp_instance = MagicMock()
+        mock_smtp_cls.return_value.__enter__ = MagicMock(
+            return_value=mock_smtp_instance
+        )
+        mock_smtp_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         send_email_with_embedded_image(
             recipient_email=["user@dbca.wa.gov.au"],
@@ -66,13 +69,12 @@ class TestSendEmailWithEmbeddedImage:
             html_content="<p>Hello</p>",
         )
 
-        mock_email_cls.assert_called_once()
-        call_args = mock_email_cls.call_args
-        # Fourth positional arg is recipient list
-        assert call_args[0][3] == ["user@dbca.wa.gov.au"]
-        mock_msg.send.assert_called_once()
+        mock_smtp_cls.assert_called_once()
+        mock_smtp_instance.send_message.assert_called_once()
+        sent_msg = mock_smtp_instance.send_message.call_args[0][0]
+        assert sent_msg["To"] == "user@dbca.wa.gov.au"
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @patch("os.path.exists", return_value=False)
     @patch("django.core.cache.cache.get", return_value=None)
     @patch("django.core.cache.cache.set")
@@ -82,14 +84,17 @@ class TestSendEmailWithEmbeddedImage:
         mock_cache_set,
         mock_cache_get,
         mock_exists,
-        mock_email_cls,
+        mock_smtp_cls,
         mock_admin_opts_test_mode,
     ):
         """In test mode, email is redirected to the test user."""
         from config.helpers import send_email_with_embedded_image
 
-        mock_msg = MagicMock()
-        mock_email_cls.return_value = mock_msg
+        mock_smtp_instance = MagicMock()
+        mock_smtp_cls.return_value.__enter__ = MagicMock(
+            return_value=mock_smtp_instance
+        )
+        mock_smtp_cls.return_value.__exit__ = MagicMock(return_value=False)
         _, test_user = mock_admin_opts_test_mode
 
         send_email_with_embedded_image(
@@ -98,15 +103,15 @@ class TestSendEmailWithEmbeddedImage:
             html_content="<p>Hello</p>",
         )
 
-        mock_email_cls.assert_called_once()
-        call_args = mock_email_cls.call_args
+        mock_smtp_cls.assert_called_once()
+        mock_smtp_instance.send_message.assert_called_once()
+        sent_msg = mock_smtp_instance.send_message.call_args[0][0]
         # Recipient should be redirected to test user
-        assert call_args[0][3] == [test_user.email]
+        assert test_user.email in sent_msg["To"]
         # Subject should have [TEST] prefix
-        assert call_args[0][0].startswith("[TEST]")
-        mock_msg.send.assert_called_once()
+        assert sent_msg["Subject"].startswith("[TEST]")
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @patch("os.path.exists", return_value=False)
     @patch("django.core.cache.cache.get", return_value=True)
     @pytest.mark.integration
@@ -114,7 +119,7 @@ class TestSendEmailWithEmbeddedImage:
         self,
         mock_cache_get,
         mock_exists,
-        mock_email_cls,
+        mock_smtp_cls,
         mock_admin_opts_test_mode,
     ):
         """In test mode, duplicate emails (same subject within window) are skipped."""
@@ -127,9 +132,9 @@ class TestSendEmailWithEmbeddedImage:
         )
 
         # Email should NOT be sent (dedup cache hit)
-        mock_email_cls.assert_not_called()
+        mock_smtp_cls.assert_not_called()
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @patch("os.path.exists", return_value=False)
     @patch("django.core.cache.cache.get", return_value=None)
     @patch("django.core.cache.cache.set")
@@ -139,14 +144,17 @@ class TestSendEmailWithEmbeddedImage:
         mock_cache_set,
         mock_cache_get,
         mock_exists,
-        mock_email_cls,
+        mock_smtp_cls,
         mock_admin_opts_test_mode,
     ):
         """In test mode, a test banner is injected into the HTML content."""
         from config.helpers import send_email_with_embedded_image
 
-        mock_msg = MagicMock()
-        mock_email_cls.return_value = mock_msg
+        mock_smtp_instance = MagicMock()
+        mock_smtp_cls.return_value.__enter__ = MagicMock(
+            return_value=mock_smtp_instance
+        )
+        mock_smtp_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         send_email_with_embedded_image(
             recipient_email=["original@dbca.wa.gov.au"],
@@ -154,23 +162,33 @@ class TestSendEmailWithEmbeddedImage:
             html_content='<html><body style="margin:0"><p>Hello</p></body></html>',
         )
 
-        # Check that attach_alternative was called with HTML containing the test banner
-        attach_call = mock_msg.attach_alternative.call_args
-        html_content = attach_call[0][0]
+        # Get the sent message and extract HTML content from it
+        mock_smtp_instance.send_message.assert_called_once()
+        sent_msg = mock_smtp_instance.send_message.call_args[0][0]
+        # Walk the MIME parts to find the HTML content
+        html_content = None
+        for part in sent_msg.walk():
+            if part.get_content_type() == "text/html":
+                html_content = part.get_payload(decode=True).decode("utf-8")
+                break
+        assert html_content is not None
         assert "Test Mode" in html_content
         assert "redirected" in html_content
         assert "original@dbca.wa.gov.au" in html_content
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @pytest.mark.integration
     def test_logo_attachment_when_file_exists(
-        self, mock_email_cls, mock_admin_opts_normal
+        self, mock_smtp_cls, mock_admin_opts_normal
     ):
         """Logo should be attached as CID image when file exists."""
         from config.helpers import send_email_with_embedded_image
 
-        mock_msg = MagicMock()
-        mock_email_cls.return_value = mock_msg
+        mock_smtp_instance = MagicMock()
+        mock_smtp_cls.return_value.__enter__ = MagicMock(
+            return_value=mock_smtp_instance
+        )
+        mock_smtp_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         # Mock os.path.exists to return True for logo, and provide fake image data
         with (
@@ -183,20 +201,27 @@ class TestSendEmailWithEmbeddedImage:
                 html_content="<p>Hello</p>",
             )
 
-        # Should have attached the logo image
-        assert mock_msg.attach.called
+        # Should have sent the message (with logo attached in the MIME structure)
+        mock_smtp_instance.send_message.assert_called_once()
+        sent_msg = mock_smtp_instance.send_message.call_args[0][0]
+        # Check that the message has an image part (the logo)
+        content_types = [part.get_content_type() for part in sent_msg.walk()]
+        assert "image/png" in content_types
 
-    @patch("config.helpers.EmailMultiAlternatives")
+    @patch("smtplib.SMTP")
     @patch("os.path.exists", return_value=False)
     @pytest.mark.integration
     def test_no_logo_when_file_missing(
-        self, mock_exists, mock_email_cls, mock_admin_opts_normal
+        self, mock_exists, mock_smtp_cls, mock_admin_opts_normal
     ):
         """Email should still send when logo file is missing."""
         from config.helpers import send_email_with_embedded_image
 
-        mock_msg = MagicMock()
-        mock_email_cls.return_value = mock_msg
+        mock_smtp_instance = MagicMock()
+        mock_smtp_cls.return_value.__enter__ = MagicMock(
+            return_value=mock_smtp_instance
+        )
+        mock_smtp_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         send_email_with_embedded_image(
             recipient_email=["user@dbca.wa.gov.au"],
@@ -204,6 +229,8 @@ class TestSendEmailWithEmbeddedImage:
             html_content="<p>Hello</p>",
         )
 
-        mock_msg.send.assert_called_once()
-        # Logo should NOT be attached
-        assert not mock_msg.attach.called
+        mock_smtp_instance.send_message.assert_called_once()
+        sent_msg = mock_smtp_instance.send_message.call_args[0][0]
+        # Logo should NOT be attached — no image parts
+        content_types = [part.get_content_type() for part in sent_msg.walk()]
+        assert "image/png" not in content_types

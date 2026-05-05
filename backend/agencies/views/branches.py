@@ -39,8 +39,10 @@ class Branches(APIView):
             start = (page - 1) * page_size
             end = start + page_size
 
-            branches = Branch.objects.filter(Q(name__icontains=search_term)).order_by(
-                "name"
+            branches = (
+                Branch.objects.filter(Q(name__icontains=search_term))
+                .order_by("name")
+                .select_related("manager")
             )
 
             total_branches = branches.count()
@@ -59,7 +61,7 @@ class Branches(APIView):
                 status=HTTP_200_OK,
             )
         else:
-            branches = Branch.objects.all()
+            branches = Branch.objects.select_related("manager").all()
             serializer = TinyBranchSerializer(branches, many=True)
             return Response(serializer.data, status=HTTP_200_OK)
 

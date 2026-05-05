@@ -32,7 +32,28 @@ class ProjectClosures(APIView):
 
     def get(self, request):
         """List all project closures"""
-        all_project_closures = ProjectClosure.objects.all()
+        all_project_closures = ProjectClosure.objects.select_related(
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        ).prefetch_related(
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
         serializer = TinyProjectClosureSerializer(
             all_project_closures,
             many=True,
@@ -101,7 +122,32 @@ class ProjectClosureDetail(APIView):
     def get(self, request, pk):
         """Get project closure by ID"""
         try:
-            project_closure = ProjectClosure.objects.get(pk=pk)
+            project_closure = (
+                ProjectClosure.objects.select_related(
+                    "document",
+                    "document__project",
+                    "document__project__business_area",
+                    "document__project__business_area__image",
+                    "document__project__business_area__division",
+                    "document__project__business_area__division__director",
+                    "document__project__business_area__division__approver",
+                    "document__project__business_area__division__key_stakeholder",
+                    "document__project__business_area__leader",
+                    "document__project__business_area__caretaker",
+                    "document__project__business_area__finance_admin",
+                    "document__project__business_area__data_custodian",
+                    "document__project__image",
+                    "document__project__image__uploader",
+                    "document__pdf",
+                    "document__creator",
+                    "document__modifier",
+                )
+                .prefetch_related(
+                    "document__project__business_area__division__approvers",
+                    "document__project__business_area__division__directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except ProjectClosure.DoesNotExist:
             raise NotFound
 

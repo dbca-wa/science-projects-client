@@ -18,6 +18,7 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from common.query_helpers import optimise_document_qs
 from documents.models import ProjectDocument
 from documents.serializers import ProjectDocumentSerializer
 from documents.services.approval_service import ApprovalService
@@ -251,6 +252,10 @@ class BusinessAreaDetail(APIView):
         ba.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def patch(self, request, pk):
+        """Partial update — delegates to put (which already uses partial=True)"""
+        return self.put(request, pk)
+
 
 class MyBusinessAreas(APIView):
     """Get business areas led by current user (or all for superusers)"""
@@ -275,8 +280,10 @@ class BusinessAreasUnapprovedDocs(APIView):
 
     def get_unapproved_docs_for_ba(self, pk):
         try:
-            docs = ProjectDocument.objects.filter(
-                project__business_area=pk, directorate_approval_granted=False
+            docs = optimise_document_qs(
+                ProjectDocument.objects.filter(
+                    project__business_area=pk, directorate_approval_granted=False
+                )
             ).distinct()
         except ProjectDocument.DoesNotExist:
             raise NotFound

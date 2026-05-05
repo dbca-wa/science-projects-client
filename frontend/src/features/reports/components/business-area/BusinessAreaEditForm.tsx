@@ -264,7 +264,7 @@ export const BusinessAreaEditForm = ({
 	}, [isFormDirty, businessAreaId]);
 
 	// Form submission
-	const onSubmit = (data: EditFormData) => {
+	const onSubmit = async (data: EditFormData) => {
 		const formData = new FormData();
 		formData.append("name", data.name);
 		formData.append("introduction", introductionHtml);
@@ -275,15 +275,13 @@ export const BusinessAreaEditForm = ({
 			formData.append("selectedImageUrl", "delete");
 		}
 
-		updateMutation.mutate(
-			{ id: businessAreaId, formData },
-			{
-				onSuccess: () => {
-					toast.success("Business area updated successfully");
-					goBack();
-				},
-			}
-		);
+		try {
+			await updateMutation.mutateAsync({ id: businessAreaId, formData });
+			toast.success("Business area updated successfully");
+			goBack();
+		} catch {
+			// Error toast handled by onError in the hook
+		}
 	};
 
 	if (isLoadingBA) {

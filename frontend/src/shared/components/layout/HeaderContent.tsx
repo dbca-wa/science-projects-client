@@ -9,13 +9,12 @@ import {
 	FileText,
 	Archive,
 	Database,
-	MapPin,
 	Building,
-	GitBranch,
+	Network,
 	Briefcase,
 	Settings,
 	CircleCheckBig,
-	FlaskConical,
+	Megaphone,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { ToggleDarkMode } from "./ToggleDarkMode";
@@ -274,11 +273,11 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/admin-testing", e)}
+								onClick={(e) => navigateAndClose("/manage/communications", e)}
 							>
 								<span className="flex items-center gap-3">
-									<FlaskConical className="text-xl" aria-hidden="true" />
-									<span>Admin Testing</span>
+									<Megaphone className="text-xl" aria-hidden="true" />
+									<span>Communications</span>
 								</span>
 							</Button>
 
@@ -286,16 +285,6 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
 								CRUD
 							</p>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/addresses", e)}
-							>
-								<span className="flex items-center gap-3">
-									<MapPin className="text-xl" aria-hidden="true" />
-									<span>Addresses</span>
-								</span>
-							</Button>
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
@@ -312,7 +301,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 								onClick={(e) => navigateAndClose("/manage/branches", e)}
 							>
 								<span className="flex items-center gap-3">
-									<GitBranch className="text-xl" aria-hidden="true" />
+									<Network className="text-xl" aria-hidden="true" />
 									<span>Branches</span>
 								</span>
 							</Button>
@@ -336,16 +325,10 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 									<span>Divisions</span>
 								</span>
 							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/locations", e)}
-							>
-								<span className="flex items-center gap-3">
-									<Globe className="text-xl" aria-hidden="true" />
-									<span>Locations</span>
-								</span>
-							</Button>
+							{/* AR Actions */}
+							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
+								AR Actions
+							</p>
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
@@ -356,10 +339,6 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 									<span>Report Info</span>
 								</span>
 							</Button>
-							{/* AR Actions */}
-							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
-								AR Actions
-							</p>
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"

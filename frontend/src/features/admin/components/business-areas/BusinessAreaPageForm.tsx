@@ -290,7 +290,7 @@ export function BusinessAreaPageForm({
 		initialised && normalise(introductionHtml) !== originalIntroText.current;
 
 	// Form submission
-	const onSubmit = (data: BusinessAreaFormData) => {
+	const onSubmit = async (data: BusinessAreaFormData) => {
 		if (isEditing && businessAreaId) {
 			const formData = new FormData();
 			formData.append("name", data.name);
@@ -310,10 +310,12 @@ export function BusinessAreaPageForm({
 				formData.append("selectedImageUrl", "delete");
 			}
 
-			updateMutation.mutate(
-				{ id: businessAreaId, formData },
-				{ onSuccess: () => navigate("/manage/business-areas") }
-			);
+			try {
+				await updateMutation.mutateAsync({ id: businessAreaId, formData });
+				navigate("/manage/business-areas");
+			} catch {
+				// Error toast handled by onError in the hook
+			}
 		} else {
 			// Create — always use FormData
 			const formData = new FormData();
@@ -329,9 +331,12 @@ export function BusinessAreaPageForm({
 				formData.append("data_custodian", String(data.data_custodian));
 			if (imageFile) formData.append("image", imageFile);
 
-			createMutation.mutate(formData, {
-				onSuccess: () => navigate("/manage/business-areas"),
-			});
+			try {
+				await createMutation.mutateAsync(formData);
+				navigate("/manage/business-areas");
+			} catch {
+				// Error toast handled by onError in the hook
+			}
 		}
 	};
 

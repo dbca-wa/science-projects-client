@@ -19,9 +19,9 @@ describe("ManageDropdownContent navigation", () => {
 		expect(dropdownContent).not.toMatch(/\bMail\b/);
 	});
 
-	it("displays 'Lists & Approvers' section label", () => {
-		expect(dropdownContent).toContain("Lists & Approvers");
-		expect(dropdownContent).not.toContain("Lists & Emails");
+	it("displays 'Core' section label", () => {
+		expect(dropdownContent).toContain("Core");
+		expect(dropdownContent).not.toContain("Lists & Approvers");
 	});
 
 	it("navigates to /manage/approvers (not /manage/emails)", () => {

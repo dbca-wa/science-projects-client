@@ -35,7 +35,7 @@ export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 			role="link"
 			tabIndex={0}
 			aria-label={`${section.title} — ${articleCount} article${articleCount !== 1 ? "s" : ""}`}
-			className="group cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+			className="group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 			onClick={() => navigate(`/guide/${section.id}`)}
 			onKeyDown={(e) => {
 				if (e.key === "Enter" || e.key === " ") {
@@ -45,11 +45,11 @@ export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 			}}
 		>
 			<CardHeader className="space-y-3">
-				<div className="flex items-start justify-between">
-					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-400 dark:group-hover:bg-blue-900">
+				<div className="flex items-start justify-between gap-2">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-400 dark:group-hover:bg-blue-900">
 						{iconElement}
 					</div>
-					<div className="flex items-center gap-1.5">
+					<div className="flex items-center gap-1.5 shrink-0">
 						{roleLabel && (
 							<Badge
 								variant="outline"
@@ -65,8 +65,10 @@ export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 						)}
 					</div>
 				</div>
-				<div>
-					<CardTitle className="text-base">{section.title}</CardTitle>
+				<div className="min-w-0">
+					<CardTitle className="text-base line-clamp-2">
+						{section.title}
+					</CardTitle>
 					{section.description && (
 						<CardDescription className="mt-1 line-clamp-2">
 							{section.description}

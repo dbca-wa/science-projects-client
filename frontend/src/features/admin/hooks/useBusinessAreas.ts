@@ -38,7 +38,10 @@ export const useCreateBusinessAreaFormData = () => {
 	return useMutation({
 		mutationFn: createBusinessAreaFormData,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["business-areas"] });
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["business-areas"] }),
+				queryClient.invalidateQueries({ queryKey: ["businessAreas"] }),
+			]);
 			toast.success("Business area created successfully");
 		},
 		onError: (error: Error) => {
@@ -57,7 +60,10 @@ export const useUpdateBusinessAreaFormData = () => {
 		mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
 			updateBusinessAreaFormData(id, formData),
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["business-areas"] });
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["business-areas"] }),
+				queryClient.invalidateQueries({ queryKey: ["businessAreas"] }),
+			]);
 			toast.success("Business area updated successfully");
 		},
 		onError: (error: Error) => {
@@ -75,7 +81,10 @@ export const useDeleteBusinessArea = () => {
 	return useMutation({
 		mutationFn: deleteBusinessArea,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["business-areas"] });
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["business-areas"] }),
+				queryClient.invalidateQueries({ queryKey: ["businessAreas"] }),
+			]);
 			toast.success("Business area deleted successfully");
 		},
 		onError: (error: Error) => {

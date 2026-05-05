@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from ..serializers import ProjectDocumentSerializer
 from ..services.approval_service import ApprovalService
 from ..services.document_service import DocumentService
+from ..utils.helpers import sanitise_feedback_html
 
 
 class DocApproval(APIView):
@@ -45,13 +46,27 @@ class DocApproval(APIView):
         # Get document
         document = DocumentService.get_document(document_pk)
 
+        # Extract optional comment/feedback
+        feedback_html = request.data.get("feedbackHTML", "") or request.data.get(
+            "comment", ""
+        )
+
+        # Sanitise feedback (returns "" if empty/meaningless content)
+        feedback_html = sanitise_feedback_html(feedback_html)
+
         # Delegate to service based on stage
         if stage == 1:
-            ApprovalService.approve_stage_one(document, request.user)
+            ApprovalService.approve_stage_one(
+                document, request.user, feedback_html=feedback_html
+            )
         elif stage == 2:
-            ApprovalService.approve_stage_two(document, request.user)
+            ApprovalService.approve_stage_two(
+                document, request.user, feedback_html=feedback_html
+            )
         elif stage == 3:
-            ApprovalService.approve_stage_three(document, request.user)
+            ApprovalService.approve_stage_three(
+                document, request.user, feedback_html=feedback_html
+            )
         else:
             return Response(
                 {"error": f"Invalid stage: {stage}"}, status=HTTP_400_BAD_REQUEST

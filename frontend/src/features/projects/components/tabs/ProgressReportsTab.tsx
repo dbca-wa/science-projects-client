@@ -244,7 +244,7 @@ export const ProgressReportsTab = ({
 							limitCanBePassed={true}
 							showWordLimitInLabel={true}
 							label="Progress"
-							toolbar="progressReport"
+							toolbar="report"
 						/>
 					</ProjectSection>
 

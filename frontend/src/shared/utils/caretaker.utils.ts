@@ -1,4 +1,4 @@
-import type { ICaretakee } from "@/features/caretakers/types";
+import type { ICaretakerSimpleUserData } from "@/shared/types/user.types";
 
 /**
  * Format caretaker reason from backend to display text.
@@ -12,7 +12,9 @@ export const formatCaretakerReason = (reason: string | undefined): string => {
 /**
  * Check if a caretaking relationship is valid (not expired)
  */
-export const isValidCaretaking = (caretakee: ICaretakee): boolean => {
+export const isValidCaretaking = (
+	caretakee: ICaretakerSimpleUserData
+): boolean => {
 	if (!caretakee?.end_date) return true;
 	const endDate = new Date(caretakee.end_date);
 	return endDate >= new Date();
@@ -23,7 +25,7 @@ export const isValidCaretaking = (caretakee: ICaretakee): boolean => {
  * Recursively searches through the caretaking chain.
  */
 export const hasNestedCaretakee = (
-	caretakee: ICaretakee,
+	caretakee: ICaretakerSimpleUserData,
 	targetUserId: number,
 	visited: Set<number> = new Set()
 ): boolean => {

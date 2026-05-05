@@ -63,18 +63,23 @@ export const useAllReportPDFs = () =>
 export const useLatestReport = (divisionSlug?: string) =>
 	useQuery({
 		queryKey: ["reports", "latest", divisionSlug ?? "all"],
-		queryFn: () => getLatestReport(divisionSlug),
-		staleTime: 5 * 60_000,
-		retry: (failureCount, error) => {
-			// Don't retry on 404 — it means no report exists for this division
-			if (
-				error &&
-				"status" in error &&
-				(error as { status: number }).status === 404
-			)
-				return false;
-			return failureCount < 3;
+		queryFn: async () => {
+			try {
+				return await getLatestReport(divisionSlug);
+			} catch (error) {
+				// 404 means no report exists for this division — return null, not an error
+				if (
+					error &&
+					typeof error === "object" &&
+					"status" in error &&
+					(error as { status: number }).status === 404
+				) {
+					return null;
+				}
+				throw error;
+			}
 		},
+		staleTime: 5 * 60_000,
 	});
 
 /**

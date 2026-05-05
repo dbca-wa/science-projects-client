@@ -18,7 +18,7 @@ class NotificationService:
     """Business logic for document notifications"""
 
     @staticmethod
-    def notify_document_approved(document, approver, stage=None):
+    def notify_document_approved(document, approver, stage=None, feedback_html=""):
         """
         Notify the correct next approver when a document is approved at a stage.
 
@@ -33,6 +33,7 @@ class NotificationService:
             document: Approved document instance
             approver: User who approved the document
             stage: The approval stage that was just completed (1, 2, or 3)
+            feedback_html: Optional comment/feedback HTML to include in email
         """
         if stage is not None:
             recipients = NotificationService._get_stage_approval_recipients(
@@ -54,14 +55,18 @@ class NotificationService:
         if stage == 3:
             email_subject = f"{document.kind.title()} — Final Approval Granted"
 
+        additional_context = {
+            "email_subject": email_subject,
+        }
+        if feedback_html:
+            additional_context["feedback_html"] = feedback_html
+
         EmailService.send_document_notification(
             notification_type=notification_type,
             document=document,
             recipients=recipients,
             actioning_user=approver,
-            additional_context={
-                "email_subject": email_subject,
-            },
+            additional_context=additional_context,
         )
 
     @staticmethod
@@ -70,6 +75,9 @@ class NotificationService:
         Send consolidated approval notification emails for batch-approved documents.
         Groups documents by recipient so each user gets one email listing all their
         approved documents, rather than one email per document.
+
+        Recipients are limited to project leads and business area leads only —
+        regular team members do not receive batch approval notifications.
 
         Args:
             documents: List of approved ProjectDocument instances
@@ -90,11 +98,12 @@ class NotificationService:
             "projectclosure": "closure",
         }
 
-        # Group documents by recipient (deduplicated by user PK)
-        user_docs = {}  # pk → {name, email, docs: []}
+        # Group documents by recipient (deduplicated by email)
+        # Only project leads and BA leads receive batch approval emails
+        user_docs = {}  # email → {name, email, docs: []}
 
         for doc in documents:
-            recipients = NotificationService._get_document_recipients(doc)
+            recipients = NotificationService._get_batch_approval_recipients(doc)
             kind_label = document_kind_dict.get(doc.kind, doc.kind)
             url_kind = url_kind_map.get(doc.kind, doc.kind)
             doc_info = {
@@ -107,7 +116,6 @@ class NotificationService:
                 email = recipient["email"]
                 if not email:
                     continue
-                # Use email as key since we don't have PK in recipient dicts
                 if email not in user_docs:
                     user_docs[email] = {
                         "name": recipient["name"],
@@ -991,6 +999,202 @@ class NotificationService:
             )
 
     @staticmethod
+    def send_announcement_emails(
+        actioning_user,
+        recipient_groups,
+        excluded_user_ids=None,
+        custom_message="",
+        custom_messages=None,
+        subject="SPMS: Announcement",
+        division_slug=None,
+    ):
+        """
+        Send announcement emails to selected recipient groups.
+        Reuses the same recipient resolution logic as send_cycle_opened_emails
+        (deduplication by highest role, active staff with @dbca.wa.gov.au emails).
+
+        Args:
+            actioning_user: User who is sending the announcement.
+            recipient_groups: List of groups, e.g. ["ba_leads", "project_leads", "team_members"].
+            excluded_user_ids: Optional list of user PKs to exclude.
+            custom_message: HTML string for the email body (single message for all).
+            custom_messages: Dict with per-group messages (takes precedence over custom_message).
+            subject: Email subject line.
+            division_slug: Optional division slug to scope recipients.
+        """
+        from agencies.models import BusinessArea, Division
+        from projects.models import ProjectMember
+
+        settings.LOGGER.info("Sending announcement emails")
+        template_path = "./email_templates/announcement_email.html"
+
+        actioning_user_name = (
+            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
+        )
+        actioning_user_email = actioning_user.email
+
+        def _is_valid_recipient(user):
+            return (
+                user
+                and user.is_active
+                and user.is_staff
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
+
+        # Collect users with role priorities for deduplication
+        # Priority: BA Lead (3) > Project Lead (2) > Team Member (1)
+        user_roles = {}
+
+        # Resolve division if provided
+        division = None
+        if division_slug:
+            try:
+                division = Division.objects.get(slug=division_slug)
+            except Division.DoesNotExist:
+                pass
+
+        all_projects = Project.objects.exclude(
+            status__in=[
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ]
+        )
+        if division:
+            all_projects = all_projects.filter(business_area__division=division)
+
+        if "ba_leads" in recipient_groups:
+            bas = BusinessArea.objects.select_related("leader").all()
+            if division:
+                bas = bas.filter(division=division)
+            for ba in bas:
+                if _is_valid_recipient(ba.leader):
+                    pk = ba.leader.pk
+                    if pk not in user_roles or user_roles[pk][0] < 3:
+                        user_roles[pk] = (
+                            3,
+                            f"{ba.leader.display_first_name} {ba.leader.display_last_name}",
+                            ba.leader.email,
+                        )
+
+        if "project_leads" in recipient_groups:
+            leaders = ProjectMember.objects.filter(
+                project__in=all_projects,
+                is_leader=True,
+            ).select_related("user")
+            for member in leaders:
+                if _is_valid_recipient(member.user):
+                    pk = member.user.pk
+                    if pk not in user_roles or user_roles[pk][0] < 2:
+                        user_roles[pk] = (
+                            2,
+                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            member.user.email,
+                        )
+
+        if "team_members" in recipient_groups:
+            members = ProjectMember.objects.filter(
+                project__in=all_projects,
+                is_leader=False,
+            ).select_related("user")
+            for member in members:
+                if _is_valid_recipient(member.user):
+                    pk = member.user.pk
+                    if pk not in user_roles:
+                        user_roles[pk] = (
+                            1,
+                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            member.user.email,
+                        )
+
+        # Remove excluded users
+        if excluded_user_ids:
+            for pk in excluded_user_ids:
+                user_roles.pop(pk, None)
+
+        # Sanitise custom message(s)
+        import bleach
+
+        allowed_tags = [
+            "p",
+            "br",
+            "strong",
+            "em",
+            "u",
+            "s",
+            "a",
+            "ul",
+            "ol",
+            "li",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "blockquote",
+            "span",
+        ]
+        allowed_attrs = {"a": ["href", "target"], "span": ["style"]}
+
+        sanitised_message = None
+        sanitised_messages = None
+
+        if custom_messages and isinstance(custom_messages, dict):
+            sanitised_messages = {}
+            for key in ("ba_leads", "project_leads", "team_members"):
+                raw = custom_messages.get(key, "")
+                if raw:
+                    sanitised_messages[key] = bleach.clean(
+                        raw, tags=allowed_tags, attributes=allowed_attrs, strip=True
+                    )
+        elif custom_message:
+            sanitised_message = bleach.clean(
+                custom_message, tags=allowed_tags, attributes=allowed_attrs, strip=True
+            )
+
+        # Map role priority to group key for per-group message lookup
+        priority_to_group = {3: "ba_leads", 2: "project_leads", 1: "team_members"}
+
+        emails_sent = 0
+        errors = []
+
+        for pk, (priority, name, email) in user_roles.items():
+            # Determine the custom message for this recipient
+            recipient_custom_message = None
+            if sanitised_messages:
+                group_key = priority_to_group.get(priority, "team_members")
+                recipient_custom_message = sanitised_messages.get(group_key)
+            elif sanitised_message:
+                recipient_custom_message = sanitised_message
+
+            template_props = {
+                "subject": subject,
+                "actioning_user_email": actioning_user_email,
+                "actioning_user_name": actioning_user_name,
+                "recipient_name": name,
+                "site_url": settings.SITE_URL,
+                "custom_message": recipient_custom_message,
+            }
+
+            try:
+                template_content = render_to_string(template_path, template_props)
+                send_email_with_embedded_image(
+                    recipient_email=[email],
+                    subject=subject,
+                    html_content=template_content,
+                )
+                emails_sent += 1
+            except Exception as e:
+                settings.LOGGER.error(f"Failed to send announcement to {email}: {e}")
+                errors.append(f"Failed to send to {email}")
+
+        settings.LOGGER.info(
+            f"Announcement emails sent: {emails_sent}/{len(user_roles)}"
+        )
+        return {"emails_sent": emails_sent, "errors": errors}
+
+    @staticmethod
     def notify_project_closed(project, closer):
         """
         Notify when project is closed
@@ -1258,6 +1462,54 @@ class NotificationService:
                     }
                 )
                 seen_pks.add(ba.leader.pk)
+
+        return recipients
+
+    @staticmethod
+    def _get_batch_approval_recipients(document):
+        """
+        Get recipients for batch approval notifications.
+        Only active project leads and business area leads — NOT regular team members.
+
+        Returns:
+            List of dicts with 'name', 'email', 'kind'
+        """
+        recipients = []
+        seen_emails = set()
+
+        if hasattr(document, "project") and document.project:
+            # Project leads only (not regular team members)
+            for member in document.project.members.filter(is_leader=True):
+                if (
+                    member.user.is_active
+                    and member.user.email
+                    and member.user.email not in seen_emails
+                ):
+                    recipients.append(
+                        {
+                            "name": member.user.get_full_name(),
+                            "email": member.user.email,
+                            "kind": "Project Lead",
+                        }
+                    )
+                    seen_emails.add(member.user.email)
+
+            # Business area leader
+            if document.project.business_area and document.project.business_area.leader:
+                ba_leader = document.project.business_area.leader
+                if (
+                    ba_leader.is_active
+                    and ba_leader.email
+                    and ba_leader.email not in seen_emails
+                ):
+                    recipients.append(
+                        {
+                            "name": ba_leader.get_full_name(),
+                            "email": ba_leader.email,
+                            "kind": "Business Area Leader",
+                        }
+                    )
+                    seen_emails.add(ba_leader.email)
 
         return recipients
 

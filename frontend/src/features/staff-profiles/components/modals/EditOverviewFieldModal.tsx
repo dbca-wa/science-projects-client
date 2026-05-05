@@ -43,7 +43,7 @@ const EditOverviewFieldModal = ({
 					value={value}
 					onChange={setValue}
 					placeholder={`Enter your ${title.toLowerCase()}...`}
-					toolbar="staffProfile"
+					toolbar="profile"
 					wordLimit={1000}
 				/>
 			</div>

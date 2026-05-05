@@ -25,7 +25,7 @@ import type {
 } from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
 import { canEditProject } from "@/features/projects/utils/permissions";
-import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
+import { isDocumentTypeAllowed } from "@/shared/constants/allowedDocumentTypes";
 
 interface ProjectActionsDropdownProps {
 	project: IProjectData;

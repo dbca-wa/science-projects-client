@@ -115,3 +115,46 @@ class Command(BaseCommand):
                 f"({articles_created} created, {articles_updated} updated)."
             )
         )
+
+        # Seed homepage banner content
+        from adminoptions.models import AdminOptions
+
+        admin_opts = AdminOptions.objects.first()
+        if admin_opts:
+            admin_opts.show_homepage_message = True
+            admin_opts.homepage_message = (
+                '<p class="editor-paragraph mb-2">'
+                '<span style="white-space: pre-wrap;">Welcome to the new SPMS. '
+                "The system has been overhauled to improve UX. "
+                "List of new features and update:</span></p>"
+                '<ul class="editor-ul editor-ul1">'
+                '<li value="1" class="editor-li">'
+                '<span style="white-space: pre-wrap;">Project Creation Wizard '
+                "(save progress in a draft!)</span></li>"
+                '<li value="2" class="editor-li">'
+                '<span style="white-space: pre-wrap;">Saved searches '
+                "(your last search will be remembered)</span></li>"
+                '<li value="3" class="editor-li">'
+                '<span style="white-space: pre-wrap;">New emails! '
+                "(Design more consistent with DBCA theming)</span></li>"
+                '<li value="4" class="editor-li">'
+                '<span style="white-space: pre-wrap;">New Project Document '
+                "PDF Design!</span></li>"
+                '<li value="5" class="editor-li">'
+                '<span style="white-space: pre-wrap;">Knowledge base - find out '
+                "what you need to do and how with improved guides!</span></li>"
+                '<li value="6" class="editor-li">'
+                '<span style="white-space: pre-wrap;">Improved Image upload - '
+                "crop and adjust to get images exactly how you want!</span></li>"
+                '<li value="7" class="editor-li">'
+                '<span style="white-space: pre-wrap;">New invite email '
+                "(send to staff that aren't already in the system)</span></li>"
+                '<li value="8" class="editor-li">'
+                '<span style="white-space: pre-wrap;">Redesigned staff profiles! '
+                "Showcase your work to the public in style</span></li>"
+                "</ul>"
+            )
+            admin_opts.save(update_fields=["show_homepage_message", "homepage_message"])
+            self.stdout.write(
+                self.style.SUCCESS("Homepage banner seeded (enabled with content).")
+            )

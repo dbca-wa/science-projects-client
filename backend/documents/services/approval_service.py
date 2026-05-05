@@ -51,7 +51,9 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_one(document, approver, send_notifications=True):
+    def approve_stage_one(
+        document, approver, send_notifications=True, feedback_html=""
+    ):
         """
         Approve document at stage 1 (project lead)
 
@@ -59,6 +61,7 @@ class ApprovalService:
             document: ProjectDocument instance
             approver: User approving the document
             send_notifications: Whether to send notification emails
+            feedback_html: Optional comment/feedback HTML to include in email
 
         Raises:
             PermissionDenied: If user not authorised
@@ -76,7 +79,7 @@ class ApprovalService:
         if send_notifications:
             try:
                 NotificationService.notify_document_approved(
-                    document, approver, stage=1
+                    document, approver, stage=1, feedback_html=feedback_html
                 )
             except Exception as e:
                 settings.LOGGER.error(
@@ -85,7 +88,9 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_two(document, approver, send_notifications=True):
+    def approve_stage_two(
+        document, approver, send_notifications=True, feedback_html=""
+    ):
         """
         Approve document at stage 2 (business area lead)
 
@@ -93,6 +98,7 @@ class ApprovalService:
             document: ProjectDocument instance
             approver: User approving the document
             send_notifications: Whether to send notification emails
+            feedback_html: Optional comment/feedback HTML to include in email
 
         Raises:
             PermissionDenied: If user not authorised
@@ -115,7 +121,7 @@ class ApprovalService:
         if send_notifications:
             try:
                 NotificationService.notify_document_approved(
-                    document, approver, stage=2
+                    document, approver, stage=2, feedback_html=feedback_html
                 )
             except Exception as e:
                 settings.LOGGER.error(
@@ -124,7 +130,9 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def approve_stage_three(document, approver, send_notifications=True):
+    def approve_stage_three(
+        document, approver, send_notifications=True, feedback_html=""
+    ):
         """
         Approve document at stage 3 (directorate) - final approval
 
@@ -132,6 +140,7 @@ class ApprovalService:
             document: ProjectDocument instance
             approver: User approving the document
             send_notifications: Whether to send notification emails
+            feedback_html: Optional comment/feedback HTML to include in email
 
         Raises:
             PermissionDenied: If user not authorised
@@ -207,7 +216,7 @@ class ApprovalService:
         if send_notifications:
             try:
                 NotificationService.notify_document_approved(
-                    document, approver, stage=3
+                    document, approver, stage=3, feedback_html=feedback_html
                 )
             except Exception as e:
                 settings.LOGGER.error(

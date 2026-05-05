@@ -56,12 +56,14 @@ export const useUpdateBusinessAreaLead = () => {
 		mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
 			updateBusinessAreaLead(id, formData),
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: ["business-areas", "mine"],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: ["business-areas", "detail"],
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: ["business-areas"],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ["businessAreas"],
+				}),
+			]);
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to update business area");

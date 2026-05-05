@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_202_ACCEPTED
 from rest_framework.views import APIView
 
+from common.query_helpers import optimise_document_qs, optimise_project_qs
 from documents.models import ProjectDocument
 from documents.serializers import ProjectDocumentSerializer
 
@@ -54,6 +55,8 @@ class SuspendProject(APIView):
             project.status_before_suspend = None
 
         project.save()
+        # Re-fetch with optimisation for serialisation
+        project = ProjectService.get_project(pk)
         serializer = TinyProjectSerializer(project)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)
 
@@ -67,15 +70,9 @@ class ProjectDocs(APIView):
         """Get all documents for a project"""
         settings.LOGGER.info(f"{request.user} is viewing documents for project {pk}")
 
-        documents = (
+        documents = optimise_document_qs(
             ProjectDocument.objects.filter(project_id=pk)
-            .select_related(
-                "project",
-                "creator",
-                "modifier",
-            )
-            .order_by("-created_at")
-        )
+        ).order_by("-created_at")
 
         serializer = ProjectDocumentSerializer(documents, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
@@ -92,6 +89,8 @@ class ToggleUserProfileVisibilityForProject(APIView):
             f"{request.user} is toggling profile visibility for project (pk={pk})"
         )
         project = ProjectService.toggle_user_profile_visibility(pk, request.user)
+        # Re-fetch with optimisation for serialisation
+        project = ProjectService.get_project(pk)
         serializer = TinyProjectSerializer(project)
         return Response(serializer.data, status=HTTP_202_ACCEPTED)
 
@@ -101,7 +100,7 @@ class CoreFunctionProjects(APIView):
 
     def get(self, request):
         """Get all core function projects"""
-        projects = Project.objects.filter(kind="core_function").all()
+        projects = optimise_project_qs(Project.objects.filter(kind="core_function"))
         serializer = TinyProjectSerializer(projects, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -111,7 +110,7 @@ class ScienceProjects(APIView):
 
     def get(self, request):
         """Get all science projects"""
-        projects = Project.objects.filter(kind="science").all()
+        projects = optimise_project_qs(Project.objects.filter(kind="science"))
         serializer = TinyProjectSerializer(projects, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -121,7 +120,7 @@ class StudentProjects(APIView):
 
     def get(self, request):
         """Get all student projects"""
-        projects = Project.objects.filter(kind="student").all()
+        projects = optimise_project_qs(Project.objects.filter(kind="student"))
         serializer = TinyProjectSerializer(projects, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -131,6 +130,6 @@ class ExternalProjects(APIView):
 
     def get(self, request):
         """Get all external projects"""
-        projects = Project.objects.filter(kind="external").all()
+        projects = optimise_project_qs(Project.objects.filter(kind="external"))
         serializer = TinyProjectSerializer(projects, many=True)
         return Response(serializer.data, status=HTTP_200_OK)

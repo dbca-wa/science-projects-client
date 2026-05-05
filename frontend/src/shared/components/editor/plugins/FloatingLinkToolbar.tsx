@@ -26,6 +26,7 @@ import {
 	RemoveFormatting,
 } from "lucide-react";
 import { useLinkEditor } from "../toolbar/link-editor.utils";
+import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
 import type { ToolbarMode } from "@/shared/types/editor.types";
 
 interface FloatingLinkToolbarProps {
@@ -58,34 +59,14 @@ export const FloatingLinkToolbar = ({
 	const [isSubscript, setIsSubscript] = useState(false);
 	const [isSuperscript, setIsSuperscript] = useState(false);
 
-	// Determine which buttons are visible based on toolbar mode
-	// Mirrors the main Toolbar component's visibility logic
-	const isProfileMode = toolbar === "profile" || toolbar === "staffProfile";
-	const isProgressReport = toolbar === "progressReport";
-	const isBusinessArea = toolbar === "businessArea";
+	// Derive button visibility from TOOLBAR_CONFIGS — mirrors the main Toolbar component
+	const config = TOOLBAR_CONFIGS[toolbar];
 
-	const showBold =
-		toolbar === "full" ||
-		toolbar === "simple" ||
-		toolbar === "minimal" ||
-		isBusinessArea ||
-		isProfileMode ||
-		isProgressReport;
+	const showBold = config.formatting.bold;
 	const showItalic = toolbar !== "none";
-	const showUnderline =
-		toolbar === "full" || isProfileMode || isProgressReport || isBusinessArea;
-	const showSubscriptSuperscript =
-		toolbar === "full" ||
-		isProfileMode ||
-		toolbar === "projectTitle" ||
-		isProgressReport ||
-		isBusinessArea;
-	const showClearFormatting =
-		toolbar === "full" ||
-		isProfileMode ||
-		toolbar === "projectTitle" ||
-		isProgressReport ||
-		isBusinessArea;
+	const showUnderline = config.formatting.underline;
+	const showSubscriptSuperscript = config.formatting.subscript;
+	const showClearFormatting = config.features.clearFormatting;
 
 	// Count visible buttons to decide whether to render at all
 	const visibleButtonCount =
