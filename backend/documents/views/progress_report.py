@@ -26,7 +26,28 @@ class ProgressReports(APIView):
 
     def get(self, request):
         """List all progress reports"""
-        all_progress_reports = ProgressReport.objects.all()
+        all_progress_reports = ProgressReport.objects.select_related(
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        ).prefetch_related(
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
         serializer = TinyProgressReportSerializer(
             all_progress_reports,
             many=True,
@@ -58,7 +79,32 @@ class ProgressReportDetail(APIView):
     def get(self, request, pk):
         """Get progress report by ID"""
         try:
-            progress_report = ProgressReport.objects.get(pk=pk)
+            progress_report = (
+                ProgressReport.objects.select_related(
+                    "document",
+                    "document__project",
+                    "document__project__business_area",
+                    "document__project__business_area__image",
+                    "document__project__business_area__division",
+                    "document__project__business_area__division__director",
+                    "document__project__business_area__division__approver",
+                    "document__project__business_area__division__key_stakeholder",
+                    "document__project__business_area__leader",
+                    "document__project__business_area__caretaker",
+                    "document__project__business_area__finance_admin",
+                    "document__project__business_area__data_custodian",
+                    "document__project__image",
+                    "document__project__image__uploader",
+                    "document__pdf",
+                    "document__creator",
+                    "document__modifier",
+                )
+                .prefetch_related(
+                    "document__project__business_area__division__approvers",
+                    "document__project__business_area__division__directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except ProgressReport.DoesNotExist:
             raise NotFound
 

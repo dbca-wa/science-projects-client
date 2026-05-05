@@ -19,6 +19,7 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 
+from common.query_helpers import optimise_document_qs
 from projects.constants import ALLOWED_DOCUMENT_TYPES, AUTO_APPROVE_CLOSURE_KINDS
 from projects.models import Project, ProjectMember
 from users.models import User
@@ -97,36 +98,13 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 ).values_list("id", flat=True)
 
                 # Fetch all documents requiring BA attention with optimised relationships
-                docs_requiring_ba_attention = (
+                docs_requiring_ba_attention = optimise_document_qs(
                     ProjectDocument.objects.exclude(
                         status=ProjectDocument.StatusChoices.APPROVED
-                    )
-                    .filter(
+                    ).filter(
                         project__in=ba_project_ids,
                         project_lead_approval_granted=True,
                         business_area_lead_approval_granted=False,
-                    )
-                    .select_related(
-                        "project",
-                        "project__business_area",
-                        "project__business_area__image",
-                        "project__business_area__division",
-                        "project__business_area__division__director",
-                        "project__business_area__division__approver",
-                        "project__business_area__leader",
-                        "project__business_area__caretaker",
-                        "project__business_area__finance_admin",
-                        "project__business_area__data_custodian",
-                        "project__image",
-                        "project__image__uploader",
-                        "pdf",
-                        "pdf__document",
-                        "pdf__project",
-                        "creator",
-                        "modifier",
-                    )
-                    .prefetch_related(
-                        "project__business_area__division__directorate_email_list",
                     )
                 )
 
@@ -151,26 +129,8 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                         project__business_area__division__in=user_division_ids
                     )
 
-                docs_requiring_directorate_attention = directorate_base.select_related(
-                    "project",
-                    "project__business_area",
-                    "project__business_area__image",
-                    "project__business_area__division",
-                    "project__business_area__division__director",
-                    "project__business_area__division__approver",
-                    "project__business_area__leader",
-                    "project__business_area__caretaker",
-                    "project__business_area__finance_admin",
-                    "project__business_area__data_custodian",
-                    "project__image",
-                    "project__image__uploader",
-                    "pdf",
-                    "pdf__document",
-                    "pdf__project",
-                    "creator",
-                    "modifier",
-                ).prefetch_related(
-                    "project__business_area__division__directorate_email_list",
+                docs_requiring_directorate_attention = optimise_document_qs(
+                    directorate_base
                 )
 
                 # Append the documents to the respective lists
@@ -187,35 +147,12 @@ class ProjectDocsPendingMyActionAllStages(APIView):
             )
 
             # Fetch all documents requiring lead attention with optimised relationships
-            docs_requiring_lead_attention = (
+            docs_requiring_lead_attention = optimise_document_qs(
                 ProjectDocument.objects.exclude(
                     status=ProjectDocument.StatusChoices.APPROVED
-                )
-                .filter(
+                ).filter(
                     project__in=lead_project_ids,
                     project_lead_approval_granted=False,
-                )
-                .select_related(
-                    "project",
-                    "project__business_area",
-                    "project__business_area__image",
-                    "project__business_area__division",
-                    "project__business_area__division__director",
-                    "project__business_area__division__approver",
-                    "project__business_area__leader",
-                    "project__business_area__caretaker",
-                    "project__business_area__finance_admin",
-                    "project__business_area__data_custodian",
-                    "project__image",
-                    "project__image__uploader",
-                    "pdf",
-                    "pdf__document",
-                    "pdf__project",
-                    "creator",
-                    "modifier",
-                )
-                .prefetch_related(
-                    "project__business_area__division__directorate_email_list",
                 )
             )
 
@@ -234,35 +171,12 @@ class ProjectDocsPendingMyActionAllStages(APIView):
                 ).values_list("project_id", flat=True)
             )
 
-            docs_requiring_team_attention = (
+            docs_requiring_team_attention = optimise_document_qs(
                 ProjectDocument.objects.exclude(
                     status=ProjectDocument.StatusChoices.APPROVED
-                )
-                .filter(
+                ).filter(
                     project_lead_approval_granted=False,
                     project__in=my_non_leader_project_ids,
-                )
-                .select_related(
-                    "project",
-                    "project__business_area",
-                    "project__business_area__image",
-                    "project__business_area__division",
-                    "project__business_area__division__director",
-                    "project__business_area__division__approver",
-                    "project__business_area__leader",
-                    "project__business_area__caretaker",
-                    "project__business_area__finance_admin",
-                    "project__business_area__data_custodian",
-                    "project__image",
-                    "project__image__uploader",
-                    "pdf",
-                    "pdf__document",
-                    "pdf__project",
-                    "creator",
-                    "modifier",
-                )
-                .prefetch_related(
-                    "project__business_area__division__directorate_email_list",
                 )
             )
 

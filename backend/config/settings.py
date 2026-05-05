@@ -114,23 +114,15 @@ STORAGES = {
 # endregion ========================================================================================
 
 # region Email Config =========================================================
-# Email backend — auto-selects based on MANDRILL_API_KEY presence:
-# - If MANDRILL_API_KEY is set: uses Mandrill (Mailchimp Transactional)
-# - If not set: falls back to SMTP relay (internal mail-relay.lan.fyi)
-# - Can be overridden entirely via EMAIL_BACKEND env var
-_mandrill_key = env("MANDRILL_API_KEY", default="")
+# Email backend — can be overridden via EMAIL_BACKEND env var.
+# Default: SMTP relay (internal mail-relay.lan.fyi)
+# For development: set EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 if env("EMAIL_BACKEND", default=""):
     EMAIL_BACKEND = env("EMAIL_BACKEND")
-elif _mandrill_key:
-    EMAIL_BACKEND = "anymail.backends.mandrill.EmailBackend"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-ANYMAIL = {
-    "MANDRILL_API_KEY": _mandrill_key,
-}
-
-# SMTP relay config (used when Mandrill is not configured)
+# SMTP relay config
 EMAIL_HOST = env("EMAIL_HOST", default="mail-relay.lan.fyi")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 
@@ -264,7 +256,6 @@ SYSTEM_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
-    "anymail",
 ]
 
 

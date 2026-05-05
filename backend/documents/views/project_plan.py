@@ -26,7 +26,33 @@ class ProjectPlans(APIView):
 
     def get(self, request):
         """List all project plans"""
-        all_project_plans = ProjectPlan.objects.all()
+        all_project_plans = (
+            ProjectPlan.objects.select_related(
+                "document",
+            )
+            .prefetch_related(
+                "document__project__business_area__division__approvers",
+                "document__project__business_area__division__directorate_email_list",
+            )
+            .select_related(
+                "document__project",
+                "document__project__business_area",
+                "document__project__business_area__image",
+                "document__project__business_area__division",
+                "document__project__business_area__division__director",
+                "document__project__business_area__division__approver",
+                "document__project__business_area__division__key_stakeholder",
+                "document__project__business_area__leader",
+                "document__project__business_area__caretaker",
+                "document__project__business_area__finance_admin",
+                "document__project__business_area__data_custodian",
+                "document__project__image",
+                "document__project__image__uploader",
+                "document__pdf",
+                "document__creator",
+                "document__modifier",
+            )
+        )
         serializer = TinyProjectPlanSerializer(
             all_project_plans,
             many=True,
@@ -58,7 +84,32 @@ class ProjectPlanDetail(APIView):
     def get(self, request, pk):
         """Get project plan by ID"""
         try:
-            project_plan = ProjectPlan.objects.get(pk=pk)
+            project_plan = (
+                ProjectPlan.objects.select_related(
+                    "document",
+                    "document__project",
+                    "document__project__business_area",
+                    "document__project__business_area__image",
+                    "document__project__business_area__division",
+                    "document__project__business_area__division__director",
+                    "document__project__business_area__division__approver",
+                    "document__project__business_area__division__key_stakeholder",
+                    "document__project__business_area__leader",
+                    "document__project__business_area__caretaker",
+                    "document__project__business_area__finance_admin",
+                    "document__project__business_area__data_custodian",
+                    "document__project__image",
+                    "document__project__image__uploader",
+                    "document__pdf",
+                    "document__creator",
+                    "document__modifier",
+                )
+                .prefetch_related(
+                    "document__project__business_area__division__approvers",
+                    "document__project__business_area__division__directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except ProjectPlan.DoesNotExist:
             raise NotFound
 

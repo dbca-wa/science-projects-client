@@ -26,7 +26,28 @@ class StudentReports(APIView):
 
     def get(self, request):
         """List all student reports"""
-        all_student_reports = StudentReport.objects.all()
+        all_student_reports = StudentReport.objects.select_related(
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        ).prefetch_related(
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
         serializer = TinyStudentReportSerializer(
             all_student_reports,
             many=True,
@@ -57,7 +78,32 @@ class StudentReportDetail(APIView):
     def get(self, request, pk):
         """Get student report by ID"""
         try:
-            student_report = StudentReport.objects.get(pk=pk)
+            student_report = (
+                StudentReport.objects.select_related(
+                    "document",
+                    "document__project",
+                    "document__project__business_area",
+                    "document__project__business_area__image",
+                    "document__project__business_area__division",
+                    "document__project__business_area__division__director",
+                    "document__project__business_area__division__approver",
+                    "document__project__business_area__division__key_stakeholder",
+                    "document__project__business_area__leader",
+                    "document__project__business_area__caretaker",
+                    "document__project__business_area__finance_admin",
+                    "document__project__business_area__data_custodian",
+                    "document__project__image",
+                    "document__project__image__uploader",
+                    "document__pdf",
+                    "document__creator",
+                    "document__modifier",
+                )
+                .prefetch_related(
+                    "document__project__business_area__division__approvers",
+                    "document__project__business_area__division__directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except StudentReport.DoesNotExist:
             raise NotFound
 
@@ -151,8 +197,31 @@ class StudentReportByYear(APIView):
     def get(self, request, project, year):
         """Get student report for a specific project and year"""
         try:
-            student_report = StudentReport.objects.get(
-                year=year, document__project=project
+            student_report = (
+                StudentReport.objects.select_related(
+                    "document",
+                    "document__project",
+                    "document__project__business_area",
+                    "document__project__business_area__image",
+                    "document__project__business_area__division",
+                    "document__project__business_area__division__director",
+                    "document__project__business_area__division__approver",
+                    "document__project__business_area__division__key_stakeholder",
+                    "document__project__business_area__leader",
+                    "document__project__business_area__caretaker",
+                    "document__project__business_area__finance_admin",
+                    "document__project__business_area__data_custodian",
+                    "document__project__image",
+                    "document__project__image__uploader",
+                    "document__pdf",
+                    "document__creator",
+                    "document__modifier",
+                )
+                .prefetch_related(
+                    "document__project__business_area__division__approvers",
+                    "document__project__business_area__division__directorate_email_list",
+                )
+                .get(year=year, document__project=project)
             )
         except StudentReport.DoesNotExist:
             raise NotFound

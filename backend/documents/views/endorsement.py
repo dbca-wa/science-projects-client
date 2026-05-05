@@ -36,7 +36,30 @@ class Endorsements(APIView):
 
     def get(self, request):
         """List all endorsements"""
-        all_endorsements = Endorsement.objects.all()
+        all_endorsements = Endorsement.objects.select_related(
+            "project_plan",
+            "project_plan__document",
+            "project_plan__document__project",
+            "project_plan__document__project__business_area",
+            "project_plan__document__project__business_area__image",
+            "project_plan__document__project__business_area__division",
+            "project_plan__document__project__business_area__division__director",
+            "project_plan__document__project__business_area__division__approver",
+            "project_plan__document__project__business_area__division__key_stakeholder",
+            "project_plan__document__project__business_area__leader",
+            "project_plan__document__project__business_area__caretaker",
+            "project_plan__document__project__business_area__finance_admin",
+            "project_plan__document__project__business_area__data_custodian",
+            "project_plan__document__project__image",
+            "project_plan__document__project__image__uploader",
+            "project_plan__document__pdf",
+            "project_plan__document__creator",
+            "project_plan__document__modifier",
+            "aec_pdf",
+        ).prefetch_related(
+            "project_plan__document__project__business_area__division__approvers",
+            "project_plan__document__project__business_area__division__directorate_email_list",
+        )
         serializer = TinyEndorsementSerializer(
             all_endorsements,
             many=True,
@@ -68,7 +91,34 @@ class EndorsementDetail(APIView):
     def get(self, request, pk):
         """Get endorsement by ID"""
         try:
-            endorsement = Endorsement.objects.get(pk=pk)
+            endorsement = (
+                Endorsement.objects.select_related(
+                    "project_plan",
+                    "project_plan__document",
+                    "project_plan__document__project",
+                    "project_plan__document__project__business_area",
+                    "project_plan__document__project__business_area__image",
+                    "project_plan__document__project__business_area__division",
+                    "project_plan__document__project__business_area__division__director",
+                    "project_plan__document__project__business_area__division__approver",
+                    "project_plan__document__project__business_area__division__key_stakeholder",
+                    "project_plan__document__project__business_area__leader",
+                    "project_plan__document__project__business_area__caretaker",
+                    "project_plan__document__project__business_area__finance_admin",
+                    "project_plan__document__project__business_area__data_custodian",
+                    "project_plan__document__project__image",
+                    "project_plan__document__project__image__uploader",
+                    "project_plan__document__pdf",
+                    "project_plan__document__creator",
+                    "project_plan__document__modifier",
+                    "aec_pdf",
+                )
+                .prefetch_related(
+                    "project_plan__document__project__business_area__division__approvers",
+                    "project_plan__document__project__business_area__division__directorate_email_list",
+                )
+                .get(pk=pk)
+            )
         except Endorsement.DoesNotExist:
             raise NotFound
 

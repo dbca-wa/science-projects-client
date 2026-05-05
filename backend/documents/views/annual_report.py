@@ -679,6 +679,30 @@ class LatestYearsProgressReports(APIView):
                 project__business_area__division=target_report.division
             )
 
+        # Optimise for ProgressReportSerializer which nests document → project → BA → division
+        active_docs = active_docs.select_related(
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        ).prefetch_related(
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
+
         serializer = ProgressReportSerializer(
             active_docs, many=True, context={"request": request}
         )
@@ -718,6 +742,30 @@ class LatestYearsStudentReports(APIView):
             active_docs = active_docs.filter(
                 project__business_area__division=target_report.division
             )
+
+        # Optimise for StudentReportSerializer which nests document → project → BA → division
+        active_docs = active_docs.select_related(
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        ).prefetch_related(
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
 
         serializer = StudentReportSerializer(
             active_docs, many=True, context={"request": request}
@@ -766,6 +814,33 @@ class LatestYearsInactiveReports(APIView):
             pr_qs = pr_qs.filter(
                 project__business_area__division=target_report.division
             )
+
+        # Optimise both querysets for their serialisers
+        _select = (
+            "document",
+            "document__project",
+            "document__project__business_area",
+            "document__project__business_area__image",
+            "document__project__business_area__division",
+            "document__project__business_area__division__director",
+            "document__project__business_area__division__approver",
+            "document__project__business_area__division__key_stakeholder",
+            "document__project__business_area__leader",
+            "document__project__business_area__caretaker",
+            "document__project__business_area__finance_admin",
+            "document__project__business_area__data_custodian",
+            "document__project__image",
+            "document__project__image__uploader",
+            "document__pdf",
+            "document__creator",
+            "document__modifier",
+        )
+        _prefetch = (
+            "document__project__business_area__division__approvers",
+            "document__project__business_area__division__directorate_email_list",
+        )
+        sr_qs = sr_qs.select_related(*_select).prefetch_related(*_prefetch)
+        pr_qs = pr_qs.select_related(*_select).prefetch_related(*_prefetch)
 
         sr_serializer = StudentReportSerializer(
             sr_qs, many=True, context={"request": request}

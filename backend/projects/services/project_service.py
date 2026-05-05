@@ -14,6 +14,8 @@ from django.db.models import Case, CharField, IntegerField, Q, Value, When
 from django.db.models.functions import Cast
 from rest_framework.exceptions import NotFound
 
+from common.query_helpers import optimise_project_qs
+
 from ..models import Project
 
 logger = logging.getLogger(__name__)
@@ -48,19 +50,8 @@ class ProjectService:
         # Cache miss - query database
         logger.debug(f"Cache miss for user {user_id} projects")
         projects = (
-            Project.objects.filter(members__user_id=user_id)
+            optimise_project_qs(Project.objects.filter(members__user_id=user_id))
             .select_related(
-                "business_area",
-                "business_area__division",
-                "business_area__division__director",
-                "business_area__division__approver",
-                "business_area__leader",
-                "business_area__caretaker",
-                "business_area__finance_admin",
-                "business_area__data_custodian",
-                "business_area__image",
-                "image",
-                "image__uploader",
                 "area",
             )
             .prefetch_related(
@@ -71,7 +62,6 @@ class ProjectService:
                 "members__user__work__business_area",
                 "members__user__caretakers",
                 "members__user__caretaking_for",
-                "business_area__division__directorate_email_list",
                 "admintasks",
             )
             .distinct()
@@ -135,29 +125,21 @@ class ProjectService:
             projects = ProjectService._apply_filters(projects, filters)
 
         # N+1 query optimization
-        projects = projects.select_related(
-            "business_area",
-            "business_area__division",
-            "business_area__division__director",
-            "business_area__division__approver",
-            "business_area__leader",
-            "business_area__caretaker",
-            "business_area__finance_admin",
-            "business_area__data_custodian",
-            "business_area__image",
-            "image",
-            "image__uploader",
-            "area",
-        ).prefetch_related(
-            "members",
-            "members__user",
-            "members__user__profile",
-            "members__user__work",
-            "members__user__work__business_area",
-            "members__user__caretakers",
-            "members__user__caretaking_for",
-            "business_area__division__directorate_email_list",
-            "admintasks",
+        projects = (
+            optimise_project_qs(projects)
+            .select_related(
+                "area",
+            )
+            .prefetch_related(
+                "members",
+                "members__user",
+                "members__user__profile",
+                "members__user__work",
+                "members__user__work__business_area",
+                "members__user__caretakers",
+                "members__user__caretaking_for",
+                "admintasks",
+            )
         )
 
         # Custom ordering
@@ -309,29 +291,21 @@ class ProjectService:
         # No additional filtering needed, just the kind filter above
 
         # Apply N+1 optimization for ALL cases (including single-part searches)
-        projects = projects.select_related(
-            "business_area",
-            "business_area__division",
-            "business_area__division__director",
-            "business_area__division__approver",
-            "business_area__leader",
-            "business_area__caretaker",
-            "business_area__finance_admin",
-            "business_area__data_custodian",
-            "business_area__image",
-            "image",
-            "image__uploader",
-            "area",
-        ).prefetch_related(
-            "members",
-            "members__user",
-            "members__user__profile",
-            "members__user__work",
-            "members__user__work__business_area",
-            "members__user__caretakers",
-            "members__user__caretaking_for",
-            "business_area__division__directorate_email_list",
-            "admintasks",
+        projects = (
+            optimise_project_qs(projects)
+            .select_related(
+                "area",
+            )
+            .prefetch_related(
+                "members",
+                "members__user",
+                "members__user__profile",
+                "members__user__work",
+                "members__user__work__business_area",
+                "members__user__caretakers",
+                "members__user__caretaking_for",
+                "admintasks",
+            )
         )
 
         return projects
@@ -352,22 +326,9 @@ class ProjectService:
         """
         try:
             return (
-                Project.objects.select_related(
-                    "business_area",
-                    "business_area__division",
-                    "business_area__division__director",
-                    "business_area__division__approver",
-                    "business_area__leader",
-                    "business_area__caretaker",
-                    "business_area__finance_admin",
-                    "business_area__data_custodian",
-                    "business_area__image",
-                    "image",
-                    "image__uploader",
+                optimise_project_qs(Project.objects.filter(pk=pk))
+                .select_related(
                     "area",
-                )
-                .prefetch_related(
-                    "business_area__division__directorate_email_list",
                 )
                 .get(pk=pk)
             )

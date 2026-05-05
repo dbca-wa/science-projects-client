@@ -24,7 +24,18 @@ class Divisions(APIView):
     """List and create divisions"""
 
     def get(self, request):
-        divisions = Division.objects.all()
+        divisions = (
+            Division.objects.select_related(
+                "director",
+                "approver",
+                "key_stakeholder",
+            )
+            .prefetch_related(
+                "approvers",
+                "directorate_email_list",
+            )
+            .all()
+        )
         serializer = TinyDivisionSerializer(divisions, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -88,7 +99,21 @@ class DivisionEmailList(APIView):
             raise NotFound(f"User with pk {pk} not found")
 
     def get(self, request, pk):
-        division = AgencyService.get_division(pk)
+        try:
+            division = (
+                Division.objects.select_related(
+                    "director",
+                    "approver",
+                    "key_stakeholder",
+                )
+                .prefetch_related(
+                    "approvers",
+                    "directorate_email_list",
+                )
+                .get(pk=pk)
+            )
+        except Division.DoesNotExist:
+            raise NotFound(f"Division {pk} not found")
         serializer = TinyDivisionSerializer(division)
         return Response(serializer.data)
 
