@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from agencies.models import Agency, Branch
 from common.tests.factories import UserFactory
-from contacts.models import Address, AgencyContact, BranchContact, UserContact
+from contacts.models import AgencyContact, BranchContact, UserContact
 
 User = get_user_model()
 
@@ -41,34 +41,6 @@ def branch(db, agency):
 
 
 @pytest.fixture
-def address_for_agency(db, agency):
-    """Provide an address for an agency"""
-    return Address.objects.create(
-        agency=agency,
-        street="123 Test St",
-        suburb="Test Suburb",
-        city="Test City",
-        zipcode=12345,
-        state="Test State",
-        country="Test Country",
-    )
-
-
-@pytest.fixture
-def address_for_branch(db, branch):
-    """Provide an address for a branch"""
-    return Address.objects.create(
-        branch=branch,
-        street="456 Branch St",
-        suburb="Branch Suburb",
-        city="Branch City",
-        zipcode=67890,
-        state="Branch State",
-        country="Branch Country",
-    )
-
-
-@pytest.fixture
 def user_contact(db, user):
     """Provide a user contact"""
     return UserContact.objects.create(
@@ -81,7 +53,7 @@ def user_contact(db, user):
 
 
 @pytest.fixture
-def agency_contact(db, agency, address_for_agency):
+def agency_contact(db, agency):
     """Provide an agency contact"""
     return AgencyContact.objects.create(
         agency=agency,
@@ -89,12 +61,11 @@ def agency_contact(db, agency, address_for_agency):
         phone="1234567890",
         alt_phone="0987654321",
         fax="1112223333",
-        address=address_for_agency,
     )
 
 
 @pytest.fixture
-def branch_contact(db, branch, address_for_branch):
+def branch_contact(db, branch):
     """Provide a branch contact"""
     return BranchContact.objects.create(
         branch=branch,
@@ -102,7 +73,6 @@ def branch_contact(db, branch, address_for_branch):
         phone="1234567890",
         alt_phone="0987654321",
         fax="1112223333",
-        address=address_for_branch,
     )
 
 

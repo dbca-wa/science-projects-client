@@ -7,13 +7,9 @@ import type {
 	IBusinessAreaUpdate,
 	IDivision,
 	IAffiliation,
-	IAddress,
-	ISimpleLocationData,
 	IBranchForm,
-	IAddressForm,
 	IAffiliationForm,
 	IDivisionForm,
-	ILocationForm,
 	IReportInfoForm,
 } from "../types/admin.types";
 import type { IAnnualReport } from "@/shared/types/report.types";
@@ -176,51 +172,6 @@ export const updateDivisionApprovers = async (
 		ADMIN_ENDPOINTS.DIVISION_EMAIL_LIST(divisionId),
 		{ approversList: userIds }
 	);
-};
-
-// Addresses
-export const getAddresses = async (): Promise<IAddress[]> => {
-	return apiClient.get<IAddress[]>(ADMIN_ENDPOINTS.ADDRESSES);
-};
-
-export const createAddress = async (data: IAddressForm): Promise<IAddress> => {
-	return apiClient.post<IAddress>(ADMIN_ENDPOINTS.ADDRESSES, data);
-};
-
-export const updateAddress = async (
-	id: number,
-	data: IAddressForm
-): Promise<IAddress> => {
-	return apiClient.put<IAddress>(ADMIN_ENDPOINTS.ADDRESS_DETAIL(id), data);
-};
-
-export const deleteAddress = async (id: number): Promise<void> => {
-	return apiClient.delete(ADMIN_ENDPOINTS.ADDRESS_DETAIL(id));
-};
-
-// Locations
-export const getLocations = async (): Promise<ISimpleLocationData[]> => {
-	return apiClient.get<ISimpleLocationData[]>(ADMIN_ENDPOINTS.LOCATIONS);
-};
-
-export const createLocation = async (
-	data: ILocationForm
-): Promise<ISimpleLocationData> => {
-	return apiClient.post<ISimpleLocationData>(ADMIN_ENDPOINTS.LOCATIONS, data);
-};
-
-export const updateLocation = async (
-	id: number,
-	data: ILocationForm
-): Promise<ISimpleLocationData> => {
-	return apiClient.put<ISimpleLocationData>(
-		ADMIN_ENDPOINTS.LOCATION_DETAIL(id),
-		data
-	);
-};
-
-export const deleteLocation = async (id: number): Promise<void> => {
-	return apiClient.delete(ADMIN_ENDPOINTS.LOCATION_DETAIL(id));
 };
 
 // Report Info

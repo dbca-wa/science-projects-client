@@ -1,69 +1,11 @@
 # region IMPORTS ====================================================================================================
 from django.db import models
-from django.forms import ValidationError
 
 from common.models import CommonModel
 
 # endregion  =================================================================================================
 
 # region Models ====================================================================================================
-
-
-class Address(CommonModel):
-    """
-    Model Definition for addresses of agencies and their branches
-    """
-
-    agency = models.ForeignKey(
-        "agencies.agency",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="address",
-    )
-    branch = models.ForeignKey(
-        "agencies.Branch",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="address",
-    )
-    street = models.CharField(max_length=140)
-    suburb = models.CharField(
-        max_length=140,
-        null=True,
-        blank=True,
-    )
-    city = models.CharField(max_length=140)
-    zipcode = models.IntegerField()
-    state = models.CharField(max_length=140)
-    country = models.CharField(max_length=140)
-    pobox = models.CharField(
-        null=True,
-        blank=True,
-    )
-
-    # Ensures either agency or branch have values, but not both
-    def clean(self):
-        if self.agency is None and self.branch is None:
-            raise ValidationError(
-                "An address must be associated with either an agency or a branch."
-            )
-        if self.agency and self.branch:
-            raise ValidationError(
-                "An address cannot be associated with both an agency and a branch."
-            )
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
-    def __str__(self) -> str:
-        return f"{self.street} | {self.state}"
-
-    class Meta:
-        verbose_name = "Address"
-        verbose_name_plural = "Addresses"
 
 
 class UserContact(CommonModel):
@@ -130,12 +72,6 @@ class AgencyContact(CommonModel):
         blank=True,
         null=True,
     )
-    address = models.ForeignKey(
-        "contacts.Address",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
 
     def __str__(self) -> str:
         return f"{self.agency.name} Contact"
@@ -171,12 +107,6 @@ class BranchContact(CommonModel):
     )
     fax = models.CharField(
         max_length=20,
-        blank=True,
-        null=True,
-    )
-    address = models.ForeignKey(
-        "contacts.Address",
-        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )

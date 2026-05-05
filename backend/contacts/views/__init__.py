@@ -2,7 +2,6 @@
 Contact views
 """
 
-from .addresses import AddressDetail, Addresses
 from .contacts import (
     AgencyContactDetail,
     AgencyContacts,
@@ -13,8 +12,6 @@ from .contacts import (
 )
 
 __all__ = [
-    "Addresses",
-    "AddressDetail",
     "AgencyContacts",
     "AgencyContactDetail",
     "BranchContacts",

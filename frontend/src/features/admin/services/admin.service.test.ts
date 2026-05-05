@@ -17,14 +17,6 @@ import {
 	createDivision,
 	updateDivision,
 	deleteDivision,
-	getAddresses,
-	createAddress,
-	updateAddress,
-	deleteAddress,
-	getLocations,
-	createLocation,
-	updateLocation,
-	deleteLocation,
 	getReportInfos,
 	createReportInfo,
 	updateReportInfo,
@@ -195,72 +187,6 @@ describe("admin.service", () => {
 		it("deleteDivision should DELETE", async () => {
 			(apiClient.delete as Mock).mockResolvedValue(undefined);
 			await deleteDivision(1);
-			expect(apiClient.delete).toHaveBeenCalled();
-		});
-	});
-
-	describe("addresses CRUD", () => {
-		it("getAddresses should GET all addresses", async () => {
-			(apiClient.get as Mock).mockResolvedValue([]);
-			await getAddresses();
-			expect(apiClient.get).toHaveBeenCalled();
-		});
-
-		it("createAddress should POST data", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ id: 1 });
-			await createAddress({
-				street: "123 Main St",
-				branch: null,
-				zipcode: "6000",
-				city: "Perth",
-				state: "WA",
-				country: "Australia",
-			});
-			expect(apiClient.post).toHaveBeenCalled();
-		});
-
-		it("updateAddress should PUT data", async () => {
-			(apiClient.put as Mock).mockResolvedValue({ id: 1 });
-			await updateAddress(1, {
-				street: "456 Oak Ave",
-				branch: null,
-				zipcode: "6001",
-				city: "Perth",
-				state: "WA",
-				country: "Australia",
-			});
-			expect(apiClient.put).toHaveBeenCalled();
-		});
-
-		it("deleteAddress should DELETE", async () => {
-			(apiClient.delete as Mock).mockResolvedValue(undefined);
-			await deleteAddress(1);
-			expect(apiClient.delete).toHaveBeenCalled();
-		});
-	});
-
-	describe("locations CRUD", () => {
-		it("getLocations should GET all locations", async () => {
-			(apiClient.get as Mock).mockResolvedValue([]);
-			await getLocations();
-			expect(apiClient.get).toHaveBeenCalled();
-		});
-
-		it("createLocation should POST data", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ id: 1 });
-			await createLocation({ name: "Perth", area_type: "dbcaregion" });
-			expect(apiClient.post).toHaveBeenCalled();
-		});
-
-		it("updateLocation should PUT data", async () => {
-			(apiClient.put as Mock).mockResolvedValue({ id: 1 });
-			await updateLocation(1, { name: "Updated", area_type: "dbcaregion" });
-			expect(apiClient.put).toHaveBeenCalled();
-		});
-
-		it("deleteLocation should DELETE", async () => {
-			(apiClient.delete as Mock).mockResolvedValue(undefined);
-			await deleteLocation(1);
 			expect(apiClient.delete).toHaveBeenCalled();
 		});
 	});

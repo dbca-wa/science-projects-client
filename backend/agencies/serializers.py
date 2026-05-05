@@ -2,7 +2,6 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from contacts.models import Address
 from medias.models import BusinessAreaPhoto
 from users.models import User
 
@@ -349,37 +348,6 @@ class TinyBusinessAreaSerializer(serializers.ModelSerializer):
 
 
 # region Staff Profile Serializers ====================================================================================================
-
-
-class StaffProfileAddressSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Address
-        fields = (
-            "id",
-            "street",
-            "city",
-            "state",
-            "country",
-            "zipcode",
-            "pobox",
-        )
-
-
-class StaffProfileBranchSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-
-    def get_address(self, obj):
-        try:
-            address = Address.objects.get(branch=obj)
-            serializer = StaffProfileAddressSerializer(address)
-            return serializer.data
-        except Address.DoesNotExist:
-            return None
-
-    class Meta:
-        model = Branch
-        fields = ["name", "address"]
 
 
 class StaffProfileBASerializer(serializers.ModelSerializer):

@@ -111,33 +111,6 @@ export interface IDivision {
 	approvers: IEmailListUser[];
 }
 
-// ADDRESS ============================================================================
-
-/**
- * Nested branch object returned by TinyAddressSerializer.
- * The address list endpoint returns branch as a nested object,
- * while the form sends branch as a plain ID.
- */
-export interface IAddressBranch {
-	id: number;
-	name: string;
-	agency: number;
-	manager: IBranchManager | null;
-}
-
-export interface IAddress {
-	id: number;
-	agency?: number | IAgency | null;
-	branch?: number | IAddressBranch | null;
-	street: string;
-	suburb?: string;
-	city: string;
-	zipcode?: number;
-	state: string;
-	country: string;
-	pobox?: string;
-}
-
 // LOCATION ============================================================================
 
 export interface OrganisedLocationData {

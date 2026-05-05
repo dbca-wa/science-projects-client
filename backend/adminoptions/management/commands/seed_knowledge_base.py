@@ -129,26 +129,26 @@ class Command(BaseCommand):
                 "List of new features and update:</span></p>"
                 '<ul class="editor-ul editor-ul1">'
                 '<li value="1" class="editor-li">'
-                '<span style="white-space: pre-wrap;">Project Creation Wizard '
-                "(save progress in a draft!)</span></li>"
+                '<span style="white-space: pre-wrap;">Project Creation Wizard! '
+                "Save progress in a draft</span></li>"
                 '<li value="2" class="editor-li">'
-                '<span style="white-space: pre-wrap;">Saved searches '
-                "(your last search will be remembered)</span></li>"
+                '<span style="white-space: pre-wrap;">Saved searches! '
+                "Your last search will be remembered</span></li>"
                 '<li value="3" class="editor-li">'
                 '<span style="white-space: pre-wrap;">New emails! '
-                "(Design more consistent with DBCA theming)</span></li>"
+                "Design more consistent with DBCA theming</span></li>"
                 '<li value="4" class="editor-li">'
                 '<span style="white-space: pre-wrap;">New Project Document '
                 "PDF Design!</span></li>"
                 '<li value="5" class="editor-li">'
-                '<span style="white-space: pre-wrap;">Knowledge base - find out '
+                '<span style="white-space: pre-wrap;">Knowledge base \u2013 find out '
                 "what you need to do and how with improved guides!</span></li>"
                 '<li value="6" class="editor-li">'
-                '<span style="white-space: pre-wrap;">Improved Image upload - '
+                '<span style="white-space: pre-wrap;">Improved Image upload \u2013 '
                 "crop and adjust to get images exactly how you want!</span></li>"
                 '<li value="7" class="editor-li">'
-                '<span style="white-space: pre-wrap;">New invite email '
-                "(send to staff that aren't already in the system)</span></li>"
+                '<span style="white-space: pre-wrap;">New invite email! '
+                "Send to staff that aren\u2019t already in the system</span></li>"
                 '<li value="8" class="editor-li">'
                 '<span style="white-space: pre-wrap;">Redesigned staff profiles! '
                 "Showcase your work to the public in style</span></li>"

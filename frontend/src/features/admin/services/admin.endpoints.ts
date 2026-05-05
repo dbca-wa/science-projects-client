@@ -17,14 +17,6 @@ export const ADMIN_ENDPOINTS = {
 	DIVISION_DETAIL: (id: number) => `agencies/divisions/${id}`,
 	DIVISION_EMAIL_LIST: (id: number) => `agencies/divisions/${id}/email_list`,
 
-	// Contacts app
-	ADDRESSES: "contacts/addresses",
-	ADDRESS_DETAIL: (id: number) => `contacts/addresses/${id}`,
-
-	// Locations app
-	LOCATIONS: "locations/list",
-	LOCATION_DETAIL: (id: number) => `locations/${id}`,
-
 	// Documents app (report info)
 	REPORTS: "documents/reports",
 	REPORT_DETAIL: (id: number) => `documents/reports/${id}`,
