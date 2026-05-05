@@ -288,7 +288,7 @@ class TestAnnouncementMessageSanitisation:
         call_kwargs = mock_send.call_args[1]
         html_content = call_kwargs["html_content"]
         assert "<strong>Important</strong>" in html_content
-        assert "https://example.com" in html_content
+        assert 'href="https://example.com"' in html_content
 
 
 @pytest.mark.django_db
