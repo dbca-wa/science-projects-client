@@ -9,7 +9,15 @@ import {
 	AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
-import { User, Globe, LogOut, Moon, Sun, BookOpen, Mail } from "lucide-react";
+import {
+	User,
+	Globe,
+	LogOut,
+	Moon,
+	Sun,
+	BookOpen,
+	Megaphone,
+} from "lucide-react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
@@ -166,19 +174,19 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 							</span>
 						</div>
 
-						{/* Admin Testing */}
+						{/* Communications */}
 						<button
 							ref={registerMenuItem(3)}
 							type="button"
 							onClick={(e) => {
-								navigateOrOpen("/manage/admin-testing", e);
+								navigateOrOpen("/manage/communications", e);
 							}}
 							className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 							role="menuitem"
 						>
 							<div className="flex gap-2 items-center">
-								<Mail className="h-4 w-4" aria-hidden="true" />
-								<span className="text-sm">Admin Testing</span>
+								<Megaphone className="h-4 w-4" aria-hidden="true" />
+								<span className="text-sm">Communications</span>
 							</div>
 						</button>
 					</div>

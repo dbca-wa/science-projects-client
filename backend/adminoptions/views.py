@@ -1136,6 +1136,17 @@ class SendAllTestEmails(APIView):
                 "email_subject": "Staff Profile Contact",
             },
         },
+        {
+            "name": "announcement_email",
+            "subject": "SPMS: Announcement",
+            "context": {
+                "recipient_name": "Test User",
+                "actioning_user_name": "Admin User",
+                "actioning_user_email": "admin@dbca.wa.gov.au",
+                "custom_message": "<p>This is a test announcement message from the SPMS admin team. Please ensure all project reports are up to date before the end of the quarter.</p>",
+                "subject": "SPMS: Announcement",
+            },
+        },
     ]
 
     def post(self, req):
@@ -1348,6 +1359,162 @@ class SendAllTestEmails(APIView):
                 "results": results,
             }
         )
+
+
+class HomepageBannerSettings(APIView):
+    """Get and update homepage banner settings."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Return current banner settings for all authenticated users."""
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts:
+            return Response(
+                {"show_homepage_message": False, "homepage_message": None},
+                status=HTTP_200_OK,
+            )
+        return Response(
+            {
+                "show_homepage_message": admin_opts.show_homepage_message,
+                "homepage_message": admin_opts.homepage_message,
+            },
+            status=HTTP_200_OK,
+        )
+
+    def put(self, request):
+        """Update banner settings (superusers only)."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can update banner settings."},
+                status=HTTP_401_UNAUTHORIZED,
+            )
+
+        admin_opts = AdminOptions.objects.first()
+        if not admin_opts:
+            return Response(
+                {"error": "AdminOptions not configured"},
+                status=HTTP_404_NOT_FOUND,
+            )
+
+        admin_opts.show_homepage_message = request.data.get(
+            "show_homepage_message", False
+        )
+        admin_opts.homepage_message = request.data.get("homepage_message", "")
+        admin_opts.save(update_fields=["show_homepage_message", "homepage_message"])
+
+        settings.LOGGER.info(f"{request.user} updated homepage banner settings")
+        return Response({"status": "updated"}, status=HTTP_200_OK)
+
+
+class SendAnnouncement(APIView):
+    """Send announcement emails to selected recipient groups."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        from documents.services.notification_service import NotificationService
+
+        recipient_groups = request.data.get("recipient_groups", [])
+        custom_message = request.data.get("custom_message", "")
+        custom_messages = request.data.get("custom_messages")
+        subject = request.data.get("subject", "SPMS: Announcement")
+        division = request.data.get("division")
+        excluded_user_ids = request.data.get("excluded_user_ids", [])
+
+        if not recipient_groups:
+            return Response(
+                {"error": "At least one recipient group is required."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        if not custom_message and not custom_messages:
+            return Response(
+                {"error": "A message is required."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        valid_groups = {"ba_leads", "project_leads", "team_members"}
+        if not all(g in valid_groups for g in recipient_groups):
+            return Response(
+                {"error": "Invalid recipient group specified."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            result = NotificationService.send_announcement_emails(
+                actioning_user=request.user,
+                recipient_groups=recipient_groups,
+                excluded_user_ids=excluded_user_ids,
+                custom_message=custom_message,
+                custom_messages=custom_messages,
+                subject=subject,
+                division_slug=division,
+            )
+        except Exception as e:
+            settings.LOGGER.error(
+                f"Error sending announcement emails: {e}", exc_info=True
+            )
+            return Response(
+                {"error": "Failed to send announcement emails."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        settings.LOGGER.info(
+            f"{request.user} sent announcement to {result['emails_sent']} recipients"
+        )
+        return Response(result, status=HTTP_200_OK)
+
+
+class AnnouncementEmailPreview(APIView):
+    """Render the announcement email template for iframe preview."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        import base64
+        import re
+
+        from django.template.loader import render_to_string
+
+        context = {
+            "recipient_name": request.data.get("recipient_name", "Recipient Name"),
+            "actioning_user_name": (
+                f"{request.user.display_first_name} {request.user.display_last_name}"
+            ),
+            "actioning_user_email": request.user.email,
+            "custom_message": request.data.get("custom_message", ""),
+            "subject": request.data.get("subject", "SPMS: Announcement"),
+            "site_url": settings.SITE_URL,
+            "logo_url": True,
+        }
+
+        try:
+            html = render_to_string(
+                "./email_templates/announcement_email.html", context
+            )
+        except Exception as e:
+            settings.LOGGER.error(f"Error rendering announcement preview: {e}")
+            return Response(
+                {"error": "Failed to render email preview."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Inline the CID logo as a base64 data URL for browser preview
+        logo_path = os.path.join(
+            settings.BASE_DIR, "documents", "static", "images", "dbca_email.png"
+        )
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+            data_url = f"data:image/png;base64,{logo_b64}"
+            html = re.sub(
+                r'src=["\']cid:dbca-logo["\']',
+                f'src="{data_url}"',
+                html,
+            )
+
+        return Response({"html": html}, status=HTTP_200_OK)
 
 
 class RespondToCaretakerRequest(APIView):

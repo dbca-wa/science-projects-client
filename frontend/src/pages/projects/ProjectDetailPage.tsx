@@ -37,7 +37,7 @@ import { StudentReportsTab } from "@/features/projects/components/tabs/StudentRe
 import { ProjectClosureTab } from "@/features/projects/components/tabs/ProjectClosureTab";
 import { useConfetti } from "@/shared/hooks/effects/useConfetti";
 import { PageTransition } from "@/shared/components/PageTransition";
-import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
+import { isDocumentTypeAllowed } from "@/shared/constants/allowedDocumentTypes";
 
 interface ProjectDetailPageProps {
 	selectedTab?: string;

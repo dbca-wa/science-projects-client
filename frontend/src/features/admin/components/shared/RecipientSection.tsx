@@ -3,13 +3,13 @@ import { Copy, X } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { toast } from "sonner";
 
-interface RecipientUser {
+export interface RecipientUser {
 	pk: number;
 	name: string;
 	email: string;
 }
 
-interface NewCycleRecipientSectionProps {
+interface RecipientSectionProps {
 	title: string;
 	users: RecipientUser[];
 	excludedUserIds: number[];
@@ -21,13 +21,13 @@ interface NewCycleRecipientSectionProps {
  * Displays a single recipient group with user list, copy button,
  * and exclude/restore functionality.
  */
-export const NewCycleRecipientSection = ({
+export const RecipientSection = ({
 	title,
 	users,
 	excludedUserIds,
 	onExcludeUser,
 	onRestoreUser,
-}: NewCycleRecipientSectionProps) => {
+}: RecipientSectionProps) => {
 	const excludedSet = useMemo(
 		() => new Set(excludedUserIds),
 		[excludedUserIds]

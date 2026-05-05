@@ -20,7 +20,7 @@ import {
 import { useCurrentUser } from "@/features/auth";
 import { isUserAtApprovalStage } from "@/shared/utils/project-permissions.utils";
 import { findProjectLeader } from "@/shared/utils/team.utils";
-import { isDocumentTypeAllowed } from "@/features/projects/constants/allowedDocumentTypes";
+import { isDocumentTypeAllowed } from "@/shared/constants/allowedDocumentTypes";
 
 interface DocumentActionsSectionProps {
 	document: IMainDoc;

@@ -12,7 +12,7 @@ import {
 	type WizardSubmissionData,
 } from "../../services/wizard-submission.service";
 import { useCurrentUser } from "@/features/auth";
-import { FULL_WORKFLOW_KINDS } from "../../constants/allowedDocumentTypes";
+import { FULL_WORKFLOW_KINDS } from "../../../../shared/constants/allowedDocumentTypes.ts";
 
 interface WizardContainerProps {
 	onComplete: (projectId: number) => void;

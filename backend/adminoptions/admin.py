@@ -99,11 +99,13 @@ class ContentFieldAdmin(admin.ModelAdmin):
 class AdminOptionsAdmin(admin.ModelAdmin, JSONFieldPrettyPrintMixin):
     list_display = [
         "email_options",
+        "email_testing_mode",
+        "show_homepage_message",
         "updated_at",
         "guide_content_count",
     ]
 
-    readonly_fields = ["guide_content_display"]
+    readonly_fields = ["guide_content_display", "new_cycle_draft_display"]
 
     @admin.display(description="Guide Content Entries")
     def guide_content_count(self, obj):
@@ -117,20 +119,49 @@ class AdminOptionsAdmin(admin.ModelAdmin, JSONFieldPrettyPrintMixin):
         """Display guide_content in a formatted way"""
         return self.pretty_print_json(obj.guide_content)
 
+    @admin.display(description="New Cycle Draft (Formatted)")
+    def new_cycle_draft_display(self, obj):
+        """Display new_cycle_draft in a formatted way"""
+        return self.pretty_print_json(obj.new_cycle_draft)
+
     def get_fieldsets(self, request, obj=None):
         fieldsets = [
-            (None, {"fields": ("email_options", "maintainer")}),
+            (
+                "Email Settings",
+                {
+                    "fields": ("email_options", "maintainer"),
+                },
+            ),
+            (
+                "Email Testing",
+                {
+                    "fields": ("email_testing_mode", "email_test_user"),
+                    "description": "When testing mode is enabled, all emails are redirected to the test user.",
+                },
+            ),
+            (
+                "Homepage Banner",
+                {
+                    "fields": ("show_homepage_message", "homepage_message"),
+                    "description": "Display a banner message on the dashboard for all users.",
+                },
+            ),
+            (
+                "New Cycle Draft",
+                {
+                    "fields": ("new_cycle_draft", "new_cycle_draft_display"),
+                    "classes": ("collapse",),
+                    "description": "Saved new cycle configuration defaults.",
+                },
+            ),
             (
                 "Guide Content",
                 {
                     "fields": ("guide_content", "guide_content_display"),
+                    "classes": ("collapse",),
                     "description": "Dynamic guide content stored as JSON.",
                 },
             ),
-        ]
-
-        # legacy fields
-        fieldsets.append(
             (
                 "Legacy Guide Fields",
                 {
@@ -150,8 +181,8 @@ class AdminOptionsAdmin(admin.ModelAdmin, JSONFieldPrettyPrintMixin):
                     "classes": ("collapse",),
                     "description": "Legacy fields for backward compatibility. Use the new guide content system instead.",
                 },
-            )
-        )
+            ),
+        ]
 
         return fieldsets
 

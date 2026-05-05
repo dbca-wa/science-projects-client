@@ -496,8 +496,8 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Admin Test Page",
-		path: "/manage/admin-testing",
+		name: "Communications",
+		path: "/manage/communications/:tab?",
 		component: AdminTestPage,
 		requiresAuth: true,
 		requiresAdmin: true,

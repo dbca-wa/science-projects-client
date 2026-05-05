@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Loader2, FileDown } from "lucide-react";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
@@ -19,13 +20,24 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
+import {
+	Tabs,
+	TabsList,
+	TabsTrigger,
+	TabsContent,
+} from "@/shared/components/ui/tabs";
 import { UserSearchDropdown } from "@/shared/components/user/UserSearchDropdown";
 import {
 	useEmailTestingSettings,
 	useUpdateEmailTestingSettings,
 	useSendAllTestEmails,
 } from "@/features/admin/hooks/useEmailTestingSettings";
-import { useGenerateTestPDF, useGenerateAllTestPDFs } from "@/features/admin/hooks/useTestPDF";
+import {
+	useGenerateTestPDF,
+	useGenerateAllTestPDFs,
+} from "@/features/admin/hooks/useTestPDF";
+import { AnnouncementContent } from "@/features/admin/components/shared/AnnouncementContent";
+import { BannerContent } from "@/features/admin/components/shared/BannerContent";
 
 /** All available email templates with human-readable labels */
 const EMAIL_TEMPLATES = [
@@ -52,25 +64,8 @@ const EMAIL_TEMPLATES = [
 	{ name: "project_reopened_email", label: "Project Reopened" },
 	{ name: "spms_link_email", label: "SPMS Invite" },
 	{ name: "staff_profile_email", label: "Staff Profile Contact" },
+	{ name: "announcement_email", label: "Announcement" },
 ] as const;
-
-
-interface SectionCardProps {
-	title: string;
-	children: React.ReactNode;
-}
-
-const SectionCard = ({ title, children }: SectionCardProps) => (
-	<div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
-		<div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-			<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-				{title}
-			</h2>
-		</div>
-		<div className="p-6">{children}</div>
-	</div>
-);
-
 
 const EmailTestingContent = () => {
 	const { data: settings } = useEmailTestingSettings();
@@ -134,8 +129,8 @@ const EmailTestingContent = () => {
 		<div className="space-y-6">
 			{/* Status banner */}
 			{settings?.email_testing_mode && settings.email_test_user && (
-				<div className="rounded-md border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
-					<p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+				<div className="rounded-md border border-blue-300 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-950">
+					<p className="text-sm font-medium text-blue-800 dark:text-blue-200">
 						Testing mode is ON — all emails will be sent to{" "}
 						{settings.email_test_user.display_first_name}{" "}
 						{settings.email_test_user.display_last_name} (
@@ -402,8 +397,21 @@ const DocumentTestingContent = () => {
 	);
 };
 
+const VALID_TABS = ["banner", "emails", "announcements", "documents"] as const;
+type CommsTab = (typeof VALID_TABS)[number];
+
 const AdminTestPage = () => {
-	useDocumentTitle("Admin Test Page");
+	useDocumentTitle("Communications");
+	const { tab } = useParams<{ tab?: string }>();
+	const navigate = useNavigate();
+
+	const activeTab: CommsTab = VALID_TABS.includes(tab as CommsTab)
+		? (tab as CommsTab)
+		: "banner";
+
+	const handleTabChange = (value: string) => {
+		navigate(`/manage/communications/${value}`, { replace: true });
+	};
 
 	const { isLoading } = useEmailTestingSettings();
 
@@ -411,7 +419,7 @@ const AdminTestPage = () => {
 		return (
 			<div className="container mx-auto space-y-6 p-6">
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-					Admin Test Page
+					Communications
 				</h1>
 				<p className="text-sm text-gray-500">Loading settings...</p>
 			</div>
@@ -421,16 +429,45 @@ const AdminTestPage = () => {
 	return (
 		<div className="container mx-auto space-y-6 p-6">
 			<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-				Admin Test Page
+				Communications
 			</h1>
 
-			<SectionCard title="Email Testing">
-				<EmailTestingContent />
-			</SectionCard>
+			<Tabs
+				value={activeTab}
+				onValueChange={handleTabChange}
+				className="w-full"
+			>
+				<TabsList className="w-full flex">
+					<TabsTrigger value="banner" className="flex-1">
+						Banner
+					</TabsTrigger>
+					<TabsTrigger value="emails" className="flex-1">
+						Emails
+					</TabsTrigger>
+					<TabsTrigger value="announcements" className="flex-1">
+						Announcements
+					</TabsTrigger>
+					<TabsTrigger value="documents" className="flex-1">
+						Documents
+					</TabsTrigger>
+				</TabsList>
 
-			<SectionCard title="Project Documents">
-				<DocumentTestingContent />
-			</SectionCard>
+				<TabsContent value="banner">
+					<BannerContent />
+				</TabsContent>
+
+				<TabsContent value="emails">
+					<EmailTestingContent />
+				</TabsContent>
+
+				<TabsContent value="announcements">
+					<AnnouncementContent />
+				</TabsContent>
+
+				<TabsContent value="documents">
+					<DocumentTestingContent />
+				</TabsContent>
+			</Tabs>
 		</div>
 	);
 };

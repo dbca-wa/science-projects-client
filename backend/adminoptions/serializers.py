@@ -164,6 +164,8 @@ class AdminOptionsCreateSerializer(serializers.ModelSerializer):
             "email_testing_mode",
             "email_test_user",
             "guide_content",
+            "show_homepage_message",
+            "homepage_message",
             # Legacy fields - keep for backward compatibility
             "guide_admin",
             "guide_about",
@@ -195,6 +197,8 @@ class AdminOptionsSerializer(serializers.ModelSerializer):
             "email_testing_mode",
             "email_test_user",
             "guide_content",
+            "show_homepage_message",
+            "homepage_message",
             "guide_sections",
             # Legacy fields - keep for backward compatibility
             "guide_admin",

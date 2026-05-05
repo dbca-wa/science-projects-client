@@ -5,10 +5,7 @@ import { cn } from "@/shared/lib/utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
 import { useAuthStore } from "@/app/stores/store-context";
 import {
-	MapPin,
 	Building,
-	GitBranch,
-	Globe,
 	Briefcase,
 	Settings,
 	Database,
@@ -16,6 +13,8 @@ import {
 	RefreshCw,
 	FileText,
 	CircleCheckBig,
+	Megaphone,
+	Network,
 } from "lucide-react";
 
 export type ARActionId = "batch-approve" | "batch-approve-old";
@@ -38,7 +37,7 @@ interface MenuSection {
 
 const MANAGE_SECTIONS: MenuSection[] = [
 	{
-		label: "Lists & Approvers",
+		label: "Core",
 		items: [
 			{
 				targetPath: "/manage/data",
@@ -50,16 +49,41 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				icon: <CircleCheckBig className="size-4" aria-hidden="true" />,
 				label: "Approvers",
 			},
+			{
+				targetPath: "/manage/communications",
+				icon: <Megaphone className="size-4" aria-hidden="true" />,
+				label: "Communications",
+			},
 		],
 	},
 	{
-		label: "CRUD",
+		label: "AR Actions",
 		items: [
 			{
-				targetPath: "/manage/addresses",
-				icon: <MapPin className="size-4" aria-hidden="true" />,
-				label: "Addresses",
+				actionId: "batch-approve-old",
+				icon: <CheckSquare className="size-4" aria-hidden="true" />,
+				label: "Batch Approve Old Reports",
 			},
+			{
+				actionId: "batch-approve",
+				icon: <CheckSquare className="size-4" aria-hidden="true" />,
+				label: "Batch Approve Reports",
+			},
+			{
+				targetPath: "/manage/reports",
+				icon: <FileText className="size-4" aria-hidden="true" />,
+				label: "Report Info",
+			},
+			{
+				targetPath: "/manage/new-cycle",
+				icon: <RefreshCw className="size-4" aria-hidden="true" />,
+				label: "Open New Cycle",
+			},
+		],
+	},
+	{
+		label: "Organisation",
+		items: [
 			{
 				targetPath: "/manage/affiliations",
 				icon: <Building className="size-4" aria-hidden="true" />,
@@ -67,7 +91,7 @@ const MANAGE_SECTIONS: MenuSection[] = [
 			},
 			{
 				targetPath: "/manage/branches",
-				icon: <GitBranch className="size-4" aria-hidden="true" />,
+				icon: <Network className="size-4" aria-hidden="true" />,
 				label: "Branches",
 			},
 			{
@@ -79,36 +103,6 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				targetPath: "/manage/divisions",
 				icon: <Settings className="size-4" aria-hidden="true" />,
 				label: "Divisions",
-			},
-			{
-				targetPath: "/manage/locations",
-				icon: <Globe className="size-4" aria-hidden="true" />,
-				label: "Locations",
-			},
-			{
-				targetPath: "/manage/reports",
-				icon: <FileText className="size-4" aria-hidden="true" />,
-				label: "Report Info",
-			},
-		],
-	},
-	{
-		label: "AR Actions",
-		items: [
-			{
-				actionId: "batch-approve",
-				icon: <CheckSquare className="size-4" aria-hidden="true" />,
-				label: "Batch Approve Reports",
-			},
-			{
-				actionId: "batch-approve-old",
-				icon: <CheckSquare className="size-4" aria-hidden="true" />,
-				label: "Batch Approve Old Reports",
-			},
-			{
-				targetPath: "/manage/new-cycle",
-				icon: <RefreshCw className="size-4" aria-hidden="true" />,
-				label: "Open New Cycle",
 			},
 		],
 	},
@@ -135,7 +129,7 @@ export const ManageDropdownContent = ({
 			if (section.label === "AR Actions") {
 				return canAccessAR ? section : null;
 			}
-			if (section.label === "CRUD" && !canAccessAR) {
+			if (section.label === "Organisation" && !canAccessAR) {
 				return {
 					...section,
 					items: section.items.filter(
@@ -204,10 +198,9 @@ export const ManageDropdownContent = ({
 		>
 			{filteredSections.map((section, sectionIdx) => (
 				<div key={section.label}>
-					{sectionIdx === filteredSections.length - 1 &&
-						filteredSections.length > 1 && (
-							<div className="my-1 border-t border-gray-200 dark:border-gray-700" />
-						)}
+					{sectionIdx > 0 && (
+						<div className="my-1 border-t border-gray-200 dark:border-gray-700" />
+					)}
 
 					<div className="px-4 py-2">
 						<span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
