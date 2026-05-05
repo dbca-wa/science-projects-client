@@ -76,6 +76,9 @@ class NotificationService:
         Groups documents by recipient so each user gets one email listing all their
         approved documents, rather than one email per document.
 
+        Recipients are limited to project leads and business area leads only —
+        regular team members do not receive batch approval notifications.
+
         Args:
             documents: List of approved ProjectDocument instances
             approver: User who performed the batch approval
@@ -95,11 +98,12 @@ class NotificationService:
             "projectclosure": "closure",
         }
 
-        # Group documents by recipient (deduplicated by user PK)
-        user_docs = {}  # pk → {name, email, docs: []}
+        # Group documents by recipient (deduplicated by email)
+        # Only project leads and BA leads receive batch approval emails
+        user_docs = {}  # email → {name, email, docs: []}
 
         for doc in documents:
-            recipients = NotificationService._get_document_recipients(doc)
+            recipients = NotificationService._get_batch_approval_recipients(doc)
             kind_label = document_kind_dict.get(doc.kind, doc.kind)
             url_kind = url_kind_map.get(doc.kind, doc.kind)
             doc_info = {
@@ -112,7 +116,6 @@ class NotificationService:
                 email = recipient["email"]
                 if not email:
                     continue
-                # Use email as key since we don't have PK in recipient dicts
                 if email not in user_docs:
                     user_docs[email] = {
                         "name": recipient["name"],
@@ -1263,6 +1266,54 @@ class NotificationService:
                     }
                 )
                 seen_pks.add(ba.leader.pk)
+
+        return recipients
+
+    @staticmethod
+    def _get_batch_approval_recipients(document):
+        """
+        Get recipients for batch approval notifications.
+        Only active project leads and business area leads — NOT regular team members.
+
+        Returns:
+            List of dicts with 'name', 'email', 'kind'
+        """
+        recipients = []
+        seen_emails = set()
+
+        if hasattr(document, "project") and document.project:
+            # Project leads only (not regular team members)
+            for member in document.project.members.filter(is_leader=True):
+                if (
+                    member.user.is_active
+                    and member.user.email
+                    and member.user.email not in seen_emails
+                ):
+                    recipients.append(
+                        {
+                            "name": member.user.get_full_name(),
+                            "email": member.user.email,
+                            "kind": "Project Lead",
+                        }
+                    )
+                    seen_emails.add(member.user.email)
+
+            # Business area leader
+            if document.project.business_area and document.project.business_area.leader:
+                ba_leader = document.project.business_area.leader
+                if (
+                    ba_leader.is_active
+                    and ba_leader.email
+                    and ba_leader.email not in seen_emails
+                ):
+                    recipients.append(
+                        {
+                            "name": ba_leader.get_full_name(),
+                            "email": ba_leader.email,
+                            "kind": "Business Area Leader",
+                        }
+                    )
+                    seen_emails.add(ba_leader.email)
 
         return recipients
 
