@@ -48,14 +48,17 @@ ContentBox.displayName = "ContentBox";
  * Provides the main layout structure with header, content area, and footer
  * Includes navigation blocking for unsaved editor changes
  */
-export function AppLayout() {
+export const AppLayout = () => {
 	return (
 		<div className="fixed top-0 left-0 w-screen h-screen overflow-hidden flex flex-col">
 			{/* Navigation blocker for unsaved editor changes */}
 			<NavigationBlocker />
 
 			{/* Scrollable container */}
-			<div className="top-0 left-0 right-0 overflow-y-auto no-scrollbar">
+			<div
+				id="scroll-container"
+				className="flex-1 overflow-y-auto no-scrollbar"
+			>
 				{/* Header */}
 				<Header />
 
@@ -84,6 +87,6 @@ export function AppLayout() {
 			/>
 		</div>
 	);
-}
+};
 
 AppLayout.displayName = "AppLayout";

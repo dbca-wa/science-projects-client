@@ -35,10 +35,17 @@ export const WizardContainer = observer(
 		const queryClient = useQueryClient();
 		const { data: currentUser } = useCurrentUser();
 
+		const scrollToTop = () => {
+			requestAnimationFrame(() => {
+				document
+					.getElementById("scroll-container")
+					?.scrollTo({ top: 0, behavior: "smooth" });
+			});
+		};
+
 		const handleBack = () => {
 			wizardStore.previousStep();
-			// Scroll to top so the user sees the previous step from the beginning
-			window.scrollTo({ top: 0, behavior: "smooth" });
+			scrollToTop();
 		};
 
 		const handleContinue = () => {
@@ -53,8 +60,7 @@ export const WizardContainer = observer(
 				// Commit editing state to saved state before advancing
 				wizardStore.commitStep();
 				wizardStore.nextStep();
-				// Scroll to top so the user sees the new step from the beginning
-				window.scrollTo({ top: 0, behavior: "smooth" });
+				scrollToTop();
 			}
 		};
 
@@ -151,7 +157,7 @@ export const WizardContainer = observer(
 
 		const handleStepClick = (stepIndex: number) => {
 			wizardStore.goToStep(stepIndex);
-			window.scrollTo({ top: 0, behavior: "smooth" });
+			scrollToTop();
 		};
 
 		return (
