@@ -6,7 +6,6 @@ export type {
 	IBusinessAreaUpdate,
 	IDivision,
 	IAffiliation,
-	IDepartmentalService,
 	IAddress,
 	ISimpleLocationData,
 } from "@/shared/types/org.types";
@@ -42,11 +41,6 @@ export interface IDivisionForm {
 export interface ILocationForm {
 	name: string;
 	area_type: string;
-}
-
-export interface IServiceForm {
-	name: string;
-	director: number | null;
 }
 
 export interface IReportInfoForm {

@@ -18,7 +18,6 @@ export interface IProjectDetailsData {
 	start_date: Date | null;
 	end_date: Date | null;
 	business_area: number | null;
-	departmental_service: number | null;
 	project_leader: number | null;
 	data_custodian: number | null;
 }
@@ -121,7 +120,6 @@ function createDefaultFormData(): IWizardFormData {
 			start_date: null,
 			end_date: null,
 			business_area: null,
-			departmental_service: null,
 			project_leader: null,
 			data_custodian: null,
 		},

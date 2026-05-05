@@ -14,7 +14,6 @@ import {
 	GitBranch,
 	Briefcase,
 	Settings,
-	List,
 	CircleCheckBig,
 	FlaskConical,
 } from "lucide-react";
@@ -357,17 +356,6 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 									<span>Report Info</span>
 								</span>
 							</Button>
-							<Button
-								variant="ghost"
-								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/services", e)}
-							>
-								<span className="flex items-center gap-3">
-									<List className="text-xl" aria-hidden="true" />
-									<span>Services</span>
-								</span>
-							</Button>
-
 							{/* AR Actions */}
 							<p className="px-6 pt-2 pb-1 text-xs font-medium text-gray-500">
 								AR Actions

@@ -12,7 +12,6 @@ from .models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -790,22 +789,6 @@ class DivisionAdmin(admin.ModelAdmin):
         return obj.approvers.count()
 
     approvers_count.short_description = "Approvers"
-
-
-@admin.register(DepartmentalService)
-class DepartmentalServiceAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "director",
-    ]
-
-    list_filter = [
-        "director",
-    ]
-
-    search_fields = ["name"]
-
-    ordering = ["name"]
 
 
 # endregion  =================================================================================================

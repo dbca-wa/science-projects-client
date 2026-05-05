@@ -97,7 +97,6 @@ export const WizardContainer = observer(
 
 					// Project details
 					business_area: formData.projectDetails.business_area,
-					departmental_service: formData.projectDetails.departmental_service,
 					start_date: formData.projectDetails.start_date,
 					end_date: formData.projectDetails.end_date,
 					project_leader: formData.projectDetails.project_leader,
@@ -121,7 +120,6 @@ export const WizardContainer = observer(
 					// External details
 					collaboration_with: formData.externalDetails?.collaboration_with,
 					budget: formData.externalDetails?.budget,
-					external_description: formData.externalDetails?.external_description,
 					aims: formData.externalDetails?.aims,
 				};
 

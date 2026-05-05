@@ -25,7 +25,6 @@ export interface EditProjectFormData {
 	description?: string;
 	image?: File | string | null;
 	business_area: number;
-	service?: number | null;
 	start_date: string;
 	end_date?: string | null;
 	project_leader?: number | null;
@@ -50,7 +49,6 @@ export interface UpdateProjectPayload {
 	description?: string;
 	image?: File | string | null;
 	business_area?: number;
-	service?: number | null;
 	start_date?: string;
 	end_date?: string | null;
 	project_leader?: number | null;

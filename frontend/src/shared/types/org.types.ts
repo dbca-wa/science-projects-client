@@ -35,14 +35,6 @@ export interface IBranch {
 	manager: IBranchManager | null;
 }
 
-// SERVICE ============================================================================
-
-export interface IDepartmentalService {
-	name: string;
-	director?: number;
-	id: number;
-}
-
 // BUSINESS AREA ============================================================================
 
 export interface IBusinessAreaUpdate {

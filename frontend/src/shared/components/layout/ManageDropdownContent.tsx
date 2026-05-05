@@ -5,7 +5,6 @@ import { cn } from "@/shared/lib/utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
 import { useAuthStore } from "@/app/stores/store-context";
 import {
-	List,
 	MapPin,
 	Building,
 	GitBranch,
@@ -90,11 +89,6 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				targetPath: "/manage/reports",
 				icon: <FileText className="size-4" aria-hidden="true" />,
 				label: "Report Info",
-			},
-			{
-				targetPath: "/manage/services",
-				icon: <List className="size-4" aria-hidden="true" />,
-				label: "Services",
 			},
 		],
 	},

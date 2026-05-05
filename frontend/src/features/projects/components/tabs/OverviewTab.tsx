@@ -324,52 +324,34 @@ export function OverviewTab({
 
 			{/* Description Section - Separate ProjectSection */}
 			<ProjectSection className="p-6">
-				{isExternal && externalDetails ? (
-					<>
-						{/* External Description */}
-						<div className="mb-6">
-							<InlineSaveEditor
-								contentType="external-project-description"
-								entityId={externalDetails.id}
-								initialContent={externalDetails.description || ""}
-								canEdit={canEdit}
-								label="External Description"
-								placeholder="Enter external project description..."
-								emptyMessage="No external description available."
-								toolbar="projectTitle"
-							/>
-						</div>
+				{/* Description — always show the project summary */}
+				<div className="mb-6">
+					<InlineSaveEditor
+						contentType="project-description"
+						entityId={project.id}
+						initialContent={project.description || ""}
+						canEdit={canEdit}
+						label="Description"
+						placeholder="Enter project description..."
+						emptyMessage="No description available."
+						toolbar="projectTitle"
+					/>
+				</div>
 
-						{/* External Aims */}
-						<div className="mb-6">
-							<InlineSaveEditor
-								contentType="external-project-aims"
-								entityId={externalDetails.id}
-								initialContent={externalDetails.aims || ""}
-								canEdit={canEdit}
-								label="External Aims"
-								placeholder="Enter external project aims..."
-								emptyMessage="No external aims available."
-								toolbar="projectTitle"
-							/>
-						</div>
-					</>
-				) : (
-					<>
-						{/* Regular Description */}
-						<div className="mb-6">
-							<InlineSaveEditor
-								contentType="project-description"
-								entityId={project.id}
-								initialContent={project.description || ""}
-								canEdit={canEdit}
-								label="Description"
-								placeholder="Enter project description..."
-								emptyMessage="No description available."
-								toolbar="projectTitle"
-							/>
-						</div>
-					</>
+				{/* Aims — only for external projects */}
+				{isExternal && externalDetails && (
+					<div className="mb-6">
+						<InlineSaveEditor
+							contentType="external-project-aims"
+							entityId={externalDetails.id}
+							initialContent={externalDetails.aims || ""}
+							canEdit={canEdit}
+							label="Aims"
+							placeholder="Enter project aims..."
+							emptyMessage="No aims available."
+							toolbar="projectTitle"
+						/>
+					</div>
 				)}
 
 				{/* Keywords Section - Self-contained component */}

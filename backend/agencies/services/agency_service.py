@@ -14,7 +14,6 @@ from agencies.models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -298,45 +297,6 @@ class AgencyService:
         division = AgencyService.get_division(pk)
         settings.LOGGER.info(f"{user} is deleting division {division}")
         division.delete()
-
-    # Departmental Service operations
-    @staticmethod
-    def list_departmental_services():
-        """List all departmental services"""
-        return DepartmentalService.objects.all()
-
-    @staticmethod
-    def get_departmental_service(pk):
-        """Get departmental service by ID"""
-        try:
-            return DepartmentalService.objects.get(pk=pk)
-        except DepartmentalService.DoesNotExist:
-            raise NotFound(f"Departmental service {pk} not found")
-
-    @staticmethod
-    def create_departmental_service(user, data):
-        """Create new departmental service"""
-        settings.LOGGER.info(f"{user} is creating departmental service")
-        return DepartmentalService.objects.create(**data)
-
-    @staticmethod
-    def update_departmental_service(pk, user, data):
-        """Update departmental service"""
-        service = AgencyService.get_departmental_service(pk)
-        settings.LOGGER.info(f"{user} is updating departmental service {service}")
-
-        for field, value in data.items():
-            setattr(service, field, value)
-        service.save()
-
-        return service
-
-    @staticmethod
-    def delete_departmental_service(pk, user):
-        """Delete departmental service"""
-        service = AgencyService.get_departmental_service(pk)
-        settings.LOGGER.info(f"{user} is deleting departmental service {service}")
-        service.delete()
 
     @staticmethod
     def delete_affiliation(pk: int, user) -> dict:

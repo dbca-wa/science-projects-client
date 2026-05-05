@@ -40,7 +40,6 @@ import { FormRichTextEditor } from "@/shared/components/editor/FormRichTextEdito
 import { RichTextEditor } from "@/shared/components/editor/RichTextEditor";
 import { UserCombobox } from "@/shared/components/user";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
-import { useServices } from "@/shared/hooks/queries/useServices";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useProjectAreas } from "@/shared/hooks/queries/useProjectAreas";
 import { useLocations } from "@/shared/hooks/queries/useLocations";
@@ -61,7 +60,6 @@ const editProjectSchema = z
 		description: z.string().optional(),
 		image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
 		business_area: z.number().min(1, "Business area is required"),
-		service: z.number().nullable().optional(),
 		start_date: z.string().min(1, "Start date is required"),
 		end_date: z.string().nullable().optional(),
 		project_leader: z.number().nullable().optional(),
@@ -71,7 +69,6 @@ const editProjectSchema = z
 		// External project fields
 		collaboration_with: z.string().optional(),
 		budget: z.string().optional(),
-		external_description: z.string().optional(),
 		aims: z.string().optional(),
 		// Student project fields
 		organisation: z.string().optional(),
@@ -117,7 +114,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
 	const { data: divisions } = useDivisions();
-	const { data: services, isLoading: isLoadingServices } = useServices();
 	const { data: _projectAreas, isLoading: isLoadingProjectAreas } =
 		useProjectAreas();
 	const { dbcaRegions, dbcaDistricts } = useLocations();
@@ -170,7 +166,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 			description: "",
 			image: null,
 			business_area: 0,
-			service: null,
 			start_date: "",
 			end_date: null,
 			project_leader: null,
@@ -179,7 +174,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 			project_areas: [],
 			collaboration_with: "",
 			budget: "",
-			external_description: "",
 			aims: "",
 			organisation: "",
 			level: "",
@@ -190,7 +184,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 	// Wait for dropdown data to load before resetting form to prevent value resets
 	useEffect(() => {
 		// Only load form data once all dropdown queries have finished loading
-		if (isLoadingBusinessAreas || isLoadingServices || isLoadingProjectAreas) {
+		if (isLoadingBusinessAreas || isLoadingProjectAreas) {
 			return;
 		}
 
@@ -205,13 +199,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 			editStore.reset();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		project.id,
-		details,
-		isLoadingBusinessAreas,
-		isLoadingServices,
-		isLoadingProjectAreas,
-	]);
+	}, [project.id, details, isLoadingBusinessAreas, isLoadingProjectAreas]);
 
 	// Watch for form changes and notify parent
 	useEffect(() => {
@@ -320,7 +308,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 			"image",
 			"title",
 			"description",
-			"service",
 			"business_area",
 			"start_date",
 			"end_date",
@@ -333,12 +320,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 
 	// Helper to check if external-details tab has dirty fields
 	const isExternalTabDirty = () => {
-		const externalFields = [
-			"collaboration_with",
-			"budget",
-			"external_description",
-			"aims",
-		];
+		const externalFields = ["collaboration_with", "budget", "aims"];
 		return isSectionDirty(externalFields);
 	};
 
@@ -359,12 +341,7 @@ export const EditProjectForm = observer(function EditProjectForm({
 	};
 
 	// Show loading spinner while dropdown data is loading
-	if (
-		isLoadingBusinessAreas ||
-		isLoadingServices ||
-		isLoadingProjectAreas ||
-		!formLoaded
-	) {
+	if (isLoadingBusinessAreas || isLoadingProjectAreas || !formLoaded) {
 		return (
 			<div className="flex items-center justify-center py-20">
 				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -569,16 +546,14 @@ export const EditProjectForm = observer(function EditProjectForm({
 									</div>
 								</section>
 
-								{/* Business Area & Service */}
+								{/* Business Area */}
 								<section
 									className={cn(
 										"bg-card rounded-lg border p-6 shadow-sm mt-6",
-										getSectionBorderClass(["business_area", "service"])
+										getSectionBorderClass(["business_area"])
 									)}
 								>
-									<h2 className="text-xl font-semibold mb-4">
-										Business Area &amp; Service
-									</h2>
+									<h2 className="text-xl font-semibold mb-4">Business Area</h2>
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 										{/* Business Area */}
 										<FormField
@@ -609,51 +584,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 													</Select>
 													<FormDescription>
 														The business area this project belongs to
-													</FormDescription>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-
-										{/* Service */}
-										<FormField
-											control={form.control}
-											name="service"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Service</FormLabel>
-													<Select
-														value={field.value?.toString() || "none"}
-														onValueChange={(value) =>
-															field.onChange(
-																value === "none" ? null : Number(value)
-															)
-														}
-													>
-														<FormControl>
-															<SelectTrigger className="w-full">
-																<SelectValue placeholder="Select service (optional)" />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															<SelectItem value="none">None</SelectItem>
-															{[...(services || [])]
-																.sort((a, b) =>
-																	(a.name || "").localeCompare(b.name || "")
-																)
-																.map((service) => (
-																	<SelectItem
-																		key={service.id}
-																		value={service.id!.toString()}
-																	>
-																		{service.name}
-																	</SelectItem>
-																))}
-														</SelectContent>
-													</Select>
-													<FormDescription>
-														The departmental service this project belongs to
-														(optional)
 													</FormDescription>
 													<FormMessage />
 												</FormItem>
@@ -803,7 +733,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 											getSectionBorderClass([
 												"collaboration_with",
 												"budget",
-												"external_description",
 												"aims",
 											])
 										)}
@@ -863,34 +792,6 @@ export const EditProjectForm = observer(function EditProjectForm({
 														</FormControl>
 														<FormDescription>
 															The estimated budget for the project in dollars
-															(optional)
-														</FormDescription>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-
-											{/* External Description */}
-											<FormField
-												control={form.control}
-												name="external_description"
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>External Description</FormLabel>
-														<FormControl>
-															<RichTextEditor
-																value={field.value || ""}
-																onChange={field.onChange}
-																placeholder="Description specific to this external project..."
-																toolbar="projectDescription"
-																disabled={isLoading}
-																minHeight="150px"
-																aria-label="External project description"
-																className="editor-standalone"
-															/>
-														</FormControl>
-														<FormDescription>
-															Description specific to this external project
 															(optional)
 														</FormDescription>
 														<FormMessage />

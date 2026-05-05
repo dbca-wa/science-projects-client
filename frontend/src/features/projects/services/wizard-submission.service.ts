@@ -17,7 +17,6 @@ export interface WizardSubmissionData {
 
 	// Project details
 	business_area: number | null;
-	departmental_service: number | null;
 	start_date: Date | null;
 	end_date: Date | null;
 	project_leader: number | null;
@@ -38,7 +37,6 @@ export interface WizardSubmissionData {
 	// External details (conditional)
 	collaboration_with?: string;
 	budget?: string;
-	external_description?: string;
 	aims?: string;
 
 	// Team members added during creation
@@ -71,12 +69,6 @@ function buildFormData(data: WizardSubmissionData): FormData {
 	if (data.business_area) {
 		formData.append("businessArea", data.business_area.toString());
 	}
-	if (data.departmental_service) {
-		formData.append(
-			"departmentalService",
-			data.departmental_service.toString()
-		);
-	}
 	if (data.data_custodian) {
 		formData.append("dataCustodian", data.data_custodian.toString());
 	}
@@ -107,9 +99,6 @@ function buildFormData(data: WizardSubmissionData): FormData {
 
 	// External-specific fields
 	if (data.projectKind === "external") {
-		if (data.external_description) {
-			formData.append("externalDescription", data.external_description);
-		}
 		if (data.aims) {
 			formData.append("aims", data.aims);
 		}

@@ -9,7 +9,6 @@ from agencies.models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -65,15 +64,6 @@ def business_area(db, agency, division, user):
         caretaker=user,
         is_active=True,
         published=False,
-    )
-
-
-@pytest.fixture
-def departmental_service(db, user):
-    """Provide a departmental service"""
-    return DepartmentalService.objects.create(
-        name="Test Service",
-        director=user,
     )
 
 
@@ -186,22 +176,3 @@ def module_business_area(
             published=False,
         )
         yield ba
-
-
-@pytest.fixture(scope="module")
-def module_departmental_service(django_db_setup, django_db_blocker, module_user):
-    """
-    Provide a module-scoped departmental service for read-only tests.
-
-    This fixture is created once per test module and shared across all tests.
-    Use this for tests that only read departmental service data and don't modify it.
-
-    Returns:
-        DepartmentalService: DepartmentalService instance (shared across module)
-    """
-    with django_db_blocker.unblock():
-        service = DepartmentalService.objects.create(
-            name="Module Service",
-            director=module_user,
-        )
-        yield service

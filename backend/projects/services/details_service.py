@@ -49,7 +49,6 @@ class DetailsService:
                 "site_custodian__profile",
                 "site_custodian__work",
                 "site_custodian__work__business_area",
-                "service",
             ).get(project_id=project_id)
         except ProjectDetail.DoesNotExist:
             raise NotFound(f"Project details not found for project {project_id}")
@@ -190,7 +189,6 @@ class DetailsService:
             owner_id=get_id(data.get("owner", data.get("creator"))),
             data_custodian_id=get_id(data.get("data_custodian")),
             site_custodian_id=get_id(data.get("site_custodian")),
-            service_id=get_id(data.get("service")),
         )
 
         return details

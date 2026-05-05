@@ -91,7 +91,6 @@ ADMIN_CHANGELIST_URLS = [
     "admin:agencies_branch_changelist",
     "admin:agencies_businessarea_changelist",
     "admin:agencies_division_changelist",
-    "admin:agencies_departmentalservice_changelist",
     # communications
     "admin:communications_chatroom_changelist",
     "admin:communications_comment_changelist",
@@ -166,7 +165,6 @@ ADMIN_SEARCH_URLS = [
     "admin:agencies_branch_changelist",
     # NOTE: agencies_businessarea excluded — pre-existing broken search on FK "leader"
     "admin:agencies_division_changelist",
-    "admin:agencies_departmentalservice_changelist",
     "admin:communications_chatroom_changelist",
     "admin:communications_comment_changelist",
     "admin:communications_directmessage_changelist",

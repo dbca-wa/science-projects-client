@@ -10,7 +10,6 @@ from agencies.models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -534,69 +533,3 @@ class TestDivision:
         assert division.directorate_email_list.count() == 2
         assert user1 in division.directorate_email_list.all()
         assert user2 in division.directorate_email_list.all()
-
-
-class TestDepartmentalService:
-    """Tests for DepartmentalService model"""
-
-    @pytest.mark.integration
-    def test_create_departmental_service(self, user, db):
-        """Test creating a departmental service"""
-        # Arrange & Act
-        service = DepartmentalService.objects.create(
-            name="Test Service",
-            director=user,
-        )
-
-        # Assert
-        assert service.id is not None
-        assert service.name == "Test Service"
-        assert service.director == user
-        assert str(service) == "Dept. Service: Test Service"
-
-    @pytest.mark.unit
-    def test_create_departmental_service_without_director(self, db):
-        """Test creating departmental service without director"""
-        # Arrange & Act
-        service = DepartmentalService.objects.create(
-            name="Test Service",
-        )
-
-        # Assert
-        assert service.id is not None
-        assert service.director is None
-
-    @pytest.mark.unit
-    def test_departmental_service_str_method(self, departmental_service, db):
-        """Test departmental service string representation"""
-        # Act
-        result = str(departmental_service)
-
-        # Assert
-        assert result == f"Dept. Service: {departmental_service.name}"
-
-    @pytest.mark.unit
-    def test_departmental_service_meta_verbose_names(self, db):
-        """Test departmental service meta verbose names"""
-        # Act
-        meta = DepartmentalService._meta
-
-        # Assert
-        assert meta.verbose_name == "Departmental Service"
-        assert meta.verbose_name_plural == "Departmental Services"
-
-    @pytest.mark.integration
-    def test_departmental_service_director_set_null_on_delete(self, user, db):
-        """Test director is set to null when user is deleted"""
-        # Arrange
-        service = DepartmentalService.objects.create(
-            name="Test Service",
-            director=user,
-        )
-
-        # Act
-        user.delete()
-        service.refresh_from_db()
-
-        # Assert
-        assert service.director is None

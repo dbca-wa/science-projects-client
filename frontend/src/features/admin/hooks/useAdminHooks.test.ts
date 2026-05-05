@@ -115,14 +115,6 @@ describe("Admin hooks", () => {
 		expect(result.current.isLoading).toBeDefined();
 	});
 
-	it("useServices should return a query", async () => {
-		const { useServices } = await import("./useServices");
-		const { result } = renderHook(() => useServices(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
 	it("useAddresses should return a query", async () => {
 		const { useAddresses } = await import("./useAddresses");
 		const { result } = renderHook(() => useAddresses(), {

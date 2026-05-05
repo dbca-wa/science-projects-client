@@ -11,7 +11,6 @@ from agencies.admin import (
     AgencyAdmin,
     BranchAdmin,
     BusinessAreaAdmin,
-    DepartmentalServiceAdmin,
     DivisionAdmin,
 )
 from agencies.models import (
@@ -19,7 +18,6 @@ from agencies.models import (
     Agency,
     Branch,
     BusinessArea,
-    DepartmentalService,
     Division,
 )
 
@@ -200,47 +198,6 @@ class TestDivisionAdmin:
         """Test ordering configuration"""
         # Arrange
         admin = DivisionAdmin(Division, AdminSite())
-
-        # Act & Assert
-        assert admin.ordering == ["name"]
-
-
-class TestDepartmentalServiceAdmin:
-    """Tests for DepartmentalServiceAdmin"""
-
-    @pytest.mark.unit
-    def test_list_display(self, db):
-        """Test list_display configuration"""
-        # Arrange
-        admin = DepartmentalServiceAdmin(DepartmentalService, AdminSite())
-
-        # Act & Assert
-        assert "name" in admin.list_display
-        assert "director" in admin.list_display
-
-    @pytest.mark.unit
-    def test_list_filter(self, db):
-        """Test list_filter configuration"""
-        # Arrange
-        admin = DepartmentalServiceAdmin(DepartmentalService, AdminSite())
-
-        # Act & Assert
-        assert "director" in admin.list_filter
-
-    @pytest.mark.unit
-    def test_search_fields(self, db):
-        """Test search_fields configuration"""
-        # Arrange
-        admin = DepartmentalServiceAdmin(DepartmentalService, AdminSite())
-
-        # Act & Assert
-        assert "name" in admin.search_fields
-
-    @pytest.mark.unit
-    def test_ordering(self, db):
-        """Test ordering configuration"""
-        # Arrange
-        admin = DepartmentalServiceAdmin(DepartmentalService, AdminSite())
 
         # Act & Assert
         assert admin.ordering == ["name"]

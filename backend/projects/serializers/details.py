@@ -23,15 +23,6 @@ class ProjectDetailSerializer(ModelSerializer):
             }
         return None
 
-    def get_service(self, obj):
-        service = obj.service
-        if service:
-            return {
-                "id": service.pk,
-                "name": service.name,
-            }
-        return None
-
     def get_creator(self, obj):
         user = obj.creator
         if user:
@@ -82,7 +73,6 @@ class ProjectDetailViewSerializer(ModelSerializer):
     """Project details view serializer with related data"""
 
     project = SerializerMethodField(read_only=True)
-    service = SerializerMethodField(read_only=True)
     creator = SerializerMethodField(read_only=True)
     modifier = SerializerMethodField(read_only=True)
     owner = SerializerMethodField(read_only=True)
@@ -99,15 +89,6 @@ class ProjectDetailViewSerializer(ModelSerializer):
             return {
                 "id": project.pk,
                 "title": project.title,
-            }
-        return None
-
-    def get_service(self, obj):
-        service = obj.service
-        if service:
-            return {
-                "id": service.pk,
-                "name": service.name,
             }
         return None
 

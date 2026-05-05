@@ -5,7 +5,7 @@
  * Matches UserDetailSheet design with project-specific role section.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -83,23 +83,22 @@ export const TeamMemberSheet = ({
 		useSetTeamLeader(projectId);
 
 	// Form state - initialise from member prop
+	// Use member values as key to reset state when member data changes externally
+	const memberKey = `${member.role}-${member.time_allocation}-${member.short_code}-${member.is_leader}`;
 	const [role, setRole] = useState(member.role);
 	const [timeAllocation, setTimeAllocation] = useState(member.time_allocation);
 	const [shortCode, setShortCode] = useState(
 		member.short_code?.toString() || ""
 	);
+	const [lastMemberKey, setLastMemberKey] = useState(memberKey);
 
 	// Sync local state when member prop updates (e.g. after promote invalidates the query)
-	useEffect(() => {
+	if (memberKey !== lastMemberKey) {
 		setRole(member.role);
 		setTimeAllocation(member.time_allocation);
 		setShortCode(member.short_code?.toString() || "");
-	}, [
-		member.role,
-		member.time_allocation,
-		member.short_code,
-		member.is_leader,
-	]);
+		setLastMemberKey(memberKey);
+	}
 
 	const isStaff = member.user.is_staff;
 	const isLeader = member.is_leader;
