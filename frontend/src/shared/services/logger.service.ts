@@ -9,7 +9,10 @@ interface LogContext {
 }
 
 class LoggerService {
-	private isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
+	// private isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
+	private isProduction =
+		typeof import.meta !== "undefined" &&
+		import.meta.env?.VITE_SENTRY_ENVIRONMENT === "production";
 
 	private getCallerInfo(): string | undefined {
 		try {
@@ -167,7 +170,7 @@ class LoggerService {
 	}
 
 	debug(message: string, context?: LogContext): void {
-		if (this.isDev) {
+		if (!this.isProduction) {
 			const { formattedArgs, contextObject } = this.formatMessage(
 				"debug",
 				message,

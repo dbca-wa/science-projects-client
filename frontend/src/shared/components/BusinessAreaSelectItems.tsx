@@ -85,6 +85,14 @@ export const BusinessAreaSelectItems = ({
 					</span>
 				</SelectItem>
 			)}
+			{filtered.length === 0 && !currentBa && (
+				<SelectItem value="__empty" disabled>
+					<span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
+						<AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
+						<span>Set approvers first (Manage → Approvers)</span>
+					</span>
+				</SelectItem>
+			)}
 			{filtered.map((ba) => (
 				<SelectItem key={ba.id} value={ba.id!.toString()}>
 					{formatBusinessAreaName(ba)}

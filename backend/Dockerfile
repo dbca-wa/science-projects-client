@@ -107,6 +107,7 @@ RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install
     curl ca-certificates \
     gdebi \
     libgif7 \
+    postgresql-client \
     && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \

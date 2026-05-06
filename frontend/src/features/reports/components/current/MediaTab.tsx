@@ -108,7 +108,12 @@ interface ImageLightboxProps {
 	alt: string;
 }
 
-function ImageLightbox({ open, onOpenChange, src, alt }: ImageLightboxProps) {
+const ImageLightbox = ({
+	open,
+	onOpenChange,
+	src,
+	alt,
+}: ImageLightboxProps) => {
 	const [scale, setScale] = useState(1);
 	const [translate, setTranslate] = useState({ x: 0, y: 0 });
 	const [isPanning, setIsPanning] = useState(false);
@@ -297,7 +302,7 @@ function ImageLightbox({ open, onOpenChange, src, alt }: ImageLightboxProps) {
 		</div>,
 		document.body
 	);
-}
+};
 
 /* ------------------------------------------------------------------ */
 /*  Report Media Card                                                  */
@@ -310,12 +315,12 @@ interface ReportMediaCardProps {
 	reportPk: number;
 }
 
-function ReportMediaCard({
+const ReportMediaCard = ({
 	section,
 	title,
 	currentMedia,
 	reportPk,
-}: ReportMediaCardProps) {
+}: ReportMediaCardProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [imgError, setImgError] = useState(false);
 	const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -597,9 +602,9 @@ function ReportMediaCard({
 				</div>
 
 				{/* Title overlay — gradient at bottom of card */}
-				<div className="px-4 py-3.5 bg-gradient-to-t from-gray-100 via-gray-50 to-white dark:from-gray-800 dark:via-gray-850 dark:to-gray-900 border-t border-gray-200/80 dark:border-gray-700/80">
+				<div className="px-4 py-3.5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-t border-gray-200/80 dark:border-gray-700/50">
 					<p
-						className="text-[13px] font-semibold text-center text-gray-700 dark:text-gray-200 tracking-wide uppercase"
+						className="text-[13px] font-semibold text-center text-gray-700 dark:text-gray-100 tracking-wide uppercase"
 						title={title}
 					>
 						{title}
@@ -669,13 +674,13 @@ function ReportMediaCard({
 			</AlertDialog>
 		</>
 	);
-}
+};
 
 /* ------------------------------------------------------------------ */
 /*  Media Tab                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function MediaTab({ report }: { report: IAnnualReport }) {
+const MediaTab = ({ report }: { report: IAnnualReport }) => {
 	const { data: mediaItems, isLoading, error } = useReportMedia(report.id);
 
 	if (isLoading) {
@@ -720,4 +725,6 @@ export default function MediaTab({ report }: { report: IAnnualReport }) {
 			</div>
 		</div>
 	);
-}
+};
+
+export default MediaTab;
