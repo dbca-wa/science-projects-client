@@ -385,6 +385,6 @@ cd backend && poetry update
 - Fix TypeScript errors: `cd frontend && bun run type-check`
 - Fix Python formatting: `cd backend && black .`
 
-## License
+---
 
 Copyright © 2023-2026 Department of Biodiversity, Conservation and Attractions, Western Australia
