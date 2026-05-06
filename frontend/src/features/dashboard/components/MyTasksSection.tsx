@@ -45,7 +45,20 @@ export const MyTasksSection = ({
 
 	const totalTasks = adminTasks.length;
 
-	if (totalTasks === 0) {
+	// Filter endorsement tasks by type (needed for both empty check and rendering)
+	const aecTasks = endorsementTasks?.aec || [];
+	const bmTasks = endorsementTasks?.bm || [];
+	const hcTasks = endorsementTasks?.hc || [];
+	const totalEndorsementTasks =
+		aecTasks.length + bmTasks.length + hcTasks.length;
+
+	// Only show empty state if BOTH admin tasks and endorsement tasks are empty
+	// (and endorsements aren't still loading)
+	if (
+		totalTasks === 0 &&
+		totalEndorsementTasks === 0 &&
+		!endorsementTasksLoading
+	) {
 		return (
 			<div className="w-full h-full">
 				<p className="text-gray-600 dark:text-gray-400 text-center py-8">
@@ -62,13 +75,6 @@ export const MyTasksSection = ({
 	const mergeUserTasks = adminTasks.filter(
 		(task) => task.action === "mergeuser"
 	);
-
-	// Filter endorsement tasks by type
-	const aecTasks = endorsementTasks?.aec || [];
-	const bmTasks = endorsementTasks?.bm || [];
-	const hcTasks = endorsementTasks?.hc || [];
-	const totalEndorsementTasks =
-		aecTasks.length + bmTasks.length + hcTasks.length;
 
 	return (
 		<div className="flex flex-col w-full h-full space-y-4">
