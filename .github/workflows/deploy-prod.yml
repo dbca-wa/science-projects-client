@@ -418,7 +418,6 @@ jobs:
         with:
           name: security-frontend-${{ steps.version.outputs.VERSION }}
           path: |
-            sbom-frontend.json
             sbom-frontend.txt
             vuln-frontend.csv
           retention-days: 90
@@ -510,7 +509,6 @@ jobs:
         with:
           name: security-backend-${{ steps.version.outputs.VERSION }}
           path: |
-            sbom-backend.json
             sbom-backend.txt
             vuln-backend.csv
           retention-days: 90
