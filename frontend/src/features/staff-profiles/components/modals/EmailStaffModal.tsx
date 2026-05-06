@@ -44,14 +44,9 @@ const EmailStaffModal = ({
 		!mutation.isPending &&
 		!showSuccess;
 
-	// Reset transient state when the modal opens so re-opens start fresh.
-	useEffect(() => {
-		if (open) {
-			setShowSuccess(false);
-		}
-	}, [open]);
-
 	// After the success animation plays, close the modal and clear the form.
+	// The close handler also resets showSuccess for the next time the modal
+	// opens — no separate "reset on open" effect is needed.
 	useEffect(() => {
 		if (!showSuccess) return;
 		const timer = setTimeout(() => {

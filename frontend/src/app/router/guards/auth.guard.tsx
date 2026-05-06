@@ -17,6 +17,7 @@ const IS_LOCAL_DEV = import.meta.env.DEV;
  * If the backend is down, the user sees a clean white page instead of
  * a login form. They can refresh when ready.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 const UnauthenticatedFallback = () => {
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
