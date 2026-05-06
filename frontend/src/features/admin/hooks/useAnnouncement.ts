@@ -9,6 +9,8 @@ export interface SendAnnouncementPayload {
 	subject?: string;
 	division?: string;
 	excluded_user_ids?: number[];
+	/** Explicit list of user PKs to send to (takes precedence over excluded_user_ids) */
+	recipient_user_pks?: number[];
 }
 
 interface SendAnnouncementResponse {
@@ -24,11 +26,6 @@ export const useSendAnnouncement = () => {
 				"adminoptions/send-announcement",
 				data
 			),
-		onSuccess: (data) => {
-			toast.success(
-				`Announcement sent to ${data.emails_sent} recipient${data.emails_sent !== 1 ? "s" : ""}`
-			);
-		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to send announcement");
 		},

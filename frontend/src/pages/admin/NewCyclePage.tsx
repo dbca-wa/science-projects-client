@@ -21,6 +21,12 @@ import {
 	TabsTrigger,
 	TabsContent,
 } from "@/shared/components/ui/tabs";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
@@ -35,6 +41,7 @@ import { useNewCyclePreview } from "@/shared/hooks/queries/useBumpEmails";
 import { RecipientSection } from "@/features/admin/components/shared/RecipientSection";
 import { NewCycleCustomMessage } from "@/features/admin/components/new-cycle/NewCycleCustomMessage";
 import { NewCycleEmailPreview } from "@/features/admin/components/new-cycle/NewCycleEmailPreview";
+import { SuccessAnimation } from "@/shared/components/SuccessAnimation";
 import { NewCycleStore } from "@/app/stores/derived/new-cycle.store";
 
 /** Green checkbox styling — overrides default primary colour */
@@ -189,6 +196,37 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 		store.state.sendTeamMembers,
 	]);
 
+	// Explicit list of user PKs to send to (what the user sees in the UI)
+	const includedUserPks = useMemo(() => {
+		if (!recipientPreview) return [];
+		const excludedSet = new Set(store.state.excludedUserIds);
+		const pks: number[] = [];
+		const seen = new Set<number>();
+		for (const group of [
+			store.state.sendBaLeads ? recipientPreview.recipients.ba_leads : [],
+			store.state.sendProjectLeads
+				? recipientPreview.recipients.project_leads
+				: [],
+			store.state.sendTeamMembers
+				? recipientPreview.recipients.team_members
+				: [],
+		]) {
+			for (const u of group) {
+				if (!excludedSet.has(u.pk) && !seen.has(u.pk)) {
+					seen.add(u.pk);
+					pks.push(u.pk);
+				}
+			}
+		}
+		return pks;
+	}, [
+		recipientPreview,
+		store.state.excludedUserIds,
+		store.state.sendBaLeads,
+		store.state.sendProjectLeads,
+		store.state.sendTeamMembers,
+	]);
+
 	const filteredNotInITAssets = useMemo(() => {
 		const nia = recipientPreview?.not_in_it_assets;
 		if (!nia) return [];
@@ -235,16 +273,22 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 				prepopulate: store.backendPrepopulate,
 				send_emails: store.anySendGroup,
 				recipient_groups: store.anySendGroup ? store.selectedGroups : undefined,
-				excluded_user_ids:
-					store.state.excludedUserIds.length > 0
-						? store.state.excludedUserIds
-						: undefined,
+				recipient_user_pks: store.anySendGroup ? includedUserPks : undefined,
 				...messagePayload,
 			},
 			{
-				onSuccess: () => store.reset(),
+				onSuccess: () => {
+					setShowSuccess(true);
+				},
 			}
 		);
+	};
+
+	const [showSuccess, setShowSuccess] = useState(false);
+
+	const handleSuccessComplete = () => {
+		setShowSuccess(false);
+		store.reset();
 	};
 
 	// Determine which message to preview based on active tab
@@ -746,6 +790,30 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 					</div>
 				</div>
 			</div>
+
+			{/* Success animation dialog */}
+			<Dialog
+				open={showSuccess}
+				onOpenChange={(next) => {
+					if (!next) handleSuccessComplete();
+				}}
+			>
+				<DialogContent className="sm:max-w-[400px]">
+					<DialogTitle className="sr-only">Success</DialogTitle>
+					<DialogDescription className="sr-only">
+						New cycle opened successfully
+					</DialogDescription>
+					<SuccessAnimation
+						title="New cycle opened"
+						subtitle={
+							store.anySendGroup
+								? "Announcement emails are being sent."
+								: "Reports have been created."
+						}
+						onComplete={handleSuccessComplete}
+					/>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 });

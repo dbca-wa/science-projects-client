@@ -1421,6 +1421,7 @@ class SendAnnouncement(APIView):
         subject = request.data.get("subject", "SPMS: Announcement")
         division = request.data.get("division")
         excluded_user_ids = request.data.get("excluded_user_ids", [])
+        recipient_user_pks = request.data.get("recipient_user_pks")
 
         if not recipient_groups:
             return Response(
@@ -1446,6 +1447,7 @@ class SendAnnouncement(APIView):
                 actioning_user=request.user,
                 recipient_groups=recipient_groups,
                 excluded_user_ids=excluded_user_ids,
+                recipient_user_pks=recipient_user_pks,
                 custom_message=custom_message,
                 custom_messages=custom_messages,
                 subject=subject,

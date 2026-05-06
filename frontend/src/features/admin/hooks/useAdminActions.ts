@@ -51,6 +51,7 @@ export const useOpenNewCycle = () => {
 			send_emails?: boolean;
 			recipient_groups?: string[];
 			excluded_user_ids?: number[];
+			recipient_user_pks?: number[];
 			custom_message?: string;
 			custom_messages?: {
 				ba_leads: string;
@@ -61,7 +62,6 @@ export const useOpenNewCycle = () => {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
 			await queryClient.invalidateQueries({ queryKey: ["reports"] });
-			toast.success("New reporting cycle opened successfully");
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || "Failed to open new cycle");

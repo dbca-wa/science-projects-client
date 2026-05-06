@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { RecipientSection } from "./RecipientSection";
 import { AnnouncementCustomMessage } from "./AnnouncementCustomMessage";
 import { EmailPreview } from "./EmailPreview";
+import { SuccessAnimation } from "@/shared/components/SuccessAnimation";
 import { AnnouncementStore } from "@/app/stores/derived/announcement.store";
 import { useNewCyclePreview } from "@/shared/hooks/queries/useBumpEmails";
 import {
@@ -103,16 +104,49 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 		store.state.sendTeamMembers,
 	]);
 
+	// Compute the explicit list of user PKs to send to (what the user actually sees)
+	const includedUserPks = useMemo(() => {
+		if (!recipientPreview) return [];
+		const excludedSet = new Set(store.state.excludedUserIds);
+		const pks: number[] = [];
+		const seen = new Set<number>();
+		for (const group of [
+			store.state.sendBaLeads ? recipientPreview.recipients.ba_leads : [],
+			store.state.sendProjectLeads
+				? recipientPreview.recipients.project_leads
+				: [],
+			store.state.sendTeamMembers
+				? recipientPreview.recipients.team_members
+				: [],
+		]) {
+			for (const u of group) {
+				if (!excludedSet.has(u.pk) && !seen.has(u.pk)) {
+					seen.add(u.pk);
+					pks.push(u.pk);
+				}
+			}
+		}
+		return pks;
+	}, [
+		recipientPreview,
+		store.state.excludedUserIds,
+		store.state.sendBaLeads,
+		store.state.sendProjectLeads,
+		store.state.sendTeamMembers,
+	]);
+
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [showSuccess, setShowSuccess] = useState(false);
+	const [sentCount, setSentCount] = useState(0);
 
 	const handleSend = () => {
 		const payload: SendAnnouncementPayload = {
 			recipient_groups: store.selectedGroups,
 			subject: store.state.subject,
-			excluded_user_ids:
-				store.state.excludedUserIds.length > 0
-					? store.state.excludedUserIds
-					: undefined,
+			// Send the explicit list of user PKs to email. This guarantees the
+			// backend sends to exactly who the user sees in the UI — no mismatch
+			// between preview resolution and send resolution.
+			recipient_user_pks: includedUserPks,
 		};
 
 		if (store.state.perGroupEnabled) {
@@ -130,8 +164,17 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 		}
 
 		sendAnnouncement(payload, {
-			onSuccess: () => store.reset(),
+			onSuccess: (data) => {
+				setSentCount(data.emails_sent);
+				setShowSuccess(true);
+			},
 		});
+	};
+
+	const handleSuccessComplete = () => {
+		setShowSuccess(false);
+		setConfirmOpen(false);
+		store.reset();
 	};
 
 	return (
@@ -298,7 +341,14 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 
 			{/* Send button with confirmation */}
 			<div className="flex justify-end">
-				<AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+				<AlertDialog
+					open={confirmOpen}
+					onOpenChange={(next) => {
+						// Block closing during send or success animation
+						if (!next && (isPending || showSuccess)) return;
+						setConfirmOpen(next);
+					}}
+				>
 					<AlertDialogTrigger asChild>
 						<Button
 							disabled={!store.canSubmit || isPending}
@@ -310,22 +360,32 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Send Announcement?</AlertDialogTitle>
-							<AlertDialogDescription>
-								This will send an announcement email to{" "}
-								<strong>{allValidEmails.length}</strong> recipient
-								{allValidEmails.length !== 1 ? "s" : ""}. This action cannot be
-								undone.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={handleSend}>
-								Send to {allValidEmails.length} recipient
-								{allValidEmails.length !== 1 ? "s" : ""}
-							</AlertDialogAction>
-						</AlertDialogFooter>
+						{showSuccess ? (
+							<SuccessAnimation
+								title="Announcement sent"
+								subtitle={`Sent to ${sentCount} recipient${sentCount !== 1 ? "s" : ""}.`}
+								onComplete={handleSuccessComplete}
+							/>
+						) : (
+							<>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Send Announcement?</AlertDialogTitle>
+									<AlertDialogDescription>
+										This will send an announcement email to{" "}
+										<strong>{allValidEmails.length}</strong> recipient
+										{allValidEmails.length !== 1 ? "s" : ""}. This action cannot
+										be undone.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction onClick={handleSend}>
+										Send to {allValidEmails.length} recipient
+										{allValidEmails.length !== 1 ? "s" : ""}
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</>
+						)}
 					</AlertDialogContent>
 				</AlertDialog>
 			</div>

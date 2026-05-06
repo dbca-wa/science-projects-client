@@ -343,6 +343,7 @@ class NewCycleOpen(APIView):
         if should_email:
             recipient_groups = request.data.get("recipient_groups")
             excluded_user_ids = request.data.get("excluded_user_ids", [])
+            recipient_user_pks = request.data.get("recipient_user_pks")
             custom_message = request.data.get("custom_message")
             custom_messages = request.data.get("custom_messages")
             try:
@@ -352,6 +353,7 @@ class NewCycleOpen(APIView):
                     division_slug=division_slug,
                     recipient_groups=recipient_groups,
                     excluded_user_ids=excluded_user_ids,
+                    recipient_user_pks=recipient_user_pks,
                     custom_message=custom_message,
                     custom_messages=custom_messages,
                 )

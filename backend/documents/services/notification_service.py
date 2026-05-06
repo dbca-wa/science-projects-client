@@ -790,6 +790,7 @@ class NotificationService:
         division_slug=None,
         recipient_groups=None,
         excluded_user_ids=None,
+        recipient_user_pks=None,
         custom_message=None,
         custom_messages=None,
     ):
@@ -806,6 +807,7 @@ class NotificationService:
             recipient_groups: List of groups to include, e.g. ["ba_leads", "project_leads", "team_members"].
                 If None, defaults to ["ba_leads", "project_leads"].
             excluded_user_ids: List of user PKs to exclude from emails.
+            recipient_user_pks: Optional explicit list of user PKs to send to (takes precedence).
             custom_message: Single HTML string to replace default email text for all groups.
             custom_messages: Dict with keys 'ba_leads', 'project_leads', 'team_members',
                 each containing an HTML string. Takes precedence over custom_message.
@@ -853,7 +855,7 @@ class NotificationService:
             )
 
         if "ba_leads" in recipient_groups:
-            bas = BusinessArea.objects.select_related("leader").all()
+            bas = BusinessArea.objects.select_related("leader").filter(is_active=True)
             if division_slug and last_report.division:
                 bas = bas.filter(division=last_report.division)
             for ba in bas:
@@ -896,8 +898,12 @@ class NotificationService:
                             member.user.email,
                         )
 
-        # Remove excluded users from the recipient list
-        if excluded_user_ids:
+        # Filter to explicit recipient list if provided (takes precedence)
+        if recipient_user_pks:
+            allowed = set(recipient_user_pks)
+            user_roles = {pk: v for pk, v in user_roles.items() if pk in allowed}
+        elif excluded_user_ids:
+            # Fallback: remove excluded users (legacy behaviour)
             for pk in excluded_user_ids:
                 user_roles.pop(pk, None)
 
@@ -1003,6 +1009,7 @@ class NotificationService:
         actioning_user,
         recipient_groups,
         excluded_user_ids=None,
+        recipient_user_pks=None,
         custom_message="",
         custom_messages=None,
         subject="SPMS: Announcement",
@@ -1017,6 +1024,9 @@ class NotificationService:
             actioning_user: User who is sending the announcement.
             recipient_groups: List of groups, e.g. ["ba_leads", "project_leads", "team_members"].
             excluded_user_ids: Optional list of user PKs to exclude.
+            recipient_user_pks: Optional explicit list of user PKs to send to.
+                If provided, takes precedence — only these users receive the email
+                (still filtered by recipient_groups for role assignment).
             custom_message: HTML string for the email body (single message for all).
             custom_messages: Dict with per-group messages (takes precedence over custom_message).
             subject: Email subject line.
@@ -1064,7 +1074,7 @@ class NotificationService:
             all_projects = all_projects.filter(business_area__division=division)
 
         if "ba_leads" in recipient_groups:
-            bas = BusinessArea.objects.select_related("leader").all()
+            bas = BusinessArea.objects.select_related("leader").filter(is_active=True)
             if division:
                 bas = bas.filter(division=division)
             for ba in bas:
@@ -1107,8 +1117,13 @@ class NotificationService:
                             member.user.email,
                         )
 
-        # Remove excluded users
-        if excluded_user_ids:
+        # Filter to explicit recipient list if provided (takes precedence)
+        # This ensures the backend sends to exactly who the frontend showed.
+        if recipient_user_pks:
+            allowed = set(recipient_user_pks)
+            user_roles = {pk: v for pk, v in user_roles.items() if pk in allowed}
+        elif excluded_user_ids:
+            # Fallback: remove excluded users (legacy behaviour)
             for pk in excluded_user_ids:
                 user_roles.pop(pk, None)
 
