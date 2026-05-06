@@ -1,8 +1,20 @@
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 
+// Staff-profile pages run on the science-profiles subdomain. Derive the SPMS
+// app URL from the current origin so one build works in both staging and prod.
+// Falls back to the VITE_PRODUCTION_BASE_URL env var for dev/override.
+const getSpmsAppUrl = (): string => {
+	const override = import.meta.env.VITE_PRODUCTION_BASE_URL;
+	if (override) return override;
+	if (typeof window !== "undefined") {
+		return `${window.location.origin.replace("science-profiles", "scienceprojects")}/`;
+	}
+	return "/";
+};
+
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-	const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+	const spmsAppUrl = getSpmsAppUrl();
 
 	return (
 		<div className="flex h-16.25 w-full flex-row items-center justify-between gap-2 bg-[#2d2f32] p-2 text-white dark:bg-slate-950">
@@ -16,7 +28,7 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 			{isLoggedIn && (
 				<div className="flex justify-end pr-4">
 					<a
-						href={VITE_PRODUCTION_BASE_URL ?? "/"}
+						href={spmsAppUrl}
 						className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
 					>
 						SPMS
@@ -28,7 +40,7 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 };
 
 const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-	const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+	const spmsAppUrl = getSpmsAppUrl();
 
 	return (
 		<div className="flex h-16.25 w-full items-center justify-between gap-2 bg-[#2d2f32] p-2 px-5 text-white dark:bg-slate-950">
@@ -41,7 +53,7 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 			</a>
 			{isLoggedIn && (
 				<a
-					href={VITE_PRODUCTION_BASE_URL ?? "/"}
+					href={spmsAppUrl}
 					className="text-lg text-white hover:text-slate-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2d2f32] rounded px-2 py-1"
 				>
 					SPMS
@@ -51,7 +63,11 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 	);
 };
 
-const StaffProfileHeader = observer(({ isDesktop }: { isDesktop: boolean }) => {
+const StaffProfileHeader = observer(function StaffProfileHeader({
+	isDesktop,
+}: {
+	isDesktop: boolean;
+}) {
 	const authStore = useAuthStore();
 
 	return (
@@ -64,7 +80,5 @@ const StaffProfileHeader = observer(({ isDesktop }: { isDesktop: boolean }) => {
 		</>
 	);
 });
-
-StaffProfileHeader.displayName = "StaffProfileHeader";
 
 export default StaffProfileHeader;

@@ -9,10 +9,26 @@ interface LogContext {
 }
 
 class LoggerService {
-	// private isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
-	private isProduction =
-		typeof import.meta !== "undefined" &&
-		import.meta.env?.VITE_SENTRY_ENVIRONMENT === "production";
+	// Derive "production" status at runtime so a single build works across
+	// staging/prod. Only silences debug logs when actually on the prod domain.
+	private get isProduction(): boolean {
+		if (typeof window !== "undefined") {
+			const host = window.location.hostname;
+			if (
+				host.includes("-test.") ||
+				host.includes("localhost") ||
+				host.includes("127.0.0.1")
+			) {
+				return false;
+			}
+			// Any other host (prod domain) → production
+			return true;
+		}
+		return (
+			typeof import.meta !== "undefined" &&
+			import.meta.env?.VITE_SENTRY_ENVIRONMENT === "production"
+		);
+	}
 
 	private getCallerInfo(): string | undefined {
 		try {

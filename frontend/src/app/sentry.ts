@@ -16,8 +16,27 @@ import {
 export function initSentry() {
 	// Only initialise if DSN is configured
 	const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
-	const sentryEnvironment =
-		import.meta.env.VITE_SENTRY_ENVIRONMENT || "development";
+
+	// Derive Sentry environment at runtime so one build works for both staging
+	// and production. Uses hostname detection: *-test.* is test, else production.
+	// Falls back to the build-time env var for local dev.
+	const deriveEnvironment = (): string => {
+		const buildEnv = import.meta.env.VITE_SENTRY_ENVIRONMENT;
+		if (buildEnv && buildEnv !== "production") return buildEnv;
+		if (typeof window !== "undefined") {
+			const host = window.location.hostname;
+			if (
+				host.includes("-test.") ||
+				host.includes("localhost") ||
+				host.includes("127.0.0.1")
+			) {
+				return "test";
+			}
+			return "production";
+		}
+		return buildEnv || "development";
+	};
+	const sentryEnvironment = deriveEnvironment();
 
 	if (!sentryDsn) {
 		console.warn("Sentry DSN not configured - error tracking disabled");
