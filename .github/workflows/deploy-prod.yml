@@ -366,15 +366,15 @@ jobs:
           output: "sbom-frontend.json"
 
       - name: Generate SBOM text format (Frontend)
-        uses: aquasecurity/trivy-action@v0.36.0
-        env:
-          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
-        with:
-          scan-type: "sbom"
-          scanners: "vuln"
-          input: "sbom-frontend.json"
-          format: "table"
-          output: "sbom-frontend.txt"
+        run: |
+          jq -r '
+            "SBOM: " + (.metadata.component.name // "frontend") + " (" + (.metadata.component.version // "latest") + ")\n" +
+            "Generated: " + (.metadata.timestamp // "unknown") + "\n" +
+            "Format: CycloneDX " + (.specVersion // "1.5") + "\n\n" +
+            "PACKAGES (" + (.components | length | tostring) + " total):\n" +
+            "--------------------------------------------------------------------------------\n" +
+            (.components | sort_by(.name) | .[] | .type + "  " + .name + "@" + (.version // "unknown") + (if .purl then "  (" + .purl + ")" else "" end))
+          ' sbom-frontend.json > sbom-frontend.txt 2>/dev/null || cp sbom-frontend.json sbom-frontend.txt
 
       - name: Generate vulnerability CSV (Frontend)
         uses: aquasecurity/trivy-action@v0.36.0
@@ -458,15 +458,15 @@ jobs:
           output: "sbom-backend.json"
 
       - name: Generate SBOM text format (Backend)
-        uses: aquasecurity/trivy-action@v0.36.0
-        env:
-          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
-        with:
-          scan-type: "sbom"
-          scanners: "vuln"
-          input: "sbom-backend.json"
-          format: "table"
-          output: "sbom-backend.txt"
+        run: |
+          jq -r '
+            "SBOM: " + (.metadata.component.name // "backend") + " (" + (.metadata.component.version // "latest") + ")\n" +
+            "Generated: " + (.metadata.timestamp // "unknown") + "\n" +
+            "Format: CycloneDX " + (.specVersion // "1.5") + "\n\n" +
+            "PACKAGES (" + (.components | length | tostring) + " total):\n" +
+            "--------------------------------------------------------------------------------\n" +
+            (.components | sort_by(.name) | .[] | .type + "  " + .name + "@" + (.version // "unknown") + (if .purl then "  (" + .purl + ")" else "" end))
+          ' sbom-backend.json > sbom-backend.txt 2>/dev/null || cp sbom-backend.json sbom-backend.txt
 
       - name: Generate vulnerability CSV (Backend)
         uses: aquasecurity/trivy-action@v0.36.0
