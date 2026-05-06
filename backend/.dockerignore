@@ -1,4 +1,6 @@
 media_audit/
+uat_creds.yaml
+prod_creds.yaml
 
 # Git and version control
 .git/

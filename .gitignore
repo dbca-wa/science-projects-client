@@ -1,5 +1,7 @@
 # Root-level gitignore for monorepo
 # Specific ignores are in frontend/.gitignore and backend/.gitignore
+uat_creds.yaml
+prod_creds.yaml
 
 # OS files
 .DS_Store
