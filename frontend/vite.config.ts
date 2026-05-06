@@ -61,7 +61,17 @@ const CSP_CONFIG = {
 		styleSrc: ["'self'", "'unsafe-inline'"], // Tailwind requires unsafe-inline
 		imgSrc: ["'self'", "data:", "blob:", "https:"],
 		fontSrc: ["'self'", "data:"],
-		connectSrc: ["'self'", "https://*.ingest.us.sentry.io"], // Allow Sentry error reporting
+		// 'self' covers the current origin. Both SPMS domains are listed so
+		// the science-profiles-* frontend can call the scienceprojects-* API
+		// (the /api ingress only exists on the scienceprojects-* domain).
+		connectSrc: [
+			"'self'",
+			"https://scienceprojects.dbca.wa.gov.au",
+			"https://scienceprojects-test.dbca.wa.gov.au",
+			"https://science-profiles.dbca.wa.gov.au",
+			"https://science-profiles-test.dbca.wa.gov.au",
+			"https://*.ingest.us.sentry.io",
+		],
 		frameSrc: ["'self'", "blob:"],
 		objectSrc: ["'none'"],
 		baseUri: ["'self'"],
