@@ -21,8 +21,8 @@ const getProductionApiUrl = (): string => {
 		);
 		return `${spmsOrigin}/api/v1/`;
 	}
-	// SSR / non-browser context — fall back to build-time override if present
-	return import.meta.env.VITE_PRODUCTION_BACKEND_API_URL || "";
+	// Non-browser context (tests, SSR) — no API URL available
+	return "";
 };
 
 export const API_CONFIG = {

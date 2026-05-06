@@ -8,8 +8,8 @@ const getSpmsAppUrl = (): string => {
 	if (typeof window !== "undefined") {
 		return `${window.location.origin.replace("science-profiles", "scienceprojects")}/`;
 	}
-	// SSR / non-browser fallback
-	return import.meta.env.VITE_PRODUCTION_BASE_URL || "/";
+	// Non-browser fallback
+	return "/";
 };
 
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {

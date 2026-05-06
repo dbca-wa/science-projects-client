@@ -31,8 +31,8 @@ export function initSentry() {
 			}
 			return "production";
 		}
-		// SSR / build-time fallback
-		return import.meta.env.VITE_SENTRY_ENVIRONMENT || "development";
+		// Non-browser context (tests, SSR)
+		return "development";
 	};
 	const sentryEnvironment = deriveEnvironment();
 

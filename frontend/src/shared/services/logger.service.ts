@@ -24,10 +24,8 @@ class LoggerService {
 			// Any other host (prod domain) → production
 			return true;
 		}
-		return (
-			typeof import.meta !== "undefined" &&
-			import.meta.env?.VITE_SENTRY_ENVIRONMENT === "production"
-		);
+		// Non-browser context (tests, SSR) — never suppress logs
+		return false;
 	}
 
 	private getCallerInfo(): string | undefined {
