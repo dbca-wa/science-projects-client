@@ -1,7 +1,7 @@
 # Science Projects Management System (SPMS) Backend
 
 
-> **Note**: This is the backend component of the Science Projects monorepo. See the [root README](../README.md) for the complete system overview.
+> **Note**: This is the backend component of the Science Projects monorepo. See the [root README](../README.md) for the complete system overview. This was merged from a separate repo into monorepo.
 
 ## What is SPMS?
 
