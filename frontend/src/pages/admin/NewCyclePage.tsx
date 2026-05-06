@@ -150,6 +150,14 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 		(userId: number) => store.restoreUser(userId),
 		[store]
 	);
+	const handleExcludeAll = useCallback(
+		(userIds: number[]) => store.excludeUsers(userIds),
+		[store]
+	);
+	const handleRestoreAll = useCallback(
+		(userIds: number[]) => store.restoreUsers(userIds),
+		[store]
+	);
 
 	const allValidEmails = useMemo(() => {
 		if (!recipientPreview) return [];
@@ -458,6 +466,8 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 						{store.state.sendProjectLeads && (
@@ -467,6 +477,8 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 						{store.state.sendTeamMembers && (
@@ -476,6 +488,8 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 					</div>

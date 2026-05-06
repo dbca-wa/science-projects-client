@@ -81,6 +81,8 @@ export class NewCycleStore extends BaseStore<NewCycleStoreState> {
 			setSendTeamMembers: action,
 			excludeUser: action,
 			restoreUser: action,
+			excludeUsers: action,
+			restoreUsers: action,
 			setCustomMessageEnabled: action,
 			setPerGroupEnabled: action,
 			setGroupCustomEnabled: action,
@@ -219,13 +221,31 @@ export class NewCycleStore extends BaseStore<NewCycleStoreState> {
 
 	excludeUser = (userId: number) => {
 		if (!this.state.excludedUserIds.includes(userId)) {
-			this.state.excludedUserIds.push(userId);
+			// Use assignment (not push) so React components that memoise on the
+			// array reference detect the change.
+			this.state.excludedUserIds = [...this.state.excludedUserIds, userId];
 		}
 	};
 
 	restoreUser = (userId: number) => {
 		this.state.excludedUserIds = this.state.excludedUserIds.filter(
 			(id) => id !== userId
+		);
+	};
+
+	excludeUsers = (userIds: number[]) => {
+		const toAdd = userIds.filter(
+			(id) => !this.state.excludedUserIds.includes(id)
+		);
+		if (toAdd.length > 0) {
+			this.state.excludedUserIds = [...this.state.excludedUserIds, ...toAdd];
+		}
+	};
+
+	restoreUsers = (userIds: number[]) => {
+		const idSet = new Set(userIds);
+		this.state.excludedUserIds = this.state.excludedUserIds.filter(
+			(id) => !idSet.has(id)
 		);
 	};
 

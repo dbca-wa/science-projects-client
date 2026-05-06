@@ -64,6 +64,14 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 		(userId: number) => store.restoreUser(userId),
 		[store]
 	);
+	const handleExcludeAll = useCallback(
+		(userIds: number[]) => store.excludeUsers(userIds),
+		[store]
+	);
+	const handleRestoreAll = useCallback(
+		(userIds: number[]) => store.restoreUsers(userIds),
+		[store]
+	);
 
 	const allValidEmails = useMemo(() => {
 		if (!recipientPreview) return [];
@@ -222,6 +230,8 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 						{store.state.sendProjectLeads && (
@@ -231,6 +241,8 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 						{store.state.sendTeamMembers && (
@@ -240,6 +252,8 @@ export const AnnouncementContent = observer(function AnnouncementContent() {
 								excludedUserIds={store.state.excludedUserIds}
 								onExcludeUser={handleExcludeUser}
 								onRestoreUser={handleRestoreUser}
+								onExcludeAll={handleExcludeAll}
+								onRestoreAll={handleRestoreAll}
 							/>
 						)}
 					</div>

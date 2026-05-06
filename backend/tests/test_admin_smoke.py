@@ -47,7 +47,6 @@ def admin_client(admin_user):
 
 ADMIN_CHANGELIST_URLS = [
     # contacts
-    "admin:contacts_address_changelist",
     "admin:contacts_usercontact_changelist",
     "admin:contacts_branchcontact_changelist",
     "admin:contacts_agencycontact_changelist",
@@ -134,7 +133,6 @@ ADMIN_SEARCH_URLS = [
     "admin:contacts_usercontact_changelist",
     "admin:medias_projectdocumentpdf_changelist",
     # All other panels with search enabled
-    "admin:contacts_address_changelist",
     "admin:contacts_branchcontact_changelist",
     "admin:contacts_agencycontact_changelist",
     "admin:medias_agencyimage_changelist",

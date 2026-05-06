@@ -44,7 +44,7 @@ const EmailStaffModal = ({
 		!mutation.isPending &&
 		!showSuccess;
 
-	// Reset transient state whenever the modal opens so a re-open starts fresh.
+	// Reset transient state when the modal opens so re-opens start fresh.
 	useEffect(() => {
 		if (open) {
 			setShowSuccess(false);
@@ -63,8 +63,8 @@ const EmailStaffModal = ({
 		return () => clearTimeout(timer);
 	}, [showSuccess, onOpenChange]);
 
-	// While showing success or sending, block closing via backdrop/escape so the
-	// user sees confirmation. Allow closing otherwise.
+	// Block closing via backdrop or escape while sending or showing success so
+	// the user sees the confirmation through to completion.
 	const handleOpenChange = (next: boolean) => {
 		if (!next && (mutation.isPending || showSuccess)) return;
 		onOpenChange(next);
