@@ -329,6 +329,7 @@ class TestSendAnnouncementExecution:
             actioning_user=superuser,
             recipient_groups=["ba_leads", "project_leads"],
             excluded_user_ids=[],
+            recipient_user_pks=None,
             custom_message="<p>Important announcement</p>",
             custom_messages=None,
             subject="SPMS: Test Announcement",

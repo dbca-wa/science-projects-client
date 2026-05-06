@@ -1,7 +1,8 @@
 # Science Projects Management System
 
 [![CodeQL](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/github-code-scanning/codeql)
-[![Tests](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/test.yml)
+[![Deploy](https://github.com/dbca-wa/science-projects/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/dbca-wa/science-projects/actions/workflows/deploy-prod.yml)
+[![Staging](https://github.com/dbca-wa/science-projects/actions/workflows/deploy-staging.yml/badge.svg?branch=staging)](https://github.com/dbca-wa/science-projects/actions/workflows/deploy-staging.yml)
 ![Frontend Coverage](https://img.shields.io/badge/frontend--coverage-66%25-orange)
 ![Backend Coverage](https://img.shields.io/badge/backend--coverage-83%25-green)
 ![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA%20Compliant-green)
