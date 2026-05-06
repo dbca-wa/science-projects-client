@@ -144,16 +144,6 @@ export default defineConfig({
 			},
 		},
 	},
-	esbuild: {
-		drop: process.env.NODE_ENV === "production" ? ["debugger"] : [],
-		// Strip debug/info/log from production builds ONLY when targeting prod environment
-		// Staging builds keep logs for debugging (VITE_SENTRY_ENVIRONMENT distinguishes them)
-		pure:
-			process.env.NODE_ENV === "production" &&
-			process.env.VITE_SENTRY_ENVIRONMENT === "production"
-				? ["console.log", "console.debug", "console.info"]
-				: [],
-	},
 	plugins: [
 		react() as never,
 		tailwindcss() as never,
