@@ -1,21 +1,6 @@
 from django.contrib import admin
 
-from .models import Address, AgencyContact, BranchContact, UserContact
-
-
-@admin.register(Address)
-class AddressAdmin(admin.ModelAdmin):
-    list_display = [
-        "street",
-        "state",
-        "country",
-        "agency",
-        "branch",
-    ]
-
-    search_fields = ["street", "branch__name", "agency__name", "city", "state"]
-
-    list_filter = ["state", "country"]
+from .models import AgencyContact, BranchContact, UserContact
 
 
 @admin.register(UserContact)
@@ -45,7 +30,6 @@ class BranchContactAdmin(admin.ModelAdmin):
         "branch",
         "email",
         "phone",
-        "display_address",
     ]
 
     search_fields = [
@@ -53,15 +37,6 @@ class BranchContactAdmin(admin.ModelAdmin):
     ]
 
     ordering = ["branch__name"]
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("branch", "address")
-
-    @admin.display(description="Address")
-    def display_address(self, obj):
-        if obj.address:
-            return f"{obj.address.street}"
-        return None
 
 
 @admin.register(AgencyContact)
@@ -71,7 +46,6 @@ class AgencyContactAdmin(admin.ModelAdmin):
         "agency",
         "email",
         "phone",
-        "address",
     ]
 
     search_fields = [

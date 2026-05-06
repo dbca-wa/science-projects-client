@@ -367,7 +367,7 @@ export const UserDetailSheet = observer(
 									</Button>
 								</div>
 
-								{/* Organization Info Section */}
+								{/* Organisation Info Section */}
 								<div className="border border-gray-300 dark:border-gray-500 rounded-xl p-4 mb-2">
 									<div className="flex flex-col">
 										{accountIsStaff && (

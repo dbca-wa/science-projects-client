@@ -5,50 +5,11 @@ Contact service - Business logic for contact operations
 from django.conf import settings
 from rest_framework.exceptions import NotFound
 
-from contacts.models import Address, AgencyContact, BranchContact, UserContact
+from contacts.models import AgencyContact, BranchContact, UserContact
 
 
 class ContactService:
     """Business logic for contact operations"""
-
-    # Address operations
-    @staticmethod
-    def list_addresses():
-        """List all addresses"""
-        return Address.objects.all()
-
-    @staticmethod
-    def get_address(pk):
-        """Get address by ID"""
-        try:
-            return Address.objects.get(pk=pk)
-        except Address.DoesNotExist:
-            raise NotFound(f"Address {pk} not found")
-
-    @staticmethod
-    def create_address(user, data):
-        """Create new address"""
-        settings.LOGGER.info(f"{user} is creating address")
-        return Address.objects.create(**data)
-
-    @staticmethod
-    def update_address(pk, user, data):
-        """Update address"""
-        address = ContactService.get_address(pk)
-        settings.LOGGER.info(f"{user} is updating address {address}")
-
-        for field, value in data.items():
-            setattr(address, field, value)
-        address.save()
-
-        return address
-
-    @staticmethod
-    def delete_address(pk, user):
-        """Delete address"""
-        address = ContactService.get_address(pk)
-        settings.LOGGER.info(f"{user} is deleting address {address}")
-        address.delete()
 
     # Agency contact operations
     @staticmethod

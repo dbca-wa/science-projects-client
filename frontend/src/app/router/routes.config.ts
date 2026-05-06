@@ -51,7 +51,6 @@ const MyDivisionPage = lazy(() => import("@/pages/reports/MyDivisionPage"));
 
 // Pages - Admin (lazy loaded)
 const BranchesPage = lazy(() => import("@/pages/admin/BranchesPage"));
-const AddressesPage = lazy(() => import("@/pages/admin/AddressesPage"));
 const AffiliationsPage = lazy(() => import("@/pages/admin/AffiliationsPage"));
 const BusinessAreasPage = lazy(() => import("@/pages/admin/BusinessAreasPage"));
 const BusinessAreaAddPage = lazy(
@@ -61,7 +60,6 @@ const BusinessAreaEditPage = lazy(
 	() => import("@/pages/admin/BusinessAreaEditPage")
 );
 const DivisionsPage = lazy(() => import("@/pages/admin/DivisionsPage"));
-const LocationsPage = lazy(() => import("@/pages/admin/LocationsPage"));
 const ReportInfoPage = lazy(() => import("@/pages/admin/ReportInfoPage"));
 const DataListsPage = lazy(() => import("@/pages/admin/DataListsPage"));
 const ApproversPage = lazy(() => import("@/pages/admin/ApproversPage"));
@@ -505,15 +503,6 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		layoutWrapper: "content",
 	},
 	{
-		name: "Addresses",
-		path: "/manage/addresses",
-		component: AddressesPage,
-		requiresAuth: true,
-		requiresAdmin: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
 		name: "Affiliations",
 		path: "/manage/affiliations",
 		component: AffiliationsPage,
@@ -562,15 +551,6 @@ export const ADMIN_ROUTES: RouteConfig[] = [
 		name: "Divisions",
 		path: "/manage/divisions",
 		component: DivisionsPage,
-		requiresAuth: true,
-		requiresAdmin: true,
-		showInSidebar: false,
-		layoutWrapper: "content",
-	},
-	{
-		name: "Locations",
-		path: "/manage/locations",
-		component: LocationsPage,
 		requiresAuth: true,
 		requiresAdmin: true,
 		showInSidebar: false,

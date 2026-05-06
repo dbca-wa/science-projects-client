@@ -31,14 +31,6 @@ vi.mock("../services/admin.service", () => ({
 	createService: vi.fn().mockResolvedValue({}),
 	updateService: vi.fn().mockResolvedValue({}),
 	deleteService: vi.fn().mockResolvedValue(undefined),
-	getAddresses: vi.fn().mockResolvedValue([]),
-	createAddress: vi.fn().mockResolvedValue({}),
-	updateAddress: vi.fn().mockResolvedValue({}),
-	deleteAddress: vi.fn().mockResolvedValue(undefined),
-	getLocations: vi.fn().mockResolvedValue([]),
-	createLocation: vi.fn().mockResolvedValue({}),
-	updateLocation: vi.fn().mockResolvedValue({}),
-	deleteLocation: vi.fn().mockResolvedValue(undefined),
 	getReportInfos: vi.fn().mockResolvedValue([]),
 	createReportInfo: vi.fn().mockResolvedValue({}),
 	updateReportInfo: vi.fn().mockResolvedValue({}),
@@ -110,22 +102,6 @@ describe("Admin hooks", () => {
 	it("useDivisions should return a query", async () => {
 		const { useDivisions } = await import("./useDivisions");
 		const { result } = renderHook(() => useDivisions(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
-	it("useAddresses should return a query", async () => {
-		const { useAddresses } = await import("./useAddresses");
-		const { result } = renderHook(() => useAddresses(), {
-			wrapper: createWrapper(),
-		});
-		expect(result.current.isLoading).toBeDefined();
-	});
-
-	it("useLocations should return a query", async () => {
-		const { useLocations } = await import("./useLocations");
-		const { result } = renderHook(() => useLocations(), {
 			wrapper: createWrapper(),
 		});
 		expect(result.current.isLoading).toBeDefined();

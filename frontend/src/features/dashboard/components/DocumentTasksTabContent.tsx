@@ -54,6 +54,16 @@ export const DocumentTasksTabContent = ({
 		);
 	}
 
+	// Determine which section is first so it opens by default
+	const firstSection =
+		projectTeamCount > 0
+			? "team"
+			: isBusinessAreaLead && baTasks.length > 0
+				? "ba"
+				: directorateTasks.length > 0
+					? "directorate"
+					: null;
+
 	return (
 		<div className="flex flex-col w-full h-full space-y-4">
 			{/* Project Team Documents */}
@@ -61,6 +71,7 @@ export const DocumentTasksTabContent = ({
 				<CollapsibleCard
 					title="Project Team Documents"
 					count={projectTeamCount}
+					defaultOpen={firstSection === "team"}
 				>
 					<ProjectTeamDocumentsDataTable
 						teamTasks={teamTasks}
@@ -74,6 +85,7 @@ export const DocumentTasksTabContent = ({
 				<CollapsibleCard
 					title="Business Area Lead Documents"
 					count={baTasks.length}
+					defaultOpen={firstSection === "ba"}
 				>
 					<BusinessAreaLeadDocumentsDataTable tasks={baTasks} />
 				</CollapsibleCard>
@@ -84,6 +96,7 @@ export const DocumentTasksTabContent = ({
 				<CollapsibleCard
 					title="Directorate Documents"
 					count={directorateTasks.length}
+					defaultOpen={firstSection === "directorate"}
 				>
 					<DirectorateDocumentsDataTable tasks={directorateTasks} />
 				</CollapsibleCard>

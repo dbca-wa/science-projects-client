@@ -43,6 +43,7 @@ import {
 import { sanitiseFormData } from "@/shared/utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
+import { BranchSelectContent } from "@/shared/components/BranchSelect";
 import type { IUserData } from "@/shared/types/user.types";
 
 interface UserEditFormProps {
@@ -473,19 +474,7 @@ export const UserEditForm = ({
 														<SelectValue placeholder="Select a branch" />
 													</SelectTrigger>
 												</FormControl>
-												<SelectContent>
-													<SelectItem value="none">None</SelectItem>
-													{branches
-														?.sort((a, b) => a.name.localeCompare(b.name))
-														.map((branch) => (
-															<SelectItem
-																key={branch.id}
-																value={branch.id!.toString()}
-															>
-																{branch.name}
-															</SelectItem>
-														))}
-												</SelectContent>
+												<BranchSelectContent noneValue="none" />
 											</Select>
 											<FormMessage />
 										</FormItem>

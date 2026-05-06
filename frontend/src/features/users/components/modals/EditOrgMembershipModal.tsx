@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useUpdateMembership } from "../../hooks/useUserMutations";
 import type { IUserData, IUserMe } from "@/shared/types/user.types";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
+import { BranchSelectContent } from "@/shared/components/BranchSelect";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { AffiliationCombobox } from "@/shared/components/AffiliationCombobox";
 import {
@@ -26,7 +27,6 @@ import {
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -51,7 +51,7 @@ interface EditOrgMembershipModalProps {
 
 export const EditOrgMembershipModal = observer(
 	({ isOpen, onClose, user, onSuccess }: EditOrgMembershipModalProps) => {
-		const { data: branches, isLoading: branchesLoading } = useBranches();
+		const { isLoading: branchesLoading } = useBranches();
 		const { data: businessAreas, isLoading: businessAreasLoading } =
 			useBusinessAreas();
 
@@ -98,9 +98,9 @@ export const EditOrgMembershipModal = observer(
 							onSubmit={form.handleSubmit(handleSubmit)}
 							className="space-y-4"
 						>
-							{/* Organization (Read-only) */}
+							{/* Organisation (Read-only) */}
 							<div className="space-y-2">
-								<FormLabel>Organization</FormLabel>
+								<FormLabel>Organisation</FormLabel>
 								<div className="text-sm text-muted-foreground">
 									{user.is_staff ? "DBCA" : "External"}
 								</div>
@@ -126,17 +126,7 @@ export const EditOrgMembershipModal = observer(
 														<SelectValue placeholder="Select branch" />
 													</SelectTrigger>
 												</FormControl>
-												<SelectContent>
-													<SelectItem value="0">None</SelectItem>
-													{branches?.map((branch) => (
-														<SelectItem
-															key={branch.id}
-															value={branch.id.toString()}
-														>
-															{branch.name}
-														</SelectItem>
-													))}
-												</SelectContent>
+												<BranchSelectContent noneValue="0" />
 											</Select>
 											<FormMessage />
 										</FormItem>
