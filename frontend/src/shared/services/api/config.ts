@@ -2,12 +2,24 @@
 import { TIMEOUT } from "@/shared/constants";
 
 // In development the API runs on a different port, so we hardcode the dev URL.
-// In production the API is served from the same origin as the frontend, so we
-// use window.location.origin at runtime. This lets a single built image work
-// across staging and prod without rebuilding (no baked-in URLs).
+// In production the API is served from the SPMS app domain (scienceprojects*),
+// not from the public profiles domain (science-profiles*). We derive the SPMS
+// origin from the current origin at runtime so one built image works in both
+// staging and production without rebuilding.
+//
+// Ingress routes:
+//   scienceprojects-test.dbca.wa.gov.au/api -> backend
+//   science-profiles-test.dbca.wa.gov.au/api -> DOES NOT EXIST (frontend only)
+//
+// So when the user is on the profiles domain, we send API calls back to the
+// SPMS domain by replacing "science-profiles" with "scienceprojects".
 const getProductionApiUrl = (): string => {
 	if (typeof window !== "undefined") {
-		return `${window.location.origin}/api/v1/`;
+		const spmsOrigin = window.location.origin.replace(
+			"science-profiles",
+			"scienceprojects"
+		);
+		return `${spmsOrigin}/api/v1/`;
 	}
 	// SSR / non-browser context — fall back to build-time override if present
 	return import.meta.env.VITE_PRODUCTION_BACKEND_API_URL || "";

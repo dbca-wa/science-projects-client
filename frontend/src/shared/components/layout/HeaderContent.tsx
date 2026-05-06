@@ -23,6 +23,7 @@ import { useLogout } from "@/features/auth/hooks/useAuth";
 import { useMyBusinessAreas } from "@/shared/hooks/queries/useMyBusinessAreas";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { useCurrentUser } from "@/features/auth";
+import { getProfilesUrl } from "@/shared/utils/profiles-url.utils";
 
 interface HeaderContentProps {
 	handleNavigation: (path: string) => void;
@@ -90,12 +91,17 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 						<Button
 							variant="ghost"
 							className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base w-full pl-6"
-							onClick={(e) =>
-								navigateAndClose(
-									`/staff/${authStore.user!.staff_profile_id}`,
-									e
-								)
-							}
+							onClick={(e) => {
+								const profileUrl = getProfilesUrl(
+									`/staff/${authStore.user!.staff_profile_id}`
+								);
+								if (e.ctrlKey || e.metaKey) {
+									window.open(profileUrl, "_blank");
+								} else {
+									onClose();
+									window.location.href = profileUrl;
+								}
+							}}
 						>
 							<span className="flex items-center gap-3">
 								<Globe className="text-xl" aria-hidden="true" />

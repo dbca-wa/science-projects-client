@@ -14,7 +14,6 @@ const getSpmsAppUrl = (): string => {
 
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 	const spmsAppUrl = getSpmsAppUrl();
-
 	return (
 		<div className="flex h-16.25 w-full flex-row items-center justify-between gap-2 bg-[#2d2f32] p-2 text-white dark:bg-slate-950">
 			<a href="/staff" className="flex justify-start px-8 cursor-pointer">

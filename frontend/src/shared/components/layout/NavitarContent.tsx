@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getUserDisplayName, getUserInitials } from "@/shared/utils/user.utils";
 import { getImageUrl } from "@/shared/utils/image.utils";
+import { getProfilesUrl } from "@/shared/utils/profiles-url.utils";
 import { useMenuKeyboardNavigation } from "@/shared/hooks/useMenuKeyboardNavigation";
 import { BiQuestionMark } from "react-icons/bi";
 
@@ -114,10 +115,15 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 						ref={registerMenuItem(1)}
 						type="button"
 						onClick={(e) => {
-							navigateOrOpen(
-								`/staff/${snapshot.userData!.staff_profile_id}`,
-								e
+							const profileUrl = getProfilesUrl(
+								`/staff/${snapshot.userData!.staff_profile_id}`
 							);
+							if (hasModifierKey(e.nativeEvent)) {
+								window.open(profileUrl, "_blank");
+							} else {
+								window.location.href = profileUrl;
+							}
+							onClose();
 						}}
 						className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded"
 						role="menuitem"
