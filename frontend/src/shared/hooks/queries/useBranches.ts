@@ -5,6 +5,7 @@ import { STALE_TIME } from "@/shared/constants";
 /**
  * Hook for fetching all branches
  * - Cached with 10 minute stale time
+ * - Returns branches sorted alphabetically by name
  * - Used across multiple features (users, projects, etc.)
  *
  * @returns TanStack Query result with branches data
@@ -14,5 +15,6 @@ export const useBranches = () => {
 		queryKey: ["branches"],
 		queryFn: getAllBranches,
 		staleTime: STALE_TIME.LONG,
+		select: (data) => [...data].sort((a, b) => a.name.localeCompare(b.name)),
 	});
 };

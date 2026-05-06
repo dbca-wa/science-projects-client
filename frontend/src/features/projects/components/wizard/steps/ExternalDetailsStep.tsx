@@ -125,7 +125,7 @@ const ExternalDetailsStep = observer(() => {
 			<div className="space-y-2">
 				<h3 className="text-lg font-semibold">External Partnership Details</h3>
 				<p className="text-sm text-muted-foreground">
-					Provide information about the external organizations and partnership
+					Provide information about the external organisations and partnership
 					details for this project.
 				</p>
 			</div>

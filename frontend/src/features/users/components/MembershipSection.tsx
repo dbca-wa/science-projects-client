@@ -17,7 +17,7 @@ interface MembershipSectionProps {
 
 /**
  * MembershipSection component
- * Displays user's organizational membership (branch, business area, affiliation)
+ * Displays user's organisational membership (branch, business area, affiliation)
  * Clickable to open edit modal
  *
  * @param user - User data to display

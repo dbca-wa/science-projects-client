@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
@@ -16,7 +16,6 @@ import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import {
 	Select,
 	SelectContent,
-	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/components/ui/select";
@@ -37,6 +36,7 @@ import {
 } from "../schemas/staffUserCreate.schema";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useBranches } from "@/shared/hooks/queries/useBranches";
+import { BranchSelectContent } from "@/shared/components/BranchSelect";
 import { sanitiseFormData } from "@/shared/utils";
 import type { IUserData } from "@/shared/types/user.types";
 
@@ -92,7 +92,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 	const createMutation = useCreateStaffUser();
 	const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 		useBusinessAreas();
-	const { data: branches, isLoading: isLoadingBranches } = useBranches();
+	const { isLoading: isLoadingBranches } = useBranches();
 
 	const form = useForm<StaffUserCreateFormData>({
 		resolver: zodResolver(staffUserCreateSchema),
@@ -130,12 +130,6 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 			confirmEmail,
 			emailValidator,
 		});
-
-	// Memoize sorted data
-	const sortedBranches = useMemo(() => {
-		if (!branches) return [];
-		return [...branches].sort((a, b) => a.name.localeCompare(b.name));
-	}, [branches]);
 
 	// Section validation states
 	const nameErrors =
@@ -382,17 +376,11 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 										disabled={isLoadingBranches || isSubmitting}
 									>
 										<FormControl>
-											<SelectTrigger>
+											<SelectTrigger className="w-full">
 												<SelectValue placeholder="Select a branch" />
 											</SelectTrigger>
 										</FormControl>
-										<SelectContent>
-											{sortedBranches.map((b) => (
-												<SelectItem key={b.id} value={b.id!.toString()}>
-													{b.name}
-												</SelectItem>
-											))}
-										</SelectContent>
+										<BranchSelectContent />
 									</Select>
 									<div className="h-5">
 										<FormMessage />
@@ -416,7 +404,7 @@ export const StaffUserForm = ({ onSuccess, onCancel }: StaffUserFormProps) => {
 										disabled={isLoadingBusinessAreas || isSubmitting}
 									>
 										<FormControl>
-											<SelectTrigger>
+											<SelectTrigger className="w-full">
 												<SelectValue placeholder="Select a business area" />
 											</SelectTrigger>
 										</FormControl>
