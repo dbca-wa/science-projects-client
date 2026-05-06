@@ -3,14 +3,13 @@ import { useAuthStore } from "@/app/stores/store-context";
 
 // Staff-profile pages run on the science-profiles subdomain. Derive the SPMS
 // app URL from the current origin so one build works in both staging and prod.
-// Falls back to the VITE_PRODUCTION_BASE_URL env var for dev/override.
+// Runtime detection takes precedence over any build-time env var.
 const getSpmsAppUrl = (): string => {
-	const override = import.meta.env.VITE_PRODUCTION_BASE_URL;
-	if (override) return override;
 	if (typeof window !== "undefined") {
 		return `${window.location.origin.replace("science-profiles", "scienceprojects")}/`;
 	}
-	return "/";
+	// SSR / non-browser fallback
+	return import.meta.env.VITE_PRODUCTION_BASE_URL || "/";
 };
 
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {

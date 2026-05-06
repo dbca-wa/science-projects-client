@@ -18,11 +18,8 @@ export function initSentry() {
 	const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
 
 	// Derive Sentry environment at runtime so one build works for both staging
-	// and production. Uses hostname detection: *-test.* is test, else production.
-	// Falls back to the build-time env var for local dev.
+	// and production. Uses hostname detection — runtime detection always wins.
 	const deriveEnvironment = (): string => {
-		const buildEnv = import.meta.env.VITE_SENTRY_ENVIRONMENT;
-		if (buildEnv && buildEnv !== "production") return buildEnv;
 		if (typeof window !== "undefined") {
 			const host = window.location.hostname;
 			if (
@@ -34,7 +31,8 @@ export function initSentry() {
 			}
 			return "production";
 		}
-		return buildEnv || "development";
+		// SSR / build-time fallback
+		return import.meta.env.VITE_SENTRY_ENVIRONMENT || "development";
 	};
 	const sentryEnvironment = deriveEnvironment();
 

@@ -6,14 +6,11 @@ import { TIMEOUT } from "@/shared/constants";
 // use window.location.origin at runtime. This lets a single built image work
 // across staging and prod without rebuilding (no baked-in URLs).
 const getProductionApiUrl = (): string => {
-	// Allow explicit override via build-time env var (for edge cases where the
-	// frontend and backend are on different domains). Falls back to same-origin.
-	const override = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL;
-	if (override) return override;
 	if (typeof window !== "undefined") {
 		return `${window.location.origin}/api/v1/`;
 	}
-	return "";
+	// SSR / non-browser context — fall back to build-time override if present
+	return import.meta.env.VITE_PRODUCTION_BACKEND_API_URL || "";
 };
 
 export const API_CONFIG = {
