@@ -31,7 +31,7 @@ const EditProjectPage = observer(() => {
 	// Check permissions
 	const hasEditPermission =
 		currentUser && data?.project
-			? canEditProject(currentUser, data.project)
+			? canEditProject(currentUser, data.project, data.members)
 			: false;
 
 	// Register form dirty state with InlineEditStore for global NavigationBlocker

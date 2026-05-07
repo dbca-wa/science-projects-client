@@ -1,23 +1,28 @@
 import { Edit } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/shared/components/ui/button";
-import type { IProjectData } from "@/shared/types/project.types";
+import type {
+	IProjectData,
+	IProjectMember,
+} from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
 import { canEditProject } from "@/features/projects/utils/permissions";
 
 interface EditProjectButtonProps {
 	project: IProjectData;
 	currentUser: IUserMe | null;
+	members?: IProjectMember[] | null;
 }
 
 export function EditProjectButton({
 	project,
 	currentUser,
+	members,
 }: EditProjectButtonProps) {
 	const navigate = useNavigate();
 
 	// Check if user can manage project
-	const hasManagePermission = canEditProject(currentUser, project);
+	const hasManagePermission = canEditProject(currentUser, project, members);
 
 	// Don't render if user doesn't have permission
 	if (!hasManagePermission) {

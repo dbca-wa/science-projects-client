@@ -59,9 +59,7 @@ describe("LayerPopover", () => {
 		await waitFor(() => {
 			expect(screen.getByLabelText("DBCA Regions")).toBeInTheDocument();
 			expect(screen.getByLabelText("DBCA Districts")).toBeInTheDocument();
-			expect(screen.getByLabelText("NRM Regions")).toBeInTheDocument();
-			expect(screen.getByLabelText("IBRA Bioregions")).toBeInTheDocument();
-			expect(screen.getByLabelText("IMCRA Marine Regions")).toBeInTheDocument();
+			// NRM, IBRA, IMCRA commented out — may be re-enabled later
 		});
 	});
 
@@ -151,13 +149,7 @@ describe("LayerPopover", () => {
 	});
 
 	it("should disable Show All when all layers are visible", async () => {
-		mockStore.state.visibleLayerTypes = [
-			"dbcaregion",
-			"dbcadistrict",
-			"nrm",
-			"ibra",
-			"imcra",
-		];
+		mockStore.state.visibleLayerTypes = ["dbcaregion", "dbcadistrict"];
 
 		render(<LayerPopover />);
 
@@ -244,7 +236,7 @@ describe("LayerPopover", () => {
 	});
 
 	it("should display layer count", async () => {
-		mockStore.state.visibleLayerTypes = ["dbcaregion", "nrm"];
+		mockStore.state.visibleLayerTypes = ["dbcaregion"];
 
 		render(<LayerPopover />);
 
@@ -252,7 +244,7 @@ describe("LayerPopover", () => {
 		fireEvent.click(trigger);
 
 		await waitFor(() => {
-			expect(screen.getByText("2 of 5 layers visible")).toBeInTheDocument();
+			expect(screen.getByText(/1 of 2 layers visible/)).toBeInTheDocument();
 		});
 	});
 
@@ -268,9 +260,8 @@ describe("LayerPopover", () => {
 					/Department of Biodiversity, Conservation and Attractions/
 				)
 			).toBeInTheDocument();
-			expect(
-				screen.getByText(/Natural Resource Management regions/)
-			).toBeInTheDocument();
+			// NRM, IBRA, IMCRA descriptions commented out — may be re-enabled later
+			expect(screen.getByText(/DBCA district boundaries/)).toBeInTheDocument();
 		});
 	});
 

@@ -74,9 +74,14 @@ export const KBSearchResults = ({ results, query }: KBSearchResultsProps) => {
 									key={field.id}
 									type="button"
 									className="w-full rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-									onClick={() =>
-										navigate(`/guide/${section.id}#article-${field.id}`)
-									}
+									onClick={(e) => {
+										const path = `/guide/${section.id}#article-${field.id}`;
+										if (e.ctrlKey || e.metaKey) {
+											window.open(path, "_blank");
+										} else {
+											navigate(path);
+										}
+									}}
 								>
 									<p className="text-sm font-medium">
 										<HighlightedText

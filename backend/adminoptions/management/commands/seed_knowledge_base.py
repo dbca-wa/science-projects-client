@@ -52,67 +52,54 @@ class Command(BaseCommand):
         return re.sub(r"<ul>(.*?)</ul>", replace_checklist_ul, html, flags=re.DOTALL)
 
     def handle(self, *args, **options):
+        # Always clear all existing content before seeding — ensures no stale
+        # articles or sections remain from previous versions.
+        ContentField.objects.all().delete()
+        GuideSection.objects.all().delete()
+
         if options["clear"]:
-            self.stdout.write("Clearing existing knowledge base content...")
-            ContentField.objects.all().delete()
-            GuideSection.objects.all().delete()
-            self.stdout.write(self.style.WARNING("All content cleared."))
+            self.stdout.write(
+                self.style.WARNING(
+                    "--clear flag is now redundant (always clears before seeding)."
+                )
+            )
 
         self.stdout.write("Seeding knowledge base sections...")
 
         sections_created = 0
-        sections_updated = 0
         articles_created = 0
-        articles_updated = 0
 
         for section_data in SECTIONS:
             section_id = section_data["id"]
-            section, created = GuideSection.objects.update_or_create(
-                id=section_id,
-                defaults=section_data,
-            )
-            if created:
-                sections_created += 1
-            else:
-                sections_updated += 1
+            section = GuideSection.objects.create(**section_data)
+            sections_created += 1
 
-            action = "Created" if created else "Updated"
-            self.stdout.write(f"  {action}: {section.title}")
+            self.stdout.write(f"  Created: {section.title}")
 
             getter = ARTICLE_GETTERS.get(section_id)
             if getter:
                 articles = getter()
                 for article_data in articles:
-                    field_key = article_data["field_key"]
                     description = self._transform_checkboxes(
                         article_data["description"]
                     )
-                    _, art_created = ContentField.objects.update_or_create(
+                    ContentField.objects.create(
                         section=section,
-                        field_key=field_key,
-                        defaults={
-                            "title": article_data["title"],
-                            "description": description,
-                            "order": article_data["order"],
-                        },
+                        field_key=article_data["field_key"],
+                        title=article_data["title"],
+                        description=description,
+                        order=article_data["order"],
                     )
-                    if art_created:
-                        articles_created += 1
-                    else:
-                        articles_updated += 1
+                    articles_created += 1
                 self.stdout.write(f"    -> {len(articles)} article(s)")
             else:
                 self.stdout.write(
                     self.style.WARNING(f"    -> No article getter for '{section_id}'")
                 )
 
-        total_sections = GuideSection.objects.count()
-        total_articles = ContentField.objects.count()
         self.stdout.write(
             self.style.SUCCESS(
-                f"\nDone. {total_sections} sections ({sections_created} created, "
-                f"{sections_updated} updated), {total_articles} articles "
-                f"({articles_created} created, {articles_updated} updated)."
+                f"\nDone. {sections_created} sections, {articles_created} articles."
             )
         )
 

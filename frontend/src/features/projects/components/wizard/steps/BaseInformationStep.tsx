@@ -28,7 +28,7 @@ const StableTitleEditor = memo(
 			value={initialValue}
 			onChange={onChange}
 			placeholder="Enter a descriptive title for your project"
-			toolbar="minimal"
+			toolbar="projectTitle"
 			minHeight="80px"
 			aria-label="Project title"
 		/>
@@ -50,7 +50,7 @@ const StableDescriptionEditor = memo(
 			value={initialValue}
 			onChange={onChange}
 			placeholder="A concise project summary, or any additional useful information..."
-			toolbar="simple"
+			toolbar="projectTitle"
 			minHeight="200px"
 			aria-label="Project summary"
 			className="editor-standalone"

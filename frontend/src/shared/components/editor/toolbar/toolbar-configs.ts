@@ -306,6 +306,36 @@ export const TOOLBAR_CONFIGS: Record<ToolbarMode, ToolbarConfig> = {
 	},
 
 	/**
+	 * Project title toolbar — for project title and description/summary fields.
+	 * Only italic, subscript, superscript, and clear formatting.
+	 * No bold, no lists, no links, no tables.
+	 */
+	projectTitle: {
+		description:
+			"Project title and summary fields. Italic, subscript, superscript, and clear formatting only.",
+		formatting: {
+			bold: false,
+			italic: true,
+			underline: false,
+			strikethrough: false,
+			subscript: true,
+			superscript: true,
+		},
+		blocks: {
+			headings: false,
+			lists: false,
+			tables: false,
+		},
+		features: {
+			links: false,
+			images: false,
+			clearFormatting: true,
+			indentOutdent: false,
+			alignment: false,
+		},
+	},
+
+	/**
 	 * No toolbar — used when the editor is read-only or no toolbar is needed.
 	 * No toolbar is rendered; no formatting restrictions applied.
 	 */

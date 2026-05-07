@@ -45,12 +45,12 @@ interface OverviewTabProps {
 	documents?: IProjectDocuments | null;
 }
 
-export function OverviewTab({
+export const OverviewTab = ({
 	project,
 	details: _details,
 	members,
 	documents,
-}: OverviewTabProps) {
+}: OverviewTabProps) => {
 	// Get current user for permission checks
 	const { data: currentUser } = useCurrentUser();
 	const caretakerPerms = useCaretakerPermissions();
@@ -132,7 +132,7 @@ export function OverviewTab({
 			? (_details.external as IExternalProjectDetails)
 			: null;
 
-	const canEdit = canEditProject(currentUser ?? null, project);
+	const canEdit = canEditProject(currentUser ?? null, project, members);
 
 	// Cancel deletion request hook
 	const cancelDeletionRequestMutation = useCancelDeletionRequest(project.id);
@@ -295,11 +295,13 @@ export function OverviewTab({
 						<EditProjectButton
 							project={project}
 							currentUser={currentUser ?? null}
+							members={members}
 						/>
 						<ProjectActionsDropdown
 							project={project}
 							documents={documents}
 							currentUser={currentUser ?? null}
+							members={members}
 							isBaLead={isBaLead}
 							userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
 							isProjectLead={isProjectLead}
@@ -451,4 +453,4 @@ export function OverviewTab({
 			/>
 		</div>
 	);
-}
+};

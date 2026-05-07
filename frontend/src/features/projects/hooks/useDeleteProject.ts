@@ -41,6 +41,11 @@ export const useDeleteProject = () => {
 				},
 			});
 
+			// Invalidate dashboard admin tasks (deletion request is now gone)
+			await queryClient.invalidateQueries({
+				queryKey: ["dashboard", "adminTasks"],
+			});
+
 			toast.success("Project deleted");
 			navigate("/projects");
 		},

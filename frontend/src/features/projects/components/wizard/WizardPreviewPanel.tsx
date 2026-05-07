@@ -10,7 +10,7 @@ import type {
 } from "@/app/stores/derived/project-wizard.store";
 import type { ProjectKind } from "@/shared/types/project.types";
 import { getImageUrl } from "@/shared/utils/image.utils";
-import { sanitizeInput } from "@/shared/utils/sanitise.utils";
+import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useUserDetail } from "@/features/users/hooks/useUserDetail";
 import { useLocations } from "@/shared/hooks/queries/useLocations";
@@ -96,10 +96,19 @@ export const WizardPreviewPanel = observer(function WizardPreviewPanel({
 		};
 	}, [imagePreview, debouncedFormData.baseInformation.image]);
 
-	// Sanitised title text
-	const plainTextTitle = debouncedFormData.baseInformation.title
-		? sanitizeInput(debouncedFormData.baseInformation.title)
-		: "";
+	// Sanitised title HTML with safe inline formatting preserved
+	const sanitisedTitleHtml = useMemo(() => {
+		const raw = debouncedFormData.baseInformation.title;
+		if (!raw) return "";
+		return sanitizeRichText(raw);
+	}, [debouncedFormData.baseInformation.title]);
+
+	const hasTitleContent = useMemo(() => {
+		if (!debouncedFormData.baseInformation.title) return false;
+		const div = document.createElement("div");
+		div.innerHTML = debouncedFormData.baseInformation.title;
+		return !!div.textContent?.trim();
+	}, [debouncedFormData.baseInformation.title]);
 
 	// Format authors from team member data
 	const authorsDisplay = useMemo(() => {
@@ -175,10 +184,13 @@ export const WizardPreviewPanel = observer(function WizardPreviewPanel({
 					<div className="flex-1 min-w-0 space-y-3">
 						{/* Title */}
 						<h2 className="text-2xl font-semibold break-words leading-tight">
-							{plainTextTitle ? (
-								<span className="text-[#62a0f2] dark:text-[#62a0f2]">
-									{plainTextTitle}
-								</span>
+							{hasTitleContent ? (
+								<span
+									className="text-[#62a0f2] dark:text-[#62a0f2] [&_em]:italic [&_sub]:text-[0.7em] [&_sup]:text-[0.7em] [&_p]:inline"
+									dangerouslySetInnerHTML={{
+										__html: sanitisedTitleHtml,
+									}}
+								/>
 							) : (
 								<span className="text-muted-foreground italic text-lg">
 									Project title (required)

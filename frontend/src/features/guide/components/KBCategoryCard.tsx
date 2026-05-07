@@ -36,7 +36,13 @@ export const KBCategoryCard = ({ section }: KBCategoryCardProps) => {
 			tabIndex={0}
 			aria-label={`${section.title} — ${articleCount} article${articleCount !== 1 ? "s" : ""}`}
 			className="group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-			onClick={() => navigate(`/guide/${section.id}`)}
+			onClick={(e) => {
+				if (e.ctrlKey || e.metaKey) {
+					window.open(`/guide/${section.id}`, "_blank");
+				} else {
+					navigate(`/guide/${section.id}`);
+				}
+			}}
 			onKeyDown={(e) => {
 				if (e.key === "Enter" || e.key === " ") {
 					e.preventDefault();

@@ -59,7 +59,7 @@ SECTIONS = [
     {
         "id": "editing-projects",
         "title": "Editing Projects",
-        "description": "Edit project details and invite team members to your projects.",
+        "description": "Edit project details, update descriptions, and manage project settings.",
         "icon": "pencil",
         "required_role": "all",
         "order": 5,
@@ -75,7 +75,7 @@ SECTIONS = [
     {
         "id": "team-management",
         "title": "Team Management",
-        "description": "Promote team members, manage membership, and understand project lead responsibilities.",
+        "description": "Add and remove team members, assign roles, promote to project lead, and manage time allocations.",
         "icon": "users",
         "required_role": "all",
         "order": 7,

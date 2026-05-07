@@ -352,9 +352,10 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 		this.state.visibleLayerTypes = [
 			"dbcaregion",
 			"dbcadistrict",
-			"nrm",
-			"ibra",
-			"imcra",
+			// Commented out — may be re-enabled later:
+			// "nrm",
+			// "ibra",
+			// "imcra",
 		];
 		this.saveToLocalStorage();
 	};

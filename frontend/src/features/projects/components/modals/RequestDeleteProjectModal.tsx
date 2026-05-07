@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,35 +34,34 @@ interface RequestDeleteProjectModalProps {
 	projectId: number;
 }
 
-export function RequestDeleteProjectModal({
+export const RequestDeleteProjectModal = ({
 	isOpen,
 	onClose,
 	projectId,
-}: RequestDeleteProjectModalProps) {
-	const [reason, setReason] = useState<string>("");
-
+}: RequestDeleteProjectModalProps) => {
 	const {
 		handleSubmit,
+		setValue,
+		watch,
 		formState: { errors },
 	} = useForm<RequestDeleteFormData>({
 		resolver: zodResolver(requestDeleteSchema),
+		defaultValues: { reason: undefined },
 	});
+
+	const reason = watch("reason");
 
 	const requestDeleteMutation = useRequestDeleteProject();
 
-	const onSubmit = async () => {
-		if (!reason) return;
-
+	const onSubmit = async (data: RequestDeleteFormData) => {
 		try {
 			await requestDeleteMutation.mutateAsync({
 				projectId,
-				reason: reason as "duplicate" | "mistake" | "other",
+				reason: data.reason,
 			});
 			onClose();
-			setReason("");
 		} catch (error) {
 			console.error("[RequestDeleteProjectModal] Request failed:", error);
-			// Error is handled by the mutation's onError
 		}
 	};
 
@@ -101,7 +99,14 @@ export function RequestDeleteProjectModal({
 						<Label htmlFor="reason-select">
 							Deletion Reason <span className="text-destructive">*</span>
 						</Label>
-						<Select value={reason} onValueChange={setReason}>
+						<Select
+							value={reason}
+							onValueChange={(val) =>
+								setValue("reason", val as RequestDeleteFormData["reason"], {
+									shouldValidate: true,
+								})
+							}
+						>
 							<SelectTrigger id="reason-select">
 								<SelectValue placeholder="Select a reason..." />
 							</SelectTrigger>
@@ -136,4 +141,4 @@ export function RequestDeleteProjectModal({
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

@@ -366,7 +366,13 @@ export const Header = observer(() => {
 									<Button
 										variant="ghost"
 										className="text-white/70 hover:text-white hover:bg-white/10 select-none"
-										onClick={() => navigate("/guide")}
+										onClick={(e) => {
+											if (e.ctrlKey || e.metaKey) {
+												window.open("/guide", "_blank");
+											} else {
+												navigate("/guide");
+											}
+										}}
 									>
 										Guide
 									</Button>

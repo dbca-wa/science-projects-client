@@ -22,6 +22,7 @@ import { Button } from "@/shared/components/ui/button";
 import type {
 	IProjectData,
 	IProjectDocuments,
+	IProjectMember,
 } from "@/shared/types/project.types";
 import type { IUserMe } from "@/shared/types/user.types";
 import { canEditProject } from "@/features/projects/utils/permissions";
@@ -31,6 +32,7 @@ interface ProjectActionsDropdownProps {
 	project: IProjectData;
 	documents?: IProjectDocuments | null;
 	currentUser: IUserMe | null;
+	members?: IProjectMember[] | null;
 	isBaLead?: boolean;
 	userIsCaretakerOfBaLeader?: boolean;
 	isProjectLead?: boolean;
@@ -54,6 +56,7 @@ export const ProjectActionsDropdown = ({
 	project,
 	documents,
 	currentUser,
+	members,
 	isBaLead,
 	userIsCaretakerOfBaLeader,
 	isProjectLead,
@@ -73,7 +76,7 @@ export const ProjectActionsDropdown = ({
 	isHiddenFromProfile,
 }: ProjectActionsDropdownProps) => {
 	// Check if user can manage project
-	const hasManagePermission = canEditProject(currentUser, project);
+	const hasManagePermission = canEditProject(currentUser, project, members);
 
 	// Determine if user can directly delete (vs request deletion)
 	// NOTE: All hooks must be called before any early returns

@@ -35,29 +35,23 @@ def get_editing_projects_articles():
             ),
         },
         {
-            "field_key": "inviting-team-members",
-            "title": "Inviting Team Members",
+            "field_key": "editing-description-inline",
+            "title": "Editing the Project Description",
             "order": 1,
             "description": (
-                "<h2>Adding Members to a Project</h2>"
+                "<h2>Inline Editing</h2>"
+                "<p>You can edit the project description directly from the overview "
+                "page without opening the full edit form:</p>"
                 "<ol>"
                 "<li>Navigate to the project's overview page.</li>"
-                "<li>In the <strong>Project Team</strong> section, click "
-                "<strong>Invite Member</strong>.</li>"
-                "<li>Search for the person by name.</li>"
-                "<li>Select the user, assign them a <strong>Project Role</strong>, "
-                "set their <strong>Time Allocation</strong> and "
-                "<strong>Short Code</strong>.</li>"
-                "<li>Click <strong>Add User</strong>.</li>"
+                "<li>Click on the description text — it becomes editable.</li>"
+                "<li>Make your changes using the rich text toolbar (bold, italic, "
+                "lists, etc.).</li>"
+                "<li>Click <strong>Save</strong> to confirm, or <strong>Cancel</strong> "
+                "to discard.</li>"
                 "</ol>"
-                f"{screenshot('Invite Member dialog with user search and role selection')}"
-                "<p>If the person is not registered in SPMS, you will need to either "
-                "invite them (for DBCA staff) or create an external user profile first. "
-                "See the <strong>Creating Projects</strong> section for details.</p>"
-                "<h2>External Collaborators</h2>"
-                "<p><strong>Reminder:</strong> External (non-DBCA) users do not use "
-                "SPMS directly. They are added for reference in the annual report only. "
-                "They do not need to log in or interact with the system.</p>"
+                "<p>This is useful for quick updates without navigating to the full "
+                "edit form.</p>"
             ),
         },
     ]

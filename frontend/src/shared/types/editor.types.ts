@@ -14,6 +14,7 @@ export type ToolbarMode =
 	| "businessArea"
 	| "newCycle"
 	| "guide"
+	| "projectTitle"
 	| "none";
 
 export interface RichTextEditorProps {

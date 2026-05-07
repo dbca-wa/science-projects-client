@@ -341,9 +341,6 @@ describe("ProjectMapStore", () => {
 			expect(store.state.visibleLayerTypes).toEqual([
 				"dbcaregion",
 				"dbcadistrict",
-				"nrm",
-				"ibra",
-				"imcra",
 			]);
 		});
 
@@ -601,9 +598,6 @@ describe("ProjectMapStore", () => {
 				expect(parsed.visibleLayerTypes).toEqual([
 					"dbcaregion",
 					"dbcadistrict",
-					"nrm",
-					"ibra",
-					"imcra",
 				]);
 			});
 
@@ -620,9 +614,6 @@ describe("ProjectMapStore", () => {
 				expect(newStore.state.visibleLayerTypes).toEqual([
 					"dbcaregion",
 					"dbcadistrict",
-					"nrm",
-					"ibra",
-					"imcra",
 				]);
 			});
 		});

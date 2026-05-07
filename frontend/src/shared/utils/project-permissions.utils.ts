@@ -9,7 +9,7 @@ import { findProjectLeader } from "@/shared/utils/team.utils";
  * Project Permission Utilities
  *
  * Utilities for checking user permissions for project operations.
- * These functions implement the permission logic defined in the requirements.
+ * Covers edit access, team management, document deletion, and approval stages.
  */
 
 /**
@@ -29,18 +29,20 @@ export interface IDocumentData {
  * Users can edit if they are:
  * - Superuser
  * - Caretaker of admin (superuser)
- * - Project leader
+ * - Any project team member (leader or regular member)
  * - Caretaker of project leader
  * - Business area leader
  * - Caretaker of business area leader
  *
  * @param user - Current user (can be IUserData or IUserMe)
  * @param project - Project to check permissions for
+ * @param members - Optional separately-fetched team members (takes precedence over project.team_members)
  * @returns true if user can edit the project
  */
 export function canEditProject(
 	user: IUserData | IUserMe | null,
-	project: IProjectData | null
+	project: IProjectData | null,
+	members?: IProjectMember[] | null
 ): boolean {
 	if (!user || !project) return false;
 
@@ -55,12 +57,20 @@ export function canEditProject(
 		if (isCaretakerOfAdmin) return true;
 	}
 
-	// Check if user is project leader (requires team_members in project)
-	if ("team_members" in project && Array.isArray(project.team_members)) {
-		if (isProjectLeader(user, project.team_members)) return true;
+	// Resolve team members — prefer passed members, fall back to project.team_members
+	const teamMembers: IProjectMember[] | null =
+		members ??
+		("team_members" in project && Array.isArray(project.team_members)
+			? project.team_members
+			: null);
+
+	if (teamMembers) {
+		// Any team member (leader or regular) can edit
+		const isTeamMember = teamMembers.some((m) => m.user.id === user.id);
+		if (isTeamMember) return true;
 
 		// Check if user is caretaker of project leader
-		if (isCaretakerOfProjectLeader(user, project.team_members)) return true;
+		if (isCaretakerOfProjectLeader(user, teamMembers)) return true;
 	}
 
 	// Check if user is business area leader

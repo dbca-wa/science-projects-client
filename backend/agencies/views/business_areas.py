@@ -207,10 +207,14 @@ class BusinessAreaDetail(APIView):
                 "introduction": request.data.get("introduction"),
                 "data_custodian": request.data.get("data_custodian"),
                 "finance_admin": request.data.get("finance_admin"),
-                "leader": leader,
             }.items()
-            if value is not None or key == "leader"
+            if value is not None
         }
+
+        # Only include leader if explicitly sent in the request
+        # (prevents clearing leader when only updating image/name/introduction)
+        if "leader" in request.data:
+            ba_data["leader"] = leader
 
         if division_id is not None:
             try:
