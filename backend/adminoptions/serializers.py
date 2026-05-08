@@ -216,7 +216,11 @@ class AdminOptionsSerializer(serializers.ModelSerializer):
 
     def get_guide_sections(self, obj):
         """Return active guide sections with their content fields"""
-        sections = GuideSection.objects.filter(is_active=True).order_by("order")
+        sections = (
+            GuideSection.objects.filter(is_active=True)
+            .prefetch_related("content_fields")
+            .order_by("order")
+        )
         return GuideSectionSerializer(sections, many=True).data
 
 

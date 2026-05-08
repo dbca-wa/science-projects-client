@@ -295,7 +295,7 @@ class GuideSectionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filter sections based on the requesting user's role."""
         user = self.request.user
-        qs = GuideSection.objects.all().order_by("order")
+        qs = GuideSection.objects.prefetch_related("content_fields").order_by("order")
 
         # Superusers see everything
         if user.is_superuser:
