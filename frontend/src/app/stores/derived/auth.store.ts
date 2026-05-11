@@ -93,18 +93,21 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 
 		logger.info("Auth store initialising", {
 			hasCsrf,
-			csrfCookie: Cookie.get("spmscsrf"),
 		});
 
-		if (!hasCsrf) {
-			// No CSRF token - definitely not authenticated
+		if (!hasCsrf && import.meta.env.DEV) {
+			// In local dev, no CSRF means definitely not authenticated
+			// (there's no SSO middleware to establish a session)
 			this.state.isAuthenticated = false;
 			this.state.initialised = true;
 			logger.info("No CSRF token - not authenticated");
 			return;
 		}
 
-		// CSRF exists - validate session with backend
+		// In production/staging: always attempt to validate with the backend.
+		// The SSO middleware will authenticate the user on the first request
+		// and set session + CSRF cookies even if none exist yet.
+		// With CSRF present: validate the existing session is still valid.
 		try {
 			const user = await getSSOMe();
 			this.user = user;
