@@ -68,4 +68,5 @@ urlpatterns = [
     path("remedy/leaderless", views.RemedyNoLeaderProjects.as_view()),
     path("remedy/multiple_leaders", views.RemedyMultipleLeaderProjects.as_view()),
     path("remedy/external_leaders", views.RemedyExternalLeaderProjects.as_view()),
+    path("remedy/role_mismatch", views.RemedyRoleMismatch.as_view()),
 ]

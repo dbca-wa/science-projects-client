@@ -259,7 +259,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 							<Button
 								variant="ghost"
 								className="justify-start text-white hover:text-white hover:bg-white/10 h-12 text-base pl-6"
-								onClick={(e) => navigateAndClose("/manage/data", e)}
+								onClick={(e) => navigateAndClose("/manage/data/unapproved", e)}
 							>
 								<span className="flex items-center gap-3">
 									<Database className="text-xl" aria-hidden="true" />

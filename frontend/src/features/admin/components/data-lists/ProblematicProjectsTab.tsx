@@ -4,13 +4,6 @@ import { Loader2, AlertCircle, Download } from "lucide-react";
 import { Alert, AlertDescription } from "@/shared/components/ui/alert";
 import { Button } from "@/shared/components/ui/button";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/shared/components/ui/select";
-import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -27,6 +20,7 @@ import {
 	useRemedyLeaderless,
 	useRemedyMultipleLeaders,
 	useRemedyExternalLeaders,
+	useRemedyRoleMismatch,
 } from "../../hooks/useDataLists";
 import type {
 	IProblematicProject,
@@ -34,7 +28,6 @@ import type {
 } from "../../types/admin.types";
 
 type RemedyKey = keyof IProblematicProjectsData;
-type StatusOption = "active" | "suspended" | "completed" | "terminated";
 type ActionType = "remedy" | "download" | "none";
 
 interface CategoryConfig {
@@ -62,7 +55,7 @@ const CATEGORIES: CategoryConfig[] = [
 		label: "Projects with Approved Closure That Are Open",
 		actionType: "remedy",
 		remedyDescription:
-			"All projects with an approved closure that are in the open/update requested state will be affected. Choose a target status for these projects.",
+			"Each project will be set to its closure's intended outcome (completed or terminated). The closure document is kept.",
 	},
 	{
 		key: "no_business_area",
@@ -96,6 +89,13 @@ const CATEGORIES: CategoryConfig[] = [
 		actionType: "remedy",
 		remedyDescription:
 			"The function will find the DBCA staff member who created the first document and assign them leader status. If no suitable staff member is found, the project will be skipped.",
+	},
+	{
+		key: "role_mismatch",
+		label: "Projects with Supervising Role but No Leader Flag",
+		actionType: "remedy",
+		remedyDescription:
+			"Members with the supervising role but without is_leader=True will be corrected. If no other leader exists, the best candidate will be promoted. Otherwise, their role will be changed to Research Scientist.",
 	},
 ];
 
@@ -163,7 +163,7 @@ const downloadProjectsAsTxt = (projects: IProblematicProject[]) => {
 	URL.revokeObjectURL(url);
 };
 
-/** Remedy confirmation dialog for open/closed projects (has status selector) */
+/** Remedy confirmation dialog for open/closed projects */
 const RemedyOpenClosedDialog = ({
 	open,
 	onOpenChange,
@@ -173,20 +173,14 @@ const RemedyOpenClosedDialog = ({
 	onOpenChange: (open: boolean) => void;
 	projects: IProblematicProject[];
 }) => {
-	const [status, setStatus] = useState<StatusOption>("active");
 	const mutation = useRemedyOpenClosed();
 
 	const handleRemedy = () => {
 		mutation.mutate(
-			{ projects: projects.map((p) => p.id), status },
+			{ projects: projects.map((p) => p.id) },
 			{ onSuccess: () => onOpenChange(false) }
 		);
 	};
-
-	const actionDescription =
-		status === "active" || status === "suspended"
-			? "The project closure documents will be deleted and projects will be set to the selected status."
-			: "The project closure documents will be kept and their intended outcome will be updated to match the selected status.";
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -199,24 +193,10 @@ const RemedyOpenClosedDialog = ({
 					</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4 py-2">
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Target Status</label>
-						<Select
-							value={status}
-							onValueChange={(v) => setStatus(v as StatusOption)}
-						>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="active">Active</SelectItem>
-								<SelectItem value="suspended">Suspended</SelectItem>
-								<SelectItem value="completed">Completed</SelectItem>
-								<SelectItem value="terminated">Terminated</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-					<p className="text-sm text-muted-foreground">{actionDescription}</p>
+					<p className="text-sm text-muted-foreground">
+						Each project will be set to its closure&apos;s intended outcome
+						(completed or terminated). The closure documents will be kept.
+					</p>
 				</div>
 				<DialogFooter>
 					<Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -226,7 +206,7 @@ const RemedyOpenClosedDialog = ({
 						{mutation.isPending && (
 							<Loader2 className="mr-2 size-4 animate-spin" />
 						)}
-						Remedy to {status}
+						Remedy
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -343,6 +323,7 @@ export const ProblematicProjectsTab = () => {
 	const leaderlessMutation = useRemedyLeaderless();
 	const multipleLeadersMutation = useRemedyMultipleLeaders();
 	const externalLeadersMutation = useRemedyExternalLeaders();
+	const roleMismatchMutation = useRemedyRoleMismatch();
 
 	if (isLoading) {
 		return (
@@ -402,6 +383,7 @@ export const ProblematicProjectsTab = () => {
 			leaderless: leaderlessMutation,
 			multiple_leaders: multipleLeadersMutation,
 			external_leaders: externalLeadersMutation,
+			role_mismatch: roleMismatchMutation,
 		};
 
 		const mutation = mutationMap[key];
@@ -419,6 +401,7 @@ export const ProblematicProjectsTab = () => {
 			leaderless: leaderlessMutation.isPending,
 			multiple_leaders: multipleLeadersMutation.isPending,
 			external_leaders: externalLeadersMutation.isPending,
+			role_mismatch: roleMismatchMutation.isPending,
 		};
 		return pendingMap[key] ?? false;
 	};

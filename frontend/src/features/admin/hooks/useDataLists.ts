@@ -50,6 +50,7 @@ import {
 	remedyLeaderless,
 	remedyMultipleLeaders,
 	remedyExternalLeaders,
+	remedyRoleMismatch,
 } from "../services/admin.service";
 
 /** Remedy open/closed projects */
@@ -127,6 +128,25 @@ export const useRemedyExternalLeaders = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: remedyExternalLeaders,
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ["admin", "problematic-projects"],
+			});
+			toast.success(
+				`Remedied ${data.successful} project(s), skipped ${data.skipped ?? 0}`
+			);
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to remedy projects");
+		},
+	});
+};
+
+/** Remedy role mismatch projects (supervising role without is_leader flag) */
+export const useRemedyRoleMismatch = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: remedyRoleMismatch,
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
 				queryKey: ["admin", "problematic-projects"],

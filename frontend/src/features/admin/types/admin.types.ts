@@ -67,6 +67,7 @@ export interface IProblematicProjectsData {
 	multiple_leaders: IProblematicProject[];
 	external_leaders: IProblematicProject[];
 	no_business_area: IProblematicProject[];
+	role_mismatch: IProblematicProject[];
 }
 
 export interface IProblematicProject {

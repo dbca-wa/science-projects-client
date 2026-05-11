@@ -34,14 +34,14 @@ interface TeamMemberCardProps {
 	allMembers?: IProjectMember[];
 }
 
-export function TeamMemberCard({
+export const TeamMemberCard = ({
 	member,
 	projectId,
 	canManageTeam,
 	isDragging = false,
 	projectKind,
 	allMembers,
-}: TeamMemberCardProps) {
+}: TeamMemberCardProps) => {
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 
 	const initials = `${member.user.display_first_name?.[0] || ""}${member.user.display_last_name?.[0] || ""}`;
@@ -157,4 +157,4 @@ export function TeamMemberCard({
 			/>
 		</>
 	);
-}
+};

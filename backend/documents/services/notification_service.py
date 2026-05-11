@@ -13,6 +13,48 @@ from users.models import User
 from ..models import ProjectDocument
 from .email_service import EmailService
 
+# ─── Shared helpers for email context ─────────────────────────────────────────
+
+DOCUMENT_KIND_MAP = {
+    "concept": "Concept Plan",
+    "projectplan": "Project Plan",
+    "progressreport": "Progress Report",
+    "studentreport": "Student Report",
+    "projectclosure": "Project Closure",
+}
+
+URL_KIND_MAP = {
+    "concept": "concept",
+    "projectplan": "project",
+    "progressreport": "progress",
+    "studentreport": "student",
+    "projectclosure": "closure",
+}
+
+
+def _build_document_context(document):
+    """Build common template context for a document notification.
+
+    Returns a dict with document_type, document_type_title, plain_project_name,
+    document_url, and site_url — the variables most email templates need.
+    """
+    document_type_title = DOCUMENT_KIND_MAP.get(document.kind, document.kind)
+    url_kind = URL_KIND_MAP.get(document.kind, document.kind)
+    document_url = f"{settings.SITE_URL}/projects/{document.project.pk}/{url_kind}"
+
+    return {
+        "document_type": document.kind,
+        "document_type_title": document_type_title,
+        "plain_project_name": strip_tags(document.project.title),
+        "document_url": document_url,
+        "site_url": settings.SITE_URL,
+    }
+
+
+def _build_project_url(project):
+    """Build the URL to a project's overview page."""
+    return f"{settings.SITE_URL}/projects/{project.pk}"
+
 
 class NotificationService:
     """Business logic for document notifications"""
@@ -57,6 +99,8 @@ class NotificationService:
 
         additional_context = {
             "email_subject": email_subject,
+            "stage": stage,
+            **_build_document_context(document),
         }
         if feedback_html:
             additional_context["feedback_html"] = feedback_html
@@ -173,13 +217,17 @@ class NotificationService:
         """
         recipients = NotificationService._get_directorate_recipients(document)
 
+        doc_ctx = _build_document_context(document)
+
         EmailService.send_document_notification(
             notification_type="approved_directorate",
             document=document,
             recipients=recipients,
             actioning_user=approver,
             additional_context={
-                "email_subject": f"{document.kind.title()} Approved by Directorate",
+                "email_subject": f"{doc_ctx['document_type_title']} Approved by Directorate",
+                "stage": 3,
+                **doc_ctx,
             },
         )
 
@@ -206,8 +254,9 @@ class NotificationService:
             recipients=recipients,
             actioning_user=recaller,
             additional_context={
-                "email_subject": f"{document.kind.title()} Recalled",
+                "email_subject": f"{_build_document_context(document)['document_type_title']} Recalled",
                 "feedback_html": feedback_html,
+                **_build_document_context(document),
             },
         )
 
@@ -234,8 +283,9 @@ class NotificationService:
             recipients=[recipient],
             actioning_user=sender,
             additional_context={
-                "email_subject": f"{document.kind.title()} Sent Back",
+                "email_subject": f"{_build_document_context(document)['document_type_title']} Sent Back",
                 "feedback_html": feedback_html,
+                **_build_document_context(document),
             },
         )
 
@@ -256,7 +306,8 @@ class NotificationService:
             recipients=recipients,
             actioning_user=submitter,
             additional_context={
-                "email_subject": f"{document.kind.title()} Ready for Review",
+                "email_subject": f"{_build_document_context(document)['document_type_title']} Ready for Review",
+                **_build_document_context(document),
             },
         )
 
@@ -272,14 +323,16 @@ class NotificationService:
         """
         recipients = NotificationService._get_document_recipients(document)
 
+        doc_ctx = _build_document_context(document)
         EmailService.send_document_notification(
             notification_type="feedback",
             document=document,
             recipients=recipients,
             actioning_user=feedback_provider,
             additional_context={
-                "email_subject": f"Feedback on {document.kind.title()}",
+                "email_subject": f"Feedback on {doc_ctx['document_type_title']}",
                 "feedback_text": feedback_text,
+                **doc_ctx,
             },
         )
 
@@ -294,13 +347,15 @@ class NotificationService:
         """
         recipients = NotificationService._get_approver_recipients(document)
 
+        doc_ctx = _build_document_context(document)
         EmailService.send_document_notification(
             notification_type="review",
             document=document,
             recipients=recipients,
             actioning_user=requester,
             additional_context={
-                "email_subject": f"Review Requested: {document.kind.title()}",
+                "email_subject": f"Review Requested: {doc_ctx['document_type_title']}",
+                **doc_ctx,
             },
         )
 
@@ -994,6 +1049,11 @@ class NotificationService:
                 "recipient_name": name,
                 "site_url": settings.SITE_URL,
                 "custom_message": recipient_custom_message,
+                "division_name": (
+                    last_report.division.name
+                    if hasattr(last_report, "division") and last_report.division
+                    else None
+                ),
             }
 
             template_content = render_to_string(template_path, template_props)
@@ -1229,6 +1289,8 @@ class NotificationService:
                 "email_subject": f"Project Closed: {strip_tags(project.title)}",
                 "project": project,
                 "plain_project_title": strip_tags(project.title),
+                "project_url": _build_project_url(project),
+                "site_url": settings.SITE_URL,
             },
         )
 
@@ -1252,6 +1314,8 @@ class NotificationService:
                 "email_subject": f"Project Reopened: {strip_tags(project.title)}",
                 "project": project,
                 "plain_project_title": strip_tags(project.title),
+                "project_url": _build_project_url(project),
+                "site_url": settings.SITE_URL,
             },
         )
 
@@ -1531,28 +1595,42 @@ class NotificationService:
     @staticmethod
     def _get_document_recipients(document):
         """
-        Get list of recipients for document notifications
+        Get list of recipients for document notifications.
+
+        Includes all active project team members and the BA leader,
+        deduplicated by email address.
 
         Returns:
             List of dicts with 'name', 'email', 'kind'
         """
         recipients = []
+        seen_emails = set()
 
         # Add project team
         if hasattr(document, "project") and document.project:
-            for member in document.project.members.all():
-                recipients.append(
-                    {
-                        "name": member.user.get_full_name(),
-                        "email": member.user.email,
-                        "kind": "Project Lead" if member.is_leader else "Team Member",
-                    }
-                )
+            for member in document.project.members.select_related("user").all():
+                user = member.user
+                if user.is_active and user.email and user.email not in seen_emails:
+                    recipients.append(
+                        {
+                            "name": user.get_full_name(),
+                            "email": user.email,
+                            "kind": (
+                                "Project Lead" if member.is_leader else "Team Member"
+                            ),
+                        }
+                    )
+                    seen_emails.add(user.email)
 
-        # Add business area contacts
+        # Add business area leader (if not already included as team member)
         if hasattr(document, "project") and document.project.business_area:
             ba = document.project.business_area
-            if ba.leader:
+            if (
+                ba.leader
+                and ba.leader.is_active
+                and ba.leader.email
+                and ba.leader.email not in seen_emails
+            ):
                 recipients.append(
                     {
                         "name": ba.leader.get_full_name(),
@@ -1560,6 +1638,7 @@ class NotificationService:
                         "kind": "Business Area Leader",
                     }
                 )
+                seen_emails.add(ba.leader.email)
 
         return recipients
 
@@ -1671,20 +1750,25 @@ class NotificationService:
     @staticmethod
     def _get_project_team_recipients(project):
         """
-        Get all project team members as recipients
+        Get all active project team members as recipients.
+
+        Filters out inactive users and users without email addresses
+        to prevent silent SMTP failures.
 
         Returns:
             List of dicts with 'name', 'email', 'kind'
         """
         recipients = []
 
-        for member in project.members.all():
-            recipients.append(
-                {
-                    "name": member.user.get_full_name(),
-                    "email": member.user.email,
-                    "kind": "Project Lead" if member.is_leader else "Team Member",
-                }
-            )
+        for member in project.members.select_related("user").all():
+            user = member.user
+            if user.is_active and user.email:
+                recipients.append(
+                    {
+                        "name": user.get_full_name(),
+                        "email": user.email,
+                        "kind": "Project Lead" if member.is_leader else "Team Member",
+                    }
+                )
 
         return recipients

@@ -388,8 +388,23 @@ class TestMemberService:
 
     @pytest.mark.integration
     def test_update_member(self, project_with_lead, project_lead, superuser, db):
-        """Test updating a member"""
-        # Arrange
+        """Test updating a non-leader member's role and time allocation"""
+        # Arrange — add a non-leader member to update
+        non_leader = User.objects.create_user(
+            username="non_leader_test",
+            email="nonlead@example.com",
+            password="test",
+            is_staff=True,
+        )
+        ProjectMember.objects.create(
+            project=project_with_lead,
+            user=non_leader,
+            is_leader=False,
+            role="technical",
+            time_allocation=50,
+            position=1,
+        )
+
         data = {
             "role": "research",
             "time_allocation": 75,
@@ -397,7 +412,7 @@ class TestMemberService:
 
         # Act
         updated = MemberService.update_member(
-            project_with_lead.pk, project_lead.pk, data, superuser
+            project_with_lead.pk, non_leader.pk, data, superuser
         )
 
         # Assert

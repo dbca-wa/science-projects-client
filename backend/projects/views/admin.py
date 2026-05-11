@@ -66,7 +66,7 @@ class ProblematicProjects(APIView):
         """Get projects with various issues"""
         settings.LOGGER.info(f"{request.user} is viewing problematic projects")
 
-        active_statuses = ["active", "updating"]
+        active_statuses = Project.ACTIVE_ONLY
 
         # Projects that are open but have approved closure
         open_with_closure = (
@@ -86,9 +86,11 @@ class ProblematicProjects(APIView):
             .select_related("business_area")
         )
 
-        # Projects with no leader
+        # Projects with no leader (EXCLUDE memberless — they're already in that list)
         leaderless = (
             Project.objects.filter(status__in=active_statuses)
+            .annotate(member_count=Count("members"))
+            .filter(member_count__gt=0)
             .exclude(members__is_leader=True)
             .select_related("business_area")
             .prefetch_related("members")
@@ -105,7 +107,7 @@ class ProblematicProjects(APIView):
             .prefetch_related("members")
         )
 
-        # Projects with external leaders
+        # Projects with external leaders (is_leader=True but user is not staff)
         external_leaders = (
             Project.objects.filter(
                 members__is_leader=True,
@@ -138,6 +140,18 @@ class ProblematicProjects(APIView):
             business_area__isnull=True,
         ).prefetch_related("members")
 
+        # Projects with role=supervising but is_leader=False (role mismatch)
+        role_mismatch = (
+            Project.objects.filter(
+                status__in=active_statuses,
+                members__role=ProjectMember.RoleChoices.SUPERVISING,
+                members__is_leader=False,
+            )
+            .select_related("business_area")
+            .prefetch_related("members", "members__user")
+            .distinct()
+        )
+
         response_data = {
             "open_with_closure": ProblematicProjectSerializer(
                 open_with_closure, many=True
@@ -157,6 +171,9 @@ class ProblematicProjects(APIView):
             "no_business_area": ProblematicProjectSerializer(
                 no_business_area, many=True
             ).data,
+            "role_mismatch": ProblematicProjectSerializer(
+                role_mismatch, many=True
+            ).data,
         }
 
         return Response(response_data, status=HTTP_200_OK)
@@ -167,11 +184,13 @@ class ProblematicProjects(APIView):
         where the document is still in 'new' status (never submitted for review).
         This catches reports that were auto-created but never worked on.
         """
-        today = date.today()
+        from django.utils import timezone
+
+        today = timezone.now()
         if today.month >= 7:
-            fy_start = date(today.year, 7, 1)
+            fy_start = timezone.make_aware(timezone.datetime(today.year, 7, 1))
         else:
-            fy_start = date(today.year - 1, 7, 1)
+            fy_start = timezone.make_aware(timezone.datetime(today.year - 1, 7, 1))
 
         stale_project_ids = (
             ProjectDocument.objects.filter(
@@ -179,7 +198,7 @@ class ProblematicProjects(APIView):
                 | Q(kind=ProjectDocument.CategoryKindChoices.STUDENTREPORT),
                 created_at__gte=fy_start,
                 status=ProjectDocument.StatusChoices.NEW,
-                project__status__in=["active", "updating"],
+                project__status__in=Project.ACTIVE_ONLY,
             )
             .values_list("project_id", flat=True)
             .distinct()
@@ -201,7 +220,7 @@ class RemedyOpenClosed(APIView):
         """Get open projects with approved closures"""
         projects = (
             Project.objects.filter(
-                status__in=["active", "updating"],
+                status__in=Project.ACTIVE_ONLY,
             )
             .exclude(Q(closure__isnull=True) | Q(closure__document__status="new"))
             .select_related(
@@ -220,18 +239,15 @@ class RemedyOpenClosed(APIView):
         return Response(serializer.data, status=HTTP_200_OK)
 
     def post(self, request):
-        """Remedy open/closed projects by setting status and handling closure documents"""
-        project_pks = request.data.get("projects", [])
-        target_status = request.data.get("status", "active")
+        """
+        Remedy open/closed projects by setting their status to the closure's
+        intended outcome (completed or terminated).
 
-        valid_statuses = ["active", "suspended", "completed", "terminated"]
-        if target_status not in valid_statuses:
-            return Response(
-                {
-                    "error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
-                },
-                status=HTTP_400_BAD_REQUEST,
-            )
+        The closure document is kept — it's fully approved and represents
+        the legitimate closure of the project. The only issue is that the
+        project status wasn't updated to match.
+        """
+        project_pks = request.data.get("projects", [])
 
         if not project_pks:
             return Response(
@@ -240,88 +256,57 @@ class RemedyOpenClosed(APIView):
             )
 
         settings.LOGGER.info(
-            f"{request.user} is remedying open/closed projects to '{target_status}': {project_pks}"
+            f"{request.user} is remedying open/closed projects: {project_pks}"
         )
 
-        should_delete_closures = target_status in ["active", "suspended"]
         remedied = []
         failed = []
 
         with transaction.atomic():
-            projects = Project.objects.filter(pk__in=project_pks).only(
-                "pk", "title", "status"
-            )
-            projects_dict = {p.pk: p for p in projects}
-
-            closure_docs = ProjectDocument.objects.filter(
-                project_id__in=project_pks,
-                kind=ProjectDocument.CategoryKindChoices.PROJECTCLOSURE,
-                directorate_approval_granted=True,
-            ).select_related("project")
-
-            closure_docs_by_project = {}
-            for doc in closure_docs:
-                closure_docs_by_project.setdefault(doc.project_id, []).append(doc)
-
-            status_map = {
-                "active": Project.StatusChoices.ACTIVE,
-                "suspended": Project.StatusChoices.SUSPENDED,
-                "completed": Project.StatusChoices.COMPLETED,
-                "terminated": Project.StatusChoices.TERMINATED,
-            }
-
             for pk in project_pks:
                 try:
-                    if pk not in projects_dict:
-                        failed.append({"project_id": pk, "error": "Project not found"})
-                        continue
+                    project = Project.objects.get(pk=pk)
+                except Project.DoesNotExist:
+                    failed.append({"project_id": pk, "error": "Project not found"})
+                    continue
 
-                    project = projects_dict[pk]
-                    docs = closure_docs_by_project.get(pk)
+                # Find the approved closure and its intended outcome
+                closure = ProjectClosure.objects.filter(
+                    project=project,
+                    document__directorate_approval_granted=True,
+                ).first()
 
-                    if not docs:
-                        failed.append(
-                            {
-                                "project_id": pk,
-                                "error": "No approved closure documents found",
-                            }
-                        )
-                        continue
-
-                    if should_delete_closures:
-                        doc_ids = [d.pk for d in docs]
-                        ProjectDocument.objects.filter(pk__in=doc_ids).delete()
-                    else:
-                        doc_ids = [d.pk for d in docs]
-                        outcome_map = {
-                            "completed": ProjectClosure.OutcomeChoices.COMPLETED,
-                            "terminated": ProjectClosure.OutcomeChoices.TERMINATED,
-                        }
-                        ProjectClosure.objects.filter(document_id__in=doc_ids).update(
-                            intended_outcome=outcome_map[target_status]
-                        )
-
-                    previous_status = project.status
-                    project.status = status_map[target_status]
-                    project.save()
-
-                    remedied.append(
-                        {
-                            "project_id": pk,
-                            "previous_status": previous_status,
-                            "new_status": project.status,
-                        }
+                if not closure:
+                    failed.append(
+                        {"project_id": pk, "error": "No approved closure found"}
                     )
+                    continue
 
-                    settings.LOGGER.info(
-                        f"Remedied project {pk}: status {previous_status} -> {project.status}"
-                    )
+                # Determine target status from the closure's intended outcome
+                outcome = closure.intended_outcome
+                if outcome == ProjectClosure.OutcomeChoices.TERMINATED:
+                    target_status = Project.StatusChoices.TERMINATED
+                else:
+                    # Default to completed (covers both explicit "completed" and null/blank)
+                    target_status = Project.StatusChoices.COMPLETED
 
-                except Exception as e:
-                    failed.append({"project_id": pk, "error": "Failed to process"})
-                    settings.LOGGER.error(
-                        f"Failed to remedy project {pk}: {e}", exc_info=True
-                    )
+                previous_status = project.status
+                project.status = target_status
+                project.save()
+
+                remedied.append(
+                    {
+                        "project_id": pk,
+                        "previous_status": previous_status,
+                        "new_status": project.status,
+                        "closure_outcome": outcome or "completed",
+                    }
+                )
+
+                settings.LOGGER.info(
+                    f"Remedied project {pk}: {previous_status} → {project.status} "
+                    f"(closure outcome: {outcome})"
+                )
 
         return Response(
             {
@@ -342,7 +327,7 @@ class RemedyMemberlessProjects(APIView):
         """Get projects with no members"""
         projects = (
             Project.objects.annotate(member_count=Count("members"))
-            .filter(member_count=0, status__in=["active", "updating"])
+            .filter(member_count=0, status__in=Project.ACTIVE_ONLY)
             .select_related(
                 "business_area",
                 "business_area__division",
@@ -354,8 +339,12 @@ class RemedyMemberlessProjects(APIView):
 
     def post(self, request):
         """
-        Remedy memberless projects by finding the first document's creator
-        and adding them as the project leader.
+        Remedy memberless projects by finding a suitable leader to add.
+
+        Priority:
+        1. First document's creator (if they're active staff with @dbca email)
+        2. The project's business area leader (if active with @dbca email)
+        3. Skip if no suitable candidate found
         """
         project_pks = request.data.get("projects", [])
         if not project_pks:
@@ -368,45 +357,72 @@ class RemedyMemberlessProjects(APIView):
             f"{request.user} is remedying memberless projects: {project_pks}"
         )
 
+        def _is_valid_leader(user):
+            return (
+                user
+                and user.is_staff
+                and user.is_active
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
+
         successful = 0
         skipped = 0
+        details = []
 
         with transaction.atomic():
             for pk in project_pks:
                 try:
-                    project = Project.objects.get(pk=pk)
+                    project = Project.objects.select_related(
+                        "business_area__leader"
+                    ).get(pk=pk)
                 except Project.DoesNotExist:
                     skipped += 1
+                    details.append({"project": pk, "reason": "not found"})
                     continue
 
+                leader_user = None
+
+                # Priority 1: first document creator
                 first_doc = self._get_first_document(pk)
-                if first_doc is None:
-                    skipped += 1
-                    continue
+                if (
+                    first_doc
+                    and first_doc.creator
+                    and _is_valid_leader(first_doc.creator)
+                ):
+                    leader_user = first_doc.creator
 
-                creator = first_doc.creator
-                if creator is None:
+                # Priority 2: business area leader
+                if not leader_user:
+                    ba = project.business_area
+                    if ba and ba.leader and _is_valid_leader(ba.leader):
+                        leader_user = ba.leader
+
+                if not leader_user:
                     skipped += 1
+                    details.append(
+                        {"project": pk, "reason": "no valid leader candidate"}
+                    )
                     continue
 
                 ProjectMember.objects.create(
                     project=project,
-                    user=creator,
+                    user=leader_user,
                     is_leader=True,
                     role=ProjectMember.RoleChoices.SUPERVISING,
                     time_allocation=1,
                     position=0,
                     short_code="",
-                    comments="Added to memberless project",
+                    comments="",
                 )
                 successful += 1
 
                 settings.LOGGER.info(
-                    f"Added {creator} as leader to memberless project {pk}"
+                    f"Added {leader_user} as leader to memberless project {pk}"
                 )
 
         return Response(
-            {"successful": successful, "skipped": skipped},
+            {"successful": successful, "skipped": skipped, "details": details},
             status=HTTP_200_OK,
         )
 
@@ -437,9 +453,11 @@ class RemedyNoLeaderProjects(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """Get projects with no leader"""
+        """Get projects with no leader (excludes memberless projects)"""
         projects = (
-            Project.objects.filter(status__in=["active", "updating"])
+            Project.objects.filter(status__in=Project.ACTIVE_ONLY)
+            .annotate(member_count=Count("members"))
+            .filter(member_count__gt=0)
             .exclude(members__is_leader=True)
             .select_related(
                 "business_area",
@@ -457,8 +475,16 @@ class RemedyNoLeaderProjects(APIView):
 
     def post(self, request):
         """
-        Remedy leaderless projects: find the member with is_leader=True,
-        set their role to supervising and position to 0, shift others down.
+        Remedy leaderless projects: find the best staff candidate and promote them.
+
+        Priority for choosing the new leader:
+        1. Staff member with role=supervising, is_active=True, @dbca.wa.gov.au email
+        2. Staff member with lowest position, is_active=True, @dbca.wa.gov.au email
+        3. Any active staff member with @dbca.wa.gov.au email
+
+        The promoted member gets: is_leader=True, role=supervising, position=0.
+        Also fixes role mismatches: staff with external roles get research,
+        external with staff roles get consulted.
         """
         project_pks = request.data.get("projects", [])
         if not project_pks:
@@ -472,25 +498,94 @@ class RemedyNoLeaderProjects(APIView):
         )
 
         successful = 0
+        skipped = 0
+        details = []
+
+        staff_roles = {
+            ProjectMember.RoleChoices.SUPERVISING,
+            ProjectMember.RoleChoices.RESEARCH,
+            ProjectMember.RoleChoices.TECHNICAL,
+        }
+        external_roles = {
+            ProjectMember.RoleChoices.ACADEMICSUPER,
+            ProjectMember.RoleChoices.STUDENT,
+            ProjectMember.RoleChoices.CONSULTED,
+            ProjectMember.RoleChoices.EXTERNALCOL,
+            ProjectMember.RoleChoices.EXTERNALPEER,
+            ProjectMember.RoleChoices.GROUP,
+        }
+
+        def _is_valid_leader_candidate(user):
+            return (
+                user.is_staff
+                and user.is_active
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
 
         with transaction.atomic():
             for pk in project_pks:
-                members = ProjectMember.objects.filter(project=pk)
+                members = ProjectMember.objects.select_related("user").filter(
+                    project=pk
+                )
                 if not members.exists():
+                    skipped += 1
+                    details.append({"project": pk, "reason": "no members"})
                     continue
 
-                for mem in members:
-                    if mem.is_leader:
-                        mem.role = ProjectMember.RoleChoices.SUPERVISING
-                        mem.position = 0
-                    else:
-                        mem.position = (mem.position or 0) + 1
-                    mem.save()
+                # Find best leader candidate
+                new_leader = None
+
+                # Priority 1: staff with supervising role + valid
+                for mem in members.filter(role=ProjectMember.RoleChoices.SUPERVISING):
+                    if _is_valid_leader_candidate(mem.user):
+                        new_leader = mem
+                        break
+
+                # Priority 2: any valid staff member, lowest position first
+                if not new_leader:
+                    for mem in members.order_by("position"):
+                        if _is_valid_leader_candidate(mem.user):
+                            new_leader = mem
+                            break
+
+                if not new_leader:
+                    skipped += 1
+                    details.append(
+                        {"project": pk, "reason": "no valid staff candidate"}
+                    )
+                    continue
+
+                # Promote the new leader
+                new_leader.is_leader = True
+                new_leader.role = ProjectMember.RoleChoices.SUPERVISING
+                new_leader.position = 0
+                new_leader.save()
+
+                # Ensure no other member has is_leader=True
+                members.exclude(pk=new_leader.pk).filter(is_leader=True).update(
+                    is_leader=False
+                )
+
+                # Fix role mismatches on all members
+                for mem in members.exclude(pk=new_leader.pk):
+                    changed = False
+                    if mem.user.is_staff and mem.role in external_roles:
+                        mem.role = ProjectMember.RoleChoices.RESEARCH
+                        changed = True
+                    elif not mem.user.is_staff and mem.role in staff_roles:
+                        mem.role = ProjectMember.RoleChoices.CONSULTED
+                        changed = True
+                    if changed:
+                        mem.save()
 
                 successful += 1
+                settings.LOGGER.info(
+                    f"Promoted {new_leader.user} to leader for leaderless project {pk}"
+                )
 
         return Response(
-            {"successful": successful},
+            {"successful": successful, "skipped": skipped, "details": details},
             status=HTTP_200_OK,
         )
 
@@ -506,7 +601,7 @@ class RemedyMultipleLeaderProjects(APIView):
             Project.objects.annotate(
                 leader_count=Count("members", filter=Q(members__is_leader=True))
             )
-            .filter(leader_count__gt=1, status__in=["active", "updating"])
+            .filter(leader_count__gt=1, status__in=Project.ACTIVE_ONLY)
             .select_related(
                 "business_area",
                 "business_area__division",
@@ -522,8 +617,19 @@ class RemedyMultipleLeaderProjects(APIView):
 
     def post(self, request):
         """
-        Remedy multiple-leader projects: keep the one with is_leader=True,
-        reassign others based on project kind and staff status.
+        Remedy multiple-leader projects: keep exactly one leader.
+
+        Selection logic (in priority order):
+        1. Among members with is_leader=True AND role=supervising:
+           pick the one with lowest position that is valid
+           (is_staff=True, is_active=True, @dbca.wa.gov.au email)
+        2. Among members with is_leader=True (any role):
+           pick the valid one with lowest position
+        3. If no valid leader among is_leader=True members:
+           find any valid staff member with lowest position
+
+        The winner gets: is_leader=True, role=supervising, position=0.
+        All others: is_leader=False, role corrected based on staff status.
         """
         project_pks = request.data.get("projects", [])
         if not project_pks:
@@ -536,7 +642,23 @@ class RemedyMultipleLeaderProjects(APIView):
             f"{request.user} is remedying multiple-leader projects: {project_pks}"
         )
 
+        staff_roles = {
+            ProjectMember.RoleChoices.SUPERVISING,
+            ProjectMember.RoleChoices.RESEARCH,
+            ProjectMember.RoleChoices.TECHNICAL,
+        }
+
+        def _is_valid_leader(user):
+            return (
+                user.is_staff
+                and user.is_active
+                and user.email
+                and user.email.endswith("@dbca.wa.gov.au")
+            )
+
         successful = 0
+        skipped = 0
+        details = []
 
         with transaction.atomic():
             for pk in project_pks:
@@ -544,51 +666,92 @@ class RemedyMultipleLeaderProjects(APIView):
                     project=pk
                 )
                 if not members.exists():
+                    skipped += 1
                     continue
 
-                project = Project.objects.get(pk=pk)
-                lead_roles = members.filter(role=ProjectMember.RoleChoices.SUPERVISING)
+                leaders = list(members.filter(is_leader=True).order_by("position"))
 
-                for mem in lead_roles:
-                    if not mem.is_leader:
-                        # Non-leader with supervising role — reassign
-                        mem.position = (mem.position or 0) + 1
+                if len(leaders) < 2:
+                    skipped += 1
+                    details.append({"project": pk, "reason": "fewer than 2 leaders"})
+                    continue
 
-                        if project.kind != Project.CategoryKindChoices.STUDENT:
-                            if not mem.user.is_staff:
-                                mem.role = ProjectMember.RoleChoices.CONSULTED
-                            else:
-                                mem.role = ProjectMember.RoleChoices.RESEARCH
-                        else:
-                            # Student project logic
-                            if not mem.user.is_staff:
-                                has_student = members.filter(
-                                    role=ProjectMember.RoleChoices.STUDENT
-                                ).exists()
-                                if has_student:
-                                    mem.role = ProjectMember.RoleChoices.ACADEMICSUPER
-                                else:
-                                    mem.role = ProjectMember.RoleChoices.STUDENT
-                            else:
-                                mem.role = ProjectMember.RoleChoices.RESEARCH
+                # Find the best leader
+                winner = None
+
+                # Priority 1: valid leader with supervising role, lowest position
+                for mem in leaders:
+                    if (
+                        mem.role == ProjectMember.RoleChoices.SUPERVISING
+                        and _is_valid_leader(mem.user)
+                    ):
+                        winner = mem
+                        break
+
+                # Priority 2: any valid leader, lowest position
+                if not winner:
+                    for mem in leaders:
+                        if _is_valid_leader(mem.user):
+                            winner = mem
+                            break
+
+                # Priority 3: any valid staff member on the project
+                if not winner:
+                    for mem in members.order_by("position"):
+                        if _is_valid_leader(mem.user):
+                            winner = mem
+                            break
+
+                if not winner:
+                    skipped += 1
+                    details.append(
+                        {"project": pk, "reason": "no valid staff candidate"}
+                    )
+                    continue
+
+                # Set the winner as sole leader
+                winner.is_leader = True
+                winner.role = ProjectMember.RoleChoices.SUPERVISING
+                winner.position = 0
+                winner.save()
+
+                # Demote all others
+                for mem in members.exclude(pk=winner.pk):
+                    changed = False
+                    if mem.is_leader:
+                        mem.is_leader = False
+                        changed = True
+
+                    # Fix role based on staff status
+                    if mem.user.is_staff:
+                        if mem.role not in staff_roles:
+                            mem.role = ProjectMember.RoleChoices.RESEARCH
+                            changed = True
+                        elif mem.role == ProjectMember.RoleChoices.SUPERVISING:
+                            # Can't have supervising without is_leader
+                            mem.role = ProjectMember.RoleChoices.RESEARCH
+                            changed = True
                     else:
-                        # Actual leader — ensure correct role/position
-                        if mem.user.is_staff:
-                            mem.role = ProjectMember.RoleChoices.SUPERVISING
-                            mem.position = 0
+                        if mem.role in staff_roles:
+                            mem.role = ProjectMember.RoleChoices.CONSULTED
+                            changed = True
 
-                    mem.save()
+                    # Bump position if at 0 (reserved for leader)
+                    if mem.position == 0:
+                        mem.position = 1
+                        changed = True
 
-                # Final pass: ensure the is_leader staff member has correct role
-                for mem in members.filter(is_leader=True, user__is_staff=True):
-                    mem.role = ProjectMember.RoleChoices.SUPERVISING
-                    mem.position = 0
-                    mem.save()
+                    if changed:
+                        mem.save()
 
                 successful += 1
+                settings.LOGGER.info(
+                    f"Remedied multiple leaders for project {pk}: "
+                    f"kept {winner.user} as sole leader"
+                )
 
         return Response(
-            {"successful": successful},
+            {"successful": successful, "skipped": skipped, "details": details},
             status=HTTP_200_OK,
         )
 
@@ -604,7 +767,7 @@ class RemedyExternalLeaderProjects(APIView):
             Project.objects.filter(
                 members__is_leader=True,
                 members__user__is_staff=False,
-                status__in=["active", "updating"],
+                status__in=Project.ACTIVE_ONLY,
             )
             .select_related(
                 "business_area",
@@ -622,8 +785,20 @@ class RemedyExternalLeaderProjects(APIView):
 
     def post(self, request):
         """
-        Remedy externally-led projects: find the first document's creator
-        who is staff and in the team, make them leader.
+        Remedy externally-led projects by transferring leadership to a staff member.
+
+        Logic:
+        1. Find the external leader (is_leader=True, is_staff=False)
+        2. Find the best staff candidate:
+           a. First choice: staff member with role=supervising (they're the actual scientist)
+           b. Second choice: first document creator if they're staff and on the team
+           c. Third choice: any staff member on the team (oldest first)
+        3. Promote the staff candidate to leader (is_leader=True, role=supervising, position=0)
+        4. Demote the external leader:
+           - Set is_leader=False
+           - Keep their current role UNLESS they have role=supervising (invalid for non-staff)
+             → in that case, change to consulted
+           - Bump their position to after the new leader
         """
         project_pks = request.data.get("projects", [])
         if not project_pks:
@@ -638,6 +813,7 @@ class RemedyExternalLeaderProjects(APIView):
 
         successful = 0
         skipped = 0
+        details = []
 
         with transaction.atomic():
             for pk in project_pks:
@@ -646,56 +822,83 @@ class RemedyExternalLeaderProjects(APIView):
                 )
                 if not members.exists():
                     skipped += 1
+                    details.append({"project": pk, "reason": "no members"})
                     continue
 
-                users_in_team = {mem.user for mem in members}
-                first_doc = self._get_first_document(pk)
-
-                if first_doc is not None and first_doc.creator is not None:
-                    creator = first_doc.creator
-                    if creator.is_staff and creator in users_in_team:
-                        # Creator is staff and on the team — make them leader
-                        for mem in members:
-                            if not mem.user.is_staff:
-                                mem.is_leader = False
-                                mem.position = (mem.position or 0) + 1
-                            if mem.user == creator:
-                                mem.role = ProjectMember.RoleChoices.SUPERVISING
-                                mem.position = 0
-                                mem.is_leader = True
-                            mem.save()
-                        successful += 1
-                        settings.LOGGER.info(
-                            f"Set {creator} as leader for externally-led project {pk}"
-                        )
-                        continue
-
-                # Fallback: find a staff member to promote
+                # Find the external leader
                 external_leader = members.filter(
                     is_leader=True, user__is_staff=False
                 ).first()
-                staff_non_leaders = members.filter(is_leader=False, user__is_staff=True)
 
-                if staff_non_leaders.exists() and external_leader:
-                    external_leader.is_leader = False
-                    external_leader.position = (external_leader.position or 0) + 1
-                    external_leader.save()
-
-                    new_leader = staff_non_leaders.order_by("created_at").first()
-                    new_leader.is_leader = True
-                    new_leader.role = ProjectMember.RoleChoices.SUPERVISING
-                    new_leader.position = 0
-                    new_leader.save()
-
-                    successful += 1
-                    settings.LOGGER.info(
-                        f"Promoted {new_leader.user} to leader for externally-led project {pk}"
-                    )
-                else:
+                if not external_leader:
                     skipped += 1
+                    details.append(
+                        {"project": pk, "reason": "no external leader found"}
+                    )
+                    continue
+
+                # Find best staff candidate for leadership
+                new_leader_member = None
+
+                # Priority 1: Staff member already with supervising role
+                staff_supervising = members.filter(
+                    user__is_staff=True, role=ProjectMember.RoleChoices.SUPERVISING
+                ).first()
+                if staff_supervising:
+                    new_leader_member = staff_supervising
+
+                # Priority 2: First document creator if staff and on team
+                if not new_leader_member:
+                    first_doc = self._get_first_document(pk)
+                    if first_doc and first_doc.creator and first_doc.creator.is_staff:
+                        creator_member = members.filter(user=first_doc.creator).first()
+                        if creator_member:
+                            new_leader_member = creator_member
+
+                # Priority 3: Any staff member (oldest membership first)
+                if not new_leader_member:
+                    new_leader_member = (
+                        members.filter(user__is_staff=True)
+                        .order_by("created_at")
+                        .first()
+                    )
+
+                if not new_leader_member:
+                    skipped += 1
+                    details.append(
+                        {"project": pk, "reason": "no staff member available"}
+                    )
+                    continue
+
+                # Demote external leader — keep their role unless it's supervising
+                external_leader.is_leader = False
+                if external_leader.role == ProjectMember.RoleChoices.SUPERVISING:
+                    # Non-staff shouldn't have supervising role
+                    external_leader.role = ProjectMember.RoleChoices.CONSULTED
+                # Bump position to after leader
+                external_leader.position = max(external_leader.position or 0, 1)
+                external_leader.save()
+
+                # Promote staff member to leader
+                new_leader_member.is_leader = True
+                new_leader_member.role = ProjectMember.RoleChoices.SUPERVISING
+                new_leader_member.position = 0
+                new_leader_member.save()
+
+                # Ensure no other members have is_leader=True (data cleanup)
+                members.exclude(pk=new_leader_member.pk).filter(is_leader=True).update(
+                    is_leader=False
+                )
+
+                successful += 1
+                settings.LOGGER.info(
+                    f"Remedied project {pk}: promoted {new_leader_member.user} "
+                    f"(was {new_leader_member.role}), demoted external "
+                    f"{external_leader.user} (kept role={external_leader.role})"
+                )
 
         return Response(
-            {"successful": successful, "skipped": skipped},
+            {"successful": successful, "skipped": skipped, "details": details},
             status=HTTP_200_OK,
         )
 
@@ -718,3 +921,146 @@ class RemedyExternalLeaderProjects(APIView):
                 return doc
 
         return None
+
+
+class RemedyRoleMismatch(APIView):
+    """Projects with members who have role=supervising but is_leader=False"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Get projects with supervising role but no is_leader flag"""
+        projects = (
+            Project.objects.filter(
+                status__in=Project.ACTIVE_ONLY,
+                members__role=ProjectMember.RoleChoices.SUPERVISING,
+                members__is_leader=False,
+            )
+            .select_related(
+                "business_area",
+                "business_area__division",
+            )
+            .prefetch_related(
+                "members",
+                "members__user",
+            )
+            .distinct()
+        )
+
+        serializer = ProblematicProjectSerializer(projects, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    def post(self, request):
+        """
+        Remedy role mismatch: for each project, if a member has role=supervising
+        but is_leader=False, either:
+        - If no other member has is_leader=True: promote this member to leader
+        - If another member already has is_leader=True: demote this member's role
+
+        Demotion role depends on staff status and project type:
+        - Staff → research (Science Support)
+        - External on student project:
+          - If no student role exists on the project → student
+          - If student role already exists → academicsuper
+        - External on non-student project → consulted
+        """
+        project_pks = request.data.get("projects", [])
+        if not project_pks:
+            return Response(
+                {"error": "No projects provided"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        settings.LOGGER.info(
+            f"{request.user} is remedying role mismatch projects: {project_pks}"
+        )
+
+        successful = 0
+        skipped = 0
+        details = []
+
+        def _get_external_demotion_role(project, members_qs):
+            """Determine the appropriate role for an external user being demoted."""
+            if project.kind == Project.CategoryKindChoices.STUDENT:
+                has_student = members_qs.filter(
+                    role=ProjectMember.RoleChoices.STUDENT
+                ).exists()
+                if has_student:
+                    return ProjectMember.RoleChoices.ACADEMICSUPER
+                else:
+                    return ProjectMember.RoleChoices.STUDENT
+            return ProjectMember.RoleChoices.CONSULTED
+
+        with transaction.atomic():
+            for pk in project_pks:
+                try:
+                    project = Project.objects.get(pk=pk)
+                except Project.DoesNotExist:
+                    skipped += 1
+                    continue
+
+                members = ProjectMember.objects.select_related("user").filter(
+                    project=pk
+                )
+                if not members.exists():
+                    skipped += 1
+                    continue
+
+                # Find members with supervising role but not is_leader
+                mismatched = list(
+                    members.filter(
+                        role=ProjectMember.RoleChoices.SUPERVISING, is_leader=False
+                    )
+                )
+
+                if not mismatched:
+                    skipped += 1
+                    continue
+
+                # Check if there's already a valid leader
+                existing_leader = members.filter(is_leader=True).first()
+
+                if existing_leader:
+                    # There's already a leader — demote the mismatched members
+                    for mem in mismatched:
+                        if mem.user.is_staff:
+                            mem.role = ProjectMember.RoleChoices.RESEARCH
+                        else:
+                            mem.role = _get_external_demotion_role(project, members)
+                        mem.save()
+                else:
+                    # No leader exists — promote the best mismatched member
+                    # Pick the one with lowest position that is valid staff
+                    promoted = None
+                    for mem in sorted(
+                        mismatched,
+                        key=lambda m: m.position if m.position is not None else 999,
+                    ):
+                        if (
+                            mem.user.is_staff
+                            and mem.user.is_active
+                            and mem.user.email
+                            and mem.user.email.endswith("@dbca.wa.gov.au")
+                        ):
+                            mem.is_leader = True
+                            mem.position = 0
+                            mem.save()
+                            promoted = mem
+                            break
+
+                    # Demote the rest
+                    for mem in mismatched:
+                        if promoted and mem.pk == promoted.pk:
+                            continue
+                        if mem.user.is_staff:
+                            mem.role = ProjectMember.RoleChoices.RESEARCH
+                        else:
+                            mem.role = _get_external_demotion_role(project, members)
+                        mem.save()
+
+                successful += 1
+
+        return Response(
+            {"successful": successful, "skipped": skipped, "details": details},
+            status=HTTP_200_OK,
+        )

@@ -1099,6 +1099,7 @@ class SendAllTestEmails(APIView):
                 "user_kind": "Team Member",
                 "actioning_user_name": "Admin Closer",
                 "actioning_user_email": "closer@dbca.wa.gov.au",
+                "plain_project_title": "Fauna Survey 2026",
                 "project_url": "/projects/42",
                 "email_subject": "Project Closed: Fauna Survey 2026",
             },
@@ -1111,6 +1112,7 @@ class SendAllTestEmails(APIView):
                 "user_kind": "Team Member",
                 "actioning_user_name": "Admin Reopener",
                 "actioning_user_email": "reopener@dbca.wa.gov.au",
+                "plain_project_title": "Fauna Survey 2026",
                 "project_url": "/projects/42",
                 "email_subject": "Project Reopened: Fauna Survey 2026",
             },
@@ -1348,13 +1350,17 @@ class SendAllTestEmails(APIView):
 
             results.append({"template": tmpl["name"], "status": "ok"})
 
-        settings.LOGGER.info(
-            f"{req.user} sent all test emails ({len(results)} templates)"
-        )
+        if single_template:
+            template_label = single_template.replace("_", " ").title()
+            settings.LOGGER.info(f"{req.user} sent test email: {template_label}")
+        else:
+            settings.LOGGER.info(
+                f"{req.user} sent all test emails ({len(results)} templates)"
+            )
 
         return Response(
             {
-                "message": f"Rendered {len(results)} email templates",
+                "message": f"Rendered {len(results)} email template{'s' if len(results) != 1 else ''}",
                 "preview_dir": "email_previews",
                 "results": results,
             }

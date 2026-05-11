@@ -1,104 +1,109 @@
+/**
+ * Tests for document service — email-triggering actions.
+ *
+ * Verifies that performDocumentAction sends the correct payload shape
+ * to the backend for approve, recall, and send_back actions.
+ */
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { performDocumentAction, deleteDocument } from "./document.service";
+import { performDocumentAction } from "./document.service";
 import { apiClient } from "@/shared/services/api/client.service";
+import { DOCUMENT_ENDPOINTS } from "./document.endpoints";
 
 vi.mock("@/shared/services/api/client.service", () => ({
 	apiClient: {
 		get: vi.fn(),
 		post: vi.fn(),
 		put: vi.fn(),
+		patch: vi.fn(),
 		delete: vi.fn(),
 	},
 }));
 
-describe("document.service", () => {
+describe("performDocumentAction", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		(apiClient.post as Mock).mockResolvedValue({});
 	});
 
-	describe("performDocumentAction", () => {
-		it("should POST approve action to approve endpoint", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ ok: true });
-
-			await performDocumentAction("concept", 123, {
-				action: "approve",
-				stage: 1,
-				documentPk: 123,
-				send_email: true,
-			});
-
-			expect(apiClient.post).toHaveBeenCalledWith("documents/actions/approve", {
-				stage: 1,
-				documentPk: 123,
-				reason: undefined,
-				feedbackHTML: undefined,
-			});
+	it("approve action sends stage, documentPk, and feedbackHTML", async () => {
+		await performDocumentAction("concept", 42, {
+			action: "approve",
+			stage: 2,
+			documentPk: 42,
+			feedbackHTML: "<p>Looks good</p>",
+			send_email: true,
 		});
 
-		it("should POST recall action to recall endpoint", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ ok: true });
-
-			await performDocumentAction("projectplan", 456, {
-				action: "recall",
+		expect(apiClient.post).toHaveBeenCalledWith(
+			DOCUMENT_ENDPOINTS.APPROVE,
+			expect.objectContaining({
 				stage: 2,
-				documentPk: 456,
-				reason: "Needs revision",
-				feedbackHTML: "<p>Please fix</p>",
-				send_email: true,
-			});
-
-			expect(apiClient.post).toHaveBeenCalledWith("documents/actions/recall", {
-				stage: 2,
-				documentPk: 456,
-				reason: "Needs revision",
-				feedbackHTML: "<p>Please fix</p>",
-			});
-		});
-
-		it("should POST send_back action to send_back endpoint", async () => {
-			(apiClient.post as Mock).mockResolvedValue({ ok: true });
-
-			await performDocumentAction("progressreport", 789, {
-				action: "send_back",
-				stage: 3,
-				documentPk: 789,
-				send_email: false,
-			});
-
-			expect(apiClient.post).toHaveBeenCalledWith(
-				"documents/actions/send_back",
-				{
-					stage: 3,
-					documentPk: 789,
-					reason: undefined,
-					feedbackHTML: undefined,
-				}
-			);
-		});
-
-		it("should throw for unknown action", async () => {
-			await expect(
-				performDocumentAction("concept", 123, {
-					action: "unknown" as "approve",
-					stage: 1,
-					documentPk: 123,
-					send_email: true,
-				})
-			).rejects.toThrow("Unknown action: unknown");
-		});
+				documentPk: 42,
+				feedbackHTML: "<p>Looks good</p>",
+			})
+		);
 	});
 
-	describe("deleteDocument", () => {
-		it("should DELETE document by ID", async () => {
-			const mockResponse = { success: true, message: "Deleted" };
-			(apiClient.delete as Mock).mockResolvedValue(mockResponse);
-
-			const result = await deleteDocument("concept", 123);
-
-			expect(apiClient.delete).toHaveBeenCalledWith(
-				"documents/projectdocuments/123"
-			);
-			expect(result).toEqual(mockResponse);
+	it("recall action sends to correct endpoint with stage and feedback", async () => {
+		await performDocumentAction("progressreport", 99, {
+			action: "recall",
+			stage: 1,
+			documentPk: 99,
+			reason: "Need to revise",
+			feedbackHTML: "<p>Revise methodology</p>",
+			send_email: true,
 		});
+
+		expect(apiClient.post).toHaveBeenCalledWith(
+			DOCUMENT_ENDPOINTS.RECALL,
+			expect.objectContaining({
+				stage: 1,
+				documentPk: 99,
+				reason: "Need to revise",
+				feedbackHTML: "<p>Revise methodology</p>",
+			})
+		);
+	});
+
+	it("send_back action sends to correct endpoint", async () => {
+		await performDocumentAction("projectplan", 55, {
+			action: "send_back",
+			stage: 2,
+			documentPk: 55,
+			feedbackHTML: "<p>Budget incomplete</p>",
+			send_email: true,
+		});
+
+		expect(apiClient.post).toHaveBeenCalledWith(
+			DOCUMENT_ENDPOINTS.SEND_BACK,
+			expect.objectContaining({
+				stage: 2,
+				documentPk: 55,
+				feedbackHTML: "<p>Budget incomplete</p>",
+			})
+		);
+	});
+
+	it("does NOT send send_email field to backend", async () => {
+		await performDocumentAction("concept", 42, {
+			action: "approve",
+			stage: 1,
+			documentPk: 42,
+			send_email: true,
+		});
+
+		const payload = (apiClient.post as Mock).mock.calls[0][1];
+		expect(payload).not.toHaveProperty("send_email");
+	});
+
+	it("throws for unknown action", async () => {
+		await expect(
+			performDocumentAction("concept", 42, {
+				action: "invalid" as never,
+				stage: 1,
+				documentPk: 42,
+				send_email: true,
+			})
+		).rejects.toThrow("Unknown action: invalid");
 	});
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
 import { useMyBusinessAreas } from "../../hooks/useBusinessAreaLead";
@@ -51,7 +51,11 @@ const BusinessAreaSubTabs = ({
 	const handleSubTabChange = (value: string) => {
 		setActivatedTabs((prev) => new Set(prev).add(value));
 		const suffix = value === "appearance" ? "" : `/${value}`;
-		navigate(`/reports/business-area${suffix}`);
+		// Preserve the ?ba= query param when switching tabs
+		const params = new URLSearchParams(window.location.search);
+		const baParam = params.get("ba");
+		const qs = baParam ? `?ba=${baParam}` : "";
+		navigate(`/reports/business-area${suffix}${qs}`);
 	};
 
 	const baId = area.id!;
@@ -143,7 +147,16 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 	const { data: divisions } = useDivisions();
 	const authStore = useAuthStore();
 	const navigate = useNavigate();
-	const [selectedBAId, setSelectedBAId] = useState<number | null>(null);
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	// Persist selected BA in URL query param so it survives tab navigation
+	const selectedBAId = searchParams.get("ba")
+		? Number(searchParams.get("ba"))
+		: null;
+
+	const setSelectedBAId = (id: number) => {
+		setSearchParams({ ba: id.toString() }, { replace: true });
+	};
 
 	const isLoading = myLoading || (authStore.isSuperuser && allLoading);
 
@@ -162,7 +175,7 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 	// Show dropdown: superusers always, non-superusers only if leading 2+ BAs
 	const showDropdown = authStore.isSuperuser || businessAreas.length > 1;
 
-	// Auto-select first BA (sorted by display name) when data loads
+	// Auto-select first BA (sorted by display name) when data loads and none selected
 	useEffect(() => {
 		if (businessAreas && businessAreas.length > 0 && selectedBAId === null) {
 			const sorted = sortBusinessAreasByDisplayName(
@@ -241,7 +254,6 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 						value={selectedBAId?.toString() ?? ""}
 						onValueChange={(v) => {
 							setSelectedBAId(Number(v));
-							navigate("/reports/business-area", { replace: true });
 						}}
 					>
 						<SelectTrigger className="w-full sm:w-[250px]">

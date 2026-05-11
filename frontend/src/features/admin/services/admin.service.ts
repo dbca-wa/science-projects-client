@@ -225,6 +225,7 @@ export const openNewCycle = async (data?: {
 	send_emails?: boolean;
 	recipient_groups?: string[];
 	excluded_user_ids?: number[];
+	recipient_user_pks?: number[];
 	custom_message?: string;
 	custom_messages?: {
 		ba_leads: string;
@@ -239,6 +240,7 @@ export const openNewCycle = async (data?: {
 		send_emails: data?.send_emails ?? false,
 		recipient_groups: data?.recipient_groups,
 		excluded_user_ids: data?.excluded_user_ids,
+		recipient_user_pks: data?.recipient_user_pks,
 		custom_message: data?.custom_message,
 		custom_messages: data?.custom_messages,
 	});
@@ -358,7 +360,6 @@ export interface IRemedyResponse {
 
 export const remedyOpenClosed = async (data: {
 	projects: number[];
-	status: "active" | "suspended" | "completed" | "terminated";
 }): Promise<IRemedyResponse> => {
 	return apiClient.post<IRemedyResponse>(
 		ADMIN_ENDPOINTS.REMEDY_OPEN_CLOSED,
@@ -398,6 +399,15 @@ export const remedyExternalLeaders = async (data: {
 }): Promise<IRemedyResponse> => {
 	return apiClient.post<IRemedyResponse>(
 		ADMIN_ENDPOINTS.REMEDY_EXTERNAL_LEADERS,
+		data
+	);
+};
+
+export const remedyRoleMismatch = async (data: {
+	projects: number[];
+}): Promise<IRemedyResponse> => {
+	return apiClient.post<IRemedyResponse>(
+		ADMIN_ENDPOINTS.REMEDY_ROLE_MISMATCH,
 		data
 	);
 };

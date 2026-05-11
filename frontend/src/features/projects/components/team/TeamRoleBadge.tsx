@@ -27,16 +27,22 @@ const ROLE_LABELS: Record<string, string> = {
  * - Uses shadcn Badge component with team role variants
  * - Colour-coded based on role type (matches original SPMS colours)
  * - Handles all team role types
- * - Shows "Project Leader" badge when isLeader is true, regardless of role
+ * - Shows "Project Leader" badge when isLeader is true AND role is supervising
+ * - For other roles with isLeader (data inconsistency), shows the actual role name
  */
-export function TeamRoleBadge({
+export const TeamRoleBadge = ({
 	role,
 	isLeader = false,
 	className,
-}: TeamRoleBadgeProps) {
-	// If user is leader, always show "Project Leader" with supervising variant
-	const displayText = isLeader ? "Project Leader" : ROLE_LABELS[role] || role;
-	const badgeRole = isLeader ? "supervising" : role;
+}: TeamRoleBadgeProps) => {
+	// Only show "Project Leader" when both is_leader AND role is supervising
+	// This prevents external users with is_leader=True (data issue) from
+	// incorrectly displaying as "Project Leader"
+	const isActualLeader = isLeader && role === "supervising";
+	const displayText = isActualLeader
+		? "Project Leader"
+		: ROLE_LABELS[role] || role;
+	const badgeRole = isActualLeader ? "supervising" : role;
 	const variant = `role_${badgeRole}` as VariantProps<
 		typeof badgeVariants
 	>["variant"];
@@ -46,4 +52,4 @@ export function TeamRoleBadge({
 			{displayText}
 		</Badge>
 	);
-}
+};

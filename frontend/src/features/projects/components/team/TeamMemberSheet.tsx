@@ -132,16 +132,18 @@ export const TeamMemberSheet = ({
 				? "Cannot remove the last external member from an external project"
 				: undefined;
 
-	// Lock role changes for leaders and for the last required member
-	// (changing role away from "student" would effectively remove the last student)
-	const isRoleLocked = isLeader || isLastRequiredMember;
-	const roleLockedReason = isLeader
-		? "Project leader role is managed via promote/demote"
-		: isLastRequiredMember && projectKind === "student"
-			? "Cannot change role — this is the only student in a student project"
-			: isLastRequiredMember && projectKind === "external"
-				? "Cannot change role — this is the only external member in an external project"
-				: undefined;
+	// Lock role changes for the supervising scientist (managed via promote/demote)
+	// and for the last required member in student/external projects
+	const isRoleLocked =
+		member.role === "supervising" || isLeader || isLastRequiredMember;
+	const roleLockedReason =
+		member.role === "supervising" || isLeader
+			? "Project leader role is managed via promote/demote"
+			: isLastRequiredMember && projectKind === "student"
+				? "Cannot change role — this is the only student in a student project"
+				: isLastRequiredMember && projectKind === "external"
+					? "Cannot change role — this is the only external member in an external project"
+					: undefined;
 
 	const handleSave = () => {
 		// For leaders or last-required members, don't include role in the update

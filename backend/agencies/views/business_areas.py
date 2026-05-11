@@ -23,7 +23,7 @@ from documents.models import ProjectDocument
 from documents.serializers import ProjectDocumentSerializer
 from documents.services.approval_service import ApprovalService
 from medias.models import BusinessAreaPhoto
-from projects.models import Project, ProjectMember
+from projects.models import Project
 from projects.serializers import ProblematicProjectSerializer
 
 from ..models import BusinessArea
@@ -380,7 +380,10 @@ class BusinessAreasProblematicProjects(APIView):
     def get_projects_in_ba_array(self, ba_array):
         try:
             projects = (
-                Project.objects.filter(business_area__in=ba_array)
+                Project.objects.filter(
+                    business_area__in=ba_array,
+                    status__in=Project.ACTIVE_ONLY,
+                )
                 .select_related("business_area", "image")
                 .prefetch_related("members", "members__user")
             )
@@ -398,6 +401,13 @@ class BusinessAreasProblematicProjects(APIView):
     def _categorise_projects(projects):
         """Categorise projects by problem type.
 
+        Uses the same detection logic as the admin ProblematicProjects view:
+        - memberless: no members at all
+        - no_leader: has members but no member with is_leader=True
+          (EXCLUDES memberless projects — they're already in that list)
+        - multiple_leads: more than one member with is_leader=True
+        - external_leader: a member with is_leader=True whose user is not staff
+
         Safely handles orphaned ProjectMember rows where the related
         user no longer exists (RelatedObjectDoesNotExist).
         """
@@ -408,7 +418,14 @@ class BusinessAreasProblematicProjects(APIView):
 
         for p in projects:
             members = p.members.all()
-            leader_tag_count = 0
+            member_count = len(members)
+
+            # Memberless — skip further checks (don't double-count in no_leader)
+            if member_count < 1:
+                memberless.append(p)
+                continue
+
+            leader_count = 0
             external_leader = False
 
             for mem in members:
@@ -420,20 +437,17 @@ class BusinessAreasProblematicProjects(APIView):
                         exc_info=True,
                     )
                     continue
-                if mem.role == ProjectMember.RoleChoices.SUPERVISING:
-                    leader_tag_count += 1
-                if mem.is_leader is True and user.is_staff is False:
-                    external_leader = True
+                if mem.is_leader:
+                    leader_count += 1
+                    if not user.is_staff:
+                        external_leader = True
 
-            if len(members) < 1:
-                memberless.append(p)
-            else:
-                if external_leader:
-                    externally_led.append(p)
-                if leader_tag_count == 0:
-                    no_leader.append(p)
-                elif leader_tag_count > 1:
-                    multiple_leaders.append(p)
+            if external_leader:
+                externally_led.append(p)
+            if leader_count == 0:
+                no_leader.append(p)
+            elif leader_count > 1:
+                multiple_leaders.append(p)
 
         return {
             "no_members": memberless,

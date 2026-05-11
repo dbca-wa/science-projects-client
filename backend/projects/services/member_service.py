@@ -199,6 +199,27 @@ class MemberService:
             f"{requesting_user} is updating member {user_id} on project {project_id}"
         )
 
+        # Enforce role/is_leader invariant:
+        # - Cannot change role TO supervising without going through promote flow
+        # - Cannot change role FROM supervising if is_leader (must demote first)
+        new_role = data.get("role")
+        if new_role is not None and new_role != member.role:
+            if new_role == "supervising" and not member.is_leader:
+                # Trying to set role to supervising without being leader — block it
+                # They should use the promote flow instead
+                settings.LOGGER.warning(
+                    f"Blocked role change to supervising for non-leader member "
+                    f"{user_id} on project {project_id}. Use promote flow instead."
+                )
+                data.pop("role", None)
+            elif member.role == "supervising" and member.is_leader:
+                # Trying to change role away from supervising while still leader — block it
+                settings.LOGGER.warning(
+                    f"Blocked role change from supervising for leader member "
+                    f"{user_id} on project {project_id}. Must demote first."
+                )
+                data.pop("role", None)
+
         # Update fields
         for field, value in data.items():
             if hasattr(member, field) and value is not None:

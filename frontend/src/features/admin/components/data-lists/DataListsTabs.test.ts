@@ -74,9 +74,9 @@ describe("ProblematicProjectsTab", () => {
 		expect(collapsibleCard).toContain("aria-label");
 	});
 
-	it("open/closed remedy has status selector", () => {
-		expect(content).toContain("StatusOption");
+	it("open/closed remedy uses closure intended outcome", () => {
 		expect(content).toContain("RemedyOpenClosedDialog");
+		expect(content).toContain("intended outcome");
 	});
 
 	it("uses DataTable with sortable columns", () => {

@@ -36,6 +36,7 @@ export const ADMIN_ENDPOINTS = {
 	REMEDY_LEADERLESS: "projects/remedy/leaderless",
 	REMEDY_MULTIPLE_LEADERS: "projects/remedy/multiple_leaders",
 	REMEDY_EXTERNAL_LEADERS: "projects/remedy/external_leaders",
+	REMEDY_ROLE_MISMATCH: "projects/remedy/role_mismatch",
 
 	// User/staff data lists
 	USERS_LIST: "users/list",

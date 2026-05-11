@@ -40,7 +40,7 @@ const MANAGE_SECTIONS: MenuSection[] = [
 		label: "Core",
 		items: [
 			{
-				targetPath: "/manage/data",
+				targetPath: "/manage/data/unapproved",
 				icon: <Database className="size-4" aria-hidden="true" />,
 				label: "Data Lists",
 			},

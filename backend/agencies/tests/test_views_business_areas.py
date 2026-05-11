@@ -202,8 +202,8 @@ class TestBusinessAreasProblematicProjects:
         """GET with business_area_id returns categorised problematic projects"""
         user = UserFactory()
         ba = BusinessAreaFactory(leader=user)
-        # Create a project with no members (memberless)
-        ProjectFactory(business_area=ba, members=[])
+        # Create a project with no members (memberless) — status=new should be included
+        ProjectFactory(business_area=ba, members=[], status="new")
 
         api_client.force_authenticate(user=user)
         response = api_client.get(
@@ -222,11 +222,11 @@ class TestBusinessAreasProblematicProjects:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_get_detects_no_leader(self, api_client):
-        """Project with members but no supervising role is flagged as no_leader"""
+        """Project with members but no is_leader=True is flagged as no_leader"""
         user = UserFactory()
         ba = BusinessAreaFactory(leader=user)
-        project = ProjectFactory(business_area=ba, members=[])
-        # Add a member who is NOT supervising
+        project = ProjectFactory(business_area=ba, members=[], status="active")
+        # Add a member who is NOT leader
         ProjectMemberFactory(project=project, user=user, is_leader=False, role="cited")
 
         api_client.force_authenticate(user=user)
@@ -241,11 +241,11 @@ class TestBusinessAreasProblematicProjects:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_get_detects_multiple_leaders(self, api_client):
-        """Project with multiple supervising members is flagged"""
+        """Project with multiple is_leader=True members is flagged"""
         user1 = UserFactory()
         user2 = UserFactory()
         ba = BusinessAreaFactory()
-        project = ProjectFactory(business_area=ba, members=[])
+        project = ProjectFactory(business_area=ba, members=[], status="active")
         ProjectMemberFactory(
             project=project, user=user1, is_leader=True, role="supervising"
         )
@@ -269,7 +269,7 @@ class TestBusinessAreasProblematicProjects:
         external_user = UserFactory(is_staff=False)
         staff_user = UserFactory(is_staff=True)
         ba = BusinessAreaFactory()
-        project = ProjectFactory(business_area=ba, members=[])
+        project = ProjectFactory(business_area=ba, members=[], status="active")
         ProjectMemberFactory(
             project=project,
             user=external_user,
@@ -293,7 +293,7 @@ class TestBusinessAreasProblematicProjects:
         user = UserFactory()
         ba1 = BusinessAreaFactory(leader=user)
         ba2 = BusinessAreaFactory(leader=user)
-        ProjectFactory(business_area=ba1, members=[])  # memberless
+        ProjectFactory(business_area=ba1, members=[], status="active")  # memberless
 
         api_client.force_authenticate(user=user)
         response = api_client.post(
@@ -311,10 +311,10 @@ class TestBusinessAreasProblematicProjects:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_get_healthy_project_not_flagged(self, api_client):
-        """A project with exactly one staff supervising member is not flagged"""
+        """A project with exactly one staff leader is not flagged"""
         staff_user = UserFactory(is_staff=True)
         ba = BusinessAreaFactory()
-        project = ProjectFactory(business_area=ba, members=[])
+        project = ProjectFactory(business_area=ba, members=[], status="active")
         ProjectMemberFactory(
             project=project, user=staff_user, is_leader=True, role="supervising"
         )
@@ -330,6 +330,29 @@ class TestBusinessAreasProblematicProjects:
         assert len(response.data["no_leader"]) == 0
         assert len(response.data["external_leader"]) == 0
         assert len(response.data["multiple_leads"]) == 0
+
+    @pytest.mark.django_db
+    @pytest.mark.integration
+    def test_completed_projects_excluded(self, api_client):
+        """Completed/terminated projects are NOT flagged as problematic"""
+        user = UserFactory()
+        ba = BusinessAreaFactory(leader=user)
+        # Completed project with no members — should NOT appear
+        ProjectFactory(business_area=ba, members=[], status="completed")
+        # Terminated project with no members — should NOT appear
+        ProjectFactory(business_area=ba, members=[], status="terminated")
+        # New project with no members — SHOULD appear
+        ProjectFactory(business_area=ba, members=[], status="new")
+
+        api_client.force_authenticate(user=user)
+        response = api_client.get(
+            agencies_urls.path("business_areas", "problematic_projects"),
+            {"business_area_id": ba.pk},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        # Only the "new" project should appear (not completed/terminated)
+        assert len(response.data["no_members"]) == 1
 
 
 class TestCategoriseProjects:

@@ -9,6 +9,7 @@ from .admin import (
     RemedyMultipleLeaderProjects,
     RemedyNoLeaderProjects,
     RemedyOpenClosed,
+    RemedyRoleMismatch,
     UnapprovedThisFY,
 )
 from .areas import AreasForProject, ProjectAreaDetail, ProjectAreas
@@ -85,6 +86,7 @@ __all__ = [
     "RemedyNoLeaderProjects",
     "RemedyMultipleLeaderProjects",
     "RemedyExternalLeaderProjects",
+    "RemedyRoleMismatch",
     # Export
     "DownloadAllProjectsAsCSV",
     "DownloadARProjectsAsCSV",

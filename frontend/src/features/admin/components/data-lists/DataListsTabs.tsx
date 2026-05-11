@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useNavigate, useLocation } from "react-router";
 import {
 	Tabs,
 	TabsList,
@@ -20,18 +21,26 @@ import {
 	useProblematicProjects,
 } from "../../hooks/useDataLists";
 
-type TabValue = "unapproved-docs" | "problematic-projects";
+type TabValue = "unapproved" | "problematic";
+
+const TAB_PATHS: Record<TabValue, string> = {
+	unapproved: "/manage/data/unapproved",
+	problematic: "/manage/data/problematic",
+};
 
 /**
  * Tabbed interface for admin data lists.
- * Tabs are lazily loaded on first visit and retained to avoid re-fetching.
+ * Tabs are URL-routed so the active tab persists across navigation.
  * Each tab shows a count badge with the number of issues.
  */
 export const DataListsTabs = () => {
-	const [activeTab, setActiveTab] = useState<TabValue>("unapproved-docs");
-	const [loadedTabs, setLoadedTabs] = useState(
-		new Set<TabValue>(["unapproved-docs"])
-	);
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	// Determine active tab from URL path
+	const activeTab: TabValue = location.pathname.includes("/problematic")
+		? "problematic"
+		: "unapproved";
 
 	const { data: unapprovedDocs } = useUnapprovedDocs();
 	const { data: problematicData } = useProblematicProjects();
@@ -47,20 +56,14 @@ export const DataListsTabs = () => {
 
 	const handleTabChange = (value: string) => {
 		const tab = value as TabValue;
-		setLoadedTabs((prev) => {
-			if (prev.has(tab)) return prev;
-			const next = new Set(prev);
-			next.add(tab);
-			return next;
-		});
-		setActiveTab(tab);
+		navigate(TAB_PATHS[tab], { replace: true });
 	};
 
 	return (
 		<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
 			{/* Desktop tabs */}
 			<TabsList className="hidden w-full justify-start md:inline-flex">
-				<TabsTrigger value="unapproved-docs">
+				<TabsTrigger value="unapproved">
 					<span className="flex items-center gap-2">
 						Unapproved Docs
 						{unapprovedCount > 0 && (
@@ -70,7 +73,7 @@ export const DataListsTabs = () => {
 						)}
 					</span>
 				</TabsTrigger>
-				<TabsTrigger value="problematic-projects">
+				<TabsTrigger value="problematic">
 					<span className="flex items-center gap-2">
 						Problematic Projects
 						{problematicCount > 0 && (
@@ -89,21 +92,21 @@ export const DataListsTabs = () => {
 						<SelectValue placeholder="Select a tab" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="unapproved-docs">
+						<SelectItem value="unapproved">
 							Unapproved Docs ({unapprovedCount})
 						</SelectItem>
-						<SelectItem value="problematic-projects">
+						<SelectItem value="problematic">
 							Problematic Projects ({problematicCount})
 						</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>
 
-			<TabsContent value="unapproved-docs">
-				{loadedTabs.has("unapproved-docs") && <UnapprovedDocsTab />}
+			<TabsContent value="unapproved">
+				<UnapprovedDocsTab />
 			</TabsContent>
-			<TabsContent value="problematic-projects">
-				{loadedTabs.has("problematic-projects") && <ProblematicProjectsTab />}
+			<TabsContent value="problematic">
+				<ProblematicProjectsTab />
 			</TabsContent>
 		</Tabs>
 	);
