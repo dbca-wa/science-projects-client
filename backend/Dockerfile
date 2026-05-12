@@ -104,8 +104,9 @@ ENV TZ="Australia/Perth"
 # Install only runtime dependencies
 RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install -y \
     -o Acquire::Retries=4 --no-install-recommends \
-    curl ca-certificates \
+    curl ca-certificates wget \
     gdebi \
+    fontconfig fonts-dejavu-core \
     libgif7 \
     libwebp7 libwebpdemux2 \
     libavif15 \
@@ -118,8 +119,17 @@ RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy Prince XML from builder stage
-COPY --from=builder /usr/lib/prince /usr/lib/prince
+# Install Prince XML in production stage (ensures all files are in correct locations)
+RUN DEB_FILE=prince.deb \
+    && ARCH=$(dpkg --print-architecture) \
+    && if [ "$ARCH" = "arm64" ]; then \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.2-1_debian12_arm64.deb"; \
+    else \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.2-1_debian12_amd64.deb"; \
+    fi \
+    && wget -O ${DEB_FILE} $PRINCE_URL \
+    && yes | gdebi ${DEB_FILE} \
+    && rm -f ${DEB_FILE}
 ENV PATH="${PATH}:/usr/lib/prince/bin"
 
 # Copy Python packages from builder stage
@@ -167,8 +177,9 @@ RUN mkdir -p /usr/src/app/backend/staticfiles /usr/src/app/backend/media \
     && chown -R ${UID}:${GID} /usr/src/app \
     && chown -R ${UID}:${GID} /home/spmsuser
 
-# Delete non-commercial license of Prince (using configmap)
-RUN rm -f /usr/lib/prince/license/license.dat
+# Ensure fontconfig cache is writable by the app user
+RUN mkdir -p /home/spmsuser/.cache/fontconfig \
+    && chown -R ${UID}:${GID} /home/spmsuser/.cache
 
 # Add labels
 LABEL org.opencontainers.image.licenses="Proprietary"
