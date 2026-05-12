@@ -40,7 +40,7 @@ export function ProjectClosureModal({
 	isOpen,
 	onClose,
 	projectId,
-	projectKind: _projectKind,
+	projectKind,
 }: ProjectClosureModalProps) {
 	const [reason, setReason] = useState<string>("");
 
@@ -57,7 +57,7 @@ export function ProjectClosureModal({
 		},
 	});
 
-	const closeMutation = useCloseProject();
+	const closeMutation = useCloseProject(projectKind);
 
 	// eslint-disable-next-line react-hooks/incompatible-library
 	const outcome = watch("outcome");

@@ -29,14 +29,15 @@ const closeProject = async ({
 /**
  * Hook for closing a project
  */
-export const useCloseProject = () => {
+export const useCloseProject = (projectKind?: string) => {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	return useMutation({
 		mutationFn: closeProject,
 		onSuccess: async (_, variables) => {
-			toast.success("Closure requested");
+			const isScience = projectKind === "science";
+			toast.success(isScience ? "Closure requested" : "Project closed");
 
 			// Invalidate using predicate to match both string and number IDs
 			await queryClient.invalidateQueries({

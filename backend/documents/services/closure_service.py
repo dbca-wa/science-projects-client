@@ -16,7 +16,11 @@ class ClosureService:
     @transaction.atomic
     def create_closure(user, project, data):
         """
-        Create project closure document
+        Create project closure document.
+
+        For science projects: creates closure doc, sets project to closure_requested.
+        For all other kinds (student, external, core_function): creates closure doc,
+        immediately approves it at all levels, and sets project to the intended outcome.
 
         Args:
             user: User creating the closure
@@ -24,9 +28,11 @@ class ClosureService:
             data: Closure data (reason, intended_outcome, etc.)
 
         Returns:
-            ProjectClosure instance
+            ProjectDocument instance
         """
-        from ..models import ProjectClosure
+        from projects.models import Project
+
+        from ..models import ProjectClosure, ProjectDocument
 
         settings.LOGGER.info(f"{user} is creating closure for project {project}")
 
@@ -42,22 +48,50 @@ class ClosureService:
         }
 
         # Add optional fields if provided
+        intended_outcome = None
         if data:
             if "reason" in data:
                 closure_data["reason"] = data["reason"]
             if "intended_outcome" in data or "outcome" in data:
-                # Support both 'intended_outcome' and 'outcome' field names
-                closure_data["intended_outcome"] = data.get(
-                    "intended_outcome", data.get("outcome")
-                )
+                intended_outcome = data.get("intended_outcome", data.get("outcome"))
+                closure_data["intended_outcome"] = intended_outcome
 
         ProjectClosure.objects.create(**closure_data)
 
-        # Update project status to closure_requested
-        project.status = "closure_requested"
-        project.save()
+        # Science projects require full approval workflow
+        if project.kind == Project.CategoryKindChoices.SCIENCE:
+            project.status = Project.StatusChoices.CLOSUREREQ
+            project.save()
+            settings.LOGGER.info(
+                f"Science project {project} status changed to closure_requested"
+            )
+        else:
+            # Non-science projects: immediate approval and closure
+            document.project_lead_approval_granted = True
+            document.business_area_lead_approval_granted = True
+            document.directorate_approval_granted = True
+            document.status = ProjectDocument.StatusChoices.APPROVED
+            document.save()
 
-        settings.LOGGER.info(f"Project {project} status changed to closure_requested")
+            # Set project to the intended outcome status
+            if intended_outcome == "terminated":
+                project.status = Project.StatusChoices.TERMINATED
+            else:
+                project.status = Project.StatusChoices.COMPLETED
+            project.save()
+
+            settings.LOGGER.info(
+                f"Non-science project {project} immediately closed "
+                f"(status: {project.status})"
+            )
+
+            # Send closure notification
+            try:
+                NotificationService.notify_project_closed(project, user)
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send closure notification: {e}", exc_info=True
+                )
 
         return document
 
