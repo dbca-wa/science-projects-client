@@ -30,9 +30,9 @@ ENV PATH="${PATH}:/etc/poetry/bin"
 RUN DEB_FILE=prince.deb \
     && ARCH=$(dpkg --print-architecture) \
     && if [ "$ARCH" = "arm64" ]; then \
-    PRINCE_URL="https://www.princexml.com/download/prince_16.1-1_debian12_arm64.deb"; \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.2-1_debian12_arm64.deb"; \
     else \
-    PRINCE_URL="https://www.princexml.com/download/prince_16.1-1_debian12_amd64.deb"; \
+    PRINCE_URL="https://www.princexml.com/download/prince_16.2-1_debian12_amd64.deb"; \
     fi \
     && wget -O ${DEB_FILE} $PRINCE_URL \
     && yes | gdebi ${DEB_FILE} \
@@ -107,6 +107,8 @@ RUN echo "Installing Runtime Dependencies." && apt-get update && apt-get install
     curl ca-certificates \
     gdebi \
     libgif7 \
+    libwebp7 libwebpdemux2 \
+    libavif15 \
     postgresql-client \
     && apt-get upgrade -y \
     && apt-get clean \
