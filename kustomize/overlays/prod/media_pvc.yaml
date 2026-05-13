@@ -10,3 +10,41 @@ spec:
   resources:
     requests:
       storage: 16Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: blob.csi.azure.com
+  name: pv-spms-media-data-blob
+spec:
+  capacity:
+    storage: 16Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azureblob-fuse-retain
+  mountOptions:
+    - -o allow_other
+    - --file-cache-timeout-in-seconds=120
+  csi:
+    driver: blob.csi.azure.com
+    volumeHandle: bcsspms_spms-website-prod
+    volumeAttributes:
+      storageAccount: bcsspms
+      containerName: spms-website-prod
+    nodeStageSecretRef:
+      name: spms-azure-storage-secret-prod
+      namespace: spms
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-spms-media-data-blob
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 16Gi
+  volumeName: pv-spms-media-data-blob-prod
+  storageClassName: azureblob-fuse-retain
