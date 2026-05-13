@@ -1,65 +1,83 @@
 """
-Utility functions for detecting and processing @mentions in comments
+Utility functions for detecting and processing @mentions in comments.
+
+Mentions are extracted from the HTML stored in comment.text by parsing
+data-user-id attributes on Lexical mention spans. This is reliable
+regardless of name format (hyphenated, "Mc" prefixes, multi-word, etc.).
 """
 
-import re
 from typing import List
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 
 from users.models import User
 
 
-def extract_mentions(text: str) -> List[str]:
+def extract_mention_user_ids(html_text: str) -> List[int]:
     """
-    Extract @mention full names from comment text
+    Extract unique user IDs from mention spans in comment HTML.
 
-    Matches patterns like:
-    - @John Smith
-    - @Jane Doe
-    - @Bob Johnson
+    The frontend (Lexical editor) renders mentions as:
+        <span data-lexical-mention="true" data-user-id="123"
+              data-display-name="Rory McDonald">@Rory McDonald</span>
 
-    Format: @FirstName LastName (space-separated)
+    This function parses the HTML and extracts all data-user-id values,
+    returning a deduplicated list of integer user IDs.
 
     Args:
-        text: Comment text content
+        html_text: Raw HTML comment content from the Lexical editor.
 
     Returns:
-        List of mentioned full names (without @ symbol)
+        Deduplicated list of user IDs found in mention spans.
     """
-    # Pattern matches @ followed by two words (first and last name)
-    # Each word starts with uppercase letter followed by lowercase letters
-    pattern = r"@([A-Z][a-z]+\s[A-Z][a-z]+)"
-    matches = re.findall(pattern, text)
+    if not html_text:
+        return []
 
-    # Remove duplicates while preserving order
+    try:
+        soup = BeautifulSoup(html_text, "html.parser")
+    except Exception as e:
+        settings.LOGGER.error(f"Failed to parse comment HTML for mentions: {e}")
+        return []
+
+    mention_spans = soup.find_all("span", attrs={"data-lexical-mention": "true"})
+
     seen = set()
-    unique_mentions = []
-    for match in matches:
-        if match.lower() not in seen:
-            seen.add(match.lower())
-            unique_mentions.append(match)
+    user_ids = []
 
-    return unique_mentions
+    for span in mention_spans:
+        raw_id = span.get("data-user-id")
+        if not raw_id:
+            continue
+
+        try:
+            uid = int(raw_id)
+        except (ValueError, TypeError):
+            settings.LOGGER.warning(
+                f"Invalid data-user-id value in mention span: {raw_id}"
+            )
+            continue
+
+        if uid not in seen:
+            seen.add(uid)
+            user_ids.append(uid)
+
+    return user_ids
 
 
-def validate_mentioned_users(full_names: List[str], project_id: int) -> List[User]:
+def validate_mentioned_users_by_id(user_ids: List[int], project_id: int) -> List[User]:
     """
-    Validate that mentioned users exist and are part of the project team
-
-    Project team includes:
-    - Project team members
-    - Business area leads
-    - Administrators
+    Validate that mentioned users exist, are active staff, and are
+    mentionable in the given project.
 
     Args:
-        full_names: List of full names (FirstName LastName) to validate
-        project_id: Project ID to check team membership
+        user_ids: Deduplicated list of user PKs from mention spans.
+        project_id: Project ID to check team membership.
 
     Returns:
-        List of valid User objects
+        List of valid, mentionable User objects.
     """
-    if not full_names:
+    if not user_ids:
         return []
 
     from projects.models import Project
@@ -72,39 +90,29 @@ def validate_mentioned_users(full_names: List[str], project_id: int) -> List[Use
         )
         return []
 
-    # Get all valid users for this project
     valid_users = []
 
-    for full_name in full_names:
+    for uid in user_ids:
         try:
-            # Split full name into first and last name
-            name_parts = full_name.split(" ", 1)
-            if len(name_parts) != 2:
-                settings.LOGGER.info(f"Invalid name format: {full_name}")
-                continue
-
-            first_name, last_name = name_parts
-
-            # Try to find user by display names (case-insensitive)
-            user = User.objects.filter(
-                display_first_name__iexact=first_name,
-                display_last_name__iexact=last_name,
-            ).first()
-
-            if not user:
-                settings.LOGGER.info(f"User {full_name} not found for mention")
-                continue
-
-            # Check if user is part of project team, BA lead, or admin
-            if is_user_mentionable(user, project):
-                valid_users.append(user)
-            else:
-                settings.LOGGER.info(
-                    f"User {full_name} not mentionable in project {project_id}"
-                )
-        except Exception as e:
-            settings.LOGGER.error(f"Error validating mention for {full_name}: {e}")
+            user = User.objects.get(pk=uid)
+        except User.DoesNotExist:
+            settings.LOGGER.info(f"Mentioned user ID {uid} not found in database")
             continue
+
+        if not user.is_active or not user.is_staff:
+            full_name = f"{user.display_first_name} {user.display_last_name}"
+            settings.LOGGER.info(
+                f"User {full_name} (ID {uid}) is inactive or not staff, skipping mention"
+            )
+            continue
+
+        if is_user_mentionable(user, project):
+            valid_users.append(user)
+        else:
+            full_name = f"{user.display_first_name} {user.display_last_name}"
+            settings.LOGGER.info(
+                f"User {full_name} (ID {uid}) not mentionable in project {project_id}"
+            )
 
     return valid_users
 
@@ -172,28 +180,28 @@ def create_mention_records(comment, mentioned_users: List[User]) -> None:
 
 def process_comment_mentions(comment) -> List[User]:
     """
-    Process mentions in a comment
+    Process mentions in a comment.
 
-    Extracts mentions in @FirstName LastName format, validates users,
-    and creates CommentMention records.
+    Parses the comment HTML to extract user IDs from Lexical mention spans,
+    validates users against the project team, and creates CommentMention records.
 
     Args:
-        comment: Comment instance
+        comment: Comment instance (must have .text and .document.project_id)
 
     Returns:
-        List of mentioned User objects
+        List of mentioned User objects that were validated and recorded.
     """
-    # Extract mentions from comment text
-    full_names = extract_mentions(comment.text)
+    # Extract user IDs from mention spans in the HTML
+    user_ids = extract_mention_user_ids(comment.text)
 
-    if not full_names:
+    if not user_ids:
         return []
 
     # Get project ID from comment's document
     project_id = comment.document.project_id
 
     # Validate mentioned users
-    valid_users = validate_mentioned_users(full_names, project_id)
+    valid_users = validate_mentioned_users_by_id(user_ids, project_id)
 
     if not valid_users:
         return []
