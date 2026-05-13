@@ -6,6 +6,10 @@ secretGenerator:
     type: Opaque
     envs:
       - .env
+  - name: spms-azure-storage-secret
+    type: Opaque
+    envs:
+      - .env.azurestorageaccount
 configMapGenerator:
   - name: prince2-license
     files:

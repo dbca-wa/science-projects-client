@@ -10,7 +10,7 @@ spec:
       containers:
         - name: spms-backend
           image: ghcr.io/dbca-wa/science-projects-backend
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: 'Australia/Perth'
@@ -34,7 +34,7 @@ spec:
               name: tmpfs-ram-backend
         - name: spms-frontend
           image: ghcr.io/dbca-wa/science-projects-frontend
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: 'Australia/Perth'

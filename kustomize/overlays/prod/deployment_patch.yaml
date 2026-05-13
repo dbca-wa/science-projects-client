@@ -26,16 +26,25 @@ spec:
               name: spms-media-prod
       containers:
         - name: spms-backend
-          imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
                 name: spms-env-prod
           volumeMounts:
-            - mountPath: /usr/src/app/backend/files
-              name: spms-media-prod
-        - name: spms-frontend
-          imagePullPolicy: IfNotPresent
+            - name: spms-media-prod
+              mountPath: /usr/src/app/backend/files
+            - name: spms-media-blob-prod
+              mountPath: /mnt/container
+            - name: prince2-license-prod
+              mountPath: /usr/lib/prince/license
+              readOnly: true
       volumes:
         - name: spms-media-prod
           persistentVolumeClaim:
             claimName: spms-media-data-prod
+        - name: spms-media-blob-prod
+          persistentVolumeClaim:
+            claimName: pvc-spms-media-data-blob-prod
+        - name: prince2-license-prod
+          configMap:
+            defaultMode: 420
+            name: prince2-license-prod
