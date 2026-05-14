@@ -92,10 +92,10 @@ const CATEGORIES: CategoryConfig[] = [
 	},
 	{
 		key: "role_mismatch",
-		label: "Projects with Supervising Role but No Leader Flag",
+		label: "Projects with Role/Leader Mismatch",
 		actionType: "remedy",
 		remedyDescription:
-			"Members with the supervising role but without is_leader=True will be corrected. If no other leader exists, the best candidate will be promoted. Otherwise, their role will be changed to Research Scientist.",
+			"Fixes mismatches between the is_leader flag and the supervising role. Leaders without the supervising role will get it assigned. Members with the supervising role but without is_leader will be demoted (if another leader exists) or promoted to leader.",
 	},
 ];
 

@@ -140,13 +140,23 @@ class ProblematicProjects(APIView):
             business_area__isnull=True,
         ).prefetch_related("members")
 
-        # Projects with role=supervising but is_leader=False (role mismatch)
+        # Projects with role mismatch between is_leader flag and role field:
+        # Case 1: role=supervising but is_leader=False
+        # Case 2: is_leader=True but role != supervising
+        supervising_not_leader = Project.objects.filter(
+            status__in=active_statuses,
+            members__role=ProjectMember.RoleChoices.SUPERVISING,
+            members__is_leader=False,
+        )
+        leader_not_supervising = Project.objects.filter(
+            status__in=active_statuses,
+            members__is_leader=True,
+        ).exclude(
+            members__is_leader=True,
+            members__role=ProjectMember.RoleChoices.SUPERVISING,
+        )
         role_mismatch = (
-            Project.objects.filter(
-                status__in=active_statuses,
-                members__role=ProjectMember.RoleChoices.SUPERVISING,
-                members__is_leader=False,
-            )
+            (supervising_not_leader | leader_not_supervising)
             .select_related("business_area")
             .prefetch_related("members", "members__user")
             .distinct()
@@ -924,18 +934,29 @@ class RemedyExternalLeaderProjects(APIView):
 
 
 class RemedyRoleMismatch(APIView):
-    """Projects with members who have role=supervising but is_leader=False"""
+    """Projects with role/is_leader mismatch"""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """Get projects with supervising role but no is_leader flag"""
+        """Get projects with role mismatch:
+        - Members with role=supervising but is_leader=False
+        - Members with is_leader=True but role != supervising
+        """
+        supervising_not_leader = Project.objects.filter(
+            status__in=Project.ACTIVE_ONLY,
+            members__role=ProjectMember.RoleChoices.SUPERVISING,
+            members__is_leader=False,
+        )
+        leader_not_supervising = Project.objects.filter(
+            status__in=Project.ACTIVE_ONLY,
+            members__is_leader=True,
+        ).exclude(
+            members__is_leader=True,
+            members__role=ProjectMember.RoleChoices.SUPERVISING,
+        )
         projects = (
-            Project.objects.filter(
-                status__in=Project.ACTIVE_ONLY,
-                members__role=ProjectMember.RoleChoices.SUPERVISING,
-                members__is_leader=False,
-            )
+            (supervising_not_leader | leader_not_supervising)
             .select_related(
                 "business_area",
                 "business_area__division",
@@ -1013,8 +1034,24 @@ class RemedyRoleMismatch(APIView):
                     )
                 )
 
-                if not mismatched:
+                # Find leaders without supervising role
+                leaders_wrong_role = list(
+                    members.filter(is_leader=True).exclude(
+                        role=ProjectMember.RoleChoices.SUPERVISING
+                    )
+                )
+
+                if not mismatched and not leaders_wrong_role:
                     skipped += 1
+                    continue
+
+                # Fix leaders with wrong role — set to supervising
+                for mem in leaders_wrong_role:
+                    mem.role = ProjectMember.RoleChoices.SUPERVISING
+                    mem.save()
+
+                if not mismatched:
+                    successful += 1
                     continue
 
                 # Check if there's already a valid leader

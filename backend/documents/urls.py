@@ -6,6 +6,7 @@ urlpatterns = [
     # Reports ========================================================
     path("reports", views.Reports.as_view()),
     path("reports/<int:pk>", views.ReportDetail.as_view()),
+    path("reports/<int:pk>/delete-preview", views.ReportDeletePreview.as_view()),
     path("reports/download/<int:pk>", views.DownloadAnnualReport.as_view()),
     path("reports/latestyear", views.GetLatestReportYear.as_view()),
     path(

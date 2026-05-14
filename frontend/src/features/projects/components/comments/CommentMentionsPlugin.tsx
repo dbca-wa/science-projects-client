@@ -164,9 +164,9 @@ export const CommentMentionsPlugin = ({
 						return;
 					}
 
-					// Find the @ position — we need to delete from @ (or space before @) to cursor
+					// Find the @ position — we need to delete from @ to cursor
 					const atIndex = textBeforeCursor.lastIndexOf("@");
-					const deleteFrom = atIndex > 0 ? atIndex - 1 : atIndex;
+					const deleteFrom = atIndex;
 					const deleteCount = textBeforeCursor.length - deleteFrom;
 
 					// Use Lexical's selection API to select and delete the mention text

@@ -201,6 +201,31 @@ class ReportDetail(APIView):
         return Response(status=HTTP_204_NO_CONTENT)
 
 
+class ReportDeletePreview(APIView):
+    """Preview what will be deleted when an annual report is removed"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        """Get counts of associated documents that will be cascade-deleted"""
+        try:
+            report = AnnualReport.objects.get(pk=pk)
+        except AnnualReport.DoesNotExist:
+            raise NotFound
+
+        progress_count = ProgressReport.objects.filter(report=report).count()
+        student_count = StudentReport.objects.filter(report=report).count()
+
+        return Response(
+            {
+                "progress_reports": progress_count,
+                "student_reports": student_count,
+                "total_documents": progress_count + student_count,
+            },
+            status=HTTP_200_OK,
+        )
+
+
 class GetLatestReportYear(APIView):
     """Get the latest annual report year"""
 

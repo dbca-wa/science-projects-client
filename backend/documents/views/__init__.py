@@ -37,6 +37,7 @@ from .annual_report import (  # BeginAnnualReportDocGeneration,  # Removed dupli
     LatestYearsProgressReports,
     LatestYearsStudentReports,
     PublishReportPDF,
+    ReportDeletePreview,
     ReportDetail,
     Reports,
 )
@@ -175,6 +176,7 @@ __all__ = [
     # Annual report
     "Reports",
     "ReportDetail",
+    "ReportDeletePreview",
     "GetLatestReportYear",
     "GetAvailableReportYearsForStudentReport",
     "GetAvailableReportYearsForProgressReport",

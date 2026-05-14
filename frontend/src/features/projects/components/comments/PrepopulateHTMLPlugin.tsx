@@ -55,9 +55,9 @@ export const PrepopulateHTMLPlugin = ({ html }: PrepopulateHTMLPluginProps) => {
  */
 function processNode(domNode: Node, lexicalParent: ElementNode) {
 	if (domNode.nodeType === Node.TEXT_NODE) {
-		// Text node
+		// Text node — preserve spaces between inline elements (e.g. mentions)
 		const text = domNode.textContent || "";
-		if (text.trim()) {
+		if (text) {
 			const textNode = $createTextNode(text);
 			lexicalParent.append(textNode);
 		}

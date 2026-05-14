@@ -8,9 +8,9 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select";
 import { CrudListLayout } from "../shared/CrudListLayout";
-import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
 import { UserIdCell } from "../shared/UserIdCell";
 import { ReportInfoForm } from "./ReportInfoForm";
+import { DeleteAnnualReportDialog } from "./DeleteAnnualReportDialog";
 import { useReportInfo, useDeleteReportInfo } from "../../hooks/useReportInfo";
 import { useDivisions } from "../../hooks/useDivisions";
 import { DivisionSelectItems } from "@/shared/components/DivisionSelectItems";
@@ -149,12 +149,12 @@ export const ReportInfoList = () => {
 				report={editingItem}
 			/>
 
-			<DeleteConfirmDialog
+			<DeleteAnnualReportDialog
 				open={!!deleteTarget}
 				onOpenChange={(open) => {
 					if (!open) setDeleteTarget(null);
 				}}
-				entityName="report info"
+				report={deleteTarget}
 				onConfirm={handleDeleteConfirm}
 				isPending={deleteMutation.isPending}
 			/>
