@@ -6,7 +6,8 @@ import type { IProjectMember } from "@/shared/types/project.types";
 function createMockMember(
 	firstName: string | null,
 	lastName: string | null,
-	position: number
+	position: number,
+	isLeader = false
 ): IProjectMember {
 	return {
 		id: 1,
@@ -37,7 +38,7 @@ function createMockMember(
 		role: "Research Scientist",
 		short_code: null,
 		time_allocation: 0,
-		is_leader: false,
+		is_leader: isLeader,
 		affiliation: { id: 1, name: "Test Affiliation" },
 	};
 }
@@ -119,5 +120,26 @@ describe("formatAuthors", () => {
 	it("should handle long names", () => {
 		const members = [createMockMember("Christopher", "Montgomery-Smith", 0)];
 		expect(formatAuthors(members)).toBe("C. Montgomery-Smith");
+	});
+
+	it("should always show leader first regardless of position value", () => {
+		const members = [
+			createMockMember("Alice", "Johnson", 2),
+			createMockMember("Bob", "Prince", 5, true), // Leader with higher position
+			createMockMember("Charlie", "Smith", 3),
+		];
+		expect(formatAuthors(members)).toBe("B. Prince, A. Johnson, C. Smith");
+	});
+
+	it("should sort non-leaders by position after leader", () => {
+		const members = [
+			createMockMember("Charlie", "Smith", 4),
+			createMockMember("Bob", "Prince", 1, true),
+			createMockMember("Alice", "Johnson", 2),
+			createMockMember("Dave", "Williams", 3),
+		];
+		expect(formatAuthors(members)).toBe(
+			"B. Prince, A. Johnson, D. Williams, C. Smith"
+		);
 	});
 });

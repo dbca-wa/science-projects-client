@@ -19,6 +19,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { Button } from "@/shared/components/ui/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import type {
 	IProjectData,
 	IProjectDocuments,
@@ -27,6 +32,10 @@ import type {
 import type { IUserMe } from "@/shared/types/user.types";
 import { canEditProject } from "@/features/projects/utils/permissions";
 import { isDocumentTypeAllowed } from "@/shared/constants/allowedDocumentTypes";
+import {
+	isProjectProtected,
+	PROTECTED_TOOLTIP,
+} from "@/shared/utils/project-protection.utils";
 
 interface ProjectActionsDropdownProps {
 	project: IProjectData;
@@ -108,6 +117,9 @@ export const ProjectActionsDropdown = ({
 		return null;
 	}
 
+	// Check if project is in a protected (closed) state
+	const isProtected = isProjectProtected(project.status);
+
 	// Check if project is suspended
 	const isSuspended = project.status === "suspended";
 
@@ -133,7 +145,12 @@ export const ProjectActionsDropdown = ({
 			?.business_area_lead_approval_granted === true &&
 		documents?.project_closure?.document?.directorate_approval_granted === true;
 
-	const canReopen = hasClosureDocument && isReopenableStatus && closureApproved;
+	// Can reopen if closure document exists and project is in a reopenable status
+	// For closure_requested, the closure may not be fully approved yet but reopen is still valid
+	const canReopen =
+		hasClosureDocument &&
+		isReopenableStatus &&
+		(closureApproved || project.status === "closure_requested");
 	const canClose = !hasClosureDocument && !isReopenableStatus;
 
 	// Check if concept plan can be created
@@ -179,41 +196,81 @@ export const ProjectActionsDropdown = ({
 						<>
 							{/* Create Student Report - Only for student projects */}
 							{canCreateStudentReport && onCreateStudentReport && (
-								<DropdownMenuItem
-									onClick={onCreateStudentReport}
-									className={isSuspended ? "opacity-50 cursor-not-allowed" : ""}
-								>
-									<FileText className="mr-2 h-4 w-4" />
-									<span>Create Student Report</span>
-								</DropdownMenuItem>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="w-full">
+											<DropdownMenuItem
+												onClick={
+													isProtected || isSuspended
+														? undefined
+														: onCreateStudentReport
+												}
+												className={
+													isProtected || isSuspended
+														? "opacity-50 cursor-not-allowed"
+														: ""
+												}
+											>
+												<FileText className="mr-2 h-4 w-4" />
+												<span>Create Student Report</span>
+											</DropdownMenuItem>
+										</span>
+									</TooltipTrigger>
+									{isProtected && (
+										<TooltipContent>{PROTECTED_TOOLTIP}</TooltipContent>
+									)}
+								</Tooltip>
 							)}
 
 							{/* Create Concept Plan - Only for science/core_function without existing concept plan */}
 							{canCreateConceptPlan && onCreateConceptPlan && (
-								<DropdownMenuItem onClick={onCreateConceptPlan}>
-									<FileText className="mr-2 h-4 w-4" />
-									<span>Create Concept Plan</span>
-								</DropdownMenuItem>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="w-full">
+											<DropdownMenuItem
+												onClick={isProtected ? undefined : onCreateConceptPlan}
+												className={
+													isProtected ? "opacity-50 cursor-not-allowed" : ""
+												}
+											>
+												<FileText className="mr-2 h-4 w-4" />
+												<span>Create Concept Plan</span>
+											</DropdownMenuItem>
+										</span>
+									</TooltipTrigger>
+									{isProtected && (
+										<TooltipContent>{PROTECTED_TOOLTIP}</TooltipContent>
+									)}
+								</Tooltip>
 							)}
 
 							{/* Create Progress Report - Only for kinds that allow progress reports */}
 							{isDocumentTypeAllowed(project.kind, "progressreport") &&
 								onCreateProgressReport && (
-									<DropdownMenuItem
-										onClick={
-											canCreateProgressReport
-												? onCreateProgressReport
-												: undefined
-										}
-										className={
-											!canCreateProgressReport
-												? "opacity-50 cursor-not-allowed"
-												: ""
-										}
-									>
-										<FileText className="mr-2 h-4 w-4" />
-										<span>Create Progress Report</span>
-									</DropdownMenuItem>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<span className="w-full">
+												<DropdownMenuItem
+													onClick={
+														canCreateProgressReport && !isProtected
+															? onCreateProgressReport
+															: undefined
+													}
+													className={
+														!canCreateProgressReport || isProtected
+															? "opacity-50 cursor-not-allowed"
+															: ""
+													}
+												>
+													<FileText className="mr-2 h-4 w-4" />
+													<span>Create Progress Report</span>
+												</DropdownMenuItem>
+											</span>
+										</TooltipTrigger>
+										{isProtected && (
+											<TooltipContent>{PROTECTED_TOOLTIP}</TooltipContent>
+										)}
+									</Tooltip>
 								)}
 
 							<DropdownMenuSeparator />
@@ -244,7 +301,12 @@ export const ProjectActionsDropdown = ({
 					{isDocumentTypeAllowed(project.kind, "projectclosure") &&
 						canClose &&
 						onCloseProject && (
-							<DropdownMenuItem onClick={onCloseProject}>
+							<DropdownMenuItem
+								onClick={isTerminalStatus ? undefined : onCloseProject}
+								className={
+									isTerminalStatus ? "opacity-50 cursor-not-allowed" : ""
+								}
+							>
 								<XCircle className="mr-2 h-4 w-4" />
 								<span>Close Project</span>
 							</DropdownMenuItem>
@@ -258,11 +320,16 @@ export const ProjectActionsDropdown = ({
 						</DropdownMenuItem>
 					)}
 
-					{/* Set Status - Superuser only */}
+					{/* Set Status - Superuser only, disabled when fully closed */}
 					{currentUser?.is_superuser && onSetStatus && (
 						<>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={onSetStatus}>
+							<DropdownMenuItem
+								onClick={isTerminalStatus ? undefined : onSetStatus}
+								className={
+									isTerminalStatus ? "opacity-50 cursor-not-allowed" : ""
+								}
+							>
 								<Settings className="mr-2 h-4 w-4" />
 								<span>Set Status</span>
 							</DropdownMenuItem>

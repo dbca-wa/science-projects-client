@@ -58,6 +58,10 @@ def handle_comment_created(sender, instance, created, **kwargs):
 
         # Send mention notifications
         if mentioned_users:
+            settings.LOGGER.info(
+                f"Comment {instance.pk}: sending mention notifications to "
+                f"{len(mentioned_users)} user(s)"
+            )
             for mentioned_user in mentioned_users:
                 try:
                     commenter_data = {
@@ -78,14 +82,14 @@ def handle_comment_created(sender, instance, created, **kwargs):
                         comment_content=instance.text,
                     )
                     settings.LOGGER.info(
-                        f"Sent mention notification to {mentioned_user.get_full_name()} "
-                        f"for comment {instance.pk}"
+                        f"Comment {instance.pk}: mention email sent to "
+                        f"{mentioned_user.get_full_name()} ({mentioned_user.email})"
                     )
                 except Exception as e:
                     # Log error but don't fail comment creation
                     settings.LOGGER.error(
-                        f"Failed to send mention notification to "
-                        f"{mentioned_user.get_full_name()}: {e}"
+                        f"Comment {instance.pk}: failed to send mention notification to "
+                        f"{mentioned_user.get_full_name()} ({mentioned_user.email}): {e}"
                     )
 
         # Blanket team notifications disabled — only @mentioned users should

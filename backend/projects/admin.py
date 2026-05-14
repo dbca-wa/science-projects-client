@@ -177,6 +177,197 @@ def report_orphaned_data(model_admin, req, selected):
 # region ADMIN CLASSES ==============================================
 
 
+@admin.action(description="⚡ Reconcile project closures (select any 1 project)")
+def fix_closed_project_documents(model_admin, req, selected):
+    """
+    Reconciles project closure consistency. Three operations, in this order:
+
+    1. For ANY project with a fully-approved closure whose intended_outcome is
+       completed/terminated and the project status doesn't match → set the
+       project status to that intended outcome.
+
+    2. For projects in completed or terminated status with NO closure →
+       create a fully-approved closure document (intended_outcome = current status).
+
+    3. For projects in completed or terminated status with an existing closure
+       that is NOT fully approved → fully approve that closure.
+
+    Strictly limited to:
+    - Only touches the project closure document, never any other document type
+    - Steps 2 and 3 only target projects already in completed/terminated status
+    - Does NOT touch suspended or closure_requested projects in steps 2/3
+    """
+    from django.db import transaction
+
+    from documents.models import ProjectClosure, ProjectDocument
+
+    statuses_synced = 0
+    closures_created = 0
+    closures_approved = 0
+    errors = []
+
+    closed_statuses = [
+        Project.StatusChoices.COMPLETED,
+        Project.StatusChoices.TERMINATED,
+    ]
+    approved_status = ProjectDocument.StatusChoices.APPROVED
+    closure_kind = ProjectDocument.CategoryKindChoices.PROJECTCLOSURE
+
+    # ─── Step 1: Sync project status from fully-approved closures ──────────
+    # Fetch closure documents (with their detail and project) where:
+    #   - closure is fully approved
+    #   - project status is NOT already completed/terminated
+    # Then filter in Python by intended_outcome (since it lives on the
+    # related ProjectClosure model and we need to read the value).
+    approved_closures = (
+        ProjectDocument.objects.filter(
+            kind=closure_kind,
+            project_lead_approval_granted=True,
+            business_area_lead_approval_granted=True,
+            directorate_approval_granted=True,
+            status=approved_status,
+        )
+        .exclude(project__status__in=closed_statuses)
+        .select_related("project")
+        .prefetch_related("project_closure_details")
+    )
+
+    project_status_updates = []
+    seen_project_pks = set()
+    for closure_doc in approved_closures:
+        project = closure_doc.project
+        if project.pk in seen_project_pks:
+            continue  # Defensive: skip if a project somehow has multiple closures
+
+        try:
+            closure_detail = next(iter(closure_doc.project_closure_details.all()), None)
+            if not closure_detail or not closure_detail.intended_outcome:
+                continue
+
+            intended = closure_detail.intended_outcome
+            if intended in closed_statuses and project.status != intended:
+                project.status = intended
+                project_status_updates.append(project)
+                seen_project_pks.add(project.pk)
+        except Exception as e:
+            errors.append(f"[{project.pk}] Step 1 error: {str(e)}")
+
+    if project_status_updates:
+        try:
+            with transaction.atomic():
+                Project.objects.bulk_update(project_status_updates, ["status"])
+                statuses_synced = len(project_status_updates)
+        except Exception as e:
+            errors.append(f"Step 1 bulk_update error: {str(e)}")
+
+    # ─── Step 2: Create closures for completed/terminated projects without one ─
+    # Single query: closed projects that lack a closure document.
+    targets_no_closure = list(
+        Project.objects.filter(status__in=closed_statuses)
+        .exclude(documents__kind=closure_kind)
+        .only("pk", "status")
+    )
+
+    if targets_no_closure:
+        new_closure_docs = []
+        for project in targets_no_closure:
+            new_closure_docs.append(
+                ProjectDocument(
+                    project=project,
+                    kind=closure_kind,
+                    status=approved_status,
+                    project_lead_approval_granted=True,
+                    business_area_lead_approval_granted=True,
+                    directorate_approval_granted=True,
+                    creator=req.user,
+                    modifier=req.user,
+                )
+            )
+
+        try:
+            with transaction.atomic():
+                # bulk_create returns objects with primary keys set on Postgres
+                created_docs = ProjectDocument.objects.bulk_create(new_closure_docs)
+
+                # Build the matching ProjectClosure detail records
+                closure_details = []
+                project_by_pk = {p.pk: p for p in targets_no_closure}
+                for doc in created_docs:
+                    project = project_by_pk.get(doc.project_id)
+                    if project is None:
+                        continue
+                    closure_details.append(
+                        ProjectClosure(
+                            document=doc,
+                            project=project,
+                            intended_outcome=project.status,
+                        )
+                    )
+                ProjectClosure.objects.bulk_create(closure_details)
+                closures_created = len(created_docs)
+        except Exception as e:
+            errors.append(f"Step 2 bulk_create error: {str(e)}")
+
+    # ─── Step 3: Approve closures on completed/terminated projects ──────────
+    # Find closures that exist on completed/terminated projects but aren't
+    # fully approved. Use a single bulk_update.
+    unapproved_closures = list(
+        ProjectDocument.objects.filter(
+            kind=closure_kind,
+            project__status__in=closed_statuses,
+        )
+        .exclude(
+            project_lead_approval_granted=True,
+            business_area_lead_approval_granted=True,
+            directorate_approval_granted=True,
+            status=approved_status,
+        )
+        .select_related("project")
+    )
+
+    if unapproved_closures:
+        for closure_doc in unapproved_closures:
+            closure_doc.project_lead_approval_granted = True
+            closure_doc.business_area_lead_approval_granted = True
+            closure_doc.directorate_approval_granted = True
+            closure_doc.status = approved_status
+
+        try:
+            with transaction.atomic():
+                ProjectDocument.objects.bulk_update(
+                    unapproved_closures,
+                    [
+                        "project_lead_approval_granted",
+                        "business_area_lead_approval_granted",
+                        "directorate_approval_granted",
+                        "status",
+                    ],
+                )
+                closures_approved = len(unapproved_closures)
+        except Exception as e:
+            errors.append(f"Step 3 bulk_update error: {str(e)}")
+
+    parts = []
+    if statuses_synced:
+        parts.append(
+            f"{statuses_synced} project statuses synced from approved closures"
+        )
+    if closures_created:
+        parts.append(f"{closures_created} closures created")
+    if closures_approved:
+        parts.append(f"{closures_approved} closures fully approved")
+    if not statuses_synced and not closures_created and not closures_approved:
+        parts.append("all clean — no changes needed")
+    if errors:
+        parts.append(f"{len(errors)} errors")
+
+    message = " | ".join(parts)
+    if errors:
+        message += f"\nErrors: {'; '.join(errors[:5])}"
+
+    model_admin.message_user(req, message, level="success" if not errors else "warning")
+
+
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     # kind = ProjectCategorySerializer()
@@ -203,6 +394,8 @@ class ProjectAdmin(admin.ModelAdmin):
     ]
 
     ordering = ["title"]
+
+    actions = [fix_closed_project_documents]
 
 
 @admin.register(ProjectArea)

@@ -6,7 +6,6 @@ interface UpdateEndorsementsData {
 	ae_endorsement_required: boolean;
 	ae_endorsement_provided: boolean;
 	aec_pdf?: File;
-	should_send_emails?: boolean;
 }
 
 const updateEndorsements = async (
@@ -15,7 +14,6 @@ const updateEndorsements = async (
 ): Promise<void> => {
 	const formData = new FormData();
 
-	// Only send the endorsement fields - backend doesn't use should_send_emails
 	formData.append(
 		"ae_endorsement_required",
 		String(data.ae_endorsement_required)
@@ -35,9 +33,7 @@ const updateEndorsements = async (
 		`documents/project_plans/${projectPlanId}/seek_endorsement`,
 		formData,
 		{
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
+			headers: { "Content-Type": undefined },
 		}
 	);
 };
@@ -48,12 +44,8 @@ export const useUpdateEndorsements = (projectPlanId: number) => {
 	return useMutation({
 		mutationFn: (data: UpdateEndorsementsData) =>
 			updateEndorsements(projectPlanId, data),
-		onSuccess: (_, variables) => {
-			const message = variables.should_send_emails
-				? "Endorsements updated and emails sent"
-				: "Endorsements updated successfully";
-			toast.success(message);
-			// Invalidate project query to refresh endorsements data
+		onSuccess: () => {
+			toast.success("Endorsements updated successfully");
 			queryClient.invalidateQueries({ queryKey: ["projects"] });
 		},
 		onError: (error: Error) => {

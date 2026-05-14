@@ -18,12 +18,13 @@ def extract_mention_user_ids(html_text: str) -> List[int]:
     """
     Extract unique user IDs from mention spans in comment HTML.
 
-    The frontend (Lexical editor) renders mentions as:
-        <span data-lexical-mention="true" data-user-id="123"
-              data-display-name="Rory McDonald">@Rory McDonald</span>
+    The frontend (Lexical editor) stores mentions as spans with data-user-id:
+        <span class="mention" data-user-id="1068"
+              data-display-name="Rory McAuley"
+              data-email="rory.mcauley@dbca.wa.gov.au">@Rory McAuley</span>
 
-    This function parses the HTML and extracts all data-user-id values,
-    returning a deduplicated list of integer user IDs.
+    This function finds ALL spans with a data-user-id attribute and extracts
+    the user IDs, returning a deduplicated list.
 
     Args:
         html_text: Raw HTML comment content from the Lexical editor.
@@ -40,7 +41,9 @@ def extract_mention_user_ids(html_text: str) -> List[int]:
         settings.LOGGER.error(f"Failed to parse comment HTML for mentions: {e}")
         return []
 
-    mention_spans = soup.find_all("span", attrs={"data-lexical-mention": "true"})
+    # Find spans by data-user-id attribute (the reliable identifier).
+    # This matches both class="mention" and data-lexical-mention="true" variants.
+    mention_spans = soup.find_all("span", attrs={"data-user-id": True})
 
     seen = set()
     user_ids = []
@@ -204,13 +207,21 @@ def process_comment_mentions(comment) -> List[User]:
     valid_users = validate_mentioned_users_by_id(user_ids, project_id)
 
     if not valid_users:
+        settings.LOGGER.info(
+            f"Comment {comment.pk}: {len(user_ids)} mention IDs extracted "
+            f"but none validated for project {project_id}"
+        )
         return []
 
     # Create mention records
     create_mention_records(comment, valid_users)
 
+    # Single summary log line with all mentioned names
+    names = ", ".join(
+        f"{u.display_first_name} {u.display_last_name} (ID {u.pk})" for u in valid_users
+    )
     settings.LOGGER.info(
-        f"Processed {len(valid_users)} mentions in comment {comment.pk}"
+        f"Comment {comment.pk}: {len(valid_users)} mention(s) processed — {names}"
     )
 
     return valid_users

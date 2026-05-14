@@ -33,13 +33,13 @@ export function formatAuthors(members: IProjectMember[]): string {
 		);
 	});
 
-	// Sort by position (ascending)
+	// Sort: leader first, then by position (ascending) — matches team management drag order
 	filteredMembers.sort((a, b) => {
-		const posA = a.position;
-		const posB = b.position;
-		if (posA < posB) return -1;
-		if (posA > posB) return 1;
-		return 0;
+		// Leader always first
+		if (a.is_leader && !b.is_leader) return -1;
+		if (!a.is_leader && b.is_leader) return 1;
+		// Otherwise sort by position
+		return a.position - b.position;
 	});
 
 	// Format as "F. LastName"

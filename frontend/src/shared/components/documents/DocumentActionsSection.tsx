@@ -3,7 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Download, FileText, Trash2, Bell, Lock } from "lucide-react";
+import {
+	Download,
+	FileText,
+	Trash2,
+	Bell,
+	Lock,
+	ShieldAlert,
+} from "lucide-react";
 import { useSendBump } from "@/shared/hooks/queries/useBumpEmails";
 import type { IMainDoc } from "@/shared/types/document.types";
 import type {
@@ -21,6 +28,10 @@ import { useCurrentUser } from "@/features/auth";
 import { isUserAtApprovalStage } from "@/shared/utils/project-permissions.utils";
 import { findProjectLeader } from "@/shared/utils/team.utils";
 import { isDocumentTypeAllowed } from "@/shared/constants/allowedDocumentTypes";
+import {
+	areDocumentActionsBlocked,
+	PROTECTED_TOOLTIP,
+} from "@/shared/utils/project-protection.utils";
 
 interface DocumentActionsSectionProps {
 	document: IMainDoc;
@@ -123,6 +134,9 @@ export const DocumentActionsSection = ({
 	onReopenProject,
 }: DocumentActionsSectionProps) => {
 	const { data: currentUser } = useCurrentUser();
+
+	// Check if the project is in a protected (closed) state
+	const isProtected = areDocumentActionsBlocked(project.status, documentType);
 
 	const approvalState = useMemo(() => getApprovalState(document), [document]);
 
@@ -384,12 +398,8 @@ export const DocumentActionsSection = ({
 	const canReopenProject = useMemo(() => {
 		if (documentType !== "projectclosure") return false;
 
-		const isProjectClosed =
-			project.status === "completed" ||
-			project.status === "terminated" ||
-			project.status === "suspended";
-
-		if (!isProjectClosed) return false;
+		// Show reopen button when project is in any protected state
+		if (!isProtected && project.status !== "suspended") return false;
 
 		const hasPermission =
 			currentUser?.is_superuser ||
@@ -404,6 +414,7 @@ export const DocumentActionsSection = ({
 	}, [
 		documentType,
 		project,
+		isProtected,
 		currentUser,
 		isProjectLead,
 		isBaLead,
@@ -421,6 +432,15 @@ export const DocumentActionsSection = ({
 					<CardTitle>Actions</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4 pt-0">
+					{/* Protection banner for closed projects */}
+					{isProtected && (
+						<div className="flex items-center gap-2 rounded-md border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 px-3 py-2">
+							<ShieldAlert className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
+							<p className="text-xs text-amber-700 dark:text-amber-300">
+								{PROTECTED_TOOLTIP}
+							</p>
+						</div>
+					)}
 					{/* Locked banner */}
 					{locked && (
 						<div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-3 py-2">
@@ -433,7 +453,7 @@ export const DocumentActionsSection = ({
 					)}
 					{/* Approval Status Section with actions under each stage */}
 					<div
-						className={`rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3 ${locked ? "opacity-50 pointer-events-none" : ""}`}
+						className={`rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3 ${locked || isProtected ? "opacity-50 pointer-events-none" : ""}`}
 					>
 						<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
 							Approval Status
@@ -581,7 +601,8 @@ export const DocumentActionsSection = ({
 					</div>
 
 					{/* Send Reminder Button — for admins/KS/BA leads when document is at stage 1 or 2 */}
-					{currentUser?.is_superuser &&
+					{!isProtected &&
+						currentUser?.is_superuser &&
 						(currentStage === "project_lead" ||
 							currentStage === "business_area_lead") &&
 						document.status !== "approved" &&

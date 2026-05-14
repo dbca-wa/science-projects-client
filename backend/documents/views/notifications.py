@@ -23,6 +23,7 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 from projects.models import Project
+from projects.utils.protection import is_project_protected
 from users.models import PublicStaffProfile, User
 
 from ..models import (
@@ -107,6 +108,9 @@ class NewCycleOpen(APIView):
                 & Q(status="active")
             )
 
+        # Explicit exclusion of protected projects as a safety net
+        eligible_projects = eligible_projects.exclude(status__in=Project.CLOSED_ONLY)
+
         eligible_projects = eligible_projects.exclude(
             documents__progress_report_details__report__year=last_report.year
         )
@@ -122,6 +126,11 @@ class NewCycleOpen(APIView):
                 Q(status="active") & Q(kind__in=[Project.CategoryKindChoices.STUDENT])
             )
 
+        # Explicit exclusion of protected projects as a safety net
+        eligible_student_projects = eligible_student_projects.exclude(
+            status__in=Project.CLOSED_ONLY
+        )
+
         eligible_student_projects = eligible_student_projects.exclude(
             documents__student_report_details__report__year=last_report.year
         )
@@ -134,6 +143,22 @@ class NewCycleOpen(APIView):
             eligible_student_projects = eligible_student_projects.filter(
                 business_area__division=last_report.division
             )
+
+        # ─── Handle suspended external projects ───────────────────────────────
+        # External projects don't get documents spawned, but suspended ones
+        # should be unsuspended and set to active on new cycle open.
+        suspended_external_projects = Project.objects.filter(
+            kind=Project.CategoryKindChoices.EXTERNAL,
+            status=Project.StatusChoices.SUSPENDED,
+        ).exclude(status__in=Project.CLOSED_ONLY)
+
+        if division_slug and last_report.division:
+            suspended_external_projects = suspended_external_projects.filter(
+                business_area__division=last_report.division
+            )
+
+        # Bulk unsuspend external projects → set to active
+        suspended_external_projects.update(status=Project.StatusChoices.ACTIVE)
 
         # Combine querysets
         all_eligible_projects = eligible_projects | eligible_student_projects
@@ -181,14 +206,21 @@ class NewCycleOpen(APIView):
         for project in all_eligible_projects:
             if project.kind == Project.CategoryKindChoices.STUDENT:
                 typeofdoc = ProjectDocument.CategoryKindChoices.STUDENTREPORT
+                already_exists = project.pk in existing_sr_project_pks
             elif project.kind in [
                 Project.CategoryKindChoices.SCIENCE,
                 Project.CategoryKindChoices.COREFUNCTION,
             ]:
                 typeofdoc = ProjectDocument.CategoryKindChoices.PROGRESSREPORT
+                already_exists = project.pk in existing_pr_project_pks
             else:
                 continue
 
+            # Skip if a report already exists for this year — no document creation needed
+            if already_exists:
+                continue
+
+            # Create the ProjectDocument
             new_doc_data = {
                 "kind": typeofdoc,
                 "status": "new",
@@ -196,148 +228,114 @@ class NewCycleOpen(APIView):
                 "creator": request.user.pk,
                 "project": project.pk,
             }
-
             new_project_document = ProjectDocumentCreateSerializer(data=new_doc_data)
-
-            if new_project_document.is_valid():
-                with transaction.atomic():
-                    doc = new_project_document.save()
-
-                    if project.kind != Project.CategoryKindChoices.STUDENT:
-                        # Create progress report
-                        exists = project.pk in existing_pr_project_pks
-
-                        if not exists:
-                            # Get previous report for prepopulation
-                            last_one = previous_pr_by_project.get(project.pk)
-
-                            if not should_prepopulate:
-                                # Prepopulate only aims, context, implications
-                                prepopulated_aims = (
-                                    last_one.aims if last_one else "<p></p>"
-                                )
-                                prepopulated_context = (
-                                    last_one.context if last_one else "<p></p>"
-                                )
-                                prepopulated_implications = (
-                                    last_one.implications if last_one else "<p></p>"
-                                )
-
-                                progress_report_data = {
-                                    "document": doc.pk,
-                                    "project": project.pk,
-                                    "report": last_report.pk,
-                                    "year": last_report.year,
-                                    "context": prepopulated_context,
-                                    "implications": prepopulated_implications,
-                                    "future": "<p></p>",
-                                    "progress": "<p></p>",
-                                    "aims": prepopulated_aims,
-                                }
-                            else:
-                                # Prepopulate with all last year's data
-                                if last_one:
-                                    progress_report_data = {
-                                        "document": doc.pk,
-                                        "project": project.pk,
-                                        "report": last_report.pk,
-                                        "year": last_report.year,
-                                        "context": last_one.context,
-                                        "implications": last_one.implications,
-                                        "future": last_one.future,
-                                        "progress": last_one.progress,
-                                        "aims": last_one.aims,
-                                    }
-                                else:
-                                    progress_report_data = {
-                                        "document": doc.pk,
-                                        "project": project.pk,
-                                        "report": last_report.pk,
-                                        "year": last_report.year,
-                                        "context": "<p></p>",
-                                        "implications": "<p></p>",
-                                        "future": "<p></p>",
-                                        "progress": "<p></p>",
-                                        "aims": "<p></p>",
-                                    }
-
-                            progress_report = ProgressReportCreateSerializer(
-                                data=progress_report_data
-                            )
-
-                            if progress_report.is_valid():
-                                progress_report.save()
-                                project.status = Project.StatusChoices.UPDATING
-                                project.save()
-                            else:
-                                settings.LOGGER.error(
-                                    f"Error validating progress report: {progress_report.errors}"
-                                )
-                                return Response(
-                                    progress_report.errors, HTTP_400_BAD_REQUEST
-                                )
-                        else:
-                            project.status = Project.StatusChoices.UPDATING
-                            project.save()
-                    else:
-                        # Create student report
-                        exists = project.pk in existing_sr_project_pks
-
-                        if not exists:
-                            # Get previous report for prepopulation
-                            last_one = previous_sr_by_project.get(project.pk)
-
-                            if not should_prepopulate:
-                                student_report_data = {
-                                    "document": doc.pk,
-                                    "project": project.pk,
-                                    "report": last_report.pk,
-                                    "year": last_report.year,
-                                    "progress_report": "<p></p>",
-                                }
-                            else:
-                                # Prepopulate with last year's data
-                                if last_one:
-                                    student_report_data = {
-                                        "document": doc.pk,
-                                        "project": project.pk,
-                                        "report": last_report.pk,
-                                        "year": last_report.year,
-                                        "progress_report": last_one.progress_report,
-                                    }
-                                else:
-                                    student_report_data = {
-                                        "document": doc.pk,
-                                        "project": project.pk,
-                                        "report": last_report.pk,
-                                        "year": last_report.year,
-                                        "progress_report": "<p></p>",
-                                    }
-
-                            student_report = StudentReportCreateSerializer(
-                                data=student_report_data
-                            )
-
-                            if student_report.is_valid():
-                                student_report.save()
-                                project.status = Project.StatusChoices.UPDATING
-                                project.save()
-                            else:
-                                settings.LOGGER.error(
-                                    f"Error validating student report {student_report.errors}"
-                                )
-                                return Response(
-                                    student_report.errors, HTTP_400_BAD_REQUEST
-                                )
-                        else:
-                            project.status = Project.StatusChoices.UPDATING
-                            project.save()
-
-            else:
+            if not new_project_document.is_valid():
                 settings.LOGGER.error(
                     f"Error opening new cycle: {new_project_document.errors}"
                 )
                 return Response(new_project_document.errors, HTTP_400_BAD_REQUEST)
+
+            with transaction.atomic():
+                doc = new_project_document.save()
+
+                if project.kind != Project.CategoryKindChoices.STUDENT:
+                    # Create progress report
+                    last_one = previous_pr_by_project.get(project.pk)
+
+                    if not should_prepopulate:
+                        progress_report_data = {
+                            "document": doc.pk,
+                            "project": project.pk,
+                            "report": last_report.pk,
+                            "year": last_report.year,
+                            "context": last_one.context if last_one else "<p></p>",
+                            "implications": (
+                                last_one.implications if last_one else "<p></p>"
+                            ),
+                            "future": "<p></p>",
+                            "progress": "<p></p>",
+                            "aims": last_one.aims if last_one else "<p></p>",
+                        }
+                    else:
+                        if last_one:
+                            progress_report_data = {
+                                "document": doc.pk,
+                                "project": project.pk,
+                                "report": last_report.pk,
+                                "year": last_report.year,
+                                "context": last_one.context,
+                                "implications": last_one.implications,
+                                "future": last_one.future,
+                                "progress": last_one.progress,
+                                "aims": last_one.aims,
+                            }
+                        else:
+                            progress_report_data = {
+                                "document": doc.pk,
+                                "project": project.pk,
+                                "report": last_report.pk,
+                                "year": last_report.year,
+                                "context": "<p></p>",
+                                "implications": "<p></p>",
+                                "future": "<p></p>",
+                                "progress": "<p></p>",
+                                "aims": "<p></p>",
+                            }
+
+                    progress_report = ProgressReportCreateSerializer(
+                        data=progress_report_data
+                    )
+                    if progress_report.is_valid():
+                        progress_report.save()
+                    else:
+                        settings.LOGGER.error(
+                            f"Error validating progress report: {progress_report.errors}"
+                        )
+                        return Response(progress_report.errors, HTTP_400_BAD_REQUEST)
+                else:
+                    # Create student report
+                    last_one = previous_sr_by_project.get(project.pk)
+
+                    if not should_prepopulate:
+                        student_report_data = {
+                            "document": doc.pk,
+                            "project": project.pk,
+                            "report": last_report.pk,
+                            "year": last_report.year,
+                            "progress_report": "<p></p>",
+                        }
+                    else:
+                        if last_one:
+                            student_report_data = {
+                                "document": doc.pk,
+                                "project": project.pk,
+                                "report": last_report.pk,
+                                "year": last_report.year,
+                                "progress_report": last_one.progress_report,
+                            }
+                        else:
+                            student_report_data = {
+                                "document": doc.pk,
+                                "project": project.pk,
+                                "report": last_report.pk,
+                                "year": last_report.year,
+                                "progress_report": "<p></p>",
+                            }
+
+                    student_report = StudentReportCreateSerializer(
+                        data=student_report_data
+                    )
+                    if student_report.is_valid():
+                        student_report.save()
+                    else:
+                        settings.LOGGER.error(
+                            f"Error validating student report {student_report.errors}"
+                        )
+                        return Response(student_report.errors, HTTP_400_BAD_REQUEST)
+
+                # Set project status to updating after successful creation
+                project.status = Project.StatusChoices.UPDATING
+                project.save()
 
         # Send emails if requested
         if should_email:
@@ -384,6 +382,23 @@ class SendBumpEmails(APIView):
                 {"error": "No documents provided"},
                 status=HTTP_400_BAD_REQUEST,
             )
+
+        # Single-document bump: check if the project is protected
+        if len(documents_requiring_action) == 1:
+            doc_data = documents_requiring_action[0]
+            project_id = doc_data.get("projectId")
+            if project_id:
+                try:
+                    project_instance = Project.objects.get(pk=project_id)
+                    if is_project_protected(project_instance):
+                        return Response(
+                            {
+                                "error": "Cannot send bump reminder \u2014 this project is closed."
+                            },
+                            status=HTTP_400_BAD_REQUEST,
+                        )
+                except Project.DoesNotExist:
+                    pass
 
         settings.LOGGER.warning(
             f"{request.user} is sending bump emails for {len(documents_requiring_action)} documents..."
@@ -469,6 +484,9 @@ class BumpPreview(APIView):
             )
             .exclude(
                 project__status="terminated",
+            )
+            .exclude(
+                project__status__in=Project.CLOSED_ONLY,
             )
             .select_related(
                 "project", "project__business_area", "project__business_area__leader"
@@ -597,10 +615,30 @@ class SendBumpAll(APIView):
 
         # Reuse the preview logic to get the user/document grouping
         # BumpPreview reads stage from both query_params and request.data
+        # Note: BumpPreview already excludes protected projects via CLOSED_ONLY filter
         preview_view = BumpPreview()
         preview_view.request = request
         preview_response = preview_view.get(request)
         users_data = preview_response.data.get("users", [])
+
+        # Count documents excluded due to project protection
+        # (documents on protected projects are already filtered out by BumpPreview)
+        from documents.models import ProjectDocument as PD
+
+        total_pending = (
+            PD.objects.filter(
+                Q(kind="progressreport") | Q(kind="studentreport"),
+            )
+            .exclude(
+                status__in=[
+                    PD.StatusChoices.APPROVED,
+                    PD.StatusChoices.NEW,
+                ]
+            )
+            .count()
+        )
+        included_count = sum(u["total"] for u in users_data)
+        excluded_count = max(0, total_pending - included_count)
 
         if not users_data:
             return Response(
@@ -724,6 +762,7 @@ class SendBumpAll(APIView):
             {
                 "emails_sent": emails_sent,
                 "total_users": len(users_data),
+                "excluded_count": excluded_count,
                 "errors": errors,
             }
         )

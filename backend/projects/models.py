@@ -88,7 +88,7 @@ class Project(CommonModel):
     CLOSED_ONLY = (
         StatusChoices.COMPLETED,
         StatusChoices.TERMINATED,
-        # StatusChoices.SUSPENDED,
+        StatusChoices.CLOSUREREQ,
     )
 
     kind = models.CharField(

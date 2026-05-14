@@ -85,7 +85,8 @@ export const ProjectPlanTab = ({
 	const canEdit = getEffectiveCanEdit(
 		canEditBase,
 		projectPlan.document,
-		isLocked
+		isLocked,
+		currentUser?.is_superuser
 	);
 
 	// Lock report creation if project is terminated/completed or has approved closure
@@ -158,10 +159,10 @@ export const ProjectPlanTab = ({
 						<ProjectPlanEndorsements
 							projectPlan={projectPlan}
 							userData={userData ?? null}
+							members={members}
 							isBaLead={isBaLead}
 							userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
 							userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
-							locked={isLocked || projectPlan.document.status === "approved"}
 						/>
 					)}
 

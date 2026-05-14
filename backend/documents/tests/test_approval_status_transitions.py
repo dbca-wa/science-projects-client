@@ -197,7 +197,7 @@ class TestProjectClosureApproval:
 
     @pytest.mark.integration
     def test_science_sets_closure_requested(self, approval_setup):
-        """Science project closure → status = closure_requested."""
+        """Science project closure stage 3 approval → status = intended_outcome (completed)."""
         setup = approval_setup
         # project.kind is already "science" from fixture
 
@@ -214,7 +214,7 @@ class TestProjectClosureApproval:
         )
 
         setup["project"].refresh_from_db()
-        assert setup["project"].status == "closure_requested"
+        assert setup["project"].status == "completed"
 
 
 class TestProgressReportApproval:

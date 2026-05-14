@@ -149,7 +149,10 @@ class CommunicationService:
     @staticmethod
     def create_comment(user, data):
         """
-        Create new comment and process @mentions
+        Create new comment.
+
+        Mention processing and email notifications are handled by the
+        post_save signal (handle_comment_created in signals.py).
 
         Args:
             user: User creating the comment
@@ -159,21 +162,14 @@ class CommunicationService:
             Created comment instance
         """
         settings.LOGGER.info(
-            f"{user} is posting a comment on document (ID: {data.get('document').pk}, Kind: {data.get('document').kind})"
+            f"{user} is posting a comment on document "
+            f"(ID: {data.get('document').pk}, Kind: {data.get('document').kind})"
         )
 
         # Add user to data before creating comment
         data["user"] = user
 
         comment = Comment.objects.create(**data)
-
-        # Process @mentions in the comment
-        mentioned_users = process_comment_mentions(comment)
-
-        if mentioned_users:
-            settings.LOGGER.info(
-                f"Comment {comment.pk} mentions {len(mentioned_users)} users"
-            )
 
         return comment
 

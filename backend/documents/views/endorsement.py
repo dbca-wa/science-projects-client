@@ -204,6 +204,8 @@ class EndorsementsPendingMyAction(APIView):
         filtered_endorsements = Endorsement.objects.filter(
             q_ae,
             project_plan__project__status__in=Project.ACTIVE_ONLY,
+        ).exclude(
+            project_plan__document__project__status__in=Project.CLOSED_ONLY,
         )
 
         for endorsement in filtered_endorsements:
@@ -230,6 +232,31 @@ class SeekEndorsement(APIView):
     """Seek endorsement for a project plan"""
 
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        """Get AEC notification recipients for this project plan"""
+        from users.models import User
+
+        aec_users = User.objects.filter(is_aec=True, is_active=True).values(
+            "id", "display_first_name", "display_last_name", "email"
+        )
+
+        recipients = [
+            {
+                "name": f"{u['display_first_name'] or ''} {u['display_last_name'] or ''}".strip(),
+                "email": u["email"] or "",
+                "role": "AEC Member",
+            }
+            for u in aec_users
+        ]
+
+        return Response(
+            {
+                "recipients": recipients,
+                "role_label": "Animal Ethics Committee Members",
+            },
+            status=HTTP_200_OK,
+        )
 
     def post(self, request, pk):
         """Request endorsement for project plan"""

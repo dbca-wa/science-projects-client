@@ -22,6 +22,10 @@ from rest_framework.views import APIView
 from common.query_helpers import optimise_document_qs
 from projects.constants import ALLOWED_DOCUMENT_TYPES, AUTO_APPROVE_CLOSURE_KINDS
 from projects.models import Project, ProjectMember
+from projects.utils.protection import (
+    is_project_protected,
+    should_skip_status_transition,
+)
 from users.models import User
 
 from ..models import (
@@ -273,6 +277,14 @@ class DocumentSpawner(APIView):
             return Response(
                 {"error": f"Project with pk {project} not found."},
                 HTTP_404_NOT_FOUND,
+            )
+
+        if is_project_protected(project_instance):
+            return Response(
+                {
+                    "error": "Cannot create documents for a closed project. Reopen the project first."
+                },
+                HTTP_400_BAD_REQUEST,
             )
 
         allowed_types = ALLOWED_DOCUMENT_TYPES.get(project_instance.kind, [])
@@ -627,6 +639,7 @@ class BatchApproveOld(APIView):
                     "suspended",
                     "terminated",
                     "completed",
+                    "closure_requested",
                 ]
             )
             .select_related("project")
@@ -684,10 +697,13 @@ class BatchApproveOld(APIView):
                     docs_to_update.append(doc)
 
                     # Only update project status if no approved closure exists
+                    # and the project is not protected or superseded by a later document
                     project = doc.project
                     if (
                         project.pk not in closure_project_pks
                         and project not in projects_to_update
+                        and not is_project_protected(project)
+                        and not should_skip_status_transition(doc)
                     ):
                         project.status = Project.StatusChoices.ACTIVE
                         projects_to_update.append(project)
@@ -847,10 +863,14 @@ class BatchApproveCurrent(APIView):
                     doc.status = "approved"
                     docs_to_update.append(doc)
 
+                    # Only update project status if no approved closure exists
+                    # and the project is not protected or superseded by a later document
                     project = doc.project
                     if (
                         project.pk not in closure_project_pks
                         and project not in projects_to_update
+                        and not is_project_protected(project)
+                        and not should_skip_status_transition(doc)
                     ):
                         project.status = Project.StatusChoices.ACTIVE
                         projects_to_update.append(project)
@@ -1086,13 +1106,8 @@ class NewCycleOpenPreview(APIView):
             if _is_valid(ba.leader):
                 users_with_roles.append((ba.leader, 3, "BA Lead"))
 
-        # Project leads and team members — exclude terminated and completed projects
-        all_projects = Project.objects.exclude(
-            status__in=[
-                Project.StatusChoices.COMPLETED,
-                Project.StatusChoices.TERMINATED,
-            ]
-        )
+        # Project leads and team members — exclude protected projects
+        all_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY)
         if division_slug and last_report and last_report.division:
             all_projects = all_projects.filter(
                 business_area__division=last_report.division
@@ -1341,8 +1356,9 @@ class FinalDocApproval(APIView):
             )
             if ser.is_valid():
                 u_document = ser.save()
-                u_document.project.status = Project.StatusChoices.ACTIVE
-                u_document.project.save()
+                if not is_project_protected(u_document.project):
+                    u_document.project.status = Project.StatusChoices.ACTIVE
+                    u_document.project.save()
             else:
                 settings.LOGGER.error(msg=f"{ser.errors}")
                 return Response(
@@ -1371,8 +1387,9 @@ class FinalDocApproval(APIView):
             )
             if ser.is_valid():
                 u_document = ser.save()
-                u_document.project.status = Project.StatusChoices.UPDATING
-                u_document.project.save()
+                if not is_project_protected(u_document.project):
+                    u_document.project.status = Project.StatusChoices.UPDATING
+                    u_document.project.save()
             else:
                 settings.LOGGER.error(msg=f"{ser.errors}")
                 return Response(

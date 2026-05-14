@@ -8,6 +8,7 @@ from django.db.models import Q
 from rest_framework.exceptions import NotFound
 
 from common.query_helpers import optimise_document_qs
+from projects.utils.protection import is_project_protected
 
 from ..models import ProjectDocument
 
@@ -137,14 +138,31 @@ class DocumentService:
 
         project = document.project
         kind = document.kind
+
+        # Closure documents are always deletable without status rollback.
+        # The ReopenProject view handles status changes itself after
+        # deleting the closure, so we simply remove it here.
+        if kind == ProjectDocument.CategoryKindChoices.PROJECTCLOSURE:
+            document.delete()
+            return
+
+        # Protected projects: allow deletion but skip status rollback.
+        # The project status must remain unchanged.
+        if is_project_protected(project):
+            document.delete()
+            settings.LOGGER.info(
+                f"Deleted document {document.pk} on protected project "
+                f"{project.pk} (status: {project.status}) — skipping rollback"
+            )
+            return
+
+        # Standard case: delete and roll back project status
         previous_status = project.status
 
         # Determine the correct rollback status
         rollback_status = DocumentService._get_rollback_status(kind, project)
 
         if rollback_status and rollback_status != previous_status:
-            pass
-
             project.status = rollback_status
             project.save()
             settings.LOGGER.info(

@@ -390,6 +390,24 @@ class TestIsDocumentEditable:
 
         assert is_document_editable(project_document, user)
 
+    @pytest.mark.integration
+    def test_superuser_can_edit_approved_document(self, project_document, user):
+        """Test superuser can edit even when document is approved"""
+        project_document.status = "approved"
+        user.is_superuser = True
+        user.save()
+
+        assert is_document_editable(project_document, user)
+
+    @pytest.mark.integration
+    def test_superuser_can_edit_without_being_member(
+        self, project_document, user_factory
+    ):
+        """Test superuser can edit even without being a project member"""
+        superuser = user_factory(is_superuser=True)
+
+        assert is_document_editable(project_document, superuser)
+
 
 class TestGetNextApprovalStage:
     """Tests for get_next_approval_stage"""

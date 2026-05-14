@@ -416,6 +416,25 @@ class ProjectDetails(APIView):
             pk=pk, user=request.user, data=serializer.validated_data
         )
 
+        # Handle project image upload (separate from serializer — image is a related model)
+        image_file = request.FILES.get("image")
+        if image_file:
+            try:
+                # Update existing photo or create new one
+                photo, _created = ProjectPhoto.objects.update_or_create(
+                    project=project,
+                    defaults={
+                        "file": image_file,
+                        "uploader": request.user,
+                    },
+                )
+            except Exception as e:
+                settings.LOGGER.error(f"Image upload error: {e}")
+                return Response(
+                    {"error": "Image upload failed. Please try a different file."},
+                    status=HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
         result_serializer = ProjectSerializer(project)
         return Response(result_serializer.data, status=HTTP_202_ACCEPTED)
 

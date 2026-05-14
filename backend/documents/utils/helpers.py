@@ -78,6 +78,10 @@ def is_document_editable(document, user):
     Returns:
         bool: True if editable
     """
+    # Superusers can always edit document content
+    if user.is_superuser:
+        return True
+
     # Document must not be approved
     if document.status == "approved":
         return False

@@ -90,7 +90,8 @@ export function ProjectClosureTab({
 	const canEdit = getEffectiveCanEdit(
 		canEditBase,
 		projectClosure.document,
-		false
+		false,
+		currentUser?.is_superuser
 	);
 	const lockedMessage = getLockedMessage(projectClosure.document, isLocked);
 

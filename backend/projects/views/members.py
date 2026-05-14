@@ -197,64 +197,22 @@ class MentionableUsersForProject(APIView):
         """
         Get all mentionable users for a project.
 
-        Returns all users who have permission to comment on the project:
-        - Project team members
-        - Business area leads (users in same BA as project)
-        - Directorate users (users in "Directorate" BA, case-sensitive)
-        - Superusers
-        - Caretakers of all above users
+        Returns all active staff users. Any staff member can be mentioned
+        in any project's comments to support cross-team communication.
         """
         from django.contrib.auth import get_user_model
 
-        from caretakers.models import Caretaker
-        from projects.models import Project
         from users.serializers import TinyUserSerializer
 
         User = get_user_model()
 
-        try:
-            project = Project.objects.get(pk=pk)
-        except Project.DoesNotExist:
-            return Response(
-                {"error": f"Project {pk} not found"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        mentionable_users = set()
-
-        # 1. Project team members
-        team_member_ids = project.members.values_list("pk", flat=True)
-        mentionable_users.update(team_member_ids)
-
-        # 2. Business area leads (users in same BA as project)
-        if project.business_area:
-            ba_user_ids = User.objects.filter(
-                work__business_area=project.business_area
-            ).values_list("pk", flat=True)
-            mentionable_users.update(ba_user_ids)
-
-        # 3. Directorate users (case-sensitive "Directorate")
-        directorate_user_ids = User.objects.filter(
-            work__business_area__name="Directorate"
-        ).values_list("pk", flat=True)
-        mentionable_users.update(directorate_user_ids)
-
-        # 4. Superusers
-        superuser_ids = User.objects.filter(is_superuser=True).values_list(
-            "pk", flat=True
-        )
-        mentionable_users.update(superuser_ids)
-
-        # 5. Caretakers of all above users
-        caretaker_ids = Caretaker.objects.filter(
-            user__pk__in=mentionable_users
-        ).values_list("caretaker_id", flat=True)
-        mentionable_users.update(caretaker_ids)
-
-        # Get user objects and serialise
-        users = User.objects.filter(pk__in=mentionable_users).select_related(
-            "work", "work__business_area", "work__branch", "avatar"
-        )
+        # All active staff are mentionable — not scoped to project team.
+        # Users frequently need to mention people outside their immediate
+        # project team for cross-team communication.
+        users = User.objects.filter(
+            is_active=True,
+            is_staff=True,
+        ).select_related("work", "work__business_area", "work__branch", "avatar")
 
         serializer = TinyUserSerializer(users, many=True)
         return Response(serializer.data, status=HTTP_200_OK)

@@ -128,15 +128,19 @@ export const isReportCreationLocked = (
  *
  * Takes the base permission (from calculateDocumentEditPermission) and
  * applies document-level locking: if the document is fully approved or
- * the document tab is locked, editing is disabled.
+ * the document tab is locked, editing is disabled — unless the user is
+ * a superuser, in which case locking is bypassed for content editing.
  *
  * Content remains copyable in read-only mode via RichTextDisplay.
  */
 export const getEffectiveCanEdit = (
 	canEditBase: boolean,
 	document: IMainDoc,
-	isTabLocked: boolean
+	isTabLocked: boolean,
+	isSuperuser = false
 ): boolean => {
+	// Superusers bypass all document locking for content editing
+	if (isSuperuser) return true;
 	if (isTabLocked) return false;
 	if (isRichTextLocked(document)) return false;
 	return canEditBase;

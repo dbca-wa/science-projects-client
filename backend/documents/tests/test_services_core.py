@@ -134,8 +134,12 @@ class TestDocumentService:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_delete_closure_document_reverts_status(self):
-        """Test deleting closure document reverts project status based on remaining documents"""
+    def test_delete_closure_document_skips_rollback(self):
+        """Test deleting closure document does NOT revert project status.
+
+        The ReopenProject view handles status changes itself after deleting
+        the closure, so DocumentService simply removes the document.
+        """
         # Arrange
         from documents.tests.factories import ProjectClosureFactory
         from projects.models import Project
@@ -144,7 +148,7 @@ class TestDocumentService:
         project_closure = ProjectClosureFactory()
         project = project_closure.document.project
 
-        # Create an approved project plan so the rollback target is "active"
+        # Create an approved project plan (would be rollback target if rollback ran)
         ProjectDocument.objects.create(
             project=project,
             kind=ProjectDocument.CategoryKindChoices.PROJECTPLAN,
@@ -162,10 +166,10 @@ class TestDocumentService:
         # Act
         DocumentService.delete_document(document_pk, user)
 
-        # Assert
+        # Assert — document deleted, project status unchanged
         assert not ProjectDocument.objects.filter(pk=document_pk).exists()
         project.refresh_from_db()
-        assert project.status == Project.StatusChoices.ACTIVE
+        assert project.status == Project.StatusChoices.CLOSUREREQ
 
     @pytest.mark.django_db
     @pytest.mark.integration

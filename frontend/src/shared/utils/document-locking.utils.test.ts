@@ -234,5 +234,30 @@ describe("document-locking.utils", () => {
 			expect(getEffectiveCanEdit(true, doc, false)).toBe(true);
 			expect(getEffectiveCanEdit(false, doc, false)).toBe(false);
 		});
+
+		it("returns true for superuser even when tab is locked", () => {
+			const doc = makeDocument({ status: "new" });
+			expect(getEffectiveCanEdit(true, doc, true, true)).toBe(true);
+		});
+
+		it("returns true for superuser even when document is fully approved", () => {
+			const doc = makeDocument({ status: "approved" });
+			expect(getEffectiveCanEdit(true, doc, false, true)).toBe(true);
+		});
+
+		it("returns true for superuser even when both tab locked and document approved", () => {
+			const doc = makeDocument({ status: "approved" });
+			expect(getEffectiveCanEdit(true, doc, true, true)).toBe(true);
+		});
+
+		it("does not grant superuser bypass when isSuperuser is false", () => {
+			const doc = makeDocument({ status: "approved" });
+			expect(getEffectiveCanEdit(true, doc, false, false)).toBe(false);
+		});
+
+		it("does not grant superuser bypass when isSuperuser is undefined", () => {
+			const doc = makeDocument({ status: "approved" });
+			expect(getEffectiveCanEdit(true, doc, false, undefined)).toBe(false);
+		});
 	});
 });

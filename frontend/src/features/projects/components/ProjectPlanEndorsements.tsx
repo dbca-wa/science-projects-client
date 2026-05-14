@@ -1,16 +1,15 @@
 import { useState, useMemo } from "react";
 import type { IProjectPlan } from "@/shared/types/document.types";
 import type { IUserData } from "@/shared/types/user.types";
+import type { IProjectMember } from "@/shared/types/project.types";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Switch } from "@/shared/components/ui/switch";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
-import { FileText, Trash2 } from "lucide-react";
+import { FileText, Trash2, Loader2 } from "lucide-react";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { SingleFileUpload } from "@/shared/components/upload/SingleFileUpload";
-import { SeekEndorsementModal } from "./modals/SeekEndorsementModal";
 import { DeletePDFEndorsementModal } from "./modals/DeletePDFEndorsementModal";
 import { useUpdateEndorsements } from "../hooks/useUpdateEndorsements";
 import { useDeleteEndorsementPDF } from "../hooks/useDeleteEndorsementPDF";
@@ -18,6 +17,7 @@ import { useDeleteEndorsementPDF } from "../hooks/useDeleteEndorsementPDF";
 interface ProjectPlanEndorsementsProps {
 	projectPlan: IProjectPlan;
 	userData: IUserData | null;
+	members?: IProjectMember[] | null;
 	isBaLead?: boolean;
 	userIsCaretakerOfAdmin?: boolean;
 	userIsCaretakerOfBaLeader?: boolean;
@@ -28,34 +28,36 @@ interface ProjectPlanEndorsementsProps {
 export const ProjectPlanEndorsements = ({
 	projectPlan,
 	userData,
+	members,
 	isBaLead,
 	userIsCaretakerOfAdmin,
 	userIsCaretakerOfBaLeader,
-	locked = false,
 }: ProjectPlanEndorsementsProps) => {
-	// Permissions logic — locked overrides all edit permissions
+	// Permissions: project member, BA lead, superuser, or caretaker of admin/BA lead
+	// Always editable regardless of document lock status
 	const canEdit = useMemo(() => {
-		if (locked) return false;
-		return (
-			userData?.is_superuser ||
-			userIsCaretakerOfAdmin ||
-			userData?.is_aec ||
-			isBaLead ||
-			userIsCaretakerOfBaLeader
-		);
+		if (!userData) return false;
+		if (userData.is_superuser) return true;
+		if (userIsCaretakerOfAdmin) return true;
+		if (isBaLead) return true;
+		if (userIsCaretakerOfBaLeader) return true;
+		// Check if user is a project member
+		if (members?.some((m) => m.user.id === userData.id)) return true;
+		return false;
 	}, [
 		userData,
+		members,
 		isBaLead,
-		locked,
 		userIsCaretakerOfAdmin,
 		userIsCaretakerOfBaLeader,
 	]);
 
 	// State management
-	// Track local changes to ae_endorsement_required (checkbox state)
 	const [localAecRequired, setLocalAecRequired] = useState<boolean | null>(
 		null
 	);
+	const [uploadedPDF, setUploadedPDF] = useState<File | null>(null);
+	const [isDeletePDFModalOpen, setIsDeletePDFModalOpen] = useState(false);
 
 	// Use local state if it exists, otherwise use prop value
 	const aecEndorsementRequired =
@@ -63,22 +65,11 @@ export const ProjectPlanEndorsements = ({
 			? localAecRequired
 			: (projectPlan.endorsements?.ae_endorsement_required ?? false);
 
-	const [uploadedPDF, setUploadedPDF] = useState<File | null>(null);
-
 	// Derive aecEndorsementProvided from uploadedPDF and projectPlan
 	const aecEndorsementProvided = useMemo(() => {
-		// If there's an uploaded PDF, endorsement is provided
-		if (uploadedPDF && uploadedPDF.type === "application/pdf") {
-			return true;
-		}
-		// Otherwise use the value from projectPlan
+		if (uploadedPDF && uploadedPDF.type === "application/pdf") return true;
 		return projectPlan.endorsements?.ae_endorsement_provided ?? false;
 	}, [uploadedPDF, projectPlan.endorsements?.ae_endorsement_provided]);
-
-	// Modal states
-	const [isSeekEndorsementModalOpen, setIsSeekEndorsementModalOpen] =
-		useState(false);
-	const [isDeletePDFModalOpen, setIsDeletePDFModalOpen] = useState(false);
 
 	// Mutations
 	const updateEndorsementsMutation = useUpdateEndorsements(projectPlan.id);
@@ -87,8 +78,7 @@ export const ProjectPlanEndorsements = ({
 	// Extract filename from path
 	const extractFilename = (filePath: string) => {
 		const parts = filePath.split("/");
-		const filename = parts[parts.length - 1];
-		return filename;
+		return parts[parts.length - 1];
 	};
 
 	// Compute if there are changes
@@ -107,43 +97,27 @@ export const ProjectPlanEndorsements = ({
 		projectPlan.endorsements,
 	]);
 
-	// Handle save button click
-	const handleSaveClick = () => {
-		setIsSeekEndorsementModalOpen(true);
-	};
-
-	// Handle save confirmation from modal
-	const handleSaveConfirm = (shouldSendEmails: boolean) => {
+	// Handle save — direct save with toast, no modal
+	const handleSave = () => {
 		updateEndorsementsMutation.mutate(
 			{
 				ae_endorsement_required: aecEndorsementRequired,
 				ae_endorsement_provided: aecEndorsementProvided,
 				aec_pdf: uploadedPDF || undefined,
-				should_send_emails: shouldSendEmails,
 			},
 			{
 				onSuccess: () => {
-					// Reset local state after successful save
 					setLocalAecRequired(null);
 					setUploadedPDF(null);
-					setIsSeekEndorsementModalOpen(false);
 				},
 			}
 		);
 	};
 
-	// Handle delete PDF button click
-	const handleDeletePDFClick = () => {
-		setIsDeletePDFModalOpen(true);
-	};
-
-	// Handle delete PDF confirmation from modal
+	// Handle delete PDF confirmation
 	const handleDeletePDFConfirm = () => {
 		deletePDFMutation.mutate(undefined, {
 			onSuccess: () => {
-				// Reset states after successful deletion
-				// Note: aecEndorsementProvided is computed from uploadedPDF and projectPlan
-				// so we only need to reset uploadedPDF
 				setUploadedPDF(null);
 				setIsDeletePDFModalOpen(false);
 			},
@@ -157,17 +131,6 @@ export const ProjectPlanEndorsements = ({
 
 	return (
 		<>
-			{/* Modals - always render, controlled by isOpen */}
-			<SeekEndorsementModal
-				isOpen={isSeekEndorsementModalOpen}
-				onClose={() => setIsSeekEndorsementModalOpen(false)}
-				onConfirm={handleSaveConfirm}
-				isLoading={updateEndorsementsMutation.isPending}
-				aecEndorsementRequired={aecEndorsementRequired}
-				aecEndorsementProvided={aecEndorsementProvided}
-				uploadedPDFName={uploadedPDF?.name}
-			/>
-
 			<DeletePDFEndorsementModal
 				isOpen={isDeletePDFModalOpen}
 				onClose={() => setIsDeletePDFModalOpen(false)}
@@ -213,32 +176,21 @@ export const ProjectPlanEndorsements = ({
 							</span>
 							<span className="md:hidden">AEC Endorsement</span>
 						</Label>
-						<div>
-							{!canEdit ? (
-								<Badge
-									variant={
-										!aecEndorsementRequired
-											? "secondary"
-											: aecEndorsementProvided
-												? "default"
-												: "destructive"
-									}
-								>
-									{!aecEndorsementRequired
-										? "Not Required"
-										: aecEndorsementProvided
-											? "Granted"
-											: "Required"}
-								</Badge>
-							) : (
-								<Switch
-									id="aec-provided"
-									checked={aecEndorsementProvided}
-									disabled={true}
-									className="border border-gray-500 dark:border-gray-500 data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-600"
-								/>
-							)}
-						</div>
+						<Badge
+							variant={
+								!aecEndorsementRequired
+									? "secondary"
+									: aecEndorsementProvided
+										? "default"
+										: "destructive"
+							}
+						>
+							{!aecEndorsementRequired
+								? "Not Required"
+								: aecEndorsementProvided
+									? "Granted"
+									: "Required"}
+						</Badge>
 					</div>
 
 					{/* Current PDF Display */}
@@ -271,7 +223,7 @@ export const ProjectPlanEndorsements = ({
 										variant="ghost"
 										size="icon"
 										className="h-8 w-8 flex-shrink-0"
-										onClick={handleDeletePDFClick}
+										onClick={() => setIsDeletePDFModalOpen(true)}
 									>
 										<Trash2 className="h-4 w-4 text-destructive" />
 									</Button>
@@ -295,16 +247,25 @@ export const ProjectPlanEndorsements = ({
 					)}
 				</div>
 
-				{/* Save Button - Outside the card */}
-				<div className="flex justify-end">
-					<Button
-						onClick={handleSaveClick}
-						disabled={!hasChanges || !canEdit}
-						size="lg"
-					>
-						Save Endorsements
-					</Button>
-				</div>
+				{/* Save Button */}
+				{canEdit && (
+					<div className="flex justify-end">
+						<Button
+							onClick={handleSave}
+							disabled={!hasChanges || updateEndorsementsMutation.isPending}
+							size="lg"
+						>
+							{updateEndorsementsMutation.isPending ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Saving...
+								</>
+							) : (
+								"Save Endorsements"
+							)}
+						</Button>
+					</div>
+				)}
 			</ProjectSection>
 		</>
 	);

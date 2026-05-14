@@ -103,7 +103,8 @@ export const ConceptPlanTab = ({
 	const canEdit = getEffectiveCanEdit(
 		canEditBase,
 		conceptPlan.document,
-		isLocked
+		isLocked,
+		currentUser?.is_superuser
 	);
 	const lockedMessage = getLockedMessage(conceptPlan.document, isLocked);
 

@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useNavigate } from "react-router";
 import {
 	Dialog,
 	DialogContent,
@@ -31,11 +32,11 @@ interface ReopenProjectModalProps {
 	projectId: number;
 }
 
-export function ReopenProjectModal({
+export const ReopenProjectModal = ({
 	isOpen,
 	onClose,
 	projectId,
-}: ReopenProjectModalProps) {
+}: ReopenProjectModalProps) => {
 	const {
 		register,
 		handleSubmit,
@@ -52,6 +53,7 @@ export function ReopenProjectModal({
 	});
 
 	const reopenMutation = useReopenProject();
+	const navigate = useNavigate();
 	// eslint-disable-next-line react-hooks/incompatible-library
 	const confirmed = watch("confirmed");
 	const reason = watch("reason");
@@ -61,6 +63,8 @@ export function ReopenProjectModal({
 		reopenMutation.mutate(data.projectId, {
 			onSuccess: () => {
 				onClose();
+				// Navigate to the overview tab — the closure tab no longer exists
+				navigate(`/projects/${data.projectId}`);
 			},
 		});
 	};
@@ -150,4 +154,4 @@ export function ReopenProjectModal({
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

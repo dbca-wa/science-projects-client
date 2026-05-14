@@ -136,6 +136,8 @@ export const DocumentActionsSectionWithModals = ({
 	);
 	const [recallStage, setRecallStage] = useState<number | null>(null);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+	const [isActionSuccess, setIsActionSuccess] = useState(false);
 
 	// Mutations
 	const documentActionMutation = useDocumentAction(documentType, project.id);
@@ -233,9 +235,20 @@ export const DocumentActionsSectionWithModals = ({
 			},
 			{
 				onSuccess: () => {
-					setActionModalOpen(false);
-					setCurrentAction(null);
-					setRecallStage(null);
+					// Show success animation if email was sent
+					if (data.sendEmail) {
+						setIsActionSuccess(true);
+						setTimeout(() => {
+							setIsActionSuccess(false);
+							setActionModalOpen(false);
+							setCurrentAction(null);
+							setRecallStage(null);
+						}, 1500);
+					} else {
+						setActionModalOpen(false);
+						setCurrentAction(null);
+						setRecallStage(null);
+					}
 				},
 			}
 		);
@@ -244,7 +257,15 @@ export const DocumentActionsSectionWithModals = ({
 	const handleDeleteConfirm = async () => {
 		try {
 			await deleteDocumentMutation.mutateAsync(document.id);
+
+			// Show success animation in the modal
+			setIsDeleteSuccess(true);
+
+			// Wait for the animation to play, then close and navigate
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+
 			setDeleteModalOpen(false);
+			setIsDeleteSuccess(false);
 
 			// Navigate to the previous available document tab after deletion
 			const fallbackTab = getPostDeleteTab(documentType, all_documents);
@@ -310,6 +331,7 @@ export const DocumentActionsSectionWithModals = ({
 					document={document}
 					project={project}
 					isSubmitting={documentActionMutation.isPending}
+					isSuccess={isActionSuccess}
 				/>
 			)}
 
@@ -320,6 +342,7 @@ export const DocumentActionsSectionWithModals = ({
 				onConfirm={handleDeleteConfirm}
 				documentType={documentType}
 				isDeleting={deleteDocumentMutation.isPending}
+				isDeleteSuccess={isDeleteSuccess}
 			/>
 		</>
 	);

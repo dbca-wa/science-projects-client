@@ -6,6 +6,12 @@ from django.conf import settings
 from django.db import transaction
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from projects.utils.protection import (
+    are_document_actions_blocked,
+    is_project_protected,
+    should_skip_status_transition,
+)
+
 from ..models import ProjectDocument
 from ..utils.helpers import sanitise_feedback_html
 from .notification_service import NotificationService
@@ -170,7 +176,17 @@ class ApprovalService:
         kind = document.kind
         project = document.project
 
-        if kind == ProjectDocument.CategoryKindChoices.CONCEPTPLAN:
+        # Skip project status changes when document actions are blocked
+        # or when a later-stage document already governs the project status.
+        if are_document_actions_blocked(document) or should_skip_status_transition(
+            document
+        ):
+            settings.LOGGER.info(
+                f"Skipping project status transition for document {document.pk} "
+                f"(actions_blocked={are_document_actions_blocked(document)}, "
+                f"superseded={should_skip_status_transition(document)})"
+            )
+        elif kind == ProjectDocument.CategoryKindChoices.CONCEPTPLAN:
             # Concept plan approved → set to pending, auto-create project plan
             project.status = Project.StatusChoices.PENDING
             project.save()
@@ -191,11 +207,7 @@ class ApprovalService:
             # Closure approved → set status based on intended outcome
             closure = document.project_closure_details.first()
             if closure and closure.intended_outcome:
-                if project.kind == Project.CategoryKindChoices.SCIENCE:
-                    # Science projects need additional directorate sign-off
-                    project.status = Project.StatusChoices.CLOSUREREQ
-                else:
-                    project.status = closure.intended_outcome
+                project.status = closure.intended_outcome
                 project.save()
 
         elif kind in [
@@ -203,13 +215,13 @@ class ApprovalService:
             ProjectDocument.CategoryKindChoices.STUDENTREPORT,
         ]:
             # Progress/student report approved → set to active
-            # Only if no approved closure exists
+            # Only if no approved closure exists and project is not in closure process
             has_approved_closure = ProjectDocument.objects.filter(
                 project=project,
                 kind=ProjectDocument.CategoryKindChoices.PROJECTCLOSURE,
                 status=ProjectDocument.StatusChoices.APPROVED,
             ).exists()
-            if not has_approved_closure:
+            if not has_approved_closure and not is_project_protected(project):
                 project.status = Project.StatusChoices.ACTIVE
                 project.save()
 
@@ -386,6 +398,14 @@ class ApprovalService:
         from projects.models import Project
 
         project = document.project
+
+        # Don't revert status when document actions are blocked or when a
+        # later-stage document already governs the project status.
+        if are_document_actions_blocked(document) or should_skip_status_transition(
+            document
+        ):
+            return
+
         kind = document.kind
 
         # Don't touch suspended projects
@@ -600,11 +620,13 @@ class ApprovalService:
             document.status = ProjectDocument.StatusChoices.APPROVED
             document.save()
 
+            # Only transition project status if the project is not protected.
             project = document.project
-            closure = document.project_closure_details.first()
-            if closure and closure.intended_outcome:
-                project.status = closure.intended_outcome
-                project.save()
+            if not is_project_protected(project):
+                closure = document.project_closure_details.first()
+                if closure and closure.intended_outcome:
+                    project.status = closure.intended_outcome
+                    project.save()
 
     @staticmethod
     def get_approval_stage(document):

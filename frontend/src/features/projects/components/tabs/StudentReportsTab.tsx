@@ -62,17 +62,24 @@ export function StudentReportsTab({
 		new Set(studentReports.map((report) => report.year))
 	).sort((a, b) => b - a); // Sort descending (newest first)
 
-	// Default to highest year
+	// Default to highest year, auto-corrects if selected year no longer exists
 	const [selectedYear, setSelectedYear] = useState<number>(() => {
 		return years.length > 0 ? Math.max(...years) : new Date().getFullYear();
 	});
 
+	// Derive the effective year — if selectedYear was deleted, fall back to highest
+	const effectiveYear = years.includes(selectedYear)
+		? selectedYear
+		: years.length > 0
+			? Math.max(...years)
+			: selectedYear;
+
 	// Find the selected student report using useMemo to avoid effect
 	const selectedReport = useMemo(() => {
 		return (
-			studentReports.find((report) => report.year === selectedYear) || null
+			studentReports.find((report) => report.year === effectiveYear) || null
 		);
-	}, [selectedYear, studentReports]);
+	}, [effectiveYear, studentReports]);
 
 	const { data: currentUser } = useCurrentUser();
 
@@ -121,14 +128,15 @@ export function StudentReportsTab({
 
 	// Lock older reports — only approved older reports are locked
 	const isLocked = isOlderReportLocked(
-		selectedYear,
+		effectiveYear,
 		years,
 		selectedReport.document.status
 	);
 	const canEdit = getEffectiveCanEdit(
 		canEditBase,
 		selectedReport.document,
-		isLocked
+		isLocked,
+		currentUser?.is_superuser
 	);
 	const lockedMessage = getLockedMessage(
 		selectedReport.document,
@@ -141,7 +149,7 @@ export function StudentReportsTab({
 			{/* Year Selector with Create Button */}
 			<YearSelector
 				years={years}
-				selectedYear={selectedYear}
+				selectedYear={effectiveYear}
 				onYearChange={setSelectedYear}
 				yearStatuses={yearStatuses}
 				action={

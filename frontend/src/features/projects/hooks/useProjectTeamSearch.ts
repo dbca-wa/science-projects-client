@@ -56,24 +56,18 @@ export const useProjectMentionableUsers = (
 		if (!searchTerm.trim()) return query.data;
 
 		const lowerSearch = searchTerm.toLowerCase().trim();
+		// Split search into words for multi-word matching (e.g. "Bob R" matches "Bob Richardson")
+		const searchWords = lowerSearch.split(/\s+/).filter(Boolean);
 
 		return query.data.filter((user) => {
-			// Match on first name
-			if (user.display_first_name?.toLowerCase().includes(lowerSearch)) {
-				return true;
-			}
+			const fullName =
+				`${user.display_first_name ?? ""} ${user.display_last_name ?? ""}`.toLowerCase();
+			const email = (user.email ?? "").toLowerCase();
 
-			// Match on last name
-			if (user.display_last_name?.toLowerCase().includes(lowerSearch)) {
-				return true;
-			}
-
-			// Match on email
-			if (user.email?.toLowerCase().includes(lowerSearch)) {
-				return true;
-			}
-
-			return false;
+			// Every search word must match somewhere in the name or email
+			return searchWords.every(
+				(word) => fullName.includes(word) || email.includes(word)
+			);
 		});
 	}, [query.data, searchTerm]);
 

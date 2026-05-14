@@ -62,17 +62,24 @@ export const ProgressReportsTab = ({
 		new Set(progressReports.map((report) => report.year))
 	).sort((a, b) => b - a); // Sort descending (newest first)
 
-	// Default to highest year
+	// Default to highest year, auto-corrects if selected year no longer exists
 	const [selectedYear, setSelectedYear] = useState<number>(() => {
 		return years.length > 0 ? Math.max(...years) : new Date().getFullYear();
 	});
 
+	// Derive the effective year — if selectedYear was deleted, fall back to highest
+	const effectiveYear = years.includes(selectedYear)
+		? selectedYear
+		: years.length > 0
+			? Math.max(...years)
+			: selectedYear;
+
 	// Find the selected progress report using useMemo to avoid effect
 	const selectedReport = useMemo(() => {
 		return (
-			progressReports.find((report) => report.year === selectedYear) || null
+			progressReports.find((report) => report.year === effectiveYear) || null
 		);
-	}, [selectedYear, progressReports]);
+	}, [effectiveYear, progressReports]);
 
 	const { data: currentUser } = useCurrentUser();
 
@@ -120,7 +127,7 @@ export const ProgressReportsTab = ({
 
 	// Lock older reports — only approved older reports are locked
 	const isLocked = isOlderReportLocked(
-		selectedYear,
+		effectiveYear,
 		years,
 		selectedReport.document.status
 	);
@@ -131,7 +138,8 @@ export const ProgressReportsTab = ({
 	const canEdit = getEffectiveCanEdit(
 		canEditBase,
 		selectedReport.document,
-		isLocked
+		isLocked,
+		currentUser?.is_superuser
 	);
 	const lockedMessage = getLockedMessage(
 		selectedReport.document,
@@ -144,7 +152,7 @@ export const ProgressReportsTab = ({
 			{/* Year Selector with Create Button */}
 			<YearSelector
 				years={years}
-				selectedYear={selectedYear}
+				selectedYear={effectiveYear}
 				onYearChange={setSelectedYear}
 				yearStatuses={yearStatuses}
 				action={

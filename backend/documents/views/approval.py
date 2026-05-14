@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_202_ACCEPTED, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
+from projects.utils.protection import is_project_protected
+
 from ..serializers import ProjectDocumentSerializer
 from ..services.approval_service import ApprovalService
 from ..services.document_service import DocumentService
@@ -171,13 +173,29 @@ class BatchApprove(APIView):
         # Get documents
         documents = [DocumentService.get_document(doc_id) for doc_id in document_ids]
 
-        # Delegate to service
+        # Separate protected vs actionable documents
+        skipped = []
+        actionable = []
+        for doc in documents:
+            if is_project_protected(doc.project):
+                skipped.append(
+                    {
+                        "document_id": doc.pk,
+                        "reason": f"Project is {doc.project.status}",
+                    }
+                )
+            else:
+                actionable.append(doc)
+
+        # Delegate to service — only process actionable documents
         send_notifications = request.data.get("send_notifications", True)
         results = ApprovalService.batch_approve(
-            documents=documents,
+            documents=actionable,
             approver=request.user,
             stage=int(stage),
             send_notifications=send_notifications,
         )
+
+        results["skipped"] = skipped
 
         return Response(results, status=HTTP_200_OK)

@@ -97,9 +97,10 @@ async function updateProject({
 					formData.append(key, String(value));
 				}
 			}
+			// Let Axios/browser set Content-Type with boundary for multipart
 			promises.push(
 				apiClient.patch(`projects/${id}`, formData, {
-					headers: { "Content-Type": "multipart/form-data" },
+					headers: { "Content-Type": undefined },
 				})
 			);
 		} else {

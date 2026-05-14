@@ -954,7 +954,7 @@ class NotificationService:
                         )
 
         # Filter to explicit recipient list if provided (takes precedence)
-        if recipient_user_pks:
+        if recipient_user_pks is not None:
             allowed = set(recipient_user_pks)
             user_roles = {pk: v for pk, v in user_roles.items() if pk in allowed}
         elif excluded_user_ids:

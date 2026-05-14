@@ -46,9 +46,9 @@ class TestMentionableUsersForProject:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_includes_ba_users(self, api_client):
-        """Users in the same business area are included"""
-        leader = UserFactory()
-        ba_user = UserFactory()
+        """Active staff users in the same business area are included"""
+        leader = UserFactory(is_staff=True)
+        ba_user = UserFactory(is_staff=True)
         ba = BusinessAreaFactory()
         project = ProjectFactory(business_area=ba, members=[])
         ProjectMemberFactory(project=project, user=leader, is_leader=True)
@@ -66,9 +66,9 @@ class TestMentionableUsersForProject:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_includes_superusers(self, api_client):
-        """Superusers are included in mentionable users"""
-        user = UserFactory()
-        superuser = UserFactory(is_superuser=True)
+        """Superusers who are staff are included in mentionable users"""
+        user = UserFactory(is_staff=True)
+        superuser = UserFactory(is_superuser=True, is_staff=True)
         ba = BusinessAreaFactory()
         project = ProjectFactory(business_area=ba, members=[])
         ProjectMemberFactory(project=project, user=user, is_leader=True)
@@ -85,9 +85,9 @@ class TestMentionableUsersForProject:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_includes_directorate_users(self, api_client):
-        """Users in the 'Directorate' business area are included"""
-        user = UserFactory()
-        directorate_user = UserFactory()
+        """Staff users in the 'Directorate' business area are included"""
+        user = UserFactory(is_staff=True)
+        directorate_user = UserFactory(is_staff=True)
         ba = BusinessAreaFactory()
         project = ProjectFactory(business_area=ba, members=[])
         ProjectMemberFactory(project=project, user=user, is_leader=True)
@@ -108,12 +108,12 @@ class TestMentionableUsersForProject:
     @pytest.mark.django_db
     @pytest.mark.integration
     def test_includes_caretakers_of_superusers(self, api_client):
-        """Caretakers of mentionable users (e.g. superusers) are included"""
+        """Staff caretakers of superusers are included"""
         from caretakers.models import Caretaker
 
-        user = UserFactory()
-        superuser = UserFactory(is_superuser=True)
-        caretaker_user = UserFactory()
+        user = UserFactory(is_staff=True)
+        superuser = UserFactory(is_superuser=True, is_staff=True)
+        caretaker_user = UserFactory(is_staff=True)
         ba = BusinessAreaFactory()
         project = ProjectFactory(business_area=ba, members=[])
         ProjectMemberFactory(project=project, user=user, is_leader=True)
@@ -148,15 +148,15 @@ class TestMentionableUsersForProject:
 
     @pytest.mark.django_db
     @pytest.mark.integration
-    def test_nonexistent_project_returns_400(self, api_client):
-        """Non-existent project returns 400"""
-        user = UserFactory()
+    def test_nonexistent_project_returns_200(self, api_client):
+        """Non-existent project still returns 200 (view returns all staff regardless)"""
+        user = UserFactory(is_staff=True)
         api_client.force_authenticate(user=user)
         response = api_client.get(
             projects_urls.path(99999, "mentionable-users"),
         )
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.django_db
     @pytest.mark.integration

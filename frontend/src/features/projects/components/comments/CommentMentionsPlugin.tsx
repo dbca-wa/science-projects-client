@@ -52,6 +52,11 @@ export const CommentMentionsPlugin = ({
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 	const [isInserting, setIsInserting] = useState(false);
+	// Track mention mode: once @ is typed, we stay in mention mode until
+	// the user exits (double-space, Escape, Enter selection, or click away)
+	const [mentionAnchorOffset, setMentionAnchorOffset] = useState<number | null>(
+		null
+	);
 
 	// Fetch mentionable users based on search query
 	const { data: mentionableUsers = [] } = useProjectMentionableUsers(
@@ -59,10 +64,12 @@ export const CommentMentionsPlugin = ({
 		queryString || ""
 	);
 
-	// Limit to 3 results
-	const filteredUsers = mentionableUsers.slice(0, 3);
-	const showDropdown =
-		queryString !== null && queryString.length > 0 && filteredUsers.length > 0;
+	// Show dropdown whenever we're in mention mode (queryString is set and non-empty)
+	// Even with 0 results, keep it open so the user knows they're still searching
+	const showDropdown = queryString !== null && queryString.length > 0;
+
+	// Limit displayed results to 5
+	const filteredUsers = mentionableUsers.slice(0, 5);
 
 	// Reset selected index when query changes (not results)
 	useEffect(() => {
@@ -72,24 +79,35 @@ export const CommentMentionsPlugin = ({
 		}
 	}, [queryString]);
 
-	// Check for @ mention pattern
+	// Check for @ mention pattern — allows spaces so users can type full names.
+	// Double-space exits the mention search.
 	const checkForMentionMatch = useCallback(
 		(text: string): MentionMatch | null => {
-			const mentionMatch = /(?:^|\s)@(\w*)$/.exec(text);
+			// Find the last @ in the text that isn't preceded by a non-space character
+			const atIndex = text.lastIndexOf("@");
+			if (atIndex === -1) return null;
 
-			if (mentionMatch !== null) {
-				const matchingString = mentionMatch[1];
-				const replaceableString = mentionMatch[0];
-				const leadOffset = mentionMatch.index;
-
-				return {
-					leadOffset,
-					matchingString,
-					replaceableString,
-				};
+			// The character before @ must be start-of-string or a space/newline
+			if (atIndex > 0) {
+				const charBefore = text[atIndex - 1];
+				if (charBefore !== " " && charBefore !== "\n") return null;
 			}
 
-			return null;
+			const afterAt = text.slice(atIndex + 1);
+
+			// Exit if there are two consecutive spaces after @
+			if (afterAt.includes("  ")) return null;
+
+			// Must have at least one non-space character after @
+			const trimmed = afterAt.trim();
+			if (trimmed.length === 0) return null;
+
+			return {
+				leadOffset: atIndex > 0 ? atIndex - 1 : 0,
+				matchingString: afterAt.trimEnd(),
+				replaceableString:
+					atIndex > 0 ? text.slice(atIndex - 1) : text.slice(atIndex),
+			};
 		},
 		[]
 	);
@@ -119,42 +137,166 @@ export const CommentMentionsPlugin = ({
 						return;
 					}
 
-					const textContent = anchorNode.getTextContent();
+					// Build text before cursor from all text children of the paragraph
+					// (same approach as the update listener to handle split text nodes)
+					const parentNode = anchorNode.getParent();
+					if (!parentNode) return;
 
-					const match = checkForMentionMatch(
-						textContent.slice(0, anchor.offset)
-					);
+					let textBeforeCursor = "";
+					const children = parentNode.getChildren();
+					for (const child of children) {
+						if (child === anchorNode) {
+							textBeforeCursor += anchorNode
+								.getTextContent()
+								.slice(0, anchor.offset);
+							break;
+						} else if ($isTextNode(child)) {
+							textBeforeCursor += child.getTextContent();
+						} else {
+							// Non-text node — reset
+							textBeforeCursor = "";
+						}
+					}
+
+					const match = checkForMentionMatch(textBeforeCursor);
 
 					if (!match) {
 						return;
 					}
 
-					// Calculate position to replace
-					const startOffset = match.leadOffset;
-					const endOffset = anchor.offset;
+					// Find the @ position — we need to delete from @ (or space before @) to cursor
+					const atIndex = textBeforeCursor.lastIndexOf("@");
+					const deleteFrom = atIndex > 0 ? atIndex - 1 : atIndex;
+					const deleteCount = textBeforeCursor.length - deleteFrom;
 
-					// Create mention node
-					const mentionNode = $createMentionNode(
-						member.id,
-						`${member.display_first_name} ${member.display_last_name}`,
-						member.email
-					);
+					// Use Lexical's selection API to select and delete the mention text
+					// Move anchor back by deleteCount characters, then delete selection
+					const focusOffset = anchor.offset;
+					const anchorText = anchorNode.getTextContent();
 
-					// Split text node and insert mention
-					if (startOffset === 0) {
-						anchorNode.replace(mentionNode);
+					// If the entire mention text is within the anchor node
+					if (deleteCount <= focusOffset) {
+						const startOffset = focusOffset - deleteCount;
+
+						// Create mention node
+						const mentionNode = $createMentionNode(
+							member.id,
+							`${member.display_first_name} ${member.display_last_name}`,
+							member.email
+						);
+
+						// Split and replace
+						if (startOffset === 0 && focusOffset === anchorText.length) {
+							// Replace entire node
+							anchorNode.replace(mentionNode);
+						} else if (startOffset === 0) {
+							// Replace from start
+							const [targetNode] = anchorNode.splitText(focusOffset);
+							targetNode.replace(mentionNode);
+						} else {
+							const parts = anchorNode.splitText(startOffset, focusOffset);
+							const targetNode = parts[1];
+							targetNode.replace(mentionNode);
+						}
+
+						// Add space after mention and position cursor
+						const spaceNode = new TextNode(" ");
+						mentionNode.insertAfter(spaceNode);
+						spaceNode.select(1, 1);
 					} else {
-						const [, targetNode] = anchorNode.splitText(startOffset, endOffset);
-						targetNode.replace(mentionNode);
+						// Mention text spans multiple nodes — use a simpler approach:
+						// Delete backward from cursor by deleteCount chars, then insert mention
+						// We'll reconstruct by removing nodes and inserting fresh
+
+						// Collect nodes to remove (from the @ onwards)
+						let charsToRemove = deleteCount;
+						const nodesToProcess: Array<{
+							node: TextNode;
+							removeChars: number;
+							fromEnd: boolean;
+						}> = [];
+
+						// Walk backwards through textNodesBefore
+						const textNodes: TextNode[] = [];
+						for (const child of children) {
+							if (child === anchorNode) {
+								textNodes.push(anchorNode);
+								break;
+							} else if ($isTextNode(child)) {
+								textNodes.push(child as TextNode);
+							} else {
+								textNodes.length = 0;
+							}
+						}
+
+						// Process from the anchor node backwards
+						for (
+							let i = textNodes.length - 1;
+							i >= 0 && charsToRemove > 0;
+							i--
+						) {
+							const node = textNodes[i];
+							const nodeLen =
+								node === anchorNode
+									? focusOffset
+									: node.getTextContent().length;
+							const removeFromThis = Math.min(charsToRemove, nodeLen);
+							nodesToProcess.unshift({
+								node,
+								removeChars: removeFromThis,
+								fromEnd: true,
+							});
+							charsToRemove -= removeFromThis;
+						}
+
+						// Create mention node
+						const mentionNode = $createMentionNode(
+							member.id,
+							`${member.display_first_name} ${member.display_last_name}`,
+							member.email
+						);
+
+						// Process: trim or remove each affected node
+						let mentionInserted = false;
+						for (const { node, removeChars } of nodesToProcess) {
+							const fullText = node.getTextContent();
+							const nodeLen =
+								node === anchorNode ? focusOffset : fullText.length;
+
+							if (removeChars >= nodeLen) {
+								// Remove entire node (or the part before cursor)
+								if (node === anchorNode && focusOffset < fullText.length) {
+									// Keep text after cursor
+									const afterText = fullText.slice(focusOffset);
+									node.setTextContent(afterText);
+									if (!mentionInserted) {
+										node.insertBefore(mentionNode);
+										mentionInserted = true;
+									}
+								} else {
+									if (!mentionInserted) {
+										node.replace(mentionNode);
+										mentionInserted = true;
+									} else {
+										node.remove();
+									}
+								}
+							} else {
+								// Partial removal — keep the beginning
+								const keepLen = nodeLen - removeChars;
+								node.setTextContent(fullText.slice(0, keepLen));
+								if (!mentionInserted) {
+									node.insertAfter(mentionNode);
+									mentionInserted = true;
+								}
+							}
+						}
+
+						// Add space after mention and position cursor
+						const spaceNode = new TextNode(" ");
+						mentionNode.insertAfter(spaceNode);
+						spaceNode.select(1, 1);
 					}
-
-					// Add space after mention and move cursor after the space
-					const spaceNode = new TextNode(" ");
-					mentionNode.insertAfter(spaceNode);
-
-					// Select the end of the space node to position cursor after it
-					const spaceEnd = spaceNode.getTextContentSize();
-					spaceNode.select(spaceEnd, spaceEnd);
 				},
 				{ discrete: true }
 			); // Make update synchronous
@@ -303,6 +445,7 @@ export const CommentMentionsPlugin = ({
 
 				if (!$isRangeSelection(selection)) {
 					setQueryString(null);
+					setMentionAnchorOffset(null);
 					return;
 				}
 
@@ -311,15 +454,44 @@ export const CommentMentionsPlugin = ({
 
 				if (!$isTextNode(anchorNode)) {
 					setQueryString(null);
+					setMentionAnchorOffset(null);
 					return;
 				}
 
-				const textContent = anchorNode.getTextContent();
-				const textBeforeCursor = textContent.slice(0, anchor.offset);
+				// Get the full text content of the paragraph (parent) node
+				// This avoids issues with Lexical splitting text nodes at spaces
+				const parentNode = anchorNode.getParent();
+				if (!parentNode) {
+					setQueryString(null);
+					setMentionAnchorOffset(null);
+					return;
+				}
+
+				// Build text before cursor from all text children of the paragraph
+				let textBeforeCursor = "";
+				const children = parentNode.getChildren();
+				for (const child of children) {
+					if (child === anchorNode) {
+						// Add text up to cursor position in the anchor node
+						textBeforeCursor += anchorNode
+							.getTextContent()
+							.slice(0, anchor.offset);
+						break;
+					} else if ($isTextNode(child)) {
+						textBeforeCursor += child.getTextContent();
+					} else {
+						// Non-text node (e.g. existing mention) — reset, start fresh after it
+						textBeforeCursor = "";
+					}
+				}
+
 				const match = checkForMentionMatch(textBeforeCursor);
 
 				if (match) {
 					setQueryString(match.matchingString);
+					if (mentionAnchorOffset === null) {
+						setMentionAnchorOffset(match.leadOffset);
+					}
 
 					// Calculate dropdown position
 					const domSelection = window.getSelection();
@@ -334,10 +506,11 @@ export const CommentMentionsPlugin = ({
 					}
 				} else {
 					setQueryString(null);
+					setMentionAnchorOffset(null);
 				}
 			});
 		});
-	}, [editor, checkForMentionMatch]);
+	}, [editor, checkForMentionMatch, mentionAnchorOffset]);
 
 	return showDropdown
 		? createPortal(
