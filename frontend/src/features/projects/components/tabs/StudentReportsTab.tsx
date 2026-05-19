@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useSearchParams } from "react-router";
 import type { IStudentReport } from "@/shared/types/document.types";
 import type {
 	IProjectData,
@@ -62,12 +63,44 @@ export function StudentReportsTab({
 		new Set(studentReports.map((report) => report.year))
 	).sort((a, b) => b - a); // Sort descending (newest first)
 
-	// Default to highest year, auto-corrects if selected year no longer exists
-	const [selectedYear, setSelectedYear] = useState<number>(() => {
-		return years.length > 0 ? Math.max(...years) : new Date().getFullYear();
-	});
+	const [searchParams, setSearchParams] = useSearchParams();
 
-	// Derive the effective year — if selectedYear was deleted, fall back to highest
+	// Parse FY param from URL (e.g. "2023-24" → 2024)
+	const yearFromUrl = useMemo(() => {
+		const fyParam = searchParams.get("FY");
+		if (!fyParam) return null;
+		const match = fyParam.match(/^(\d{4})-(\d{2})$/);
+		if (!match) return null;
+		return parseInt(match[1], 10) + 1;
+	}, [searchParams]);
+
+	// Selected year: from URL param if valid, otherwise default to latest
+	const selectedYear = useMemo(() => {
+		if (yearFromUrl && years.includes(yearFromUrl)) return yearFromUrl;
+		return years.length > 0 ? Math.max(...years) : new Date().getFullYear();
+	}, [yearFromUrl, years]);
+
+	// Update URL when year changes
+	const handleYearChange = useCallback(
+		(year: number) => {
+			setSearchParams(
+				(prev) => {
+					const next = new URLSearchParams(prev);
+					const defaultYear = years.length > 0 ? Math.max(...years) : null;
+					if (year === defaultYear) {
+						next.delete("FY");
+					} else {
+						next.set("FY", `${year - 1}-${String(year).slice(2)}`);
+					}
+					return next;
+				},
+				{ replace: true }
+			);
+		},
+		[setSearchParams, years]
+	);
+
+	// Derive the effective year — if selectedYear no longer exists, fall back to highest
 	const effectiveYear = years.includes(selectedYear)
 		? selectedYear
 		: years.length > 0
@@ -150,7 +183,7 @@ export function StudentReportsTab({
 			<YearSelector
 				years={years}
 				selectedYear={effectiveYear}
-				onYearChange={setSelectedYear}
+				onYearChange={handleYearChange}
 				yearStatuses={yearStatuses}
 				action={
 					<Tooltip>

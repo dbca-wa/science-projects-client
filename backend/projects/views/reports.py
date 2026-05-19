@@ -81,17 +81,23 @@ class CreateProgressReport(APIView):
             year=year,
         )
 
-        # Set project status to "updating" (update requested)
+        # Only change project status to "updating" if the report is for the
+        # latest annual report year. Creating reports for previous years
+        # (historical data) should not impact the project status.
         from projects.models import Project
 
-        project = Project.objects.get(pk=project_id)
-        if project.status not in (
-            Project.StatusChoices.SUSPENDED,
-            Project.StatusChoices.COMPLETED,
-            Project.StatusChoices.TERMINATED,
-        ):
-            project.status = Project.StatusChoices.UPDATING
-            project.save()
+        latest_report = AnnualReport.objects.order_by("-year").first()
+        is_latest_year = latest_report and year == latest_report.year
+
+        if is_latest_year:
+            project = Project.objects.get(pk=project_id)
+            if project.status not in (
+                Project.StatusChoices.SUSPENDED,
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ):
+                project.status = Project.StatusChoices.UPDATING
+                project.save()
 
         settings.LOGGER.info(
             f"{request.user} created progress report {progress_report.id} for project {project_id}"
@@ -164,17 +170,23 @@ class CreateStudentReport(APIView):
             year=year,
         )
 
-        # Set project status to "updating" (update requested)
+        # Only change project status to "updating" if the report is for the
+        # latest annual report year. Creating reports for previous years
+        # (historical data) should not impact the project status.
         from projects.models import Project
 
-        project = Project.objects.get(pk=project_id)
-        if project.status not in (
-            Project.StatusChoices.SUSPENDED,
-            Project.StatusChoices.COMPLETED,
-            Project.StatusChoices.TERMINATED,
-        ):
-            project.status = Project.StatusChoices.UPDATING
-            project.save()
+        latest_report = AnnualReport.objects.order_by("-year").first()
+        is_latest_year = latest_report and year == latest_report.year
+
+        if is_latest_year:
+            project = Project.objects.get(pk=project_id)
+            if project.status not in (
+                Project.StatusChoices.SUSPENDED,
+                Project.StatusChoices.COMPLETED,
+                Project.StatusChoices.TERMINATED,
+            ):
+                project.status = Project.StatusChoices.UPDATING
+                project.save()
 
         settings.LOGGER.info(
             f"{request.user} created student report {student_report.id} for project {project_id}"
