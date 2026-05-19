@@ -37,10 +37,25 @@ def _build_document_context(document):
 
     Returns a dict with document_type, document_type_title, plain_project_name,
     document_url, and site_url — the variables most email templates need.
+
+    For progress reports and student reports, the URL includes a ?FY= query
+    parameter so the link opens the correct financial year (not just the latest).
     """
     document_type_title = DOCUMENT_KIND_MAP.get(document.kind, document.kind)
     url_kind = URL_KIND_MAP.get(document.kind, document.kind)
     document_url = f"{settings.SITE_URL}/projects/{document.project.pk}/{url_kind}"
+
+    # Add ?FY= param for progress reports and student reports
+    if document.kind == "progressreport":
+        report_detail = document.progress_report_details.first()
+        if report_detail and report_detail.year:
+            year = report_detail.year
+            document_url += f"?FY={year - 1}-{str(year)[2:]}"
+    elif document.kind == "studentreport":
+        report_detail = document.student_report_details.first()
+        if report_detail and report_detail.year:
+            year = report_detail.year
+            document_url += f"?FY={year - 1}-{str(year)[2:]}"
 
     return {
         "document_type": document.kind,
@@ -150,10 +165,24 @@ class NotificationService:
             recipients = NotificationService._get_batch_approval_recipients(doc)
             kind_label = document_kind_dict.get(doc.kind, doc.kind)
             url_kind = url_kind_map.get(doc.kind, doc.kind)
+            doc_url = f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}"
+
+            # Add ?FY= param for progress/student reports
+            if doc.kind == "progressreport":
+                report_detail = doc.progress_report_details.first()
+                if report_detail and report_detail.year:
+                    year = report_detail.year
+                    doc_url += f"?FY={year - 1}-{str(year)[2:]}"
+            elif doc.kind == "studentreport":
+                report_detail = doc.student_report_details.first()
+                if report_detail and report_detail.year:
+                    year = report_detail.year
+                    doc_url += f"?FY={year - 1}-{str(year)[2:]}"
+
             doc_info = {
                 "project_title": strip_tags(doc.project.title),
                 "document_kind": kind_label,
-                "document_url": f"{settings.SITE_URL}/projects/{doc.project.pk}/{url_kind}",
+                "document_url": doc_url,
             }
 
             for recipient in recipients:
@@ -439,6 +468,23 @@ class NotificationService:
                     email_subject = f"SPMS: Action Required - {strip_tags(doc_data.get('projectTitle', ''))}"
                     to_email = [user_to_action.email]
 
+                    # Build document URL with ?FY= for progress/student reports
+                    doc_url = f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}"
+                    if document_kind_raw in ("progressreport", "studentreport"):
+                        doc_id = doc_data.get("documentId")
+                        if doc_id:
+                            try:
+                                doc_obj = ProjectDocument.objects.get(pk=doc_id)
+                                if document_kind_raw == "progressreport":
+                                    detail = doc_obj.progress_report_details.first()
+                                else:
+                                    detail = doc_obj.student_report_details.first()
+                                if detail and detail.year:
+                                    year = detail.year
+                                    doc_url += f"?FY={year - 1}-{str(year)[2:]}"
+                            except ProjectDocument.DoesNotExist:
+                                pass
+
                     template_props = {
                         "email_subject": email_subject,
                         "actioning_user_email": actioning_user_email,
@@ -451,7 +497,7 @@ class NotificationService:
                         "document_kind_raw": document_kind_raw,
                         "action_capacity": doc_data.get("actionCapacity"),
                         "site_url": settings.SITE_URL,
-                        "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
+                        "document_url": doc_url,
                     }
 
                     template_content = render_to_string(template_path, template_props)
@@ -505,6 +551,24 @@ class NotificationService:
                     "document_kind": document_kind_title,
                     "document_url": f"{settings.SITE_URL}/projects/{doc_data.get('projectId')}/{url_doc_kind}",
                 }
+
+                # Add ?FY= for progress/student reports in consolidated emails
+                if document_kind_raw in ("progressreport", "studentreport"):
+                    doc_id = doc_data.get("documentId")
+                    if doc_id:
+                        try:
+                            doc_obj = ProjectDocument.objects.get(pk=doc_id)
+                            if document_kind_raw == "progressreport":
+                                detail = doc_obj.progress_report_details.first()
+                            else:
+                                detail = doc_obj.student_report_details.first()
+                            if detail and detail.year:
+                                year = detail.year
+                                doc_info[
+                                    "document_url"
+                                ] += f"?FY={year - 1}-{str(year)[2:]}"
+                        except ProjectDocument.DoesNotExist:
+                            pass
 
                 action_capacity = doc_data.get("actionCapacity", "")
                 if "business area" in action_capacity.lower():
@@ -635,6 +699,18 @@ class NotificationService:
             "projectclosure": "closure",
         }
         document_url = f"{settings.SITE_URL}/projects/{project.pk}/{url_safe_kind_dict[document.kind]}"
+
+        # Add ?FY= param for progress/student reports
+        if document.kind == "progressreport":
+            report_detail = document.progress_report_details.first()
+            if report_detail and report_detail.year:
+                year = report_detail.year
+                document_url += f"?FY={year - 1}-{str(year)[2:]}"
+        elif document.kind == "studentreport":
+            report_detail = document.student_report_details.first()
+            if report_detail and report_detail.year:
+                year = report_detail.year
+                document_url += f"?FY={year - 1}-{str(year)[2:]}"
 
         # Clean comment content
         def clean_comment_content(html_content):
@@ -798,6 +874,18 @@ class NotificationService:
             "projectclosure": "closure",
         }
         document_url = f"{settings.SITE_URL}/projects/{project.pk}/{url_safe_kind_dict.get(document.kind, document.kind)}"
+
+        # Add ?FY= param for progress/student reports
+        if document.kind == "progressreport":
+            report_detail = document.progress_report_details.first()
+            if report_detail and report_detail.year:
+                year = report_detail.year
+                document_url += f"?FY={year - 1}-{str(year)[2:]}"
+        elif document.kind == "studentreport":
+            report_detail = document.student_report_details.first()
+            if report_detail and report_detail.year:
+                year = report_detail.year
+                document_url += f"?FY={year - 1}-{str(year)[2:]}"
 
         commenter_name = f"{commenter.display_first_name} {commenter.display_last_name}"
         document_kind_readable = ProjectDocument.CategoryKindChoices(
