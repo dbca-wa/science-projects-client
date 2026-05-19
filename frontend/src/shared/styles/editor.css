@@ -468,6 +468,14 @@
 	padding-left: 1.5rem;
 	margin: 0.25rem 0;
 }
+.editor-input-display ol ol,
+.editor-readonly .editor-input-display ol ol {
+	list-style-type: lower-alpha;
+}
+.editor-input-display ol ol ol,
+.editor-readonly .editor-input-display ol ol ol {
+	list-style-type: lower-roman;
+}
 .editor-input-display ul ul,
 .editor-readonly .editor-input-display ul ul {
 	list-style-type: circle;

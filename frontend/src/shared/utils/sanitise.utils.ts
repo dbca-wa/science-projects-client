@@ -200,11 +200,12 @@ export function sanitizeRichText(html: string): string {
 			"class",
 			"style",
 			"role",
+			"aria-level",
 			"aria-checked",
 			"tabindex",
 			"__lexicallisttype",
 		],
-		ALLOW_DATA_ATTR: false,
+		ALLOW_DATA_ATTR: true,
 		// Explicitly forbid dangerous tags
 		FORBID_TAGS: [
 			"script",
