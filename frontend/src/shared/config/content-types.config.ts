@@ -100,6 +100,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "background", content);
@@ -114,6 +115,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "aims", content);
@@ -128,6 +130,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "outcome", content);
@@ -142,6 +145,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "collaborations", content);
@@ -156,6 +160,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "strategic_context", content);
@@ -171,6 +176,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "staff_time_allocation", content);
@@ -185,6 +191,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["concept-plans", "detail", id],
 			["concept-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateConceptPlanField(id, "budget", content);
@@ -200,6 +207,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "background", content);
@@ -215,6 +223,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "aims", content);
@@ -229,6 +238,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "outcome", content);
@@ -243,6 +253,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "knowledge_transfer", content);
@@ -258,6 +269,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "project_tasks", content);
@@ -273,6 +285,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "listed_references", content);
@@ -288,6 +301,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "methodology", content);
@@ -302,6 +316,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "operating_budget", content);
@@ -316,6 +331,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "operating_budget_external", content);
@@ -330,6 +346,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectPlanField(id, "related_projects", content);
@@ -345,6 +362,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			// Note: This updates the endorsements object, not the project plan directly
@@ -360,6 +378,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-plans", "detail", id],
 			["project-plans"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			// Note: This updates the endorsements object, not the project plan directly
@@ -376,6 +395,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["progress-reports", "detail", id],
 			["progress-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProgressReportField(id, "context", content);
@@ -391,6 +411,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["progress-reports", "detail", id],
 			["progress-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProgressReportField(id, "aims", content);
@@ -405,6 +426,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["progress-reports", "detail", id],
 			["progress-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProgressReportField(id, "progress", content);
@@ -419,6 +441,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["progress-reports", "detail", id],
 			["progress-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProgressReportField(id, "implications", content);
@@ -433,6 +456,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["progress-reports", "detail", id],
 			["progress-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProgressReportField(id, "future", content);
@@ -448,6 +472,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["student-reports", "detail", id],
 			["student-reports"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateStudentReportField(id, "progress_report", content);
@@ -463,7 +488,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
-			["projects", "detail"], // Invalidate all project details to update parent
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "intended_outcome", content);
@@ -478,6 +503,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "reason", content);
@@ -492,6 +518,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "scientific_outputs", content);
@@ -506,6 +533,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "knowledge_transfer", content);
@@ -520,6 +548,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "data_location", content);
@@ -534,6 +563,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "hardcopy_location", content);
@@ -548,6 +578,7 @@ export const CONTENT_TYPE_CONFIGS: Record<ContentType, ContentTypeConfig> = {
 		invalidateKeys: (id: number) => [
 			["project-closures", "detail", id],
 			["project-closures"],
+			["projects"],
 		],
 		updateFn: async (id: number, content: string) => {
 			await updateProjectClosureField(id, "backup_location", content);
