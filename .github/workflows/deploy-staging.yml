@@ -82,6 +82,8 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:test
           build-args: |
@@ -130,6 +132,8 @@ jobs:
         with:
           context: ./backend
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:test
           cache-from: type=gha,scope=backend-staging

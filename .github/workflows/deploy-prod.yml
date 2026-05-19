@@ -82,6 +82,8 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:${{ steps.version.outputs.VERSION }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-frontend:stable
@@ -137,6 +139,8 @@ jobs:
         with:
           context: ./backend
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:${{ steps.version.outputs.VERSION }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-backend:stable
@@ -329,6 +333,60 @@ jobs:
           echo "1. Test environment will use new images" >> $GITHUB_STEP_SUMMARY
           echo "2. Verify functionality in test environment" >> $GITHUB_STEP_SUMMARY
           echo "3. Deploy to production when ready" >> $GITHUB_STEP_SUMMARY
+
+  # ====================== CLEANUP OLD PACKAGE VERSIONS ======================
+  cleanup-packages:
+    name: Cleanup Old Package Versions
+    runs-on: ubuntu-latest
+    needs: [build-frontend-prod, build-backend-prod]
+    if: |
+      always() &&
+      (needs.build-frontend-prod.result == 'success' || needs.build-backend-prod.result == 'success')
+
+    steps:
+      # Step 1: Remove orphaned untagged versions (platform manifests from old builds)
+      # Keep 10 most recent untagged versions to support the 10 most recent tagged releases
+      - name: Cleanup untagged frontend versions
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: dbca-wa
+          package-name: science-projects-frontend
+          package-type: container
+          min-versions-to-keep: 10
+          delete-only-untagged-versions: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup untagged backend versions
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: dbca-wa
+          package-name: science-projects-backend
+          package-type: container
+          min-versions-to-keep: 10
+          delete-only-untagged-versions: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 2: Remove old tagged versions, keeping the 10 most recent releases
+      # The 'stable' tag is always preserved via ignore-versions regex
+      - name: Cleanup old frontend releases
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: dbca-wa
+          package-name: science-projects-frontend
+          package-type: container
+          min-versions-to-keep: 10
+          ignore-versions: '^stable$'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup old backend releases
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: dbca-wa
+          package-name: science-projects-backend
+          package-type: container
+          min-versions-to-keep: 10
+          ignore-versions: '^stable$'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   # ====================== VULNERABILITY SCAN ======================
   scan-frontend:
