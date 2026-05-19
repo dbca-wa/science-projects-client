@@ -107,15 +107,17 @@ class NotificationService:
 
         # Use different notification type for final approval (stage 3)
         notification_type = "approved"
-        email_subject = f"{document.kind.title()} Approved"
+        doc_ctx = _build_document_context(document)
+        doc_type_title = doc_ctx["document_type_title"]
+        email_subject = f"{doc_type_title} Approved"
 
         if stage == 3:
-            email_subject = f"{document.kind.title()} — Final Approval Granted"
+            email_subject = f"{doc_type_title} — Final Approval Granted"
 
         additional_context = {
             "email_subject": email_subject,
             "stage": stage,
-            **_build_document_context(document),
+            **doc_ctx,
         }
         if feedback_html:
             additional_context["feedback_html"] = feedback_html
