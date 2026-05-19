@@ -9,7 +9,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { axe, toHaveNoViolations } from "jest-axe";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router";
+import { MemoryRouter } from "react-router";
 import { ProgressReportsTab } from "./ProgressReportsTab";
 import type { IProgressReport } from "@/shared/types/document.types";
 import type { IProjectData } from "@/shared/types/project.types";
@@ -203,7 +203,7 @@ function renderWithProviders(ui: React.ReactElement) {
 
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<BrowserRouter>{ui}</BrowserRouter>
+			<MemoryRouter>{ui}</MemoryRouter>
 		</QueryClientProvider>
 	);
 }
