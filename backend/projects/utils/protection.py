@@ -24,6 +24,29 @@ DOCUMENT_STAGE_ORDER: dict[str, int] = {
 }
 
 
+def has_closure_document(project: "Project") -> bool:
+    """
+    Check if a project has any closure document (excluding drafts with status 'new').
+
+    This is broader than is_project_protected() — it catches projects that have
+    a closure in progress (submitted, in review, approved) regardless of the
+    project's current status.
+
+    Args:
+        project: Project instance to check.
+
+    Returns:
+        True if the project has a non-draft closure document.
+    """
+    from documents.models import ProjectDocument
+
+    return (
+        ProjectDocument.objects.filter(project=project, kind="projectclosure")
+        .exclude(status="new")
+        .exists()
+    )
+
+
 def is_project_protected(project: "Project") -> bool:
     """
     Check if a project is in a protected state for document creation and

@@ -60,6 +60,7 @@ import {
 } from "@/shared/utils/user.utils";
 import { getStyledHtmlOrFallback } from "@/shared/utils/html-display.utils";
 import { UserDisplay } from "@/shared/components/user";
+import { EditExternalUserName } from "@/shared/components/user-sheet";
 import { getImageUrl } from "@/shared/utils/image.utils";
 import { useCancelAdminTask } from "@/shared/hooks/useAdminTaskActions";
 
@@ -346,6 +347,12 @@ export const UserDetailSheet = observer(
 										)}
 									</div>
 								</div>
+
+								{/* Edit Name for External Users */}
+								<EditExternalUserName
+									user={user}
+									canEdit={authStore.user?.is_staff ?? false}
+								/>
 
 								{/* Action Buttons */}
 								<div className="grid grid-cols-2 gap-4 mb-4 pt-2 pb-4">

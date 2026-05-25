@@ -68,6 +68,9 @@ export interface IProblematicProjectsData {
 	external_leaders: IProblematicProject[];
 	no_business_area: IProblematicProject[];
 	role_mismatch: IProblematicProject[];
+	closure_state_mismatch: IProblematicProject[];
+	closure_not_closing: IProblematicProject[];
+	legacy_suspended_closure: IProblematicProject[];
 }
 
 export interface IProblematicProject {

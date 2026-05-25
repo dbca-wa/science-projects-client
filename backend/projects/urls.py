@@ -69,4 +69,13 @@ urlpatterns = [
     path("remedy/multiple_leaders", views.RemedyMultipleLeaderProjects.as_view()),
     path("remedy/external_leaders", views.RemedyExternalLeaderProjects.as_view()),
     path("remedy/role_mismatch", views.RemedyRoleMismatch.as_view()),
+    path(
+        "remedy/closure_state_mismatch",
+        views.RemedyClosureStateMismatch.as_view(),
+    ),
+    path("remedy/closure_not_closing", views.RemedyClosureNotClosing.as_view()),
+    path(
+        "remedy/legacy_suspended_closure",
+        views.RemedyLegacySuspendedClosure.as_view(),
+    ),
 ]

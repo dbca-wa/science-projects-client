@@ -538,7 +538,7 @@ class ReopenProject(APIView):
         return Project.StatusChoices.NEW
 
     def post(self, request, pk):
-        """Reopen a project by removing the closure and restoring appropriate status"""
+        """Reopen a project by removing the closure and setting to updating status"""
         from ..services.notification_service import NotificationService
         from ..utils.helpers import get_current_maintainer_id
 
@@ -556,16 +556,18 @@ class ReopenProject(APIView):
                 if project_document is None:
                     project = Project.objects.filter(pk=pk).first()
                     if project:
-                        project.status = self._determine_reopened_status(project)
-                        project.save()
+                        project.status = Project.StatusChoices.UPDATING
+                        project.status_before_suspend = None
+                        project.save(skip_closure_validation=True)
                 else:
                     project = project_document.project
                     project_document.delete()
                     # Refresh project from DB after deleting closure
                     project = Project.objects.filter(pk=project.pk).first()
                     if project:
-                        project.status = self._determine_reopened_status(project)
-                        project.save()
+                        project.status = Project.StatusChoices.UPDATING
+                        project.status_before_suspend = None
+                        project.save(skip_closure_validation=True)
 
                 settings.LOGGER.info(msg="Sending project reopened email")
 
@@ -655,12 +657,13 @@ class BatchApproveOld(APIView):
                 project__business_area__division=last_report.division
             )
 
-        # Pre-fetch project PKs that have an approved closure (for status logic)
+        # Pre-fetch project PKs that have any non-draft closure (for status logic)
         closure_project_pks = set(
             ProjectDocument.objects.filter(
                 kind="projectclosure",
-                status="approved",
-            ).values_list("project_id", flat=True)
+            )
+            .exclude(status="new")
+            .values_list("project_id", flat=True)
         )
 
         try:
@@ -822,12 +825,13 @@ class BatchApproveCurrent(APIView):
                 project__business_area__division=last_report.division
             )
 
-        # Pre-fetch project PKs with approved closures
+        # Pre-fetch project PKs with any non-draft closure
         closure_project_pks = set(
             ProjectDocument.objects.filter(
                 kind="projectclosure",
-                status="approved",
-            ).values_list("project_id", flat=True)
+            )
+            .exclude(status="new")
+            .values_list("project_id", flat=True)
         )
 
         try:
@@ -930,13 +934,15 @@ def _deduplicate_by_highest_role(users_with_roles):
         dict with keys 'ba_leads', 'project_leads', 'team_members',
         each containing a list of {pk, name, email}.
     """
+    from users.utils import get_user_display_name
+
     best_role = {}  # pk → (priority, label, name, email)
     for user, priority, label in users_with_roles:
         if user.pk not in best_role or priority > best_role[user.pk][0]:
             best_role[user.pk] = (
                 priority,
                 label,
-                f"{user.display_first_name} {user.display_last_name}",
+                get_user_display_name(user),
                 user.email,
             )
 
@@ -1106,8 +1112,10 @@ class NewCycleOpenPreview(APIView):
             if _is_valid(ba.leader):
                 users_with_roles.append((ba.leader, 3, "BA Lead"))
 
-        # Project leads and team members — exclude protected projects
-        all_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY)
+        # Project leads and team members — exclude protected projects and inactive BAs
+        all_projects = Project.objects.exclude(status__in=Project.CLOSED_ONLY).filter(
+            business_area__is_active=True
+        )
         if division_slug and last_report and last_report.division:
             all_projects = all_projects.filter(
                 business_area__division=last_report.division

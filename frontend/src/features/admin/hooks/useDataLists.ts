@@ -44,6 +44,7 @@ export const useStaffEmailList = () => {
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { apiClient } from "@/shared/services/api/client.service";
 import {
 	remedyOpenClosed,
 	remedyMemberless,
@@ -153,6 +154,68 @@ export const useRemedyRoleMismatch = () => {
 			});
 			toast.success(
 				`Remedied ${data.successful} project(s), skipped ${data.skipped ?? 0}`
+			);
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to remedy projects");
+		},
+	});
+};
+
+/** Remedy closure state mismatch projects */
+export const useRemedyClosureStateMismatch = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: () =>
+			apiClient.post<{ successful: number; errors: string[] }>(
+				"projects/remedy/closure_state_mismatch"
+			),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ["admin", "problematic-projects"],
+			});
+			toast.success(`Remedied ${data.successful} project(s)`);
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to remedy projects");
+		},
+	});
+};
+
+/** Remedy closure not closing projects */
+export const useRemedyClosureNotClosing = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: () =>
+			apiClient.post<{ successful: number; errors: string[] }>(
+				"projects/remedy/closure_not_closing"
+			),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ["admin", "problematic-projects"],
+			});
+			toast.success(`Remedied ${data.successful} project(s)`);
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Failed to remedy projects");
+		},
+	});
+};
+
+/** Remedy legacy suspended closure projects */
+export const useRemedyLegacySuspendedClosure = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: () =>
+			apiClient.post<{ successful: number; errors: string[] }>(
+				"projects/remedy/legacy_suspended_closure"
+			),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ["admin", "problematic-projects"],
+			});
+			toast.success(
+				`Removed closure documents from ${data.successful} project(s)`
 			);
 		},
 		onError: (error: Error) => {

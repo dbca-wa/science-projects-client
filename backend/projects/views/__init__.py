@@ -4,7 +4,10 @@ Project views
 
 from .admin import (
     ProblematicProjects,
+    RemedyClosureNotClosing,
+    RemedyClosureStateMismatch,
     RemedyExternalLeaderProjects,
+    RemedyLegacySuspendedClosure,
     RemedyMemberlessProjects,
     RemedyMultipleLeaderProjects,
     RemedyNoLeaderProjects,
@@ -87,6 +90,9 @@ __all__ = [
     "RemedyMultipleLeaderProjects",
     "RemedyExternalLeaderProjects",
     "RemedyRoleMismatch",
+    "RemedyClosureStateMismatch",
+    "RemedyClosureNotClosing",
+    "RemedyLegacySuspendedClosure",
     # Export
     "DownloadAllProjectsAsCSV",
     "DownloadARProjectsAsCSV",

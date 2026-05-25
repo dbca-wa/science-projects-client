@@ -21,6 +21,9 @@ import {
 	useRemedyMultipleLeaders,
 	useRemedyExternalLeaders,
 	useRemedyRoleMismatch,
+	useRemedyClosureStateMismatch,
+	useRemedyClosureNotClosing,
+	useRemedyLegacySuspendedClosure,
 } from "../../hooks/useDataLists";
 import type {
 	IProblematicProject,
@@ -96,6 +99,27 @@ const CATEGORIES: CategoryConfig[] = [
 		actionType: "remedy",
 		remedyDescription:
 			"Fixes mismatches between the is_leader flag and the supervising role. Leaders without the supervising role will get it assigned. Members with the supervising role but without is_leader will be demoted (if another leader exists) or promoted to leader.",
+	},
+	{
+		key: "closure_state_mismatch",
+		label: "Projects with Closure Document in Wrong State",
+		actionType: "remedy",
+		remedyDescription:
+			"Each affected project will be set to 'closure_requested' status to align with its closure document.",
+	},
+	{
+		key: "closure_not_closing",
+		label: "Projects with Any Closure Not in Closing State",
+		actionType: "remedy",
+		remedyDescription:
+			"Projects with a fully-approved closure will be set to their intended outcome (completed or terminated). Projects with an unapproved closure will be set to 'closure_requested'.",
+	},
+	{
+		key: "legacy_suspended_closure",
+		label: "Suspended Projects with Closure (Legacy)",
+		actionType: "remedy",
+		remedyDescription:
+			"The closure document will be removed from each project. The project will remain in 'suspended' status.",
 	},
 ];
 
@@ -241,13 +265,20 @@ const RemedyConfirmDialog = ({
 				</DialogDescription>
 			</DialogHeader>
 			<p className="text-sm text-muted-foreground py-2">{description}</p>
+			<div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+				<p className="text-sm text-amber-800 dark:text-amber-300">
+					<strong>⚠ Note:</strong> This automated remedy may not catch all edge
+					cases. Manual review of each affected project is recommended to ensure
+					the correct state is applied.
+				</p>
+			</div>
 			<DialogFooter>
 				<Button variant="outline" onClick={() => onOpenChange(false)}>
 					Cancel
 				</Button>
 				<Button onClick={onConfirm} disabled={isPending}>
 					{isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-					Remedy
+					Approve & Remedy
 				</Button>
 			</DialogFooter>
 		</DialogContent>
@@ -324,6 +355,9 @@ export const ProblematicProjectsTab = () => {
 	const multipleLeadersMutation = useRemedyMultipleLeaders();
 	const externalLeadersMutation = useRemedyExternalLeaders();
 	const roleMismatchMutation = useRemedyRoleMismatch();
+	const closureStateMismatchMutation = useRemedyClosureStateMismatch();
+	const closureNotClosingMutation = useRemedyClosureNotClosing();
+	const legacySuspendedClosureMutation = useRemedyLegacySuspendedClosure();
 
 	if (isLoading) {
 		return (
@@ -384,6 +418,12 @@ export const ProblematicProjectsTab = () => {
 			multiple_leaders: multipleLeadersMutation,
 			external_leaders: externalLeadersMutation,
 			role_mismatch: roleMismatchMutation,
+			closure_state_mismatch:
+				closureStateMismatchMutation as unknown as typeof memberlessMutation,
+			closure_not_closing:
+				closureNotClosingMutation as unknown as typeof memberlessMutation,
+			legacy_suspended_closure:
+				legacySuspendedClosureMutation as unknown as typeof memberlessMutation,
 		};
 
 		const mutation = mutationMap[key];
@@ -402,6 +442,9 @@ export const ProblematicProjectsTab = () => {
 			multiple_leaders: multipleLeadersMutation.isPending,
 			external_leaders: externalLeadersMutation.isPending,
 			role_mismatch: roleMismatchMutation.isPending,
+			closure_state_mismatch: closureStateMismatchMutation.isPending,
+			closure_not_closing: closureNotClosingMutation.isPending,
+			legacy_suspended_closure: legacySuspendedClosureMutation.isPending,
 		};
 		return pendingMap[key] ?? false;
 	};

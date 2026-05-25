@@ -15,6 +15,7 @@ urlpatterns = [
     ),  # Using "list" instead of "" to avoid trailing slash
     # Integer pk pattern comes after string patterns
     path("<int:pk>", views.UserDetail.as_view()),
+    path("<int:pk>/name", views.UserNameUpdate.as_view()),
     # Login / Config Views
     path("<int:pk>/toggleactive", views.ToggleUserActive.as_view()),
     path("<int:pk>/admin", views.SwitchAdmin.as_view()),

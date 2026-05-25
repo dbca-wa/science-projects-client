@@ -162,6 +162,53 @@ class ProblematicProjects(APIView):
             .distinct()
         )
 
+        # Projects with a non-new closure document but NOT in a valid closure state
+        closure_state_mismatch = (
+            Project.objects.filter(
+                documents__kind="projectclosure",
+            )
+            .exclude(documents__status="new")
+            .exclude(status__in=Project.VALID_CLOSURE_STATES)
+            .select_related("business_area")
+            .prefetch_related("members")
+            .distinct()
+        )
+
+        # Projects with ANY closure document not in closing-related states
+        # (broader than closure_state_mismatch — includes suspended etc.)
+        closure_not_closing = (
+            Project.objects.filter(documents__kind="projectclosure")
+            .exclude(
+                status__in=[
+                    Project.StatusChoices.CLOSUREREQ,
+                    Project.StatusChoices.CLOSING,
+                    Project.StatusChoices.FINAL_UPDATE,
+                    Project.StatusChoices.COMPLETED,
+                    Project.StatusChoices.TERMINATED,
+                ]
+            )
+            .select_related("business_area")
+            .prefetch_related("members")
+            .distinct()
+        )
+
+        # Legacy suspended projects with a fully-approved closure whose
+        # intended_outcome is NOT completed or terminated
+        legacy_suspended_closure = (
+            Project.objects.filter(
+                status=Project.StatusChoices.SUSPENDED,
+                documents__kind="projectclosure",
+                documents__project_lead_approval_granted=True,
+                documents__business_area_lead_approval_granted=True,
+                documents__directorate_approval_granted=True,
+                documents__status="approved",
+            )
+            .exclude(closure__intended_outcome__in=["completed", "terminated"])
+            .select_related("business_area")
+            .prefetch_related("members", "closure")
+            .distinct()
+        )
+
         response_data = {
             "open_with_closure": ProblematicProjectSerializer(
                 open_with_closure, many=True
@@ -183,6 +230,15 @@ class ProblematicProjects(APIView):
             ).data,
             "role_mismatch": ProblematicProjectSerializer(
                 role_mismatch, many=True
+            ).data,
+            "closure_state_mismatch": ProblematicProjectSerializer(
+                closure_state_mismatch, many=True
+            ).data,
+            "closure_not_closing": ProblematicProjectSerializer(
+                closure_not_closing, many=True
+            ).data,
+            "legacy_suspended_closure": ProblematicProjectSerializer(
+                legacy_suspended_closure, many=True
             ).data,
         }
 
@@ -1099,5 +1155,171 @@ class RemedyRoleMismatch(APIView):
 
         return Response(
             {"successful": successful, "skipped": skipped, "details": details},
+            status=HTTP_200_OK,
+        )
+
+
+class RemedyClosureStateMismatch(APIView):
+    """Remedy projects with closure documents in wrong states"""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Set all closure-state-mismatch projects to closure_requested."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can perform this action"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        # Find affected projects
+        affected = (
+            Project.objects.filter(documents__kind="projectclosure")
+            .exclude(documents__status="new")
+            .exclude(status__in=Project.VALID_CLOSURE_STATES)
+            .distinct()
+        )
+
+        successful = 0
+        errors = []
+
+        for project in affected:
+            try:
+                project.status = Project.StatusChoices.CLOSUREREQ
+                project.save(skip_closure_validation=True)
+                successful += 1
+            except Exception as e:
+                errors.append(f"Project {project.pk}: {str(e)}")
+
+        return Response(
+            {"successful": successful, "errors": errors},
+            status=HTTP_200_OK,
+        )
+
+
+class RemedyClosureNotClosing(APIView):
+    """Remedy projects with any closure not in closing states"""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Set projects to correct closure state based on closure approval status."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can perform this action"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        affected = (
+            Project.objects.filter(documents__kind="projectclosure")
+            .exclude(
+                status__in=[
+                    Project.StatusChoices.CLOSUREREQ,
+                    Project.StatusChoices.CLOSING,
+                    Project.StatusChoices.FINAL_UPDATE,
+                    Project.StatusChoices.COMPLETED,
+                    Project.StatusChoices.TERMINATED,
+                ]
+            )
+            .prefetch_related("documents", "closure")
+            .distinct()
+        )
+
+        successful = 0
+        errors = []
+
+        for project in affected:
+            try:
+                # Find the closure document
+                closure_doc = (
+                    ProjectDocument.objects.filter(
+                        project=project, kind="projectclosure"
+                    )
+                    .exclude(status="new")
+                    .first()
+                )
+
+                if not closure_doc:
+                    continue
+
+                # If fully approved, set to intended outcome
+                if (
+                    closure_doc.project_lead_approval_granted
+                    and closure_doc.business_area_lead_approval_granted
+                    and closure_doc.directorate_approval_granted
+                ):
+                    # Get intended outcome from closure detail
+                    closure_detail = getattr(project, "closure", None)
+                    if closure_detail and closure_detail.intended_outcome in [
+                        "completed",
+                        "terminated",
+                    ]:
+                        project.status = closure_detail.intended_outcome
+                    else:
+                        project.status = Project.StatusChoices.COMPLETED
+                else:
+                    # Not fully approved — set to closure_requested
+                    project.status = Project.StatusChoices.CLOSUREREQ
+
+                project.save(skip_closure_validation=True)
+                successful += 1
+            except Exception as e:
+                errors.append(f"Project {project.pk}: {str(e)}")
+
+        return Response(
+            {"successful": successful, "errors": errors},
+            status=HTTP_200_OK,
+        )
+
+
+class RemedyLegacySuspendedClosure(APIView):
+    """Remedy legacy suspended projects that used closure for suspension"""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Remove closure documents from suspended projects, keep them suspended."""
+        if not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers can perform this action"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        affected = (
+            Project.objects.filter(
+                status=Project.StatusChoices.SUSPENDED,
+                documents__kind="projectclosure",
+                documents__project_lead_approval_granted=True,
+                documents__business_area_lead_approval_granted=True,
+                documents__directorate_approval_granted=True,
+                documents__status="approved",
+            )
+            .exclude(closure__intended_outcome__in=["completed", "terminated"])
+            .prefetch_related("documents")
+            .distinct()
+        )
+
+        successful = 0
+        errors = []
+
+        for project in affected:
+            try:
+                with transaction.atomic():
+                    # Delete the closure document(s) and their details
+                    closure_docs = ProjectDocument.objects.filter(
+                        project=project, kind="projectclosure"
+                    )
+                    # Delete associated ProjectClosure records first
+                    from documents.models import ProjectClosure
+
+                    ProjectClosure.objects.filter(document__in=closure_docs).delete()
+                    closure_docs.delete()
+                    # Project stays in suspended status — no change needed
+                    successful += 1
+            except Exception as e:
+                errors.append(f"Project {project.pk}: {str(e)}")
+
+        return Response(
+            {"successful": successful, "errors": errors},
             status=HTTP_200_OK,
         )

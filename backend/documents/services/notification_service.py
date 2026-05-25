@@ -9,6 +9,7 @@ from django.utils.html import strip_tags
 from config.helpers import send_email_with_embedded_image
 from projects.models import Project
 from users.models import User
+from users.utils import get_user_display_name
 
 from ..models import ProjectDocument
 from .email_service import EmailService
@@ -414,9 +415,7 @@ class NotificationService:
         Returns:
             dict with emails_sent count and any errors.
         """
-        actioning_user_name = (
-            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
-        )
+        actioning_user_name = get_user_display_name(actioning_user)
         actioning_user_email = actioning_user.email
 
         document_kind_dict = {
@@ -456,7 +455,7 @@ class NotificationService:
                         or not user_to_action.is_staff
                     ):
                         errors.append(
-                            f"User {user_to_action.display_first_name} {user_to_action.display_last_name} "
+                            f"User {get_user_display_name(user_to_action)} "
                             f"is inactive, external or has no email"
                         )
                         continue
@@ -491,7 +490,7 @@ class NotificationService:
                         "email_subject": email_subject,
                         "actioning_user_email": actioning_user_email,
                         "actioning_user_name": actioning_user_name,
-                        "recipient_name": f"{user_to_action.display_first_name} {user_to_action.display_last_name}",
+                        "recipient_name": get_user_display_name(user_to_action),
                         "recipient_email": user_to_action.email,
                         "project_title": strip_tags(doc_data.get("projectTitle", "")),
                         "project_id": doc_data.get("projectId"),
@@ -584,14 +583,12 @@ class NotificationService:
 
                     if not user.is_active or not user.email or not user.is_staff:
                         errors.append(
-                            f"User {user.display_first_name} {user.display_last_name} "
+                            f"User {get_user_display_name(user)} "
                             f"is inactive, external or has no email"
                         )
                         continue
 
-                    recipient_name = (
-                        f"{user.display_first_name} {user.display_last_name}"
-                    )
+                    recipient_name = get_user_display_name(user)
                     total_docs = len(docs_by_role["as_project_lead"]) + len(
                         docs_by_role["as_ba_lead"]
                     )
@@ -889,7 +886,7 @@ class NotificationService:
                 year = report_detail.year
                 document_url += f"?FY={year - 1}-{str(year)[2:]}"
 
-        commenter_name = f"{commenter.display_first_name} {commenter.display_last_name}"
+        commenter_name = get_user_display_name(commenter)
         document_kind_readable = ProjectDocument.CategoryKindChoices(
             document.kind
         ).label
@@ -966,9 +963,7 @@ class NotificationService:
         settings.LOGGER.info("Sending cycle opened emails")
         template_path = "./email_templates/new_cycle_open_email.html"
 
-        actioning_user_name = (
-            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
-        )
+        actioning_user_name = get_user_display_name(actioning_user)
         actioning_user_email = actioning_user.email
 
         financial_year_string = f"{int(last_report.year - 1)}-{int(last_report.year)}"
@@ -987,13 +982,14 @@ class NotificationService:
         user_roles = {}  # pk → (priority, name, email)
 
         # Exclude terminated and completed projects — only open/active projects
-        # should have their leads and members notified about new cycles
+        # should have their leads and members notified about new cycles.
+        # Also exclude projects belonging to inactive business areas.
         all_projects = Project.objects.exclude(
             status__in=[
                 Project.StatusChoices.COMPLETED,
                 Project.StatusChoices.TERMINATED,
             ]
-        )
+        ).filter(business_area__is_active=True)
         if division_slug and last_report.division:
             all_projects = all_projects.filter(
                 business_area__division=last_report.division
@@ -1009,7 +1005,7 @@ class NotificationService:
                     if pk not in user_roles or user_roles[pk][0] < 3:
                         user_roles[pk] = (
                             3,
-                            f"{ba.leader.display_first_name} {ba.leader.display_last_name}",
+                            get_user_display_name(ba.leader),
                             ba.leader.email,
                         )
 
@@ -1024,7 +1020,7 @@ class NotificationService:
                     if pk not in user_roles or user_roles[pk][0] < 2:
                         user_roles[pk] = (
                             2,
-                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            get_user_display_name(member.user),
                             member.user.email,
                         )
 
@@ -1039,7 +1035,7 @@ class NotificationService:
                     if pk not in user_roles:
                         user_roles[pk] = (
                             1,
-                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            get_user_display_name(member.user),
                             member.user.email,
                         )
 
@@ -1188,9 +1184,7 @@ class NotificationService:
         settings.LOGGER.info("Sending announcement emails")
         template_path = "./email_templates/announcement_email.html"
 
-        actioning_user_name = (
-            f"{actioning_user.display_first_name} {actioning_user.display_last_name}"
-        )
+        actioning_user_name = get_user_display_name(actioning_user)
         actioning_user_email = actioning_user.email
 
         def _is_valid_recipient(user):
@@ -1219,7 +1213,7 @@ class NotificationService:
                 Project.StatusChoices.COMPLETED,
                 Project.StatusChoices.TERMINATED,
             ]
-        )
+        ).filter(business_area__is_active=True)
         if division:
             all_projects = all_projects.filter(business_area__division=division)
 
@@ -1233,7 +1227,7 @@ class NotificationService:
                     if pk not in user_roles or user_roles[pk][0] < 3:
                         user_roles[pk] = (
                             3,
-                            f"{ba.leader.display_first_name} {ba.leader.display_last_name}",
+                            get_user_display_name(ba.leader),
                             ba.leader.email,
                         )
 
@@ -1248,7 +1242,7 @@ class NotificationService:
                     if pk not in user_roles or user_roles[pk][0] < 2:
                         user_roles[pk] = (
                             2,
-                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            get_user_display_name(member.user),
                             member.user.email,
                         )
 
@@ -1263,7 +1257,7 @@ class NotificationService:
                     if pk not in user_roles:
                         user_roles[pk] = (
                             1,
-                            f"{member.user.display_first_name} {member.user.display_last_name}",
+                            get_user_display_name(member.user),
                             member.user.email,
                         )
 

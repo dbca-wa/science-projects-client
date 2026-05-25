@@ -77,7 +77,55 @@ def format_user_name(user):
     Returns:
         Formatted name string
     """
-    return f"{user.display_first_name} {user.display_last_name}"
+    return get_user_display_name(user)
+
+
+def get_user_display_name(user):
+    """
+    Get user's display name with fallback logic.
+    Priority: display names → first/last names → username → empty string.
+
+    A name field is considered invalid if it is None, empty, whitespace-only,
+    or starts with the string "None" (case-sensitive).
+
+    Args:
+        user: User object (or any object with display_first_name, display_last_name,
+              first_name, last_name, username attributes)
+
+    Returns:
+        Display name string
+    """
+
+    def _is_valid(value):
+        if not value:
+            return False
+        if not str(value).strip():
+            return False
+        if str(value).startswith("None"):
+            return False
+        return True
+
+    if _is_valid(getattr(user, "display_first_name", None)) and _is_valid(
+        getattr(user, "display_last_name", None)
+    ):
+        return f"{user.display_first_name} {user.display_last_name}"
+
+    if _is_valid(getattr(user, "first_name", None)) and _is_valid(
+        getattr(user, "last_name", None)
+    ):
+        return f"{user.first_name} {user.last_name}"
+
+    # Single valid name (for organisations with only one name set)
+    if _is_valid(getattr(user, "display_first_name", None)):
+        return user.display_first_name
+    if _is_valid(getattr(user, "display_last_name", None)):
+        return user.display_last_name
+    if _is_valid(getattr(user, "first_name", None)):
+        return user.first_name
+    if _is_valid(getattr(user, "last_name", None)):
+        return user.last_name
+
+    return getattr(user, "username", None) or ""
 
 
 def get_user_avatar_url(user):

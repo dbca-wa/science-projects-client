@@ -111,6 +111,14 @@ class NewCycleOpen(APIView):
         # Explicit exclusion of protected projects as a safety net
         eligible_projects = eligible_projects.exclude(status__in=Project.CLOSED_ONLY)
 
+        # Exclude projects with any non-draft closure document
+        projects_with_closure = set(
+            ProjectDocument.objects.filter(kind="projectclosure")
+            .exclude(status="new")
+            .values_list("project_id", flat=True)
+        )
+        eligible_projects = eligible_projects.exclude(pk__in=projects_with_closure)
+
         eligible_projects = eligible_projects.exclude(
             documents__progress_report_details__report__year=last_report.year
         )
@@ -129,6 +137,11 @@ class NewCycleOpen(APIView):
         # Explicit exclusion of protected projects as a safety net
         eligible_student_projects = eligible_student_projects.exclude(
             status__in=Project.CLOSED_ONLY
+        )
+
+        # Exclude student projects with any non-draft closure document
+        eligible_student_projects = eligible_student_projects.exclude(
+            pk__in=projects_with_closure
         )
 
         eligible_student_projects = eligible_student_projects.exclude(

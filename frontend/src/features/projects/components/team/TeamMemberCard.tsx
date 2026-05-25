@@ -6,7 +6,7 @@
  */
 
 import { useState } from "react";
-import { Crown } from "lucide-react";
+import { Crown, AlertCircle } from "lucide-react";
 import {
 	Avatar,
 	AvatarFallback,
@@ -19,6 +19,11 @@ import {
 	TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { getAvatarUrl } from "@/shared/utils/image.utils";
+import {
+	getUserDisplayName,
+	getUserInitials,
+	isValidName,
+} from "@/shared/utils/user.utils";
 import { cn } from "@/shared/lib/utils";
 import type { IProjectMember } from "@/shared/types/project.types";
 import { TeamMemberSheet } from "./TeamMemberSheet";
@@ -44,13 +49,16 @@ export const TeamMemberCard = ({
 }: TeamMemberCardProps) => {
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-	const initials = `${member.user.display_first_name?.[0] || ""}${member.user.display_last_name?.[0] || ""}`;
+	const initials = getUserInitials(member.user);
 	const avatarUrl = getAvatarUrl(member.user.image);
+	const displayName = getUserDisplayName(member.user);
 
-	const displayName =
-		member.user.display_first_name && member.user.display_last_name
-			? `${member.user.display_first_name} ${member.user.display_last_name}`
-			: member.user.username || "Unknown User";
+	// Check if user has no valid names (showing username as fallback)
+	const hasNoValidName =
+		!isValidName(member.user.display_first_name) &&
+		!isValidName(member.user.display_last_name) &&
+		!isValidName(member.user.first_name) &&
+		!isValidName(member.user.last_name);
 
 	return (
 		<>
@@ -80,28 +88,33 @@ export const TeamMemberCard = ({
 
 				{/* Name and role */}
 				<div className="flex-1 min-w-0 space-y-1">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="link"
-								className={cn(
-									"h-auto p-0 text-lg font-semibold justify-start relative z-20",
-									`text-[${LINK_COLOR}]`,
-									isDragging && "text-white hover:text-white"
-								)}
-								onClick={() => setIsSheetOpen(true)}
-								aria-label={`View details for ${displayName}`}
-							>
-								{displayName}
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>
-								Click to view member details
-								{canManageTeam && " • Drag card to reorder"}
-							</p>
-						</TooltipContent>
-					</Tooltip>
+					<div className="flex items-center gap-1">
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="link"
+									className={cn(
+										"h-auto p-0 text-lg font-semibold justify-start relative z-20 has-[>svg]:p-0",
+										`text-[${LINK_COLOR}]`,
+										isDragging && "text-white hover:text-white"
+									)}
+									onClick={() => setIsSheetOpen(true)}
+									aria-label={`View details for ${displayName}`}
+								>
+									{displayName}
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>
+									Click to view member details
+									{canManageTeam && " • Drag card to reorder"}
+								</p>
+							</TooltipContent>
+						</Tooltip>
+						{hasNoValidName && (
+							<AlertCircle className="size-4 text-red-600 dark:text-red-400 shrink-0" />
+						)}
+					</div>
 
 					{/* Caretaker indicator */}
 					{member.user.caretakers && member.user.caretakers.length > 0 && (

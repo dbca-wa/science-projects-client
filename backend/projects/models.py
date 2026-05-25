@@ -91,6 +91,14 @@ class Project(CommonModel):
         StatusChoices.CLOSUREREQ,
     )
 
+    VALID_CLOSURE_STATES = (
+        StatusChoices.CLOSUREREQ,
+        StatusChoices.CLOSING,
+        StatusChoices.FINAL_UPDATE,
+        StatusChoices.COMPLETED,
+        StatusChoices.TERMINATED,
+    )
+
     kind = models.CharField(
         choices=CategoryKindChoices.choices,
         blank=True,
@@ -218,6 +226,41 @@ class Project(CommonModel):
                 return self.external_project_info.description
             except ObjectDoesNotExist:
                 return ""
+
+    def _validate_closure_state(self):
+        """Validate closure state constraints on status changes."""
+        from django.core.exceptions import ValidationError
+
+        # Only validate existing projects (not initial creation)
+        if self.pk and self.status not in self.VALID_CLOSURE_STATES:
+            from documents.models import ProjectDocument
+
+            has_closure = (
+                ProjectDocument.objects.filter(project=self, kind="projectclosure")
+                .exclude(status="new")
+                .exists()
+            )
+            if has_closure:
+                valid_labels = ", ".join(s.label for s in self.VALID_CLOSURE_STATES)
+                raise ValidationError(
+                    {
+                        "status": (
+                            f"Cannot set status to '{self.get_status_display()}' while a "
+                            f"closure document exists. Valid statuses are: {valid_labels}."
+                        )
+                    }
+                )
+
+    def clean(self):
+        """Validate closure state constraints."""
+        super().clean()
+        self._validate_closure_state()
+
+    def save(self, *args, **kwargs):
+        skip_closure_validation = kwargs.pop("skip_closure_validation", False)
+        if not skip_closure_validation:
+            self._validate_closure_state()
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"({self.kind.upper()}) {self.extract_inner_text(self.title)}"

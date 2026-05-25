@@ -2,9 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/components/ui/select";
 import { getUserDisplayName } from "@/shared/utils/user.utils";
 import { UserLink } from "@/shared/components/user";
 import { useUserDetail } from "@/features/users/hooks";
+import { useDivisions } from "@/shared/hooks/queries/useDivisions";
 import { CrudListLayout } from "../shared/CrudListLayout";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
 import {
@@ -19,6 +30,7 @@ import { getImageUrl } from "@/shared/utils/image.utils";
 const columns = [
 	{ header: "Image", accessor: "image", className: "w-16" },
 	{ header: "Name", accessor: "name" },
+	{ header: "Status", accessor: "status", className: "w-24" },
 	{
 		header: "Leader",
 		accessor: "leader",
@@ -61,13 +73,28 @@ function UserIdLink({ userId }: { userId: number }) {
 export const BusinessAreaList = () => {
 	const navigate = useNavigate();
 	const { data: businessAreas = [], isLoading, error } = useBusinessAreas();
+	const { data: divisions = [] } = useDivisions();
 	const deleteMutation = useDeleteBusinessArea();
 
 	const [searchTerm, setSearchTerm] = useState("");
+	const [showActiveOnly, setShowActiveOnly] = useState(true);
+	const [selectedDivision, setSelectedDivision] = useState("All");
 	const [deleteTarget, setDeleteTarget] = useState<IBusinessArea | null>(null);
 
 	const filtered = sortAlphabetically(
-		filterByName(businessAreas, searchTerm, (ba) => ba.name),
+		filterByName(businessAreas, searchTerm, (ba) => ba.name).filter((ba) => {
+			// Active-only filter
+			if (showActiveOnly && !ba.is_active) return false;
+			// Division filter
+			if (selectedDivision !== "All") {
+				const baDivisionId =
+					typeof ba.division === "object" && ba.division
+						? ba.division.id
+						: ba.division;
+				if (String(baDivisionId) !== selectedDivision) return false;
+			}
+			return true;
+		}),
 		(ba) => ba.name
 	);
 
@@ -125,6 +152,52 @@ export const BusinessAreaList = () => {
 				data={filtered}
 				isLoading={isLoading}
 				error={error}
+				emptyMessage={
+					showActiveOnly || selectedDivision !== "All"
+						? "No business areas match the selected filters"
+						: undefined
+				}
+				filterContent={
+					<div className="flex flex-wrap items-center gap-4">
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id="active-only"
+								checked={showActiveOnly}
+								onCheckedChange={(checked) =>
+									setShowActiveOnly(checked === true)
+								}
+								className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
+							/>
+							<Label
+								htmlFor="active-only"
+								className="text-sm font-normal cursor-pointer whitespace-nowrap"
+							>
+								Show active only
+							</Label>
+						</div>
+						<Select
+							value={selectedDivision}
+							onValueChange={setSelectedDivision}
+						>
+							<SelectTrigger
+								className="w-40 text-sm"
+								aria-label="Filter by division"
+							>
+								<SelectValue placeholder="All Divisions" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="All">All Divisions</SelectItem>
+								{[...divisions]
+									.sort((a, b) => a.slug.localeCompare(b.slug))
+									.map((div) => (
+										<SelectItem key={div.id} value={String(div.id)}>
+											{div.slug}
+										</SelectItem>
+									))}
+							</SelectContent>
+						</Select>
+					</div>
+				}
 				renderRow={(ba) => (
 					<tr key={ba.id} className="border-b last:border-b-0">
 						<td className="w-16 px-4 py-3">
@@ -141,6 +214,17 @@ export const BusinessAreaList = () => {
 							)}
 						</td>
 						<td className="px-4 py-3">{ba.name}</td>
+						<td className="px-4 py-3">
+							{ba.is_active ? (
+								<Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-100">
+									Active
+								</Badge>
+							) : (
+								<Badge variant="secondary" className="text-muted-foreground">
+									Inactive
+								</Badge>
+							)}
+						</td>
 						<td className="hidden px-4 py-3 md:table-cell">
 							{renderUserLink(ba.leader)}
 						</td>

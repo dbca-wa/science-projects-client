@@ -10,3 +10,4 @@ export { UserSheetOrganisationSection } from "./UserSheetOrganisationSection";
 export { UserSheetAboutSection } from "./UserSheetAboutSection";
 export { UserSheetDetailsSection } from "./UserSheetDetailsSection";
 export { SectionContainer } from "./SectionContainer";
+export { EditExternalUserName } from "./EditExternalUserName";

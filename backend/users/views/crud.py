@@ -98,3 +98,72 @@ class DirectorateUsers(ListAPIView):
     def get_queryset(self):
         directorate_id = self.kwargs.get("directorate_id")
         return UserService.get_users_by_directorate(directorate_id)
+
+
+class UserNameUpdate(APIView):
+    """Update name fields for a user (staff editing external users)"""
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        """
+        Update name fields for a user.
+
+        Staff users can edit external users' names.
+        Only superusers can edit staff users' names.
+        """
+        # Must be staff to use this endpoint
+        if not request.user.is_staff:
+            return Response({"error": "Permission denied"}, status=403)
+
+        # Get target user
+        try:
+            target_user = UserService.get_user(pk)
+        except Exception:
+            return Response({"error": "User not found"}, status=404)
+
+        # Permission check: staff can only edit external users
+        if target_user.is_staff and not request.user.is_superuser:
+            return Response(
+                {"error": "Only superusers may edit staff user names"},
+                status=403,
+            )
+
+        # Validate and update fields
+        name_fields = {
+            "first_name": (0, 100),
+            "last_name": (0, 100),
+            "display_first_name": (0, 201),
+            "display_last_name": (0, 201),
+        }
+
+        errors = {}
+        update_data = {}
+
+        for field, (min_len, max_len) in name_fields.items():
+            if field in request.data:
+                value = request.data[field]
+                if value is None:
+                    # Allow null — store as empty string
+                    update_data[field] = ""
+                    continue
+                trimmed = str(value).strip()
+                if len(trimmed) > max_len:
+                    errors[field] = [
+                        f"Must be at most {max_len} characters after trimming"
+                    ]
+                else:
+                    update_data[field] = trimmed
+
+        if errors:
+            return Response(errors, status=HTTP_400_BAD_REQUEST)
+
+        if not update_data:
+            return Response(
+                {"error": "No valid fields provided"}, status=HTTP_400_BAD_REQUEST
+            )
+
+        # Apply updates
+        user = UserService.update_user(pk, update_data)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)

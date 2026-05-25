@@ -14,10 +14,18 @@ import { ProjectActionsDropdown } from "../overview/ProjectActionsDropdown";
 import { ProjectSection } from "@/shared/components/ProjectSection";
 import { InlineSaveEditor } from "@/shared/components/editor/InlineSaveEditor";
 import { ProjectKeywordsSection } from "../keywords/ProjectKeywordsSection";
-import { formatAuthors } from "../../utils/authors/authors.utils";
+import {
+	formatAuthors,
+	getAuthorEntries,
+} from "../../utils/authors/authors.utils";
 import { formatYearRange } from "../../utils/year.utils";
 import { sanitizeInput } from "@/shared/utils/sanitise.utils";
 import { Info, Building2, Calendar, Layers } from "lucide-react";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/features/auth";
@@ -120,6 +128,7 @@ export const OverviewTab = ({
 	const plainTextTitle = sanitizeInput(project.title);
 
 	// Format authors from team members
+	const authorEntries = getAuthorEntries(members || []);
 	const authorsDisplay = formatAuthors(members || []);
 
 	// Format year range
@@ -217,9 +226,41 @@ export const OverviewTab = ({
 								{plainTextTitle}
 							</h2>
 
-							{authorsDisplay && (
+							{(authorsDisplay ||
+								authorEntries.some((e) => e.hasInvalidName)) && (
 								<p className="mt-2 text-md font-normal text-gray-500 dark:text-gray-500">
 									{authorsDisplay}
+									{authorsDisplay &&
+										authorEntries.some((e) => e.hasInvalidName) &&
+										", "}
+									{authorEntries
+										.filter((e) => e.hasInvalidName)
+										.map((entry, idx) => (
+											<span key={entry.userId}>
+												{idx > 0 && ", "}
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<button
+															type="button"
+															className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-600 text-white cursor-pointer hover:bg-red-700 transition-colors"
+															onClick={() => {
+																document
+																	.getElementById("project-team-section")
+																	?.scrollIntoView({ behavior: "smooth" });
+															}}
+														>
+															{entry.text}
+														</button>
+													</TooltipTrigger>
+													<TooltipContent>
+														<p>
+															This user has no name set. Click to scroll to the
+															team section and fix it.
+														</p>
+													</TooltipContent>
+												</Tooltip>
+											</span>
+										))}
 								</p>
 							)}
 						</div>
@@ -365,7 +406,7 @@ export const OverviewTab = ({
 			</ProjectSection>
 
 			{/* Project Team Section */}
-			<ProjectSection className="p-6">
+			<ProjectSection className="p-6" id="project-team-section">
 				<ProjectTeamSection
 					projectId={project.id}
 					canManageTeam={canManageTeam}

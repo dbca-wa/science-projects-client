@@ -21,6 +21,17 @@ interface UserLike {
 }
 
 /**
+ * Check if a name field value is valid for display purposes.
+ * Returns false for null, undefined, empty, whitespace-only, or strings starting with "None".
+ */
+export const isValidName = (value: string | null | undefined): boolean => {
+	if (!value) return false;
+	if (value.trim().length === 0) return false;
+	if (value.startsWith("None")) return false;
+	return true;
+};
+
+/**
  * Get user's display name with fallback logic
  * Priority: display_first_name + display_last_name → first_name + last_name → username
  *
@@ -38,15 +49,26 @@ export const getUserDisplayName = (
 ): string => {
 	if (!user) return "";
 
-	const firstName = user.display_first_name || user.first_name;
-	const lastName = user.display_last_name || user.last_name;
-
-	// Check if display name is valid (not "None")
-	if (firstName && !firstName.startsWith("None") && lastName) {
-		return `${firstName} ${lastName}`;
+	// Try display names first (both valid = full name)
+	if (
+		isValidName(user.display_first_name) &&
+		isValidName(user.display_last_name)
+	) {
+		return `${user.display_first_name} ${user.display_last_name}`;
 	}
 
-	// Fallback to username
+	// Try first_name + last_name (both valid = full name)
+	if (isValidName(user.first_name) && isValidName(user.last_name)) {
+		return `${user.first_name} ${user.last_name}`;
+	}
+
+	// Single valid display name (for organisations with only one name set)
+	if (isValidName(user.display_first_name)) return user.display_first_name!;
+	if (isValidName(user.display_last_name)) return user.display_last_name!;
+	if (isValidName(user.first_name)) return user.first_name!;
+	if (isValidName(user.last_name)) return user.last_name!;
+
+	// Final fallback to username
 	return user.username || "";
 };
 
@@ -63,9 +85,7 @@ export const getUserDisplayName = (
  * getUserInitials(userWithNoName) // ""
  * ```
  */
-export const getUserInitials = (
-	user: IUserData | IUserMe | null | undefined
-): string => {
+export const getUserInitials = (user: UserLike | null | undefined): string => {
 	if (!user) return "";
 
 	const firstName = user.display_first_name || user.first_name;

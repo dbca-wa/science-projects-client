@@ -7,6 +7,7 @@ from .helpers import (
     format_user_name,
     get_user_avatar_url,
     get_user_business_area,
+    get_user_display_name,
     search_profiles,
     search_users,
 )
@@ -30,6 +31,7 @@ __all__ = [
     "search_users",
     "search_profiles",
     "format_user_name",
+    "get_user_display_name",
     "get_user_avatar_url",
     "get_user_business_area",
 ]

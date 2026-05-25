@@ -4,7 +4,7 @@ User views
 
 from .admin import SwitchAdmin, ToggleUserActive
 from .auth import ChangePassword, Login, Logout
-from .crud import DirectorateUsers, UserDetail, Users
+from .crud import DirectorateUsers, UserDetail, UserNameUpdate, Users
 from .invite import InviteUser
 from .it_assets_search import ITAssetsSearch
 from .profile_entries import (
@@ -58,6 +58,7 @@ __all__ = [
     # CRUD
     "Users",
     "UserDetail",
+    "UserNameUpdate",
     "DirectorateUsers",
     # Utils
     "CheckEmailExists",

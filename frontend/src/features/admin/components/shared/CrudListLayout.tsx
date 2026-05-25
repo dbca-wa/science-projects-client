@@ -21,6 +21,8 @@ interface CrudListLayoutProps<T> {
 	addButtonLabel?: string;
 	/** Additional action buttons rendered alongside the Add button */
 	extraActions?: ReactNode;
+	/** Filter controls rendered between search and table */
+	filterContent?: ReactNode;
 	columns: ColumnDef[];
 	data: T[];
 	renderRow: (item: T) => ReactNode;
@@ -38,6 +40,7 @@ export function CrudListLayout<T>({
 	onAddClick,
 	addButtonLabel,
 	extraActions,
+	filterContent,
 	columns,
 	data,
 	renderRow,
@@ -60,6 +63,8 @@ export function CrudListLayout<T>({
 				onChange={onSearchChange}
 				placeholder={searchPlaceholder}
 			/>
+
+			{filterContent && <div className="py-1">{filterContent}</div>}
 
 			{isLoading && (
 				<div className="flex justify-center py-12">

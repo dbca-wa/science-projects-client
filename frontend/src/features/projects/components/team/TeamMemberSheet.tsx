@@ -36,6 +36,7 @@ import {
 	UserSheetAboutSection,
 	UserSheetDetailsSection,
 	SectionContainer,
+	EditExternalUserName,
 } from "@/shared/components/user-sheet";
 
 interface TeamMemberSheetProps {
@@ -206,6 +207,12 @@ export const TeamMemberSheet = ({
 			<SheetContent className="w-full sm:max-w-md overflow-y-auto p-6">
 				{/* Header Section */}
 				<UserSheetHeader user={member.user as unknown as IUserData} />
+
+				{/* Edit Name for External Users */}
+				<EditExternalUserName
+					user={member.user as unknown as IUserData}
+					canEdit={true}
+				/>
 
 				{/* Action Buttons */}
 				{canManageTeam && (
