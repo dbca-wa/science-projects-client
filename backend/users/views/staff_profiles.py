@@ -156,11 +156,15 @@ class StaffProfiles(APIView):
                 users = base_queryset.filter(
                     Q(first_name__icontains=first_name)
                     & Q(last_name__icontains=last_name)
+                    | Q(display_first_name__icontains=first_name)
+                    & Q(display_last_name__icontains=last_name)
                 )
             else:
                 users = base_queryset.filter(
                     Q(first_name__icontains=search_term)
                     | Q(last_name__icontains=search_term)
+                    | Q(display_first_name__icontains=search_term)
+                    | Q(display_last_name__icontains=search_term)
                 )
         else:
             users = base_queryset

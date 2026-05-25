@@ -2,8 +2,7 @@
 User helper utilities
 """
 
-from django.db.models import CharField, Q, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 
 
 def search_users(queryset, search_term):
@@ -20,16 +19,26 @@ def search_users(queryset, search_term):
     if not search_term or len(search_term) < 2:
         return queryset
 
-    return queryset.annotate(
-        full_name=Concat(
-            "first_name", Value(" "), "last_name", output_field=CharField()
+    search_term = search_term.strip()
+    search_parts = search_term.split(" ", 1)
+
+    if len(search_parts) == 2:
+        first_part, last_part = search_parts
+        return queryset.filter(
+            Q(first_name__icontains=first_part) & Q(last_name__icontains=last_part)
+            | Q(display_first_name__icontains=first_part)
+            & Q(display_last_name__icontains=last_part)
+            | Q(email__icontains=search_term)
+            | Q(username__icontains=search_term)
         )
-    ).filter(
+
+    return queryset.filter(
         Q(username__icontains=search_term)
         | Q(email__icontains=search_term)
         | Q(first_name__icontains=search_term)
         | Q(last_name__icontains=search_term)
-        | Q(full_name__icontains=search_term)
+        | Q(display_first_name__icontains=search_term)
+        | Q(display_last_name__icontains=search_term)
     )
 
 
@@ -50,6 +59,8 @@ def search_profiles(queryset, search_term):
     return queryset.filter(
         Q(user__first_name__icontains=search_term)
         | Q(user__last_name__icontains=search_term)
+        | Q(user__display_first_name__icontains=search_term)
+        | Q(user__display_last_name__icontains=search_term)
         | Q(user__email__icontains=search_term)
         | Q(about__icontains=search_term)
         | Q(expertise__icontains=search_term)

@@ -9,8 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import Q, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 from django.utils.crypto import get_random_string
 from rest_framework.exceptions import NotFound, ValidationError
 
@@ -112,7 +111,7 @@ class UserService:
         if filters:
             users = UserService._apply_filters(users, filters)
 
-        return users.distinct()
+        return users.order_by("last_name", "first_name").distinct()
 
     @staticmethod
     def _apply_filters(queryset, filters):
@@ -120,15 +119,30 @@ class UserService:
         # Search term
         search = filters.get("search")
         if search:
-            queryset = queryset.annotate(
-                full_name=Concat("first_name", Value(" "), "last_name")
-            ).filter(
-                Q(username__icontains=search)
-                | Q(email__icontains=search)
-                | Q(first_name__icontains=search)
-                | Q(last_name__icontains=search)
-                | Q(full_name__icontains=search)
-            )
+            search = search.strip()
+            search_parts = search.split(" ", 1)
+
+            if len(search_parts) == 2:
+                # Two-part search: match first + last name combinations
+                first_part, last_part = search_parts
+                queryset = queryset.filter(
+                    Q(first_name__icontains=first_part)
+                    & Q(last_name__icontains=last_part)
+                    | Q(display_first_name__icontains=first_part)
+                    & Q(display_last_name__icontains=last_part)
+                    | Q(email__icontains=search)
+                    | Q(username__icontains=search)
+                )
+            else:
+                # Single-term search: match against all name fields
+                queryset = queryset.filter(
+                    Q(username__icontains=search)
+                    | Q(email__icontains=search)
+                    | Q(first_name__icontains=search)
+                    | Q(last_name__icontains=search)
+                    | Q(display_first_name__icontains=search)
+                    | Q(display_last_name__icontains=search)
+                )
 
         # Staff filter (only_staff=true means is_staff=True)
         only_staff = filters.get("only_staff")
