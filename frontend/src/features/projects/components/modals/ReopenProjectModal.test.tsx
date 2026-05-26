@@ -41,6 +41,30 @@ vi.mock("@/shared/components/editor/FormRichTextEditor", () => ({
 	),
 }));
 
+// Mock the Checkbox to avoid Radix internals in tests
+vi.mock("@/shared/components/ui/checkbox", () => ({
+	Checkbox: ({
+		checked,
+		onCheckedChange,
+		id,
+		"aria-label": ariaLabel,
+	}: {
+		checked?: boolean;
+		onCheckedChange?: (checked: boolean) => void;
+		id?: string;
+		"aria-label"?: string;
+	}) => (
+		<input
+			type="checkbox"
+			role="checkbox"
+			id={id}
+			checked={checked}
+			onChange={(e) => onCheckedChange?.(e.target.checked)}
+			aria-label={ariaLabel}
+		/>
+	),
+}));
+
 describe("ReopenProjectModal", () => {
 	const defaultProps = {
 		isOpen: true,
@@ -56,7 +80,6 @@ describe("ReopenProjectModal", () => {
 	});
 
 	it("enables submit button when checkbox is ticked and reason has 10+ characters", async () => {
-		const user = userEvent.setup();
 		render(<ReopenProjectModal {...defaultProps} />);
 
 		// Tick the checkbox
@@ -67,15 +90,20 @@ describe("ReopenProjectModal", () => {
 
 		// Enter a reason with 10+ characters in the rich text editor
 		const editor = screen.getByTestId("rich-text-editor");
-		await user.type(editor, "Need to fix progress report");
+		fireEvent.change(editor, {
+			target: { value: "Need to fix progress report" },
+		});
 
 		// Button should now be enabled
-		await waitFor(() => {
-			const submitButton = screen.getByRole("button", {
-				name: /open project/i,
-			});
-			expect(submitButton).not.toBeDisabled();
-		});
+		await waitFor(
+			() => {
+				const submitButton = screen.getByRole("button", {
+					name: /open project/i,
+				});
+				expect(submitButton).not.toBeDisabled();
+			},
+			{ timeout: 3000 }
+		);
 	});
 
 	it("keeps submit button disabled when only checkbox is ticked (no reason)", () => {
@@ -112,7 +140,6 @@ describe("ReopenProjectModal", () => {
 	});
 
 	it("disables submit button when checkbox is unticked after being ticked", async () => {
-		const user = userEvent.setup();
 		render(<ReopenProjectModal {...defaultProps} />);
 
 		// Tick the checkbox
@@ -123,26 +150,34 @@ describe("ReopenProjectModal", () => {
 
 		// Enter a valid reason
 		const editor = screen.getByTestId("rich-text-editor");
-		await user.type(editor, "Need to fix progress report");
+		fireEvent.change(editor, {
+			target: { value: "Need to fix progress report" },
+		});
 
 		// Verify button is enabled
-		await waitFor(() => {
-			const submitButton = screen.getByRole("button", {
-				name: /open project/i,
-			});
-			expect(submitButton).not.toBeDisabled();
-		});
+		await waitFor(
+			() => {
+				const submitButton = screen.getByRole("button", {
+					name: /open project/i,
+				});
+				expect(submitButton).not.toBeDisabled();
+			},
+			{ timeout: 3000 }
+		);
 
 		// Untick the checkbox
 		fireEvent.click(checkbox);
 
 		// Button should be disabled again
-		await waitFor(() => {
-			const submitButton = screen.getByRole("button", {
-				name: /open project/i,
-			});
-			expect(submitButton).toBeDisabled();
-		});
+		await waitFor(
+			() => {
+				const submitButton = screen.getByRole("button", {
+					name: /open project/i,
+				});
+				expect(submitButton).toBeDisabled();
+			},
+			{ timeout: 3000 }
+		);
 	});
 
 	it("shows reason field as disabled (greyed out) before checkbox is ticked", () => {

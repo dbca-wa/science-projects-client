@@ -26,11 +26,19 @@ interface ReopenProjectModalProps {
 const MIN_REASON_LENGTH = 10;
 
 /**
- * Strip HTML tags and get plain text length
+ * Get plain text length from HTML content.
+ * Used only for character counting (not for sanitisation).
  */
 const getPlainTextLength = (html: string): number => {
-	const text = html.replace(/<[^>]*>/g, "").trim();
-	return text.length;
+	if (!html) return 0;
+	if (typeof DOMParser !== "undefined") {
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		return (doc.body.textContent || "").trim().length;
+	}
+	// Fallback for environments without DOMParser
+	const div = document.createElement("div");
+	div.innerHTML = html;
+	return (div.textContent || "").trim().length;
 };
 
 export const ReopenProjectModal = ({
