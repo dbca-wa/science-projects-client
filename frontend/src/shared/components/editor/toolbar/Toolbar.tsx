@@ -128,6 +128,13 @@ export const Toolbar: React.FC<ToolbarProps> = observer(
 					aria-label="Text formatting"
 					aria-orientation="horizontal"
 					onKeyDown={handleKeyDown}
+					onMouseDown={(e) => {
+						// Prevent editor blur when clicking anywhere in the toolbar area.
+						// Without this, clicking between buttons or on button padding causes
+						// the editor to lose focus, clearing the selection and breaking
+						// formatting commands.
+						e.preventDefault();
+					}}
 				>
 					{/* Undo/Redo buttons - shown in all modes */}
 					<div

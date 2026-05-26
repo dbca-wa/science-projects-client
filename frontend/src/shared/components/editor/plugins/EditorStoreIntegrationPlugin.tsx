@@ -66,16 +66,35 @@ export const EditorStoreIntegrationPlugin = observer(
 				() => {
 					// Only clear if this editor is still the active one
 					// (prevents clearing when focus moves to the toolbar buttons)
-					setTimeout(() => {
+					requestAnimationFrame(() => {
 						if (editorStore.activeEditorKey === key) {
-							// Check if focus moved to a toolbar button (which has onMouseDown preventDefault)
 							const activeEl = document.activeElement;
+
+							// If activeElement is body, it means preventDefault was called on
+							// mousedown (toolbar click) — focus didn't move anywhere, so don't
+							// clear state. The editor will regain focus on the next interaction.
+							if (activeEl === document.body) return;
+
+							// Check if focus moved to a toolbar button or the floating toolbar
 							const isToolbarButton = activeEl?.closest('[role="toolbar"]');
-							if (!isToolbarButton) {
+							const isFloatingToolbar = activeEl?.closest(
+								'[aria-label="Floating formatting toolbar"]'
+							);
+							// Also check if focus is still within the same editor container
+							const rootEl = editor.getRootElement();
+							const editorContainer = rootEl?.closest(".editor-container");
+							const isWithinContainer =
+								editorContainer && editorContainer.contains(activeEl);
+
+							if (
+								!isToolbarButton &&
+								!isFloatingToolbar &&
+								!isWithinContainer
+							) {
 								editorStore.clearFormattingState();
 							}
 						}
-					}, 50);
+					});
 					return false;
 				},
 				COMMAND_PRIORITY_LOW

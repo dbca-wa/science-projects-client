@@ -30,9 +30,11 @@ export interface IWizardPersistenceOptions {
 }
 
 /**
- * Storage key for wizard persistence
+ * Storage key for wizard persistence — per project kind
  */
-const STORAGE_KEY = "project-wizard-draft";
+const STORAGE_KEY_PREFIX = "project-wizard-draft";
+const buildSessionKey = (kind: ProjectKind | null) =>
+	kind ? `${STORAGE_KEY_PREFIX}-${kind}` : STORAGE_KEY_PREFIX;
 
 /**
  * Expiration time for draft data (24 hours in milliseconds)
@@ -298,7 +300,10 @@ export const useWizardPersistence = (
 				},
 			};
 
-			sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+			sessionStorage.setItem(
+				buildSessionKey(wizardStore.state.projectKind),
+				JSON.stringify(data)
+			);
 			logger.debug("Wizard draft saved to session storage", {
 				hasImage: imageData !== null,
 			});
@@ -367,7 +372,7 @@ export const useWizardPersistence = (
 	 */
 	const clearDraft = useCallback(() => {
 		try {
-			sessionStorage.removeItem(STORAGE_KEY);
+			sessionStorage.removeItem(buildSessionKey(wizardStore.state.projectKind));
 			logger.debug("Wizard draft cleared from session storage");
 		} catch (error) {
 			logger.error("Failed to clear wizard draft", {
@@ -379,7 +384,7 @@ export const useWizardPersistence = (
 		if (onServerDelete) {
 			onServerDelete();
 		}
-	}, [onServerDelete]);
+	}, [onServerDelete, wizardStore.state.projectKind]);
 
 	/**
 	 * Restore wizard data using a three-tier fallback strategy:
@@ -552,8 +557,9 @@ export const useWizardPersistence = (
 				}
 			}
 
-			// ── Tier 3: sessionStorage draft (existing behaviour) ─────────
-			const stored = sessionStorage.getItem(STORAGE_KEY);
+			// ── Tier 3: sessionStorage draft (same-session persistence) ─────────
+			const sessionKey = buildSessionKey(wizardStore.state.projectKind);
+			const stored = sessionStorage.getItem(sessionKey);
 			if (!stored) {
 				logger.debug("No wizard draft found in any storage layer");
 				return null;
@@ -651,7 +657,9 @@ export const useWizardPersistence = (
 	 */
 	const hasDraft = useCallback((): boolean => {
 		try {
-			const stored = sessionStorage.getItem(STORAGE_KEY);
+			const stored = sessionStorage.getItem(
+				buildSessionKey(wizardStore.state.projectKind)
+			);
 			if (!stored) return false;
 
 			const data: IPersistedWizardData = JSON.parse(stored);
@@ -662,7 +670,7 @@ export const useWizardPersistence = (
 			});
 			return false;
 		}
-	}, [isExpired]);
+	}, [isExpired, wizardStore.state.projectKind]);
 
 	/**
 	 * NOTE: Draft restoration is handled explicitly by the page component

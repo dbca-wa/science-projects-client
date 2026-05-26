@@ -1189,7 +1189,10 @@ class RemedyClosureStateMismatch(APIView):
                 project.save(skip_closure_validation=True)
                 successful += 1
             except Exception as e:
-                errors.append(f"Project {project.pk}: {str(e)}")
+                settings.LOGGER.error(
+                    f"Failed to update project {project.pk} status: {e}"
+                )
+                errors.append(f"Project {project.pk}: Failed to update status")
 
         return Response(
             {"successful": successful, "errors": errors},
@@ -1264,7 +1267,10 @@ class RemedyClosureNotClosing(APIView):
                 project.save(skip_closure_validation=True)
                 successful += 1
             except Exception as e:
-                errors.append(f"Project {project.pk}: {str(e)}")
+                settings.LOGGER.error(
+                    f"Failed to remedy closure state for project {project.pk}: {e}"
+                )
+                errors.append(f"Project {project.pk}: Failed to update closure state")
 
         return Response(
             {"successful": successful, "errors": errors},
@@ -1317,7 +1323,12 @@ class RemedyLegacySuspendedClosure(APIView):
                     # Project stays in suspended status — no change needed
                     successful += 1
             except Exception as e:
-                errors.append(f"Project {project.pk}: {str(e)}")
+                settings.LOGGER.error(
+                    f"Failed to remove legacy closure for project {project.pk}: {e}"
+                )
+                errors.append(
+                    f"Project {project.pk}: Failed to remove closure documents"
+                )
 
         return Response(
             {"successful": successful, "errors": errors},

@@ -47,7 +47,9 @@ describe("getUserDisplayName", () => {
 		it("should fallback to username when display_first_name is 'None'", () => {
 			const user = createMockUser({
 				display_first_name: "None",
-				display_last_name: "Doe",
+				display_last_name: "None",
+				first_name: "None",
+				last_name: "None",
 				username: "johndoe",
 			});
 

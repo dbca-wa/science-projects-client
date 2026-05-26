@@ -1,9 +1,10 @@
 /**
  * FloatingLinkToolbar Plugin
  *
- * A small absolute-positioned toolbar that appears near the user's text selection,
- * containing a link button. Positioned relative to the .editor-container to avoid
- * z-index conflicts with Dialog/Drawer wrappers.
+ * A compact absolute-positioned toolbar that appears near the user's text selection,
+ * providing formatting, structure, and link controls based on the active toolbar mode.
+ * Positioned relative to the .editor-container to avoid z-index conflicts with
+ * Dialog/Drawer wrappers.
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -16,16 +17,28 @@ import {
 	FORMAT_TEXT_COMMAND,
 } from "lexical";
 import { $isLinkNode } from "@lexical/link";
+import { $isListNode, $isListItemNode } from "@lexical/list";
 import {
 	Link as LinkIcon,
 	Bold,
 	Italic,
 	Underline,
+	Strikethrough,
 	Subscript,
 	Superscript,
 	RemoveFormatting,
+	List,
+	ListOrdered,
+	ListChecks,
+	Indent,
+	Outdent,
+	AlignLeft,
+	AlignCenter,
+	AlignRight,
+	AlignJustify,
 } from "lucide-react";
 import { useLinkEditor } from "../toolbar/link-editor.utils";
+import { useEditorStore } from "@/app/stores/store-context";
 import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
 import type { ToolbarMode } from "@/shared/types/editor.types";
 
@@ -43,6 +56,7 @@ export const FloatingLinkToolbar = ({
 }: FloatingLinkToolbarProps) => {
 	const [editor] = useLexicalComposerContext();
 	const linkEditor = useLinkEditor();
+	const editorStore = useEditorStore();
 	const [position, setPosition] = useState<{
 		top: number;
 		left: number;
@@ -56,8 +70,13 @@ export const FloatingLinkToolbar = ({
 	const [isBold, setIsBold] = useState(false);
 	const [isItalic, setIsItalic] = useState(false);
 	const [isUnderline, setIsUnderline] = useState(false);
+	const [isStrikethrough, setIsStrikethrough] = useState(false);
 	const [isSubscript, setIsSubscript] = useState(false);
 	const [isSuperscript, setIsSuperscript] = useState(false);
+	const [isList, setIsList] = useState(false);
+	const [listType, setListType] = useState<
+		"bullet" | "number" | "check" | null
+	>(null);
 
 	// Derive button visibility from TOOLBAR_CONFIGS — mirrors the main Toolbar component
 	const config = TOOLBAR_CONFIGS[toolbar];
@@ -65,16 +84,24 @@ export const FloatingLinkToolbar = ({
 	const showBold = config.formatting.bold;
 	const showItalic = toolbar !== "none";
 	const showUnderline = config.formatting.underline;
+	const showStrikethrough = config.formatting.strikethrough;
 	const showSubscriptSuperscript = config.formatting.subscript;
 	const showClearFormatting = config.features.clearFormatting;
+	const showList = config.blocks.lists;
+	const showIndentOutdent = config.features.indentOutdent;
+	const showAlignment = config.features.alignment;
 
 	// Count visible buttons to decide whether to render at all
 	const visibleButtonCount =
 		(showBold ? 1 : 0) +
 		(showItalic ? 1 : 0) +
 		(showUnderline ? 1 : 0) +
+		(showStrikethrough ? 1 : 0) +
 		(showSubscriptSuperscript ? 2 : 0) +
 		(showClearFormatting ? 1 : 0) +
+		(showList ? 1 : 0) +
+		(showIndentOutdent ? 2 : 0) +
+		(showAlignment ? 1 : 0) +
 		(showLinks ? 1 : 0);
 
 	const updateToolbar = useCallback(() => {
@@ -103,8 +130,36 @@ export const FloatingLinkToolbar = ({
 		setIsBold(selection.hasFormat("bold"));
 		setIsItalic(selection.hasFormat("italic"));
 		setIsUnderline(selection.hasFormat("underline"));
+		setIsStrikethrough(selection.hasFormat("strikethrough"));
 		setIsSubscript(selection.hasFormat("subscript"));
 		setIsSuperscript(selection.hasFormat("superscript"));
+
+		// Detect list state by traversing up from anchor node
+		let foundList = false;
+		let foundListType: "bullet" | "number" | "check" | null = null;
+		const anchorNode = selection.anchor.getNode();
+		let currentNode = anchorNode;
+		while (currentNode) {
+			if ($isListItemNode(currentNode)) {
+				foundList = true;
+				const listParent = currentNode.getParent();
+				if ($isListNode(listParent)) {
+					const lexicalListType = listParent.getListType();
+					foundListType =
+						lexicalListType === "number"
+							? "number"
+							: lexicalListType === "check"
+								? "check"
+								: "bullet";
+				}
+				break;
+			}
+			const p = currentNode.getParent();
+			if (!p) break;
+			currentNode = p;
+		}
+		setIsList(foundList);
+		setListType(foundListType);
 	}, [editor]);
 
 	const updatePosition = useCallback(() => {
@@ -135,28 +190,36 @@ export const FloatingLinkToolbar = ({
 		}
 
 		const range = nativeSelection.getRangeAt(0);
-		const rangeRect = range.getBoundingClientRect();
-		const containerRect = container.getBoundingClientRect();
-
-		// Calculate position relative to the container
-		let top = rangeRect.top - containerRect.top - TOOLBAR_HEIGHT - TOOLBAR_GAP;
-		const toolbarWidth = toolbarRef.current?.offsetWidth || 200;
-		let left =
-			rangeRect.left -
-			containerRect.left +
-			rangeRect.width / 2 -
-			toolbarWidth / 2;
-
-		// Flip below if it would overflow the top of the container
-		if (top < 0) {
-			top = rangeRect.bottom - containerRect.top + TOOLBAR_GAP;
+		const rects = range.getClientRects();
+		if (rects.length === 0) {
+			setPosition(null);
+			setVisible(false);
+			return;
 		}
 
-		// Shift horizontally to stay within container bounds
-		if (left < 0) {
-			left = 0;
-		} else if (left + toolbarWidth > container.clientWidth) {
-			left = container.clientWidth - toolbarWidth;
+		const containerRect = container.getBoundingClientRect();
+
+		// Position centred above the selection (matching CanvaDocs reference behaviour)
+		const startRect = rects[0];
+		const endRect = rects[rects.length - 1];
+		const selLeft = Math.min(startRect.left, endRect.left);
+		const selRight = Math.max(startRect.right, endRect.right);
+
+		// Vertical: above the selection start, with gap
+		let top = startRect.top - containerRect.top - TOOLBAR_HEIGHT - TOOLBAR_GAP;
+
+		// Horizontal: set left to selection midpoint — CSS translateX(-50%) handles centering
+		const left = selLeft - containerRect.left + (selRight - selLeft) / 2;
+
+		// Flip below if it would overflow the top of the container or overlap the main toolbar
+		const mainToolbar = container.querySelector(".editor-toolbar");
+		const mainToolbarBottom = mainToolbar
+			? mainToolbar.getBoundingClientRect().bottom - containerRect.top
+			: 0;
+
+		if (top < mainToolbarBottom) {
+			// Position below the selection end instead
+			top = endRect.bottom - containerRect.top + TOOLBAR_GAP;
 		}
 
 		setPosition({ top, left });
@@ -173,8 +236,19 @@ export const FloatingLinkToolbar = ({
 			setVisible(false);
 			setPosition(null);
 		};
-		const handleMouseUp = () => {
+		const handleMouseUp = (e: MouseEvent) => {
 			mouseIsDown.current = false;
+
+			// Don't reposition if the mouseup was on the main toolbar — the user
+			// is clicking a toolbar button, not making a new selection
+			const target = e.target as HTMLElement;
+			if (
+				target.closest('[role="toolbar"]') ||
+				target.closest(".editor-toolbar")
+			) {
+				return;
+			}
+
 			requestAnimationFrame(() => {
 				editor.getEditorState().read(() => {
 					updateToolbar();
@@ -282,8 +356,29 @@ export const FloatingLinkToolbar = ({
 		}`;
 
 	// Track whether we need a separator before the next group
-	const hasFormatButtons = showBold || showItalic || showUnderline;
+	const hasFormatButtons =
+		showBold || showItalic || showUnderline || showStrikethrough;
 	const hasSubSuperClear = showSubscriptSuperscript || showClearFormatting;
+	const hasStructureButtons = showList || showIndentOutdent || showAlignment;
+
+	// Get the list icon based on current list type
+	const ListIcon =
+		listType === "number"
+			? ListOrdered
+			: listType === "check"
+				? ListChecks
+				: List;
+
+	// Get the alignment icon based on current state
+	const alignmentState = editorStore.state.textAlignment;
+	const AlignIcon =
+		alignmentState === "center"
+			? AlignCenter
+			: alignmentState === "right"
+				? AlignRight
+				: alignmentState === "justify"
+					? AlignJustify
+					: AlignLeft;
 
 	return (
 		<div
@@ -292,6 +387,7 @@ export const FloatingLinkToolbar = ({
 			style={{
 				top: position.top,
 				left: position.left,
+				transform: "translateX(-50%)",
 				opacity: visible ? 1 : 0,
 			}}
 			role="toolbar"
@@ -331,6 +427,19 @@ export const FloatingLinkToolbar = ({
 					aria-pressed={isUnderline}
 				>
 					<Underline className="h-3.5 w-3.5" />
+				</button>
+			)}
+			{showStrikethrough && (
+				<button
+					type="button"
+					className={btnClass(isStrikethrough)}
+					onClick={() =>
+						editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
+					}
+					aria-label="Strikethrough"
+					aria-pressed={isStrikethrough}
+				>
+					<Strikethrough className="h-3.5 w-3.5" />
 				</button>
 			)}
 
@@ -376,19 +485,92 @@ export const FloatingLinkToolbar = ({
 				</button>
 			)}
 
-			{showLinks && (
+			{/* Separator between formatting and structure buttons */}
+			{(hasFormatButtons || hasSubSuperClear) && hasStructureButtons && (
+				<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
+			)}
+
+			{/* List cycling button */}
+			{showList && (
+				<button
+					type="button"
+					className={btnClass(isList)}
+					onClick={() => editorStore.toggleList()}
+					aria-label={
+						isList
+							? listType === "number"
+								? "Numbered List"
+								: listType === "check"
+									? "Checklist"
+									: "Bullet List"
+							: "List"
+					}
+					aria-pressed={isList}
+				>
+					<ListIcon className="h-3.5 w-3.5" />
+				</button>
+			)}
+
+			{/* Indent/Outdent buttons */}
+			{showIndentOutdent && (
 				<>
-					<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
 					<button
 						type="button"
-						className={btnClass(isOnLink)}
-						onClick={handleClick}
-						aria-label={isOnLink ? "Edit Link" : "Add Link"}
-						aria-pressed={isOnLink}
+						className={btnClass(false)}
+						onClick={() => editorStore.decreaseIndent()}
+						aria-label="Decrease indent"
 					>
-						<LinkIcon className="h-3.5 w-3.5" />
+						<Outdent className="h-3.5 w-3.5" />
+					</button>
+					<button
+						type="button"
+						className={btnClass(false)}
+						onClick={() => editorStore.increaseIndent()}
+						aria-label="Increase indent"
+					>
+						<Indent className="h-3.5 w-3.5" />
 					</button>
 				</>
+			)}
+
+			{/* Alignment cycling button */}
+			{showAlignment && (
+				<button
+					type="button"
+					className={btnClass(false)}
+					onClick={() => {
+						const alignments: Array<"left" | "center" | "right" | "justify"> = [
+							"left",
+							"center",
+							"right",
+							"justify",
+						];
+						const currentIndex = alignments.indexOf(alignmentState);
+						const nextIndex = (currentIndex + 1) % alignments.length;
+						editorStore.setTextAlignment(alignments[nextIndex]);
+					}}
+					aria-label={`Align ${alignmentState}`}
+				>
+					<AlignIcon className="h-3.5 w-3.5" />
+				</button>
+			)}
+
+			{/* Separator before link button */}
+			{showLinks &&
+				(hasFormatButtons || hasSubSuperClear || hasStructureButtons) && (
+					<div className="mx-0.5 h-4 w-px bg-slate-200 dark:bg-gray-600" />
+				)}
+
+			{showLinks && (
+				<button
+					type="button"
+					className={btnClass(isOnLink)}
+					onClick={handleClick}
+					aria-label={isOnLink ? "Edit Link" : "Add Link"}
+					aria-pressed={isOnLink}
+				>
+					<LinkIcon className="h-3.5 w-3.5" />
+				</button>
 			)}
 		</div>
 	);

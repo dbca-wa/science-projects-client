@@ -43,9 +43,13 @@ export const MoveCursorToEndPlugin: React.FC = () => {
 			});
 
 			// Focus editor immediately after positioning cursor
-			requestAnimationFrame(() => {
+			if (typeof requestAnimationFrame !== "undefined") {
+				requestAnimationFrame(() => {
+					editor.focus();
+				});
+			} else {
 				editor.focus();
-			});
+			}
 		};
 
 		// Check if editor is already editable (happens when moveCursorToEnd={true})
