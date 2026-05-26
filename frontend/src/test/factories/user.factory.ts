@@ -87,6 +87,8 @@ export const createMockUserWithInvalidName = (): IUserData =>
 	createMockUser({
 		display_first_name: "None",
 		display_last_name: "None",
+		first_name: "None",
+		last_name: "None",
 		username: "testuser",
 	});
 

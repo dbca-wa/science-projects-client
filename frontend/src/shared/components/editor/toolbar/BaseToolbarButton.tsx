@@ -40,9 +40,9 @@ export const BaseToolbarButton: React.FC<BaseToolbarButtonProps> = ({
 	const isDark = darkMode ?? contextDarkMode;
 	const activeClass = isActive
 		? isDark
-			? "bg-gray-200 text-gray-900 hover:bg-gray-300"
-			: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-		: "";
+			? "bg-gray-200 text-gray-900 hover:bg-gray-300 ring-1 ring-gray-300"
+			: "bg-blue-200/80 text-blue-800 hover:bg-blue-200 ring-1 ring-blue-300 dark:bg-blue-900/50 dark:text-blue-200 dark:hover:bg-blue-900/60 dark:ring-blue-700"
+		: "hover:bg-green-200/80 hover:text-green-800 hover:ring-1 hover:ring-green-300 dark:hover:bg-green-900/50 dark:hover:text-green-200 dark:hover:ring-green-700";
 
 	return (
 		<Tooltip>

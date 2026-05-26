@@ -647,14 +647,18 @@
 
 /* Toolbar */
 .editor-toolbar {
+	position: relative;
+	z-index: 20;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.25rem;
 	padding: 0.75rem;
-	border: none; /* No border - parent container handles it */
-	border-bottom: 2px solid hsl(var(--border)); /* Only bottom border for visual separation */
-	background-color: hsl(var(--muted) / 0.5);
+	border: none;
+	border-bottom: 2px solid hsl(var(--border)); /* Prominent border for clear separation */
+	background-color: rgb(
+		249 250 251
+	); /* bg-gray-50 — consistent visible background */
 	box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
@@ -663,7 +667,7 @@
 }
 
 .dark .editor-toolbar {
-	background-color: rgb(15, 21, 33); /* dark:bg-gray-800 */
+	background-color: rgb(31 41 55); /* gray-800 */
 	border-bottom-color: rgb(55 65 81); /* dark:border-gray-700 */
 }
 
@@ -1323,14 +1327,12 @@
 	background-color: rgb(23 37 84 / 0.2); /* blue-950/20 */
 }
 
-/* Make internals transparent so the parent bg shows through */
-.editor-standalone .editor-content-wrapper,
-.editor-standalone .editor-toolbar {
+/* Make content wrapper transparent so the parent bg shows through */
+.editor-standalone .editor-content-wrapper {
 	background-color: transparent;
 }
 
-.dark .editor-standalone .editor-content-wrapper,
-.dark .editor-standalone .editor-toolbar {
+.dark .editor-standalone .editor-content-wrapper {
 	background-color: transparent;
 }
 
@@ -1338,17 +1340,15 @@
 /* Managed editor variant (inline-save-editor)  */
 /* Used inside InlineSaveEditor and             */
 /* FormRichTextEditor where the PARENT manages  */
-/* focus/dirty bg state. All internal bgs are   */
+/* focus/dirty bg state. Content wrapper is     */
 /* transparent so the parent colour shows       */
-/* through toolbar, content, and footer.        */
+/* through the content area.                    */
 /* ============================================ */
 
-.inline-save-editor .editor-content-wrapper,
-.inline-save-editor .editor-toolbar {
+.inline-save-editor .editor-content-wrapper {
 	background-color: transparent;
 }
 
-.dark .inline-save-editor .editor-content-wrapper,
-.dark .inline-save-editor .editor-toolbar {
+.dark .inline-save-editor .editor-content-wrapper {
 	background-color: transparent;
 }

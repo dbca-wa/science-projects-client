@@ -67,6 +67,17 @@ const ProjectCreateWizardPage = observer(() => {
 
 		if (projectKind && PROJECT_TYPE_NAMES[projectKind]) {
 			hasRestoredRef.current = true;
+
+			// Reset the wizard store if it has data from a different project type.
+			// The store is a singleton that persists across route changes, so stale
+			// data from a previous type would bleed into the new one without this.
+			if (
+				wizardStore.state.projectKind &&
+				wizardStore.state.projectKind !== projectKind
+			) {
+				wizardStore.resetWizard();
+			}
+
 			wizardStore.setProjectKind(projectKind);
 
 			const restore = async () => {
@@ -125,14 +136,31 @@ const ProjectCreateWizardPage = observer(() => {
 		});
 	};
 
-	const handleCancel = () => {
-		// Clear all persistence layers (store, localStorage, sessionStorage, server, query cache)
+	const handleCancel = async () => {
+		// Disable the draft query FIRST to prevent it from refetching when we clear the cache
+		// (removeQueries on a mounted observer triggers an immediate refetch)
+		queryClient.setQueryData(["projects", "drafts", projectKind], null);
+
+		// Clear all local persistence layers (store, localStorage, sessionStorage, query cache)
 		clearAllWizardState({
 			wizardStore,
 			queryClient,
 			projectKind: projectKind!,
-			deleteServerDraft: () => deleteDraftMutation.mutate(),
 		});
+
+		// Await the server draft deletion
+		try {
+			await deleteDraftMutation.mutateAsync();
+		} catch {
+			// Ignore errors — draft may not exist on the server
+		}
+
+		// Final cache cleanup after server confirms deletion
+		queryClient.removeQueries({
+			queryKey: ["projects", "drafts", projectKind],
+			exact: true,
+		});
+
 		navigate("/projects/create");
 	};
 
@@ -145,7 +173,7 @@ const ProjectCreateWizardPage = observer(() => {
 				{/* Header */}
 				<div className="mb-6 sm:mb-8">
 					<button
-						onClick={handleCancel}
+						onClick={() => navigate("/projects/create")}
 						className="mb-3 sm:mb-4 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 					>
 						<ArrowLeft className="h-4 w-4" />

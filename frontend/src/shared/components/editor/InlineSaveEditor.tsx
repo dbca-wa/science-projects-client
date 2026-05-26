@@ -18,7 +18,7 @@ import { countWords } from "@/shared/utils/word-count.utils";
 import { isRichTextEmpty } from "@/shared/utils/rich-text.utils";
 import type { ContentType } from "@/shared/types/inline-edit.types";
 import type { ToolbarMode } from "@/shared/types/editor.types";
-import { sanitizeInput } from "@/shared/utils/sanitise.utils";
+import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
 
 export interface InlineSaveEditorProps {
 	// Content configuration
@@ -175,10 +175,21 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 		}, 0);
 	}, [contentType, entityId, savedContent, onCancel, onEditEnd]);
 
-	// Handle content change — use normalised text comparison to avoid
-	// false positives from Lexical re-serialising the same content differently
-	const normaliseForComparison = (html: string) =>
-		sanitizeInput(html).replace(/\s+/g, " ").trim();
+	// Handle content change — use normalised HTML comparison to detect
+	// both text content and structural changes (paragraph→list, heading, etc.)
+	// Strips all attributes (class, style, data-*, etc.) since Lexical adds its own
+	// during serialisation, but preserves structural tags so p→ul/li changes are detected.
+	const normaliseForComparison = (html: string) => {
+		const sanitised = sanitizeRichText(html);
+		return sanitised
+			.replace(/<([a-z][a-z0-9]*)\s+[^>]*?>/gi, "<$1>") // Strip all attributes from opening tags
+			.replace(/<br\s*\/?>/gi, "") // Remove <br> tags (Lexical adds these in empty paragraphs)
+			.replace(/<span>(.*?)<\/span>/gi, "$1") // Unwrap plain spans (Lexical wraps text in spans)
+			.replace(/<p><\/p>/g, "") // Remove empty paragraphs
+			.replace(/<div><\/div>/g, "") // Remove empty divs
+			.replace(/\s+/g, " ")
+			.trim();
+	};
 
 	// Handle copying content to clipboard (for locked editors)
 	const handleCopyContent = useCallback(() => {
@@ -464,13 +475,13 @@ export const InlineSaveEditor = observer(function InlineSaveEditor({
 								: "border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900"
 					}`}
 				>
-					{/* Header section with label — bg is transparent so parent state colour shows */}
+					{/* Header section with label — matches toolbar bg for visual continuity */}
 					{label && (
 						<div
 							className={`flex items-center justify-between ${
 								compact
 									? "px-6 pt-4 pb-1"
-									: "px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50"
+									: "px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-800"
 							}`}
 						>
 							<div>{renderLabel()}</div>

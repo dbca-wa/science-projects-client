@@ -4,7 +4,7 @@ import type { ProjectKind } from "@/shared/types/project.types";
 import { clearDraftFromLocalStorage } from "./draft-persistence.utils";
 import { logger } from "@/shared/services/logger.service";
 
-const SESSION_STORAGE_KEY = "project-wizard-draft";
+const SESSION_STORAGE_KEY_PREFIX = "project-wizard-draft";
 
 interface ClearAllWizardStateOptions {
 	wizardStore: ProjectWizardStore;
@@ -37,9 +37,9 @@ export function clearAllWizardState({
 	// 3. localStorage
 	clearDraftFromLocalStorage(projectKind);
 
-	// 4. sessionStorage
+	// 4. sessionStorage (per-kind key)
 	try {
-		sessionStorage.removeItem(SESSION_STORAGE_KEY);
+		sessionStorage.removeItem(`${SESSION_STORAGE_KEY_PREFIX}-${projectKind}`);
 	} catch (error) {
 		logger.error("Failed to clear sessionStorage draft", {
 			error: error instanceof Error ? error.message : String(error),
@@ -51,8 +51,15 @@ export function clearAllWizardState({
 		deleteServerDraft();
 	}
 
-	// 6. TanStack Query cache
-	queryClient.removeQueries({ queryKey: ["projects", "drafts", projectKind] });
+	// 6. TanStack Query cache — set data to null and remove the query entirely
+	// Setting data to null ensures any active observers see the draft as gone,
+	// and removeQueries cleans up the cache entry for the next mount.
+	// Use exact: true to only remove this specific project kind's draft query.
+	queryClient.setQueryData(["projects", "drafts", projectKind], null);
+	queryClient.removeQueries({
+		queryKey: ["projects", "drafts", projectKind],
+		exact: true,
+	});
 
 	logger.info("Cleared all wizard state", { projectKind });
 }

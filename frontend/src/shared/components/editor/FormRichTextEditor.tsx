@@ -135,9 +135,9 @@ export const FormRichTextEditor = forwardRef<
 				ref={setRefs}
 				className={`relative rounded-lg shadow-sm overflow-hidden transition-all duration-300 ${containerClass} ${className}`}
 			>
-				{/* Label/description header */}
+				{/* Label/description header — matches toolbar bg for visual continuity */}
 				{(label || description) && (
-					<div className="px-4 pt-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+					<div className="px-4 pt-4 pb-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
 						{label && (
 							<label className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
 								{label}

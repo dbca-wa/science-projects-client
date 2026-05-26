@@ -58,42 +58,42 @@ describe("formatAuthors", () => {
 		expect(formatAuthors(members)).toBe("A. Johnson, J. Smith, B. Williams");
 	});
 
-	it("should filter out members with null first name", () => {
+	it("should include members with null first name using last name only", () => {
 		const members = [
 			createMockMember("John", "Smith", 0),
 			createMockMember(null, "Doe", 1),
 		];
-		expect(formatAuthors(members)).toBe("J. Smith");
+		expect(formatAuthors(members)).toBe("J. Smith, Doe");
 	});
 
-	it("should filter out members with null last name", () => {
+	it("should include members with null last name using first name only", () => {
 		const members = [
 			createMockMember("John", "Smith", 0),
 			createMockMember("Jane", null, 1),
 		];
-		expect(formatAuthors(members)).toBe("J. Smith");
+		expect(formatAuthors(members)).toBe("J. Smith, Jane");
 	});
 
-	it("should filter out members with 'None' as first name", () => {
+	it("should include members with 'None' as first name using last name only", () => {
 		const members = [
 			createMockMember("John", "Smith", 0),
 			createMockMember("None", "Doe", 1),
 		];
-		expect(formatAuthors(members)).toBe("J. Smith");
+		expect(formatAuthors(members)).toBe("J. Smith, Doe");
 	});
 
-	it("should filter out members with 'None' as last name", () => {
+	it("should include members with 'None' as last name using first name only", () => {
 		const members = [
 			createMockMember("John", "Smith", 0),
 			createMockMember("Jane", "None", 1),
 		];
-		expect(formatAuthors(members)).toBe("J. Smith");
+		expect(formatAuthors(members)).toBe("J. Smith, Jane");
 	});
 
-	it("should return empty string when no valid members", () => {
+	it("should return empty string when all members have both names invalid", () => {
 		const members = [
-			createMockMember(null, "Smith", 0),
-			createMockMember("John", null, 1),
+			createMockMember(null, null, 0),
+			createMockMember("None", "None", 1),
 		];
 		expect(formatAuthors(members)).toBe("");
 	});
