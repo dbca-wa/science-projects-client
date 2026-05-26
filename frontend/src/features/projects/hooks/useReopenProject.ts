@@ -3,18 +3,30 @@ import { apiClient } from "@/shared/services/api/client.service";
 import { toast } from "sonner";
 import { extractUserFriendlyMessage } from "@/shared/utils/error.utils";
 
+interface ReopenProjectParams {
+	projectId: number;
+	reason?: string;
+}
+
 /**
  * Reopen a closed project by deleting the project closure document
  */
-const reopenProject = async (projectId: number): Promise<void> => {
+const reopenProject = async ({
+	projectId,
+	reason,
+}: ReopenProjectParams): Promise<void> => {
 	const url = `documents/projectclosures/reopen/${projectId}`;
-	return apiClient.post<void>(url, { project: projectId });
+	return apiClient.post<void>(url, {
+		project: projectId,
+		reason: reason || "",
+	});
 };
 
 /**
  * Hook for reopening a closed project
  * - Deletes the project closure document
  * - Sets project status to 'updating'
+ * - Sends reason for reopening in the notification email
  * - Invalidates project queries on success
  * - Shows success/error toast notifications
  *
@@ -24,10 +36,12 @@ export const useReopenProject = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (projectId: number) => reopenProject(projectId),
-		onSuccess: (_data, projectId) => {
+		mutationFn: (params: ReopenProjectParams) => reopenProject(params),
+		onSuccess: (_data, params) => {
 			// Invalidate project queries to refetch updated project
-			queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
+			queryClient.invalidateQueries({
+				queryKey: ["projects", params.projectId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["projects"] });
 
 			// Show success toast

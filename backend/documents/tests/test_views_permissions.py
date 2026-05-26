@@ -1435,7 +1435,9 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
+        mock_approve.assert_called_once_with(
+            project_document, user, feedback_html="", send_notifications=True
+        )
         assert "id" in response.data
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_two")
@@ -1458,7 +1460,9 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
+        mock_approve.assert_called_once_with(
+            project_document, user, feedback_html="", send_notifications=True
+        )
 
     @patch("documents.services.approval_service.ApprovalService.approve_stage_three")
     @patch("documents.services.document_service.DocumentService.get_document")
@@ -1480,7 +1484,9 @@ class TestDocApproval:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_approve.assert_called_once_with(project_document, user, feedback_html="")
+        mock_approve.assert_called_once_with(
+            project_document, user, feedback_html="", send_notifications=True
+        )
 
     @pytest.mark.integration
     def test_doc_approval_missing_stage(self, api_client, user, project_document, db):
@@ -1594,7 +1600,11 @@ class TestDocRecall:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_recall.assert_called_once_with(
-            project_document, user, "Need to make changes", stage=2
+            project_document,
+            user,
+            "Need to make changes",
+            stage=2,
+            send_notifications=True,
         )
         assert "id" in response.data
 
@@ -1618,7 +1628,9 @@ class TestDocRecall:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_recall.assert_called_once_with(project_document, user, "", stage=1)
+        mock_recall.assert_called_once_with(
+            project_document, user, "", stage=1, send_notifications=True
+        )
 
     @pytest.mark.integration
     def test_doc_recall_missing_stage(self, api_client, user, project_document, db):
@@ -1698,7 +1710,7 @@ class TestDocSendBack:
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
         mock_send_back.assert_called_once_with(
-            project_document, user, "Needs more detail"
+            project_document, user, "Needs more detail", send_notifications=True
         )
         assert "id" in response.data
 
@@ -1722,7 +1734,9 @@ class TestDocSendBack:
 
         # Assert
         assert response.status_code == status.HTTP_202_ACCEPTED
-        mock_send_back.assert_called_once_with(project_document, user, "")
+        mock_send_back.assert_called_once_with(
+            project_document, user, "", send_notifications=True
+        )
 
     @pytest.mark.integration
     def test_doc_send_back_missing_stage(self, api_client, user, project_document, db):

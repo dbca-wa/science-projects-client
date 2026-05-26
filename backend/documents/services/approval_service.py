@@ -247,7 +247,7 @@ class ApprovalService:
 
     @staticmethod
     @transaction.atomic
-    def send_back(document, sender, feedback_html=""):
+    def send_back(document, sender, feedback_html="", send_notifications=True):
         """
         Send document back for revision
 
@@ -259,6 +259,7 @@ class ApprovalService:
             document: ProjectDocument instance
             sender: User sending back the document
             feedback_html: Optional rich text HTML feedback (shown in email)
+            send_notifications: Whether to send notification emails
         """
         settings.LOGGER.info(f"{sender} is sending back document {document}")
 
@@ -293,18 +294,22 @@ class ApprovalService:
         document.status = ProjectDocument.StatusChoices.REVISING
         document.save()
 
-        try:
-            NotificationService.notify_document_sent_back(
-                document, sender, feedback_html
-            )
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send document sent back notification: {e}", exc_info=True
-            )
+        if send_notifications:
+            try:
+                NotificationService.notify_document_sent_back(
+                    document, sender, feedback_html
+                )
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send document sent back notification: {e}",
+                    exc_info=True,
+                )
 
     @staticmethod
     @transaction.atomic
-    def recall(document, recaller, feedback_html="", stage=None):
+    def recall(
+        document, recaller, feedback_html="", stage=None, send_notifications=True
+    ):
         """
         Recall document from approval process.
 
@@ -320,6 +325,7 @@ class ApprovalService:
             recaller: User recalling the document
             feedback_html: Optional rich text HTML feedback (shown in email)
             stage: The approval stage being recalled (1, 2, or 3)
+            send_notifications: Whether to send notification emails
         """
         settings.LOGGER.info(
             f"{recaller} is recalling document {document} at stage {stage}"
@@ -368,14 +374,15 @@ class ApprovalService:
 
         document.save()
 
-        try:
-            NotificationService.notify_document_recalled(
-                document, recaller, feedback_html
-            )
-        except Exception as e:
-            settings.LOGGER.error(
-                f"Failed to send document recalled notification: {e}", exc_info=True
-            )
+        if send_notifications:
+            try:
+                NotificationService.notify_document_recalled(
+                    document, recaller, feedback_html
+                )
+            except Exception as e:
+                settings.LOGGER.error(
+                    f"Failed to send document recalled notification: {e}", exc_info=True
+                )
 
     @staticmethod
     def _revert_stage_three_project_status(document):

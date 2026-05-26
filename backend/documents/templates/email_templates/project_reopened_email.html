@@ -9,6 +9,22 @@
 <p style="font-size: 14px; line-height: 26px; margin: 16px 0; color: #4b5563;">
   {% if actioning_user_name %}<strong style="color: #1f2937;">{{ actioning_user_name }}</strong> (<a href="mailto:{{ actioning_user_email }}" style="color: #2563eb; text-decoration: none; font-weight: 500;" target="_blank">{{ actioning_user_email }}</a>) has reopened {% endif %}the project{% if plain_project_title %} <strong style="color: #1f2937;">&#x27;{{ plain_project_title }}&#x27;</strong>{% endif %} that you are a member of.
 </p>
+
+{% if feedback_html %}
+<table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="margin-top:24px;margin-bottom:24px;border:1px solid #e5e7eb;border-radius:0.25rem;overflow:hidden">
+  <tbody>
+    <tr>
+      <td style="padding:16px 24px;background-color:#f9fafb">
+        <h2 style="color:#1f2937;font-size:16px;font-weight:600;margin-top:0;margin-bottom:8px">Reason for reopening:</h2>
+        <div style="font-size:14px;line-height:24px;color:#4b5563">
+          {{ feedback_html|safe }}
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{% endif %}
+
 <p style="font-size: 14px; line-height: 26px; margin: 16px 0; color: #4b5563;">
   This project is now active again. Please review any outstanding tasks or documents.
 </p>

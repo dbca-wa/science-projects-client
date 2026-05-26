@@ -44,6 +44,7 @@ export const performDocumentAction = async (
 		documentPk: documentId,
 		reason: data.reason,
 		feedbackHTML: data.feedbackHTML,
+		send_email: data.send_email,
 	});
 };
 
