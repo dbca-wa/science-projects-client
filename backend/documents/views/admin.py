@@ -572,8 +572,11 @@ class ReopenProject(APIView):
                 settings.LOGGER.info(msg="Sending project reopened email")
 
                 if project:
+                    # Extract reason from request data (rich text HTML)
+                    reason_html = request.data.get("reason", "")
+
                     NotificationService.notify_project_reopened(
-                        project=project, reopener=request.user
+                        project=project, reopener=request.user, reason_html=reason_html
                     )
 
                     return Response(

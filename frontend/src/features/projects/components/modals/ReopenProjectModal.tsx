@@ -1,6 +1,4 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
 	Dialog,
@@ -12,19 +10,9 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { Label } from "@/shared/components/ui/label";
+import { FormRichTextEditor } from "@/shared/components/editor/FormRichTextEditor";
 import { useReopenProject } from "@/features/projects/hooks/useReopenProject";
-
-const reopenSchema = z.object({
-	projectId: z.number(),
-	confirmed: z.boolean().refine((val) => val === true, {
-		message: "You must confirm to reopen the project",
-	}),
-	reason: z.string().min(10, "Reason must be at least 10 characters"),
-});
-
-type ReopenFormData = z.infer<typeof reopenSchema>;
 
 interface ReopenProjectModalProps {
 	isOpen: boolean;
@@ -32,46 +20,65 @@ interface ReopenProjectModalProps {
 	projectId: number;
 }
 
+/**
+ * Minimum character length for the reason (stripped of HTML tags)
+ */
+const MIN_REASON_LENGTH = 10;
+
+/**
+ * Get plain text length from HTML content.
+ * Used only for character counting (not for sanitisation).
+ */
+const getPlainTextLength = (html: string): number => {
+	if (!html) return 0;
+	if (typeof DOMParser !== "undefined") {
+		const doc = new DOMParser().parseFromString(html, "text/html");
+		return (doc.body.textContent || "").trim().length;
+	}
+	// Fallback for environments without DOMParser
+	const div = document.createElement("div");
+	div.innerHTML = html;
+	return (div.textContent || "").trim().length;
+};
+
 export const ReopenProjectModal = ({
 	isOpen,
 	onClose,
 	projectId,
 }: ReopenProjectModalProps) => {
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		watch,
-		setValue,
-	} = useForm<ReopenFormData>({
-		resolver: zodResolver(reopenSchema),
-		defaultValues: {
-			projectId,
-			confirmed: false,
-			reason: "",
-		},
-	});
+	const [confirmed, setConfirmed] = useState(false);
+	const [reasonHTML, setReasonHTML] = useState("");
 
 	const reopenMutation = useReopenProject();
 	const navigate = useNavigate();
-	// eslint-disable-next-line react-hooks/incompatible-library
-	const confirmed = watch("confirmed");
-	const reason = watch("reason");
-	const canSubmit = confirmed && reason.length >= 10;
 
-	const onSubmit = (data: ReopenFormData) => {
-		reopenMutation.mutate(data.projectId, {
-			onSuccess: () => {
-				onClose();
-				// Navigate to the overview tab — the closure tab no longer exists
-				navigate(`/projects/${data.projectId}`);
-			},
-		});
+	const reasonLength = getPlainTextLength(reasonHTML);
+	const canSubmit = confirmed && reasonLength >= MIN_REASON_LENGTH;
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!canSubmit) return;
+
+		reopenMutation.mutate(
+			{ projectId, reason: reasonHTML },
+			{
+				onSuccess: () => {
+					onClose();
+					navigate(`/projects/${projectId}`);
+				},
+			}
+		);
+	};
+
+	const handleClose = () => {
+		setConfirmed(false);
+		setReasonHTML("");
+		onClose();
 	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-[500px]">
+		<Dialog open={isOpen} onOpenChange={handleClose}>
+			<DialogContent className="sm:max-w-[600px]">
 				<DialogHeader>
 					<DialogTitle>
 						Are you sure you want to reopen this project?
@@ -81,13 +88,13 @@ export const ReopenProjectModal = ({
 					</DialogDescription>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+				<form onSubmit={handleSubmit} className="space-y-4">
 					<div className="rounded-lg bg-muted p-4">
 						<h4 className="mb-3 text-lg font-semibold">Info</h4>
 						<ul className="ml-6 list-disc space-y-2 text-sm">
 							<li>
 								The project will become active, with the status set to
-								'updating'
+								&apos;updating&apos;
 							</li>
 							<li>The project closure document will be deleted</li>
 							<li>Progress Reports can be created again</li>
@@ -102,9 +109,7 @@ export const ReopenProjectModal = ({
 						<Checkbox
 							id="confirmed"
 							checked={confirmed}
-							onCheckedChange={(checked) =>
-								setValue("confirmed", checked as boolean)
-							}
+							onCheckedChange={(checked) => setConfirmed(checked as boolean)}
 							aria-label="Are you sure you want to reopen this project?"
 						/>
 						<Label
@@ -114,31 +119,32 @@ export const ReopenProjectModal = ({
 							Are you sure you want to reopen this project?
 						</Label>
 					</div>
-					{errors.confirmed && (
-						<p className="text-sm text-destructive">
-							{errors.confirmed.message}
-						</p>
-					)}
 
-					{/* Reason Textarea */}
-					<div className="space-y-2">
-						<Label htmlFor="reason">Reason for reopening</Label>
-						<Textarea
-							id="reason"
-							{...register("reason")}
+					{/* Reason Rich Text Editor — only active after checkbox is ticked */}
+					<div
+						className={`space-y-2 ${!confirmed ? "opacity-50 pointer-events-none" : ""}`}
+					>
+						<label className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
+							Reason for reopening <span className="text-destructive">*</span>
+						</label>
+						<FormRichTextEditor
+							value={reasonHTML}
+							onChange={setReasonHTML}
+							toolbar="simple"
 							placeholder="Please provide a reason for reopening this project..."
-							className="min-h-[100px]"
-							aria-label="Reason for reopening"
+							wordLimit={500}
 						/>
-						{errors.reason && (
-							<p className="text-sm text-destructive">
-								{errors.reason.message}
-							</p>
-						)}
+						{confirmed &&
+							reasonLength > 0 &&
+							reasonLength < MIN_REASON_LENGTH && (
+								<p className="text-sm text-destructive">
+									Reason must be at least {MIN_REASON_LENGTH} characters
+								</p>
+							)}
 					</div>
 
 					<DialogFooter className="gap-2">
-						<Button type="button" variant="outline" onClick={onClose}>
+						<Button type="button" variant="outline" onClick={handleClose}>
 							Cancel
 						</Button>
 						<Button

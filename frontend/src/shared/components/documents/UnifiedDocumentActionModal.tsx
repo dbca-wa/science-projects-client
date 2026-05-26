@@ -321,7 +321,9 @@ export const UnifiedDocumentActionModal = ({
 		}
 
 		onSubmit(formData);
-		reset();
+		// Do NOT reset here — the modal stays open for the success animation.
+		// Resetting immediately re-ticks the email checkbox (default: true) which
+		// confuses the user. The form is reset when the modal closes via handleClose.
 		setFeedbackHTML("");
 	};
 

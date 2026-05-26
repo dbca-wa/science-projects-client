@@ -41,6 +41,26 @@ vi.mock("@/shared/components/editor", () => ({
 	),
 }));
 
+vi.mock("@/shared/components/editor/FormRichTextEditor", () => ({
+	FormRichTextEditor: ({
+		value,
+		onChange,
+		placeholder,
+	}: {
+		value: string;
+		onChange: (val: string) => void;
+		placeholder?: string;
+	}) => (
+		<textarea
+			data-testid="rich-text-editor"
+			value={value}
+			onChange={(e) => onChange(e.target.value)}
+			placeholder={placeholder}
+			aria-label="Reason for reopening"
+		/>
+	),
+}));
+
 vi.mock("@/shared/components/ProjectSection", () => ({
 	ProjectSection: ({
 		title,
@@ -258,20 +278,11 @@ describe("ProjectClosureTab", () => {
 		const reopenButton = screen.getByTestId("reopen-project-button");
 		await user.click(reopenButton);
 
-		// Reason textarea should exist in the modal
+		// Rich text editor for reason should exist in the modal
 		await waitFor(() => {
-			const textarea = screen.queryByRole("textbox", {
-				name: /reason/i,
-			});
-			expect(textarea).toBeInTheDocument();
+			const editor = screen.queryByTestId("rich-text-editor");
+			expect(editor).toBeInTheDocument();
 		});
-
-		const textarea = screen.queryByRole("textbox");
-		if (textarea) {
-			console.log("Reason textarea found — modal is implemented");
-		} else {
-			console.log("Reason textarea not found — modal may not be implemented");
-		}
 	});
 
 	/**

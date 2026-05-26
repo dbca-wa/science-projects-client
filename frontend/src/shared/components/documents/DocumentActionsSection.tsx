@@ -167,12 +167,9 @@ export const DocumentActionsSection = ({
 
 	// Delete button: Show when project lead approval NOT granted AND document NOT directorate approved
 	// Special case: project plans with no progress reports can be deleted even if partially approved
+	// Special case: progress/student reports on closed projects can be deleted by authorised users
+	// Lifecycle protection: can't delete if a later-stage document exists
 	const canDelete = useMemo(() => {
-		// Never show if fully approved
-		if (document.directorate_approval_granted) {
-			return false;
-		}
-
 		// Check if user has permission (project lead, superuser, or caretaker)
 		const hasPermission =
 			currentUser?.is_superuser ||
@@ -183,6 +180,41 @@ export const DocumentActionsSection = ({
 			userIsCaretakerOfBaLeader;
 
 		if (!hasPermission) return false;
+
+		// Lifecycle protection: can't delete if a later-stage document exists
+		if (documentType === "concept") {
+			// Can't delete concept plan if project plan exists
+			if (all_documents?.project_plan) return false;
+		}
+		if (documentType === "projectplan") {
+			// Can't delete project plan if progress reports or student reports exist
+			if (
+				all_documents?.progress_reports &&
+				all_documents.progress_reports.length > 0
+			)
+				return false;
+			if (
+				all_documents?.student_reports &&
+				all_documents.student_reports.length > 0
+			)
+				return false;
+		}
+
+		// Closed-project exemption: progress/student reports can be deleted by authorised users
+		// regardless of approval state when the project is completed or terminated
+		const isClosedProject =
+			project.status === "completed" || project.status === "terminated";
+		const isExemptDocType =
+			documentType === "progressreport" || documentType === "studentreport";
+
+		if (isClosedProject && isExemptDocType) {
+			return true;
+		}
+
+		// Never show if fully approved (standard rule for non-exempt cases)
+		if (document.directorate_approval_granted) {
+			return false;
+		}
 
 		// Show for new documents (project lead approval not granted)
 		if (!document.project_lead_approval_granted) {
@@ -204,6 +236,7 @@ export const DocumentActionsSection = ({
 		document,
 		documentType,
 		all_documents,
+		project.status,
 		isProjectLead,
 		isBaLead,
 		userIsCaretakerOfAdmin,
@@ -451,6 +484,24 @@ export const DocumentActionsSection = ({
 							</p>
 						</div>
 					)}
+
+					{/* Delete button for exempt documents on closed projects (outside the overlay) */}
+					{isProtected && canDelete && onDelete && (
+						<div className="rounded-lg border-2 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 p-3 space-y-2">
+							<h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+								Delete Document
+							</h3>
+							<Button
+								onClick={onDelete}
+								variant="action-red"
+								size="sm"
+								className="w-full"
+							>
+								<Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
+								Delete Document
+							</Button>
+						</div>
+					)}
 					{/* Approval Status Section with actions under each stage */}
 					<div
 						className={`rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-muted/30 dark:bg-gray-900 p-3 space-y-3 ${locked || isProtected ? "opacity-50 pointer-events-none" : ""}`}
@@ -476,8 +527,8 @@ export const DocumentActionsSection = ({
 											Submit for Approval
 										</Button>
 									)}
-									{/* Delete button - Red (only when project lead approval NOT granted) */}
-									{canDelete && onDelete && (
+									{/* Delete button - Red (only when not protected — protected case uses the exempt section above) */}
+									{canDelete && !isProtected && onDelete && (
 										<Button
 											onClick={onDelete}
 											variant="action-red"

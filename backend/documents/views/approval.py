@@ -56,18 +56,30 @@ class DocApproval(APIView):
         # Sanitise feedback (returns "" if empty/meaningless content)
         feedback_html = sanitise_feedback_html(feedback_html)
 
+        # Read send_email preference (defaults to True for backwards compatibility)
+        send_email = request.data.get("send_email", True)
+
         # Delegate to service based on stage
         if stage == 1:
             ApprovalService.approve_stage_one(
-                document, request.user, feedback_html=feedback_html
+                document,
+                request.user,
+                feedback_html=feedback_html,
+                send_notifications=send_email,
             )
         elif stage == 2:
             ApprovalService.approve_stage_two(
-                document, request.user, feedback_html=feedback_html
+                document,
+                request.user,
+                feedback_html=feedback_html,
+                send_notifications=send_email,
             )
         elif stage == 3:
             ApprovalService.approve_stage_three(
-                document, request.user, feedback_html=feedback_html
+                document,
+                request.user,
+                feedback_html=feedback_html,
+                send_notifications=send_email,
             )
         else:
             return Response(
@@ -108,8 +120,17 @@ class DocRecall(APIView):
         # Get document
         document = DocumentService.get_document(document_pk)
 
+        # Read send_email preference (defaults to True for backwards compatibility)
+        send_email = request.data.get("send_email", True)
+
         # Delegate to service — pass stage so recall goes back exactly one step
-        ApprovalService.recall(document, request.user, feedback_html, stage=int(stage))
+        ApprovalService.recall(
+            document,
+            request.user,
+            feedback_html,
+            stage=int(stage),
+            send_notifications=send_email,
+        )
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)
@@ -145,8 +166,13 @@ class DocSendBack(APIView):
         # Get document
         document = DocumentService.get_document(document_pk)
 
+        # Read send_email preference (defaults to True for backwards compatibility)
+        send_email = request.data.get("send_email", True)
+
         # Delegate to service
-        ApprovalService.send_back(document, request.user, feedback_html)
+        ApprovalService.send_back(
+            document, request.user, feedback_html, send_notifications=send_email
+        )
 
         # Serialize and return
         serializer = ProjectDocumentSerializer(document)

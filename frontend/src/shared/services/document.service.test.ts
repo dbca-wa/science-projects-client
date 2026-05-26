@@ -25,7 +25,7 @@ describe("performDocumentAction", () => {
 		(apiClient.post as Mock).mockResolvedValue({});
 	});
 
-	it("approve action sends stage, documentPk, and feedbackHTML", async () => {
+	it("approve action sends stage, documentPk, feedbackHTML, and send_email", async () => {
 		await performDocumentAction("concept", 42, {
 			action: "approve",
 			stage: 2,
@@ -40,6 +40,7 @@ describe("performDocumentAction", () => {
 				stage: 2,
 				documentPk: 42,
 				feedbackHTML: "<p>Looks good</p>",
+				send_email: true,
 			})
 		);
 	});
@@ -84,7 +85,19 @@ describe("performDocumentAction", () => {
 		);
 	});
 
-	it("does NOT send send_email field to backend", async () => {
+	it("includes send_email field in POST body", async () => {
+		await performDocumentAction("concept", 42, {
+			action: "approve",
+			stage: 1,
+			documentPk: 42,
+			send_email: false,
+		});
+
+		const payload = (apiClient.post as Mock).mock.calls[0][1];
+		expect(payload).toHaveProperty("send_email", false);
+	});
+
+	it("includes send_email=true when checkbox is selected", async () => {
 		await performDocumentAction("concept", 42, {
 			action: "approve",
 			stage: 1,
@@ -93,7 +106,7 @@ describe("performDocumentAction", () => {
 		});
 
 		const payload = (apiClient.post as Mock).mock.calls[0][1];
-		expect(payload).not.toHaveProperty("send_email");
+		expect(payload).toHaveProperty("send_email", true);
 	});
 
 	it("throws for unknown action", async () => {

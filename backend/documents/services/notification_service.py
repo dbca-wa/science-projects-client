@@ -1379,13 +1379,14 @@ class NotificationService:
         )
 
     @staticmethod
-    def notify_project_reopened(project, reopener):
+    def notify_project_reopened(project, reopener, reason_html=""):
         """
         Notify when project is reopened
 
         Args:
             project: Project instance
             reopener: User who reopened the project
+            reason_html: Optional rich text HTML reason for reopening
         """
         recipients = NotificationService._get_project_team_recipients(project)
 
@@ -1400,6 +1401,7 @@ class NotificationService:
                 "plain_project_title": strip_tags(project.title),
                 "project_url": _build_project_url(project),
                 "site_url": settings.SITE_URL,
+                "feedback_html": reason_html,
             },
         )
 
