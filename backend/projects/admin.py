@@ -1,7 +1,11 @@
 # region IMPORTS ==============================================
 
+import csv
+
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib import admin
+from django.http import HttpResponse
 
 from locations.models import Area
 
@@ -557,14 +561,189 @@ def create_external_details_if_missing(model_admin, req, selected):
     model_admin.message_user(req, f"Successfully updated {updated_count} projects.")
 
 
+@admin.action(description="Export external project funding (CSV)")
+def export_external_funding_csv(model_admin, req, selected):
+    """
+    Export a CSV of external projects for the latest annual report's division.
+    Includes:
+      - Active external projects (would appear on the report)
+      - Completed/terminated external projects that had a fully approved closure
+        in the latest report year
+    Ordered: active first, then completed. Totals at the bottom.
+    Select any one row to trigger.
+    """
+    from django.db.models import Max
+
+    from documents.models import AnnualReport, ProjectDocument
+
+    def extract_text(html):
+        """Strip HTML tags and return plain text."""
+        if not html:
+            return ""
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.get_text(separator=" | ", strip=True)
+
+    # Determine division from the Annual Report filter or the selected item
+    report_id = req.GET.get("annual_report", "")
+    division = None
+    report_year = None
+
+    if report_id:
+        try:
+            report = AnnualReport.objects.select_related("division").get(
+                pk=int(report_id)
+            )
+            division = report.division
+            report_year = report.year
+        except AnnualReport.DoesNotExist:
+            pass
+
+    # Fallback: use the latest annual report for the selected item's division
+    if not division:
+        first = selected[0]
+        project = first.project
+        if project.business_area and project.business_area.division:
+            division = project.business_area.division
+            # Get the latest report year for this division
+            latest = AnnualReport.objects.filter(division=division).aggregate(
+                latest_year=Max("year")
+            )
+            report_year = latest.get("latest_year")
+
+    if not report_year:
+        # Ultimate fallback: latest year across all reports
+        latest = AnnualReport.objects.aggregate(latest_year=Max("year"))
+        report_year = latest.get("latest_year") or 2025
+
+    division_name = division.name if division else "All"
+    division_slug = division.slug if division else "all"
+
+    # ─── Query 1: Active external projects (appear on the report) ─────────
+    active_query = ExternalProjectDetails.objects.filter(
+        project__kind=Project.CategoryKindChoices.EXTERNAL,
+        project__status=Project.StatusChoices.ACTIVE,
+    ).select_related("project__business_area__division")
+
+    if division:
+        active_query = active_query.filter(project__business_area__division=division)
+
+    active_query = active_query.order_by("project__title")
+
+    # ─── Query 2: Completed/terminated external projects with fully approved
+    #     closure in the report year ───────────────────────────────────────────
+    closed_statuses = [
+        Project.StatusChoices.COMPLETED,
+        Project.StatusChoices.TERMINATED,
+    ]
+
+    # Find external projects that are completed/terminated AND have a fully
+    # approved closure document created in the report year
+    closed_project_pks = (
+        ProjectDocument.objects.filter(
+            kind=ProjectDocument.CategoryKindChoices.PROJECTCLOSURE,
+            project__kind=Project.CategoryKindChoices.EXTERNAL,
+            project__status__in=closed_statuses,
+            project_lead_approval_granted=True,
+            business_area_lead_approval_granted=True,
+            directorate_approval_granted=True,
+            created_at__year=report_year,
+        )
+        .values_list("project_id", flat=True)
+        .distinct()
+    )
+
+    if division:
+        closed_project_pks = closed_project_pks.filter(
+            project__business_area__division=division
+        )
+
+    closed_query = (
+        ExternalProjectDetails.objects.filter(
+            project__pk__in=closed_project_pks,
+        )
+        .select_related("project__business_area__division")
+        .order_by("project__title")
+    )
+
+    # ─── Build CSV ────────────────────────────────────────────────────────
+    filename = f"external_funding_{division_slug}_{report_year}.csv"
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Project ID",
+            "Project Tag",
+            "Title",
+            "Business Area",
+            "Partners/Collaborators",
+            "Funding/Budget",
+            "Status",
+        ]
+    )
+
+    active_count = 0
+    closed_count = 0
+
+    # Write active projects first
+    for ext_detail in active_query:
+        project = ext_detail.project
+        writer.writerow(
+            [
+                project.pk,
+                project.get_project_tag(),
+                extract_text(project.title),
+                project.business_area.name if project.business_area else "",
+                extract_text(ext_detail.collaboration_with),
+                extract_text(ext_detail.budget),
+                project.get_status_display(),
+            ]
+        )
+        active_count += 1
+
+    # Write completed/terminated projects
+    for ext_detail in closed_query:
+        project = ext_detail.project
+        writer.writerow(
+            [
+                project.pk,
+                project.get_project_tag(),
+                extract_text(project.title),
+                project.business_area.name if project.business_area else "",
+                extract_text(ext_detail.collaboration_with),
+                extract_text(ext_detail.budget),
+                project.get_status_display(),
+            ]
+        )
+        closed_count += 1
+
+    # Write totals
+    total = active_count + closed_count
+    writer.writerow([])
+    writer.writerow(["", "", "", "", "", "TOTALS", ""])
+    writer.writerow(["", "", "", "", "", f"Active: {active_count}", ""])
+    writer.writerow(["", "", "", "", "", f"Completed/Closed: {closed_count}", ""])
+    writer.writerow(["", "", "", "", "", f"Total: {total}", ""])
+
+    model_admin.message_user(
+        req,
+        f"Exported {total} external projects for {division_name} "
+        f"(report year {report_year}): {active_count} active, "
+        f"{closed_count} completed/closed.",
+    )
+    return response
+
+
 @admin.register(ExternalProjectDetails)
 class ExternalProjectDetailAdmin(admin.ModelAdmin):
     list_display = [
         "pk",
         "project",
+        "project_tag",
+        "division_name",
         "collaboration_with",
         "budget",
-        "description",
     ]
 
     search_fields = [
@@ -572,16 +751,112 @@ class ExternalProjectDetailAdmin(admin.ModelAdmin):
         "pk",
     ]
 
+    class AnnualReportFilter(admin.SimpleListFilter):
+        """
+        Filter external projects by annual report.
+        Replicates the logic used during report generation:
+        external + division matches + status=active (excludes completed/suspended/terminated).
+        """
+
+        title = "Annual Report"
+        parameter_name = "annual_report"
+
+        def lookups(self, request, model_admin):
+            from documents.models import AnnualReport
+
+            reports = AnnualReport.objects.select_related("division").order_by("-year")
+            return [
+                (
+                    str(r.pk),
+                    f"{r.year} - {r.division.slug if r.division else 'No Division'}",
+                )
+                for r in reports
+            ]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                from documents.models import AnnualReport
+
+                try:
+                    report = AnnualReport.objects.select_related("division").get(
+                        pk=int(self.value())
+                    )
+                except AnnualReport.DoesNotExist:
+                    return queryset
+
+                # Apply the same logic as annual report generation:
+                # division match + exclude completed/suspended/terminated
+                qs = queryset.exclude(
+                    project__status__in=[
+                        Project.StatusChoices.COMPLETED,
+                        Project.StatusChoices.SUSPENDED,
+                        Project.StatusChoices.TERMINATED,
+                    ]
+                )
+                if report.division:
+                    qs = qs.filter(project__business_area__division=report.division)
+                return qs
+            return queryset
+
+    class DivisionFilter(admin.SimpleListFilter):
+        title = "Division"
+        parameter_name = "division"
+
+        def lookups(self, request, model_admin):
+            from agencies.models import Division
+
+            return [(d.slug, d.name) for d in Division.objects.all().order_by("name")]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                return queryset.filter(
+                    project__business_area__division__slug=self.value()
+                )
+            return queryset
+
+    class StatusFilter(admin.SimpleListFilter):
+        title = "Project Status"
+        parameter_name = "project_status"
+
+        def lookups(self, request, model_admin):
+            return Project.StatusChoices.choices
+
+        def queryset(self, request, queryset):
+            if self.value():
+                return queryset.filter(project__status=self.value())
+            return queryset
+
     list_filter = [
+        AnnualReportFilter,
+        DivisionFilter,
+        StatusFilter,
         "collaboration_with",
     ]
 
     ordering = ["project__title"]
 
     actions = [
+        export_external_funding_csv,
         update_external_description_with_project_description_if_empty,
         create_external_details_if_missing,
     ]
+
+    @admin.display(description="Tag")
+    def project_tag(self, obj):
+        return obj.project.get_project_tag()
+
+    @admin.display(description="Division")
+    def division_name(self, obj):
+        if obj.project.business_area and obj.project.business_area.division:
+            return obj.project.business_area.division.slug
+        return "-"
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("project__business_area__division")
+        )
 
 
 # endregion ==============================================
