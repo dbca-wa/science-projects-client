@@ -65,7 +65,7 @@ export const DataListsTabs = () => {
 			<TabsList className="hidden w-full justify-start md:inline-flex">
 				<TabsTrigger value="unapproved">
 					<span className="flex items-center gap-2">
-						Unapproved Docs
+						Unapproved Projects
 						{unapprovedCount > 0 && (
 							<Badge variant="secondary" className="h-5 min-w-5 px-1.5 text-xs">
 								{unapprovedCount}
@@ -93,7 +93,7 @@ export const DataListsTabs = () => {
 					</SelectTrigger>
 					<SelectContent>
 						<SelectItem value="unapproved">
-							Unapproved Docs ({unapprovedCount})
+							Unapproved Projects ({unapprovedCount})
 						</SelectItem>
 						<SelectItem value="problematic">
 							Problematic Projects ({problematicCount})

@@ -10,6 +10,7 @@ import {
 	Save,
 	Download,
 	RotateCcw,
+	Trash2,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
@@ -36,6 +37,8 @@ import { DivisionYearSafeguard } from "@/features/admin/components/actions/Divis
 import {
 	useOpenNewCycle,
 	useNewCycleDraft,
+	useSaveNewCycleDraft,
+	useDeleteNewCycleDraft,
 } from "@/features/admin/hooks/useAdminActions";
 import { useNewCyclePreview } from "@/shared/hooks/queries/useBumpEmails";
 import { RecipientSection } from "@/features/admin/components/shared/RecipientSection";
@@ -107,12 +110,15 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 }: NewCyclePageContentProps) {
 	const { mutate, isPending } = useOpenNewCycle();
 	const { data: draftData } = useNewCycleDraft();
+	const { mutate: saveDraft, isPending: isSavingDraft } =
+		useSaveNewCycleDraft();
+	const { mutate: deleteDraft } = useDeleteNewCycleDraft();
 
 	const hasSavedDraft =
 		!!draftData?.draft && Object.keys(draftData.draft).length > 0;
 
 	const handleSaveDraft = () => {
-		toast.info("Draft saving is not currently available");
+		saveDraft(store.exportDraft());
 	};
 
 	const handleLoadDraft = () => {
@@ -125,6 +131,11 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 	const handleReset = () => {
 		store.reset();
 		toast.success("Form reset to defaults");
+	};
+
+	const handleClearDraft = () => {
+		deleteDraft();
+		toast.success("Saved draft cleared");
 	};
 
 	// Debounced custom message for email preview (300ms)
@@ -744,9 +755,14 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 							variant="outline"
 							size="sm"
 							onClick={handleSaveDraft}
+							disabled={isSavingDraft}
 							className="gap-1.5"
 						>
-							<Save className="size-4" />
+							{isSavingDraft ? (
+								<Loader2 className="size-4 animate-spin" />
+							) : (
+								<Save className="size-4" />
+							)}
 							Save Draft
 						</Button>
 						<Button
@@ -762,8 +778,18 @@ const NewCyclePageContent = observer(function NewCyclePageContent({
 						<Button
 							variant="outline"
 							size="sm"
-							onClick={handleReset}
+							onClick={handleClearDraft}
+							disabled={!hasSavedDraft}
 							className="gap-1.5 text-destructive hover:text-destructive"
+						>
+							<Trash2 className="size-4" />
+							Clear Draft
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleReset}
+							className="gap-1.5 text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300 dark:text-blue-400 dark:hover:text-blue-300 dark:border-blue-800 dark:hover:border-blue-700"
 						>
 							<RotateCcw className="size-4" />
 							Reset

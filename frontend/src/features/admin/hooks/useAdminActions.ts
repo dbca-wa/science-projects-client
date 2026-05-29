@@ -96,3 +96,18 @@ export const useSaveNewCycleDraft = () => {
 		},
 	});
 };
+
+/** Delete the saved new cycle draft from the database */
+export const useDeleteNewCycleDraft = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: () =>
+			import("../services/admin.service").then((m) => m.clearNewCycleDraft()),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["new-cycle-draft"] });
+		},
+		onError: () => {
+			// Non-blocking — draft may not exist on the server
+		},
+	});
+};
