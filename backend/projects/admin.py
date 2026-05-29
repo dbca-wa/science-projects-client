@@ -564,17 +564,12 @@ def create_external_details_if_missing(model_admin, req, selected):
 @admin.action(description="Export external project funding (CSV)")
 def export_external_funding_csv(model_admin, req, selected):
     """
-    Export a CSV of external projects for the latest annual report's division.
-    Includes:
-      - Active external projects (would appear on the report)
-      - Completed/terminated external projects that had a fully approved closure
-        in the latest report year
-    Ordered: active first, then completed. Totals at the bottom.
+    Export a CSV of ALL external projects matching the current admin filters.
+    Uses the full filtered queryset (not limited by pagination).
+    Orders active projects first, then completed/closed. Includes totals.
     Select any one row to trigger.
     """
-    from django.db.models import Max
-
-    from documents.models import AnnualReport, ProjectDocument
+    from django.db.models import Case, IntegerField, Value, When
 
     def extract_text(html):
         """Strip HTML tags and return plain text."""
@@ -583,90 +578,44 @@ def export_external_funding_csv(model_admin, req, selected):
         soup = BeautifulSoup(html, "html.parser")
         return soup.get_text(separator=" | ", strip=True)
 
-    # Determine division from the Annual Report filter or the selected item
-    report_id = req.GET.get("annual_report", "")
-    division = None
-    report_year = None
+    # Get the full filtered queryset from the admin (respects all sidebar filters,
+    # ignores pagination — this gives ALL matching results)
+    changelist = model_admin.get_changelist_instance(req)
+    queryset = changelist.get_queryset(req).select_related(
+        "project__business_area__division"
+    )
 
-    if report_id:
-        try:
-            report = AnnualReport.objects.select_related("division").get(
-                pk=int(report_id)
-            )
-            division = report.division
-            report_year = report.year
-        except AnnualReport.DoesNotExist:
-            pass
-
-    # Fallback: use the latest annual report for the selected item's division
-    if not division:
-        first = selected[0]
-        project = first.project
-        if project.business_area and project.business_area.division:
-            division = project.business_area.division
-            # Get the latest report year for this division
-            latest = AnnualReport.objects.filter(division=division).aggregate(
-                latest_year=Max("year")
-            )
-            report_year = latest.get("latest_year")
-
-    if not report_year:
-        # Ultimate fallback: latest year across all reports
-        latest = AnnualReport.objects.aggregate(latest_year=Max("year"))
-        report_year = latest.get("latest_year") or 2025
-
-    division_name = division.name if division else "All"
-    division_slug = division.slug if division else "all"
-
-    # ─── Query 1: Active external projects (appear on the report) ─────────
-    active_query = ExternalProjectDetails.objects.filter(
-        project__kind=Project.CategoryKindChoices.EXTERNAL,
-        project__status=Project.StatusChoices.ACTIVE,
-    ).select_related("project__business_area__division")
-
-    if division:
-        active_query = active_query.filter(project__business_area__division=division)
-
-    active_query = active_query.order_by("project__title")
-
-    # ─── Query 2: Completed/terminated external projects with fully approved
-    #     closure in the report year ───────────────────────────────────────────
+    # Order: active first, then completed/closed, then everything else
     closed_statuses = [
         Project.StatusChoices.COMPLETED,
         Project.StatusChoices.TERMINATED,
     ]
-
-    # Find external projects that are completed/terminated AND have a fully
-    # approved closure document created in the report year
-    closed_project_pks = (
-        ProjectDocument.objects.filter(
-            kind=ProjectDocument.CategoryKindChoices.PROJECTCLOSURE,
-            project__kind=Project.CategoryKindChoices.EXTERNAL,
-            project__status__in=closed_statuses,
-            project_lead_approval_granted=True,
-            business_area_lead_approval_granted=True,
-            directorate_approval_granted=True,
-            created_at__year=report_year,
+    queryset = queryset.annotate(
+        status_order=Case(
+            When(project__status=Project.StatusChoices.ACTIVE, then=Value(0)),
+            When(project__status__in=closed_statuses, then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField(),
         )
-        .values_list("project_id", flat=True)
-        .distinct()
-    )
+    ).order_by("status_order", "project__title")
 
-    if division:
-        closed_project_pks = closed_project_pks.filter(
-            project__business_area__division=division
-        )
+    # Determine filename from filters
+    division_slug = req.GET.get("division", "")
+    report_id = req.GET.get("annual_report", "")
+    filename_parts = ["external_funding"]
+    if division_slug:
+        filename_parts.append(division_slug)
+    if report_id:
+        from documents.models import AnnualReport
 
-    closed_query = (
-        ExternalProjectDetails.objects.filter(
-            project__pk__in=closed_project_pks,
-        )
-        .select_related("project__business_area__division")
-        .order_by("project__title")
-    )
+        try:
+            report = AnnualReport.objects.get(pk=int(report_id))
+            filename_parts.append(str(report.year))
+        except AnnualReport.DoesNotExist:
+            filename_parts.append(f"report{report_id}")
+    filename = "_".join(filename_parts) + ".csv"
 
-    # ─── Build CSV ────────────────────────────────────────────────────────
-    filename = f"external_funding_{division_slug}_{report_year}.csv"
+    # Build CSV response
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
@@ -685,9 +634,9 @@ def export_external_funding_csv(model_admin, req, selected):
 
     active_count = 0
     closed_count = 0
+    other_count = 0
 
-    # Write active projects first
-    for ext_detail in active_query:
+    for ext_detail in queryset:
         project = ext_detail.project
         writer.writerow(
             [
@@ -700,37 +649,30 @@ def export_external_funding_csv(model_admin, req, selected):
                 project.get_status_display(),
             ]
         )
-        active_count += 1
 
-    # Write completed/terminated projects
-    for ext_detail in closed_query:
-        project = ext_detail.project
-        writer.writerow(
-            [
-                project.pk,
-                project.get_project_tag(),
-                extract_text(project.title),
-                project.business_area.name if project.business_area else "",
-                extract_text(ext_detail.collaboration_with),
-                extract_text(ext_detail.budget),
-                project.get_status_display(),
-            ]
-        )
-        closed_count += 1
+        if project.status == Project.StatusChoices.ACTIVE:
+            active_count += 1
+        elif project.status in closed_statuses:
+            closed_count += 1
+        else:
+            other_count += 1
 
     # Write totals
-    total = active_count + closed_count
+    total = active_count + closed_count + other_count
     writer.writerow([])
     writer.writerow(["", "", "", "", "", "TOTALS", ""])
     writer.writerow(["", "", "", "", "", f"Active: {active_count}", ""])
     writer.writerow(["", "", "", "", "", f"Completed/Closed: {closed_count}", ""])
+    if other_count:
+        writer.writerow(["", "", "", "", "", f"Other: {other_count}", ""])
     writer.writerow(["", "", "", "", "", f"Total: {total}", ""])
 
     model_admin.message_user(
         req,
-        f"Exported {total} external projects for {division_name} "
-        f"(report year {report_year}): {active_count} active, "
-        f"{closed_count} completed/closed.",
+        f"Exported {total} external projects: "
+        f"{active_count} active, {closed_count} completed/closed"
+        + (f", {other_count} other" if other_count else "")
+        + ".",
     )
     return response
 
