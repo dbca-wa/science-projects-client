@@ -248,12 +248,12 @@ export const TOOLBAR_CONFIGS: Record<ToolbarMode, ToolbarConfig> = {
 	},
 
 	/**
-	 * New cycle toolbar — for the new cycle email body editor.
-	 * Bold, italic, underline, and lists. No subscript/superscript, tables, or links.
+	 * New cycle toolbar — for the new cycle and announcement email body editors.
+	 * Bold, italic, underline, lists, and links. No subscript/superscript or tables.
 	 */
 	newCycle: {
 		description:
-			"New cycle email body editor. Bold, italic, underline, and lists — no subscript/superscript, tables, or links.",
+			"New cycle and announcement email body editors. Bold, italic, underline, lists, and links — no subscript/superscript or tables.",
 		formatting: {
 			bold: true,
 			italic: true,
@@ -268,7 +268,7 @@ export const TOOLBAR_CONFIGS: Record<ToolbarMode, ToolbarConfig> = {
 			tables: false,
 		},
 		features: {
-			links: false,
+			links: true,
 			images: false,
 			clearFormatting: false,
 			indentOutdent: false,
