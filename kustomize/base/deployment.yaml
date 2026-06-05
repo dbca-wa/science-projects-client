@@ -16,8 +16,8 @@ spec:
               value: 'Australia/Perth'
           resources:
             requests:
-              memory: '200Mi'
-              cpu: '5m'
+              memory: '256Mi'
+              cpu: '100m'
             limits:
               memory: '2Gi'
               cpu: '1000m'
@@ -41,7 +41,7 @@ spec:
           resources:
             requests:
               memory: '64Mi'
-              cpu: '5m'
+              cpu: '25m'
             limits:
               memory: '1Gi'
               cpu: '1000m'
