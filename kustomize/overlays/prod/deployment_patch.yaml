@@ -13,34 +13,18 @@ spec:
       labels:
         app: spms-prod
     spec:
-      initContainers:
-        - name: chown-files
-          image: busybox
-          command:
-            - /bin/chown
-            - -R
-            - '10001:10001'
-            - /usr/src/app/backend/files
-          volumeMounts:
-            - mountPath: /usr/src/app/backend/files
-              name: spms-media-prod
       containers:
         - name: spms-backend
           envFrom:
             - secretRef:
                 name: spms-env-prod
           volumeMounts:
-            - name: spms-media-prod
-              mountPath: /usr/src/app/backend/files
             - name: spms-media-blob-prod
-              mountPath: /mnt/container
+              mountPath: /usr/src/app/backend/files
             - name: prince2-license-prod
               mountPath: /usr/lib/prince/license
               readOnly: true
       volumes:
-        - name: spms-media-prod
-          persistentVolumeClaim:
-            claimName: spms-media-data-prod
         - name: spms-media-blob-prod
           persistentVolumeClaim:
             claimName: pvc-spms-media-data-blob-prod

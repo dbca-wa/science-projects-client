@@ -3,6 +3,13 @@
 uat_creds.yaml
 prod_creds.yaml
 
+# Kubernetes cluster credential files (downloaded from Rancher)
+az-aks-oim03.yaml
+aks-bcs-prod-01.yaml
+
+# Custom Redeploy script
+redeploy.sh
+
 # OS files
 .DS_Store
 .DS_Store?
