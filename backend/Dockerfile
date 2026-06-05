@@ -202,4 +202,4 @@ EXPOSE 8000
 ENV TMPDIR=/tmp
 
 # Launch production server
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "4", "--preload", "--worker-tmp-dir", "/tmp", "--no-control-socket"]
+CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--timeout", "300", "--graceful-timeout", "90", "--max-requests", "2048", "--workers", "3", "--preload", "--worker-tmp-dir", "/tmp", "--no-control-socket"]
