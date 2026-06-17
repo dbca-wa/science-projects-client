@@ -29,6 +29,9 @@ export const ANIMATION_DURATIONS = {
 	/** Popover component - fade + scale + translateY animation */
 	POPOVER: 150,
 
+	/** Select component - fade + scale + translateY animation */
+	SELECT: 150,
+
 	/** Alert dialog - no animations (instant) */
 	ALERT_DIALOG: 0,
 } as const;
