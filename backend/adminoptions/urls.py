@@ -34,6 +34,7 @@ urlpatterns = [
     # Misc (Admin) ======================================================
     path("send-all-test-emails", views.SendAllTestEmails.as_view()),
     path("mergeusers", views.MergeUsers.as_view()),
+    path("mergeusers/preview/<int:pk>", views.MergeUserPreview.as_view()),
     path("new-cycle-draft", views.NewCycleDraft.as_view()),
     path("homepage-banner", views.HomepageBannerSettings.as_view()),
     path("send-announcement", views.SendAnnouncement.as_view()),

@@ -48,6 +48,7 @@ export interface MapFilters {
 	year: number;
 	onlyActive: boolean;
 	onlyInactive: boolean;
+	area?: string;
 }
 
 /**

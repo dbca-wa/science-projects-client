@@ -16,6 +16,7 @@ export interface ProjectMapFilters {
 	year: number;
 	onlyActive: boolean;
 	onlyInactive: boolean;
+	area: string;
 }
 
 /**
@@ -52,6 +53,7 @@ const DEFAULT_FILTERS: ProjectMapFilters = {
 	year: 0,
 	onlyActive: false,
 	onlyInactive: false,
+	area: "All",
 };
 
 const DEFAULT_MAP_DISPLAY = {
@@ -463,7 +465,10 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			(this.state.filters.year !== undefined &&
 				this.state.filters.year !== 0) ||
 			this.state.filters.onlyActive === true ||
-			this.state.filters.onlyInactive === true
+			this.state.filters.onlyInactive === true ||
+			(this.state.filters.area !== undefined &&
+				this.state.filters.area !== "All" &&
+				this.state.filters.area !== "")
 		);
 	}
 
@@ -483,6 +488,12 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			count++;
 		if (this.state.filters.onlyActive) count++;
 		if (this.state.filters.onlyInactive) count++;
+		if (
+			this.state.filters.area !== undefined &&
+			this.state.filters.area !== "All" &&
+			this.state.filters.area !== ""
+		)
+			count++;
 
 		return count;
 	}
@@ -586,6 +597,8 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			year: this.state.filters.year,
 			onlyActive: this.state.filters.onlyActive,
 			onlyInactive: this.state.filters.onlyInactive,
+			area:
+				this.state.filters.area !== "All" ? this.state.filters.area : undefined,
 		};
 	}
 
@@ -609,6 +622,10 @@ export class ProjectMapStore extends BaseStore<ProjectMapState> {
 			year: this.state.filters.year !== 0 ? this.state.filters.year : undefined,
 			onlyActive: this.state.filters.onlyActive || undefined,
 			onlyInactive: this.state.filters.onlyInactive || undefined,
+			area:
+				this.state.filters.area && this.state.filters.area !== "All"
+					? this.state.filters.area
+					: undefined,
 		};
 	}
 

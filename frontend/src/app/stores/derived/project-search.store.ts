@@ -10,6 +10,7 @@ export interface ProjectSearchFilters {
 	user?: number | null;
 	onlyActive?: boolean;
 	onlyInactive?: boolean;
+	area?: string;
 }
 
 interface ProjectSearchStoreState extends BaseStoreState {
@@ -31,6 +32,7 @@ const DEFAULT_FILTERS: ProjectSearchFilters = {
 	user: null,
 	onlyActive: false,
 	onlyInactive: false,
+	area: "All",
 };
 
 export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
@@ -130,6 +132,7 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 					typeof filters.onlyInactive === "boolean"
 						? filters.onlyInactive
 						: false,
+				area: typeof filters.area === "string" ? filters.area : "All",
 			};
 		}
 
@@ -275,7 +278,9 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 				this.state.filters.year !== 0) ||
 			this.state.filters.user !== null ||
 			this.state.filters.onlyActive === true ||
-			this.state.filters.onlyInactive === true
+			this.state.filters.onlyInactive === true ||
+			(this.state.filters.area !== undefined &&
+				this.state.filters.area !== "All")
 		);
 	}
 
@@ -294,6 +299,11 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 		if (this.state.filters.user !== null) count++;
 		if (this.state.filters.onlyActive) count++;
 		if (this.state.filters.onlyInactive) count++;
+		if (
+			this.state.filters.area !== undefined &&
+			this.state.filters.area !== "All"
+		)
+			count++;
 
 		return count;
 	}
@@ -347,6 +357,10 @@ export class ProjectSearchStore extends BaseStore<ProjectSearchStoreState> {
 
 		if (this.state.filters.onlyInactive) {
 			params.set("onlyInactive", "true");
+		}
+
+		if (this.state.filters.area && this.state.filters.area !== "All") {
+			params.set("area", this.state.filters.area);
 		}
 
 		return params;

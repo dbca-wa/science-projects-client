@@ -29,6 +29,7 @@ export interface ProjectSearchParams {
 	selected_user?: number;
 	only_active?: boolean;
 	only_inactive?: boolean;
+	area?: string;
 }
 
 /**
@@ -76,6 +77,10 @@ export const getAllProjects = async (
 
 	if (params.only_inactive) {
 		queryParams.append("only_inactive", "true");
+	}
+
+	if (params.area && params.area !== "All") {
+		queryParams.append("area", params.area);
 	}
 
 	const url = `${PROJECT_ENDPOINTS.LIST}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
@@ -176,6 +181,7 @@ export interface ProjectMapSearchParams {
 	year?: number;
 	onlyActive?: boolean;
 	onlyInactive?: boolean;
+	area?: string;
 }
 
 /**
@@ -238,6 +244,10 @@ export const getProjectsForMap = async (
 
 	if (params.onlyInactive) {
 		queryParams.append("only_inactive", "true");
+	}
+
+	if (params.area && params.area !== "All") {
+		queryParams.append("area", params.area);
 	}
 
 	const url = `${PROJECT_ENDPOINTS.MAP}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
