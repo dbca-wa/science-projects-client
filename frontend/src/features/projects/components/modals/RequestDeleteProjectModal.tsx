@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -42,14 +42,14 @@ export const RequestDeleteProjectModal = ({
 	const {
 		handleSubmit,
 		setValue,
-		watch,
+		control,
 		formState: { errors },
 	} = useForm<RequestDeleteFormData>({
 		resolver: zodResolver(requestDeleteSchema),
 		defaultValues: { reason: undefined },
 	});
 
-	const reason = watch("reason");
+	const reason = useWatch({ control, name: "reason" });
 
 	const requestDeleteMutation = useRequestDeleteProject();
 

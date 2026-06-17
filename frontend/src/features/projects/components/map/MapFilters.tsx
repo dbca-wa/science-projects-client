@@ -17,6 +17,7 @@ import { SearchControls } from "@/shared/components/SearchControls";
 import { BusinessAreaMultiSelect } from "@/shared/components/BusinessAreaMultiSelect";
 import { UserCombobox } from "@/shared/components/user";
 import { ResponsiveLayout } from "@/shared/components/ResponsiveLayout";
+import { useLocationAreas } from "@/shared/hooks/queries/useLocationAreas";
 
 interface MapFiltersProps {
 	projectCount: number;
@@ -103,11 +104,13 @@ export const MapFilters = observer(
 			(_, i) => currentYear - i
 		);
 
+		const { data: locationAreas } = useLocationAreas();
+
 		// Different layouts for normal vs fullscreen mode
 		const isFullscreen = store.state.mapFullscreen;
 
 		return (
-			<div className="w-full select-none bg-background">
+			<div className="w-full select-none border border-gray-300 dark:border-gray-500 bg-background">
 				<div className="p-4 w-full space-y-3">
 					<ResponsiveLayout
 						breakpoint={isFullscreen ? "xl" : "lg"}
@@ -287,52 +290,78 @@ export const MapFilters = observer(
 						</div>
 					</div>
 
-					{/* Row 3: Active/Inactive Checkboxes (left) + Search Controls (right) */}
-					<div
-						className={`flex flex-col ${!isFullscreen ? "sm:flex-row" : ""} gap-3 ${!isFullscreen ? "sm:items-center sm:justify-between" : ""}`}
-					>
-						{/* Left side: Active/Inactive Checkboxes */}
-						<div className="flex flex-row gap-4 items-center">
-							<div className="flex items-center space-x-2">
-								<Checkbox
-									id="map-active-filter"
-									checked={store.state.filters.onlyActive || false}
-									onCheckedChange={handleActiveChange}
-									disabled={store.state.filters.onlyInactive || false}
-									className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
-								/>
-								<Label
-									htmlFor="map-active-filter"
-									className="text-sm font-normal cursor-pointer whitespace-nowrap"
-								>
-									Active
-								</Label>
-							</div>
-
-							<div className="flex items-center space-x-2">
-								<Checkbox
-									id="map-inactive-filter"
-									checked={store.state.filters.onlyInactive || false}
-									onCheckedChange={handleInactiveChange}
-									disabled={store.state.filters.onlyActive || false}
-								/>
-								<Label
-									htmlFor="map-inactive-filter"
-									className="text-sm font-normal cursor-pointer whitespace-nowrap"
-								>
-									Inactive
-								</Label>
-							</div>
+					{/* Row 3: Location Filter + Active/Inactive Checkboxes (left) + Search Controls (right) */}
+					<div className={`flex flex-col gap-3`}>
+						{/* Location Filter — same grid as Row 2 for matching width */}
+						<div
+							className={`grid grid-cols-1 ${!isFullscreen ? "sm:grid-cols-2 lg:grid-cols-4" : ""} gap-3`}
+						>
+							<Select
+								value={store.state.filters.area || "All"}
+								onValueChange={(value) =>
+									store.setFilters({ area: value === "All" ? "All" : value })
+								}
+							>
+								<SelectTrigger className="w-full text-sm rounded-md">
+									<SelectValue placeholder="All Locations" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="All">All Locations</SelectItem>
+									{locationAreas?.map((area) => (
+										<SelectItem key={area.id} value={area.id.toString()}>
+											{area.prefix} {area.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 
-						{/* Right side: Search Controls */}
-						<SearchControls
-							saveSearch={store.state.saveSearch}
-							onToggleSaveSearch={() => store.toggleSaveSearch()}
-							filterCount={filterCount}
-							onClearFilters={handleClearFilters}
-							className="flex gap-3 items-center"
-						/>
+						<div
+							className={`flex flex-col ${!isFullscreen ? "sm:flex-row" : ""} gap-3 ${!isFullscreen ? "sm:items-center sm:justify-between" : ""}`}
+						>
+							{/* Left side: Active/Inactive Checkboxes */}
+							<div className="flex flex-row gap-4 items-center">
+								<div className="flex items-center space-x-2">
+									<Checkbox
+										id="map-active-filter"
+										checked={store.state.filters.onlyActive || false}
+										onCheckedChange={handleActiveChange}
+										disabled={store.state.filters.onlyInactive || false}
+										className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
+									/>
+									<Label
+										htmlFor="map-active-filter"
+										className="text-sm font-normal cursor-pointer whitespace-nowrap"
+									>
+										Active
+									</Label>
+								</div>
+
+								<div className="flex items-center space-x-2">
+									<Checkbox
+										id="map-inactive-filter"
+										checked={store.state.filters.onlyInactive || false}
+										onCheckedChange={handleInactiveChange}
+										disabled={store.state.filters.onlyActive || false}
+									/>
+									<Label
+										htmlFor="map-inactive-filter"
+										className="text-sm font-normal cursor-pointer whitespace-nowrap"
+									>
+										Inactive
+									</Label>
+								</div>
+							</div>
+
+							{/* Right side: Search Controls */}
+							<SearchControls
+								saveSearch={store.state.saveSearch}
+								onToggleSaveSearch={() => store.toggleSaveSearch()}
+								filterCount={filterCount}
+								onClearFilters={handleClearFilters}
+								className="flex gap-3 items-center"
+							/>
+						</div>
 					</div>
 
 					{/* Project Statistics - only show in fullscreen mode */}

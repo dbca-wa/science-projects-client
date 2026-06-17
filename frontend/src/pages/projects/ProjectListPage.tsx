@@ -56,6 +56,7 @@ const ProjectListPage = observer(() => {
 		selected_user: projectSearchStore.state.filters.user || undefined,
 		only_active: projectSearchStore.state.filters.onlyActive,
 		only_inactive: projectSearchStore.state.filters.onlyInactive,
+		area: projectSearchStore.state.filters.area,
 	});
 
 	// Delay error display to avoid flash on initial load

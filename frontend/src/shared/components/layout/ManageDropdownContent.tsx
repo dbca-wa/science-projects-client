@@ -15,6 +15,7 @@ import {
 	CircleCheckBig,
 	Megaphone,
 	Network,
+	Merge,
 } from "lucide-react";
 
 export type ARActionId = "batch-approve" | "batch-approve-old";
@@ -103,6 +104,11 @@ const MANAGE_SECTIONS: MenuSection[] = [
 				targetPath: "/manage/divisions",
 				icon: <Settings className="size-4" aria-hidden="true" />,
 				label: "Divisions",
+			},
+			{
+				targetPath: "/manage/merge-users",
+				icon: <Merge className="size-4" aria-hidden="true" />,
+				label: "Merge Users",
 			},
 		],
 	},

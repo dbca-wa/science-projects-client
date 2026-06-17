@@ -206,6 +206,14 @@ class ProjectService:
         if year_filter != "All":
             queryset = queryset.filter(year=year_filter)
 
+        # Area/location filter
+        area_filter = filters.get("area")
+        if area_filter and area_filter != "All":
+            try:
+                queryset = queryset.filter(area__areas__contains=[int(area_filter)])
+            except (ValueError, TypeError):
+                pass
+
         # Active/inactive filters
         only_active = filters.get("only_active", False)
         only_inactive = filters.get("only_inactive", False)

@@ -14,6 +14,7 @@ import { observer } from "mobx-react-lite";
 import { debounce } from "@/shared/utils/common.utils";
 import { useBusinessAreas } from "@/shared/hooks/queries/useBusinessAreas";
 import { useDivisions } from "@/shared/hooks/queries/useDivisions";
+import { useLocationAreas } from "@/shared/hooks/queries/useLocationAreas";
 import { filterBusinessAreasByKeyStakeholder } from "@/shared/utils/division-filter.utils";
 import type { ProjectSearchFilters } from "@/app/stores/derived/project-search.store";
 import { SearchControls } from "@/shared/components/SearchControls";
@@ -49,6 +50,7 @@ export const ProjectFilters = observer(
 		const { data: businessAreas, isLoading: isLoadingBusinessAreas } =
 			useBusinessAreas();
 		const { data: divisions } = useDivisions();
+		const { data: locationAreas } = useLocationAreas();
 
 		// Local state for immediate UI updates
 		const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
@@ -297,51 +299,80 @@ export const ProjectFilters = observer(
 						</Select>
 					</div>
 
-					{/* Row 3: Active/Inactive Checkboxes and Search Controls */}
-					<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-						{/* Left side: Active/Inactive Checkboxes */}
-						<div className="flex flex-row gap-4 items-center">
-							<div className="flex items-center space-x-2">
-								<Checkbox
-									id="active-filter"
-									checked={filters.onlyActive || false}
-									onCheckedChange={handleActiveChange}
-									disabled={filters.onlyInactive || false}
-									className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
-								/>
-								<Label
-									htmlFor="active-filter"
-									className="text-sm font-normal cursor-pointer whitespace-nowrap"
+					{/* Row 3: Location Filter + Active/Inactive Checkboxes and Search Controls */}
+					<div className="flex flex-col gap-3">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+							{/* Location Filter — same grid as Row 2 so width matches */}
+							<Select
+								value={filters.area || "All"}
+								onValueChange={(value) =>
+									onFiltersChange({
+										area: value === "All" ? "All" : value,
+									})
+								}
+							>
+								<SelectTrigger
+									className="w-full text-sm rounded-md"
+									aria-label="Filter by location area"
 								>
-									Active
-								</Label>
-							</div>
-
-							<div className="flex items-center space-x-2">
-								<Checkbox
-									id="inactive-filter"
-									checked={filters.onlyInactive || false}
-									onCheckedChange={handleInactiveChange}
-									disabled={filters.onlyActive || false}
-								/>
-								<Label
-									htmlFor="inactive-filter"
-									className="text-sm font-normal cursor-pointer whitespace-nowrap"
-								>
-									Inactive
-								</Label>
-							</div>
+									<SelectValue placeholder="All Locations" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="All">All Locations</SelectItem>
+									{locationAreas?.map((area) => (
+										<SelectItem key={area.id} value={area.id.toString()}>
+											{area.prefix} {area.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 
-						{/* Right side: Remember my search and Clear button - right-aligned on mobile */}
-						<div className="flex justify-center">
-							<SearchControls
-								saveSearch={saveSearch}
-								onToggleSaveSearch={onToggleSaveSearch}
-								filterCount={filterCount}
-								onClearFilters={onClearFilters}
-								className="flex gap-3 items-center"
-							/>
+						<div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+							{/* Active/Inactive Checkboxes */}
+							<div className="flex flex-row gap-4 items-center">
+								<div className="flex items-center space-x-2">
+									<Checkbox
+										id="active-filter"
+										checked={filters.onlyActive || false}
+										onCheckedChange={handleActiveChange}
+										disabled={filters.onlyInactive || false}
+										className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-500"
+									/>
+									<Label
+										htmlFor="active-filter"
+										className="text-sm font-normal cursor-pointer whitespace-nowrap"
+									>
+										Active
+									</Label>
+								</div>
+
+								<div className="flex items-center space-x-2">
+									<Checkbox
+										id="inactive-filter"
+										checked={filters.onlyInactive || false}
+										onCheckedChange={handleInactiveChange}
+										disabled={filters.onlyActive || false}
+									/>
+									<Label
+										htmlFor="inactive-filter"
+										className="text-sm font-normal cursor-pointer whitespace-nowrap"
+									>
+										Inactive
+									</Label>
+								</div>
+							</div>
+
+							{/* Right side: Remember my search and Clear button */}
+							<div className="flex justify-center">
+								<SearchControls
+									saveSearch={saveSearch}
+									onToggleSaveSearch={onToggleSaveSearch}
+									filterCount={filterCount}
+									onClearFilters={onClearFilters}
+									className="flex gap-3 items-center"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>

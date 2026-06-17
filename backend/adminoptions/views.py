@@ -861,6 +861,84 @@ class MergeUsers(APIView):
         return Response(status=HTTP_200_OK)
 
 
+class MergeUserPreview(APIView):
+    """
+    Returns merge preview stats and detailed lists for a single user —
+    projects, comments (with document context), and documents created.
+    Used by the admin merge page to show exactly what will transfer.
+    """
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        from communications.models import Comment
+        from documents.models import ProjectDocument
+        from projects.models import ProjectMember
+
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found."},
+                status=HTTP_404_NOT_FOUND,
+            )
+
+        project_count = ProjectMember.objects.filter(user=user).count()
+        comment_count = Comment.objects.filter(user=user).count()
+        document_count = ProjectDocument.objects.filter(creator=user).count()
+
+        # Comments with document/project context
+        comments = (
+            Comment.objects.filter(user=user)
+            .select_related("document", "document__project")
+            .order_by("-created_at")[:200]
+        )
+        comments_data = []
+        for c in comments:
+            project_id = c.document.project_id if c.document else None
+            doc_kind = c.document.kind if c.document else None
+            comments_data.append(
+                {
+                    "id": c.pk,
+                    "text": c.text[:200] if c.text else "",
+                    "created_at": c.created_at.isoformat() if c.created_at else None,
+                    "project_id": project_id,
+                    "document_kind": doc_kind,
+                }
+            )
+
+        # Documents created by this user
+        documents = (
+            ProjectDocument.objects.filter(creator=user)
+            .select_related("project")
+            .order_by("-created_at")[:200]
+        )
+        documents_data = []
+        for d in documents:
+            documents_data.append(
+                {
+                    "id": d.pk,
+                    "kind": d.kind,
+                    "status": d.status,
+                    "project_id": d.project_id,
+                    "project_title": d.project.title if d.project else "",
+                    "created_at": d.created_at.isoformat() if d.created_at else None,
+                }
+            )
+
+        return Response(
+            {
+                "user_id": pk,
+                "project_count": project_count,
+                "comment_count": comment_count,
+                "document_count": document_count,
+                "comments": comments_data,
+                "documents": documents_data,
+            },
+            status=HTTP_200_OK,
+        )
+
+
 # NOTE: AdminSetCaretaker and SetCaretaker views removed - duplicates of caretakers app functionality
 # Use /api/v1/caretakers/admin-set/ instead
 
