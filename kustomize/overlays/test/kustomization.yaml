@@ -32,6 +32,6 @@ patches:
   - path: service_patch.yaml
 images:
   - name: ghcr.io/dbca-wa/science-projects-backend
-    newTag: v4.0.19
+    newTag: 4.0.20
   - name: ghcr.io/dbca-wa/science-projects-frontend
-    newTag: v4.0.19
+    newTag: 4.0.20
