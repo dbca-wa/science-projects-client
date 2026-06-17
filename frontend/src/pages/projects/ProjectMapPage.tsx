@@ -123,11 +123,11 @@ const ProjectMapPage = observer(() => {
 	}
 
 	const totalProjects = mapData?.total_projects || 0;
+	const filteredProjects = mapData?.filtered_projects ?? totalProjects;
 	const projectsWithoutLocation = mapData?.projects_without_location || 0;
 
-	// Calculate projects with location data (for display on map)
-	// The API returns all projects, but we only show those with location on the map
-	const projectsWithLocation = totalProjects - projectsWithoutLocation;
+	// Projects with location = filtered total minus those without location
+	const projectsWithLocation = filteredProjects - projectsWithoutLocation;
 
 	// Normal mode: filter bar on top, map below
 	if (!store.state.mapFullscreen) {

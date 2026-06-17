@@ -190,6 +190,7 @@ export interface ProjectMapSearchParams {
 export interface ProjectMapResponse {
 	projects: IProjectData[];
 	total_projects: number;
+	filtered_projects: number;
 	projects_without_location: number;
 }
 
