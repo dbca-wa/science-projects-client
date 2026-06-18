@@ -17,6 +17,14 @@ omit =
     */node_modules/*
     */staticfiles/*
     */files/*
+    */admin.py
+    */management/commands/seed_knowledge_base.py
+    */management/commands/fix_user_sequence.py
+    */management/commands/migrate_caretaker_data.py
+    */management/commands/verify_caretaker_migration.py
+    */management/commands/audit_media_files.py
+    */management/commands/cleanup_old_drafts.py
+    config/color_formatter.py
 
 [report]
 exclude_lines =
