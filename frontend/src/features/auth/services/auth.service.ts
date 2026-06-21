@@ -30,10 +30,14 @@ export const logInOrdinary = async ({
 };
 
 /**
- * Logout current user
+ * Logout current user.
+ * In production, the backend returns a logoutUrl from the SSO gateway
+ * that must be navigated to in order to terminate the SSO session.
  */
 export const logOut = async () => {
-	return apiClient.post<{ ok: string }>(AUTH_ENDPOINTS.LOGOUT);
+	return apiClient.post<{ ok?: string; logoutUrl?: string }>(
+		AUTH_ENDPOINTS.LOGOUT
+	);
 };
 
 /**

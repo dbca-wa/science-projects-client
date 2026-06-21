@@ -58,11 +58,7 @@ const HeaderContent = ({ handleNavigation, onClose }: HeaderContentProps) => {
 
 	const handleLogout = () => {
 		onClose();
-		logout(undefined, {
-			onSuccess: () => {
-				handleNavigation("/login");
-			},
-		});
+		logout();
 	};
 
 	return (
