@@ -251,11 +251,7 @@ const NavitarContent = ({ onClose }: NavitarContentProps) => {
 					ref={registerMenuItem(7)}
 					type="button"
 					onClick={() => {
-						logout(undefined, {
-							onSuccess: () => {
-								navigate("/login", { replace: true });
-							},
-						});
+						logout();
 						onClose();
 					}}
 					className="w-full text-left cursor-pointer p-2.5 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none rounded text-red-600 dark:text-red-400"

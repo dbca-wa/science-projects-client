@@ -99,7 +99,8 @@ export const useLogin = () => {
  * Hook for logout mutation
  * - Clears auth store on success
  * - Invalidates TanStack Query cache
- * - Navigates to login page
+ * - In production, redirects to SSO logout URL to terminate the SSO session
+ * - In local dev (no logoutUrl returned), navigates to login page
  */
 export const useLogout = () => {
 	const authStore = useAuthStore();
@@ -108,7 +109,7 @@ export const useLogout = () => {
 
 	return useMutation({
 		mutationFn: logOut,
-		onSuccess: () => {
+		onSuccess: (data) => {
 			// Clear auth store
 			authStore.logout();
 
@@ -117,8 +118,14 @@ export const useLogout = () => {
 
 			toast.success("Logged out successfully");
 
-			// Navigate to login page
-			navigate("/login");
+			// In production, the backend returns a logoutUrl from the SSO gateway.
+			// Redirecting to it terminates the SSO session properly.
+			if (data?.logoutUrl) {
+				window.location.href = data.logoutUrl;
+			} else {
+				// Local dev — no SSO, just navigate to login
+				navigate("/login");
+			}
 		},
 	});
 };
