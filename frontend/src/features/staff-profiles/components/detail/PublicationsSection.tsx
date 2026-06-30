@@ -7,22 +7,23 @@ interface PublicationsSectionProps {
 	employeeId?: string | null;
 }
 
-// Remove HTML tags and collapse whitespace so entries compare on their visible text
-const stripHtml = (value: string): string =>
-	value
-		.replace(/<[^>]*>/g, "")
-		.replace(/\s+/g, " ")
-		.trim();
+// Extract visible text from an HTML string so entries compare on their displayed content.
+// Uses the DOM parser rather than a regex, which reliably handles malformed or nested markup.
+export const stripHtml = (value: string): string => {
+	const parsed = new DOMParser().parseFromString(value, "text/html");
+	const text = parsed.body.textContent ?? "";
+	return text.replace(/\s+/g, " ").trim();
+};
 
 // The author text is the portion of the entry before the "(YYYY)" year marker
-const getAuthorKey = (pub: ILibraryPublication): string => {
+export const getAuthorKey = (pub: ILibraryPublication): string => {
 	const plain = stripHtml(pub.BiblioText ?? "");
 	const yearMatch = plain.match(/\(\d{4}[a-z]?\)/i);
 	return yearMatch ? plain.slice(0, yearMatch.index).trim() : plain;
 };
 
 // Order by author text, then fall back to title for entries sharing the same lead author
-const comparePublications = (
+export const comparePublications = (
 	a: ILibraryPublication,
 	b: ILibraryPublication
 ): number => {
