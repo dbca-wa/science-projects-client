@@ -156,7 +156,9 @@ export const DocumentActionsSection = ({
 
 	const isBusinessAreaLead = useMemo(() => {
 		if (!currentUser || !project.business_area?.leader) return false;
-		return currentUser.id === project.business_area.leader;
+		const leader = project.business_area.leader;
+		const leaderId = typeof leader === "number" ? leader : leader.id;
+		return currentUser.id === leaderId;
 	}, [currentUser, project]);
 
 	const isDirectorateApprover = useMemo(() => {

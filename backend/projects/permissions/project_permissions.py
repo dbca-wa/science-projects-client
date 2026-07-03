@@ -20,19 +20,50 @@ class CanViewProject(BasePermission):
 
 class CanEditProject(BasePermission):
     """
-    Permission to edit a project
-    Only project leaders and superusers can edit
+    Permission to edit a project.
+
+    Grants edit access to:
+    - Superusers
+    - Project team members (leader or regular)
+    - Business area leader for the project's business area
+    - Caretakers of the project leader
+    - Caretakers of the business area leader
+    - Caretakers of a superuser (admin)
     """
 
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser:
+        user = request.user
+
+        if user.is_superuser:
             return True
 
-        # Check if user is project leader
-        return obj.members.filter(user=request.user, is_leader=True).exists()
+        # Check if user is any project team member (leader or regular)
+        if obj.members.filter(user=user).exists():
+            return True
+
+        # Check if user is the business area leader
+        if obj.business_area and obj.business_area.leader == user:
+            return True
+
+        # Check if user is a caretaker of the project leader
+        leader_member = obj.members.filter(is_leader=True).first()
+        if leader_member:
+            if user.caretaking_for.filter(user=leader_member.user).exists():
+                return True
+
+        # Check if user is a caretaker of the business area leader
+        if obj.business_area and obj.business_area.leader:
+            if user.caretaking_for.filter(user=obj.business_area.leader).exists():
+                return True
+
+        # Check if user is a caretaker of a superuser
+        if user.caretaking_for.filter(user__is_superuser=True).exists():
+            return True
+
+        return False
 
 
 class CanManageProjectMembers(BasePermission):

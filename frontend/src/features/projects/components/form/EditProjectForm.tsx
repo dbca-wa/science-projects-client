@@ -52,6 +52,46 @@ import { LocationSection } from "@/features/projects/components/LocationSection"
 import { KeywordInput } from "@/shared/components/KeywordInput";
 import { BusinessAreaSelectItems } from "@/shared/components/BusinessAreaSelectItems";
 import { Badge } from "@/shared/components/ui/badge";
+import { sanitizeInput } from "@/shared/utils/sanitise.utils";
+
+/**
+ * Normalise a form value to a comparable representation for dirty detection.
+ *
+ * Rich text fields (title, description, aims, etc.) are backed by a Lexical
+ * editor that re-serialises HTML differently when focused or clicked — adding
+ * classes, wrapping in <p> tags, and altering whitespace. Comparing the raw
+ * HTML produces false "dirty" states just from clicking into a field. Stripping
+ * HTML and collapsing whitespace compares the actual text content instead, which
+ * eliminates those false positives while still catching genuine single-character
+ * edits.
+ */
+const normaliseFieldValue = (value: unknown): string => {
+	if (value === null || value === undefined) return "";
+	if (typeof value === "string") {
+		return sanitizeInput(value).replace(/\s+/g, " ").trim();
+	}
+	return String(value);
+};
+
+/**
+ * Compare a single form field's current and original values, accounting for
+ * arrays (order-independent), numbers/null, and rich text (normalised).
+ */
+const isFieldDirty = (current: unknown, original: unknown): boolean => {
+	// Arrays (e.g. project_areas) — order-independent comparison
+	if (Array.isArray(current) || Array.isArray(original)) {
+		const a = Array.isArray(current) ? [...current].sort() : [];
+		const b = Array.isArray(original) ? [...original].sort() : [];
+		return JSON.stringify(a) !== JSON.stringify(b);
+	}
+	// Numeric fields (business_area, project_leader, data_custodian) — treat
+	// null/undefined as equivalent so empty selects don't read as changed
+	if (typeof current === "number" || typeof original === "number") {
+		return (current ?? null) !== (original ?? null);
+	}
+	// Strings and everything else — compare normalised text content
+	return normaliseFieldValue(current) !== normaliseFieldValue(original);
+};
 
 // Form schema with validation
 const editProjectSchema = z
@@ -206,57 +246,34 @@ export const EditProjectForm = observer(function EditProjectForm({
 		if (!onDirtyChange || !formLoaded) return;
 
 		const subscription = form.watch((data) => {
-			// Compare current form data with original data
-			// Special handling for image field (File objects don't serialize well)
 			const currentData = { ...data };
 			const originalData = { ...editStore.state.originalData };
 
-			// Track which fields are dirty
+			// Track which fields are dirty using a single consistent comparison
 			const newDirtyFields = new Set<string>();
 
-			// Check each field
 			Object.keys(currentData).forEach((key) => {
 				const currentValue = currentData[key as keyof typeof currentData];
 				const originalValue = originalData[key as keyof typeof originalData];
 
-				// Special handling for image field
+				// Image is a File (changed) or URL string (unchanged) — compare by reference
 				if (key === "image") {
 					if (currentValue !== originalValue) {
 						newDirtyFields.add("image");
 					}
+					return;
 				}
-				// Special handling for arrays (project_areas)
-				else if (Array.isArray(currentValue) && Array.isArray(originalValue)) {
-					if (
-						JSON.stringify(currentValue.sort()) !==
-						JSON.stringify(originalValue.sort())
-					) {
-						newDirtyFields.add(key);
-					}
-				}
-				// Regular comparison
-				else if (
-					JSON.stringify(currentValue) !== JSON.stringify(originalValue)
-				) {
+
+				if (isFieldDirty(currentValue, originalValue)) {
 					newDirtyFields.add(key);
 				}
 			});
 
 			setDirtyFields(newDirtyFields);
 
-			// Compare image separately
-			const imageChanged = currentData.image !== originalData.image;
-
-			// Remove image from comparison objects
-			delete currentData.image;
-			delete originalData.image;
-
-			// Check if other fields changed
-			const otherFieldsChanged =
-				JSON.stringify(currentData) !== JSON.stringify(originalData);
-
-			const hasChanges = imageChanged || otherFieldsChanged;
-			onDirtyChange(hasChanges);
+			// Derive overall dirty state from the same per-field result so the
+			// section borders and the unsaved-changes flag never disagree
+			onDirtyChange(newDirtyFields.size > 0);
 		});
 
 		return () => subscription.unsubscribe();
@@ -269,22 +286,19 @@ export const EditProjectForm = observer(function EditProjectForm({
 	};
 
 	const handleCancel = () => {
-		// Check if form has unsaved changes by comparing form data with original
+		// Check if form has unsaved changes using the same per-field comparison
+		// as the live dirty detection so the two never disagree
 		const currentData = { ...form.getValues() };
 		const originalData = { ...editStore.state.originalData };
 
-		// Compare image separately
-		const imageChanged = currentData.image !== originalData.image;
-
-		// Remove image from comparison objects
-		delete currentData.image;
-		delete originalData.image;
-
-		// Check if other fields changed
-		const otherFieldsChanged =
-			JSON.stringify(currentData) !== JSON.stringify(originalData);
-
-		const hasChanges = imageChanged || otherFieldsChanged;
+		const hasChanges = Object.keys(currentData).some((key) => {
+			const currentValue = currentData[key as keyof typeof currentData];
+			const originalValue = originalData[key as keyof typeof originalData];
+			if (key === "image") {
+				return currentValue !== originalValue;
+			}
+			return isFieldDirty(currentValue, originalValue);
+		});
 
 		if (hasChanges) {
 			// Show confirmation if there are unsaved changes

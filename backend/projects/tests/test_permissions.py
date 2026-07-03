@@ -133,7 +133,7 @@ class TestCanEditProject:
     def test_non_leader_member_cannot_edit(
         self, project_with_members, user_factory, db
     ):
-        """Test non-leader member cannot edit project"""
+        """Test non-leader member can edit project"""
         # Arrange
         # Get a non-leader member
         non_leader_member = project_with_members.members.filter(is_leader=False).first()
@@ -143,8 +143,8 @@ class TestCanEditProject:
         # Act
         result = permission.has_object_permission(request, None, project_with_members)
 
-        # Assert
-        assert result is False
+        # Assert — any team member (leader or regular) can edit
+        assert result is True
 
     @pytest.mark.integration
     def test_non_member_cannot_edit(self, project, user_factory, db):
@@ -159,6 +159,20 @@ class TestCanEditProject:
 
         # Assert
         assert result is False
+
+    @pytest.mark.integration
+    def test_business_area_leader_can_edit(self, project, db):
+        """Test business area leader can edit projects in their area"""
+        # Arrange
+        ba_leader = project.business_area.leader
+        request = Mock(user=ba_leader)
+        permission = CanEditProject()
+
+        # Act
+        result = permission.has_object_permission(request, None, project)
+
+        # Assert
+        assert result is True
 
 
 class TestCanManageProjectMembers:
