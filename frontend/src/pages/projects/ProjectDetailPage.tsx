@@ -127,7 +127,9 @@ const ProjectDetailPage = ({
 	// eslint-disable-next-line react-hooks/preserve-manual-memoization -- React Compiler optimisation hint
 	const isBaLead = useMemo(() => {
 		if (!currentUser || !data?.project?.business_area?.leader) return false;
-		return currentUser.id === data.project.business_area.leader;
+		const leader = data.project.business_area.leader;
+		const leaderId = typeof leader === "number" ? leader : leader.id;
+		return currentUser.id === leaderId;
 	}, [currentUser, data?.project]);
 
 	// Deletion banner state and hooks

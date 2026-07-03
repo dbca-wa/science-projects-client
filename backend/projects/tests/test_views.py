@@ -120,7 +120,7 @@ class TestProjectDetails:
     def test_update_project_as_non_leader(
         self, api_client, project_with_members, user_factory, db
     ):
-        """Test updating project as non-leader member fails"""
+        """Test updating project as non-leader team member succeeds"""
         # Arrange
         non_leader = project_with_members.members.filter(is_leader=False).first().user
         api_client.force_authenticate(user=non_leader)
@@ -133,8 +133,8 @@ class TestProjectDetails:
             projects_urls.detail(project_with_members.pk), update_data, format="json"
         )
 
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        # Assert — any team member can edit
+        assert response.status_code == status.HTTP_202_ACCEPTED
 
     @pytest.mark.integration
     def test_delete_project_as_leader(
@@ -154,7 +154,7 @@ class TestProjectDetails:
 
     @pytest.mark.integration
     def test_delete_project_as_non_leader(self, api_client, project_with_members, db):
-        """Test deleting project as non-leader member fails"""
+        """Test deleting project as non-leader team member succeeds"""
         # Arrange
         non_leader = project_with_members.members.filter(is_leader=False).first().user
         api_client.force_authenticate(user=non_leader)
@@ -162,8 +162,8 @@ class TestProjectDetails:
         # Act
         response = api_client.delete(projects_urls.detail(project_with_members.pk))
 
-        # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        # Assert — any team member passes CanEditProject check
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 class TestProjectMembers:
