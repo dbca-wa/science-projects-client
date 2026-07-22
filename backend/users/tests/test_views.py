@@ -57,6 +57,7 @@ class TestAuthenticationViews:
         response = api_client.post(users_urls.path("log-in"), data, format="json")
 
         # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "error" in response.data
 
     def test_logout_authenticated(self, api_client, user):

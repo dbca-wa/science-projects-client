@@ -3,6 +3,7 @@ import { AuthStore } from "./auth.store";
 import { getSSOMe } from "@/features/auth/services/auth.service";
 import Cookie from "js-cookie";
 import { logger } from "@/shared/services/logger.service";
+import { getCsrfCookieName } from "@/shared/constants";
 import type { IUserMe } from "@/shared/types/user.types";
 
 vi.mock("@/features/auth/services/auth.service");
@@ -98,8 +99,7 @@ describe("AuthStore.initialise", () => {
 			expect(authStore.isAuthenticated).toBe(false);
 			expect(authStore.user).toBe(null);
 			expect(authStore.state.initialised).toBe(true);
-			expect(mockCookieRemove).toHaveBeenCalledWith("sessionid");
-			expect(mockCookieRemove).toHaveBeenCalledWith("spmscsrf");
+			expect(mockCookieRemove).toHaveBeenCalledWith(getCsrfCookieName());
 			expect(mockCookieRemove).toHaveBeenCalledWith("csrf");
 			expect(logger.warn).toHaveBeenCalledWith(
 				"Session invalid - clearing auth state",
@@ -124,8 +124,7 @@ describe("AuthStore.initialise", () => {
 			expect(authStore.isAuthenticated).toBe(false);
 			expect(authStore.user).toBe(null);
 			expect(authStore.state.initialised).toBe(true);
-			expect(mockCookieRemove).toHaveBeenCalledWith("sessionid");
-			expect(mockCookieRemove).toHaveBeenCalledWith("spmscsrf");
+			expect(mockCookieRemove).toHaveBeenCalledWith(getCsrfCookieName());
 			expect(mockCookieRemove).toHaveBeenCalledWith("csrf");
 			expect(logger.warn).toHaveBeenCalledWith(
 				"Session invalid - clearing auth state",
@@ -334,8 +333,7 @@ describe("AuthStore other methods", () => {
 
 			expect(authStore.isAuthenticated).toBe(false);
 			expect(authStore.user).toBe(null);
-			expect(mockCookieRemove).toHaveBeenCalledWith("sessionid");
-			expect(mockCookieRemove).toHaveBeenCalledWith("spmscsrf");
+			expect(mockCookieRemove).toHaveBeenCalledWith(getCsrfCookieName());
 			expect(mockCookieRemove).toHaveBeenCalledWith("csrf");
 		});
 	});

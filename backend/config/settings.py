@@ -191,7 +191,36 @@ if DEBUG:
 else:
     CSRF_TRUSTED_ORIGINS = [f"https://{domain}" for domain in CURRENT_DOMAINS.values()]
 
-CSRF_COOKIE_NAME = "spmscsrf"  # Set custom CSRF cookie name
+# Cookie names are set per environment. Staging and production both live under
+# the shared parent cookie domain (.dbca.wa.gov.au), so they now use different
+# names; otherwise a user who visits both would have one environment's cookies
+# overwrite the other's. Production keeps the historical names so existing
+# sessions aren't disrupted; other environments use a distinct prefix.
+# Development runs on a separate host (127.0.0.1) and can't collide, but is
+# named distinctly for consistency.
+# NOTE: Though we have not encountered any real issues with the previous approach, the session-name prefix/split is a good direction.
+# It stops staging and production sessions between apps from overwriting each other.
+# The CSRF split is additional hardening;
+# a shared CSRF cookie was already safe, because Django validates the submitted
+# token against the cookie value. Production is unaffected; staging and
+# development need a one-time re-login because their cookie names changed.
+#
+# Only the cookie NAMES change in this block. The CSRF header name
+# (X-CSRFToken) is unchanged, so the frontend submits the token identically
+# everywhere; it just reads it from the environment-specific cookie.
+CSRF_COOKIE_NAMES = {
+    "development": "spms_dev_csrf",
+    "staging": "spms_test_csrf",
+    "production": "spmscsrf",
+}
+CSRF_COOKIE_NAME = CSRF_COOKIE_NAMES.get(ENVIRONMENT, "spmscsrf")
+
+SESSION_COOKIE_NAMES = {
+    "development": "spms_dev_sessionid",
+    "staging": "spms_test_sessionid",
+    "production": "spms_sessionid",
+}
+SESSION_COOKIE_NAME = SESSION_COOKIE_NAMES.get(ENVIRONMENT, "spms_sessionid")
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
@@ -220,8 +249,7 @@ if DEBUG:
 
 
 if not DEBUG:
-    # Secure cookie configuration for production
-    SESSION_COOKIE_NAME = "spms_sessionid"
+    # Secure cookie configuration for staging and production
     SESSION_COOKIE_DOMAIN = ".dbca.wa.gov.au"
     CSRF_COOKIE_DOMAIN = ".dbca.wa.gov.au"
 
