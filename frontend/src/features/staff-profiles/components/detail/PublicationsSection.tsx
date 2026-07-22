@@ -95,7 +95,7 @@ const PublicationsSection = ({ employeeId }: PublicationsSectionProps) => {
 	const totalCount = docs.length;
 
 	return (
-		<div className="w-full p-4">
+		<div className="w-full p-4 select-text">
 			<p className="text-lg font-semibold text-slate-900">
 				Publications{totalCount > 9 ? ` (${totalCount})` : ""}
 			</p>
