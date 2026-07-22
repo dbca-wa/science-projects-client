@@ -3,6 +3,7 @@
  * Barrel export for all application constants
  */
 
+export * from "./auth";
 export * from "./breakpoints";
 export * from "./colors";
 export * from "./query";

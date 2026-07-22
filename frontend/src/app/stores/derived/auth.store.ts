@@ -5,6 +5,7 @@ import { makeObservable, observable, computed, action } from "mobx";
 import Cookie from "js-cookie";
 import { getSSOMe } from "@/features/auth/services/auth.service";
 import type { ApiError } from "@/shared/services/api/client.service";
+import { AUTH_COOKIES, getCsrfCookieName } from "@/shared/constants";
 
 interface AuthStoreState extends BaseStoreState {
 	isAuthenticated: boolean;
@@ -62,7 +63,7 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	 */
 	setUser(user: IUserMe | null) {
 		this.user = user;
-		const hasCsrf = !!Cookie.get("spmscsrf");
+		const hasCsrf = !!Cookie.get(getCsrfCookieName());
 		this.state.isAuthenticated = !!user || hasCsrf;
 	}
 
@@ -89,7 +90,7 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	 * then validate with the backend to confirm.
 	 */
 	async initialise() {
-		const hasCsrf = !!Cookie.get("spmscsrf");
+		const hasCsrf = !!Cookie.get(getCsrfCookieName());
 
 		logger.info("Auth store initialising", {
 			hasCsrf,
@@ -165,9 +166,10 @@ export class AuthStore extends BaseStore<AuthStoreState> {
 	logout() {
 		this.state.isAuthenticated = false;
 		this.user = null;
-		Cookie.remove("sessionid");
-		Cookie.remove("spmscsrf");
-		Cookie.remove("csrf");
+		// Only the readable CSRF cookies can be cleared here. The session
+		// cookie is HttpOnly and is expired by the backend on logout.
+		Cookie.remove(getCsrfCookieName());
+		Cookie.remove(AUTH_COOKIES.LEGACY_CSRF);
 		logger.info("User logged out");
 	}
 

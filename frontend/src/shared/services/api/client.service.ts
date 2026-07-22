@@ -6,6 +6,7 @@ import axios, {
 } from "axios";
 import Cookie from "js-cookie";
 import { logger } from "@/shared/services/logger.service";
+import { AUTH_COOKIES, getCsrfCookieName } from "@/shared/constants";
 import { API_CONFIG } from "./config";
 import type { DjangoErrorResponse } from "@/shared/types/api.types";
 import {
@@ -39,14 +40,13 @@ export class ApiClientService {
 		// Request interceptor to add CSRF token
 		this.client.interceptors.request.use(
 			(config) => {
-				const csrfToken = Cookie.get("spmscsrf");
+				const csrfToken = Cookie.get(getCsrfCookieName());
 
 				if (csrfToken) {
 					config.headers["X-CSRFToken"] = csrfToken;
 				} else {
-					// Clean up old cookies if CSRF token is missing
-					Cookie.remove("csrf");
-					Cookie.remove("sessionid");
+					// Clean up a stale legacy CSRF cookie if the token is missing
+					Cookie.remove(AUTH_COOKIES.LEGACY_CSRF);
 				}
 
 				return config;
@@ -74,7 +74,7 @@ export class ApiClientService {
 							});
 							// Only trigger unauthorised for session expiry (not permission denied)
 							// A 403 with no CSRF cookie means session expired
-							if (!Cookie.get("spmscsrf")) {
+							if (!Cookie.get(getCsrfCookieName())) {
 								logger.warn("No CSRF cookie with 403 - session expired");
 								await this.handleUnauthorised();
 							}
@@ -107,10 +107,10 @@ export class ApiClientService {
 	}
 
 	private async handleUnauthorised(): Promise<void> {
-		// Clear cookies
-		Cookie.remove("spmscsrf");
-		Cookie.remove("csrf");
-		Cookie.remove("sessionid");
+		// Only the readable CSRF cookies can be cleared here. The session
+		// cookie is HttpOnly and is expired by the backend on logout.
+		Cookie.remove(getCsrfCookieName());
+		Cookie.remove(AUTH_COOKIES.LEGACY_CSRF);
 
 		// Dispatch event that authStore listens to
 		window.dispatchEvent(new CustomEvent("auth:unauthorised"));

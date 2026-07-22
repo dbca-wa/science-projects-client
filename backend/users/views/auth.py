@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
 from users.services import UserService
@@ -41,7 +41,9 @@ class Login(APIView):
             UserService.login_user(request, user)
             return Response({"ok": "Welcome"})
         else:
-            return Response({"error": "Incorrect password"})
+            return Response(
+                {"error": "Incorrect password"}, status=HTTP_400_BAD_REQUEST
+            )
 
 
 class Logout(APIView):
