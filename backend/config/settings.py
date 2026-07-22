@@ -221,6 +221,7 @@ if DEBUG:
 
 if not DEBUG:
     # Secure cookie configuration for production
+    SESSION_COOKIE_NAME = "spms_sessionid"
     SESSION_COOKIE_DOMAIN = ".dbca.wa.gov.au"
     CSRF_COOKIE_DOMAIN = ".dbca.wa.gov.au"
 
