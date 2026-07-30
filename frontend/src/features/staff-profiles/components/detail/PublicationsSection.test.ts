@@ -3,7 +3,7 @@ import {
 	stripHtml,
 	getAuthorKey,
 	comparePublications,
-} from "./PublicationsSection";
+} from "../../utils/publications.utils";
 import type { ILibraryPublication } from "../../types/staff-profile.types";
 
 const makePub = (
