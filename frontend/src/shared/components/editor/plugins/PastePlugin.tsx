@@ -19,7 +19,12 @@ import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { PASTE_COMMAND, COMMAND_PRIORITY_HIGH } from "lexical";
 import { $generateNodesFromDOM } from "@lexical/html";
-import { $insertNodes, $getSelection, $isRangeSelection } from "lexical";
+import {
+	$insertNodes,
+	$getSelection,
+	$isRangeSelection,
+	type PasteCommandType,
+} from "lexical";
 import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
 import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
 import { detectWordSource } from "../utils/word-detector";
@@ -194,7 +199,10 @@ export const PastePlugin = ({ mode = "full" }: PastePluginProps) => {
 	useEffect(() => {
 		return editor.registerCommand(
 			PASTE_COMMAND,
-			(event: ClipboardEvent) => {
+			(event: PasteCommandType) => {
+				// Only handle ClipboardEvents (not InputEvents)
+				if (!(event instanceof ClipboardEvent)) return false;
+
 				const clipboardData = event.clipboardData;
 				if (!clipboardData) return false;
 
