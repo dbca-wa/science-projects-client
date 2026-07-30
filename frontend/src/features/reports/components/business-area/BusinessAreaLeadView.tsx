@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { observer } from "mobx-react-lite";
 import { useAuthStore } from "@/app/stores/store-context";
@@ -154,9 +154,12 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 		? Number(searchParams.get("ba"))
 		: null;
 
-	const setSelectedBAId = (id: number) => {
-		setSearchParams({ ba: id.toString() }, { replace: true });
-	};
+	const setSelectedBAId = useCallback(
+		(id: number) => {
+			setSearchParams({ ba: id.toString() }, { replace: true });
+		},
+		[setSearchParams]
+	);
 
 	const isLoading = myLoading || (authStore.isSuperuser && allLoading);
 
@@ -187,7 +190,7 @@ export const BusinessAreaLeadView = observer(function BusinessAreaLeadView({
 				setSelectedBAId(businessAreas[0].id!);
 			}
 		}
-	}, [businessAreas, selectedBAId]);
+	}, [businessAreas, selectedBAId, setSelectedBAId]);
 
 	const selectedArea =
 		selectedBAId !== null
