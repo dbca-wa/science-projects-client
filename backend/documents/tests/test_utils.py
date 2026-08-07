@@ -538,6 +538,12 @@ class TestGetCurrentMaintainerId:
     def test_fallback_to_superuser(self, mock_settings, user_factory, db):
         """Test fallback to superuser"""
         mock_settings.MAINTAINER_USER_ID = None
+
+        # Remove any existing superusers so this test is deterministic
+        from users.models import User
+
+        User.objects.filter(is_superuser=True).update(is_superuser=False)
+
         superuser = user_factory(is_superuser=True)
 
         result = get_current_maintainer_id()
