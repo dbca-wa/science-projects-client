@@ -197,7 +197,7 @@ jobs:
 
   # ====================== BACKEND TESTS ======================
   test-backend:
-    name: Test Backend (shard ${{ matrix.shard }}/2)
+    name: Test Backend (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.backend == 'true'
@@ -205,7 +205,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
 
     services:
       postgres:
@@ -284,7 +284,7 @@ jobs:
           EMAIL_PORT: "25"
         run: |
           poetry run pytest \
-            --splits 2 \
+            --splits 4 \
             --group ${{ matrix.shard }} \
             --splitting-algorithm least_duration \
             --store-durations \
@@ -293,7 +293,6 @@ jobs:
             --tb=short \
             --cov=. \
             --cov-report= \
-            -v \
             -ra \
             --maxfail=5
 
@@ -320,6 +319,7 @@ jobs:
           name: test-durations-${{ matrix.shard }}
           path: backend/.test_durations
           retention-days: 1
+          include-hidden-files: true
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
