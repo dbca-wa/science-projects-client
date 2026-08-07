@@ -259,10 +259,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: backend/.test_durations
-          key: test-durations-v2-${{ github.sha }}-${{ matrix.shard }}
+          key: test-durations-${{ hashFiles('backend/poetry.lock') }}
           restore-keys: |
-            test-durations-v2-combined-
-            test-durations-v2-
+            test-durations-
         continue-on-error: true
 
       - name: Run tests with coverage
@@ -287,8 +286,10 @@ jobs:
           poetry run pytest \
             --splits 2 \
             --group ${{ matrix.shard }} \
+            --splitting-algorithm least_duration \
             --store-durations \
-            -n auto \
+            -n 2 \
+            --dist=loadscope \
             --tb=short \
             --cov=. \
             --cov-report= \
@@ -312,12 +313,13 @@ jobs:
           done
           shopt -u nullglob
 
-      - name: Save test durations cache
+      - name: Upload test durations
+        uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/cache/save@v4
         with:
+          name: test-durations-${{ matrix.shard }}
           path: backend/.test_durations
-          key: test-durations-v2-${{ github.sha }}-${{ matrix.shard }}
+          retention-days: 1
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -361,6 +363,43 @@ jobs:
         with:
           pattern: backend-coverage-*
           path: backend/coverage-reports
+
+      - name: Download test durations from shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-durations-*
+          path: backend/durations-reports
+
+      - name: Merge and cache test durations
+        working-directory: backend
+        run: |
+          # Merge durations from both shards into a single file
+          # Each shard only has durations for its own tests, so we merge them
+          python3 -c "
+          import json, glob, os
+
+          merged = {}
+          for f in glob.glob('durations-reports/test-durations-*/.test_durations'):
+              with open(f) as fh:
+                  data = json.load(fh)
+                  merged.update(data)
+
+          if merged:
+              with open('.test_durations', 'w') as fh:
+                  json.dump(merged, fh, indent=2)
+              print(f'Merged {len(merged)} test durations from shards')
+          else:
+              print('No durations files found to merge')
+          "
+
+      - name: Save merged durations cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: backend/.test_durations
+          key: test-durations-${{ hashFiles('backend/poetry.lock') }}-${{ github.run_id }}
+          # Using run_id ensures each successful run updates the cache
+          # restore-keys prefix matching ensures the latest is always found
 
       - name: Combine coverage data
         working-directory: backend

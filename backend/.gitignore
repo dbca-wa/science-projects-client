@@ -240,3 +240,6 @@ media_audit/
 test_email_preview.html
 test_email_preview.eml
 email_previews/
+
+# pytest-split durations (generated locally, cached in CI)
+.test_durations

@@ -7,7 +7,7 @@ FROM oven/bun:1.3.14-alpine AS build_image
 WORKDIR /app
 
 # Copy package files and scripts (needed for postinstall)
-COPY package.json bun.lock* ./
+COPY package.json bun.lock ./
 COPY scripts ./scripts
 
 # Install dependencies
