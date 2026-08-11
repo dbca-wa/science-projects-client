@@ -102,6 +102,53 @@ export const needsCompression = (
 };
 
 /**
+ * Read the pixel dimensions of an image file
+ *
+ * @param file - The image file to measure
+ * @returns The dimensions, or null if they cannot be determined
+ */
+export const getImageDimensions = async (
+	file: File
+): Promise<{ width: number; height: number } | null> => {
+	// createImageBitmap decodes without attaching to the DOM and, unlike the
+	// Image element, always settles. Environments without it (jsdom) fall back
+	// to the size-only check.
+	if (typeof createImageBitmap !== "function") {
+		return null;
+	}
+
+	try {
+		const bitmap = await createImageBitmap(file);
+		const { width, height } = bitmap;
+		bitmap.close?.();
+		return width && height ? { width, height } : null;
+	} catch {
+		return null;
+	}
+};
+
+/**
+ * Check whether an image exceeds the maximum pixel dimension
+ *
+ * A file can sit comfortably under the size limit while still being many
+ * thousands of pixels wide. Those images have to be downscaled too, because
+ * anything that later re-encodes them at high quality (such as the crop
+ * canvas) will inflate them well beyond the size limit.
+ *
+ * @param file - The image file to check
+ * @param maxDimension - Maximum allowed width or height in pixels
+ * @returns True if the image is larger than maxDimension on either axis
+ */
+export const exceedsMaxDimension = async (
+	file: File,
+	maxDimension: number = MAX_IMAGE_DIMENSION
+): Promise<boolean> => {
+	const dimensions = await getImageDimensions(file);
+	if (!dimensions) return false;
+	return Math.max(dimensions.width, dimensions.height) > maxDimension;
+};
+
+/**
  * Compress an image file with Web Worker support
  *
  * This is the main compression function that should be used throughout the application.
@@ -144,8 +191,16 @@ export const compressImage = async (
 	// Validate file type
 	validateImageType(file, acceptedTypes);
 
-	// Check if compression is needed
-	if (!needsCompression(file, maxSizeMB)) {
+	// Compress when the file is too large OR too many pixels. Checking pixel
+	// dimensions matters because a modest file can still be very high
+	// resolution — manually shrinking a photo to just under the size limit
+	// used to bypass compression entirely and keep its full resolution.
+	const oversized = needsCompression(file, maxSizeMB);
+	const tooManyPixels = oversized
+		? false
+		: await exceedsMaxDimension(file, maxDimension);
+
+	if (!oversized && !tooManyPixels) {
 		return {
 			file,
 			metrics: {

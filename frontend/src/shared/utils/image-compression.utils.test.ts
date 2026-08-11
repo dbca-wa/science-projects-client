@@ -31,6 +31,8 @@ import {
 	blobToFile,
 	validateImageType,
 	needsCompression,
+	getImageDimensions,
+	exceedsMaxDimension,
 } from "./image-compression.utils";
 
 const mockImageCompression = imageCompression as unknown as ReturnType<
@@ -587,5 +589,72 @@ describe("worker URL integration", () => {
 
 		const callArgs = mockImageCompression.mock.calls[0][1];
 		expect(callArgs).not.toHaveProperty("libURL");
+	});
+});
+
+describe("high resolution files under the size limit", () => {
+	const stubBitmap = (width: number, height: number) => {
+		const close = vi.fn();
+		vi.stubGlobal(
+			"createImageBitmap",
+			vi.fn().mockResolvedValue({ width, height, close })
+		);
+	};
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+		vi.clearAllMocks();
+	});
+
+	it("getImageDimensions returns null when createImageBitmap is unavailable", async () => {
+		vi.stubGlobal("createImageBitmap", undefined);
+
+		expect(await getImageDimensions(createSmallFile(500))).toBeNull();
+	});
+
+	it("getImageDimensions reports the decoded dimensions", async () => {
+		stubBitmap(4000, 2670);
+
+		expect(await getImageDimensions(createSmallFile(500))).toEqual({
+			width: 4000,
+			height: 2670,
+		});
+	});
+
+	it("exceedsMaxDimension detects an oversized long edge", async () => {
+		stubBitmap(4000, 2670);
+
+		expect(await exceedsMaxDimension(createSmallFile(500), 1920)).toBe(true);
+	});
+
+	it("exceedsMaxDimension passes an image within the limit", async () => {
+		stubBitmap(1600, 1200);
+
+		expect(await exceedsMaxDimension(createSmallFile(500), 1920)).toBe(false);
+	});
+
+	it("compresses a sub-1MB file that is still very high resolution", async () => {
+		// Reproduces the reported case: a photo manually shrunk to just under
+		// the size limit kept its full resolution and skipped compression.
+		stubBitmap(4000, 2670);
+		const file = createSmallFile(950);
+		mockImageCompression.mockResolvedValue(
+			new Blob(["compressed"], { type: "image/jpeg" })
+		);
+
+		const result = await compressImage(file);
+
+		expect(mockImageCompression).toHaveBeenCalled();
+		expect(result.file).not.toBe(file);
+	});
+
+	it("still skips compression when size and dimensions are both fine", async () => {
+		stubBitmap(1200, 900);
+		const file = createSmallFile(500);
+
+		const result = await compressImage(file);
+
+		expect(mockImageCompression).not.toHaveBeenCalled();
+		expect(result.file).toBe(file);
 	});
 });

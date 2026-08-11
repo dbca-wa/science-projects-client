@@ -20,6 +20,7 @@ import {
 	DEFAULT_ACCEPTED_TYPES,
 } from "@/shared/types/media.types";
 import { ACCEPTED_IMAGE_TYPES } from "@/shared/constants/image.constants";
+import { logger } from "@/shared/services/logger.service";
 import {
 	compressImage,
 	ImageCompressionError,
@@ -259,9 +260,49 @@ export const ImageUpload = ({
 		setIsCropModalOpen(true);
 	};
 
-	const handleCropComplete = (croppedFile: File) => {
-		onChange(croppedFile);
+	const handleCropComplete = async (croppedFile: File) => {
 		setIsCropModalOpen(false);
+
+		// The crop canvas re-encodes at high quality and scales by the device
+		// pixel ratio, so its output is routinely larger than the file that was
+		// compressed on selection. Compress again here — this is the file that
+		// actually gets uploaded.
+		let fileToUse = croppedFile;
+		try {
+			if (croppedFile.size > maxSize) {
+				setIsLoading(true);
+				const result = await compressImage(croppedFile, {
+					acceptedTypes,
+					maxSizeMB: maxSize / (1024 * 1024),
+				});
+				fileToUse = result.file;
+				logger.debug("Compressed cropped image before upload", {
+					fileName: fileToUse.name,
+					croppedBytes: croppedFile.size,
+					uploadBytes: fileToUse.size,
+					devicePixelRatio: window.devicePixelRatio,
+				});
+			} else {
+				logger.debug("Cropped image already within the size limit", {
+					fileName: croppedFile.name,
+					uploadBytes: croppedFile.size,
+					limitBytes: maxSize,
+				});
+			}
+		} catch (error) {
+			// Keep the crop rather than discarding the user's work; the server
+			// rejects anything still over the limit with an actionable message.
+			logger.warn("Failed to compress cropped image", {
+				fileName: croppedFile.name,
+				size: croppedFile.size,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		} finally {
+			setIsLoading(false);
+		}
+
+		onChange(fileToUse);
+
 		// Clean up the preview URL
 		if (imageToCrop) {
 			URL.revokeObjectURL(imageToCrop);
@@ -406,7 +447,7 @@ export const ImageUpload = ({
 							Drag and drop or click to select
 						</p>
 						<p className="text-xs text-muted-foreground">
-							JPG or PNG only (max {maxSize / (1024 * 1024)}MB)
+							JPG or PNG only — large photos are compressed automatically
 						</p>
 					</div>
 					<Button

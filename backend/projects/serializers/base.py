@@ -42,7 +42,10 @@ class ProjectSerializer(ModelSerializer):
         return instance.get_deletion_request_id()
 
     def get_areas(self, instance):
-        area_ids = instance.area.areas
+        try:
+            area_ids = instance.area.areas
+        except Project.area.RelatedObjectDoesNotExist:
+            return []
         if area_ids:
             areas = Area.objects.filter(id__in=area_ids)
             return TinyAreaSerializer(areas, many=True).data

@@ -172,7 +172,7 @@ const BaseInformationStep = observer(() => {
 						onChange={handleImageChange}
 						variant="project"
 						allowUrl={false}
-						helperText="JPG or PNG only, max 1MB. Image will be used in project cards and annual reports."
+						helperText="JPG or PNG only. Large photos are compressed automatically, so upload the original. Image will be used in project cards and annual reports."
 					/>
 				</div>
 			</SectionCard>

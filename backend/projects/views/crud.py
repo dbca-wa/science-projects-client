@@ -6,6 +6,7 @@ from datetime import datetime as dt
 
 from django.conf import settings
 from django.db import transaction
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -24,7 +25,7 @@ from documents.serializers import (
     ConceptPlanCreateSerializer,
     ProjectDocumentCreateSerializer,
 )
-from medias.models import ProjectPhoto
+from medias.models import IMAGE_MAX_SIZE, ProjectPhoto
 from projects.constants import FULL_WORKFLOW_KINDS
 
 from ..permissions.project_permissions import CanEditProject
@@ -123,12 +124,33 @@ class Projects(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        # Create project with all related data
+        # Reject an oversized image before writing anything to the database so
+        # the caller gets an actionable error instead of a partial project.
+        image_data = request.FILES.get("imageData")
+        if image_data and image_data.size > IMAGE_MAX_SIZE:
+            actual_mb = image_data.size / (1024 * 1024)
+            max_mb = IMAGE_MAX_SIZE / (1024 * 1024)
+            return Response(
+                {
+                    "error": (
+                        f"Image is too large ({actual_mb:.2f}MB). "
+                        f"The maximum size is {max_mb:.0f}MB. "
+                        "Please choose a smaller image."
+                    )
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        # Create project with all related data.
+        #
+        # Every failure inside this block must raise so the transaction rolls
+        # back. Returning a Response from inside an atomic block exits the
+        # context manager cleanly, which COMMITS the partial project and leaves
+        # it without an area, members or details.
         with transaction.atomic():
             project = serializer.save()
 
             # Handle project image
-            image_data = request.FILES.get("imageData")
             if image_data:
                 try:
                     file_path = ProjectService.handle_project_image(image_data)
@@ -139,10 +161,9 @@ class Projects(APIView):
                     )
                 except Exception as e:
                     settings.LOGGER.error(f"Image upload error: {e}")
-                    return Response(
-                        {"error": "Image upload failed. Please try a different file."},
-                        status=HTTP_500_INTERNAL_SERVER_ERROR,
-                    )
+                    raise ValidationError(
+                        {"error": "Image upload failed. Please try a different file."}
+                    ) from e
 
             # Create project areas
             location_data_list = data.getlist("locations")
@@ -151,10 +172,12 @@ class Projects(APIView):
                 "areas": location_data_list,
             }
             area_serializer = ProjectAreaSerializer(data=area_data)
-            if area_serializer.is_valid():
-                area_serializer.save()
-            else:
-                return Response(area_serializer.errors, status=HTTP_400_BAD_REQUEST)
+            if not area_serializer.is_valid():
+                settings.LOGGER.error(
+                    f"Project area creation error: {area_serializer.errors}"
+                )
+                raise ValidationError(area_serializer.errors)
+            area_serializer.save()
 
             # Add project leader as member
             member_data = {
@@ -164,10 +187,12 @@ class Projects(APIView):
                 "role": "supervising",
             }
             member_serializer = ProjectMemberSerializer(data=member_data)
-            if member_serializer.is_valid():
-                member_serializer.save()
-            else:
-                return Response(member_serializer.errors, status=HTTP_400_BAD_REQUEST)
+            if not member_serializer.is_valid():
+                settings.LOGGER.error(
+                    f"Project member creation error: {member_serializer.errors}"
+                )
+                raise ValidationError(member_serializer.errors)
+            member_serializer.save()
 
             # Create project details
             detail_data = {
@@ -178,10 +203,12 @@ class Projects(APIView):
                 "data_custodian": data.get("dataCustodian"),
             }
             detail_serializer = ProjectDetailSerializer(data=detail_data)
-            if detail_serializer.is_valid():
-                detail_serializer.save()
-            else:
-                return Response(detail_serializer.errors, status=HTTP_400_BAD_REQUEST)
+            if not detail_serializer.is_valid():
+                settings.LOGGER.error(
+                    f"Project detail creation error: {detail_serializer.errors}"
+                )
+                raise ValidationError(detail_serializer.errors)
+            detail_serializer.save()
 
             # Create kind-specific details
             if kind == "student":
@@ -191,12 +218,12 @@ class Projects(APIView):
                     "level": data.get("level"),
                 }
                 student_serializer = StudentProjectDetailSerializer(data=student_data)
-                if student_serializer.is_valid():
-                    student_serializer.save()
-                else:
-                    return Response(
-                        student_serializer.errors, status=HTTP_400_BAD_REQUEST
+                if not student_serializer.is_valid():
+                    settings.LOGGER.error(
+                        f"Student detail creation error: {student_serializer.errors}"
                     )
+                    raise ValidationError(student_serializer.errors)
+                student_serializer.save()
 
             elif kind == "external":
                 external_data = {
@@ -209,12 +236,12 @@ class Projects(APIView):
                 external_serializer = ExternalProjectDetailSerializer(
                     data=external_data
                 )
-                if external_serializer.is_valid():
-                    external_serializer.save()
-                else:
-                    return Response(
-                        external_serializer.errors, status=HTTP_400_BAD_REQUEST
+                if not external_serializer.is_valid():
+                    settings.LOGGER.error(
+                        f"External detail creation error: {external_serializer.errors}"
                     )
+                    raise ValidationError(external_serializer.errors)
+                external_serializer.save()
 
             # Only create initial documents for full-workflow kinds (science, core_function)
             if kind in FULL_WORKFLOW_KINDS:
@@ -227,20 +254,21 @@ class Projects(APIView):
                     "modifier": request.user.pk,
                 }
                 doc_serializer = ProjectDocumentCreateSerializer(data=document_data)
-                if doc_serializer.is_valid():
-                    doc = doc_serializer.save()
-                    concept_data = {"document": doc.pk, "project": project.pk}
-                    concept_serializer = ConceptPlanCreateSerializer(data=concept_data)
-                    if concept_serializer.is_valid():
-                        concept_serializer.save()
-                    else:
-                        settings.LOGGER.error(
-                            f"Concept Plan creation error: {concept_serializer.errors}"
-                        )
-                else:
+                if not doc_serializer.is_valid():
                     settings.LOGGER.error(
                         f"Project Document creation error: {doc_serializer.errors}"
                     )
+                    raise ValidationError(doc_serializer.errors)
+
+                doc = doc_serializer.save()
+                concept_data = {"document": doc.pk, "project": project.pk}
+                concept_serializer = ConceptPlanCreateSerializer(data=concept_data)
+                if not concept_serializer.is_valid():
+                    settings.LOGGER.error(
+                        f"Concept Plan creation error: {concept_serializer.errors}"
+                    )
+                    raise ValidationError(concept_serializer.errors)
+                concept_serializer.save()
 
         # Return created project
         result_serializer = ProjectSerializer(project)
