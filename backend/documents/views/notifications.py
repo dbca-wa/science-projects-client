@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q
 from django.utils.html import strip_tags
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -304,7 +305,7 @@ class NewCycleOpen(APIView):
                         settings.LOGGER.error(
                             f"Error validating progress report: {progress_report.errors}"
                         )
-                        return Response(progress_report.errors, HTTP_400_BAD_REQUEST)
+                        raise ValidationError(progress_report.errors)
                 else:
                     # Create student report
                     last_one = previous_sr_by_project.get(project.pk)
@@ -344,7 +345,7 @@ class NewCycleOpen(APIView):
                         settings.LOGGER.error(
                             f"Error validating student report {student_report.errors}"
                         )
-                        return Response(student_report.errors, HTTP_400_BAD_REQUEST)
+                        raise ValidationError(student_report.errors)
 
                 # Set project status to updating after successful creation
                 project.status = Project.StatusChoices.UPDATING

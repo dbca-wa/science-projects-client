@@ -5,7 +5,7 @@ Endorsement views
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -316,9 +316,7 @@ class SeekEndorsement(APIView):
 
                     if not new_instance_serializer.is_valid():
                         settings.LOGGER.error(f"{new_instance_serializer.errors}")
-                        return Response(
-                            new_instance_serializer.errors, status=HTTP_400_BAD_REQUEST
-                        )
+                        raise ValidationError(new_instance_serializer.errors)
 
                     new_instance_serializer.save()
                     settings.LOGGER.info("Saved new valid pdf instance")

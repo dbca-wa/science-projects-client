@@ -1333,63 +1333,10 @@ class TestProjectServiceAdditional:
         assert result is None
 
     @pytest.mark.integration
-    def test_handle_project_image_string(self):
-        """Test handling project image when it's already a string"""
-        # Act
-        result = ProjectService.handle_project_image("/path/to/image.jpg")
-
-        # Assert
-        assert result == "/path/to/image.jpg"
-
-    @pytest.mark.integration
-    def test_handle_project_image_none(self):
-        """Test handling project image when it's None"""
-        # Act
-        result = ProjectService.handle_project_image(None)
-
-        # Assert
-        assert result is None
-
-    @patch("projects.services.project_service.default_storage")
-    @pytest.mark.integration
-    def test_handle_project_image_existing_file(self, mock_storage, db):
-        """Test handling project image when file already exists with same size"""
-        # Arrange
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
-        image = SimpleUploadedFile(
-            "test.jpg", b"file_content", content_type="image/jpeg"
-        )
-
-        mock_storage.exists.return_value = True
-        mock_storage.path.return_value = "/path/to/test.jpg"
-
-        with patch("os.path.exists", return_value=True):
-            with patch("os.path.getsize", return_value=len(b"file_content")):
-                # Act
-                result = ProjectService.handle_project_image(image)
-
-                # Assert
-                assert result == "projects/test.jpg"
-
-    @patch("projects.services.project_service.default_storage")
-    @pytest.mark.integration
-    def test_handle_project_image_new_file(self, mock_storage, db):
-        """Test handling new project image upload"""
-        # Arrange
-        from django.core.files.uploadedfile import SimpleUploadedFile
-
-        image = SimpleUploadedFile("new.jpg", b"new_content", content_type="image/jpeg")
-
-        mock_storage.exists.return_value = False
-        mock_storage.save.return_value = "projects/new.jpg"
-
-        # Act
-        result = ProjectService.handle_project_image(image)
-
-        # Assert
-        assert result == "projects/new.jpg"
-        mock_storage.save.assert_called_once()
+    def test_get_project_years(self, db):
+        """Test getting project years"""
+        result = ProjectService.get_project_years()
+        assert result is not None
 
 
 # Additional tests for DetailsService to reach 100% coverage

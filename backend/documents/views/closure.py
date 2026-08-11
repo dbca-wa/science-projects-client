@@ -4,7 +4,7 @@ Project closure views
 
 from django.conf import settings
 from django.db import transaction
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -85,7 +85,7 @@ class ProjectClosures(APIView):
             )
             if not doc_ser.is_valid():
                 settings.LOGGER.error(f"{doc_ser.errors}")
-                return Response(doc_ser.errors, status=HTTP_400_BAD_REQUEST)
+                raise ValidationError(doc_ser.errors)
 
             project_document = doc_ser.save()
 
@@ -104,7 +104,7 @@ class ProjectClosures(APIView):
             closure_ser = ProjectClosureCreateSerializer(data=closure_data)
             if not closure_ser.is_valid():
                 settings.LOGGER.error(f"{closure_ser.errors}")
-                return Response(closure_ser.errors, status=HTTP_400_BAD_REQUEST)
+                raise ValidationError(closure_ser.errors)
 
             project_closure = closure_ser.save()
 

@@ -179,6 +179,16 @@ export const useWizardPersistence = (
 	const isRestoringRef = useRef(false);
 
 	/**
+	 * Memoised image data keyed by the File object reference.
+	 * Avoids re-running compression + FileReader + base64 encoding on every
+	 * keystroke save when only the text fields have changed.
+	 */
+	const cachedImageRef = useRef<{
+		file: File;
+		data: IPersistedImageData | null;
+	} | null>(null);
+
+	/**
 	 * Check if persisted data has expired
 	 */
 	const isExpired = useCallback((timestamp: number): boolean => {
@@ -198,64 +208,77 @@ export const useWizardPersistence = (
 		}
 
 		try {
-			// Convert image File to base64 if present
+			// Convert image File to base64 if present, reusing cached result when
+			// the File reference hasn't changed (i.e. only text fields were edited).
 			let imageData: IPersistedImageData | null = null;
 			const imageFile = wizardStore.state.editingFormData.baseInformation.image;
 
 			if (imageFile instanceof File) {
-				let fileToConvert = imageFile;
-
-				// Compress the image if it would exceed the persistence size limit.
-				// The base64 encoding adds ~33% overhead, so target a file size that
-				// will fit comfortably: MAX_IMAGE_PERSISTENCE_SIZE / 1.4 ≈ 1.5MB.
-				const estimatedBase64Size = imageFile.size * 1.37;
-				if (estimatedBase64Size > MAX_IMAGE_PERSISTENCE_SIZE) {
-					try {
-						const targetMB = MAX_IMAGE_PERSISTENCE_SIZE / 1.37 / (1024 * 1024);
-						const result = await compressImage(imageFile, {
-							maxSizeMB: targetMB,
-							useWebWorker: true,
-						});
-						fileToConvert = result.file;
-						logger.debug("Compressed image for draft persistence", {
-							originalSize: imageFile.size,
-							compressedSize: result.file.size,
-							targetMB,
-						});
-					} catch (error) {
-						logger.warn("Failed to compress image for draft persistence", {
-							error: error instanceof Error ? error.message : String(error),
-						});
-					}
-				}
-
-				const base64 = await fileToBase64(fileToConvert);
-				if (base64) {
-					if (base64.length > MAX_IMAGE_PERSISTENCE_SIZE) {
-						// Even after compression the image is too large — skip it
-						logger.warn(
-							"Image still exceeds persistence limit after compression, skipping",
-							{
-								fileName: imageFile.name,
-								base64Length: base64.length,
-								maxSize: MAX_IMAGE_PERSISTENCE_SIZE,
-							}
-						);
-					} else {
-						imageData = {
-							dataUrl: base64,
-							fileName: imageFile.name,
-						};
-					}
+				// Cache hit: same File object as last time — skip expensive work
+				if (
+					cachedImageRef.current &&
+					cachedImageRef.current.file === imageFile
+				) {
+					imageData = cachedImageRef.current.data;
 				} else {
-					logger.warn(
-						"Failed to convert image to base64 — fileToBase64 returned null"
-					);
+					// Cache miss: compress, encode, and store
+					let fileToConvert = imageFile;
+
+					const estimatedBase64Size = imageFile.size * 1.37;
+					if (estimatedBase64Size > MAX_IMAGE_PERSISTENCE_SIZE) {
+						try {
+							const targetMB =
+								MAX_IMAGE_PERSISTENCE_SIZE / 1.37 / (1024 * 1024);
+							const result = await compressImage(imageFile, {
+								maxSizeMB: targetMB,
+								useWebWorker: true,
+							});
+							fileToConvert = result.file;
+							logger.debug("Compressed image for draft persistence", {
+								originalSize: imageFile.size,
+								compressedSize: result.file.size,
+								targetMB,
+							});
+						} catch (error) {
+							logger.warn("Failed to compress image for draft persistence", {
+								error: error instanceof Error ? error.message : String(error),
+							});
+						}
+					}
+
+					const base64 = await fileToBase64(fileToConvert);
+					if (base64) {
+						if (base64.length > MAX_IMAGE_PERSISTENCE_SIZE) {
+							logger.warn(
+								"Image still exceeds persistence limit after compression, skipping",
+								{
+									fileName: imageFile.name,
+									base64Length: base64.length,
+									maxSize: MAX_IMAGE_PERSISTENCE_SIZE,
+								}
+							);
+						} else {
+							imageData = {
+								dataUrl: base64,
+								fileName: imageFile.name,
+							};
+						}
+					} else {
+						logger.warn(
+							"Failed to convert image to base64 — fileToBase64 returned null"
+						);
+					}
+
+					// Store in cache regardless of outcome so we don't retry
+					cachedImageRef.current = { file: imageFile, data: imageData };
 				}
 			} else if (imageFile) {
 				logger.warn("Image in store is not a File instance, cannot persist", {
 					type: typeof imageFile,
 				});
+			} else {
+				// Image was removed — clear cache
+				cachedImageRef.current = null;
 			}
 
 			const data: IPersistedWizardData = {
@@ -406,18 +429,13 @@ export const useWizardPersistence = (
 
 				const serverData = serverDraft.data as Record<string, unknown>;
 				const formData = serverData.formData as
-					| IPersistedWizardData["formData"]
-					| undefined;
+					IPersistedWizardData["formData"] | undefined;
 				const teamMembers = serverData.teamMembers as
-					| IPersistedWizardData["teamMembers"]
-					| undefined;
+					IPersistedWizardData["teamMembers"] | undefined;
 				const completedSteps = serverData.completedSteps as
-					| number[]
-					| undefined;
+					number[] | undefined;
 				const serverImageData = serverData.imageData as
-					| IPersistedImageData
-					| null
-					| undefined;
+					IPersistedImageData | null | undefined;
 
 				if (formData) {
 					wizardStore.setProjectKind(serverDraft.project_kind);
