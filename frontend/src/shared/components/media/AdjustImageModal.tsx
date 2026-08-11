@@ -72,7 +72,10 @@ export const AdjustImageModal = ({
 				imgRef.current,
 				cropState.completedCrop,
 				cropState.scale,
-				0 // Rotation already applied to image
+				0, // Rotation already applied to image
+				undefined,
+				undefined,
+				1 // Upload target: keep the source resolution, do not upscale
 			);
 
 			if (blob) {

@@ -9,6 +9,10 @@ import type { PixelCrop } from "react-image-crop";
  * @param rotate - Rotation angle in degrees
  * @param targetWidth - Optional target width for the output
  * @param targetHeight - Optional target height for the output
+ * @param pixelRatio - Canvas scaling factor. Defaults to the device pixel
+ *   ratio, which keeps on-screen previews crisp. Pass 1 when the blob is
+ *   destined for upload: scaling past the source resolution only interpolates
+ *   pixels, so it inflates the file without adding any detail.
  * @returns Promise resolving to a Blob or null if canvas context unavailable
  */
 export const generateCroppedImage = async (
@@ -17,7 +21,8 @@ export const generateCroppedImage = async (
 	scale: number,
 	rotate: number,
 	targetWidth?: number,
-	targetHeight?: number
+	targetHeight?: number,
+	pixelRatio?: number
 ): Promise<Blob | null> => {
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d");
@@ -56,11 +61,11 @@ export const generateCroppedImage = async (
 		finalHeight = rotatedHeight;
 	}
 
-	const pixelRatio = window.devicePixelRatio || 1;
-	canvas.width = finalWidth * pixelRatio;
-	canvas.height = finalHeight * pixelRatio;
+	const effectivePixelRatio = pixelRatio ?? (window.devicePixelRatio || 1);
+	canvas.width = finalWidth * effectivePixelRatio;
+	canvas.height = finalHeight * effectivePixelRatio;
 
-	ctx.scale(pixelRatio, pixelRatio);
+	ctx.scale(effectivePixelRatio, effectivePixelRatio);
 	ctx.imageSmoothingQuality = "high";
 	ctx.imageSmoothingEnabled = true;
 
