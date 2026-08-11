@@ -15,6 +15,9 @@ import { useImageCrop } from "@/shared/hooks/useImageCrop";
 import { useImagePreview } from "@/shared/hooks/useImagePreview";
 import { generateCroppedImage } from "@/shared/utils/image-canvas.utils";
 import { useWindowSize } from "@/shared/hooks/useWindowSize";
+import { compressImage } from "@/shared/utils/image-compression.utils";
+import { MAX_IMAGE_SIZE_BYTES } from "@/shared/constants/image.constants";
+import { logger } from "@/shared/services/logger.service";
 
 interface AdjustImageModalProps {
 	isOpen: boolean;
@@ -28,6 +31,12 @@ interface AdjustImageModalProps {
 	reportSectionLabel?: string;
 	/** Preview layout type for report media */
 	reportPreviewType?: "chapter" | "banner-full" | "banner-cropped" | "chart";
+	/**
+	 * Size ceiling for the file handed to onCropComplete. Re-encoding a crop
+	 * can produce a larger file than the one that was selected, so the result
+	 * is compressed again when it exceeds this.
+	 */
+	maxSizeBytes?: number;
 }
 
 /**
@@ -45,6 +54,7 @@ export const AdjustImageModal = ({
 	variant = "default",
 	reportSectionLabel,
 	reportPreviewType,
+	maxSizeBytes = MAX_IMAGE_SIZE_BYTES,
 }: AdjustImageModalProps) => {
 	const imgRef = useRef<HTMLImageElement>(null);
 	const previewSectionRef = useRef<HTMLDivElement>(null);
@@ -72,11 +82,37 @@ export const AdjustImageModal = ({
 				imgRef.current,
 				cropState.completedCrop,
 				cropState.scale,
-				0 // Rotation already applied to image
+				0, // Rotation already applied to image
+				undefined,
+				undefined,
+				1 // Upload target: keep the source resolution, do not upscale
 			);
 
 			if (blob) {
-				const file = new File([blob], fileName, { type: "image/jpeg" });
+				let file = new File([blob], fileName, { type: "image/jpeg" });
+
+				// Re-encoding the crop can exceed the size of the file that was
+				// selected, so compress again before handing it back.
+				if (file.size > maxSizeBytes) {
+					try {
+						const result = await compressImage(file, {
+							maxSizeMB: maxSizeBytes / (1024 * 1024),
+						});
+						logger.debug("Compressed cropped image", {
+							fileName,
+							croppedBytes: file.size,
+							finalBytes: result.file.size,
+						});
+						file = result.file;
+					} catch (error) {
+						// Keep the crop rather than discarding the user's work.
+						logger.warn("Failed to compress cropped image", {
+							fileName,
+							croppedBytes: file.size,
+							error: error instanceof Error ? error.message : String(error),
+						});
+					}
+				}
 
 				// Cleanup preview URLs
 				if (previewUrls.avatar) URL.revokeObjectURL(previewUrls.avatar);

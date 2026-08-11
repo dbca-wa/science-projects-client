@@ -260,8 +260,10 @@ export const ImageUpload = ({
 	};
 
 	const handleCropComplete = (croppedFile: File) => {
+		// AdjustImageModal already compressed the crop down to maxSize.
 		onChange(croppedFile);
 		setIsCropModalOpen(false);
+
 		// Clean up the preview URL
 		if (imageToCrop) {
 			URL.revokeObjectURL(imageToCrop);
@@ -406,7 +408,7 @@ export const ImageUpload = ({
 							Drag and drop or click to select
 						</p>
 						<p className="text-xs text-muted-foreground">
-							JPG or PNG only (max {maxSize / (1024 * 1024)}MB)
+							JPG or PNG only — large photos are compressed automatically
 						</p>
 					</div>
 					<Button
@@ -546,6 +548,7 @@ export const ImageUpload = ({
 									: undefined
 					}
 					variant={variant}
+					maxSizeBytes={maxSize}
 				/>
 			)}
 		</div>

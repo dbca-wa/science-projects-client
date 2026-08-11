@@ -384,6 +384,9 @@ REST_FRAMEWORK = {
     # X-Forwarded-For instead of REMOTE_ADDR (which would be the proxy's IP).
     # Set to the number of proxies in front of Django (typically 1 for nginx/ALB).
     "NUM_PROXIES": 1,
+    # Translates file validation failures raised in model.save() into 400s
+    # instead of letting them surface as 500s.
+    "EXCEPTION_HANDLER": "config.exception_handlers.api_exception_handler",
 }
 
 # Log throttling status based on Redis availability
