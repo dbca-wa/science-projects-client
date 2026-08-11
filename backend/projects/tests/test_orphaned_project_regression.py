@@ -122,7 +122,7 @@ class TestCreateNeverLeavesOrphans:
         data["imageData"] = _small_image()
 
         with patch(
-            "projects.views.crud.ProjectService.handle_project_image",
+            "projects.views.crud.ProjectPhoto.objects.create",
             side_effect=OSError("disk full"),
         ):
             response = api_client.post(CREATE_URL, data=data, format="multipart")
@@ -252,3 +252,43 @@ class TestSerialiserToleratesMissingArea:
         response = api_client.get(CREATE_URL)
 
         assert response.status_code == 200, f"Got {response.status_code}"
+
+
+class TestExportSerialiserToleratesMissingStudentDetails:
+    """
+    The annual report export dereferences student_project_info the same way the
+    list endpoint dereferenced area, so it needs the same protection.
+    """
+
+    @pytest.mark.integration
+    def test_student_level_is_none_without_student_details(self, db, business_area):
+        from projects.serializers.export import TinyStudentProjectARSerializer
+
+        project = ProjectFactory(business_area=business_area, kind="student")
+
+        data = TinyStudentProjectARSerializer(project).data
+
+        assert data["student_level"] is None
+
+
+class TestRejectedImageLeavesNoFileBehind:
+    """
+    The upload is handed to the model, which validates before writing. A
+    rejected file must not be left in storage.
+    """
+
+    @pytest.mark.integration
+    def test_oversized_image_writes_nothing_to_storage(
+        self, api_client, admin_user, business_area, tmp_path, settings
+    ):
+        settings.MEDIA_ROOT = str(tmp_path)
+        api_client.force_authenticate(user=admin_user)
+
+        data = _payload(business_area, admin_user)
+        data["imageData"] = _oversized_image()
+        response = api_client.post(CREATE_URL, data=data, format="multipart")
+
+        assert response.status_code == 400
+        written = list(tmp_path.rglob("*"))
+        files = [p for p in written if p.is_file()]
+        assert files == [], f"Rejected upload left files behind: {files}"

@@ -15,7 +15,6 @@ from rest_framework.status import (
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
-    HTTP_500_INTERNAL_SERVER_ERROR,
 )
 from rest_framework.views import APIView
 
@@ -150,12 +149,14 @@ class Projects(APIView):
         with transaction.atomic():
             project = serializer.save()
 
-            # Handle project image
+            # Handle project image. The uploaded file is passed straight to the
+            # model, which validates before writing to storage — matching every
+            # other media type. Pre-saving to storage first would leave the file
+            # behind when validation rejects it.
             if image_data:
                 try:
-                    file_path = ProjectService.handle_project_image(image_data)
                     ProjectPhoto.objects.create(
-                        file=file_path,
+                        file=image_data,
                         uploader=request.user,
                         project=project,
                     )
@@ -458,9 +459,10 @@ class ProjectDetails(APIView):
                 )
             except Exception as e:
                 settings.LOGGER.error(f"Image upload error: {e}")
+                # A rejected upload is a client error, not a server fault.
                 return Response(
                     {"error": "Image upload failed. Please try a different file."},
-                    status=HTTP_500_INTERNAL_SERVER_ERROR,
+                    status=HTTP_400_BAD_REQUEST,
                 )
 
         result_serializer = ProjectSerializer(project)

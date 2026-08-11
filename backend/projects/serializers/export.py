@@ -65,7 +65,10 @@ class TinyStudentProjectARSerializer(ModelSerializer):
     student_level = SerializerMethodField()
 
     def get_student_level(self, project):
-        return project.student_project_info.level
+        try:
+            return project.student_project_info.level
+        except Project.student_project_info.RelatedObjectDoesNotExist:
+            return None
 
     class Meta:
         model = Project
