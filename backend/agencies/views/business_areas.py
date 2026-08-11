@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import transaction
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -14,7 +14,6 @@ from rest_framework.status import (
     HTTP_202_ACCEPTED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
-    HTTP_500_INTERNAL_SERVER_ERROR,
 )
 from rest_framework.views import APIView
 
@@ -107,12 +106,11 @@ class BusinessAreas(APIView):
                     }
                 except ValueError as e:
                     settings.LOGGER.error(f"Error on handling BA image: {e}")
-                    return Response(
+                    raise ValidationError(
                         {
                             "error": "Image processing failed. Please try a different file."
-                        },
-                        status=HTTP_400_BAD_REQUEST,
-                    )
+                        }
+                    ) from e
 
                 try:
                     BusinessAreaPhoto.objects.create(**image_data)
@@ -120,11 +118,9 @@ class BusinessAreas(APIView):
                     settings.LOGGER.error(
                         f"Error on creating new BA Photo instance: {e}"
                     )
-                    new_business_area.delete()
-                    return Response(
-                        {"error": "Failed to save image. Please try again."},
-                        status=HTTP_500_INTERNAL_SERVER_ERROR,
-                    )
+                    raise ValidationError(
+                        {"error": "Failed to save image. Please try again."}
+                    ) from e
 
                 optimized_ba = BusinessArea.objects.select_related(
                     "division", "image"

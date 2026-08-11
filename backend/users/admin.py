@@ -29,24 +29,32 @@ from .models import (
 
 @admin.action(description="Send About and Expertise to SP")
 def copy_about_expertise_to_staff_profile(model_admin, req, selected):
-    if len(selected) > 1:
-        settings.LOGGER.info(msg="Please select only one item")
-        model_admin.message_user(req, "Please select only one item.")
-        return
+    """
+    Copy about and expertise from UserProfile to PublicStaffProfile
+    for the selected users.
+    """
+    updated = 0
+    skipped = 0
 
-    users_to_update = User.objects.filter(is_staff=True)
-    for user in users_to_update:
-        current_about = user.profile.about
-        current_expertise = user.profile.expertise
+    for user in selected:
+        try:
+            profile = user.profile
+        except UserProfile.DoesNotExist:
+            skipped += 1
+            continue
 
-        profile = PublicStaffProfile.objects.get(user=user)
-        profile.about = f"<p>{current_about}</p>"
-        profile.expertise = f"<p>{current_expertise}</p>"
-        profile.save()
+        about = profile.about or ""
+        expertise = profile.expertise or ""
+
+        staff_profile, _created = PublicStaffProfile.objects.get_or_create(user=user)
+        staff_profile.about = f"<p>{about}</p>"
+        staff_profile.expertise = f"<p>{expertise}</p>"
+        staff_profile.save()
+        updated += 1
 
     model_admin.message_user(
         req,
-        f"Copied profile data over to staff profile for {users_to_update.count()} user(s).",
+        f"Copied profile data for {updated} user(s). Skipped {skipped} without a profile.",
     )
 
 

@@ -15,6 +15,7 @@ spec:
     spec:
       containers:
         - name: spms-backend
+          imagePullPolicy: Always
           envFrom:
             - secretRef:
                 name: spms-env-test
@@ -26,6 +27,8 @@ spec:
             - name: prince2-license-test
               mountPath: /usr/lib/prince/license
               readOnly: true
+        - name: spms-frontend
+          imagePullPolicy: Always
       volumes:
         - name: spms-media-test
           persistentVolumeClaim:

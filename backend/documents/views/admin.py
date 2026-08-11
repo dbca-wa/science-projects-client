@@ -5,7 +5,7 @@ Document admin views
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -319,10 +319,9 @@ class DocumentSpawner(APIView):
                     settings.LOGGER.error(
                         msg=f"Failed to create document: {e}", exc_info=True
                     )
-                    return Response(
-                        {"error": "Failed to create document. Please try again."},
-                        HTTP_400_BAD_REQUEST,
-                    )
+                    raise ValidationError(
+                        {"error": "Failed to create document. Please try again."}
+                    ) from e
 
                 # Create the kind-specific detail record
                 if kind == "concept":
