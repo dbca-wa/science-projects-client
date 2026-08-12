@@ -159,6 +159,41 @@ describe("sanitise.utils", () => {
 			expect(result).toBe("<p><strong>Bold</strong> and <em>italic</em></p>");
 		});
 
+		it("should preserve b tags (Word Desktop bold)", () => {
+			const html = "<p><b>Bold text</b> normal</p>";
+			const result = sanitizeRichText(html);
+			expect(result).toContain("<b>");
+			expect(result).toContain("Bold text");
+		});
+
+		it("should preserve i tags (Word Desktop italic)", () => {
+			const html = "<p><i>Italic text</i> normal</p>";
+			const result = sanitizeRichText(html);
+			expect(result).toContain("<i>");
+			expect(result).toContain("Italic text");
+		});
+
+		it("should preserve b tags with style attribute", () => {
+			const html = '<p><b style="font-weight: bold">Bold</b></p>';
+			const result = sanitizeRichText(html);
+			expect(result).toContain("<b");
+			expect(result).toContain("Bold");
+		});
+
+		it("should preserve nested b and i tags", () => {
+			const html = "<p><b><i>Bold italic</i></b></p>";
+			const result = sanitizeRichText(html);
+			expect(result).toContain("<b>");
+			expect(result).toContain("<i>");
+			expect(result).toContain("Bold italic");
+		});
+
+		it("should preserve existing strong and em tags unchanged", () => {
+			const html = "<p><strong>Bold</strong> and <em>italic</em></p>";
+			const result = sanitizeRichText(html);
+			expect(result).toBe("<p><strong>Bold</strong> and <em>italic</em></p>");
+		});
+
 		it("should handle empty input", () => {
 			expect(sanitizeRichText("")).toBe("");
 		});

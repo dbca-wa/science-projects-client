@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
 	detectFormatting,
+	detectFormattingOnBoldItalicElement,
 	wrapWithFormatting,
 	convertInlineFormatting,
 } from "./word-formatting";
@@ -21,6 +22,22 @@ describe("detectFormatting", () => {
 		const flags = detectFormatting(span);
 		expect(flags.bold).toBe(true);
 		expect(flags.italic).toBe(false);
+	});
+
+	it("detects bold from mso-bidi-font-weight: bold (Word Desktop)", () => {
+		const doc = createDoc(
+			'<span style="font-size:12.0pt;mso-bidi-font-weight:bold">text</span>'
+		);
+		const span = doc.querySelector("span")!;
+		expect(detectFormatting(span).bold).toBe(true);
+	});
+
+	it("detects italic from mso-bidi-font-style: italic (Word Desktop)", () => {
+		const doc = createDoc(
+			'<span style="font-size:12.0pt;mso-bidi-font-style:italic">text</span>'
+		);
+		const span = doc.querySelector("span")!;
+		expect(detectFormatting(span).italic).toBe(true);
 	});
 
 	it("detects bold from font-weight: 700", () => {
@@ -293,5 +310,168 @@ describe("convertInlineFormatting", () => {
 		);
 		convertInlineFormatting(doc);
 		expect(doc.body.innerHTML).toBe("<p><sub>x</sub></p>");
+	});
+
+	// Word Desktop <b> and <i> element handling
+
+	it("converts <b> element to <strong>", () => {
+		const doc = createDoc("<p><b>Bold text</b></p>");
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p><strong>Bold text</strong></p>");
+	});
+
+	it("converts <i> element to <em>", () => {
+		const doc = createDoc("<p><i>Italic text</i></p>");
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p><em>Italic text</em></p>");
+	});
+
+	it("unwraps <b style='font-weight:normal'> (not actually bold)", () => {
+		const doc = createDoc('<p><b style="font-weight: normal">Not bold</b></p>');
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p>Not bold</p>");
+	});
+
+	it("unwraps <i style='font-style:normal'> (not actually italic)", () => {
+		const doc = createDoc(
+			'<p><i style="font-style: normal">Not italic</i></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p>Not italic</p>");
+	});
+
+	it("preserves <b style='mso-bidi-font-weight:normal'> as bold (Word Desktop)", () => {
+		const doc = createDoc(
+			'<p><b style="mso-bidi-font-weight:normal">Bold text</b></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p><strong>Bold text</strong></p>");
+	});
+
+	it("preserves <i style='mso-bidi-font-style:normal'> as italic (Word Desktop)", () => {
+		const doc = createDoc(
+			'<p><i style="mso-bidi-font-style:normal">Italic text</i></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe("<p><em>Italic text</em></p>");
+	});
+
+	it("converts <b> with additional italic style to <strong><em>", () => {
+		const doc = createDoc(
+			'<p><b style="font-style: italic">Bold and italic</b></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe(
+			"<p><strong><em>Bold and italic</em></strong></p>"
+		);
+	});
+
+	it("converts <i> with additional bold style to <strong><em>", () => {
+		const doc = createDoc(
+			'<p><i style="font-weight: bold">Bold and italic</i></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe(
+			"<p><strong><em>Bold and italic</em></strong></p>"
+		);
+	});
+
+	it("handles nested <b><i>text</i></b> from Word Desktop", () => {
+		const doc = createDoc("<p><b><i>Bold italic</i></b></p>");
+		convertInlineFormatting(doc);
+		// <b> becomes <strong>, <i> inside becomes <em>
+		expect(doc.body.innerHTML).toBe(
+			"<p><strong><em>Bold italic</em></strong></p>"
+		);
+	});
+
+	it("preserves child elements within <b> tags", () => {
+		const doc = createDoc(
+			'<p><b><a href="http://example.com">Bold link</a></b></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe(
+			'<p><strong><a href="http://example.com">Bold link</a></strong></p>'
+		);
+	});
+
+	it("handles mixed spans and <b>/<i> elements", () => {
+		const doc = createDoc(
+			'<p><span style="font-weight: bold;">Span bold</span> and <b>Tag bold</b></p>'
+		);
+		convertInlineFormatting(doc);
+		expect(doc.body.innerHTML).toBe(
+			"<p><strong>Span bold</strong> and <strong>Tag bold</strong></p>"
+		);
+	});
+});
+
+describe("detectFormattingOnBoldItalicElement", () => {
+	it("detects implicit bold on <b> element", () => {
+		const doc = createDoc("<b>text</b>");
+		const el = doc.querySelector("b")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "b");
+		expect(flags.bold).toBe(true);
+		expect(flags.italic).toBe(false);
+	});
+
+	it("detects implicit italic on <i> element", () => {
+		const doc = createDoc("<i>text</i>");
+		const el = doc.querySelector("i")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "i");
+		expect(flags.italic).toBe(true);
+		expect(flags.bold).toBe(false);
+	});
+
+	it("overrides bold to false on <b style='font-weight:normal'>", () => {
+		const doc = createDoc('<b style="font-weight: normal">text</b>');
+		const el = doc.querySelector("b")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "b");
+		expect(flags.bold).toBe(false);
+	});
+
+	it("overrides italic to false on <i style='font-style:normal'>", () => {
+		const doc = createDoc('<i style="font-style: normal">text</i>');
+		const el = doc.querySelector("i")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "i");
+		expect(flags.italic).toBe(false);
+	});
+
+	it("does NOT override bold when only mso-bidi-font-weight:normal is present (Word Desktop)", () => {
+		const doc = createDoc('<b style="mso-bidi-font-weight:normal">text</b>');
+		const el = doc.querySelector("b")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "b");
+		expect(flags.bold).toBe(true);
+	});
+
+	it("does NOT override italic when only mso-bidi-font-style:normal is present (Word Desktop)", () => {
+		const doc = createDoc('<i style="mso-bidi-font-style:normal">text</i>');
+		const el = doc.querySelector("i")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "i");
+		expect(flags.italic).toBe(true);
+	});
+
+	it("detects additional italic on <b> from style", () => {
+		const doc = createDoc('<b style="font-style: italic">text</b>');
+		const el = doc.querySelector("b")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "b");
+		expect(flags.bold).toBe(true);
+		expect(flags.italic).toBe(true);
+	});
+
+	it("detects additional bold on <i> from style", () => {
+		const doc = createDoc('<i style="font-weight: bold">text</i>');
+		const el = doc.querySelector("i")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "i");
+		expect(flags.italic).toBe(true);
+		expect(flags.bold).toBe(true);
+	});
+
+	it("detects underline on <b> from style", () => {
+		const doc = createDoc('<b style="text-decoration: underline">text</b>');
+		const el = doc.querySelector("b")!;
+		const flags = detectFormattingOnBoldItalicElement(el, "b");
+		expect(flags.bold).toBe(true);
+		expect(flags.underline).toBe(true);
 	});
 });

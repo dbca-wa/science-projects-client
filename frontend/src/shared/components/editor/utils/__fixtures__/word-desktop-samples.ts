@@ -46,3 +46,20 @@ export const DESKTOP_ORDERED_LIST_NESTED = `<p class="MsoListParagraphCxSpFirst"
 // ─── Junk-Heavy Sample ──────────────────────────────────────────────────────
 
 export const DESKTOP_JUNK_HEAVY = `<p class="MsoNormal" style="mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;mso-pagination:widow-orphan;mso-line-height-rule:exactly"><span style="font-size:12.0pt;font-family:&quot;Times New Roman&quot;,serif;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-ansi-language:EN-AU;mso-fareast-language:EN-AU;mso-bidi-language:AR-SA;color:black">Clean content here</span></p>`;
+
+// ─── Real Word for Mac Samples (with mso-bidi-* styles) ─────────────────────
+
+/** Real clipboard from Word for Mac — italic with mso-bidi-font-style:normal */
+export const DESKTOP_MAC_ITALIC = `<p class=MsoNormal><span lang=EN-AU style='font-family:"Arial",sans-serif;mso-fareast-font-family:SansSerif;color:black'>Ajduk H, Dillon S (2025). In <i style='mso-bidi-font-style:normal'>The Biodiversity Conference 2025: Abstracts Book</i> pp. 194.</span></p>`;
+
+/** Real clipboard from Word for Mac — bold with mso-bidi-font-weight:normal */
+export const DESKTOP_MAC_BOLD = `<p class=MsoNormal><span lang=EN-AU style='font-family:"Arial",sans-serif;mso-fareast-font-family:SansSerif;color:black'>Arrowsmith L (2026). FD plan; <b style='mso-bidi-font-weight:normal'>930, Sheet 1</b> 14 p.</span></p>`;
+
+/** Real clipboard from Word for Mac — both bold and italic with mso-bidi-* styles */
+export const DESKTOP_MAC_BOLD_ITALIC = `<p class=MsoNormal><span lang=EN-AU style='font-family:"Arial",sans-serif;color:black'>Reference with <b style='mso-bidi-font-weight:normal'><i style='mso-bidi-font-style:normal'>bold italic title</i></b> text.</span></p>`;
+
+/** Real clipboard from Word for Mac — bullet list with mso-list:Ignore marker spans */
+export const DESKTOP_MAC_BULLET_LIST = `<p class=MsoListParagraphCxSpFirst style='text-indent:-18.0pt;mso-list:l2 level1 lfo4'><span lang=EN-GB style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol'><span style='mso-list:Ignore'>\u00B7<span style='font:7.0pt "Times New Roman"'>      </span></span></span><b><span lang=EN-GB>Bold </span></b></p><p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l2 level1 lfo4'><span lang=EN-GB style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol'><span style='mso-list:Ignore'>\u00B7<span style='font:7.0pt "Times New Roman"'>      </span></span></span><i><span lang=EN-GB>Italic </span></i></p><p class=MsoListParagraphCxSpLast style='text-indent:-18.0pt;mso-list:l2 level1 lfo4'><span lang=EN-GB style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:Symbol'><span style='mso-list:Ignore'>\u00B7<span style='font:7.0pt "Times New Roman"'>      </span></span></span><u><span lang=EN-GB>Underline</span></u></p>`;
+
+/** Real clipboard from Word for Mac — ordered list with mso-list:Ignore marker spans */
+export const DESKTOP_MAC_ORDERED_LIST = `<p class=MsoListParagraphCxSpFirst style='text-indent:-18.0pt;mso-list:l1 level1 lfo1'><span lang=EN-GB style='mso-fareast-font-family:Aptos;mso-bidi-font-family:Aptos'><span style='mso-list:Ignore'>1.<span style='font:7.0pt "Times New Roman"'>       </span></span></span><span lang=EN-GB>Number one</span></p><p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:auto;text-indent:-18.0pt;mso-list:l1 level2 lfo1'><span lang=EN-GB style='mso-fareast-font-family:Aptos;mso-bidi-font-family:Aptos'><span style='mso-list:Ignore'>a.<span style='font:7.0pt "Times New Roman"'>       </span></span></span><span lang=EN-GB>One A</span></p><p class=MsoListParagraphCxSpLast style='text-indent:-18.0pt;mso-list:l1 level1 lfo1'><span lang=EN-GB style='mso-fareast-font-family:Aptos;mso-bidi-font-family:Aptos'><span style='mso-list:Ignore'>2.<span style='font:7.0pt "Times New Roman"'>       </span></span></span><span lang=EN-GB>Number 2</span></p>`;

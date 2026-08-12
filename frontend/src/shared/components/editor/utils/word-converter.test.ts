@@ -48,6 +48,11 @@ import {
 	DESKTOP_UNORDERED_LIST_NESTED,
 	DESKTOP_ORDERED_LIST_NESTED,
 	DESKTOP_JUNK_HEAVY,
+	DESKTOP_MAC_ITALIC,
+	DESKTOP_MAC_BOLD,
+	DESKTOP_MAC_BOLD_ITALIC,
+	DESKTOP_MAC_BULLET_LIST,
+	DESKTOP_MAC_ORDERED_LIST,
 } from "./__fixtures__/word-desktop-samples";
 import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
 import type { ToolbarMode } from "@/shared/types/editor.types";
@@ -346,6 +351,27 @@ describe("convertWordHTML — combination formatting", () => {
 			expect(result).toContain("<s>");
 			expect(result).not.toContain("MsoNormal");
 		});
+
+		it("converts Word for Mac italic with mso-bidi-font-style:normal", () => {
+			const result = convertWordHTML(DESKTOP_MAC_ITALIC, "desktop");
+			expect(result).toContain("<em>");
+			expect(result).toContain(
+				"The Biodiversity Conference 2025: Abstracts Book"
+			);
+		});
+
+		it("converts Word for Mac bold with mso-bidi-font-weight:normal", () => {
+			const result = convertWordHTML(DESKTOP_MAC_BOLD, "desktop");
+			expect(result).toContain("<strong>");
+			expect(result).toContain("930, Sheet 1");
+		});
+
+		it("converts Word for Mac bold+italic with mso-bidi-* styles", () => {
+			const result = convertWordHTML(DESKTOP_MAC_BOLD_ITALIC, "desktop");
+			expect(result).toContain("<strong>");
+			expect(result).toContain("<em>");
+			expect(result).toContain("bold italic title");
+		});
 	});
 });
 
@@ -476,6 +502,38 @@ describe("convertWordHTML — unordered lists", () => {
 		expect(result).toContain("Level 2 item");
 		// No Mso classes remain
 		expect(result).not.toContain("MsoListParagraph");
+	});
+
+	it("converts Word for Mac bullet list with mso-list:Ignore marker spans", () => {
+		const result = convertWordHTML(DESKTOP_MAC_BULLET_LIST, "desktop");
+		expect(result).toContain("<ul>");
+		expect(result).toContain("<li>");
+		// Content preserved
+		expect(result).toContain("Bold");
+		expect(result).toContain("Italic");
+		expect(result).toContain("Underline");
+		// Marker characters stripped
+		expect(result).not.toContain("\u00B7");
+		// No mso-list:Ignore spans remain
+		expect(result).not.toContain("mso-list:Ignore");
+		// Formatting preserved (converted to semantic tags by convertInlineFormatting)
+		expect(result).toContain("<strong>");
+		expect(result).toContain("<em>");
+		expect(result).toContain("<u>");
+	});
+
+	it("converts Word for Mac ordered list with mso-list:Ignore marker spans", () => {
+		const result = convertWordHTML(DESKTOP_MAC_ORDERED_LIST, "desktop");
+		expect(result).toContain("<ol>");
+		expect(result).toContain("<li>");
+		// Content preserved — full text, not truncated
+		expect(result).toContain("Number one");
+		expect(result).toContain("One A");
+		expect(result).toContain("Number 2");
+		// Marker text stripped (1., a., 2.)
+		expect(result).not.toContain("mso-list:Ignore");
+		// Should have proper nesting (level 2 nested under level 1)
+		expect(result).toMatch(/<li>.*<ol>/s);
 	});
 });
 
