@@ -1,5 +1,6 @@
 # region Imports ===================================
 from bs4 import BeautifulSoup
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator
 from django.db import models
 from rest_framework import serializers
@@ -128,16 +129,55 @@ class AnnualReport(CommonModel):
 
     def save(self, *args, **kwargs):
         if not self.dm_sign:
+            # Build director name from division's director, with proper title
+            director_name = self._get_director_display_name()
+            division_name = (
+                self.division.name
+                if self.division
+                else "Biodiversity and Conservation Science"
+            )
             self.dm_sign = (
                 '<p class="editor-p-light" dir="ltr">'
-                '<span style="white-space: pre-wrap;">Dr Margaret Byrne</span>'
+                f'<span style="white-space: pre-wrap;">{director_name}</span>'
                 "<br>"
-                '<span style="white-space: pre-wrap;">Executive Director, Biodiversity and Conservation Science</span>'
+                f'<span style="white-space: pre-wrap;">Executive Director, {division_name}</span>'
                 "<br>"
                 f'<span style="white-space: pre-wrap;">October {self.year}</span>'
                 "</p>"
             )
         super().save(*args, **kwargs)
+
+    def _get_director_display_name(self):
+        """
+        Returns the division director's display name with title prefix.
+
+        Format: "Dr First Last" (title + display_first_name + display_last_name)
+        Falls back gracefully if division, director, or profile is not set.
+        """
+        if not self.division or not self.division.director:
+            return "Director"
+
+        director = self.division.director
+        first = director.display_first_name or director.first_name or ""
+        last = director.display_last_name or director.last_name or ""
+
+        # Get title from profile (e.g. "Dr", "Prof", "A/Prof")
+        title_prefix = ""
+        try:
+            if (
+                hasattr(director, "profile")
+                and director.profile
+                and director.profile.title
+            ):
+                title_prefix = director.profile.get_title_display()
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        # Build name with proper capitalisation
+        full_name = f"{first} {last}".strip()
+        if title_prefix:
+            return f"{title_prefix} {full_name}"
+        return full_name
 
     def __str__(self) -> str:
         return f"(ID: {self.pk}) ARAR - {self.year}"

@@ -66,6 +66,7 @@ export const useDeleteReportInfo = () => {
 		mutationFn: deleteReportInfo,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ["report-info"] });
+			await queryClient.invalidateQueries({ queryKey: ["reports"] });
 			toast.success("Report info deleted successfully");
 		},
 		onError: (error: Error) => {

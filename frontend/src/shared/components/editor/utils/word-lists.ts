@@ -456,20 +456,62 @@ function convertWordOnlineLists(doc: Document): void {
 /**
  * Determines whether a Word Desktop list paragraph is ordered or unordered
  * by inspecting its text content for bullet characters vs number patterns.
+ *
+ * Also checks for specific font families that indicate bullet markers
+ * (Symbol, Wingdings, Courier New) in child spans, and the content of
+ * mso-list:Ignore marker spans.
  */
 function detectDesktopListType(p: Element): "ul" | "ol" {
+	// Strategy 1: Check for bullet font families in child spans
+	// Word Desktop uses Symbol font for level 1 bullets (·),
+	// Courier New for level 2 (o), Wingdings for level 3 (§)
+	const spans = p.querySelectorAll("span");
+	for (const span of spans) {
+		const style = span.getAttribute("style") || "";
+		const fontFamily = style.toLowerCase();
+		if (
+			fontFamily.includes("font-family:symbol") ||
+			fontFamily.includes("font-family: symbol") ||
+			fontFamily.includes("font-family:wingdings") ||
+			fontFamily.includes("font-family: wingdings")
+		) {
+			return "ul";
+		}
+	}
+
+	// Strategy 2: Check mso-list:Ignore span content for the actual marker text
+	// This is the most reliable method for Word for Mac clipboard HTML
+	for (const span of spans) {
+		const style = span.getAttribute("style") || "";
+		if (
+			style.includes("mso-list:Ignore") ||
+			style.includes("mso-list: Ignore")
+		) {
+			const markerText = (span.textContent ?? "").trim();
+			// Check ordered patterns on the isolated marker text
+			if (/^[0-9]+\.$/.test(markerText)) return "ol";
+			if (/^[a-z]\.$/.test(markerText)) return "ol";
+			if (/^[ivxl]+\.$/.test(markerText)) return "ol";
+			// If found a marker span but it's not ordered, it's a bullet
+			return "ul";
+		}
+	}
+
+	// Strategy 3: Check text content for patterns (fallback for older formats)
 	const text = p.textContent ?? "";
 
-	// Check for bullet characters first
-	if (DESKTOP_BULLET_L1.test(text)) return "ul";
-	if (DESKTOP_BULLET_L2.test(text)) return "ul";
-	if (DESKTOP_BULLET_L3.test(text)) return "ul";
-
-	// Check for ordered patterns
+	// Check for bullet characters first — but only at the START of text
 	const trimmed = text.trim();
+	if (/^·/.test(trimmed)) return "ul";
+	if (/^§/.test(trimmed)) return "ul";
+
+	// Check for ordered patterns at the start
 	if (DESKTOP_ORDERED_L1.test(trimmed)) return "ol";
 	if (DESKTOP_ORDERED_L2.test(trimmed)) return "ol";
 	if (DESKTOP_ORDERED_L3.test(trimmed)) return "ol";
+
+	// Standalone "o" at start (Courier New bullet for level 2)
+	if (/^o\s/.test(trimmed)) return "ul";
 
 	return "ul";
 }
@@ -514,9 +556,46 @@ function detectDesktopLevel(p: Element): number {
 /**
  * Strips the bullet/number marker from a Word Desktop list item's HTML content.
  * Preserves inline formatting that follows the marker.
+ *
+ * Word Desktop wraps list markers in spans with `mso-list:Ignore` style,
+ * which may also contain spacer spans. After DOMPurify strips the conditional
+ * comments that originally wrapped these, they become regular content.
+ * This function removes those marker spans first, then falls back to
+ * text-pattern matching for any remaining markers.
  */
 function stripDesktopMarker(element: Element, listType: "ul" | "ol"): void {
-	// Walk through child nodes to find and remove the marker text
+	// Strategy 1: Remove spans with mso-list:Ignore (contains the marker + spacer)
+	let removedMarkerSpans = false;
+	const allSpans = Array.from(element.querySelectorAll("span"));
+	for (const span of allSpans) {
+		const style = span.getAttribute("style") || "";
+		if (
+			style.includes("mso-list:Ignore") ||
+			style.includes("mso-list: Ignore")
+		) {
+			span.remove();
+			removedMarkerSpans = true;
+			continue;
+		}
+		// Also remove spacer spans that use tiny font sizes (7.0pt Times New Roman)
+		// These are the &nbsp; spacers between the marker and content
+		if (style.includes("font:7.0pt") || style.includes("font: 7.0pt")) {
+			// Only remove if it only contains whitespace/nbsp
+			const text = span.textContent || "";
+			if (/^[\s\u00a0]*$/.test(text)) {
+				span.remove();
+				removedMarkerSpans = true;
+			}
+		}
+	}
+
+	// If we successfully removed mso-list:Ignore marker spans, the marker is gone.
+	// Do NOT run the fallback text-based stripping — it will incorrectly match
+	// content characters (e.g. "o" in "Number one" matching the bullet L2 regex).
+	if (removedMarkerSpans) return;
+
+	// Strategy 2: Text-based marker stripping for remaining markers
+	// (fallback for HTML that doesn't use mso-list:Ignore pattern)
 	const walker = element.ownerDocument.createTreeWalker(
 		element,
 		NodeFilter.SHOW_TEXT

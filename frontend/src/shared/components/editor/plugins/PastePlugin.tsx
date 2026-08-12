@@ -8,11 +8,12 @@
  * to prevent XSS attacks. This protects against malicious content in clipboard.
  *
  * Pipeline:
- * 1. Sanitise clipboard HTML (DOMPurify — always first)
- * 2. Detect Word source on ORIGINAL clipboard HTML (before sanitisation)
- * 3. If Word: convert Word HTML to semantic HTML
- * 4. Parse to DOM and strip disallowed content based on mode
- * 5. Generate Lexical nodes and insert
+ * 1. Detect Word source on ORIGINAL clipboard HTML
+ * 2. If Word Desktop: resolve style block classes to inline styles (pre-sanitisation)
+ * 3. Sanitise clipboard HTML (DOMPurify — security boundary)
+ * 4. If Word: convert Word HTML to semantic HTML
+ * 5. Parse to DOM and strip disallowed content based on mode
+ * 6. Generate Lexical nodes and insert
  */
 
 import { useEffect } from "react";
@@ -29,6 +30,7 @@ import { sanitizeRichText } from "@/shared/utils/sanitise.utils";
 import { TOOLBAR_CONFIGS } from "../toolbar/toolbar-configs";
 import { detectWordSource } from "../utils/word-detector";
 import { convertWordHTML } from "../utils/word-converter";
+import { resolveWordDesktopStyles } from "../utils/word-style-resolver";
 import type { ToolbarMode } from "@/shared/types/editor.types";
 
 interface PastePluginProps {
@@ -215,21 +217,31 @@ export const PastePlugin = ({ mode = "full" }: PastePluginProps) => {
 					const selection = $getSelection();
 					if (!$isRangeSelection(selection)) return;
 
-					// Step 1: Sanitise clipboard HTML (security — always first)
-					let processedHTML = sanitizeRichText(html);
-
-					// Step 2: Detect and convert Word content
+					// Step 1: Detect Word source on original clipboard HTML
 					const source = detectWordSource(html);
+
+					// Step 2: Resolve Word Desktop style blocks (pre-sanitisation)
+					// Word Desktop uses <style> blocks with class-based formatting that
+					// DOMPurify would remove. Resolve classes to inline styles first.
+					let htmlForSanitisation = html;
+					if (source.isWord && source.variant === "desktop") {
+						htmlForSanitisation = resolveWordDesktopStyles(html);
+					}
+
+					// Step 3: Sanitise clipboard HTML (DOMPurify — security boundary)
+					let processedHTML = sanitizeRichText(htmlForSanitisation);
+
+					// Step 4: Convert Word HTML to semantic HTML
 					if (source.isWord && source.variant) {
 						processedHTML = convertWordHTML(processedHTML, source.variant);
 					}
 
-					// Step 3: Parse and strip disallowed content based on mode
+					// Step 5: Parse and strip disallowed content based on mode
 					const parser = new DOMParser();
 					const dom = parser.parseFromString(processedHTML, "text/html");
 					stripDisallowedContent(dom, mode);
 
-					// Step 4: Generate Lexical nodes from the cleaned DOM and insert
+					// Step 6: Generate Lexical nodes from the cleaned DOM and insert
 					const nodes = $generateNodesFromDOM(editor, dom);
 					$insertNodes(nodes);
 				});

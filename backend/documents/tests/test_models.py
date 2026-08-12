@@ -13,8 +13,8 @@ class TestAnnualReport:
     """Tests for AnnualReport model"""
 
     @pytest.mark.unit
-    def test_save_sets_default_dm_sign(self, db):
-        """Test that save() sets default dm_sign if not provided"""
+    def test_save_sets_default_dm_sign_without_division(self, db):
+        """Test that save() sets a fallback dm_sign when no division is set"""
         # Arrange
         report = AnnualReport(
             year=2024,
@@ -27,8 +27,98 @@ class TestAnnualReport:
 
         # Assert
         assert report.dm_sign is not None
-        assert "Dr Margaret Byrne" in report.dm_sign
+        assert "Director" in report.dm_sign
         assert "October 2024" in report.dm_sign
+
+    @pytest.mark.integration
+    def test_save_uses_division_director_name(self, db):
+        """Test that save() uses the division director's name and title"""
+        from agencies.models import Division
+
+        # Arrange — create a director with a title
+        from common.tests.factories import UserFactory
+        from users.models import UserProfile
+
+        director_user = UserFactory(
+            username="div_director",
+            email="director@test.com",
+            first_name="Margaret",
+            last_name="Byrne",
+            display_first_name="Margaret",
+            display_last_name="Byrne",
+        )
+        UserProfile.objects.create(user=director_user, title="dr")
+        division = Division.objects.create(
+            name="Biodiversity and Conservation Science",
+            slug="bcs",
+            director=director_user,
+        )
+        report = AnnualReport(
+            year=2025,
+            division=division,
+            date_open=datetime(2025, 1, 1),
+            date_closed=datetime(2025, 12, 31),
+        )
+
+        # Act
+        report.save()
+
+        # Assert
+        assert "Dr Margaret Byrne" in report.dm_sign
+        assert "Biodiversity and Conservation Science" in report.dm_sign
+        assert "October 2025" in report.dm_sign
+
+    @pytest.mark.integration
+    def test_save_uses_director_without_title(self, db):
+        """Test dm_sign when director has no title set"""
+        from agencies.models import Division
+        from common.tests.factories import UserFactory
+
+        director_user = UserFactory(
+            username="notitle_director",
+            email="notitle@test.com",
+            first_name="John",
+            last_name="Smith",
+            display_first_name="John",
+            display_last_name="Smith",
+        )
+        division = Division.objects.create(
+            name="Parks and Wildlife Science",
+            slug="pws",
+            director=director_user,
+        )
+        report = AnnualReport(
+            year=2024,
+            division=division,
+            date_open=datetime(2024, 1, 1),
+            date_closed=datetime(2024, 12, 31),
+        )
+
+        # Act
+        report.save()
+
+        # Assert
+        assert "John Smith" in report.dm_sign
+        assert "Parks and Wildlife Science" in report.dm_sign
+        # Should NOT have "Dr" prefix since no title
+        assert "Dr John" not in report.dm_sign
+
+    @pytest.mark.integration
+    def test_save_does_not_overwrite_existing_dm_sign(self, db):
+        """Test that save() does not overwrite a manually set dm_sign"""
+        # Arrange
+        report = AnnualReport(
+            year=2024,
+            dm_sign="<p>Custom sign off</p>",
+            date_open=datetime(2024, 1, 1),
+            date_closed=datetime(2024, 12, 31),
+        )
+
+        # Act
+        report.save()
+
+        # Assert
+        assert report.dm_sign == "<p>Custom sign off</p>"
 
     @pytest.mark.unit
     def test_str_representation(self, annual_report, db):
