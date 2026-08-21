@@ -241,6 +241,7 @@ jobs:
         run: |
           git add README.md
           git commit -m "chore: update coverage badges [skip ci]" || exit 0
+          git pull --rebase origin main
           git push
 
   # ====================== UPDATE KUSTOMIZE ======================
@@ -306,6 +307,10 @@ jobs:
             # Commit and push (prod overlay only — test tracks the moving :test tag)
             git add kustomize/overlays/prod/kustomization.yaml
             git commit -m "chore: update kustomize to ${VERSION} [skip ci]"
+
+            # Pull with rebase to handle concurrent pushes from other jobs
+            # (e.g. coverage badge updates that push to main in parallel)
+            git pull --rebase origin main
             git push origin HEAD:main
             echo "✅ Kustomize versions updated to ${VERSION}"
           fi
